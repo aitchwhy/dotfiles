@@ -2,6 +2,16 @@
 
 Environment setup files for OSX setup
 
+- https://terminaltrove.com/language/rust/
+
+# Aug 9 2024 (zsh autocomplete + use ZDOTDIR setup to avoid using frameworks like OMZ)
+
+- add zsh-completions as git submodule (additional CLI program completions) - https://github.com/Phantas0s/.dotfiles/blob/master/.gitmodules
+- https://github.com/zsh-users/zsh-completions
+- https://github.com/zsh-users/zsh-completions/blob/master/zsh-completions-howto.org
+- https://thevaluable.dev/zsh-install-configure-mouseless/ + https://github.com/Phantas0s/.dotfiles/blob/master/zsh/zshenv
+- zsh syntax highlighting (https://github.com/zsh-users/zsh-syntax-highlighting)
+
 ## Nix-based dotfiles setup (Jun 18) - (nix-direnv)
 
 - to run locally cloned GH repo, run nix-darwin with "-I darwin=." after cd-ing to dotfiles dir.

@@ -1,103 +1,225 @@
+tap "derailed/k9s"
 tap "homebrew/bundle"
 tap "homebrew/services"
 tap "kdash-rs/kdash"
+tap "lusingander/tap"
+tap "oven-sh/bun"
 tap "supabase/tap"
+tap "ynqa/tap"
+# All-in-one AI-Powered CLI Chat & Copilot
+brew "aichat"
+# Record and share terminal sessions
 brew "asciinema"
+# Improved shell history for zsh, bash, fish and nushell
 brew "atuin"
+# Terminal bandwidth utilization tool
 brew "bandwhich"
+# Clone of cat(1) with syntax highlighting and Git integration
 brew "bat"
+# Linux/OSX/FreeBSD resource monitor
 brew "bpytop"
+# New way to see and navigate directory trees
 brew "broot"
+# Create and view interactive cheat sheets for *nix commands
 brew "cheat"
+# Music player with an ncurses based interface
 brew "cmus"
+# Top-like interface for container metrics
 brew "ctop"
+# Open source multi-tool for exploring and publishing data
 brew "datasette"
+# DuckDuckGo from the terminal
 brew "ddgr"
+# Good-lookin' diffs with diff-highlight and more
 brew "diff-so-fancy"
+# View disk space usage and delete unwanted data, fast
 brew "dua-cli"
+# Disk Usage/Free Utility - a better 'df' alternative
 brew "duf"
+# More intuitive version of du in rust
 brew "dust"
+# Run arbitrary commands when files change
 brew "entr"
+# Perl lib for reading and writing EXIF metadata
 brew "exiftool"
+# Modern, maintained replacement for ls
 brew "eza"
+# Simple, fast and user-friendly alternative to find
 brew "fd"
+# Fast and simple Node.js version manager
+brew "fnm"
+# Terminal JSON viewer
 brew "fx"
+# Command-line fuzzy finder written in Go
 brew "fzf"
+# Fast, simple fuzzy text selector with an advanced scoring algorithm
 brew "fzy"
+# GitHub command-line tool
 brew "gh"
+# Alternative to top/htop
 brew "glances"
+# Ping, but with a graph
 brew "gping"
+# Improved top (interactive process viewer)
 brew "htop"
+# User-friendly cURL replacement (command-line HTTP client)
 brew "httpie"
+# Run and Test HTTP Requests with plain text and curl
 brew "hurl"
+# Command-line benchmarking tool
 brew "hyperfine"
+# Interactive JSON filter using jq
+brew "jnv"
+# Lightweight and flexible command-line JSON processor
 brew "jq"
+# CLI calendar application
 brew "khal"
+# Simple terminal UI for git commands
 brew "lazygit"
+# Mac App Store command-line interface
 brew "mas"
+# Powerful paging program
 brew "most"
+# Interactive cheatsheet tool for the command-line
 brew "navi"
+# Fast, highly customisable system info script
 brew "neofetch"
+# Ambitious Vim-fork focused on extensibility and agility
 brew "neovim"
+# Port scanning utility for large networks
 brew "nmap"
+# Manage multiple Node.js versions
 brew "nvm"
+# Create, run, and share large language models (LLMs)
 brew "ollama", restart_service: true
+# CLI for Postgres with auto-completion and syntax highlighting
+brew "pgcli"
+# Wrapper to colorize and simplify ping's output
 brew "prettyping"
+# Modern replacement for ps written by Rust
 brew "procs"
+# Cloud native development platform
 brew "pulumi"
+# Pretty, minimal and fast ZSH prompt
 brew "pure"
+# Search tool like grep and The Silver Searcher
 brew "ripgrep"
+# Fast and accurate code counter with complexity and COCOMO estimates
 brew "scc"
+# Intuitive find & replace CLI
 brew "sd"
+# Command-line interface for https://speedtest.net bandwidth tests
 brew "speedtest-cli"
+# Graphical command-line client for SSH
+brew "sshs"
+# Cross-shell prompt for astronauts
 brew "starship"
+# Log file highlighter
+brew "tailspin"
+# User interface to the TELNET protocol
 brew "telnet"
+# Text interface for Git repositories
+brew "tig"
+# Simplified and community-driven man pages
 brew "tldr"
+# Instant terminal sharing
 brew "tmate"
+# Lightweight, POSIX-compliant regular expression (regex) library
 brew "tre"
+# Display directories as trees (with optional color/HTML output)
 brew "tree"
+# Network diagnostic tool, inspired by mtr
 brew "trippy"
+# Internet file retriever
 brew "wget"
+# Friendly and fast tool for sending HTTP requests
 brew "xh"
+# Command-line program for getting and setting the contents of the X selection
 brew "xsel"
+# Blazing fast terminal file manager written in Rust, based on async I/O
 brew "yazi"
+# Pluggable terminal workspace, with terminal multiplexer as the base feature
+brew "zellij"
+# Shell extension to navigate your filesystem faster
 brew "zoxide"
+# Fish shell like syntax highlighting for zsh
 brew "zsh-syntax-highlighting"
+# Kubernetes CLI To Manage Your Clusters In Style!
+brew "derailed/k9s/k9s"
+# A fast and simple dashboard for Kubernetes written in Rust
 brew "kdash-rs/kdash/kdash"
+# TUI application for AWS S3 written in Rust using ratatui
+brew "lusingander/tap/stu"
+# Incredibly fast JavaScript runtime, bundler, transpiler and package manager - all in one.
+brew "oven-sh/bun/bun"
+# Supabase CLI
 brew "supabase/tap/supabase"
+# Interactive grep (for streaming)
+brew "ynqa/tap/sigrs"
+# Password manager that keeps all passwords secure behind one password
 cask "1password"
+# Data backup and storage service
 cask "backblaze"
+# Alternative GUI for Time Machine
 cask "backuploupe"
+# Menu bar icon organiser
 cask "bartender"
+# Hard disk backup and cloning utility
 cask "carbon-copy-cloner"
+# Contacts manager
 cask "cardhop"
+# OpenAI's official ChatGPT desktop app
 cask "chatgpt"
+# Tool to list all active shortcuts of the current application
 cask "cheatsheet"
+# Track and budget money
 cask "copilot"
+# Calendar software
 cask "fantastical"
+# Web browser
 cask "firefox"
 cask "font-fira-code-nerd-font"
 cask "font-hack-nerd-font"
 cask "font-symbols-only-nerd-font"
+# Desktop automation application
 cask "hammerspoon"
+# System monitoring app
 cask "istat-menus"
+# Reverse proxy, secure introspectable tunnels to localhost
 cask "ngrok"
+# Knowledge base that works on top of a local folder of plain text Markdown files
 cask "obsidian"
+# Replacement for Docker Desktop
 cask "orbstack"
+# Desktop virtualization software
 cask "parallels"
+# PDF reader, editor and annotator
 cask "pdf-expert"
+# HTTP debugging proxy
 cask "proxyman"
+# Companion app for Flipper Zero devices
 cask "qflipper"
+# Instant messaging application focusing on security
 cask "signal"
+# Team communication and collaboration software
 cask "slack"
+# Music streaming service
 cask "spotify"
+# Daily planner and calendar
 cask "sunsama"
+# Email client
 cask "superhuman"
+# Network toolbox
 cask "surge"
+# Mesh VPN based on WireGuard
 cask "tailscale"
+# To-do list
 cask "todoist"
+# Open-source code editor
 cask "visual-studio-code"
+# Network protocol analyzer
 cask "wireshark"
+# Video communication and virtual meeting platform
 cask "zoom"
 mas "Bear", id: 1091189122
 mas "Bitwarden", id: 1352778147
@@ -172,7 +294,6 @@ vscode "esbenp.prettier-vscode"
 vscode "evan-buss.font-switcher"
 vscode "file-icons.file-icons"
 vscode "fill-labs.dependi"
-vscode "financialforce.lana"
 vscode "firsttris.vscode-jest-runner"
 vscode "formulahendry.auto-close-tag"
 vscode "formulahendry.auto-rename-tag"
@@ -196,7 +317,6 @@ vscode "howardzuo.vscode-favorites"
 vscode "humao.rest-client"
 vscode "ibm.output-colorizer"
 vscode "idered.npm"
-vscode "idleberg.applescript"
 vscode "infeng.vscode-react-typescript"
 vscode "inferrinizzard.prettier-sql-vscode"
 vscode "infracost.infracost"
@@ -293,11 +413,7 @@ vscode "ryu1kn.edit-with-shell"
 vscode "ryu1kn.partial-diff"
 vscode "salesforce.salesforce-vscode-slds"
 vscode "salesforce.salesforcedx-vscode"
-vscode "salesforce.salesforcedx-vscode-apex"
-vscode "salesforce.salesforcedx-vscode-apex-debugger"
-vscode "salesforce.salesforcedx-vscode-apex-replay-debugger"
 vscode "salesforce.salesforcedx-vscode-core"
-vscode "salesforce.salesforcedx-vscode-lightning"
 vscode "salesforce.salesforcedx-vscode-lwc"
 vscode "salesforce.salesforcedx-vscode-soql"
 vscode "salesforce.salesforcedx-vscode-visualforce"

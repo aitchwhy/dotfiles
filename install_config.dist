@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+# TODO - to improve - install_config name is no good
+
+# It's good to have this file on a cloud (I use Nextcloud)
+
+# Personnal env variables - this file need to be copied as install_config and the variables need to be replaced 
+
+# You might need to change variables in zsh/zshenv files as well
+
+# Git user and email to set up git automatically
+export GIT_USER="aitchwhy"
+export GIT_EMAIL="hank.lee.qed@gmail.com"
+
+### Installation from hosting service (nextcloud / dropbox...) ######
+# see install/install-from-cloud.sh
+
+#private configurations from my personnal cloud
+
+#export MEDIA="/run/media/$USER"
+#export CLOUD="$HOME/Nextcloud"
+#export DOTFILES_CLOUD="$CLOUD/development/dotfiles_projects/ENV"
+#export JRNL="$CLOUD/journal"

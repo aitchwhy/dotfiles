@@ -1,0 +1,16 @@
+{
+  "plugins": {
+    "doc_comment": null,
+    "node": {},
+    "es_modules": {},
+    "webpack": {}
+  },
+  "libs": [
+    "browser",
+    "jquery",
+    "react",
+    "ecma5",
+    "ecma6"
+  ],
+  "ecmaVersion": 6
+}
