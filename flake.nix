@@ -16,9 +16,21 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # Nix formatter (alejandra)
+    alejandra = {
+      url ="github:kamadorueda/alejandra/3.1.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, darwin, home-manager }: {
+  outputs = { 
+    nixpkgs, 
+    darwin, 
+    home-manager,
+    alejandra,
+    ...
+  }: {
     darwinConfigurations."hank-mbp-m3" = darwin.lib.darwinSystem {
       system = "aarch64-darwin";
       specialArgs = { inherit nixpkgs; };
