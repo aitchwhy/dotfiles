@@ -5,7 +5,7 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 
-    # Darwin system configuratio
+    # Darwin system configuration
     darwin = {
       url = "github:lnl7/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -16,27 +16,18 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    # Nix formatter (alejandra)
-    alejandra = {
-      url ="github:kamadorueda/alejandra/3.1.0";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   outputs = { 
     nixpkgs, 
     darwin, 
     home-manager,
-    alejandra,
     ...
   }: {
     darwinConfigurations."hank-mbp-m3" = darwin.lib.darwinSystem {
       system = "aarch64-darwin";
-      specialArgs = { inherit nixpkgs alejandra; };
       modules = [
         ./darwin/configuration.nix
-        alejandra.nixosModules.alejandra
         home-manager.darwinModules.home-manager
         {
           home-manager = {
@@ -52,10 +43,8 @@
 
     darwinConfigurations."hank-mstio" = darwin.lib.darwinSystem {
       system = "aarch64-darwin";
-      specialArgs = { inherit nixpkgs alejandra; };
       modules = [
         ./darwin/configuration.nix
-        alejandra.nixosModules.alejandra
         home-manager.darwinModules.home-manager
         {
           home-manager = {
