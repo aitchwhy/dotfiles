@@ -11,17 +11,52 @@
   #   entries in the changelog using `darwin-rebuild changelog`).
   system.stateVersion = 5;
 
-  # System-wide packages
-  environment.systemPackages = with pkgs; [
-    vim
-    git
-    curl
-  ];
+  users.users.hank = {
+    name = "hank";
+    home = "/Users/hank";
+  };
+
+  # fonts.packages =  [
+  #   pkgs.font-jetbrains-mono
+  #   pkgs.font-mononoki
+  #   pkgs.font-noto
+  #   pkgs.font-ubuntu
+  # ];
+
+  environment = {
+    # Use a custom configuration.nix location.
+    # Change requires a rebuild (darwin-rebuild switch -I darwin-config=/path/to/configuration.nix)
+    # $ darwin-rebuild switch -I darwin-config=$HOME/dotfiles/darwin/configuration.nix
+    darwinConfig = "$HOME/dotfiles/darwin";
+
+    # System-wide packages
+    systemPackages = [
+      # do I need this explicit home-manager install?
+      pkgs.alejandra
+      pkgs.home-manager
+      pkgs.tailscale
+      pkgs.vim
+      pkgs.git
+      pkgs.curl
+    ];
+
+    variables = {
+      # Set the default editor
+      EDITOR = "vim";
+      VISUAL = "vim";
+      # Set the default pager
+      PAGER = "less";
+      # Set the default browser
+      # BROWSER = "brave";
+    };
+  };
+
 
   # Auto upgrade nix package and the daemon service.
   nix = {
     package = pkgs.nix;
     settings = {
+      "experimental-features" = [ "nix-command" "flakes" ];
       "extra-experimental-features" = [ "nix-command" "flakes" ];
       # Nice for developers
       "keep-outputs" = "true";
@@ -37,19 +72,132 @@
     };
   };
 
-  fonts.packages = with pkgs; [
-    font-jetbrains-mono
-    font-mononoki
-    font-noto
-    font-ubuntu
-  ];
-
   homebrew = {
     enable = true;
     onActivation = {
       autoUpdate = true;
       # cleanup = "zap"; # Uninstalls all formulae not listed here
     };
+
+    brews = [
+
+      "act"
+"actionlint"
+"aider"
+"angle-grinder"
+"ast-grep"
+"atuin"
+"awscli-local"
+"bat"
+"biome"
+"bitwarden-cli"
+"broot"
+"cheat"
+"cloudflare-wrangler2"
+"curlie"
+"datasette"
+"diff-so-fancy"
+"direnv"
+"duf"
+"dust"
+"esbuild"
+"eslint"
+"exiftool"
+"eza"
+"fastfetch"
+"fd"
+"ffmpeg"
+"fx"
+"fzf"
+"gh"
+"ghi"
+"git-delta"
+"glances"
+"glow"
+"gping"
+"grex"
+"gron"
+"helix"
+"hexyl"
+"htop"
+"http-prompt"
+"httrack"
+"hurl"
+"hyperfine"
+"jd"
+"jq"
+"just"
+"k9s"
+"kanata"
+"koekeishiya/formulae/skhd"
+"lazygit"
+"localstack"
+"lua-language-server"
+"luarocks"
+"mas"
+"mcfly"
+"miller"
+"minio"
+"neovim"
+"netcat"
+"nmap"
+"nnn"
+"odin"
+"olets/tap/zsh-abbr"
+"olets/tap/zsh-autosuggestions-abbreviations-strategy"
+"onefetch"
+"pandoc"
+"pinentry-mac"
+"pkgconf"
+"poppler"
+"posting"
+"prettier"
+"procs"
+"prometheus"
+"pyenv"
+"rclone"
+"ripgrep"
+"rollup"
+"ruff"
+"rust"
+"rustscan"
+"scrapy"
+"sd"
+"shellcheck"
+"skaffold"
+"speedtest-cli"
+"speexdsp"
+"sq"
+"starship"
+"stripe/stripe-cli/stripe"
+"syncthing"
+"temporal"
+"temporalio/brew/tcld"
+"tldr"
+"traefik"
+"tree"
+"trippy"
+"uv"
+"vite"
+"volta"
+"weasyprint"
+"wget"
+"yazi"
+"yq"
+"zellij"
+"zoxide"
+"zsh-autopair"
+"zsh-autosuggestions"
+"zsh-completions"
+"zsh-history-substring-search"
+"zsh-syntax-highlighting"
+
+      # For proxmark3, we specify an arg with “with-generic”
+      {
+        name = "rfidresearchgroup/proxmark3/proxmark3";
+        args = [ "with-generic" ];
+      }    
+      ];
 
     casks = [
       "a-better-finder-rename"
@@ -177,6 +325,8 @@
 
   # Enable touch ID for sudo
   security.pam.enableSudoTouchIdAuth = true;
+
+  programs.zsh.enable = true;
 
 
   # Set hostname
