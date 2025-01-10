@@ -24,12 +24,25 @@
     # Package installations
     packages = with pkgs; [
       vim
-      git
+      neovim
       curl
+      nixd
+      ollama
+      ripgrep
+      fzf
     ];
+
+    file = {
+      ".gitconfig".source = ../.config/git/.gitconfig;
+    };
   };
 
-  # Let Home Manager manage itself
+
+  programs.git = {
+    enable = true;
+
+    lfs.enable = true;
+  };
 
   programs = {
     # Shell configuration (zsh example)
