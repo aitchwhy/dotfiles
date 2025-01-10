@@ -32,7 +32,6 @@
     # System-wide packages
     systemPackages = [
       # do I need this explicit home-manager install?
-      pkgs.alejandra
       pkgs.home-manager
       pkgs.tailscale
       pkgs.vim

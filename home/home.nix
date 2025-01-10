@@ -32,6 +32,9 @@
   # Let Home Manager manage itself
 
   programs = {
+    alejandra = {
+      enable = true;
+    };
     # Shell configuration (zsh example)
     zsh = {
       enable = true;
