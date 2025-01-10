@@ -28,12 +28,10 @@
     nixpkgs, 
     darwin, 
     home-manager,
-    alejandra,
     ...
   }: {
     darwinConfigurations."hank-mbp-m3" = darwin.lib.darwinSystem {
       system = "aarch64-darwin";
-      specialArgs = { inherit nixpkgs; };
       modules = [
         ./darwin/configuration.nix
         home-manager.darwinModules.home-manager
@@ -51,7 +49,6 @@
 
     darwinConfigurations."hank-mstio" = darwin.lib.darwinSystem {
       system = "aarch64-darwin";
-      specialArgs = { inherit nixpkgs; };
       modules = [
         ./darwin/configuration.nix
         home-manager.darwinModules.home-manager

@@ -41,7 +41,8 @@ nix run nix-darwin -- switch --flake ~/dotfiles/darwin
 
 Apply changes using nix-darwin's darwin-rebuild (after 1st install)
 ```shell
-darwin-rebuild switch --flake ~/dotfiles/darwin
+darwin-rebuild switch -I darwin-config=$HOME/dotfiles/darwin/configuration.nix
+# NOT(?) darwin-rebuild switch --flake ~/dotfiles/darwin
 ```
 
 

@@ -30,14 +30,13 @@
     darwinConfig = "$HOME/dotfiles/darwin";
 
     # System-wide packages
-    systemPackages = with pkgs; [
+    systemPackages = [
       # do I need this explicit home-manager install?
-      alejandra
-      home-manager
-      tailscale
-      vim
-      git
-      curl
+      pkgs.home-manager
+      pkgs.tailscale
+      pkgs.vim
+      pkgs.git
+      pkgs.curl
     ];
 
     variables = {
