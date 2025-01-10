@@ -23,6 +23,10 @@
     package = pkgs.nix;
     settings = {
       "extra-experimental-features" = [ "nix-command" "flakes" ];
+      # Nice for developers
+      "keep-outputs" = "true";
+      # Idem (?)
+      "keep-derivations" = "true";
     };
   };
 
@@ -32,6 +36,13 @@
       enable = true;
     };
   };
+
+  fonts.packages = with pkgs; [
+    font-jetbrains-mono
+    font-mononoki
+    font-noto
+    font-ubuntu
+  ];
 
   homebrew = {
     enable = true;
