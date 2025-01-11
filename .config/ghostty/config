@@ -8,6 +8,9 @@
 ########################
 
 
+# TODO: add zsh alias for offline docs 
+# $ ghostty +show-config --default --docs
+
 # General 
 
 macos-option-as-alt = true
@@ -19,6 +22,10 @@ clipboard-write = "allow"
 auto-update = download
 
 window-save-state = always
+window-inherit-working-directory = true
+
+# Start new windows in fullscreen
+fullscreen = false
 
 # favs
 # light : zenbones, nord-light
@@ -30,7 +37,7 @@ theme = nord
 
 font-size = 12
 
-window-decoration = true
+window-decoration = false
 window-padding-x  = 12
 window-padding-y  = 12
 
@@ -45,23 +52,16 @@ quick-terminal-animation-duration = 0
 # center, top, bottom, left, right
 quick-terminal-position = center
 
-# main, mouse, macos-menu-bar
-quick-terminal-screen = 
-
 
 # Shell (Zsh) integration
 shell-integration = zsh
+shell-integratoon-features = cursor
 
 cursor-style = block
 cursor-style-blink = false
 
 # enables cmd+click to follow URL
 link-url = true
-fullscreen = false
-
-macos-option-as-alt = true
-
-
 
 ###########################
 # Keybindings (keybind = trigger=action)
