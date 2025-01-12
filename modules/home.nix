@@ -1,12 +1,14 @@
 # home/home.nix
-{ config, pkgs, ... }: {
-
-
+{
+  config,
+  pkgs,
+  ...
+}: {
   home = {
     # Home Manager needs a bit of information about you and the
     # paths it should manage.
     username = "hank";
-    homeDirectory = "/Users/hank";  # This needs to be explicitly set
+    homeDirectory = "/Users/hank"; # This needs to be explicitly set
 
     # The state version is required and should stay at the version you
     # originally installed.
@@ -24,12 +26,18 @@
     # Package installations
     packages = with pkgs; [
       vim
-      git
+      neovim
       curl
+      nixd
+      ollama
+      ripgrep
+      fzf
     ];
-  };
 
-  # Let Home Manager manage itself
+    file = {
+      ".gitconfig".source = ../.config/git/.gitconfig;
+    };
+  };
 
   programs = {
     # Shell configuration (zsh example)
@@ -46,14 +54,14 @@
     # Git configuration
     git = {
       enable = true;
+      lfs.enable = true;
       userName = "aitchwhy";
       userEmail = "hank.lee.qed@gmail.com";
+
       extraConfig = {
         init.defaultBranch = "main";
         pull.rebase = true;
       };
     };
   };
-
-  
 }
