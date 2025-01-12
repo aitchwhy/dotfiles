@@ -1,6 +1,5 @@
 # darwin/configuration.nix
-{ pkgs, ... }: {
-
+{pkgs, ...}: {
   # Because I got this error when running (nix run nix-darwin -- switch --flake {dotfiles dir})
   # Failed assertions:
   #   - The `system.stateVersion` option is not defined in your
@@ -50,13 +49,12 @@
     };
   };
 
-
   # Auto upgrade nix package and the daemon service.
   nix = {
     package = pkgs.nix;
     settings = {
-      "experimental-features" = [ "nix-command" "flakes" ];
-      "extra-experimental-features" = [ "nix-command" "flakes" ];
+      "experimental-features" = ["nix-command" "flakes"];
+      "extra-experimental-features" = ["nix-command" "flakes"];
       # Nice for developers
       "keep-outputs" = "true";
       # Idem (?)
@@ -78,125 +76,129 @@
       # cleanup = "zap"; # Uninstalls all formulae not listed here
     };
 
-    brews = [
+    taps = [
+      ""
+    ]
 
+    brews = [
       "act"
-"actionlint"
-"aider"
-"angle-grinder"
-"ast-grep"
-"atuin"
-"awscli-local"
-"bat"
-"biome"
-"bitwarden-cli"
-"broot"
-"cheat"
-"cloudflare-wrangler2"
-"curlie"
-"datasette"
-"diff-so-fancy"
-"direnv"
-"duf"
-"dust"
-"esbuild"
-"eslint"
-"exiftool"
-"eza"
-"fastfetch"
-"fd"
-"ffmpeg"
-"fx"
-"fzf"
-"gh"
-"ghi"
-"git-delta"
-"glances"
-"glow"
-"gping"
-"grex"
-"gron"
-"helix"
-"hexyl"
-"htop"
-"http-prompt"
-"httrack"
-"hurl"
-"hyperfine"
-"jd"
-"jq"
-"just"
-"k9s"
-"kanata"
-"koekeishiya/formulae/skhd"
-"lazygit"
-"localstack"
-"lua-language-server"
-"luarocks"
-"mas"
-"mcfly"
-"miller"
-"minio"
-"neovim"
-"netcat"
-"nmap"
-"nnn"
-"odin"
-"olets/tap/zsh-abbr"
-"olets/tap/zsh-autosuggestions-abbreviations-strategy"
-"onefetch"
-"pandoc"
-"pinentry-mac"
-"pkgconf"
-"poppler"
-"posting"
-"prettier"
-"procs"
-"prometheus"
-"pyenv"
-"rclone"
-"ripgrep"
-"rollup"
-"ruff"
-"rust"
-"rustscan"
-"scrapy"
-"sd"
-"shellcheck"
-"skaffold"
-"speedtest-cli"
-"speexdsp"
-"sq"
-"starship"
-"stripe/stripe-cli/stripe"
-"syncthing"
-"temporal"
-"temporalio/brew/tcld"
-"tldr"
-"traefik"
-"tree"
-"trippy"
-"uv"
-"vite"
-"volta"
-"weasyprint"
-"wget"
-"yazi"
-"yq"
-"zellij"
-"zoxide"
-"zsh-autopair"
-"zsh-autosuggestions"
-"zsh-completions"
-"zsh-history-substring-search"
-"zsh-syntax-highlighting"
+      "actionlint"
+      "waydabber/betterdisplay/betterdisplaycli"
+      "aider"
+      "angle-grinder"
+      "ast-grep"
+      "atuin"
+      "awscli-local"
+      "bat"
+      "biome"
+      "bitwarden-cli"
+      "broot"
+      "cheat"
+      "cloudflare-wrangler2"
+      "curlie"
+      "datasette"
+      "diff-so-fancy"
+      "direnv"
+      "duf"
+      "dust"
+      "esbuild"
+      "eslint"
+      "exiftool"
+      "eza"
+      "fastfetch"
+      "fd"
+      "ffmpeg"
+      "fx"
+      "fzf"
+      "gh"
+      "ghi"
+      "git-delta"
+      "glances"
+      "glow"
+      "gping"
+      "grex"
+      "gron"
+      "helix"
+      "hexyl"
+      "htop"
+      "http-prompt"
+      "httrack"
+      "hurl"
+      "hyperfine"
+      "jd"
+      "jq"
+      "just"
+      "k9s"
+      "kanata"
+      "koekeishiya/formulae/skhd"
+      "lazygit"
+      "localstack"
+      "lua-language-server"
+      "luarocks"
+      "mas"
+      "mcfly"
+      "miller"
+      "minio"
+      "neovim"
+      "netcat"
+      "nmap"
+      "nnn"
+      "odin"
+      "olets/tap/zsh-abbr"
+      "olets/tap/zsh-autosuggestions-abbreviations-strategy"
+      "onefetch"
+      "pandoc"
+      "pinentry-mac"
+      "pkgconf"
+      "poppler"
+      "posting"
+      "prettier"
+      "procs"
+      "prometheus"
+      "pyenv"
+      "rclone"
+      "ripgrep"
+      "rollup"
+      "ruff"
+      "rust"
+      "rustscan"
+      "scrapy"
+      "sd"
+      "shellcheck"
+      "skaffold"
+      "speedtest-cli"
+      "speexdsp"
+      "sq"
+      "starship"
+      "stripe/stripe-cli/stripe"
+      "syncthing"
+      "temporal"
+      "temporalio/brew/tcld"
+      "tldr"
+      "traefik"
+      "tree"
+      "trippy"
+      "uv"
+      "vite"
+      "volta"
+      "weasyprint"
+      "wget"
+      "yazi"
+      "yq"
+      "zellij"
+      "zoxide"
+      "zsh-autopair"
+      "zsh-autosuggestions"
+      "zsh-completions"
+      "zsh-history-substring-search"
+      "zsh-syntax-highlighting"
 
       # For proxmark3, we specify an arg with “with-generic”
       {
         name = "rfidresearchgroup/proxmark3/proxmark3";
-        args = [ "with-generic" ];
-      }    
-      ];
+        args = ["with-generic"];
+      }
+    ];
 
     casks = [
       "a-better-finder-rename"
@@ -308,7 +310,6 @@
         AppleShowAllExtensions = true;
         _FXShowPosixPathInTitle = true;
         ShowPathbar = true;
-
       };
       NSGlobalDomain = {
         AppleShowAllExtensions = true;
@@ -326,7 +327,6 @@
   security.pam.enableSudoTouchIdAuth = true;
 
   programs.zsh.enable = true;
-
 
   # Set hostname
   # networking.hostName = "Hanks-MacBook-Pro";

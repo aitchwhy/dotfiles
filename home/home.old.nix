@@ -1,12 +1,14 @@
 # home/home.nix
-{ config, pkgs, ... }: {
-
-
+{
+  config,
+  pkgs,
+  ...
+}: {
   home = {
     # Home Manager needs a bit of information about you and the
     # paths it should manage.
     username = "hank";
-    homeDirectory = "/Users/hank";  # This needs to be explicitly set
+    homeDirectory = "/Users/hank"; # This needs to be explicitly set
 
     # The state version is required and should stay at the version you
     # originally installed.
@@ -24,25 +26,24 @@
     # Package installations
     packages = with pkgs; [
       vim
-      neovim
+      git
       curl
-      nixd
-      ollama
-      ripgrep
-      fzf
     ];
 
     file = {
-      ".gitconfig".source = ../.config/git/.gitconfig;
+      # Zsh config files
+      ".zshenv".source = ../home-manager/zsh/.zshenv;
+      ".zprofile".source = ../home-manager/zsh/.zprofile;
+
+      # Other config files
+      ".config/atuin/config.toml".source = ../atuin/config.toml;
+      ".config/cheat/conf.yml".source = ../cheat/conf.yml;
+
+      # Additional configs can be added here
     };
   };
 
-
-  programs.git = {
-    enable = true;
-
-    lfs.enable = true;
-  };
+  # Let Home Manager manage itself
 
   programs = {
     # Shell configuration (zsh example)
@@ -54,9 +55,20 @@
         ls = "ls --color=auto";
         ll = "ls -la";
         ".." = "cd ..";
-
-
       };
+      # Source your custom Zsh files
+      initExtra = ''
+        # Source all custom zsh files
+        source ${../../home-manager/zsh/init.sh}
+        source ${../../home-manager/zsh/aliases.zsh}
+        source ${../../home-manager/zsh/exports.zsh}
+        source ${../../home-manager/zsh/macos.sh}
+
+        # Initialize tools
+        eval "$(zoxide init zsh)"
+        eval "$(direnv hook zsh)"
+        eval "$(atuin init zsh)"
+      '';
     };
     # Git configuration
     git = {
@@ -68,7 +80,10 @@
         pull.rebase = true;
       };
     };
+    # Handle config file symlinks
+    home.file = {
+      ".config/atuin/config.toml".source = ../../atuin/config.toml;
+      ".config/cheat/conf.yml".source = ../../cheat/conf.yml;
+    };
   };
-
-  
 }

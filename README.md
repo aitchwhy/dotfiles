@@ -1,57 +1,134 @@
-# dotfiles (nix)
+# Hank's Nix Darwin Configuration
 
+A modern nix-darwin configuration for managing macOS systems using Nix Flakes, Home Manager, and Homebrew.
 
-## TODOs
+## System Overview
 
-- [ ] add README instructions
-  - [ ] how to install Determinate Nix -> `curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install`
-  - [ ] how to setup + run dotfiles for nix-darwin + home-manager
-- [ ] split up packages + import config files like [evan travers link](https://github.com/evantravers/dotfiles/blob/master/home-manager/default.nix)
-- [devenv](https://github.com/cachix/devenv)
-- [cachix](https://www.cachix.org/)
-- [flake.parts](https://github.com/hercules-ci/flake-parts) - Minimal Nix modules framework for Flakes: split your flakes into modules and get things done with community modules.
-- [flake-utils](https://github.com/numtide/flake-utils) - Pure Nix flake utility functions to help with writing flakes.
-- [flake-utils-plus](https://github.com/gytis-ivaskevicius/flake-utils-plus) - A lightweight Nix library flake for painless NixOS flake configuration.
-- lorri
-- nix-direnv
-- nixd 
-- nil + nixd - nix lang servers
-- bento - deployment tool
-- kubenix
-- kubernix
-- nixery
-- nixops
-- deadnix
-- nix-diff
+This configuration manages two macOS devices:
+- `hank-mbp`: MacBook Pro
+- `hank-mstio`: Mac Studio
+
+## Directory Structure
+
+```
+.
+├── flake.nix               # Main flake configuration
+├── flake.lock             # Flake dependencies lock file
+├── Justfile              # Command runner for common operations
+├── home/                 # Home-manager configurations
+│   ├── core.nix         # Base home-manager config
+│   ├── default.nix      # Home-manager entry point
+│   ├── git.nix          # Git configuration
+│   ├── shell.nix        # Shell configuration (zsh, etc.)
+│   └── starship.nix     # Starship prompt configuration
+├── modules/             # System modules
+│   ├── apps.nix        # Application configurations
+│   ├── homebrew-mirror.nix  # Homebrew package management
+│   ├── host-users.nix  # User-specific configurations
+│   ├── nix-core.nix    # Core Nix settings
+│   └── system.nix      # System-level configurations
+└── scripts/            # Utility scripts
+    └── darwin_set_proxy.py  # Proxy configuration helper
+```
+
+## Setup
+
+### Prerequisites
+
+1. Install Nix:
+```bash
+curl -L https://nixos.org/nix/install | sh
+```
+
+2. Install Homebrew:
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+### Installation
+
+1. Clone this repository:
+```bash
+git clone https://github.com/hank/dotfiles.git
+cd dotfiles
+```
+
+2. Bootstrap the system (this will install nix-darwin and set up the initial configuration):
+```bash
+# For MacBook Pro
+just bootstrap hank-mbp
+
+# For Mac Studio
+just bootstrap hank-mstio
+```
 
 ## Usage
 
-install nil (nix LSP server) with
-```shell
-nix profile install nixpkgs#nil
+The configuration uses [just](https://github.com/casey/just) as a command runner. Available commands:
+
+- `just build [hostname]`: Build the system configuration
+- `just switch [hostname]`: Switch to the new configuration
+- `just update [hostname]`: Build and switch in one command
+- `just check [hostname]`: Check configuration without switching
+- `just clean`: Clean up old generations
+- `just update-flake`: Update flake inputs
+- `just fmt`: Format nix files
+- `just info`: Show system information
+- `just generations`: List current system generations
+- `just full-update [hostname]`: Update everything and clean up
+
+Default hostname is "hank-mstio" if not specified.
+
+## Key Features
+
+- Multi-device management with shared configurations
+- Comprehensive application management through both Nix and Homebrew
+- Modern shell setup with zsh, starship, and various tools
+- Git configuration with extensive aliases and integrations
+- System preferences management for macOS
+- Development environment setup with various programming languages and tools
+
+## Customization
+
+### Adding a New Host
+
+1. Add the host configuration in `flake.nix`:
+```nix
+hosts = {
+  "new-host" = {
+    system = "aarch64-darwin";
+    username = "username";
+    useremail = "email";
+  };
+  # ...
+};
 ```
 
+2. Add any host-specific configurations in `modules/host-users.nix`
 
-Install first time (TODO: use github repo URL for 1st time install instead of local)
-```shell
-nix run nix-darwin -- switch --flake ~/dotfiles/darwin
+### Modifying Packages
 
-# TODO : nix run nix-darwin -- switch --flake github:aitchwhy/dotfiles
+- Nix packages: Edit `home/core.nix`
+- Homebrew packages: Edit `modules/homebrew-mirror.nix`
+- System applications: Edit `modules/apps.nix`
+
+## Maintenance
+
+### Updating
+
+To update all packages and configurations:
+```bash
+just full-update
 ```
 
-Apply changes using nix-darwin's darwin-rebuild (after 1st install)
-```shell
-darwin-rebuild switch -I darwin-config=$HOME/dotfiles/darwin/configuration.nix
-# NOT(?) darwin-rebuild switch --flake ~/dotfiles/darwin
-```
+### Troubleshooting
 
+If you encounter issues:
+1. Check the build output: `just check`
+2. Try building without switching: `just test`
+3. View the diff of changes: `just diff`
+4. Check system information: `just info`
 
-## Resources
+## License
 
-- [nixOS concepts](https://nixos.wiki/wiki/User_Environment#nix.conf)
-- [evantravers dotfiles](https://github.com/evantravers/dotfiles) + [evantravers dotfiles older]
-- [nix apps](https://nixos.wiki/wiki/Applications)
-- [nix-darwin manual](https://daiderd.com/nix-darwin/manual/index.html)
-- [HM options](https://home-manager-options.extranix.com/?query=&release=release-24.11)
-- [HM options search](https://home-manager-options.extranix.com/)
-- [awesome-nix](https://github.com/nix-community/awesome-nix)
+MIT
