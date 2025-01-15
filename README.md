@@ -1,133 +1,108 @@
-# Hank's Nix Darwin Configuration
+# Nix Configuration
 
-A modern nix-darwin configuration for managing macOS systems using Nix Flakes, Home Manager, and Homebrew.
+My personal Nix configuration for macOS systems using nix-darwin and home-manager.
 
-## System Overview
+## Overview
 
-This configuration manages two macOS devices:
-- `hank-mbp`: MacBook Pro
-- `hank-mstio`: Mac Studio
+This repository contains my personal system configuration using:
+- [Nix](https://nixos.org/) - The purely functional package manager
+- [nix-darwin](https://github.com/LnL7/nix-darwin) - MacOS system configuration
+- [home-manager](https://github.com/nix-community/home-manager) - User environment management
 
-## Directory Structure
+## Structure
 
 ```
 .
-├── flake.nix               # Main flake configuration
-├── flake.lock             # Flake dependencies lock file
-├── Justfile              # Command runner for common operations
+├── configs/               # Program-specific configurations
+│   ├── atuin/            # Shell history
+│   ├── cheat/            # Command cheatsheets
+│   ├── ghostty/          # Terminal emulator
+│   ├── git/              # Git configuration
+│   ├── hammerspoon/      # Window management
+│   ├── lazygit/          # Git TUI
+│   ├── nvim/             # Neovim configuration
+│   ├── zed/              # Zed editor
+│   └── zellij/           # Terminal multiplexer
 ├── home/                 # Home-manager configurations
-│   ├── core.nix         # Base home-manager config
+│   ├── core.nix         # Core home configuration
 │   ├── default.nix      # Home-manager entry point
 │   ├── git.nix          # Git configuration
-│   ├── shell.nix        # Shell configuration (zsh, etc.)
-│   └── starship.nix     # Starship prompt configuration
+│   ├── shell.nix        # Shell configuration
+│   └── starship.nix     # Prompt configuration
 ├── modules/             # System modules
-│   ├── apps.nix        # Application configurations
-│   ├── homebrew-mirror.nix  # Homebrew package management
-│   ├── host-users.nix  # User-specific configurations
+│   ├── apps.nix        # Application configuration
+│   ├── host-users.nix  # Host-specific user settings
 │   ├── nix-core.nix    # Core Nix settings
-│   └── system.nix      # System-level configurations
-└── scripts/            # Utility scripts
-    └── darwin_set_proxy.py  # Proxy configuration helper
+│   └── system.nix      # System configuration
+├── flake.nix           # Nix flake configuration
+├── flake.lock          # Flake lockfile
+├── Justfile            # Command runner
+└── README.md           # This file
 ```
 
 ## Setup
 
-### Prerequisites
-
 1. Install Nix:
 ```bash
-curl -L https://nixos.org/nix/install | sh
+sh <(curl -L https://nixos.org/nix/install)
 ```
 
-2. Install Homebrew:
+2. Enable Flakes:
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+mkdir -p ~/.config/nix
+echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
 ```
 
-### Installation
-
-1. Clone this repository:
+3. Install nix-darwin:
 ```bash
-git clone https://github.com/hank/dotfiles.git
-cd dotfiles
+nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A installer
+./result/bin/darwin-installer
 ```
 
-2. Bootstrap the system (this will install nix-darwin and set up the initial configuration):
+4. Clone this repository:
 ```bash
-# For MacBook Pro
-just bootstrap hank-mbp
+git clone https://github.com/yourusername/nix-config.git ~/.config/nix-config
+cd ~/.config/nix-config
+```
 
-# For Mac Studio
-just bootstrap hank-mstio
+5. Build and switch to the configuration:
+```bash
+just switch
 ```
 
 ## Usage
 
-The configuration uses [just](https://github.com/casey/just) as a command runner. Available commands:
+The `Justfile` provides several helpful commands:
 
-- `just build [hostname]`: Build the system configuration
-- `just switch [hostname]`: Switch to the new configuration
-- `just update [hostname]`: Build and switch in one command
-- `just check [hostname]`: Check configuration without switching
-- `just clean`: Clean up old generations
-- `just update-flake`: Update flake inputs
-- `just fmt`: Format nix files
-- `just info`: Show system information
-- `just generations`: List current system generations
-- `just full-update [hostname]`: Update everything and clean up
+- `just switch` - Build and switch to the new configuration
+- `just update` - Update all flake inputs
+- `just clean` - Clean up old generations
+- `just check` - Check flake
+- `just fmt` - Format nix files
+- `just build` - Build configuration without switching
+- `just diff` - Show system closure difference
 
-Default hostname is "hank-mstio" if not specified.
+## Hosts
 
-## Key Features
+This configuration supports multiple macOS hosts:
+- `hank-mbp` - MacBook Pro
+- `hank-mstio` - Mac Studio
 
-- Multi-device management with shared configurations
-- Comprehensive application management through both Nix and Homebrew
-- Modern shell setup with zsh, starship, and various tools
-- Git configuration with extensive aliases and integrations
-- System preferences management for macOS
-- Development environment setup with various programming languages and tools
+Each host inherits from the base configuration with its own specific overrides.
 
 ## Customization
 
-### Adding a New Host
-
-1. Add the host configuration in `flake.nix`:
-```nix
-hosts = {
-  "new-host" = {
-    system = "aarch64-darwin";
-    username = "username";
-    useremail = "email";
-  };
-  # ...
-};
-```
-
-2. Add any host-specific configurations in `modules/host-users.nix`
-
-### Modifying Packages
-
-- Nix packages: Edit `home/core.nix`
-- Homebrew packages: Edit `modules/homebrew-mirror.nix`
-- System applications: Edit `modules/apps.nix`
+1. Edit host-specific settings in `flake.nix`
+2. Modify system configuration in `modules/`
+3. Update user configuration in `home/`
+4. Add program-specific configs in `configs/`
 
 ## Maintenance
 
-### Updating
-
-To update all packages and configurations:
-```bash
-just full-update
-```
-
-### Troubleshooting
-
-If you encounter issues:
-1. Check the build output: `just check`
-2. Try building without switching: `just test`
-3. View the diff of changes: `just diff`
-4. Check system information: `just info`
+- Update packages: `just update`
+- Clean old generations: `just clean`
+- Format code: `just fmt`
+- Check configuration: `just check`
 
 ## License
 

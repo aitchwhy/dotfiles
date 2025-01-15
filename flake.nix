@@ -1,9 +1,9 @@
 {
-  description = "Hank's Darwin System";
+  description = "Hank's Nix Configuration";
 
   inputs = {
     # Package sets
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-24.05-darwin";
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     
     # Environment/system management
     darwin = {
@@ -12,23 +12,27 @@
     };
     
     home-manager = {
-      url = "github:nix-community/home-manager/release-24.05";
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # Nix formatter
+    alejandra = {
+      url = "github:kamadorueda/alejandra/3.1.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
   outputs = inputs @ { self, nixpkgs, darwin, home-manager, ... }:
     let
-      # Configuration for each host
+      # System settings for each host
       hosts = {
-        # MacBook Pro configuration
         "hank-mbp" = {
           system = "aarch64-darwin";
           username = "hank";
           useremail = "hank.lee.qed@gmail.com";
         };
         
-        # Mac Studio configuration
         "hank-mstio" = {
           system = "aarch64-darwin";
           username = "hank";
@@ -37,7 +41,7 @@
       };
 
       # Function to create Darwin configuration for a host
-      mkDarwinConfig = hostname: hostConfig: 
+      mkDarwinConfig = hostname: hostConfig:
         darwin.lib.darwinSystem {
           system = hostConfig.system;
           specialArgs = {
@@ -46,12 +50,17 @@
           } // inputs;
           
           modules = [
-            # Core system configuration
+            # Core nix configuration
             ./modules/nix-core.nix
+
+            # System configuration
             ./modules/system.nix
+            
+            # Host-specific users
             ./modules/host-users.nix
+            
+            # Apps and packages
             ./modules/apps.nix
-            ./modules/homebrew-mirror.nix
 
             # Home Manager configuration
             home-manager.darwinModules.home-manager
@@ -68,12 +77,11 @@
             }
           ];
         };
-
     in {
       # Generate configurations for all hosts
       darwinConfigurations = builtins.mapAttrs mkDarwinConfig hosts;
 
-      # Formatter for nix files
-      formatter.${hosts.hank-mstio.system} = nixpkgs.legacyPackages.${hosts.hank-mstio.system}.alejandra;
+      # Formatter
+      formatter.aarch64-darwin = nixpkgs.legacyPackages.aarch64-darwin.alejandra;
     };
 }

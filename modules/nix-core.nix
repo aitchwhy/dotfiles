@@ -14,6 +14,30 @@
       auto-optimise-store = false;
       
       # Binary cache configuration
+  # Nix configuration
+  nix = {
+    # Enable flakes and new 'nix' command
+    extraOptions = ''
+      experimental-features = nix-command flakes
+      warn-dirty = false
+      keep-outputs = true
+      keep-derivations = true
+      fallback = true
+    '';
+
+    # Garbage collection settings
+    gc = {
+      automatic = true;
+      interval = { 
+        Hour = 24;
+        Minute = 0;
+      };
+      options = "--delete-older-than 30d";
+    };
+
+    # Binary cache settings
+    settings = {
+      # Enable binary caches
       substituters = [
         "https://cache.nixos.org"
         "https://nix-community.cachix.org"
@@ -49,6 +73,19 @@
       "nixpkgs=${pkgs.nixpkgs}"
       "/nix/var/nix/profiles/per-user/root/channels"
     ];
+
+      # Optimization settings
+      auto-optimise-store = true;
+      trusted-users = [ "@admin" ];
+      max-jobs = "auto";
+      cores = 0;
+      sandbox = true;
+    };
+
+    # Registry settings
+    registry = {
+      nixpkgs.flake = pkgs.path;
+    };
   };
 
   # Allow unfree packages
