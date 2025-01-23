@@ -1,0 +1,38 @@
+{
+  // https://code.visualstudio.com/docs/editor/workspaces#_workspace-settings
+  "folders": [
+    {
+      "name": "dotfiles",
+      "path": "/Users/hank/dotfiles"
+    },
+    {
+      "name": "Documents",
+      "path": "/Users/hank/Documents"
+    },
+    {
+      "name": "Desktop",
+      "path": "/Users/hank/Desktop"
+    },
+    {
+      "name": "src",
+      "path": "/Users/hank/src"
+    },
+    {
+      "name": ".config",
+      "path": "/Users/hank/.config"
+    },
+    {
+      "name": ".hammerspoon",
+      "path": "/Users/hank/.hammerspoon"
+    },
+    {
+      "name": ".ssh",
+      "path": "/Users/hank/.ssh"
+    },
+    {
+      "name": "CloudStorage",
+      "path": "/Users/hank/Library/CloudStorage"
+    }
+  ],
+  "settings": {}
+}

@@ -187,7 +187,7 @@
   "problems.showCurrentInStatus": true,
   "projectManager.filterOnFullPath": true,
   "projectManager.git.baseFolders": ["~/src", "~/dotfiles"],
-  "projectManager.projectsLocation": "~/Dropbox/_WORKSPACE/projects.json",
+  "projectManager.projectsLocation": "/Users/hank/dotfiles/configs/cursor/projects.json",
   "python.terminal.focusAfterLaunch": true,
   "pythonIndent.trimLinesWithOnlyWhitespace": true,
   "raycast.loglevel": "info",
@@ -1464,5 +1464,20 @@
   "xstate.nestTypegenFiles": false,
   "window.closeWhenEmpty": true,
   "debug.console.closeOnEnd": true,
-  "workbench.editor.closeOnFileDelete": true
+  "workbench.editor.closeOnFileDelete": true,
+  "extensions.closeExtensionDetailsOnViewChange": true,
+  "projectManager.groupList": true,
+  "projectManager.showParentFolderInfoOnDuplicates": true,
+  "projectManager.sortList": "Path",
+  "explorer.confirmDragAndDrop": false,
+  "git.openRepositoryInParentFolders": "always",
+  "files.autoSaveWorkspaceFilesOnly": true,
+  "[mermaid]": {
+    "breadcrumbs.showArrays": true
+  },
+  "files.associations": {
+    "*.mermaid": "mermaid"
+  },
+  "markdown-mermaid.languages": ["mermaid"],
+  "window.zoomLevel": -1
 }
