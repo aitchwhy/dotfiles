@@ -15,7 +15,6 @@
   },
   "bookmarks.saveBookmarksInProject": true,
   "bookmarks.sideBar.expanded": true,
-  "cline.vsCodeLmModelSelector": null,
   "code-runner.clearPreviousOutput": true,
   "cursor.aipreview.enabled": true,
   "cursor.cmdk.useThemedDiffBackground": true,
@@ -1445,7 +1444,6 @@
   "window.openFoldersInNewWindow": "on",
   "window.zoomPerWindow": false,
   "workbench.activityBar.location": "bottom",
-  "workbench.colorTheme": "Catppuccin Macchiato",
   "workbench.editor.alwaysShowEditorActions": true,
   "workbench.editor.autoLockGroups": {
     "workbench.editor.chatSession": true
@@ -1479,5 +1477,6 @@
     "*.mermaid": "mermaid"
   },
   "markdown-mermaid.languages": ["mermaid"],
-  "window.zoomLevel": -1
+  "editor.screenReaderAnnounceInlineSuggestion": false,
+  "window.zoomLevel": 1
 }
