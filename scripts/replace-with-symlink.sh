@@ -2,16 +2,17 @@
 
 ######################
 # Example (Cursor)
-# ln -sf  /Users/hank/dotfiles/home/configs/cursor/keybindings.json /Users/hank/Library/Application\ Support/Cursor/User/keybindings.json
+# ln -sf  "/Users/hank/dotfiles/home/configs/cursor/keybindings.json "/Users/hank/Library/Application\ Support/Cursor/User/keybindings.json"
+# ls -al "/Users/hank/Library/Application Support/Cursor/User"
 ######################
 
-SRC_CONFIG_DIR="$HOME/dotfiles/home/configs"
+CONFIGS="$HOME/dotfiles/home/configs"
 
-DST_CONFIG_DIR="$HOME/.config"
-DST_LIB_DIR="$HOME/Library/Application\ Support"
+DOT_CONFIGS="$HOME/.config"
+LIB_APP_SUPPORT="$HOME/Library/Application\ Support"
 
 # ghostty
-ln -sf $SRC_CONFIG_DIR/ghostty/config $DST_CONFIG_DIR/ghostty/config
+replace_with_symlink "$CONFIGS/ghostty/config" "$DOT_CONFIGS/ghostty/config"
 
 # karabiner
 ln -sf $SRC_CONFIG_DIR/karabiner/karabiner.json $DST_CONFIG_DIR/.config/karabiner/karabiner.json
@@ -27,13 +28,42 @@ ln -sf $CONFIG_DIR/starship/starship.toml ~/.config/starship/starship.toml
 # nvim
 ln -sf $CONFIG_DIR/nvim/init.lua ~/.config/nvim/init.lua
 
+# Config paths
+replace_with_symlink "$CONFIGS/yazi" "$DOT_CONFIGS/yazi"
+replace_with_symlink "$CONFIGS/zoxide" "$DOT_CONFIGS/zoxide"
+replace_with_symlink "$CONFIGS/zellij" "$DOT_CONFIGS/zellij"
+replace_with_symlink "$CONFIGS/atuin" "$DOT_CONFIGS/atuin"
+replace_with_symlink "$CONFIGS/cheat" "$DOT_CONFIGS/cheat"
+replace_with_symlink "$CONFIGS/zed/settings.json" "$DOT_CONFIGS/zed/settings.json"
+
+# Replace with symlink if regular file
+replace_with_symlink() {
+    local source=$1
+    local target=$2
+
+    if [ -f "$target" ] && [ ! -L "$target" ]; then
+        echo "Replacing $target with symlink to $source"
+        rm "$target"
+        ln -s "$source" "$target"
+    elif [ ! -e "$target" ]; then
+        echo "Creating symlink from $target to $source"
+        ln -s "$source" "$target"
+    fi
+}
+
+# Process each config file
+for config in "${CONFIGS[@]}" "${DOT_CONFIGS[@]}" "${LIB_APP_SUPPORT[@]}"; do
+    if [ -e "$config" ]; then
+        source_path="$DOTFILES_ROOT/$config"
+        target_path="$HOME/$config"
+        
+        replace_with_symlink "$source_path" "$target_path"
+    fi
+done
+
 # lazygit
 # gh
 # yazi
-# zoxide
-# zellij
-# atuin
-# cheat
 # zed
 
 
@@ -67,3 +97,28 @@ ln -sf $CONFIG_DIR/nvim/init.lua ~/.config/nvim/init.lua
 # ln -s "$DOTFILES_DIR/home/$NEW_NAME" "$TARGET_FILE"
 
 # echo "File moved to $DOTFILES_DIR/$NEW_NAME and symlink created at $TARGET_FILE"
+
+# Replace with symlink if regular file
+replace_with_symlink() {
+    local source=$1
+    local target=$2
+
+    if [ -f "$target" ] && [ ! -L "$target" ]; then
+        echo "Replacing $target with symlink to $source"
+        rm "$target"
+        ln -s "$source" "$target"
+    elif [ ! -e "$target" ]; then
+        echo "Creating symlink from $target to $source"
+        ln -s "$source" "$target"
+    fi
+}
+
+# Process each config file
+for config in "${CONFIGS[@]}" "${DOT_CONFIGS[@]}" "${LIB_APP_SUPPORT[@]}"; do
+    if [ -e "$config" ]; then
+        source_path="$DOTFILES_ROOT/$config"
+        target_path="$HOME/$config"
+        
+        replace_with_symlink "$source_path" "$target_path"
+    fi
+done

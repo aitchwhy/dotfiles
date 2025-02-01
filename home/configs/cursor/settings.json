@@ -1437,7 +1437,6 @@
       "type": "command"
     }
   ],
-  "window.customTitleBarVisibility": "never",
   "window.nativeTabs": true,
   "window.newWindowDimensions": "maximized",
   "window.newWindowProfile": "Default",
