@@ -1,0 +1,106 @@
+#######################
+# Docs - https://ghostty.org/docs/
+#
+# The syntax is "key = value". The whitespace around the equals doesn't matter.
+# Comments start with a `#` and are only valid on their own line.
+# Blank lines are ignored!
+# Empty values reset the configuration to the default value (font-family = )
+########################
+
+
+# General 
+
+auto-update = download
+window-save-state = always
+
+# This controls whether an initial window is created when Ghostty is run. 
+initial-window = true
+
+macos-option-as-alt = true
+macos-non-native-fullscreen = true
+
+clipboard-read = "allow"
+clipboard-write = "allow"
+
+
+# favs
+# light : zenbones, nord-light
+# dark : catppuccin-frappe, nord, tokyonight-storm
+
+#theme = light:nord-light,dark:nord
+#theme = light:zenbones,dark:nord
+theme = tokyonight-storm
+# theme = nord
+# theme = catppuccin-frappe
+
+
+font-size = 12
+
+window-decoration = true
+window-padding-x  = 12
+window-padding-y  = 12
+
+
+confirm-close-surface = false
+mouse-hide-while-typing = false
+
+
+# Quick terminal (floating)
+quick-terminal-animation-duration = 0
+
+# center, top, bottom, left, right
+quick-terminal-position = top
+
+# main, mouse, macos-menu-bar
+quick-terminal-screen = main
+
+# Automatically hide the quick terminal when focus shifts to another window.
+# Set it to false for the quick terminal to remain open even when it loses focus.
+quick-terminal-autohide = true
+
+# Shell (Zsh) integration
+shell-integration = zsh
+
+cursor-style = block
+cursor-style-blink = true
+
+# enables cmd+click to follow URL
+link-url = true
+# NO full screen on app startup
+fullscreen = false
+
+###########################
+# Keybindings 
+#
+# > Syntax is "keybind = trigger=action"
+###########################
+# SPECIAL CHARS
+#
+# Numeric keys are written as words (e.g. one, two - not 1, 2)
+# Special chars can be both words or single chars (; and semicolon) - (list of chars https://github.com/ghostty-org/ghostty/blob/d6e76858164d52cff460fedc61ddf2e560912d71/src/input/key.zig#L255) 
+###########################
+# MODIFIER KEYS
+#
+# Valid modifiers are shift, ctrl/control, alt/opt/option, and cmd/command/super. NOT supported fn or "globe" key.
+########################### 
+# LEADER KEYS / CHORD SEQUENCE
+# 
+# Specify MULTIPLE triggers separated by > to require a sequence of triggers to activate the action.
+#  - For example, ctrl+a>n=new_window -> new_window action if ctrl+a followed separately by n
+#  - There is no hardcoded limit on the number of parts in a sequence.
+###########################
+# LIST OF ACTIONS
+# - list with command ($ ghostty +list-actions command)
+# - docs link : https://github.com/ghostty-org/ghostty/blob/d6e76858164d52cff460fedc61ddf2e560912d71/src/input/key.zig#L255
+###########################
+
+keybind = cmd+comma=open_config
+keybind = cmd+shift+comma=reload_config
+
+keybind = cmd+opt+i=inspector:toggle
+
+keybind = cmd+enter=toggle_fullscreen
+
+#keybind = global:cmd+period=toggle_quick_terminal
+
+
