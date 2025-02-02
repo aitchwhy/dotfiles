@@ -1,0 +1,100 @@
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+
+# Zsh
+*.zwc
+*.zwc.old
+.zcompdump*
+.zsh_history
+.zsh_sessions
+.zsh/.zcompdump*
+
+# Neovim
+.netrwhist
+nvim/plugin/
+nvim/lazy-lock.json
+*.swp
+*.swo
+*~
+
+# Nix
+result
+result-*
+.direnv/
+.envrc
+
+# Python/uv
+__pycache__/
+*.py[cod]
+.uv/
+.venv/
+venv/
+.env
+
+# Yazi
+.yazi/yazi.log
+.yazi/history/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# VSCode/Cursor
+.vscode/
+.cursor/
+*.code-workspace
+
+# Zed
+.zed/
+.zed/settings.json.backup
+
+# Logs and databases
+*.log
+*.sqlite
+*.sqlite3
+
+# Local configuration files
+.env.local
+.env.*.local
+config.local.js
+*.local.yml
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+*~
+
+# IDE specific files
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Atuin history
+.config/atuin/history.db
+.config/atuin/key
+.config/atuin/*.log
+
+# Zellij
+.config/zellij/plugins/
+
+# Cheat
+.cheat/personal/
+
+# Zoxide
+.zoxide/
+
+# Starship
+starship.backup.toml
+
+# Ghostty
+.config/ghostty/cached*

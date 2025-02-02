@@ -1,0 +1,131 @@
+
+# -----------------------------------------------------
+# In (~/.zprofile), command below is run for zsh completions + etc
+#
+# eval "$(/opt/homebrew/bin/brew shellenv)"
+#
+# This sets up zsh shell with homebrew (e.g. set env-vars available set by homebrew)
+# - HOMEBREW_PREFIX
+# - HOMEBREW_CELLAR
+# - HOMEBREW_REPOSITORY
+# -----------------------------------------------------
+
+# -----------------------------------------------------
+# Path updates & default editor
+# -----------------------------------------------------
+# export PATH="/opt/homebrew/bin:$PATH"
+export EDITOR="nvim"
+export VISUAL="nvim"
+
+# -----------------------------------------------------
+# Prompt customization (example with Starship, optional)
+# https://starship.rs/
+# -----------------------------------------------------
+if command -v starship >/dev/null 2>&1; then
+ eval "$(starship init zsh)"
+fi
+
+if command -v atuin >/dev/null 2>&1; then
+  eval "$(atuin init zsh)"
+fi
+
+# -----------------------------------------------------
+# Zsh plugins (modify based on your chosen framework)
+# -----------------------------------------------------
+# For Oh My Zsh, add desired plugins in ~/.zshrc plugin list
+# plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
+
+# Manually sourcing plugins if not using a framework:
+source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# source /opt/homebrew/share/zsh/site-functions
+
+
+# -----------------------------------------------------
+# Useful aliases
+# -----------------------------------------------------
+alias ll="ls -lahG"
+alias brewup="brew update && brew upgrade && brew cleanup"
+
+#------------------------------------------------------------------------------
+# Aliases
+#------------------------------------------------------------------------------
+# Modern CLI alternatives
+alias cat='bat --paging=always'
+alias grep='rg'
+alias find='fd'
+alias md='glow'
+alias ls='eza --icons'
+alias ll='eza -l --icons'
+alias la='eza -al --icons'
+
+# Git shortcuts
+alias gs='git status'
+alias ga='git add'
+alias gc='git commit'
+alias gp='git push'
+alias gl='git pull'
+alias lg='lazygit'
+
+# FZF enhanced commands
+alias flog='fzf --preview "bat --style=numbers --color=always --line-range=:500 {}"'
+alias falias='alias | fzf'
+alias fman='man -k . | fzf --preview "man {}"'
+
+# Homebrew shortcuts
+alias b="brew"
+alias bdr="brew doctor"
+alias blk="brew leaves"
+alias boc="brew outdated --cask"
+alias bof="brew outdated --formula"
+alias bupd="brew update"
+alias bupg="brew upgrade"
+alias bclean="brew cleanup --prune=all"
+alias bcleanall='brew cleanup --prune=all && rm -rf $(brew --cache)'
+alias bpull="bupd && bupg && bclean"
+alias bin="brew install"
+alias brein="brew reinstall"
+alias bi="brew info"
+alias bs="brew search"
+
+# Homebrew Cask/Bundle management
+alias bcl="brew list --cask"
+alias bcin="brew install --cask"
+alias bcup="brew upgrade --cask"
+alias bb="brew bundle"
+alias bbls="brew bundle dump --all --file=- --verbose"
+alias bbsave="brew bundle dump --all --verbose --global -f && chezmoi re-add ~/.Brewfile"
+alias bbcheck="brew bundle check --all --global --verbose"
+
+# Dotfile management (chezmoi)
+alias cm="chezmoi"
+
+# Directory navigation
+alias gdl='cd ~/Downloads'
+alias gcf='cd ~/.config/'
+
+
+# Zsh configuration
+alias ze="nvim ~/.zshrc"
+alias zep="nvim ~/.zprofile"
+alias zs="source ~/.zshrc"
+alias zcompreset="rm -f ~/.zcompdump; compinit"
+
+
+# -----------------------------------------------------
+# Custom functions (example)
+# -----------------------------------------------------
+mkcd () {
+  mkdir -p "$1" && cd "$1"
+}
+
+# -----------------------------------------------------
+# Ensure .zshrc updates are applied
+# -----------------------------------------------------
+export PATH
+
+
+[ ! -f "$HOME/.x-cmd.root/X" ] || . "$HOME/.x-cmd.root/X" # boot up x-cmd.
+
+# Added by Windsurf
+export PATH="/Users/hank/.codeium/windsurf/bin:$PATH"
