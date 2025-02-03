@@ -2,11 +2,18 @@
 # Unified ZSH configuration
 set -e
 
+DOTFILES="$HOME/dotfiles/home"
+CONFIG="$HOME/.config"
+
 # Create essential symlinks
-ln -sf ~/dotfiles/.zshrc ~/.zshrc
-ln -sf ~/dotfiles/Brewfile ~/Brewfile
-ln -sf ~/dotfiles/starship.toml ~/.config/starship.toml
-ln -snf ~/dotfiles/nvim ~/.config/nvim
+ln -sf $DOTFILES/Brewfile ~/.Brewfile
+ln -sf $DOTFILES/zsh/zshrc ~/.zshrc
+# ln -sf $DOTFILES/zsh/.zprofile ~/.zprofile
+# ln -sf $DOTFILES/zsh/.zshenv ~/.zshenv
+
+ln -sf $DOTFILES/.config/starship.toml $CONFIG/starship.toml
+ln -sf $DOTFILES/.config/nvim $CONFIG/nvim
+
 
 # Xcode Command Line Tools
 if ! xcode-select -p &>/dev/null; then
