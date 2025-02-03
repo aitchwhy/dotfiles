@@ -1,0 +1,161 @@
+#!/usr/bin/env zsh
+
+# -----------------------------------------------------
+# Apple Silicon Optimizations
+# -----------------------------------------------------
+# Explicitly set Homebrew path for ARM
+export HOMEBREW_PREFIX="/opt/homebrew"
+
+# Rosetta 2 compatibility layer (only load if needed)
+if [[ $(arch) == "i386" ]]; then
+    export HOMEBREW_X86_PREFIX="/usr/local"
+    path=($HOMEBREW_X86_PREFIX/bin $path)
+fi
+
+# -----------------------------------------------------
+# System Performance Configuration
+# -----------------------------------------------------
+# GPU-accelerated tools (M2 Ultra specific)
+export METAL_DEVICE_WRAPPER_TYPE=1
+export ENABLE_METAL=1
+
+# Memory management (optimized for 192GB RAM)
+export BAT_CACHE_PATH="${XDG_CACHE_HOME}/bat"
+export BAT_THEME="Dracula"
+export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border --margin=2%"
+
+# -----------------------------------------------------
+# Apple Silicon-Specific Path Configuration
+# -----------------------------------------------------
+typeset -U path fpath
+
+path=(
+    # ARM-optimized binaries
+    $HOMEBREW_PREFIX/{bin,sbin}
+    
+    # CUDA and Metal support (if installed)
+    /usr/local/cuda/bin(N)
+    
+    # CoreML and ANE paths
+    $HOME/Library/CoreML/Models(N)
+    
+    # System debugging tools
+    /usr/bin
+    /usr/sbin
+    /bin
+    /sbin
+    
+    # Local binaries
+    $HOME/.local/bin
+    $path
+)
+
+# -----------------------------------------------------
+# macOS-Specific Features
+# -----------------------------------------------------
+# QuickLook integration
+ql() { qlmanage -p "$@" >& /dev/null }
+
+# Spotlight search integration
+spot() {
+    local query=$1
+    mdfind -name "$query"
+}
+
+# System integrity check
+alias check-sip='csrutil status'
+alias check-secureboot='bputil -g'
+
+# -----------------------------------------------------
+# Hardware-Optimized Tools
+# -----------------------------------------------------
+# Metal-accelerated tools
+alias mlcompute='python3 -c "import tensorflow as tf; print(tf.config.list_physical_devices('GPU'))"'
+alias coreml-info='/usr/bin/coremlcompiler --help'
+
+# Neural Engine monitoring
+ane-info() {
+    ioreg -l | grep -i "AppleANEFWVersion"
+    sysctl -a | grep ane
+}
+
+# -----------------------------------------------------
+# Advanced Homebrew Configuration
+# -----------------------------------------------------
+export HOMEBREW_BUNDLE_FILE="${XDG_CONFIG_HOME}/homebrew/Brewfile"
+export HOMEBREW_INSTALL_CLEANUP=1
+export HOMEBREW_DISPLAY_INSTALL_TIMES=1
+
+brew-optimize() {
+    arch -arm64 brew update --force
+    arch -arm64 brew upgrade
+    arch -arm64 brew cleanup --prune=all
+    arch -arm64 brew autoremove
+    arch -arm64 brew doctor
+}
+
+# -----------------------------------------------------
+# macOS Security Configuration
+# -----------------------------------------------------
+# Secure directory changes
+cd() {
+    builtin cd "$@" && \
+    [ -n "$TMUX" ] && tmux rename-window "$(basename "$PWD")"
+    security_checks
+}
+
+security_checks() {
+    # Verify directory ownership
+    if [[ $(stat -f %u .) != $(id -u) ]]; then
+        echo "Warning: Directory owned by different user!"
+    fi
+    
+    # Check for unusual permissions
+    if [[ $(stat -f %Sp .) != "drwx"* ]]; then
+        echo "Warning: Non-standard permissions on directory!"
+    fi
+}
+
+# -----------------------------------------------------
+# Metal-Enhanced Developer Tools
+# -----------------------------------------------------
+# GPU-accelerated development
+alias metal-build='xcodebuild -scheme MetalPetal -configuration Release'
+alias tensorflow-mps='export TF_ENABLE_ONEDNN_OPTS=1 && export TF_METAL_ENABLED=1'
+
+# CoreML model compilation
+compile-coreml() {
+    xcrun coremlcompiler compile "$1" "${1%.mlmodel}.mlmodelc"
+}
+
+# -----------------------------------------------------
+# System Monitoring (M2 Ultra Specific)
+# -----------------------------------------------------
+alias gpu-stats='sudo powermetrics --samplers gpu -i 1000'
+alias neural-stats='sudo powermetrics --samplers ne -i 1000'
+alias mem-stats='sudo memory_pressure -S -l'
+alias thermal-stats='sudo powermetrics --samplers smc -i 1000'
+
+# -----------------------------------------------------
+# Xcode Integration
+# -----------------------------------------------------
+xc() {
+    local workspace=$(find . -name "*.xcworkspace" -maxdepth 2 | head -1)
+    if [[ -n $workspace ]]; then
+        open -a Xcode "$workspace"
+    else
+        open -a Xcode
+    fi
+}
+
+# -----------------------------------------------------
+# Final Configuration
+# -----------------------------------------------------
+# Load platform-agnostic configuration
+source "${XDG_CONFIG_HOME}/zsh/main.zsh"
+
+# Load machine-specific overrides
+[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
+
+
+
