@@ -274,8 +274,77 @@ alias gp='git push'
 alias gl='git pull'
 (( ${+commands[lazygit]} )) && alias lg='lazygit'
 
+
+
+# -----------------------------------------------------
 # Homebrew shortcuts
-alias bupd='brew update && brew upgrade && brew cleanup'
+# -----------------------------------------------------
+alias ll="ls -lahG"
+alias brewup="brew update && brew upgrade && brew cleanup"
+
+#------------------------------------------------------------------------------
+# Aliases
+#------------------------------------------------------------------------------
+# Modern CLI alternatives
+alias cat='bat --paging=always'
+alias grep='rg'
+alias find='fd'
+alias md='glow'
+alias ls='eza --icons'
+alias ll='eza -l --icons'
+alias la='eza -al --icons'
+
+# Git shortcuts
+alias gs='git status'
+alias ga='git add'
+alias gc='git commit'
+alias gp='git push'
+alias gl='git pull'
+alias lg='lazygit'
+
+# FZF enhanced commands
+alias flog='fzf --preview "bat --style=numbers --color=always --line-range=:500 {}"'
+alias falias='alias | fzf'
+alias fman='man -k . | fzf --preview "man {}"'
+
+# Homebrew shortcuts
+alias b="brew"
+alias bdr="brew doctor"
+alias blk="brew leaves"
+alias boc="brew outdated --cask"
+alias bof="brew outdated --formula"
+alias bupd="brew update"
+alias bupg="brew upgrade"
+alias bclean="brew cleanup --prune=all"
+alias bcleanall='brew cleanup --prune=all && rm -rf $(brew --cache)'
+alias bpull="bupd && bupg && bclean"
+alias bin="brew install"
+alias brein="brew reinstall"
+alias bi="brew info"
+alias bs="brew search"
+
+# Homebrew Cask/Bundle management
+alias bcl="brew list --cask"
+alias bcin="brew install --cask"
+alias bcup="brew upgrade --cask"
+alias bb="brew bundle"
+alias bbls="brew bundle dump --all --file=- --verbose"
+alias bbsave="brew bundle dump --all --verbose --global -f && chezmoi re-add ~/.Brewfile"
+alias bbcheck="brew bundle check --all --global --verbose"
+
+# Directory navigation
+alias gdl='cd ~/Downloads'
+alias gcf='cd ~/.config/'
+
+
+# Zsh configuration
+alias ze="nvim ~/.zshrc"
+alias zep="nvim ~/.zprofile"
+alias zs="source ~/.zshrc"
+alias zcompreset="rm -f ~/.zcompdump; compinit"
+
+alias be="nvim ~/.Brewfile"
+
 
 # -----------------------------------------------------
 # Functions
