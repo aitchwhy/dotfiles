@@ -46,9 +46,9 @@ setup_zsh_symlinks() {
     link "${ZDOTDIR}/zshrc" "${HOME}/.zshrc"
     link "${ZDOTDIR}/zshenv" "${HOME}/.zshenv"
     link "${ZDOTDIR}/zprofile" "${HOME}/.zprofile"
-    
+
     # Link ZDOTDIR itself
-    link "${ZDOTDIR}" "${XDG_CONFIG_HOME}/zsh"
+    #link "${ZDOTDIR}" "${XDG_CONFIG_HOME}/zsh"
 }
 
 # Initialize shell environment
