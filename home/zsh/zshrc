@@ -1,6 +1,5 @@
 
 # ~/dotfiles/home/zsh/zshrc - Interactive shell configuration
-# Symlinked to ~/.zshrc
 source "${ZDOTDIR}/env.zsh"
 source "${ZDOTDIR}/completions.zsh"
 source "${ZDOTDIR}/aliases.zsh"
@@ -41,57 +40,3 @@ bindkey '^[[1;5D' backward-word
 bindkey '^H' backward-kill-word
 bindkey '^[[3;5~' kill-word
 
-
-
-# # Load configurations in specific order
-# for config in "${ZDOTDIR}"/{env,completions,aliases,functions,macos}.zsh; do
-#     [[ -f "$config" ]] && source "$config"
-# done
-
-# # History configuration
-# HISTFILE="${XDG_STATE_HOME}/zsh/history"
-# HISTSIZE=1000000
-# SAVEHIST=1000000
-
-# setopt EXTENDED_HISTORY        # Save timestamp
-# setopt SHARE_HISTORY          # Share between sessions
-# setopt HIST_EXPIRE_DUPS_FIRST # Expire duplicates first
-# setopt HIST_IGNORE_DUPS       # Ignore duplicates
-# setopt HIST_FIND_NO_DUPS      # No duplicates in search
-# setopt HIST_REDUCE_BLANKS     # Remove extra blanks
-# setopt HIST_VERIFY            # Verify history expansion
-
-# # Directory options
-# setopt AUTO_CD                # cd without typing cd
-# setopt AUTO_PUSHD            # pushd instead of cd
-# setopt PUSHD_IGNORE_DUPS     # No duplicate pushd
-# setopt PUSHD_SILENT          # No pushd stack
-# setopt EXTENDED_GLOB         # Extended globbing
-
-# # Tool initializations
-# has_command starship && eval "$(starship init zsh)"
-# has_command zoxide && eval "$(zoxide init zsh)"
-# has_command atuin && eval "$(atuin init zsh)"
-# has_command direnv && eval "$(direnv hook zsh)"
-
-# # Key bindings
-# bindkey -v                    # Vi mode
-# bindkey '^R' _atuin_search_widget
-# bindkey '^[[1;5C' forward-word
-# bindkey '^[[1;5D' backward-word
-# bindkey '^H' backward-kill-word
-# bindkey '^[[3;5~' kill-word
-
-# # ~/dotfiles/home/zsh/env.zsh
-# # Environment variables for interactive shells
-# export LESS="-R --mouse -Dd+r$Du+b"
-# export LESSHISTFILE="${XDG_STATE_HOME}/less/history"
-# export LESSHISTSIZE=1000
-
-# # FZF configuration
-# export FZF_DEFAULT_COMMAND='fd --type f --hidden --exclude .git'
-# export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-# export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
-
-# # Zoxide configuration
-# export _ZO_DATA_DIR="${XDG_DATA_HOME}/zoxide"

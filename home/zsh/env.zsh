@@ -15,3 +15,5 @@ export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
 
 # Zoxide configuration
 export _ZO_DATA_DIR="${XDG_DATA_HOME}/zoxide"
+
+
