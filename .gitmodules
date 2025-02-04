@@ -1,0 +1,3 @@
+[submodule "ai/mcp/servers"]
+	path = ai/mcp/servers
+	url = https://github.com/aitchwhy/servers
