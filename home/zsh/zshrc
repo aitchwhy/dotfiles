@@ -1,62 +1,44 @@
-#!/usr/bin/env zsh
-# Main ZSH configuration
 
-# # Load order matters
-# ZSHDIR="${0:a:h}"
-# source $ZSHDIR/env.zsh       # Environment first
-# source $ZSHDIR/plugins.zsh   # Then plugins
-# source $ZSHDIR/completions.zsh
-# source $ZSHDIR/aliases.zsh   # Aliases after completions
-# source $ZSHDIR/functions.zsh
+# ~/dotfiles/home/zsh/zshrc - Interactive shell configuration
+source "${ZDOTDIR}/env.zsh"
+source "${ZDOTDIR}/completions.zsh"
+source "${ZDOTDIR}/aliases.zsh"
+source "${ZDOTDIR}/functions.zsh"
+source "${ZDOTDIR}/macos.zsh"
 
-# # Starship prompt
-# eval "$(starship init zsh)"
-########################################
-
-
-# -----------------------------------------------------
-# Environment Setup
-# -----------------------------------------------------
-export DOTFILES="${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles"
-export ZDOTDIR="${XDG_CONFIG_HOME}/zsh"
-
-# -----------------------------------------------------
-# Base Configuration (XDG Compliant)
-# -----------------------------------------------------
-export EDITOR='nvim'
-export VISUAL='nvim'
-: ${HISTFILE:=${XDG_DATA_HOME}/zsh/history}
-: ${ZSHEXTRA:=${ZDOTDIR}/extra}
+# History configuration
+HISTFILE="${XDG_DATA_HOME}/zsh/history"
 HISTSIZE=1000000
 SAVEHIST=1000000
 
-# -----------------------------------------------------
-# Core Productivity Settings
-# -----------------------------------------------------
-setopt AUTO_CD                  
-setopt INTERACTIVE_COMMENTS    
-setopt EXTENDED_GLOB           
-setopt AUTO_PUSHD              
-setopt PUSHD_IGNORE_DUPS       
-setopt COMPLETE_IN_WORD        
+setopt EXTENDED_HISTORY
+setopt SHARE_HISTORY
+setopt HIST_EXPIRE_DUPS_FIRST
+setopt HIST_IGNORE_DUPS
+setopt HIST_FIND_NO_DUPS
+setopt HIST_REDUCE_BLANKS
+setopt HIST_VERIFY
 
-# -----------------------------------------------------
-# Keyboard-Driven Workflow Setup
-# -----------------------------------------------------
-bindkey -v  # Vi mode for command editing
-bindkey '^R' history-incremental-pattern-search-backward
+# Directory options
+setopt AUTO_CD
+setopt AUTO_PUSHD
+setopt PUSHD_IGNORE_DUPS
+setopt PUSHD_SILENT
+setopt EXTENDED_GLOB
 
-# -----------------------------------------------------
-# Instant-Load Productivity Tools
-# -----------------------------------------------------
-(( ${+commands[zoxide]} )) && eval "$(zoxide init zsh --cmd j)"
-(( ${+commands[atuin]} )) && eval "$(atuin init zsh)"
-(( ${+commands[starship]} )) && eval "$(starship init zsh)"
+# Tool initializations
+has_command starship && eval "$(starship init zsh)"
+has_command zoxide && eval "$(zoxide init zsh)"
+has_command atuin && eval "$(atuin init zsh)"
+has_command direnv && eval "$(direnv hook zsh)"
 
-# -----------------------------------------------------
-# Universal Aliases (Cross-Platform)
-# -----------------------------------------------------
-source "${DOTFILES}/home/aliases.zsh"  # See aliases section below
+# Key bindings
+bindkey -v  # Vi mode
+bindkey '^R' _atuin_search_widget
+bindkey '^[[1;5C' forward-word
+bindkey '^[[1;5D' backward-word
+bindkey '^H' backward-kill-word
+bindkey '^[[3;5~' kill-word
 
 # -----------------------------------------------------
 # Smart Completion System
