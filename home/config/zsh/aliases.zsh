@@ -4,6 +4,14 @@
 # Command aliases
 # -----------------------------------------------------
 
+# Enhanced ls (if eza available)
+has_command eza && {
+    alias ll='eza -l --git --icons --group-directories-first'
+    alias la='eza -la --git --icons --group-directories-first'
+    alias lt='eza --tree --icons --group-directories-first'
+    alias l='eza -F --icons --group-directories-first'
+}
+
 # Modern CLI replacements
 has_command bat && alias cat='bat --paging=never'
 has_command eza && alias ls='eza --icons --group-directories-first'
@@ -14,27 +22,20 @@ has_command dust && alias du='dust'
 has_command duf && alias df='duf'
 has_command zoxide && alias cd='z'
 
-# Enhanced ls (if eza available)
-has_command eza && {
-    alias ll='eza -l --git --icons --group-directories-first'
-    alias la='eza -la --git --icons --group-directories-first'
-    alias lt='eza --tree --icons --group-directories-first'
-    alias l='eza -F --icons --group-directories-first'
-}
-
 # Git shortcuts
 alias gs='git status'
 alias ga='git add'
 alias gc='git commit'
 alias gp='git push'
 alias gl='git pull'
+
 has_command lazygit && alias lg='lazygit'
 
 # Navigation
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
-alias -- -='cd -'
+# alias -='cd -'
 
 
 # # Check if command exists helper
