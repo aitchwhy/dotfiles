@@ -1,252 +1,109 @@
-
-# ~/dotfiles/home/zsh/zshrc - Interactive shell configuration
-source "${ZDOTDIR}/env.zsh"
-source "${ZDOTDIR}/completions.zsh"
-source "${ZDOTDIR}/aliases.zsh"
-source "${ZDOTDIR}/functions.zsh"
-source "${ZDOTDIR}/macos.zsh"
-
-# History configuration
-HISTFILE="${XDG_DATA_HOME}/zsh/history"
-HISTSIZE=1000000
-SAVEHIST=1000000
-
-setopt EXTENDED_HISTORY
-setopt SHARE_HISTORY
-setopt HIST_EXPIRE_DUPS_FIRST
-setopt HIST_IGNORE_DUPS
-setopt HIST_FIND_NO_DUPS
-setopt HIST_REDUCE_BLANKS
-setopt HIST_VERIFY
-
-# Directory options
-setopt AUTO_CD
-setopt AUTO_PUSHD
-setopt PUSHD_IGNORE_DUPS
-setopt PUSHD_SILENT
-setopt EXTENDED_GLOB
-
-# Tool initializations
-has_command starship && eval "$(starship init zsh)"
-has_command zoxide && eval "$(zoxide init zsh)"
-has_command atuin && eval "$(atuin init zsh)"
-has_command direnv && eval "$(direnv hook zsh)"
-
-# Key bindings
-bindkey -v  # Vi mode
-bindkey '^R' _atuin_search_widget
-bindkey '^[[1;5C' forward-word
-bindkey '^[[1;5D' backward-word
-bindkey '^H' backward-kill-word
-bindkey '^[[3;5~' kill-word
-
-# -----------------------------------------------------
-# Smart Completion System
-# -----------------------------------------------------
-autoload -Uz compinit && compinit -d "${XDG_CACHE_HOME}/zsh/zcompdump"
-zstyle ':completion:*' menu select
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
-zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
-
-# -----------------------------------------------------
-# Plugin System (Declarative Loading)
-# -----------------------------------------------------
-typeset -A ZSH_PLUGINS=(
-  syntax-highlighting "/opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-  autosuggestions "/opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
-  abbr "/opt/homebrew/share/zsh-abbr/zsh-abbr.zsh"
-)
-
-for plugin (${(k)ZSH_PLUGINS}) {
-  [[ -f ${ZSH_PLUGINS[$plugin]} ]] && source ${ZSH_PLUGINS[$plugin]}
-}
-
-# -----------------------------------------------------
-# Workflow Enhancers
-# -----------------------------------------------------
-source "${ZDOTDIR}/functions.zsh"  # See functions section below
-
-# -----------------------------------------------------
-# Environment-Specific Settings
-# -----------------------------------------------------
-case $(uname) in
-  Darwin*)
-    source "${ZDOTDIR}/macos.zsh"
-    ;;
-  Linux*)
-    source "${ZDOTDIR}/linux.zsh"
-    ;;
-esac
-
-# -----------------------------------------------------
-# Final Initialization
-# -----------------------------------------------------
-(( ${+commands[direnv]} )) && emulate zsh -c "$(direnv export zsh)"
-[[ -f "${ZDOTDIR}/local.zsh" ]] && source "${ZDOTDIR}/local.zsh"
-
-###############
 #!/usr/bin/env zsh
 
 # -----------------------------------------------------
-# Startup Performance Optimization
+# Helper Functions
 # -----------------------------------------------------
-# Load zprof first if needed for profiling
-# zmodload zsh/zprof
+has_command() { command -v "$1" >/dev/null; }
 
 # -----------------------------------------------------
-# Homebrew Initialization
+# Homebrew Setup
 # -----------------------------------------------------
-# Verify Homebrew exists and configure environment
 if (( ! ${+commands[brew]} )); then
     echo "Homebrew not found. Please install from https://brew.sh"
     return 1
 fi
 
-# Load Homebrew environment variables
-if [[ -z "$HOMEBREW_PREFIX" ]]; then
-    eval "$(brew shellenv)"
-fi
-
-# -----------------------------------------------------
-# Zsh Configuration Options
-# -----------------------------------------------------
-# History Configuration
-HISTFILE="${XDG_DATA_HOME:-$HOME/.local/share}/zsh/history"
-HISTSIZE=1000000
-SAVEHIST=1000000
-setopt EXTENDED_HISTORY        # Save timestamp and duration
-setopt SHARE_HISTORY           # Share history between sessions
-setopt HIST_EXPIRE_DUPS_FIRST  # Expire duplicates first
-setopt HIST_IGNORE_DUPS        # Ignore duplicate entries
-setopt HIST_FIND_NO_DUPS       # Don't show duplicates in search
-setopt HIST_REDUCE_BLANKS      # Remove superfluous blanks
-setopt HIST_VERIFY             # Verify expanded history before executing
-
-# Directory Navigation
-setopt AUTO_CD              # Change directories without cd
-setopt AUTO_PUSHD           # Push directories to stack
-setopt PUSHD_IGNORE_DUPS    # Don't push duplicates
-setopt PUSHD_SILENT         # Quiet directory stacking
-setopt EXTENDED_GLOB        # Enable extended globbing
-
-# Other Options
-setopt INTERACTIVE_COMMENTS  # Allow comments in interactive shells
+# Load Homebrew environment
+eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # -----------------------------------------------------
 # Environment Variables
 # -----------------------------------------------------
-# XDG Base Directory Specification
-export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
-export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
-export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
-
-# Language and Locale
-export LANG='en_US.UTF-8'
-export LC_ALL='en_US.UTF-8'
-
-# Preferred Editors
-export EDITOR='nvim'
-export VISUAL='nvim'
-export SUDO_EDITOR='nvim'
-
-# Pager Configuration
-export PAGER='less'
-export LESS='--RAW-CONTROL-CHARS --quit-if-one-screen --no-init'
-export MANPAGER="sh -c 'col -bx | bat --language=man --plain'"
-
-# Homebrew Optimizations
-export HOMEBREW_NO_ANALYTICS=1
-export HOMEBREW_NO_ENV_HINTS=1
-export HOMEBREW_NO_AUTO_UPDATE=1
-export HOMEBREW_BAT=1
-export HOMEBREW_CURL_RETRIES=2
-
-# -----------------------------------------------------
-# Path Configuration
-# -----------------------------------------------------
-# Unique path array to prevent duplicates
-typeset -U path fpath
-
-# System paths
+# Extended PATH configuration
+typeset -U path
 path=(
     $HOMEBREW_PREFIX/{bin,sbin}
     $HOME/.local/{bin,sbin}
-    /usr/local/{bin,sbin}
     $path
 )
 
-# Language/tool-specific paths (conditionally added)
+# Add language-specific paths if they exist
 [[ -d "$HOME/.bun/bin" ]] && path+=("$HOME/.bun/bin")
 [[ -d "$HOME/.cargo/bin" ]] && path+=("$HOME/.cargo/bin")
 [[ -d "$HOME/go/bin" ]] && path+=("$HOME/go/bin")
 
+# Tool-specific settings
+export MANPAGER="sh -c 'col -bx | bat --language=man --plain'"
+export LESS='--RAW-CONTROL-CHARS --quit-if-one-screen --no-init'
+export HOMEBREW_NO_ANALYTICS=1
+export HOMEBREW_NO_ENV_HINTS=1
+export HOMEBREW_BAT=1
+
+# -----------------------------------------------------
+# History Configuration
+# -----------------------------------------------------
+HISTFILE="${XDG_DATA_HOME}/zsh/history"
+HISTSIZE=1000000
+SAVEHIST=1000000
+
+setopt EXTENDED_HISTORY        # Save timestamp and duration
+setopt SHARE_HISTORY          # Share history between sessions
+setopt HIST_EXPIRE_DUPS_FIRST # Expire duplicates first
+setopt HIST_IGNORE_DUPS       # Ignore duplicate entries
+setopt HIST_FIND_NO_DUPS      # Don't show duplicates in search
+setopt HIST_REDUCE_BLANKS     # Remove superfluous blanks
+setopt HIST_VERIFY           # Verify history expansion
+
+# -----------------------------------------------------
+# Directory Options
+# -----------------------------------------------------
+setopt AUTO_CD              # Change directories without cd
+setopt AUTO_PUSHD          # Push directories to stack
+setopt PUSHD_IGNORE_DUPS   # Don't push duplicates
+setopt PUSHD_SILENT        # Quiet directory stacking
+setopt EXTENDED_GLOB       # Extended globbing
+
 # -----------------------------------------------------
 # Completion System
 # -----------------------------------------------------
-# Configure fpath for completions
+# Initialize completion system
+autoload -Uz compinit && compinit -d "${XDG_CACHE_HOME}/zsh/zcompdump"
+
+# Add Homebrew completions to fpath
 fpath=(
     $HOMEBREW_PREFIX/share/zsh/site-functions
     $HOMEBREW_PREFIX/share/zsh-completions
     $fpath
 )
 
-# Initialize completion system with caching
-autoload -Uz compinit
-if [[ -n ${ZDOTDIR}/.zcompdump(#qN.mh+24) ]]; then
-    compinit -d ${ZDOTDIR}/.zcompdump
-else
-    compinit -C -d ${ZDOTDIR}/.zcompdump
-fi
-
-# Modern completion styling
+# Completion styling
 zstyle ':completion:*' menu select
-zstyle ':completion:*' group-name ''
-zstyle ':completion:*' list-colors ''
-zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 
 # -----------------------------------------------------
-# Plugin Configuration
+# Key Bindings
 # -----------------------------------------------------
-# Load plugins from Homebrew
-plugins=(
-    zsh-syntax-highlighting
-    zsh-autosuggestions
-)
-
-for plugin ($plugins); do
-    if [[ -r $HOMEBREW_PREFIX/share/$plugin/$plugin.zsh ]]; then
-        source $HOMEBREW_PREFIX/share/$plugin/$plugin.zsh
-    fi
-done
-
-# -----------------------------------------------------
-# Tool Configurations
-# -----------------------------------------------------
-# FZF configuration
-if (( ${+commands[fzf]} )); then
-    export FZF_DEFAULT_COMMAND="fd --type f --hidden --follow --exclude .git"
-    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-    export FZF_ALT_C_COMMAND="fd --type d --hidden --no-ignore"
-
-    source $HOMEBREW_PREFIX/opt/fzf/shell/key-bindings.zsh
-fi
+bindkey -v  # Vi mode
+bindkey '^[[1;5C' forward-word
+bindkey '^[[1;5D' backward-word
+bindkey '^H' backward-kill-word
+bindkey '^[[3;5~' kill-word
 
 # -----------------------------------------------------
 # Aliases
 # -----------------------------------------------------
 # Modern CLI replacements
-(( ${+commands[bat]} ))      && alias cat='bat --pager "less -FR"'
-(( ${+commands[eza]} ))      && alias ls='eza --icons --group-directories-first'
-(( ${+commands[rg]} ))       && alias grep='rg'
-(( ${+commands[fd]} ))       && alias find='fd'
-(( ${+commands[glow]} ))     && alias md='glow'
-
-# Enhanced ls commands
-(( ${+commands[eza]} )) && {
+has_command bat && alias cat='bat --paging=never'
+has_command eza && {
+    alias ls='eza --icons --group-directories-first'
     alias ll='eza -l --git --icons --group-directories-first'
     alias la='eza -la --git --icons --group-directories-first'
-    alias tree='eza --tree --icons --group-directories-first'
+    alias lt='eza --tree --icons --group-directories-first'
 }
+has_command rg && alias grep='rg'
+has_command fd && alias find='fd'
+has_command zoxide && alias cd='z'
 
 # Git shortcuts
 alias gs='git status'
@@ -254,119 +111,57 @@ alias ga='git add'
 alias gc='git commit'
 alias gp='git push'
 alias gl='git pull'
-(( ${+commands[lazygit]} )) && alias lg='lazygit'
+has_command lazygit && alias lg='lazygit'
 
+# Navigation
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias -- -='cd -'
 
+# Package management
+alias brewup='brew update && brew upgrade && brew cleanup'
 
-# -----------------------------------------------------
-# Homebrew shortcuts
-# -----------------------------------------------------
-alias ll="ls -lahG"
-alias brewup="brew update && brew upgrade && brew cleanup"
-
-#------------------------------------------------------------------------------
-# Aliases
-#------------------------------------------------------------------------------
-# Modern CLI alternatives
-alias cat='bat --paging=always'
-alias grep='rg'
-alias find='fd'
-alias md='glow'
-alias ls='eza --icons'
-alias ll='eza -l --icons'
-alias la='eza -al --icons'
-
-# Git shortcuts
-alias gs='git status'
-alias ga='git add'
-alias gc='git commit'
-alias gp='git push'
-alias gl='git pull'
-alias lg='lazygit'
-
-# FZF enhanced commands
-alias flog='fzf --preview "bat --style=numbers --color=always --line-range=:500 {}"'
-alias falias='alias | fzf'
-alias fman='man -k . | fzf --preview "man {}"'
-
-# Homebrew shortcuts
-alias b="brew"
-alias bdr="brew doctor"
-alias blk="brew leaves"
-alias boc="brew outdated --cask"
-alias bof="brew outdated --formula"
-alias bupd="brew update"
-alias bupg="brew upgrade"
-alias bclean="brew cleanup --prune=all"
-alias bcleanall='brew cleanup --prune=all && rm -rf $(brew --cache)'
-alias bpull="bupd && bupg && bclean"
-alias bin="brew install"
-alias brein="brew reinstall"
-alias bi="brew info"
-alias bs="brew search"
-
-# Homebrew Cask/Bundle management
-alias bcl="brew list --cask"
-alias bcin="brew install --cask"
-alias bcup="brew upgrade --cask"
-alias bb="brew bundle"
-alias bbls="brew bundle dump --all --file=- --verbose"
-alias bbsave="brew bundle dump --all --verbose --global -f && chezmoi re-add ~/.Brewfile"
-alias bbcheck="brew bundle check --all --global --verbose"
-
-# Directory navigation
-alias gdl='cd ~/Downloads'
-alias gcf='cd ~/.config/'
-
-
-# Zsh configuration
-alias ze="nvim ~/.zshrc"
-alias zep="nvim ~/.zprofile"
-alias zs="source ~/.zshrc"
-alias zcompreset="rm -f ~/.zcompdump; compinit"
-
-alias be="nvim ~/.Brewfile"
-
+# Editor
+alias v='nvim'
+alias vc='nvim ~/.config/nvim/'
 
 # -----------------------------------------------------
-# Functions
+# Tool Initialization (Early)
 # -----------------------------------------------------
-# Create and change to directory
-mkcd() { mkdir -p "$1" && cd "$1" }
+# Initialize starship first for prompt
+if [[ -x "$(command -v starship)" ]]; then
+    eval "$(starship init zsh)"
+else
+    echo "Warning: starship not found. Please install with 'brew install starship'"
+fi
 
-# Quick config editing
-conf() {
-    local config_files=(
-        ~/.zshrc
-        ~/.config/nvim/init.lua
-        ~/.gitconfig
-    )
-    nvim ${config_files[@]}
-}
-
-# -----------------------------------------------------
-# Shell Enhancements
-# -----------------------------------------------------
-# Starship prompt
-(( ${+commands[starship]} )) && eval "$(starship init zsh)"
-
-# zoxide directory jumper
-(( ${+commands[zoxide]} )) && eval "$(zoxide init zsh)"
-
-# atuin history manager
-(( ${+commands[atuin]} )) && eval "$(atuin init zsh)"
+# Other tool initializations
+eval "$(zoxide init zsh)"
+eval "$(atuin init zsh)"
+eval "$(direnv hook zsh)"
 
 # -----------------------------------------------------
-# Final Configuration
+# Plugin System
 # -----------------------------------------------------
-# Load local overrides
-[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
+# Load plugins if they exist
+local plugins=(
+    "/opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+    "/opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+    "/opt/homebrew/share/zsh-abbr/zsh-abbr.zsh"
+)
 
-# Cleanup variables
-unset plugins plugin
+for plugin in $plugins; do
+    [[ -f $plugin ]] && source $plugin
+done
 
 # -----------------------------------------------------
-# Performance Profiling
+# Load Custom Functions
 # -----------------------------------------------------
-# Uncomment to enable startup profiling
-# zprof
+[[ -f "${ZDOTDIR}/functions.zsh" ]] && source "${ZDOTDIR}/functions.zsh"
+
+# -----------------------------------------------------
+# Local Configuration
+# -----------------------------------------------------
+# Load local overrides if they exist
+[[ -f "${ZDOTDIR}/local.zsh" ]] && source "${ZDOTDIR}/local.zsh"

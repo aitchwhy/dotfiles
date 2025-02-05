@@ -1,6 +1,7 @@
+#!/usr/bin/env zsh
 
-
-# Custom functions
+# -----------------------------------------------------
+# Directory Management
 # -----------------------------------------------------
 
 # Create and enter directory
@@ -8,7 +9,11 @@ mkcd() {
     mkdir -p "$1" && cd "$1"
 }
 
-# Extract archives
+# -----------------------------------------------------
+# Archive Management
+# -----------------------------------------------------
+
+# Extract various archive types
 extract() {
     if [ -f $1 ]; then
         case $1 in
@@ -30,7 +35,11 @@ extract() {
     fi
 }
 
-# Process killer with fzf
+# -----------------------------------------------------
+# Process Management
+# -----------------------------------------------------
+
+# Interactive process killer using fzf
 fkill() {
     local pid
     if [ "$UID" != "0" ]; then
@@ -44,7 +53,11 @@ fkill() {
     fi
 }
 
-# Quick edit configs
+# -----------------------------------------------------
+# Configuration Management
+# -----------------------------------------------------
+
+# Quick edit common config files
 conf() {
     local config_files=(
         "${ZDOTDIR}/zshrc"
@@ -53,4 +66,3 @@ conf() {
     )
     ${EDITOR:-nvim} ${config_files[@]}
 }
-
