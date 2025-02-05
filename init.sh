@@ -42,8 +42,6 @@ setup_xdg() {
     ensure_dir "${HOME}/.local/share"
     ensure_dir "${HOME}/.local/state"
 }
-
-# Setup ZSH configuration
 setup_zsh() {
     local zsh_config="${HOME}/.config/zsh"
     local dotfiles_zsh="${HOME}/dotfiles/home/config/zsh"
@@ -78,17 +76,19 @@ EOF
         git clone --depth=1 https://github.com/mattmc3/antidote.git "$antidote_dir"
     fi
 
-    # Create symlink for ZSH config
-    if [[ -L "$zsh_config" ]]; then
-        rm "$zsh_config"
-    fi
-    log_info "Creating symlink for ZSH configuration"
-    ln -sf "$dotfiles_zsh" "$zsh_config"
+    # Symlink each file individually instead of the whole directory
+    for file in "${dotfiles_zsh}"/*; do
+        local fname=$(basename "$file")
+        local target="${zsh_config}/${fname}"
+        backup_if_exists "$target"
+        log_info "Creating symlink for ${fname}"
+        ln -sf "$file" "$target"
+    done
 
     # Generate static plugin file
     if command -v antidote > /dev/null; then
         log_info "Generating static plugins file..."
-        antidote bundle < "${dotfiles_zsh}/plugins.txt" > "${dotfiles_zsh}/.plugins.zsh"
+        antidote bundle < "${dotfiles_zsh}/plugins.txt" > "${zsh_config}/.plugins.zsh"
     fi
 }
 
