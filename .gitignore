@@ -1,3 +1,12 @@
 result
 result/
+
+# Zsh-specific ignores
+home/.config/zsh/.zcompdump*
+home/.config/zsh/.zsh_history
+home/.config/zsh/plugins/
+home/.config/zsh/cache/
+
+# General ignores
 .DS_Store
+*.swp

@@ -1,4 +1,53 @@
-#!/usr/bin/env zsh
+# Load tool if it exists
+load_if_exists() {
+    local cmd="$1"
+    local setup_cmd="$2"
+    
+    if command -v "$cmd" > /dev/null; then
+        eval "$setup_cmd"
+    fi
+}
+
+# Load optional config file
+load_config_if_exists() {
+    local config="$1"
+    [[ -f "$config" ]] && source "$config"
+}
+
+
+
+# Update dotfiles
+update_dotfiles() {
+    local dotfiles_dir="$HOME/dotfiles"
+    if [[ -d "$dotfiles_dir/.git" ]]; then
+        (cd "$dotfiles_dir" && git pull && ./init.sh)
+    fi
+}
+
+
+# -----------------------------------------------------
+# Directory management
+# -----------------------------------------------------
+
+# Make directory and cd into it
+mkcd() {
+    mkdir -p "$1" && cd "$1"
+}
+
+# Path manipulation
+path_append() {
+    if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
+        PATH="${PATH:+"$PATH:"}$1"
+    fi
+}
+
+path_prepend() {
+    if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
+        PATH="$1${PATH:+":$PATH"}"
+    fi
+}
+
+
 
 # -----------------------------------------------------
 # Directory Management
@@ -51,18 +100,4 @@ fkill() {
     if [ "x$pid" != "x" ]; then
         echo $pid | xargs kill -${1:-9}
     fi
-}
-
-# -----------------------------------------------------
-# Configuration Management
-# -----------------------------------------------------
-
-# Quick edit common config files
-conf() {
-    local config_files=(
-        "${ZDOTDIR}/zshrc"
-        "${XDG_CONFIG_HOME}/nvim/init.lua"
-        "${XDG_CONFIG_HOME}/starship.toml"
-    )
-    ${EDITOR:-nvim} ${config_files[@]}
 }
