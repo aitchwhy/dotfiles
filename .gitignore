@@ -2,10 +2,11 @@ result
 result/
 
 # Zsh-specific ignores
-home/.config/zsh/.zcompdump*
-home/.config/zsh/.zsh_history
-home/.config/zsh/plugins/
-home/.config/zsh/cache/
+.zcompdump*
+.zsh_history
+.antidote/
+plugins/
+cache/
 
 # General ignores
 .DS_Store

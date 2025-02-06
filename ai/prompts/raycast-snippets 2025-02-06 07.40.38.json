@@ -1,0 +1,494 @@
+[
+    {
+        "name": "Patter AI Standup",
+        "text": "# Patter AI Standup ({date format=\"MMM d, yyyy\"})\n\n## Since last time\n\n* \n\n## Today\n\n* \n\n## Notes\n\n* \n\n#patter-ai\/standup"
+    },
+    {
+        "name": "chrome urls",
+        "text": "chrome:\/\/chrome-urls",
+        "keyword": ";chr"
+    },
+    {
+        "name": "bw",
+        "text": "(Jhbw53771020017)!@#",
+        "keyword": ";bw"
+    },
+    {
+        "name": "homebrew uninstaller shell script",
+        "text": "\/bin\/bash -c \"$(curl -fsSL https:\/\/raw.githubusercontent.com\/Homebrew\/install\/HEAD\/uninstall.sh)\""
+    },
+    {
+        "text": "# Ansa Deployment ({date format=\"MMM d, yyyy\"})\n\n\n---\n## Prep\n\n* [[Ansa Services+Environments]]\n* [[Ansa Deployment (Ansa testing curl URL) (Jun 27, 2023)]]\n\n---\n## Agenda\n\n* Deploy Microservices in Envs -> [[Ansa Services+Environments]]\n    * Microservices\n        * `ansa-server`\n        * `ansa-ios-backend`\n        * etc\n    * Envs\n        * PROD\n        * TODO\n* Code changes JIRA ticket note -> ANSA-??? Bear Note\n* DB migration\n    * `schema` -> ??? TODO\n    * `data` -> ??? TODO\n    * `manual data` -> ??? TODO\n\n\n- - -\n## Notes\n\n* new commit hash : `xxx`\n* existing\n  * PROD : `xxx`\n    * existing deploy commit (image AWS Cloudformation)\n  * SANDBOX : `xxx`\n    * existing deploy commit (image AWS Cloudformation)\n* changes (`scripts\/ansa_utils.sh`)\n  * get target dest full git log (e.g. latest `main` or `HEAD` if checked-out)\n    * `git log HEAD --format=\"%H\"`\n  * `.\/scripts\/ansa_utils.sh deploy_history {full git commit hash}`\n    * ??? TODO commit diff image\n* Notify team -> Slack msg\n  * Slack msg screenshot\n\n### DB migration (if any)\n\n* (from localhost laptop) + (CD-ed into `ansa-platform` root)\n  * SSH into environment Tailscale (for DB RDS access)\n    * SSH configs\n\n* Construct RDS connection string\n```shell\nexport POSTGRESQL_URL='postgresql:\/\/{{user}}:{{password}}@{{host}}:{{port}}\/{{dbname}}?sslmode=disable'\n\n# localhost dev DB example\nexport POSTGRESQL_URL='postgresql:\/\/ansa:bowieandearl@localhost:54320\/ansa?sslmode=disable'\n\n# sandbox with SSH\nexport POSTGRESQL_URL='postgresql:\/\/ansa:N58AxpL71kOkxcsFgi3IGlgT7J5JGGZQ@localhost:5434\/ansa?sslmode=disable'\n\n# live with SSH\nexport POSTGRESQL_URL='postgresql:\/\/ansa:fAk5Rmc1XAycsNRdbKZucLwEludfi5vC@localhost:5434\/ansa?sslmode=disable'\n\n```\n\n* run `golang-migrate` to get current version\n```shell\nmigrate -database ${POSTGRESQL_URL} -path migrations\/schema version\n```\n* run `golang-migrate` to latest migration (`up`)\n```shell\nmigrate -database ${POSTGRESQL_URL} -path migrations\/schema up\n```\n* (if deployment error) run `golang-migrate` revert back to old version\n```shell\nmigrate -database ${POSTGRESQL_URL} -path migrations\/schema goto {previous_ver}\n```\n\n\n### Sandbox\n\n#### DB migration\n\n* RDS connection string\n```shell\n# TODO (from above SSH conn string + POSTGRESQL_URL for golang-migrate)\n...\n```\n* RDS migration\n  * version BEFORE migration (==??==)\n    * image screenshot of version\n  * version AFTER migration (==??==)\n    * image screenshot of version\n\n#### Current deployed\n\n* Cloudformation git hashes\n  * old : `xxx`\n  * new : `xxx`\n\n\n#### Cloudformation logs\n\n* Update complete\n  * AWS Cloudformation event logs screenshot\n\n\n#### infra logs (`\/var\/log\/deploy.log`)\n\n\n* no errors\n  * logs tail-ed screenshot\n\n\n#### app logs (`~\/mnt\/ansa\/logs\/web-request.log`)\n\n* no errors\n  * logs tail-ed screenshot\n\n\n#### Run test APIs\n  \n```\ncurl -X POST --url https:\/\/api-sandbox.getansa.com\/v1\/customers\/5fe209c9-e205-4a28-b3d8-c30d0717ed5a\/add-balance -H 'Content-Type: application\/json' -H 'Authorization: ansa_sk_sandbox_DaiMx\/mnEUh\/IXYHI7KQ7O9r2wOPe7fT' -d '{\"paymentMethodId\": \"43710d5c-e704-4d03-97b7-0b7425585a\", \"amount\": 2500, \"currency\": \"usd\"}'\n\n```\n\n\n```\ncurl -X POST --url https:\/\/api-sandbox.getansa.com\/v1\/customers\/5fe209c9-e205-4a28-b3d8-c30d0717ed5a\/use-balance -H 'Content-Type: application\/json' -H 'Authorization: ansa_sk_sandbox_DaiMx\/mnEUh\/IXYHI7KQ7O9r2wOPe7fT' -d '{ \"amount\": 1500, \"currency\": \"usd\" }'\n\n```\n\n\n### Prod\n\n#### DB migration\n\n* RDS connection string\n```shell\n# TODO (from above SSH conn string + POSTGRESQL_URL for golang-migrate)\n...\n```\n* RDS migration\n  * version BEFORE migration (==??==)\n    * image screenshot of version\n  * version AFTER migration (==??==)\n    * image screenshot of version\n\n#### Current deployed\n\n* Cloudformation git hashes\n  * old : `xxx`\n  * new : `xxx`\n\n\n#### Cloudformation logs\n\n* Update complete\n  * AWS Cloudformation event logs screenshot\n\n\n#### infra logs (`\/var\/log\/deploy.log`)\n\n\n* no errors\n  * logs tail-ed screenshot\n\n\n#### app logs (`~\/mnt\/ansa\/logs\/web-request.log`)\n\n* no errors\n  * logs tail-ed screenshot\n\n\n#### Run test APIs\n\n```\ncurl -X \"POST\" --url https:\/\/api.getansa.com\/v1\/customers\/3bdf6da8-2880-49b1-a440-e312ad4d8441\/add-balance -H 'Content-Type: application\/json' -H 'Authorization: ansa_sk_live_ssc1ZBgj3HV+INg4OkRyAeYwcBq0ixf6' -d '{ \"amount\": 500, \"paymentMethodId\": \"a3dad663-ea97-47e7-acd4-afc404f87cda\", \"currency\": \"usd\" }' \n\n```\n\n\n```\ncurl -X \"POST\" --url https:\/\/api.getansa.com\/v1\/customers\/3bdf6da8-2880-49b1-a440-e312ad4d8441\/use-balance -H 'Content-Type: application\/json' -H 'Authorization: ansa_sk_live_ssc1ZBgj3HV+INg4OkRyAeYwcBq0ixf6' -d '{ \"amount\": 50 }'\n\n```\n\n\n---\n## TODOs + Follow up Action items\n\n\n\n#ansa\/deployment\n",
+        "name": "Ansa Deployment"
+    },
+    {
+        "name": "homebrew man page",
+        "text": "https:\/\/docs.brew.sh\/Manpage"
+    },
+    {
+        "text": "ssh hank@aitchwhy.synology.me -p 222",
+        "name": "SSH NAS CLI"
+    },
+    {
+        "text": "## Preview\n\n* big events\n* main goals\n  * `work`\n  * `chores`\n  * `hacking`\n  * `career`\n  * `social`\n\n## During\n\n* standup\n\n## Review\n\n* big events review\n* main goals review\n  * `work`\n  * `chores`\n  * `hacking`\n  * `career`\n  * `social`\n",
+        "name": "daily"
+    },
+    {
+        "name": "audio device Scarlett 2i2 dashboard FocusRite",
+        "text": "https:\/\/id.focusritegroup.com\/en\/my-hardware"
+    },
+    {
+        "name": "dropbox email",
+        "text": "announce.powder.attitude.tray.marble@addtodropbox.com"
+    },
+    {
+        "name": "Daily Algorithms",
+        "text": "# Daily Algorithms ({date format=\"MMM d, yyyy\"})\n\n* Problem Link\n\n#programming\/algorithm\/competitive-programming\n#plans\/job_search_4\n"
+    },
+    {
+        "text": "Custard-Hybrid-Snore5",
+        "name": "apple dev"
+    },
+    {
+        "name": "hank mint-mobile phone number",
+        "text": "2023524713"
+    },
+    {
+        "text": "# Ansa Incident ({cursor}) ({date format=\"MMM d, yyyy\"})\n\n---\n## Prep\n* [[Ansa Services+Environments]]\n    * Microservices\n        * `ansa-platform`\n        * `ansa-ios-backend`\n        * etc\n    * Envs\n        * `PROD-LIVE`\n        * `PROD-SANDBOX`\n        * etc\n\n---\n## Bug report\n\n* Slack link\n* Sentry link\n* Logs link\n\n* incident channel Slack link\n\n---\n## {date format=\"MMM d, yyyy\"}\n\n\n---\n## RCA\n\n### Analysis\n\n* incident Slack channel link\n* reported time (Sentry Link)\n    * Local : ``\n    * UTC : ``\n* relevant logs\n* relevant metrics\n\n### Impacted\n\n* Merchant\n    * ID : ``\n    * Name : ``\n* User\n    * ID : ``\n    * Name : ``\n    * Mixpanel link\n    * ios-backend User ID : ``\n    * PSP ID : ``\n\n* Tracing\n    * ansa-server requestID or logs link : ``\n    * ios-backend requestID or logs link : ``\n    * ledger transaction ID : ``\n\n### Ansa Microservices Code\n\n* `ansa-platform`\n* `ansa-ios-backend`\n* `ansa-ios`\n* `ansa-infra`\n* `ansa-admin`\n\n### Ansa external 3rd party Services\n\n* PSP link\n* Sardine link\n* AWS services link\n* etc links\n\n\n---\n## Fix\n\n### reproduce issue\n\n* DB Dump\n\n### Fix deployment\n\n* deployment Bear Note\n\n---\n\n#ansa\/incident",
+        "name": "Ansa Incident"
+    },
+    {
+        "name": "jira",
+        "text": "# DB-??? {cursor} ({date format=\"MMM d, yyyy\"})\n\n---\n## Context\n\n* JIRA link\n\n---\n## Summary of Changes\n\n---\n## {date format=\"MMM d, yyyy\"}\n\n---\n## Domain Topic\n\n---\n## Test \/ Validation\n\n---\n## PR\n\n* link\n* review\n\n---\n## Deployment \n\n---\n\n---\n#patter-ai\/jira\n\n"
+    },
+    {
+        "text": "# Ansa Interview (?Interview Type) (? Name - ?Role) ({date format=\"MMM d, yyyy\"})\n\n- - -\n## Prep for meeting\n\n* Video link\n* Coderpad\n* Lever\n\n- - -\n## Agenda\n\n* Notion Doc for interview\n\n- - -\n## Meeting notes\n\n\n* intros\n\n* problem\n\n* questions\n  * Candidate -> Hank\n  * Hank -> Candidate\n\n\n- - -\n## TODOs + Follow up Action items\n\n\n\n- - -\n\n#ansa\/interview",
+        "name": "Ansa Interview"
+    },
+    {
+        "name": "social",
+        "text": "# Title {cursor} ({date format=\"MMM d, yyyy\"})\n\n---\n## Prep for event\n\n\n---\n## Agenda\n\n\n---\n## Notes\n\n\n---\n## TODOs + Follow up Action items\n\n* CRM\n  * add new people\n  * update new info on known people\n* Photos\n  * share with event participants\n\n#social"
+    },
+    {
+        "text": "curl -sS https:\/\/webi.sh\/webi | sh",
+        "name": "webi install (curl)"
+    },
+    {
+        "name": "(LLM prompt template) (Calendar Fantasical) parse data+files into natural language input",
+        "text": "parse attached files (e.g. HTML, screenshot image) relevant data as well as any optionally provided relevant textual data below and output natural language string that works as input to calendar app Fantastical to add events. Include useful info and links (e.g. flight reservation code or flight code) to the calendar event title or notes section."
+    },
+    {
+        "name": "weekly",
+        "text": "# Week ({date format=\"MMM d, yyyy (EEE)\"} ~ {date format=\"MMM d, yyyy (EEE)\" offset=\"+6d\"})\n\n* Follow up previous week -> [[Week ({date format=\"MMM d, yyyy (EEE)\" offset=\"-7d\"} ~ {date format=\"MMM d, yyyy (EEE)\" offset=\"-1d\"})]]\n\n---\n## Preview\n\n* [[Weekly Preview ({date format=\"MMM d, yyyy (EEE)\"} ~ {date format=\"MMM d, yyyy (EEE)\" offset=\"+6d\"})]]\n\n---\n## Review\n\n* [[Weekly Review ({date format=\"MMM d, yyyy (EEE)\"} ~ {date format=\"MMM d, yyyy (EEE)\" offset=\"+6d\"})]]\n\n---\n# {date format=\"MMM d, yyyy (EEE)\"}\n\n\n## Preview\n\n* big events\n* main goals\n  * `work`\n  * `chores`\n  * `hacking`\n  * `career`\n  * `social`\n\n## During\n\n* [[Standup ({date format=\"MMM d, yyyy\"})]]\n* [[Daily Algorithms ({date format=\"MMM d, yyyy\"})]]\n\n## Review\n\n* big events review\n* main goals review\n  * `work`\n  * `chores`\n  * `hacking`\n  * `career`\n  * `social`\n\n---\n# {date format=\"MMM d, yyyy (EEE)\" offset=\"+1d\"}\n\n\n## Preview\n\n* big events\n* main goals\n  * `work`\n  * `chores`\n  * `hacking`\n  * `career`\n  * `social`\n\n## During\n\n* [[Standup ({date format=\"MMM d, yyyy\"  offset=\"+1d\"})]]\n* [[Daily Algorithms ({date format=\"MMM d, yyyy\"  offset=\"+1d\"})]]\n\n## Review\n\n* big events review\n* main goals review\n  * `work`\n  * `chores`\n  * `hacking`\n  * `career`\n  * `social`\n\n---\n# {date format=\"MMM d, yyyy (EEE)\" offset=\"+2d\"}\n\n## Preview\n\n* big events\n* main goals\n  * `work`\n  * `chores`\n  * `hacking`\n  * `career`\n  * `social`\n\n## During\n\n* [[Standup ({date format=\"MMM d, yyyy\"  offset=\"+2d\"})]]\n* [[Daily Algorithms ({date format=\"MMM d, yyyy\"  offset=\"+2d\"})]]\n\n## Review\n\n* big events review\n* main goals review\n  * `work`\n  * `chores`\n  * `hacking`\n  * `career`\n  * `social`\n\n---\n# {date format=\"MMM d, yyyy (EEE)\" offset=\"+3d\"}\n\n## Preview\n\n* big events\n* main goals\n  * `work`\n  * `chores`\n  * `hacking`\n  * `career`\n  * `social`\n\n## During\n\n* [[Standup ({date format=\"MMM d, yyyy\"  offset=\"+3d\"})]]\n* [[Daily Algorithms ({date format=\"MMM d, yyyy\"  offset=\"+3d\"})]]\n\n## Review\n\n* big events review\n* main goals review\n  * `work`\n  * `chores`\n  * `hacking`\n  * `career`\n  * `social`\n\n---\n# {date format=\"MMM d, yyyy (EEE)\" offset=\"+4d\"}\n\n## Preview\n\n* big events\n* main goals\n  * `work`\n  * `chores`\n  * `hacking`\n  * `career`\n  * `social`\n\n## During\n\n* [[Standup ({date format=\"MMM d, yyyy\"  offset=\"+4d\"})]]\n* [[Daily Algorithms ({date format=\"MMM d, yyyy\"  offset=\"+4d\"})]]\n\n## Review\n\n* big events review\n* main goals review\n  * `work`\n  * `chores`\n  * `hacking`\n  * `career`\n  * `social`\n\n---\n# {date format=\"MMM d, yyyy (EEE)\" offset=\"+5d\"}\n\n## Preview\n\n* big events\n* main goals\n  * `work`\n  * `chores`\n  * `hacking`\n  * `career`\n  * `social`\n\n## During\n\n* [[Daily Algorithms ({date format=\"MMM d, yyyy\"  offset=\"+5d\"})]]\n\n## Review\n\n* big events review\n* main goals review\n  * `work`\n  * `chores`\n  * `hacking`\n  * `career`\n  * `social`\n\n---\n# {date format=\"MMM d, yyyy (EEE)\" offset=\"+6d\"}\n\n## Preview\n\n* big events\n* main goals\n  * `work`\n  * `chores`\n  * `hacking`\n  * `career`\n  * `social`\n\n## During\n\n* [[Daily Algorithms ({date format=\"MMM d, yyyy\"  offset=\"+5d\"})]]\n\n## Review\n\n* big events review\n* main goals review\n  * `work`\n  * `chores`\n  * `hacking`\n  * `career`\n  * `social`\n\n---\n# Upcoming week\n\n\n---\n\n\n---\n#plans\n"
+    },
+    {
+        "text": "m7c8d3w3g1g6p7w6@aitchcareai.slack.com",
+        "name": "Slack forwarding address aitchcare.ai"
+    },
+    {
+        "name": "Circle",
+        "text": "●",
+        "keyword": "!circle"
+    },
+    {
+        "text": "7714749856",
+        "name": "hank t-mobile 2nd number"
+    },
+    {
+        "name": "Google Voice phone number (hank)",
+        "text": "5717495763"
+    },
+    {
+        "name": "industrious office aitchcare.ai mail address",
+        "text": "Jong Hyun Lee\n14 Ridge Square NW\n3rd Floor\nWashington DC, 20012"
+    },
+    {
+        "text": "Solve coding problem attached as image or below text. Explain the problem and the core algorithm concepts in the solution, and walk through step-by-step of each step of the problem solution explanation. Optimize response for quick and easy reading - use most concise language that does not lose salient info but can be read faster and easier + format each section of response with large headers to make it visually easy to navigate.\n\nProvide full python 3.10 code as solution with descriptive comments. Heavily prefer to use python 3.10 library utils whenever possible for code brevity+elegance like dataclasses, itertools, collections, functools.",
+        "name": "(LLM Prompt template) solve coding problem attached as image or below text"
+    },
+    {
+        "name": "phone number 413",
+        "text": "4133254473"
+    },
+    {
+        "name": "qed-gmail",
+        "text": "hank.lee.qed@gmail.com"
+    },
+    {
+        "name": "mac studio mstio hostname",
+        "text": "hank-mstio.local"
+    },
+    {
+        "name": "raspi web ui tailscale",
+        "text": "http:\/\/raspi.mink-betta.ts.net:8581\/"
+    },
+    {
+        "name": "meeting",
+        "text": "# {Title} {cursor} ({date format=\"MMM d, yyyy\"})\n\n---\n## Prep for meeting\n\n\n---\n## Agenda\n\n\n---\n## Meeting notes\n\n\n---\n## TODOs + Follow up Action items\n\n"
+    },
+    {
+        "name": "travel",
+        "text": "# Trip {cursor} ({date format=\"MMM d, yyyy\"} ~ {date format=\"MMM d, yyyy\"})\n\n---\n## Common\n\n* Splitwise\n\n---\n## Prep \/ TODOs\n\n* Flights\n* Stay (hotel \/ airbnb)\n* Transportation (rental car, etc)\n* Ticket\n\n### {date format=\"MMM d, yyyy (EEE)\"}\n\n- [ ] something\n\n---\n## People\n\n---\n## Goals\n\n---\n## Admin\n\n---\n## Itinerary\n\n### {date format=\"MMM d, yyyy (EEE)\" offset=\"+1d\"}\n\n### {date format=\"MMM d, yyyy (EEE)\"}\n\n---\n## Packing list\n\n\n- [ ] EDC\n  - [ ] keys\n  - [ ] wallet (2 IDs for backup)\n  - [ ] jewelry\n    - [ ] Rings\n    - [ ] Necklace\n    - [ ] Earring\n  - [ ] sunglasses\n- [ ] Toiletries\n  - [ ] razor\n  - [ ] Face wash\n  - [ ] 1 toner + 1 BHA + 1 face lotion\n  - [ ] Sunscreen\n  - [ ] 1 toothbrush + 1 toothpaste + floss\n  - [ ] hair product\n  - [ ] cologne\n  - [ ] mini eye drops\n  - [ ] contacts + glasses\n- [ ] Clothing\n  - [ ] 5 underwear\n  - [ ] 4 pairs of socks\n  - [ ] top\n    - [ ] button shirts\n    - [ ] undershirts\n    - [ ] jackets\n    - [ ] hoodies\n  - [ ] bottom\n    - [ ] 2 jeans (black + grey)\n    - [ ] 2 belts - 1 Tom Ford belt + brown\n  - [ ] PJs\n    - [ ] 1 blue shirt (vineyard vines) + PJ pants\n    - [ ] 1 Givenchy sweatpants\n  - [ ] shoes\n    - [ ] 1 Dolce&Gabbana sneakers\n    - [ ] 1 Versace boots\n  - [ ] hats (workout + normal)\n  - [ ] 3 workout clothes\n- [ ] Electronics\n  - [ ] laptop (work) + charger\n  - [ ] phone + charger (3-in-1 kit)\n  - [ ] iPad + USB-C charger\n  - [ ] AirPods\n  - [ ] Speaker\n  - [ ] Apple Watch\n  - [ ] WHOOP + charger + Mac dongle (to enable USB charging)\n  - [ ] portable battery\n- [ ] Etc\n  - [ ] Lint roller\n  - [ ] Workout bag (with running shoes)\n\n#social\n#leisure\/travel"
+    },
+    {
+        "text": "https:\/\/admin.duosecurity.com\/",
+        "name": "Admin Duo Security"
+    },
+    {
+        "keyword": ";li",
+        "name": "linkedin url",
+        "text": "https:\/\/www.linkedin.com\/in\/hank-lee-66652152\/"
+    },
+    {
+        "text": "https:\/\/github.com\/aitchwhy\/",
+        "name": "Github aitchwhy"
+    },
+    {
+        "text": "Thanks {first_name} for the intro! Moving you to BCC to spare your inbox",
+        "name": "Intro"
+    },
+    {
+        "name": "Asana email 30 Ridge Square NW Apt 621 task creation automate",
+        "text": "mailto:x@mail.asana.com"
+    },
+    {
+        "text": "woozy-groggy-overrule67",
+        "name": "wifi"
+    },
+    {
+        "name": "Google Workspace Email logs search",
+        "text": "https:\/\/admin.google.com\/u\/1\/ac\/emaillogsearch"
+    },
+    {
+        "name": "Reclaim AI Calendar link",
+        "text": "https:\/\/app.reclaim.ai\/m\/hank-lee"
+    },
+    {
+        "name": "QED email",
+        "keyword": ";qed",
+        "text": "hank.lee.qed@gmail.com"
+    },
+    {
+        "text": "Resource-Dawn-Kudos5!",
+        "name": "aive@mstio mac studio"
+    },
+    {
+        "name": "hank kakao email (hank.io@kakao.com)",
+        "text": "hank.io@kakao.com"
+    },
+    {
+        "name": "192.168.1.1 admin",
+        "text": "Public-Flashbulb1-Shower"
+    },
+    {
+        "text": "255.255.255.0",
+        "name": "nighthawk-router-local-network-lan-cidr-subnet-mask"
+    },
+    {
+        "name": "nighthawk-router-local-network-lan-ip",
+        "text": "192.168.1.1"
+    },
+    {
+        "name": "h-synology-nas-local-network-lan-ip",
+        "text": "192.168.1.33"
+    },
+    {
+        "text": "192.168.1.47",
+        "name": "h-mstio-local-network-lan-ip"
+    },
+    {
+        "name": "h-mbp-local-network-lan-ip",
+        "text": "192.168.1.55"
+    },
+    {
+        "name": "tplink-extender-local-network-lan-ip",
+        "text": "192.168.1.104"
+    },
+    {
+        "text": "192.168.1.0\/24",
+        "name": "nighthawk-router-local-network-lan-cidr"
+    },
+    {
+        "name": "apple",
+        "text": "Running-Backup-Aching4",
+        "keyword": ";a"
+    },
+    {
+        "text": "Headless-Booted8-Drier",
+        "name": "nas p"
+    },
+    {
+        "text": "hank.lee.qed@icloud.com",
+        "name": "icloud"
+    },
+    {
+        "name": "mac",
+        "text": "FuckingPassword!@#",
+        "keyword": ";mac"
+    },
+    {
+        "name": "dropbox local folder directory path",
+        "text": "~\/Library\/CloudStorage\/Dropbox\/Inbox\/{cursor}-{date format=\"yyyy-MM-dd\"}"
+    },
+    {
+        "keyword": ";gh-issue",
+        "name": "GitHub Issue Template",
+        "text": "## Expected Behavior\n\n## Actual Behavior\n\n## Steps to Reproduce the Problem\n\n  1.\n  1.\n  1.\n\n## Specifications\n\n  - Version:\n  - Platform:\n  - Subsystem:\n"
+    },
+    {
+        "name": "GitHub Pull Request Template",
+        "keyword": ";gh-pr",
+        "text": "<!-- Thanks for opening a PR! Your contribution is much appreciated.-->\n\nFixes #\n\n## Proposed Changes\n\n  -\n  -\n  -\n"
+    },
+    {
+        "name": "GitHub Details",
+        "text": "<details>\n<summary>Title<\/summary>\n{cursor}\n<\/details>",
+        "keyword": ";gh-details"
+    },
+    {
+        "name": "GitHub Table",
+        "text": "| Title1 | Title2 |\n| ------- | ------- |\n| Content1 | Content2 |\n  ",
+        "keyword": ";gh-table"
+    },
+    {
+        "name": "Command",
+        "text": "⌘",
+        "keyword": ";cmd"
+    },
+    {
+        "name": "Control",
+        "text": "⌃",
+        "keyword": ";ctrl"
+    },
+    {
+        "name": "Caps Lock",
+        "text": "⇪",
+        "keyword": ";caps"
+    },
+    {
+        "name": "Shift",
+        "text": "⇧",
+        "keyword": ";shift"
+    },
+    {
+        "name": "Option",
+        "text": "⌥",
+        "keyword": ";opt"
+    },
+    {
+        "keyword": ";backspace",
+        "name": "Backspace",
+        "text": "⌫"
+    },
+    {
+        "keyword": ";esc",
+        "name": "Escape",
+        "text": "⎋"
+    },
+    {
+        "name": "Tab",
+        "text": "⇥",
+        "keyword": ";tab"
+    },
+    {
+        "text": "⏎",
+        "keyword": ";return",
+        "name": "Return"
+    },
+    {
+        "name": "Apple",
+        "keyword": ";apple",
+        "text": ""
+    },
+    {
+        "keyword": ";sparkle",
+        "text": "✦",
+        "name": "Sparkle"
+    },
+    {
+        "name": "Horizontal Ellipsis",
+        "text": "…",
+        "keyword": ";horizontal-ellipsis"
+    },
+    {
+        "name": "Arrow Left",
+        "text": "←",
+        "keyword": ";left"
+    },
+    {
+        "name": "Arrow Up",
+        "keyword": ";up",
+        "text": "↑"
+    },
+    {
+        "text": "→",
+        "name": "Arrow Right",
+        "keyword": ";right"
+    },
+    {
+        "keyword": ";down",
+        "name": "Arrow Down",
+        "text": "↓"
+    },
+    {
+        "keyword": ";undo",
+        "name": "Undo",
+        "text": "↺"
+    },
+    {
+        "keyword": ";redo",
+        "text": "↻",
+        "name": "Redo"
+    },
+    {
+        "name": "Email Address",
+        "keyword": ";email",
+        "text": "your@email.com"
+    },
+    {
+        "text": "123 Quebec Road, Montreal, QC, H3A 2B2",
+        "name": "Address",
+        "keyword": ";address"
+    },
+    {
+        "text": "console.log({cursor})",
+        "name": "Console Log",
+        "keyword": ";log"
+    },
+    {
+        "keyword": ";try",
+        "name": "Try Catch",
+        "text": "try {\n  {cursor}\n} catch (error) {\n\n} finally {\n\n}"
+    },
+    {
+        "name": "React: useEffect",
+        "keyword": ";rue",
+        "text": "React.useEffect(() => {\n  {cursor}\n}, [])"
+    },
+    {
+        "name": "Sleep Promise",
+        "text": "const sleep = (time = 3000) => new Promise (resolve => setTimeout (resolve, time));",
+        "keyword": ";sleep"
+    },
+    {
+        "keyword": ";switch",
+        "name": "Switch Statement",
+        "text": "switch ({cursor}) {\n  case 'value': {\n    break\n  }\n  default: {\n    break\n  }\n}"
+    },
+    {
+        "text": "export function Component() {\n  return null\n}",
+        "keyword": ";rfc",
+        "name": "Export Functional Component"
+    },
+    {
+        "keyword": ";ray-vc",
+        "text": "export default function Command() {\n  return {cursor}\n}",
+        "name": "Raycast View Command"
+    },
+    {
+        "keyword": ";css-ac",
+        "name": "CSS Center Align",
+        "text": ".selector {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}"
+    },
+    {
+        "keyword": ";vscd-init",
+        "name": "Create and Open Folder in VSCode",
+        "text": "mkdir {clipboard} && code -r {clipboard}"
+    },
+    {
+        "text": "document.querySelector({cursor})",
+        "keyword": ";qs",
+        "name": "DOM Query Selector"
+    },
+    {
+        "name": "On my way!",
+        "keyword": "omw",
+        "text": "On my way!"
+    },
+    {
+        "name": "30 Ridge Square NW Apt 621",
+        "text": "30 Ridge Square NW Apt 621",
+        "keyword": "30r"
+    },
+    {
+        "keyword": "hk",
+        "name": "hotkey",
+        "text": "hotkey"
+    },
+    {
+        "name": "City Ridge",
+        "text": "City Ridge",
+        "keyword": "cr"
+    },
+    {
+        "keyword": "413",
+        "name": "4133254473",
+        "text": "4133254473"
+    },
+    {
+        "keyword": ";pm",
+        "name": "haute.h@pm.me",
+        "text": "haute.h@pm.me"
+    },
+    {
+        "text": "# doc link - https:\/\/code.visualstudio.com\/docs\/editor\/portable\ncode-portable-data",
+        "name": "vscode macos app portable version DIRECTORY FOLDER name",
+        "keyword": ";codeport"
+    },
+    {
+        "text": "curl --proto '=https' --tlsv1.2 -sSf -L https:\/\/install.determinate.systems\/nix | \\\n  sh -s -- install --no-confirm --extra-conf \"trusted-users = $(id -un)\"",
+        "name": "Install Nix (Determinate Systems)"
+    },
+    {
+        "name": "phone number 240",
+        "text": "2404575354"
+    },
+    {
+        "name": "Monkt convert docs to AI ready md + json",
+        "text": "https:\/\/monkt.com\/"
+    },
+    {
+        "text": "$HOME\/Library\/Application\\ Support\/Code\/User\/settings.json",
+        "name": "vscode-settings-json-path"
+    },
+    {
+        "text": "sh -c \"$(curl -fsLS get.chezmoi.io)\" -- init --apply aitchwhy",
+        "name": "chezmoi zsh shell one line install script"
+    },
+    {
+        "text": "curl https:\/\/get.volta.sh | bash\n",
+        "name": "Volta install shell zsh script"
+    },
+    {
+        "name": "brew install",
+        "text": "\/bin\/bash -c \"$(curl -fsSL https:\/\/raw.githubusercontent.com\/Homebrew\/install\/HEAD\/install.sh)\"\n"
+    },
+    {
+        "name": "uv python tool install command",
+        "text": "curl -LsSf https:\/\/astral.sh\/uv\/install.sh | sh\n"
+    },
+    {
+        "name": "llm",
+        "text": "\tRole & Style:\n\t\t1.\tYou are an expert software engineer and mentor preparing me for Big Tech interviews.\n\t2.\tI will provide the problem statement as an attached image or text (assume we can parse or summarize it).\n\t3.\tFocus on the fastest solution in minimal “no-typing” Python 3.12+ code.\n\t4.\tBefore coding, start with an ELI5 conceptual explanation so I can discuss the approach.\n\t5.\tProvide a very concise code implementation, optimized for speed and clarity.\n\n\tTask Outline:\n\t\t1.\tRestate the Problem (Briefly):\n\t•\tSummarize the challenge using the attached problem statement.\n\t•\tConfirm any assumptions if not specified in the problem.\n\n\t\t2.\tELI5 Conceptual Understanding (Approach First):\n\t•\tExplain the problem in plain language so even a child could understand.\n\t•\tCompare at least two solution approaches briefly (e.g., brute force vs. optimized).\n\t•\tUse simple analogies to illustrate the key idea (e.g., “We’re sorting like alphabetizing a list of names…”).\n\n\t\t3.\tMinimal Diagrams (Optional ASCII Art):\n\t•\tIf relevant, show a quick flow or data-structure transformation.\n\t•\tKeep it short and easy to glance at.\n\n\t\t4.\tSpeedy\/Minimal Python 3.12+ Code:\n\t•\tProvide a single function or snippet that can be quickly copied and run.\n\t•\tUse as few lines as possible, but remain clear and correct.\n\t•\tFavor built-ins and concise data-structure usage.\n\t•\tDemonstrate best practices (e.g., using f-strings, type hints, etc.) where helpful but keep the code tight.\n\n\t\t5.\tStep-by-Step Example (Optional):\n\t•\tIf time allows, walk through one simple example to show how the code works.\n\t•\tFocus on the critical transitions or data changes.\n\n\t\t6.\tComplexity & Trade-offs:\n\t•\tProvide Big-O time and space complexity.\n\t•\tMention any trade-offs (e.g., small memory overhead for speed improvements).\n\n\t\t7.\tFinal Interview Tips & Potential Follow-ups:\n\t•\tNote common pitfalls or special edge cases.\n\t•\tGive ideas for how an interviewer might extend the problem (e.g., handle larger inputs, add constraints)."
+    },
+    {
+        "name": "starship init config shell zsh command",
+        "text": "mkdir -p ~\/.config && touch ~\/.config\/starship.toml\n"
+    },
+    {
+        "name": "x-cmd CLI unified tooling install script",
+        "text": "eval \"$(curl https:\/\/get.x-cmd.com)\""
+    },
+    {
+        "text": "Valid-Unvarying4-Snare",
+        "name": "macos time-machine backups"
+    },
+    {
+        "text": "vnc:\/\/208.52.161.15",
+        "name": "MacStadium cloud hosted Mac Mini M4 VNC URL address"
+    },
+    {
+        "text": "defaults export pro.betterdisplay.BetterDisplay ~\/Desktop\/BetterDisplay.plist\n\ndefaults import pro.betterdisplay.BetterDisplay ~\/Desktop\/BetterDisplay.plist\n",
+        "name": "BetterDisplay mac os app settings import\/export shell command"
+    }
+]

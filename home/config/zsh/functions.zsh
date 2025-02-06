@@ -1,103 +1,51 @@
-# Load tool if it exists
-load_if_exists() {
-    local cmd="$1"
-    local setup_cmd="$2"
-    
-    if command -v "$cmd" > /dev/null; then
-        eval "$setup_cmd"
-    fi
-}
 
-# Load optional config file
-load_config_if_exists() {
-    local config="$1"
-    [[ -f "$config" ]] && source "$config"
-}
+  # Symlink .zshenv from dotfiles
+  backup_if_exists "${HOME}/.zshenv"
+  ln -sf "${dotfiles_dir}/home/zshenv" "${HOME}/.zshenv"
+  log_info "Symlinked .zshenv"
 
+  # Install/Update Antidote
+  local antidote_dir="${zsh_config}/.antidote"
+  if [[ ! -d "$antidote_dir" ]]; then
+    log_info "Installing Antidote..."
+    git clone --depth=1 https://github.com/mattmc3/antidote.git "$antidote_dir"
+  else
+    log_info "Updating Antidote..."
+    (cd "$antidote_dir" && git pull --rebase --autostash)
+  fi
 
+  # Symlink all Zsh config files
+  local zsh_files=(
+    ".zshrc"
+    "aliases.zsh"
+    "env.zsh"
+    "functions.zsh"
+    "macos.zsh"
+    "plugins.txt"
+  )
 
-# Update dotfiles
-update_dotfiles() {
-    local dotfiles_dir="$HOME/dotfiles"
-    if [[ -d "$dotfiles_dir/.git" ]]; then
-        (cd "$dotfiles_dir" && git pull && ./init.sh)
-    fi
-}
+  for fname in "${zsh_files[@]}"; do
+    local source_file="${dotfiles_zsh}/${fname}"
+    local target_file="${zsh_config}/${fname}"
 
-
-# -----------------------------------------------------
-# Directory management
-# -----------------------------------------------------
-
-# Make directory and cd into it
-mkcd() {
-    mkdir -p "$1" && cd "$1"
-}
-
-# Path manipulation
-path_append() {
-    if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
-        PATH="${PATH:+"$PATH:"}$1"
-    fi
-}
-
-path_prepend() {
-    if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
-        PATH="$1${PATH:+":$PATH"}"
-    fi
-}
-
-
-
-# -----------------------------------------------------
-# Directory Management
-# -----------------------------------------------------
-
-# Create and enter directory
-mkcd() {
-    mkdir -p "$1" && cd "$1"
-}
-
-# -----------------------------------------------------
-# Archive Management
-# -----------------------------------------------------
-
-# Extract various archive types
-extract() {
-    if [ -f $1 ]; then
-        case $1 in
-            *.tar.bz2)   tar xjf $1     ;;
-            *.tar.gz)    tar xzf $1     ;;
-            *.bz2)       bunzip2 $1     ;;
-            *.rar)       unrar e $1     ;;
-            *.gz)        gunzip $1      ;;
-            *.tar)       tar xf $1      ;;
-            *.tbz2)      tar xjf $1     ;;
-            *.tgz)       tar xzf $1     ;;
-            *.zip)       unzip $1       ;;
-            *.Z)         uncompress $1  ;;
-            *.7z)        7z x $1        ;;
-            *)          echo "'$1' cannot be extracted" ;;
-        esac
+    if [[ -f "$source_file" ]]; then
+      backup_if_exists "$target_file"
+      ln -sf "$source_file" "$target_file"
+      log_info "Symlinked ${fname}"
     else
-        echo "'$1' is not a valid file"
+      log_error "File not found: $source_file. Skipping."
     fi
-}
+  done
 
-# -----------------------------------------------------
-# Process Management
-# -----------------------------------------------------
-
-# Interactive process killer using fzf
-fkill() {
-    local pid
-    if [ "$UID" != "0" ]; then
-        pid=$(ps -f -u $UID | sed 1d | fzf -m | awk '{print $2}')
+  # Generate static plugins file
+  if [[ -f "${zsh_config}/plugins.txt" ]]; then
+    if command -v antidote &>/dev/null; then
+      log_info "Generating .plugins.zsh from plugins.txt..."
+      antidote bundle <"${zsh_config}/plugins.txt" >"${zsh_config}/.plugins.zsh"
     else
-        pid=$(ps -ef | sed 1d | fzf -m | awk '{print $2}')
+      log_info "Generating .plugins.zsh using local antidote..."
+      "${antidote_dir}/antidote.zsh" bundle <"${zsh_config}/plugins.txt" >"${zsh_config}/.plugins.zsh"
     fi
+  fi
 
-    if [ "x$pid" != "x" ]; then
-        echo $pid | xargs kill -${1:-9}
-    fi
-}
+  log_success "Zsh configuration complete"
