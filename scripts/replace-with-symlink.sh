@@ -6,40 +6,22 @@
 # ls -al "/Users/hank/Library/Application Support/Cursor/User"
 ######################
 
-CONFIGS="$HOME/dotfiles/home/configs"
+# Exit if any command fails
+set -e
 
+# Base directories
+DOTFILES_ROOT="$HOME/dotfiles"
+CONFIGS="$DOTFILES_ROOT/home/configs"
 DOT_CONFIGS="$HOME/.config"
-LIB_APP_SUPPORT="$HOME/Library/Application\ Support"
-
-# ghostty
-replace_with_symlink "$CONFIGS/ghostty/config" "$DOT_CONFIGS/ghostty/config"
-
-# karabiner
-ln -sf $SRC_CONFIG_DIR/karabiner/karabiner.json $DST_CONFIG_DIR/.config/karabiner/karabiner.json
-
-# Cursor (App)
-# /Users/hank/Library/Application\ Support/Cursor/User/keybindings.json
-ln -sf $SRC_CONFIG_DIR/Cursor/User/keybindings.json  $SRC_CONFIG_DIR/Cursor/User/keybindings.json ~/.config/cursor/keybindings.json
-ln -sf $CONFIG_DIR/cursor/keybindings.json ~/.config/cursor/keybindings.json
-
-# starship
-ln -sf $CONFIG_DIR/starship/starship.toml ~/.config/starship/starship.toml
-
-# nvim
-ln -sf $CONFIG_DIR/nvim/init.lua ~/.config/nvim/init.lua
-
-# Config paths
-replace_with_symlink "$CONFIGS/yazi" "$DOT_CONFIGS/yazi"
-replace_with_symlink "$CONFIGS/zoxide" "$DOT_CONFIGS/zoxide"
-replace_with_symlink "$CONFIGS/zellij" "$DOT_CONFIGS/zellij"
-replace_with_symlink "$CONFIGS/atuin" "$DOT_CONFIGS/atuin"
-replace_with_symlink "$CONFIGS/cheat" "$DOT_CONFIGS/cheat"
-replace_with_symlink "$CONFIGS/zed/settings.json" "$DOT_CONFIGS/zed/settings.json"
+LIB_APP_SUPPORT="$HOME/Library/Application Support"
 
 # Replace with symlink if regular file
 replace_with_symlink() {
     local source=$1
     local target=$2
+
+    # Create target directory if it doesn't exist
+    mkdir -p "$(dirname "$target")"
 
     if [ -f "$target" ] && [ ! -L "$target" ]; then
         echo "Replacing $target with symlink to $source"
@@ -51,23 +33,29 @@ replace_with_symlink() {
     fi
 }
 
-# Process each config file
-for config in "${CONFIGS[@]}" "${DOT_CONFIGS[@]}" "${LIB_APP_SUPPORT[@]}"; do
-    if [ -e "$config" ]; then
-        source_path="$DOTFILES_ROOT/$config"
-        target_path="$HOME/$config"
-        
-        replace_with_symlink "$source_path" "$target_path"
-    fi
-done
+# Config paths
+replace_with_symlink "$CONFIGS/ghostty/config" "$DOT_CONFIGS/ghostty/config"
+replace_with_symlink "$CONFIGS/karabiner/karabiner.json" "$DOT_CONFIGS/karabiner/karabiner.json"
+replace_with_symlink "$CONFIGS/cursor/keybindings.json" "$LIB_APP_SUPPORT/Cursor/User/keybindings.json"
+replace_with_symlink "$CONFIGS/starship/starship.toml" "$DOT_CONFIGS/starship/starship.toml"
+replace_with_symlink "$CONFIGS/nvim/init.lua" "$DOT_CONFIGS/nvim/init.lua"
+replace_with_symlink "$CONFIGS/yazi" "$DOT_CONFIGS/yazi"
+replace_with_symlink "$CONFIGS/zoxide" "$DOT_CONFIGS/zoxide"
+replace_with_symlink "$CONFIGS/zellij" "$DOT_CONFIGS/zellij"
+replace_with_symlink "$CONFIGS/atuin" "$DOT_CONFIGS/atuin"
+replace_with_symlink "$CONFIGS/cheat" "$DOT_CONFIGS/cheat"
+replace_with_symlink "$CONFIGS/zed/settings.json" "$DOT_CONFIGS/zed/settings.json"
+replace_with_symlink "$CONFIGS/lazygit" "$DOT_CONFIGS/lazygit"
+replace_with_symlink "$CONFIGS/gh" "$DOT_CONFIGS/gh"
 
-# lazygit
-# gh
-# yazi
-# zed
-
-
-
+# Optional: Process additional config files from arrays if needed
+# for config in "${ADDITIONAL_CONFIGS[@]}"; do
+#     if [ -e "$CONFIGS/$config" ]; then
+#         source_path="$CONFIGS/$config"
+#         target_path="$DOT_CONFIGS/$config"
+#         replace_with_symlink "$source_path" "$target_path"
+#     fi
+# done
 
 ########################
 # TODO: generic CLI version
