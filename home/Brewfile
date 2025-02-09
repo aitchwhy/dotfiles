@@ -127,6 +127,7 @@ brew "volta"
 brew "weasyprint"
 brew "xclip"
 brew "xh"
+brew "xcodes"
 brew "yazi"
 brew "yq"
 brew "yt-dlp"
@@ -201,6 +202,11 @@ cask "virtualbuddy"
 cask "visual-studio-code"
 cask "yubico-yubikey-manager"
 cask "zoom"
+cask "proton-mail"
+cask "proton-drive"
+cask "proton-pass"
+cask "protonvpn"
+# mas "Monica AI: Chat, Image & Video", id: 6450770590
 mas "Amphetamine", id: 937984704
 mas "Bear", id: 1091189122
 mas "Bitwarden", id: 1352778147
@@ -220,6 +226,7 @@ mas "KakaoTalk", id: 869223134
 mas "Keynote", id: 409183694
 mas "Kindle", id: 302584613
 mas "LanScan", id: 472226235
+mas "NextDNS", id: 1464122853
 mas "Numbers", id: 409203825
 mas "Omnivore", id: 1564031042
 mas "One Thing", id: 1604176982
@@ -394,6 +401,7 @@ vscode "tombonnike.vscode-status-bar-format-toggle"
 vscode "tomoki1207.pdf"
 vscode "tomrijndorp.find-it-faster"
 vscode "tonka3000.raycast"
+vscode "trunk.io"
 vscode "usernamehw.errorlens"
 vscode "vadimcn.vscode-lldb"
 vscode "virgilsisoe.hammerspoon"

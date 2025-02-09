@@ -1,7 +1,75 @@
 #!/usr/bin/env bash
+# Automate Zsh-based dev environment setup on macOS (Apple Silicon)
+# This script is idempotent – safe to run multiple times.
+
 set -euo pipefail
 
+# Configurable variables
+DOTFILES_REPO="${DOTFILES_REPO:-"https://github.com/<your-username>/dotfiles. git"}"
+DOTFILES_DIR="$HOME/dotfiles"
+BACKUP_DIR="$HOME/.dotfiles_backup"
+ZDOTDIR_TARGET="$HOME/.config/zsh"
+BREWFILE_PATH="$DOTFILES_DIR/home/Brewfile"
 # TODO: https://randomgeekery.org/config/shell/zsh/
+
+# Core packages to ensure are installed via Homebrew
+CORE_PACKAGES=(zsh fzf atuin starship)
+
+# Determine mode and options
+MODE="init"
+FULL_INSTALL=false
+if [[ $# -gt 0 ]]; then
+  for arg in "$@"; do
+    case "$arg" in
+    init) MODE="init" ;;
+    update) MODE="update" ;;
+    full)
+      MODE="init"
+      FULL_INSTALL=true
+      ;; # "full" treated as init + full
+    --full | --all) FULL_INSTALL=true ;;
+    -h | --help)
+      echo "Usage: $0 [init|update] [--full]"
+      exit 0
+      ;;
+    esac
+  done
+fi
+
+# macOS only
+if [[ "$(uname -s)" != "Darwin" ]]; then
+  echo "Error: This script is intended for macOS systems." >&2
+  exit 1
+fi
+
+echo "Starting setup (mode: $MODE${FULL_INSTALL:+ " with full Brewfile"})..."
+
+# 1. Homebrew installation
+if ! command -v brew &>/dev/null; then
+  echo "Homebrew not found. Installing Homebrew..."
+  # Using non-interactive Homebrew installation (will still prompt for sudo if needed)
+  NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  echo "Homebrew installation complete."
+  # Brew on Apple Silicon installs to /opt/homebrew; add to PATH for current session:
+  if [[ -x "/opt/homebrew/bin/brew" ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  elif [[ -x "/usr/local/bin/brew" ]]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+  fi
+else
+  echo "Homebrew is already installed."
+fi
+
+# 2. Install core packages via Homebrew
+echo "Ensuring core packages are installed via Homebrew..."
+for pkg in "${CORE_PACKAGES[@]}"; do
+  if brew list --formula | grep -q "^${pkg}\$"; then
+    echo "  - $pkg is already installed."
+  else
+    echo "  - Installing $pkg..."
+    brew install "$pkg"
+  fi
+done
 
 #######################################
 # Logging Helpers
