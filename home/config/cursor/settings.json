@@ -1,6 +1,6 @@
 {
   "GitLive.Special branches": "main|master|trunk|dev|develop|qa|test|release[-/].*",
-  "editor.accessibilitySupport": "on",
+  "editor.accessibilitySupport": "off",
   "roo-cline.allowedCommands": [
     "npm test",
     "npm install",
