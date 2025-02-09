@@ -1,1 +1,0 @@
-. /Users/hank/dotfiles/home/.zshenv
