@@ -210,7 +210,7 @@ cask "yubico-yubikey-manager"
 cask "zoom"
 mas "Amphetamine", id: 937984704
 mas "Bear", id: 1091189122
-mas "Bitwarden", id: 1352778147
+# mas "Bitwarden", id: 1352778147
 mas "Cleaner One Pro", id: 1133028347
 mas "CleanMyMac", id: 1339170533
 mas "DaisyDisk", id: 411643860
