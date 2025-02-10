@@ -145,6 +145,7 @@ link_home_dotfiles() {
     # Skip the "config" directory, as we'll handle that separately for zsh
     [[ "$base" == "config" ]] && continue
     [[ "$base" == "Brewfile" ]] && continue # handled separately
+    [[ "$base" == *.nix ]] && continue  # match all nix files(Without quotes around pattern)
     local dest="$HOME/$base"
 
     if [[ -L "$dest" ]]; then
