@@ -244,7 +244,7 @@ change_shell() {
     if [ ! -x "$new_shell" ]; then
         log_error "Shell does not exist or is not executable: $new_shell"
         return 1
-    }
+    fi
 
     # Add to /etc/shells if needed
     if ! grep -Fxq "$new_shell" /etc/shells; then
