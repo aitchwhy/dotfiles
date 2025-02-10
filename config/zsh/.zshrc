@@ -3,23 +3,23 @@
 # Organized for performance and clarity
 ############################
 
-source "$DOTFILES_DIR/scripts/utils.sh"
+# source "$DOTFILES_DIR/scripts/utils.sh"
 
 
-# Helper functions
-_load_if_exists() 
-    local cmd="$1"
-    local setup_cmd="$2"
-    
-    if command -v "$cmd" > /dev/null; then
-        eval "$setup_cmd"
-    fi
-}
-
-_load_config_if_exists() {
-    local config="$1"
-    [[ -f "$config" ]] && source "$config"
-}
+# # Helper functions
+# _load_if_exists() 
+#     local cmd="$1"
+#     local setup_cmd="$2"
+#
+#     if command -v "$cmd" > /dev/null; then
+#         eval "$setup_cmd"
+#     fi
+# }
+#
+# _load_config_if_exists() {
+#     local config="$1"
+#     [[ -f "$config" ]] && source "$config"
+# }
 
 # ============================================================================ #
 # .zshenv
@@ -170,9 +170,9 @@ _load_brew_plugin "autosuggestions"
 (( $+commands[abbr] )) && eval "$(abbr init zsh)"
 
 # Initialize zellij if installed and not already in a session
-if (( $+commands[zellij] )) && [[ -z "$ZELLIJ" ]]; then
-    eval "$(zellij setup --generate-auto-start zsh)"
-fi
+# if (( $+commands[zellij] )) && [[ -z "$ZELLIJ" ]]; then
+#     eval "$(zellij setup --generate-auto-start zsh)"
+# fi
 
 # pyenv
 (( $+commands[pyenv] )) && eval "$(pyenv init -)"
@@ -194,16 +194,15 @@ fi
 
 
 # ====== Yazi File Manager Configuration ======
-if (( $+commands[yazi] )); then
-    function ya() {
-        local tmp="$(mktemp -t "yazi-cwd.XXXXX")"
-        yazi "$@" --cwd-file="$tmp"
-        if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-            cd -- "$cwd"
-        fi
-        rm -f -- "$tmp"
-    }
-fi
+function y() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	yazi "$@" --cwd-file="$tmp"
+	if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+		builtin cd -- "$cwd"
+	fi
+	rm -f -- "$tmp"
+}
+
 
 # ====== Aliases ======
 # Modern replacements
@@ -261,6 +260,6 @@ alias brewup='brew update && brew upgrade && brew cleanup'
 
 # ====== Local Configuration ======
 # Source local customizations if they exist
-[[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
+# [[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
 # [[ -f "$ZDOTDIR/local.zsh" ]] && source "$ZDOTDIR/local.zsh"
 
