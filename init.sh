@@ -276,13 +276,6 @@ apply_macos_tweaks() {
 
 if [[ "$MODE" == "init" ]]; then
   log "===== INIT MODE: First-time setup ====="
-  install_homebrew
-
-  if $FULL_BREW; then
-    brew_full_install
-  else
-    log "--full not specified; skipping Brewfile-based install."
-  fi
 
   # Sync the repo (either clone or pull)
   sync_dotfiles_repo
@@ -290,6 +283,16 @@ if [[ "$MODE" == "init" ]]; then
   link_home_dotfiles
   # Set up ~/.config/zsh with $ZDOTDIR
   setup_zdotdir
+
+
+  # Install Homebrew if missing (after linking zsh config)
+  install_homebrew
+  if $FULL_BREW; then
+    brew_full_install
+  else
+    log "--full not specified; skipping Brewfile-based install."
+  fi
+
   # Change default shell to brew zsh
   setup_shell
   # Apply macOS tweaks
