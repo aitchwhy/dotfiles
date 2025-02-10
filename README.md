@@ -10,14 +10,28 @@
 
 ## (1) clone dotfiles into (~/dotfiles)
 
-## (3) Setup
-
-`~/.zshenv` needs setting up
-
-## Run init.sh
-
-```shell
-~/dotfiles/init.sh
+```
+git clone https://github.com/aitchwhy/dotfiles.git ~/dotfiles
 ```
 
+## (2) Run init
+
+```shell
+chmod +x $HOME/dotfiles/init.sh
+
+$HOME/dotfiles/init.sh
+```
+
+
+## (3) Setup
+
+Zsh shell  needs setting up
+```
+# ~/.zshenv
+```
+
+```
+# ~/.zshrc
+ln -sf ~/path/to/dotfiles/.zshrc ~/.zshrc
+```
 
