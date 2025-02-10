@@ -36,8 +36,11 @@ setup_homebrew() {
     fi
     
     if [[ -f "$DOTFILES_DIR/Brewfile" ]]; then
+        log "Symlinking brewfile..."
+	ln -sf "$DOTFILES_DIR/Brewfile" ~/.Brewfile
         log "Installing Homebrew packages..."
-        brew bundle --file="$DOTFILES_DIR/Brewfile"
+        brew bundle --global --force --verbose --cleanup --zap
+        # brew bundle --file="$DOTFILES_DIR/Brewfile" --force 
     else
         error "Brewfile not found in $DOTFILES_DIR"
     fi
