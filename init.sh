@@ -139,7 +139,6 @@ setup_macos() {
     for app in "Finder" "Dock"; do
         killall "${app}" &>/dev/null || true
     done
-}
 
 # Backup existing configurations
 backup_existing() {
