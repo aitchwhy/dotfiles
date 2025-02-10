@@ -3,7 +3,7 @@
 # Organized for performance and clarity
 ############################
 
-# source "$DOTFILES_DIR/scripts/utils.sh"
+# source "$HOME/dotfiles/scripts/utils.sh"
 
 
 # # Helper functions
@@ -175,7 +175,7 @@ _load_brew_plugin "autosuggestions"
 # fi
 
 # pyenv
-(( $+commands[pyenv] )) && eval "$(pyenv init -)"
+# (( $+commands[pyenv] )) && eval "$(pyenv init -)"
 
 # fnm
 (( $+commands[fnm] )) && eval "$(fnm env --use-on-cd)"
