@@ -1,325 +1,183 @@
 #!/usr/bin/env bash
-# init.sh - Initialize or update a macOS (Apple Silicon) development environment with Zsh.
-#           Incorporates ZDOTDIR => ~/.config/zsh by symlinking dotfiles/home/config/zsh.
-#
-# Usage: init.sh [--full] <init|update>
-#   --full  : (optional) When specified with 'init' or 'update',
-#             install all Homebrew packages from Brewfile.
-#   init    : Perform first-time setup (install Homebrew, base packages,
-#             dotfiles, shell config, macOS tweaks).
-#   update  : Update dotfiles and Homebrew packages, re-apply config changes (maintenance).
+# Initialize dotfiles and system configuration
+# Structured for config directory layout
 
-set -euo pipefail # strict error handling
+set -euo pipefail
 
-################################################################################
-# GLOBAL CONFIG
-################################################################################
+# Configuration
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONFIG_DIR="$HOME/.config"
+XDG_STATE_HOME="$HOME/.local/state"
+XDG_DATA_HOME="$HOME/.local/share"
 
-DOTFILES_REPO="${DOTFILES_REPO:-"https://github.com/<your-username>/dotfiles.git"}"
-DOTFILES_DIR="$HOME/dotfiles"
+# Utility functions
+log() { echo "==> $*" >&2; }
+error() { echo "ERROR: $*" >&2; exit 1; }
 
-BACKUP_SUFFIX=".bak.$(date +'%Y%m%d%H%M%S')"
-ZDOTDIR_TARGET="$HOME/.config/zsh" # We'll symlink dotfiles/home/config/zsh to here
-BREWFILE_PATH="$DOTFILES_DIR/home/Brewfile"
-
-################################################################################
-# LOGGING & USAGE
-################################################################################
-
-log() {
-  echo "$(date +'%Y-%m-%d %H:%M:%S') $*"
+# Create necessary directories
+setup_directories() {
+    log "Creating XDG directories..."
+    mkdir -p "$CONFIG_DIR" "$XDG_STATE_HOME" "$XDG_DATA_HOME"
+    
+    # Create state directory for zsh history
+    mkdir -p "$XDG_STATE_HOME/zsh"
 }
 
-usage() {
-  cat <<EOF
-Usage: $0 [--full] <init|update>
-  --full     Install all packages from Brewfile (~/dotfiles/home/Brewfile)
-  init       First-time setup: Homebrew, dotfiles, shell, macOS tweaks
-  update     Maintenance updates: pull dotfiles, upgrade brew, re-apply config
+# Install Homebrew and packages
+setup_homebrew() {
+    if ! command -v brew >/dev/null; then
+        log "Installing Homebrew..."
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        
+        # Add Homebrew to PATH for the rest of the script
+        if [[ -f /opt/homebrew/bin/brew ]]; then
+            eval "$(/opt/homebrew/bin/brew shellenv)"
+        fi
+    fi
+    
+    if [[ -f "$DOTFILES_DIR/Brewfile" ]]; then
+        log "Installing Homebrew packages..."
+        brew bundle --file="$DOTFILES_DIR/Brewfile"
+    else
+        error "Brewfile not found in $DOTFILES_DIR"
+    fi
+}
+
+# Create symbolic links for config files
+create_symlinks() {
+    log "Creating symbolic links..."
+    
+    # Function to create symlink with parent directory
+    link_config() {
+        local src="$1"
+        local dest="$2"
+        mkdir -p "$(dirname "$dest")"
+        ln -sf "$src" "$dest"
+    }
+    
+    # Core configurations
+    link_config "$DOTFILES_DIR/config/zsh/.zshrc" "$HOME/.zshrc"
+    
+    # Config directory symlinks
+    declare -A configs=(
+        ["aide"]="VSCode/User"           # VSCode settings
+        ["atuin"]="atuin"
+        ["bat"]="bat"
+        ["cursor"]="cursor"
+        ["ghostty"]="ghostty"
+        ["git/.gitconfig"]="git/config"
+        ["git/.gitignore"]="git/ignore"
+        ["hammerspoon"]="../.hammerspoon" # Special case for home directory
+        ["karabiner"]="karabiner"
+        ["nvim"]="nvim"
+        ["starship.toml"]="starship.toml"
+        ["yazi"]="yazi"
+        ["zed"]="zed"
+        ["zellij"]="zellij"
+        ["zsh-abbr"]="zsh-abbr"
+    )
+    
+    for src in "${!configs[@]}"; do
+        local dest=${configs[$src]}
+        local full_src="$DOTFILES_DIR/config/$src"
+        local full_dest="$CONFIG_DIR/$dest"
+        
+        if [[ -e "$full_src" ]]; then
+            log "Linking $src to $dest"
+            if [[ "$dest" == "../.hammerspoon" ]]; then
+                link_config "$full_src" "$HOME/.hammerspoon"
+            else
+                link_config "$full_src" "$full_dest"
+            fi
+        fi
+    done
+}
+
+# Configure git if not already set up
+setup_git() {
+    if [[ ! -f "$CONFIG_DIR/git/config" ]]; then
+        log "Configuring git..."
+        read -p "Enter git user name: " git_name
+        read -p "Enter git email: " git_email
+        
+        mkdir -p "$CONFIG_DIR/git"
+        cat > "$CONFIG_DIR/git/config" << EOF
+[user]
+    name = $git_name
+    email = $git_email
+[init]
+    defaultBranch = main
+[core]
+    editor = nvim
 EOF
-  exit 1
-}
-
-################################################################################
-# ARG PARSING
-################################################################################
-
-MODE=""
-FULL_BREW=false
-
-[[ $# -eq 0 ]] && usage
-
-for arg in "$@"; do
-  case "$arg" in
-  --full) FULL_BREW=true ;;
-  init) MODE="init" ;;
-  update) MODE="update" ;;
-  -h | --help) usage ;;
-  *)
-    usage
-    ;;
-  esac
-done
-
-if [[ -z "$MODE" ]]; then
-  usage
-fi
-
-################################################################################
-# HELPER FUNCTIONS
-################################################################################
-
-# Backup an existing file or directory by renaming it with a timestamp suffix.
-backup_item() {
-  local item="$1"
-  if [[ -e "$item" || -L "$item" ]]; then
-    local backup_item="$item$BACKUP_SUFFIX"
-    mv -f "$item" "$backup_item"
-    log "Backed up $item -> $backup_item"
-  fi
-}
-
-# 1) Check for Homebrew and install if missing.
-install_homebrew() {
-  if command -v brew &>/dev/null; then
-    log "Homebrew is already installed."
-  else
-    log "Installing Homebrew..."
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    log "Homebrew installed successfully."
-
-    # Add brew to PATH for the rest of the script
-    if [[ -x "/opt/homebrew/bin/brew" ]]; then
-      eval "$(/opt/homebrew/bin/brew shellenv)"
-    elif [[ -x "/usr/local/bin/brew" ]]; then
-      eval "$(/usr/local/bin/brew shellenv)"
     fi
-  fi
 }
 
-# 2) Update/upgrade Homebrew packages
-update_homebrew() {
-  log "Updating Homebrew formulae..."
-  brew update
-  log "Upgrading installed Homebrew packages..."
-  brew upgrade
-  brew cleanup
+# Configure macOS defaults
+setup_macos() {
+    log "Configuring macOS defaults..."
+    
+    # Show hidden files in Finder
+    defaults write com.apple.finder AppleShowAllFiles -bool true
+    
+    # Show path bar and status bar in Finder
+    defaults write com.apple.finder ShowPathbar -bool true
+    defaults write com.apple.finder ShowStatusBar -bool true
+    
+    # Use list view in Finder by default
+    defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
+    
+    # Set key repeat settings
+    defaults write NSGlobalDomain KeyRepeat -int 2
+    defaults write NSGlobalDomain InitialKeyRepeat -int 15
+    
+    # Enable tap-to-click
+    defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
+    
+    # Restart affected applications
+    for app in "Finder" "Dock"; do
+        killall "${app}" &>/dev/null || true
+    done
 }
 
-# 3) Perform Brewfile installation if --full is requested
-brew_full_install() {
-  if [[ -f "$BREWFILE_PATH" ]]; then
-    log "Installing all packages from Brewfile: $BREWFILE_PATH"
-    brew bundle --file="$BREWFILE_PATH"
-  else
-    log "Brewfile not found at $BREWFILE_PATH. Skipping full install."
-  fi
+# Backup existing configurations
+backup_existing() {
+    local backup_dir="$HOME/.dotfiles_backup/$(date +%Y%m%d_%H%M%S)"
+    local files_to_backup=(
+        "$HOME/.zshrc"
+        "$HOME/.hammerspoon"
+        "$CONFIG_DIR/git/config"
+    )
+    
+    for file in "${files_to_backup[@]}"; do
+        if [[ -e "$file" ]] && [[ ! -L "$file" ]]; then
+            log "Backing up $file..."
+            mkdir -p "$backup_dir/$(dirname "${file#$HOME/}")"
+            mv "$file" "$backup_dir/${file#$HOME/}"
+        fi
+    done
 }
 
-# 4) Clone or update the dotfiles repo
-sync_dotfiles_repo() {
-  if [[ -d "$DOTFILES_DIR" ]]; then
-    # If it's a git repo, pull updates
-    if [[ -d "$DOTFILES_DIR/.git" ]]; then
-      log "Updating dotfiles repo at $DOTFILES_DIR..."
-      git -C "$DOTFILES_DIR" pull --ff-only || log "Warning: could not pull latest changes."
-    else
-      log "Directory $DOTFILES_DIR exists but is not a git repo. Skipping git pull."
-    fi
-  else
-    log "Cloning dotfiles repo from $DOTFILES_REPO to $DOTFILES_DIR..."
-    git clone "$DOTFILES_REPO" "$DOTFILES_DIR"
-  fi
+# Clean .DS_Store files
+clean_ds_store() {
+    log "Cleaning .DS_Store files..."
+    find "$DOTFILES_DIR" -name ".DS_Store" -delete
 }
 
-# 5) Symlink non-Zsh dotfiles in ~/dotfiles/home/* into $HOME (except 'config')
-#    Because Zsh config is handled separately.
-link_home_dotfiles() {
-  local home_dir="$DOTFILES_DIR/home"
-  [[ ! -d "$home_dir" ]] && log "No ~/dotfiles/home directory found. Skipping home dotfiles symlink." && return
-
-  log "Linking standard dotfiles from $home_dir into \$HOME..."
-  shopt -s nullglob dotglob
-  for item in "$home_dir"/*; do
-    local base="$(basename "$item")"
-    # Skip the "config" directory, as we'll handle that separately for zsh
-    [[ "$base" == "config" ]] && continue
-    [[ "$base" == "Brewfile" ]] && continue # handled separately
-    [[ "$base" == *.nix ]] && continue  # match all nix files(Without quotes around pattern)
-    local dest="$HOME/$base"
-
-    if [[ -L "$dest" ]]; then
-      # Already a symlink
-      if [[ "$(readlink "$dest")" == "$item" ]]; then
-        log "~/$base is already symlinked. Skipping."
-        continue
-      else
-        backup_item "$dest"
-      fi
-    elif [[ -e "$dest" ]]; then
-      backup_item "$dest"
-    fi
-
-    ln -s "$item" "$dest"
-    log "Symlinked $dest -> $item"
-  done
-  shopt -u nullglob dotglob
+# Main installation
+main() {
+    log "Starting dotfiles installation..."
+    
+    clean_ds_store
+    backup_existing
+    setup_directories
+    setup_homebrew
+    create_symlinks
+    setup_git
+    setup_macos
+    
+    log "Installation complete! Please restart your shell and Finder."
+    log "Your old configurations have been backed up to ~/.dotfiles_backup if they existed."
 }
 
-# 6) Symlink zsh config directory (dotfiles/home/config/zsh) to ~/.config/zsh
-#    Then ensure we set ZDOTDIR via ~/.zshenv
-setup_zdotdir() {
-  local zsh_dir="$DOTFILES_DIR/home/config/zsh"
-  if [[ ! -d "$zsh_dir" ]]; then
-    log "Zsh config directory not found at $zsh_dir. Skipping."
-    return
-  fi
-
-  # Ensure ~/.config directory
-  mkdir -p "$HOME/.config"
-
-  # Backup existing ~/.config/zsh (if it exists) and symlink
-  if [[ -L "$ZDOTDIR_TARGET" ]]; then
-    if [[ "$(readlink "$ZDOTDIR_TARGET")" == "$zsh_dir" ]]; then
-      log "~/.config/zsh is already symlinked to dotfiles. Skipping."
-    else
-      backup_item "$ZDOTDIR_TARGET"
-      ln -s "$zsh_dir" "$ZDOTDIR_TARGET"
-      log "Symlinked ~/.config/zsh -> $zsh_dir"
-    fi
-  elif [[ -e "$ZDOTDIR_TARGET" ]]; then
-    backup_item "$ZDOTDIR_TARGET"
-    ln -s "$zsh_dir" "$ZDOTDIR_TARGET"
-    log "Symlinked ~/.config/zsh -> $zsh_dir"
-  else
-    ln -s "$zsh_dir" "$ZDOTDIR_TARGET"
-    log "Symlinked ~/.config/zsh -> $zsh_dir"
-  fi
-
-  # Now ensure ~/.zshenv sets ZDOTDIR. We'll append if it's not present.
-  local main_zshenv="$HOME/.zshenv"
-  if [[ -f "$main_zshenv" ]]; then
-    if grep -q "ZDOTDIR=" "$main_zshenv"; then
-      log "Detected ZDOTDIR in ~/.zshenv. No update needed."
-    else
-      echo "export ZDOTDIR=\"$ZDOTDIR_TARGET\"" >>"$main_zshenv"
-      echo "[[ -f \$ZDOTDIR/.zshenv ]] && source \$ZDOTDIR/.zshenv" >>"$main_zshenv"
-      log "Appended ZDOTDIR config to ~/.zshenv."
-    fi
-  else
-    cat <<EOF >"$main_zshenv"
-# Minimal stub for Zsh to load configs from ~/.config/zsh
-export ZDOTDIR="$ZDOTDIR_TARGET"
-[[ -f "\$ZDOTDIR/.zshenv" ]] && source "\$ZDOTDIR/.zshenv"
-EOF
-    log "Created ~/.zshenv that sets ZDOTDIR -> $ZDOTDIR_TARGET"
-  fi
-}
-
-# 7) Change default shell to Homebrew Zsh if not already set
-setup_shell() {
-  local brew_zsh
-  brew_zsh="$(brew --prefix)/bin/zsh"
-  if [[ ! -x "$brew_zsh" ]]; then
-    log "Homebrew zsh not found at $brew_zsh. Skipping shell change."
-    return
-  fi
-
-  # Add brew zsh to /etc/shells if missing
-  if ! grep -Fxq "$brew_zsh" /etc/shells; then
-    log "Adding $brew_zsh to /etc/shells (requires sudo)..."
-    echo "$brew_zsh" | sudo tee -a /etc/shells >/dev/null
-  fi
-
-  # If current shell is not brew zsh, chsh
-  if [[ "$SHELL" != "$brew_zsh" ]]; then
-    log "Changing default shell to $brew_zsh. You may be prompted for your password."
-    chsh -s "$brew_zsh" "$USER" || log "Could not change shell. Try manually: chsh -s $brew_zsh"
-  else
-    log "Default shell is already set to $brew_zsh."
-  fi
-}
-
-# 8) Apply macOS preference tweaks
-apply_macos_tweaks() {
-  log "Applying macOS preference tweaks (Finder, Dock, keyboard)..."
-  # Finder
-  defaults write com.apple.finder AppleShowAllFiles -bool true
-  defaults write NSGlobalDomain AppleShowAllExtensions -bool true
-  defaults write com.apple.finder ShowPathbar -bool true
-  defaults write com.apple.finder ShowStatusBar -bool true
-  # Dock
-  defaults write com.apple.dock autohide -bool true
-  defaults write com.apple.dock autohide-delay -float 0
-  defaults write com.apple.dock autohide-time-modifier -float 0.5
-  defaults write com.apple.dock show-recents -bool false
-  # Keyboard
-  defaults write NSGlobalDomain KeyRepeat -int 1
-  defaults write NSGlobalDomain InitialKeyRepeat -int 10
-  defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
-  defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
-  defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
-
-  # Restart Finder and Dock if running
-  if pgrep Finder >/dev/null; then
-    killall Finder || true
-  fi
-  if pgrep Dock >/dev/null; then
-    killall Dock || true
-  fi
-  log "macOS tweaks applied."
-}
-
-################################################################################
-# MAIN LOGIC
-################################################################################
-
-if [[ "$MODE" == "init" ]]; then
-  log "===== INIT MODE: First-time setup ====="
-
-  # Sync the repo (either clone or pull)
-  sync_dotfiles_repo
-  # Link standard dotfiles from ~/dotfiles/home (except 'config')
-  link_home_dotfiles
-  # Set up ~/.config/zsh with $ZDOTDIR
-  setup_zdotdir
-
-
-  # Install Homebrew if missing (after linking zsh config)
-  install_homebrew
-  if $FULL_BREW; then
-    brew_full_install
-  else
-    log "--full not specified; skipping Brewfile-based install."
-  fi
-
-  # Change default shell to brew zsh
-  setup_shell
-  # Apply macOS tweaks
-  apply_macos_tweaks
-
-  log "===== INIT COMPLETE ====="
-
-elif [[ "$MODE" == "update" ]]; then
-  log "===== UPDATE MODE: Maintenance ====="
-  install_homebrew
-  # Pull changes in repo
-  sync_dotfiles_repo
-  # Re-link any new/modified dotfiles
-  link_home_dotfiles
-  # Make sure ZDOTDIR is correct
-  setup_zdotdir
-  # Update & upgrade Homebrew
-  update_homebrew
-  # Full Brewfile install if needed
-  if $FULL_BREW; then
-    brew_full_install
-  fi
-  # Re-apply macOS tweaks (idempotent)
-  apply_macos_tweaks
-
-  log "===== UPDATE COMPLETE ====="
-else
-  usage
-fi
-
+main "$@"
