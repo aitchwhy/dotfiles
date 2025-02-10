@@ -57,7 +57,8 @@ create_symlinks() {
     
     # Core configurations
     link_config "$DOTFILES_DIR/config/zsh/.zshrc" "$HOME/.zshrc"
-    
+    link_config "$DOTFILES_DIR/config/zsh/.zprofile" "$HOME/.zprofile"
+
     # Config directory symlinks
     declare -A configs=(
         ["aide"]="VSCode/User"           # VSCode settings
