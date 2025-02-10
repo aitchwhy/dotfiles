@@ -126,6 +126,21 @@ bindkey '^A' beginning-of-line
 bindkey '^?' backward-delete-char
 
 # ====== Completion System ======
+
+# https://docs.brew.sh/Shell-Completion#configuring-completions-in-zsh
+# Initialize completions for Homebrew and installed packages
+# if type brew &>/dev/null; then
+#     FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
+#
+#     # Load brew-installed completions
+#     local completion_file
+#     for completion_file in "$(brew --prefix)/share/zsh/site-functions"/_*; do
+#         if [[ -f "$completion_file" ]]; then
+#             source "$completion_file"
+#         fi
+#     done
+# fi
+
 # Load completion system
 autoload -Uz compinit
 if [[ -n ${ZDOTDIR:-$HOME}/.zcompdump(#qN.mh+24) ]]; then
@@ -134,18 +149,6 @@ else
     compinit -C
 fi
 
-# Initialize completions for Homebrew and installed packages
-if type brew &>/dev/null; then
-    FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
-    
-    # Load brew-installed completions
-    local completion_file
-    for completion_file in "$(brew --prefix)/share/zsh/site-functions"/_*; do
-        if [[ -f "$completion_file" ]]; then
-            source "$completion_file"
-        fi
-    done
-fi
 
 # ====== Plugin Loading ======
 # Function to load brew-installed plugins
@@ -168,6 +171,9 @@ _load_brew_plugin "autosuggestions"
 
 # Initialize zsh-abbr if installed
 (( $+commands[abbr] )) && eval "$(abbr init zsh)"
+
+(( $+commands[zoxide] )) && eval "$(zoxide init zsh)"
+
 
 # Initialize zellij if installed and not already in a session
 # if (( $+commands[zellij] )) && [[ -z "$ZELLIJ" ]]; then
