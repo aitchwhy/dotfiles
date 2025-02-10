@@ -2,7 +2,7 @@
 # Initialize dotfiles and system configuration
 # Structured for config directory layout
 
-set -euo pipefail
+# set -euo pipefail
 
 # Configuration
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -142,6 +142,7 @@ setup_macos() {
     for app in "Finder" "Dock"; do
         killall "${app}" &>/dev/null || true
     done
+}
 
 # Backup existing configurations
 backup_existing() {
