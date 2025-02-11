@@ -166,6 +166,9 @@ brew "tmux"
 brew "utf8proc"
 brew "util-linux"
 brew "yakitrak/yakitrak/obs"
+brew "koekeishiya/formulae/yabai"
+brew "koekeishiya/formulae/skhd"
+brew "kanata"
 
 ##################################
 # Casks
