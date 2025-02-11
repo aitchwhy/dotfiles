@@ -171,6 +171,7 @@ brew "tmux"
 brew "koekeishiya/formulae/yabai"
 brew "koekeishiya/formulae/skhd"
 brew "kanata"
+brew "blackhole-16ch"
 
 ##################################
 # Casks
