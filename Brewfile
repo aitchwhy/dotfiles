@@ -162,11 +162,11 @@ brew "yakitrak/yakitrak/obsidian-cli"
 
 # Newly added formulae that were slated for uninstall:
 # brew "diff-so-fancy"
-brew "neofetch"
+# brew "neofetch"
 # brew "screenresolution"
 # brew "syncthing"
 brew "tmux"
-brew "utf8proc"
+# brew "utf8proc"
 # brew "util-linux"
 brew "koekeishiya/formulae/yabai"
 brew "koekeishiya/formulae/skhd"
@@ -338,8 +338,9 @@ mas "Termius", id: 1176074088
 # mas "Todoist", id: 585829637
 mas "Toggl Track", id: 1291898086
 mas "Tripsy", id: 1429967544
-mas "Yoink", id: 457622435
-mas "Yubico Authenticator", id: 1497506650
+# mas "Yoink", id: 457622435
+# mas "Yubico Authenticator", id: 1497506650
+mas "Logic Pro", id: 634148309
 
 ##################################
 # VSCode Extensions
