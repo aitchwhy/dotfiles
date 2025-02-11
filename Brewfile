@@ -171,13 +171,13 @@ brew "tmux"
 brew "koekeishiya/formulae/yabai"
 brew "koekeishiya/formulae/skhd"
 brew "kanata"
-brew "blackhole-16ch"
 
 ##################################
 # Casks
 ##################################
 # Combined and alphabetically sorted old + newly added casks
 
+cask "blackhole-16ch"
 cask "macwhisper"
 cask "todoist"
 cask "slack"
