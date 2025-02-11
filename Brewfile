@@ -5,8 +5,8 @@
 ##################################
 tap "coder/coder"
 tap "homebrew/bundle"
-tap "homebrew/cask"
-tap "homebrew/core"
+# tap "homebrew/cask"
+# tap "homebrew/core"
 tap "homebrew/services"
 tap "koekeishiya/formulae"
 tap "olets/tap"
@@ -341,7 +341,7 @@ mas "Toggl Track", id: 1291898086
 mas "Tripsy", id: 1429967544
 # mas "Yoink", id: 457622435
 # mas "Yubico Authenticator", id: 1497506650
-mas "Logic Pro", id: 634148309
+# mas "Logic Pro", id: 634148309
 
 ##################################
 # VSCode Extensions
