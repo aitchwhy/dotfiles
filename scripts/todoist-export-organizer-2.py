@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, scrolledtext
+import pdb
 import json
 import requests
 import re
@@ -68,6 +69,10 @@ class TodoistExporter:
         url_pattern = re.compile(
             r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
         )
+        breakpoint()
+        for task in tasks:
+            print(f"################ task is {task}")
+
         return [task for task in tasks if url_pattern.search(task["content"])]
 
     def extract_url(self, content: str) -> str:
