@@ -1422,6 +1422,7 @@
   "workbench.tree.indent": 4,
   "xstate.nestTypegenFiles": false,
   "yaml.schemas": {
-    "file:///Users/hank/.aide/extensions/atlassian.atlascode-3.4.3/resources/schemas/pipelines-schema.json": "bitbucket-pipelines.yml"
-  }
+    "file:///Users/hank/.aide/extensions/atlassian.atlascode-3.2.2/resources/schemas/pipelines-schema.json": "bitbucket-pipelines.yml"
+  },
+  "workbench.preferredDarkColorTheme": "Catppuccin Macchiato"
 }
