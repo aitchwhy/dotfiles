@@ -172,6 +172,8 @@ brew "yakitrak/yakitrak/obs"
 ##################################
 # Combined and alphabetically sorted old + newly added casks
 
+cask "macwhisper"
+cask "todoist"
 cask "slack"
 cask "a-better-finder-rename"
 cask "affine"
@@ -267,7 +269,7 @@ cask "swish"
 cask "synologyassistant"
 cask "tableplus"
 cask "tailscale"
-# cask "termius"
+cask "termius"
 cask "textexpander"
 cask "timelane"
 cask "tower"
@@ -280,13 +282,19 @@ cask "yubico-yubikey-manager"
 cask "zen-browser"
 cask "zed"
 cask "zoom"
+cask "fantastical"
 
 ##################################
 # Mac App Store
 ##################################
+mas "Monica AI: Chat, Image & Video", id: 6450770590
+mas "Aiko", id: 1672085276
+mas "HacKit", id: 1549557075
 mas "Amphetamine", id: 937984704
 mas "Bear", id: 1091189122
-# mas "Bitwarden", id: 1352778147
+mas "Mela", id: 1568924476
+mas "rmcd", id: 1596283165
+mas "Bitwarden", id: 1352778147
 mas "Cleaner One Pro", id: 1133028347
 mas "CleanMyMac", id: 1339170533
 mas "DaisyDisk", id: 411643860
@@ -294,8 +302,8 @@ mas "Day One", id: 1055511498
 mas "Drafts", id: 1435957248
 mas "Dropover", id: 1355679052
 mas "ExcalidrawZ", id: 6636493997
-mas "Fantastical", id: 975937182
 mas "Flighty", id: 1358823008
+mas "Alpenglow: Sunset Prediction", id: 978589174
 mas "Flow", id: 1423210932
 mas "Focus", id: 777233759
 mas "Journey", id: 1662059644
@@ -311,11 +319,11 @@ mas "Pages", id: 409201541
 mas "Pandan", id: 1569600264
 mas "Parcel", id: 639968404
 mas "Pixea", id: 1507782672
-mas "SnippetsLab", id: 1006087419
-mas "Snippety", id: 1530751461
-mas "Snippit", id: 1465481124
+# mas "SnippetsLab", id: 1006087419
+# mas "Snippety", id: 1530751461
+# mas "Snippit", id: 1465481124
 mas "Termius", id: 1176074088
-mas "Todoist", id: 585829637
+# mas "Todoist", id: 585829637
 mas "Toggl Track", id: 1291898086
 mas "Tripsy", id: 1429967544
 mas "Yoink", id: 457622435
