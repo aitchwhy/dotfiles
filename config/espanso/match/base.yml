@@ -9,7 +9,7 @@
 # it gets replaced by the "replace" string.
 matches:
   # Simple text replacement
-  - trigger: ":espanso"
+  - trigger: ";espanso"
     replace: "Hi there!"
 
   # NOTE: espanso uses YAML to define matches, so pay attention to the indentation!
@@ -17,7 +17,7 @@ matches:
   # But matches can also be dynamic:
 
   # Print the current date
-  - trigger: ":date"
+  - trigger: ";date"
     replace: "{{mydate}}"
     vars:
       - name: mydate
@@ -26,7 +26,7 @@ matches:
           format: "%m/%d/%Y"
 
   # Print the output of a shell command
-  - trigger: ":shell"
+  - trigger: ";shell"
     replace: "{{output}}"
     vars:
       - name: output
@@ -35,7 +35,7 @@ matches:
           cmd: "echo 'Hello from your shell'"
 
   # Meeting & Scheduling
-  - trigger: ":cal30"
+  - trigger: ";cal30"
     replace: "Hi {{first_name}}, Excited to learn more about {{company_name}} and how I can contribute! Here's my Calendly link to schedule a quick 30-min chat: https://calendly.com/hank-lee/30min If none of the times work, just let me know and we'll find something else."
     vars:
       - name: "first_name"
@@ -43,26 +43,26 @@ matches:
       - name: "company_name"
         type: "text"
 
-  - trigger: ":calcq"
+  - trigger: ";calcq"
     replace: "Here's my 30-minute Calendly link for scheduling: https://calendly.com/hank-lee/30min If none of the available times work, let me know."
 
-  - trigger: ":schedcc"
+  - trigger: ";schedcc"
     replace: "Thanks {{first_name}}! Adding Matti on CC who will find us time to connect."
     vars:
       - name: "first_name"
         type: "text"
 
-  - trigger: ":zoom"
+  - trigger: ";zoom"
     replace: "Here is my zoom link - https://us06web.zoom.us/j/5347018535"
 
-  - trigger: ":followup"
+  - trigger: ";followup"
     replace: "Hi {{first_name}}, Just following up on our recent chat—curious if any thoughts or ideas have come up?"
     vars:
       - name: "first_name"
         type: "text"
 
   # Team Communication
-  - trigger: ":teamupdate"
+  - trigger: ";teamupdate"
     replace: |
       Hey all,
       TL;DR: We are {{status}} for {{milestone}}.
@@ -82,7 +82,7 @@ matches:
       - name: "links"
         type: "text"
 
-  - trigger: ":meetnotes"
+  - trigger: ";meetnotes"
     replace: |
       Hey {{first_name}},
       Quick recap, but looking forward to our next call on {{date}}:
@@ -96,7 +96,7 @@ matches:
         type: "text"
 
   # Professional Introductions & Responses
-  - trigger: ":introme"
+  - trigger: ";introme"
     replace: "Hi {{first_name}}! 👋 I'm {{your_name}}, nice to meet you! I'm a {{your_role}} at {{your_company}}."
     vars:
       - name: "first_name"
@@ -108,10 +108,10 @@ matches:
       - name: "your_company"
         type: "text"
 
-  - trigger: ":superhuman"
+  - trigger: ";superhuman"
     replace: "Superhuman is the fastest email experience in the world. Our customers get through their inbox twice as fast as before, resulting in \"Inbox Zero\" like never before."
 
-  - trigger: ":reject"
+  - trigger: ";reject"
     replace: "Hey {{sender}}, Sorry to hear things didn't work out with {{company_name}}, but I appreciate you keeping me updated through the process."
     vars:
       - name: "sender"
@@ -119,7 +119,7 @@ matches:
       - name: "company_name"
         type: "text"
 
-  - trigger: ":declinehr"
+  - trigger: ";declinehr"
     replace: "Hi {{first_name}}, Thanks for the note! I'm not interested right now, but perhaps later."
     vars:
       - name: "first_name"
