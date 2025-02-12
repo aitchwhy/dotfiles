@@ -7,8 +7,15 @@ if [[ "$(uname -s)" != "Darwin" || "$(uname -m)" != "arm64" ]]; then
   exit 1
 fi
 
+# TODO: slink $DOTFILES/.config/zellij/main-layout.kdl $HOME/.config/config.kdl
+
 # Define the config mapping (source:destination pairs)
 CONFIG_MAP=(
+  "$HOME/dotfiles/Brewfile:$HOME/.Brewfile"
+  "$HOME/dotfiles/config/zsh/.zshrc:$HOME/.zshrc"
+  "$HOME/dotfiles/config/zsh/.zprofile:$HOME/.zprofile"
+  "$HOME/dotfiles/Brewfile:$HOME/.Brewfile"
+
   "$HOME/dotfiles/config/git/.gitconfig:$HOME/.gitconfig"
   "$HOME/dotfiles/config/git/.gitignore:$HOME/.gitignore"
   "$HOME/dotfiles/config/nvim:$HOME/.config/nvim"

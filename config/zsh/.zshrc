@@ -47,7 +47,20 @@ export ZELLIJ_CONFIG_DIR="$XDG_CONFIG_HOME/zellij"
 
 export BAT_CONFIG_PATH="$XDG_CONFIG_HOME/bat/config"
 export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/config"
+
+# fzf -> https://junegunn.github.io/fzf/shell-integration/
+export FZF_CTRL_T_COMMAND=""
 export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"
+# CTRL-Y to copy the command into clipboard using pbcopy
+export FZF_CTRL_R_OPTS="
+  --bind 'ctrl-y:execute-silent(echo -n {2..} | pbcopy)+abort'
+  --color header:italic
+  --header 'Press CTRL-Y to copy command into clipboard'"
+# Preview file content using bat (https://github.com/sharkdp/bat)
+export FZF_CTRL_T_OPTS="
+  --walker-skip .git,node_modules,target
+  --preview 'bat -n --color=always {}'
+  --bind 'ctrl-/:change-preview-window(down|hidden|)'"
 
 # Zoxide configuration
 export _ZO_DATA_DIR="${XDG_DATA_HOME}/zoxide"
@@ -171,6 +184,12 @@ _load_brew_plugin "syntax-highlighting"
 _load_brew_plugin "autosuggestions"
 
 # ====== Tool Initialization ======
+
+# fzf
+source <(fzf --zsh)
+
+
+
 # Initialize starship prompt if installed
 (( $+commands[starship] )) && eval "$(starship init zsh)"
 
@@ -181,6 +200,7 @@ _load_brew_plugin "autosuggestions"
 (( $+commands[abbr] )) && eval "$(abbr init zsh)"
 
 (( $+commands[zoxide] )) && eval "$(zoxide init zsh)"
+
 
 
 # Initialize zellij if installed and not already in a session
@@ -773,18 +793,12 @@ slink() {
     ln -nfs "$src_orig" "$dst_link"
 }
 
-slink_init() {
-    slink $DOTFILES/.Brewfile $HOME/.Brewfile
-    slink $DOTFILES/.zshrc $HOME/.zshrc
-
-    slink $DOTFILES_EXPORTS $OMZ_CUSTOM/exports.zsh
-    slink $DOTFILES_ALIASES $OMZ_CUSTOM/aliases.zsh
-    slink $DOTFILES_FUNCTIONS $OMZ_CUSTOM/functions.zsh
-
-    slink $DOTFILES/nvm/default-packages $NVM_DIR/default-packages
-    slink $DOTFILES/.config/git/.gitignore $HOME/.gitignore
-
-
-    slink $DOTFILES/.config/zellij/main-layout.kdl $HOME/.config/config.kdl
+# fzf + zoxide :  https://junegunn.github.io/fzf/examples/directory-navigation/#zoxidehttpsgithubcomajeetdsouzazoxide
+z() {
+  local dir=$(
+    zoxide query --list --score |
+    fzf --height 40% --layout reverse --info inline \
+        --nth 2.. --tac --no-sort --query "$*" \
+        --bind 'enter:become:echo {2..}'
+  ) && cd "$dir"
 }
-
