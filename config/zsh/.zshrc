@@ -78,10 +78,18 @@ export SAVEHIST=10000
 # Initialize Homebrew (this also sets up PATH)
 if [[ -x /opt/homebrew/bin/brew ]]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
+    # Use /opt/homebrew if on Apple Silicon
+    # export HOMEBREW_PREFIX="/opt/homebrew"
+    # export PATH="$HOMEBREW_PREFIX/bin:$PATH"
 fi
-# Use /opt/homebrew if on Apple Silicon
-# export HOMEBREW_PREFIX="/opt/homebrew"
-# export PATH="$HOMEBREW_PREFIX/bin:$PATH"
+
+
+# Brew bundle - https://docs.brew.sh/Manpage#bundle-subcommand
+# global bundle file location
+export HOMEBREW_BUNDLE_FILE="~/.Brewfile"
+export HOMEBREW_BUNDLE_INSTALL_CLEANUP=1
+export HOMEBREW_BUNDLE_DUMP_DESCRIBE=1
+
 
 # Additional PATH entries (only add if they exist and aren't already in PATH)
 typeset -U path  # Ensure unique entries
@@ -187,7 +195,7 @@ _load_brew_plugin "autosuggestions"
 (( $+commands[fnm] )) && eval "$(fnm env --use-on-cd)"
 
 # uv
-eval "$(uv generate-shell-completion zsh)"
+# (( $+commands[fnm] ))  && eval "$(uv generate-shell-completion zsh)"
 
 
 # # Python (pyenv)
@@ -224,12 +232,49 @@ function y() {
 
 # Aliases
 # Modern CLI tool alternatives
+# https://github.com/MohamedElashri/eza-zsh/blob/main/eza-zsh.plugin.zsh
 if command -v eza >/dev/null; then
-    alias ls='eza --icons --group-directories-first'
-    alias ll='eza -l --git --icons --group-directories-first'
-    alias la='eza -la --git --icons --group-directories-first'
-    alias lt='eza --tree --icons --group-directories-first'
+    # general use aliases updated for eza
+    alias ls='eza' # Basic replacement for ls with eza
+    alias l='eza --long -bF' # Extended details with binary sizes and type indicators
+    alias ll='eza --long -a' # Long format, including hidden files
+    alias llm='eza --long -a --sort=modified' # Long format, including hidden files, sorted by modification date
+    alias la='eza -a --group-directories-first' # Show all files, with directories listed first
+    alias lx='eza -a --group-directories-first --extended' # Show all files and extended attributes, directories first
+    alias tree='eza --tree' # Tree view
+    alias lS='eza --oneline' # Display one entry per line
+
+    # new aliases than exa-zsh
+    alias lT='eza --tree --long' # Tree view with extended details
+    alias lr='eza --recurse --all' # Recursively list all files, including hidden ones
+    alias lg='eza --grid --color=always' # Display entries as a grid with color
+    alias ld='eza --only-dirs' # List only directories
+    alias lf='eza --only-files' # List only files
+    alias lC='eza --color-scale=size --long' # Use color scale based on file size
+    alias li='eza --icons=always --grid' # Display with icons in grid format
+    alias lh='eza --hyperlink --all' # Display all entries as hyperlinks
+    alias lX='eza --across' # Sort the grid across, rather than downwards
+    alias lt='eza --long --sort=type' # Sort by file type in long format
+    alias lsize='eza --long --sort=size' # Sort by size in long format
+    alias lmod='eza --long --modified --sort=modified' # Sort by modification date in long format, using the modified timestamp
+
+    # Advanced filtering and display options
+    alias ldepth='eza --level=2' # Limit recursion depth to 2
+    alias lignore='eza --git-ignore' # Ignore files mentioned in .gitignore
+    alias lcontext='eza --long --context' # Show security context
 fi
+
+# TODO: improvements (https://news.ycombinator.com/item?id=41037197)
+# TODO: ripgrep rg
+# TODO: fd
+# TODO: fzf
+# TODO: lazydocker
+# TODO: jless
+# TODO: starship
+# TODO: sd
+# TODO: vegeta
+# TODO: miller
+# TODO: hyperfine
 
 
 # Editor
@@ -348,41 +393,149 @@ alias g='ghostty'
 # https://github.com/Homebrew/homebrew-aliases
 
 alias b="brew"
-#alias bdr="brew doctor"
-#alias boc="brew outdated --cask"
-#alias bof="brew outdated --formula"
-alias bupd="brew update"
-alias bupg="brew upgrade"
+alias benv="brew --env"
+alias bp="brew --prefix"
+alias bc="brew config"
+alias bh="brew home"
+alias bcmd="brew commands"
+alias bdr="brew doctor"
+alias bud="brew update"
+alias bug="brew upgrade"
 alias bclean="brew cleanup --prune=all && brew autoremove"
-alias bcleanall='brew cleanup --prune=all && rm -rf $(brew --cache) && brew autoremove'
+alias bcleanall='brew cleanup --prune=all && brew autoremove && rm -rf $(brew --cache)'
 alias bin="brew install"
 alias brein="brew reinstall"
 alias bi="brew info"
-alias bs="brew search"
+alias bs="brew search --eval-all --desc"
 alias bl="brew leaves"
 
 ## Homebrew Cask/Bundle management
 alias bcl="brew list --cask"
 alias bcin="brew install --cask"
+
+# brew bundle
 alias bb="brew bundle"
-alias bbls="brew bundle dump --all --file=- --verbose"
-alias bbsave="brew bundle dump --all --verbose --global"
-alias bbcheck="brew bundle check --all --verbose --global"
+alias bbdump="bb dump --all --verbose --desc --file=-"
+alias bbdumpf="bb dump --all --verbose --global --froce"
+alias bbcheck="bb check --all --verbose --global"
+alias bblist="bb list --all --verbose --global"
+alias bbcleanup="bb cleanup --zap --all --verbose --global"
+alias bbcleanupf="bb cleanup --zap --all --verbose --global --force"
 
 ## Directory navigation
+alias gdot='cd ~/dotfiles'
+alias gsrc='cd ~/src'
+alias ghammer='cd ~/.hammerspoon'
+alias gcf='cd ~/.config'
+alias glocal='cd ~/.local'
+alias gnvim='cd ~/.config/nvim'
+
 alias gdl='cd ~/Downloads'
-alias gcf='cd ~/.config/'
+alias gdesk='cd ~/Desktop'
+alias gdoc='cd ~/Documents'
+alias gobs='cd ~/obsidian/primary'
+
+alias gcloud='cd ~/Library/CloudStorage'
+alias gdrop='cd ~/Library/CloudStorage/Dropbox'
+alias glib='cd ~/Library'
+alias glibapp='cd ~/Library/Application Support'
+alias gicloud='cd ~/iCloud Drive'
+
+
 #
 #
 # Zsh configuration
+alias be="nvim ~/.Brewfile"
 alias ze="nvim ~/.zshrc"
-alias zs="exec zsh"
 alias zr="exec zsh"
-alias zcompreset="rm -f ~/.zcompdump; compinit"
+alias zreset="rm -f ~/.zcompdump; compinit && exec zsh"
 
 
 # Tailscale
 alias ts="tailscale"
+alias es="espanso"
+
+
+# Zellij
+alias zj="zellij"
+
+# ghostty
+alias g="ghostty"
+
+
+# atuin
+alias at="atuin"
+alias ats="atuin store"
+alias ati="atuin import auto"
+
+# python + uv
+alias py='python' # Quick access to python interpreter
+alias py3='python3' # Explicitly use python 3
+alias uv='uv pip' # Use pip3 for package management
+alias uvpip='uv pip' # Use pip3 for package management
+alias venv='python3 -m venv' # Create virtual environments
+alias activate='source venv/bin/activate' # Activate virtual environment
+alias deactivate='deactivate' # Deactivate virtual environment
+alias pyrun='python -m' # Run a module as a script
+alias pydoc='pydoc3' # Access python documentation
+
+# +-----+
+# | Git |
+# +-----+
+
+alias gs='git status'
+alias gss='git status -s'
+alias ga='git add'
+alias gp='git push'
+alias gplo='git pull origin'
+alias gblame='git blame'
+alias gpo='git push origin'
+alias gpof='git push origin --force-with-lease'
+alias gpofn='git push origin --force-with-lease --no-verify'
+alias gpt='git push --tag'
+alias gtd='git tag --delete'
+alias gtdr='git tag --delete origin'
+alias grb='git branch -r'                                                                           # display remote branch
+alias gb='git branch '
+alias gc='git commit'
+alias gd='git diff'
+alias gco='git checkout '
+alias gl='git log --oneline'
+alias gr='git remote'
+alias grs='git remote show'
+alias glol='git log --graph --abbrev-commit --oneline --decorate'
+alias gclean="git branch --merged | grep  -v '\\*\\|master\\|develop' | xargs -n 1 git branch -d" # Delete local branch merged with master
+alias gblog="git for-each-ref --sort=committerdate refs/heads/ --format='%(HEAD) %(color:red)%(refname:short)%(color:reset) - %(color:yellow)%(objectname:short)%(color:reset) - %(contents:subject) - %(authorname) (%(color:blue)%(committerdate:relative)%(color:reset))'"                                                             # git log for each branches
+alias gsub="git submodule update --remote"                                                        # pull submodules
+alias gj="git-jump"                                                                               # Open in vim quickfix list files of interest (git diff, merged...)
+alias dif="git diff --no-index"                                                                   # Diff two files even if not in git repo! Can add -w (don't diff whitespaces)
+
+
+# +--------+
+# | docker |
+# +--------+
+alias dockls="docker container ls | awk 'NR > 1 {print \$NF}'"                  # display names of running containers
+alias dockRr='docker rm $(docker ps -a -q)'                                     # delete every containers / images
+alias dockRr='docker rm $(docker ps -a -q) && docker rmi $(docker images -q)'   # delete every containers / images
+alias dockstats='docker stats $(docker ps -q)'                                  # stats on images
+alias dockimg='docker images'                                                   # list images installed
+alias dockprune='docker system prune -a'                                        # prune everything
+alias dockceu='docker-compose run --rm -u $(id -u):$(id -g)'                    # run as the host user
+alias dockce='docker-compose run --rm'
+
+# +----------------+
+# | docker-compose |
+# +----------------+
+
+alias docker-compose-dev='docker-compose -f docker-compose-dev.yml' # run a different config file than the default one
+
+# +----------+
+# | Personal |
+# +----------+
+
+alias nvidia-settings='nvidia-settings --config="$XDG_CONFIG_HOME"/nvidia/settings'
+
+# Folders
 
 # # +--------+
 # # | System |
@@ -535,52 +688,6 @@ alias ts="tailscale"
 #
 # alias port="netstat -tulpn | grep"
 #
-# # +--------+
-# # | Neovim |
-# # +--------+
-#
-# alias vim='nvim'
-# alias vi='nvim'
-# alias svim='sudoedit'
-# alias dvim="vim -u /usr/share/nvim/archlinux.vim" # nvim with default config
-# alias nvimc='rm -I $VIMCONFIG/swap/*'             # clean nvim swap file
-# alias nvimcu='rm -I $VIMCONFIG/undo/*'            # clean the vim undo
-# alias nviml='nvim -w $VIMCONFIG/vimlog "$@"'      # log the keystrokes 
-# alias nvimd='nvim --noplugin -u NONE'             # launch nvim without any plugin or config (nvim debug)
-# alias nvimfr='nvim +e /tmp/scratchpad.md -c "set spelllang=fr"'
-# alias lvim='\vim -c "set nowrap|syntax off"'        # fast vim for big files / big oneliner
-#
-# # +-----+
-# # | Git |
-# # +-----+
-#
-# alias gs='git status'
-# alias gss='git status -s'
-# alias ga='git add'
-# alias gp='git push'
-# alias gpraise='git blame'
-# alias gpo='git push origin'
-# alias gpof='git push origin --force-with-lease'
-# alias gpofn='git push origin --force-with-lease --no-verify'
-# alias gpt='git push --tag'
-# alias gtd='git tag --delete'
-# alias gtdr='git tag --delete origin'
-# alias grb='git branch -r'                                                                           # display remote branch
-# alias gplo='git pull origin'
-# alias gb='git branch '
-# alias gc='git commit'
-# alias gd='git diff'
-# alias gco='git checkout '
-# alias gl='git log --oneline'
-# alias gr='git remote'
-# alias grs='git remote show'
-# alias glol='git log --graph --abbrev-commit --oneline --decorate'
-# alias gclean="git branch --merged | grep  -v '\\*\\|master\\|develop' | xargs -n 1 git branch -d" # Delete local branch merged with master
-# alias gblog="git for-each-ref --sort=committerdate refs/heads/ --format='%(HEAD) %(color:red)%(refname:short)%(color:reset) - %(color:yellow)%(objectname:short)%(color:reset) - %(contents:subject) - %(authorname) (%(color:blue)%(committerdate:relative)%(color:reset))'"                                                             # git log for each branches
-# alias gsub="git submodule update --remote"                                                        # pull submodules
-# alias gj="git-jump"                                                                               # Open in vim quickfix list files of interest (git diff, merged...)
-#
-# alias dif="git diff --no-index"                                                                   # Diff two files even if not in git repo! Can add -w (don't diff whitespaces)
 #
 # # +------+
 # # | tmux |
@@ -610,35 +717,6 @@ alias ts="tailscale"
 # alias ubackup='udiskie-umount $MEDIA/BACKUP'
 # alias umedia='udiskie-umount $MEDIA/*'
 #
-# # +--------+
-# # | docker |
-# # +--------+
-# alias dockls="docker container ls | awk 'NR > 1 {print \$NF}'"                  # display names of running containers
-# alias dockRr='docker rm $(docker ps -a -q)'                                     # delete every containers / images
-# alias dockRr='docker rm $(docker ps -a -q) && docker rmi $(docker images -q)'   # delete every containers / images
-# alias dockstats='docker stats $(docker ps -q)'                                  # stats on images
-# alias dockimg='docker images'                                                   # list images installed
-# alias dockprune='docker system prune -a'                                        # prune everything
-# alias dockceu='docker-compose run --rm -u $(id -u):$(id -g)'                    # run as the host user
-# alias dockce='docker-compose run --rm'
-#
-# # +----------------+
-# # | docker-compose |
-# # +----------------+
-#
-# alias docker-compose-dev='docker-compose -f docker-compose-dev.yml' # run a different config file than the default one
-#
-# # +----------+
-# # | Personal |
-# # +----------+
-#
-# alias nvidia-settings='nvidia-settings --config="$XDG_CONFIG_HOME"/nvidia/settings'
-#
-# # Folders
-# alias work="$HOME/workspace"
-# alias doc="$HOME/Documents"
-# alias dow="$HOME/Downloads"
-# alias dot="$HOME/.dotfiles"
 #
 # # Mindmaps
 # alias freebrain="freemind $CLOUD/knowledge_base/_BRAINSTORMING/*.mm &> /dev/null &"
@@ -649,9 +727,6 @@ alias ts="tailscale"
 # # Golang
 # alias gosrc="$GOPATH/src/" # golang src
 # alias gobin="$GOPATH/bin/" # golang bin
-#
-# # Clojure
-# alias cljrepl='clojure -Sdeps "{:deps {com.bhauman/rebel-readline {:mvn/version \"0.1.4\"}}}" -m rebel-readline.main'
 #
 # # AWS
 # alias awsa='aws --profile amboss-profile'
@@ -673,46 +748,43 @@ alias ts="tailscale"
 #
 # alias ddg="duckduckgo"
 # alias wiki="wikipedia"
-#
-#
-# ## marta file manager symlink
-# ## ln -s /Applications/Marta.app/Contents/Resources/launcher /usr/local/bin/marta
-# #alias marta="/Applications/Marta.app/Contents/Resources/launcher"
-# #
-# ## -----------------------------------------------------
-# ## Custom functions (example)
-# ## -----------------------------------------------------
-# #mkcd () {
-# #  mkdir -p "$1" && cd "$1"
-# #}
-# #
-#
-# # custom functions
-# # symlink
-# slink() {
-#     local src_orig=$1
-#     local dst_link=$2
-#     local dst_dir=$(dirname "$dst_link")
-#
-#     # Create the directory if it does not exist
-#     mkdir -p "$dst_dir"
-#
-#     # Create the symlink
-#     ln -nfs "$src_orig" "$dst_link"
-# }
-#
-# slink_init() {
-#     slink $DOTFILES/.Brewfile $HOME/.Brewfile
-#     slink $DOTFILES/.zshrc $HOME/.zshrc
-#
-#     slink $DOTFILES_EXPORTS $OMZ_CUSTOM/exports.zsh
-#     slink $DOTFILES_ALIASES $OMZ_CUSTOM/aliases.zsh
-#     slink $DOTFILES_FUNCTIONS $OMZ_CUSTOM/functions.zsh
-#
-#     slink $DOTFILES/nvm/default-packages $NVM_DIR/default-packages
-#     slink $DOTFILES/.config/git/.gitignore $HOME/.gitignore
-#
-#
-#     slink $DOTFILES/.config/zellij/main-layout.kdl $HOME/.config/config.kdl
-# }
-#
+
+
+
+# -----------------------------------------------------
+# Custom functions (example)
+# -----------------------------------------------------
+mkcd () {
+ mkdir -p "$1" && cd "$1"
+}
+
+
+# custom functions
+# symlink
+slink() {
+    local src_orig=$1
+    local dst_link=$2
+    local dst_dir=$(dirname "$dst_link")
+
+    # Create the directory if it does not exist
+    mkdir -p "$dst_dir"
+
+    # Create the symlink
+    ln -nfs "$src_orig" "$dst_link"
+}
+
+slink_init() {
+    slink $DOTFILES/.Brewfile $HOME/.Brewfile
+    slink $DOTFILES/.zshrc $HOME/.zshrc
+
+    slink $DOTFILES_EXPORTS $OMZ_CUSTOM/exports.zsh
+    slink $DOTFILES_ALIASES $OMZ_CUSTOM/aliases.zsh
+    slink $DOTFILES_FUNCTIONS $OMZ_CUSTOM/functions.zsh
+
+    slink $DOTFILES/nvm/default-packages $NVM_DIR/default-packages
+    slink $DOTFILES/.config/git/.gitignore $HOME/.gitignore
+
+
+    slink $DOTFILES/.config/zellij/main-layout.kdl $HOME/.config/config.kdl
+}
+
