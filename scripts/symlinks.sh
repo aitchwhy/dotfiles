@@ -28,6 +28,7 @@ CONFIG_MAP=(
   "$HOME/dotfiles/config/starship.toml:$HOME/.config/starship.toml"
   "$HOME/dotfiles/config/zellij/config.kdl:$HOME/.config/zellij/config.kdl"
   "$HOME/dotfiles/config/zsh-abbr/user-abbreviations:$HOME/.config/zsh-abbr/user-abbreviations"
+  "$HOME/dotfiles/config/atuin/config.toml:$HOME/.config/atuin/config.toml"
 
   # Add more file or directory mappings as needed:
   # "$HOME/dotfiles/<app>:<target_path>"

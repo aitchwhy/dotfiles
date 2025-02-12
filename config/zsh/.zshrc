@@ -71,8 +71,6 @@ export FZF_DEFAULT_OPTS="
   --color=marker:#9ece6a,spinner:#9ece6a,header:#9ece6a
 "
 
-
-
 #############
 # History search (CTRL-R) + atuin
 # Paste the selected command from history onto the command-line
@@ -83,11 +81,8 @@ export FZF_DEFAULT_OPTS="
 # Set FZF_CTRL_R_OPTS to pass additional options to fzf
 # CTRL-Y to copy the command into clipboard using pbcopy
 #############
-export FZF_CTRL_R_OPTS="
-  --bind 'ctrl-y:execute-silent(echo -n {2..} | pbcopy)+abort'
-  --color header:italic
-  --header 'Press CTRL-Y to copy command into clipboard'"
 
+# History search (CTRL-R) - Integrated with Atuin
 export FZF_CTRL_R_OPTS="
   --bind 'ctrl-y:execute-silent(echo -n {2..} | pbcopy)+abort'
   --color header:italic
@@ -112,7 +107,6 @@ export FZF_CTRL_T_OPTS="
   --bind 'ctrl-/:change-preview-window(down|hidden|)'
   --border-label='Files'"
 
-
 #############
 # Directory navigation (ALT-C) (cd into the selected directory)
 #
@@ -128,6 +122,8 @@ export FZF_ALT_C_OPTS="
   --walker-skip .git,node_modules,target,.cache
   --preview 'tree -C {} | head -200'
   --border-label='Directories'"
+
+
 
 # Zoxide configuration
 export _ZO_DATA_DIR="${XDG_DATA_HOME}/zoxide"
@@ -261,7 +257,8 @@ source <(fzf --zsh)
 (( $+commands[starship] )) && eval "$(starship init zsh)"
 
 # Initialize atuin if installed (with up arrow disabled due to vi mode)
-(( $+commands[atuin] )) && eval "$(atuin init zsh --disable-up-arrow)"
+# (( $+commands[atuin] )) && eval "$(atuin init zsh --disable-up-arrow)"
+(( $+commands[atuin] )) && eval "$(atuin init zsh --disable-ctrl-r)"
 
 # Initialize zsh-abbr if installed
 (( $+commands[abbr] )) && eval "$(abbr init zsh)"
