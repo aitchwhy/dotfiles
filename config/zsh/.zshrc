@@ -160,7 +160,7 @@ fi
 
 # Brew bundle - https://docs.brew.sh/Manpage#bundle-subcommand
 # global bundle file location
-export HOMEBREW_BUNDLE_FILE="~/.Brewfile"
+# export HOMEBREW_BUNDLE_FILE="~/.Brewfile"
 export HOMEBREW_BUNDLE_INSTALL_CLEANUP=1
 export HOMEBREW_BUNDLE_DUMP_DESCRIBE=1
 
