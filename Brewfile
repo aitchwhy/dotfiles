@@ -22,7 +22,21 @@ tap "yakitrak/yakitrak"
 ##################################
 # Formulae
 ##################################
-brew "python-tk@3.13" # replace 3.13 with your Python version
+# brew "python-tk@3.13" # replace 3.13 with your Python version
+brew "typescript-language-server"
+brew "bash-language-server"
+brew "marksman"
+brew "yaml-language-server"
+brew "vscode-langservers-extracted"
+brew "pyright"
+brew "gopls"
+brew "rust-analyzer"
+brew "stylua"
+brew "prettier"
+brew "black"
+brew "shellcheck"
+brew "shfmt"
+brew "eslint"
 brew "aria2" # replace 3.13 with your Python version
 brew "rfidresearchgroup/proxmark3/arm-none-eabi-gcc"
 brew "rfidresearchgroup/proxmark3/proxmark3"
@@ -302,7 +316,7 @@ cask "quit-all"
 # NOTE: Jump Desktop license is tied to Mac App Store so need mas install and NOT cask
 mas "Paste", id: 967805235
 mas "Jump Desktop (RDP, VNC, Fluid)", id: 364876095
-mas "Structured - Daily Planner", id: 1499198946
+# mas "Structured - Daily Planner", id: 1499198946
 mas "Session Pomodoro Focus Timer", id: 1521432881
 mas "Monica AI: Chat, Image & Video", id: 6450770590
 mas "Aiko", id: 1672085276
