@@ -1,68 +1,92 @@
 # This is Git's per-user configuration file.
 
 [user]
-email = hank.lee.qed@gmail.com
-name = Hank Lee
-
-[init]
-defaultBranch = main
-
-[pull]
-rebase = false
-
-[core]
-editor = nvim
-excludesfile = ~/.gitignore
-pager = delta
-
-[interactive]
-diffFilter = delta --color-only
+  email = hank.lee.qed@gmail.com
+  name = Hank Lee
 
 [color]
-ui = true
+  ui = true
 
-[format]
-pretty = '%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
+[init]
+  defaultBranch = main
 
-[push]
-default = simple
+[core]
+  editor = nvim
+  excludesfile = ~/.gitignore
+  pager = delta
 
-[pager]
-diff = diff-so-fancy | less --tabs=1,5 -RFX
-show = diff-so-fancy | less --tabs=1,5 -RFX
+[delta]
+  syntax-theme = Dracula
+  # use n and N to move between diff sections
+  navigate = true
+  # or light = true, or omit for auto-detection
+  dark = true
+  line-numbers = true
+  side-by-side = true
+  hyperlinks = true
+  decorations = true
+  file-style = bold yellow ul
+  file-decoration-style = none
+  hunk-header-decoration-style = blue box
+  minus-style = syntax "#3f0001"
+  minus-non-emph-style = syntax "#3f0001"
+  minus-emph-style = syntax "#901011"
+  minus-empty-line-marker-style = syntax "#3f0001"
+  plus-style = syntax "#002800"
+  plus-non-emph-style = syntax "#002800"
+  plus-emph-style = syntax "#274826"
+  plus-empty-line-marker-style = syntax "#002800"
+  zero-style = syntax
+  whitespace-error-style = reverse red
+  keep-plus-minus-markers = false
 
-[page]
-diff = delta
-show = delta
-log = delta
-blame = delta
-reflog = delta
+[interactive]
+  diffFilter = delta --color-only
 
-[difftool "Kaleidoscope"]
-cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\"
-
-[mergetool "Kaleidoscope"]
-cmd = ksdiff --merge --output \"$MERGED\" --base \"$BASE\" -- \"$LOCAL\" --snapshot \"$REMOTE\" --snapshot
-trustExitCode = true
-
-[filter "lfs"]
-clean = git-lfs clean -- %f
-smudge = git-lfs smudge -- %f
-process = git-lfs filter-process
-required = true
-
-[credential]
-helper = osxkeychain
+[merge]
+  conflictstyle = zdiff3
 
 [diff]
-tool = vimdiff
-[merge]
-tool = vimdiff
+  colorMoved = default
+
+[pull]
+  rebase = false
+
+[filter "lfs"]
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
+  required = true
+
+[credential]
+  helper = osxkeychain
+
 [credential "https://github.com"]
-helper =
-helper = !/opt/homebrew/bin/gh auth git-credential
+  helper = !/opt/homebrew/bin/gh auth git-credential
+
 [credential "https://gist.github.com"]
-helper =
-helper = !/opt/homebrew/bin/gh auth git-credential
+  helper = !/opt/homebrew/bin/gh auth git-credential
+
+
+[format]
+  pretty = '%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
+
+[push]
+  default = simple
+
+######
+
+
+[pager]
+  diff = diff-so-fancy | less --tabs=1,5 -RFX
+  show = diff-so-fancy | less --tabs=1,5 -RFX
+
+[page]
+  diff = delta
+  show = delta
+  log = delta
+  blame = delta
+  reflog = delta
+
 
 #############
