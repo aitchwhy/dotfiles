@@ -178,6 +178,7 @@ brew "kanata"
 # Combined and alphabetically sorted old + newly added casks
 
 cask "blackhole-16ch"
+cask "audacity"
 cask "macwhisper"
 cask "todoist"
 cask "slack"

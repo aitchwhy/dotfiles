@@ -34,4 +34,95 @@ matches:
         params:
           cmd: "echo 'Hello from your shell'"
 
+  # Meeting & Scheduling
+  - trigger: ":cal30"
+    replace: "Hi {{first_name}}, Excited to learn more about {{company_name}} and how I can contribute! Here's my Calendly link to schedule a quick 30-min chat: https://calendly.com/hank-lee/30min If none of the times work, just let me know and we'll find something else."
+    vars:
+      - name: "first_name"
+        type: "text"
+      - name: "company_name"
+        type: "text"
+
+  - trigger: ":calcq"
+    replace: "Here's my 30-minute Calendly link for scheduling: https://calendly.com/hank-lee/30min If none of the available times work, let me know."
+
+  - trigger: ":schedcc"
+    replace: "Thanks {{first_name}}! Adding Matti on CC who will find us time to connect."
+    vars:
+      - name: "first_name"
+        type: "text"
+
+  - trigger: ":zoom"
+    replace: "Here is my zoom link - https://us06web.zoom.us/j/5347018535"
+
+  - trigger: ":followup"
+    replace: "Hi {{first_name}}, Just following up on our recent chat—curious if any thoughts or ideas have come up?"
+    vars:
+      - name: "first_name"
+        type: "text"
+
+  # Team Communication
+  - trigger: ":teamupdate"
+    replace: |
+      Hey all,
+      TL;DR: We are {{status}} for {{milestone}}.
+      📋 Goals {{goals}}
+      {{links}}
+    vars:
+      - name: "status"
+        type: "choice"
+        values:
+          - "on track"
+          - "exceeding"
+          - "off track"
+      - name: "milestone"
+        type: "text"
+      - name: "goals"
+        type: "text"
+      - name: "links"
+        type: "text"
+
+  - trigger: ":meetnotes"
+    replace: |
+      Hey {{first_name}},
+      Quick recap, but looking forward to our next call on {{date}}:
+      Next Steps: {{next_steps}}
+    vars:
+      - name: "first_name"
+        type: "text"
+      - name: "date"
+        type: "text"
+      - name: "next_steps"
+        type: "text"
+
+  # Professional Introductions & Responses
+  - trigger: ":introme"
+    replace: "Hi {{first_name}}! 👋 I'm {{your_name}}, nice to meet you! I'm a {{your_role}} at {{your_company}}."
+    vars:
+      - name: "first_name"
+        type: "text"
+      - name: "your_name"
+        type: "text"
+      - name: "your_role"
+        type: "text"
+      - name: "your_company"
+        type: "text"
+
+  - trigger: ":superhuman"
+    replace: "Superhuman is the fastest email experience in the world. Our customers get through their inbox twice as fast as before, resulting in \"Inbox Zero\" like never before."
+
+  - trigger: ":reject"
+    replace: "Hey {{sender}}, Sorry to hear things didn't work out with {{company_name}}, but I appreciate you keeping me updated through the process."
+    vars:
+      - name: "sender"
+        type: "text"
+      - name: "company_name"
+        type: "text"
+
+  - trigger: ":declinehr"
+    replace: "Hi {{first_name}}, Thanks for the note! I'm not interested right now, but perhaps later."
+    vars:
+      - name: "first_name"
+        type: "text"
+
   # And much more! For more information, visit the docs: https://espanso.org/docs/
