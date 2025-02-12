@@ -23,6 +23,7 @@ tap "yakitrak/yakitrak"
 # Formulae
 ##################################
 brew "python-tk@3.13" # replace 3.13 with your Python version
+brew "aria2" # replace 3.13 with your Python version
 brew "rfidresearchgroup/proxmark3/arm-none-eabi-gcc"
 brew "rfidresearchgroup/proxmark3/proxmark3"
 brew "act"
