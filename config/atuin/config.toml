@@ -42,23 +42,23 @@ highlight = "#bb9af7"
 selected_highlight = "#7dcfff"
 preview_border = "#7aa2f7"
 
-# Key bindings (matching fzf where possible)
-[keys]
-scroll_exits = true
+# # Key bindings (matching fzf where possible)
+# [keys]
+# scroll_exits = true
 
-# Common vim-style navigation
-up = ["ctrl-p", "up"]
-down = ["ctrl-n", "down"]
-page_up = ["ctrl-b"]
-page_down = ["ctrl-f"]
+# # Common vim-style navigation
+# up = ["ctrl-p", "up"]
+# down = ["ctrl-n", "down"]
+# page_up = ["ctrl-b"]
+# page_down = ["ctrl-f"]
 
-# Preview control
-toggle_preview = ["ctrl-/"]
+# # Preview control
+# toggle_preview = ["ctrl-/"]
 
-# Copy/execution
-copy = ["ctrl-y"]
-accept = ["enter"]
-edit = ["ctrl-e"]
+# # Copy/execution
+# copy = ["ctrl-y"]
+# accept = ["enter"]
+# edit = ["ctrl-e"]
 
 ## enable or disable automatic sync
 auto_sync = true
@@ -108,7 +108,7 @@ inline_height = 80
 
 ## Invert the UI - put the search bar at the top , Default to `false`
 # invert = false
-invert = false
+invert = true
 
 ## enable or disable showing a preview of the selected command
 ## useful when the command is longer than the terminal width and is cut off
@@ -130,6 +130,7 @@ show_preview = true
 ## use ctrl instead of alt as the shortcut modifier key for numerical UI shortcuts
 ## alt-0 .. alt-9
 # ctrl_n_shortcuts = false
+ctrl_n_shortcuts = true
 
 ## default history list format - can also be specified with the --format arg
 # history_format = "{time}\t{command}\t{duration}"
@@ -177,6 +178,7 @@ show_tabs = true
 
 ## Defaults to true. If enabled, upon hitting enter Atuin will immediately execute the command. Press tab to return to the shell and edit.
 # This applies for new installs. Old installs will keep the old behaviour unless configured otherwise.
+# enter_accept = true
 enter_accept = true
 
 ## Defaults to "emacs".  This specifies the keymap on the startup of `atuin
@@ -185,7 +187,7 @@ enter_accept = true
 ## keybinding is defined.  If this is set to "emacs", "vim-insert", or
 ## "vim-normal", the startup keymap mode in the Atuin search is forced to be
 ## the specified one.
-keymap_mode = "vim-insert"
+# keymap_mode = "vim-insert"
 
 ## Cursor style in each keymap mode.  If specified, the cursor style is changed
 ## in entering the cursor shape.  Available values are "default" and

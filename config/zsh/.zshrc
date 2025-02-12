@@ -47,8 +47,6 @@ export ZELLIJ_CONFIG_DIR="$XDG_CONFIG_HOME/zellij"
 
 export BAT_CONFIG_PATH="$XDG_CONFIG_HOME/bat/config"
 export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/config"
-
-# fzf -> https://junegunn.github.io/fzf/shell-integration/
 # default command for fzf
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --exclude node_modules --exclude target'
 # export FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden'
@@ -248,17 +246,17 @@ _load_brew_plugin "autosuggestions"
 
 # ====== Tool Initialization ======
 
-# fzf
+# (( $+commands[fzf] )) && eval "$( init zsh)"
+# fzf -> https://junegunn.github.io/fzf/shell-integration/
 source <(fzf --zsh)
-
-
 
 # Initialize starship prompt if installed
 (( $+commands[starship] )) && eval "$(starship init zsh)"
 
 # Initialize atuin if installed (with up arrow disabled due to vi mode)
 # (( $+commands[atuin] )) && eval "$(atuin init zsh --disable-up-arrow)"
-(( $+commands[atuin] )) && eval "$(atuin init zsh --disable-ctrl-r)"
+# (( $+commands[atuin] )) && eval "$(atuin init zsh --disable-ctrl-r)"
+(( $+commands[atuin] )) && eval "$(atuin init zsh)"
 
 # Initialize zsh-abbr if installed
 (( $+commands[abbr] )) && eval "$(abbr init zsh)"
@@ -871,7 +869,7 @@ z() {
 
 # ripgrep->fzf->nvim [QUERY]
 # https://junegunn.github.io/fzf/tips/ripgrep-integration/#8-handle-multiple-selections
-fzfrg() (
+rfv() (
   RELOAD='reload:rg --column --color=always --smart-case {q} || :'
   OPENER='if [[ $FZF_SELECT_COUNT -eq 0 ]]; then
             vim {1} +{2}     # No selection. Open the current line in Vim.
@@ -890,7 +888,7 @@ fzfrg() (
 )
 
 # # https://github.com/junegunn/fzf/issues/2789
-# frg() {
+# rfv() {
 #   # rg
 #   # --field-match-separator ' ' - tell rg to separate the filename and linenumber with
 #   # spaces to play well with fzf, (when recognizing index variables to use in the fzf
