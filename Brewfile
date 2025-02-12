@@ -300,6 +300,7 @@ cask "quit-all"
 ##################################
 
 # NOTE: Jump Desktop license is tied to Mac App Store so need mas install and NOT cask
+mas "Paste", id: 967805235
 mas "Jump Desktop (RDP, VNC, Fluid)", id: 364876095
 mas "Structured - Daily Planner", id: 1499198946
 mas "Session Pomodoro Focus Timer", id: 1521432881

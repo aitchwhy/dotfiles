@@ -12,22 +12,32 @@ fi
 # Define the config mapping (source:destination pairs)
 CONFIG_MAP=(
   "$HOME/dotfiles/Brewfile:$HOME/.Brewfile"
+
   "$HOME/dotfiles/config/zsh/.zshrc:$HOME/.zshrc"
   "$HOME/dotfiles/config/zsh/.zprofile:$HOME/.zprofile"
-  "$HOME/dotfiles/Brewfile:$HOME/.Brewfile"
 
   "$HOME/dotfiles/config/git/.gitconfig:$HOME/.gitconfig"
   "$HOME/dotfiles/config/git/.gitignore:$HOME/.gitignore"
+
   "$HOME/dotfiles/config/nvim:$HOME/.config/nvim"
+
   "$HOME/dotfiles/config/espanso:$HOME/.config/espanso"
+
   "$HOME/dotfiles/config/aide/keybindings.json:$HOME/Library/Application Support/Aide/User/keybindings.json"
   "$HOME/dotfiles/config/aide/settings.json:$HOME/Library/Application Support/Aide/User/settings.json"
+
   "$HOME/dotfiles/config/bat/config:$HOME/.config/bat/config"
+  
   "$HOME/dotfiles/config/ghostty/config:$HOME/.config/ghostty/config"
+
   "$HOME/dotfiles/config/karabiner/karabiner.json:$HOME/.config/karabiner/karabiner.json"
+
   "$HOME/dotfiles/config/starship.toml:$HOME/.config/starship.toml"
+
   "$HOME/dotfiles/config/zellij/config.kdl:$HOME/.config/zellij/config.kdl"
+
   "$HOME/dotfiles/config/zsh-abbr/user-abbreviations:$HOME/.config/zsh-abbr/user-abbreviations"
+
   "$HOME/dotfiles/config/atuin/config.toml:$HOME/.config/atuin/config.toml"
 
   # Add more file or directory mappings as needed:
