@@ -187,6 +187,8 @@ _load_brew_plugin "autosuggestions"
 (( $+commands[fnm] )) && eval "$(fnm env --use-on-cd)"
 
 # uv
+eval "$(uv generate-shell-completion zsh)"
+
 
 # # Python (pyenv)
 # if command -v pyenv >/dev/null; then
