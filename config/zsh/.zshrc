@@ -49,18 +49,85 @@ export BAT_CONFIG_PATH="$XDG_CONFIG_HOME/bat/config"
 export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/config"
 
 # fzf -> https://junegunn.github.io/fzf/shell-integration/
-export FZF_CTRL_T_COMMAND=""
-export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"
+# default command for fzf
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --exclude node_modules --exclude target'
+# export FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden'
+
+# Default options
+export FZF_DEFAULT_OPTS="
+  --height 80% 
+  --layout=reverse 
+  --border sharp
+  --preview 'bat --style=numbers,changes --color=always --line-range :500 {}' 
+  --preview-window='right:60%:border-left'
+  --bind='ctrl-/:toggle-preview'
+  --bind='ctrl-y:execute-silent(echo {} | pbcopy)'
+  --bind='ctrl-e:execute(nvim {} < /dev/tty > /dev/tty)'
+  --bind='ctrl-f:preview-page-down'
+  --bind='ctrl-b:preview-page-up'
+  --color=fg:#c0caf5,bg:#1a1b26,hl:#bb9af7
+  --color=fg+:#c0caf5,bg+:#292e42,hl+:#7dcfff
+  --color=info:#7aa2f7,prompt:#7dcfff,pointer:#7dcfff
+  --color=marker:#9ece6a,spinner:#9ece6a,header:#9ece6a
+"
+
+
+
+#############
+# History search (CTRL-R) + atuin
+# Paste the selected command from history onto the command-line
+#
+# If you want to see the commands in chronological order, press CTRL-R again which toggles sorting by relevance
+# Press CTRL-/ to toggle line wrapping and see the whole command
+#
+# Set FZF_CTRL_R_OPTS to pass additional options to fzf
 # CTRL-Y to copy the command into clipboard using pbcopy
+#############
 export FZF_CTRL_R_OPTS="
   --bind 'ctrl-y:execute-silent(echo -n {2..} | pbcopy)+abort'
   --color header:italic
   --header 'Press CTRL-Y to copy command into clipboard'"
+
+export FZF_CTRL_R_OPTS="
+  --bind 'ctrl-y:execute-silent(echo -n {2..} | pbcopy)+abort'
+  --color header:italic
+  --header 'CTRL-Y: Copy | CTRL-R: Toggle sort'
+  --border-label='Command History'"
+
+#############
+# Dir+File search (CTRL-T)
 # Preview file content using bat (https://github.com/sharkdp/bat)
+#
+# Paste the selected files and directories onto the command-line
+#
+# The list is generated using --walker file,dir,follow,hidden option
+# You can override the behavior by setting FZF_CTRL_T_COMMAND to a custom command that generates the desired list
+# Or you can set --walker* options in FZF_CTRL_T_OPTS
+# Set FZF_CTRL_T_OPTS to pass additional options to fzf
+#############
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_CTRL_T_OPTS="
-  --walker-skip .git,node_modules,target
+  --walker-skip .git,node_modules,target,.cache
   --preview 'bat -n --color=always {}'
-  --bind 'ctrl-/:change-preview-window(down|hidden|)'"
+  --bind 'ctrl-/:change-preview-window(down|hidden|)'
+  --border-label='Files'"
+
+
+#############
+# Directory navigation (ALT-C) (cd into the selected directory)
+#
+# The list is generated using --walker dir,follow,hidden option
+# Set FZF_ALT_C_COMMAND to override the default command
+# Or you can set --walker-* options in FZF_ALT_C_OPTS
+# Set FZF_ALT_C_OPTS to pass additional options to fzf
+#
+# Print tree structure in the preview window
+#############
+export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git --exclude node_modules --exclude target'
+export FZF_ALT_C_OPTS="
+  --walker-skip .git,node_modules,target,.cache
+  --preview 'tree -C {} | head -200'
+  --border-label='Directories'"
 
 # Zoxide configuration
 export _ZO_DATA_DIR="${XDG_DATA_HOME}/zoxide"
@@ -309,6 +376,8 @@ command -v bat >/dev/null && alias cat='bat --paging=never'
 command -v rg >/dev/null && alias grep='rg'
 command -v fd >/dev/null && alias find='fd'
 command -v lazygit >/dev/null && alias lg='lazygit'
+
+
 
 
 # Git shortcuts
@@ -790,7 +859,7 @@ slink() {
     mkdir -p "$dst_dir"
 
     # Create the symlink
-    ln -nfs "$src_orig" "$dst_link"
+    ln -sf "$src_orig" "$dst_link"
 }
 
 # fzf + zoxide :  https://junegunn.github.io/fzf/examples/directory-navigation/#zoxidehttpsgithubcomajeetdsouzazoxide
@@ -802,3 +871,46 @@ z() {
         --bind 'enter:become:echo {2..}'
   ) && cd "$dir"
 }
+
+# ripgrep->fzf->nvim [QUERY]
+# https://junegunn.github.io/fzf/tips/ripgrep-integration/#8-handle-multiple-selections
+fzfrg() (
+  RELOAD='reload:rg --column --color=always --smart-case {q} || :'
+  OPENER='if [[ $FZF_SELECT_COUNT -eq 0 ]]; then
+            vim {1} +{2}     # No selection. Open the current line in Vim.
+          else
+            vim +cw -q {+f}  # Build quickfix list for the selected items.
+          fi'
+  fzf --disabled --ansi --multi \
+      --bind "start:$RELOAD" --bind "change:$RELOAD" \
+      --bind "enter:become:$OPENER" \
+      --bind "ctrl-o:execute:$OPENER" \
+      --bind 'alt-a:select-all,alt-d:deselect-all,ctrl-/:toggle-preview' \
+      --delimiter : \
+      --preview 'bat --style=full --color=always --highlight-line {2} {1}' \
+      --preview-window '~4,+{2}+4/3,<80(up)' \
+      --query "$*"
+)
+
+# # https://github.com/junegunn/fzf/issues/2789
+# frg() {
+#   # rg
+#   # --field-match-separator ' ' - tell rg to separate the filename and linenumber with
+#   # spaces to play well with fzf, (when recognizing index variables to use in the fzf
+#   # preview command, fzf uses a default delimiter of space, see below)
+#
+#   # fzf
+#   # --preview window ~8,+{1}-5
+#   #   this is a fzf feature
+#   #   ~8 - show first 8 lines (header)
+#   #   +{2} - fzf delimits the input piped in to it and provides access via index variables {n}. 
+#   #   the default delimiter fzf uses is space but can be specified via --delimiter <delimiter>
+#   #   pass the second index variable from bat (which is the line number)
+#   #   the number is signed, you can show eg the +n row or the -n row (the nth row from the bottom)
+#   #   -5 subtract 5 rows (go up 5 rows) so that you don't show the highlighted line as the first line
+#   #   since you want to provide context by showing the rows above the highlighted line
+#
+#   rg --line-number --with-filename . --color=always --field-match-separator ' '\
+#     | fzf --preview "bat --color=always {1} --highlight-line {2}" \
+#     --preview-window ~8,+{2}-5
+# }
