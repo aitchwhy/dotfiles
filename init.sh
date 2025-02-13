@@ -12,14 +12,6 @@ CONFIG_DIR="$HOME/.config"
 # XDG_DATA_HOME="$HOME/.local/share"
 ZDOTDIR="$HOME/.config/zsh"
 
-# Config directory symlinks
-declare -A ZSH_CONFIGS=(
-    ["$HOME/dotfiles/config/zsh/.zshenv"]="$HOME/.config/zsh/.zshenv"
-    ["$HOME/dotfiles/config/zsh/.zprofile"]="$HOME/.config/zsh/.zprofile"
-    ["$HOME/dotfiles/config/zsh/.zshrc"]="$HOME/.config/zsh/.zshrc"
-)
-
-
 
 # Utility functions
 log() { echo "==> $*" >&2; }
@@ -124,6 +116,13 @@ export ZDOTDIR="$ZDOTDIR"
 [[ -f "$ZDOTDIR/.zshenv" ]] && source "$ZDOTDIR/.zshenv"
 EOF
     fi
+
+# Config directory symlinks
+    declare -A ZSH_CONFIGS=(
+        ["$HOME/dotfiles/config/zsh/.zshenv"]="$HOME/.config/zsh/.zshenv"
+        ["$HOME/dotfiles/config/zsh/.zprofile"]="$HOME/.config/zsh/.zprofile"
+        ["$HOME/dotfiles/config/zsh/.zshrc"]="$HOME/.config/zsh/.zshrc"
+    )
 
     for src in "${!ZSH_CONFIGS[@]}"; do
         local dest=${ZSH_CONFIGS[$src]}
