@@ -15,6 +15,7 @@ CONFIG_MAP=(
 
   "$HOME/dotfiles/ai/claude/claude_desktop_config.json:$HOME/Library/Application Support/Claude/claude_desktop_config.json"
 
+  "$HOME/dotfiles/config/zsh/.zshenv:$HOME/.zshenv"
   "$HOME/dotfiles/config/zsh/.zshrc:$HOME/.zshrc"
   "$HOME/dotfiles/config/zsh/.zprofile:$HOME/.zprofile"
 
