@@ -11,12 +11,11 @@ fi
 
 # Define the config mapping (source:destination pairs)
 CONFIG_MAP=(
-  "$HOME/dotfiles/config/zsh:$HOME/.config/zsh"
-  # "$HOME/dotfiles/config/zsh/.zshenv:$HOME/.config/zsh/.zshenv"
-  # "$HOME/dotfiles/config/zsh/.zshrc:$HOME/.config/zsh/.zshrc"
-  # "$HOME/dotfiles/config/zsh/.zprofile:$HOME/.config/zsh/.zprofile"
-  # "$HOME/dotfiles/config/zsh/.zprofile:$HOME/.config/zsh/.zprofile"
-  # "$HOME/dotfiles/config/zsh-abbr/user-abbreviations:$HOME/.config/zsh-abbr/user-abbreviations"
+  # "$HOME/dotfiles/config/zsh:$HOME/.config/zsh"
+  "$HOME/dotfiles/config/zsh/.zshenv:$HOME/.config/zsh/.zshenv"
+  "$HOME/dotfiles/config/zsh/.zshrc:$HOME/.config/zsh/.zshrc"
+  "$HOME/dotfiles/config/zsh/.zprofile:$HOME/.config/zsh/.zprofile"
+  "$HOME/dotfiles/config/zsh-abbr/user-abbreviations:$HOME/.config/zsh-abbr/user-abbreviations"
 
   "$HOME/dotfiles/config/starship.toml:$HOME/.config/starship.toml"
 
