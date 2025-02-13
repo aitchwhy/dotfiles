@@ -73,3 +73,5 @@ export FZF_ALT_C_OPTS="
   --preview 'tree -C {} | head -200'
   --border-label='Directories'"
 
+# Load fzf keybindings
+source "$(brew --prefix)/opt/fzf/shell/key-bindings.zsh"
