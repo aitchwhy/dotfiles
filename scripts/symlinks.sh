@@ -13,6 +13,8 @@ fi
 CONFIG_MAP=(
   "$HOME/dotfiles/Brewfile:$HOME/.Brewfile"
 
+  "$HOME/dotfiles/ai/claude/claude_desktop_config.json:$HOME/Library/Application Support/Claude/claude_desktop_config.json"
+
   "$HOME/dotfiles/config/zsh/.zshrc:$HOME/.zshrc"
   "$HOME/dotfiles/config/zsh/.zprofile:$HOME/.zprofile"
 

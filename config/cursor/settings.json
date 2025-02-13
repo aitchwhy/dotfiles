@@ -1409,5 +1409,8 @@
   "[json]": {
     "editor.defaultFormatter": "vscode.json-language-features"
   },
-  "nix.serverPath": "alejandra"
+  "nix.serverPath": "alejandra",
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  }
 }

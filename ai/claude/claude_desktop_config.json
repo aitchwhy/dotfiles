@@ -1,47 +1,40 @@
 {
-  "globalShortcut": "",
-  "mcpServers": {
-    // mcp-installer (https://github.com/anaisbetts/mcp-installer)
-    "mcp-installer": {
-      "command": "npx",
-      "args": [
-        "@anaisbetts/mcp-installer"
-      ]
-    },
-    "filesystem": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-filesystem",
-        "/Users/hank/src"
-      ]
-    },
-    "memory": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-memory"]
-    },
-    "github": {
-      "command": "docker",
-      "args": [
-        "run",
-        "-i",
-        "--rm",
-        "-e",
-        "GITHUB_PERSONAL_ACCESS_TOKEN",
-        "mcp/github"
-      ],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": ""
-      }
-    }
+	"globalShortcut": "",
+	"mcpServers": {
+		"mcp-installer": {
+			"command": "npx",
+			"args": [
+				"@anaisbetts/mcp-installer"
+			]
+		},
 		"filesystem": {
 			"command": "npx",
 			"args": [
 				"-y",
 				"@modelcontextprotocol/server-filesystem",
-				"/Users/hank/Desktop",
-				"/Users/hank/Downloads"
+				"/Users/hank/src"
 			]
+		},
+		"memory": {
+			"command": "npx",
+			"args": [
+				"-y",
+				"@modelcontextprotocol/server-memory"
+			]
+		},
+		"github": {
+			"command": "docker",
+			"args": [
+				"run",
+				"-i",
+				"--rm",
+				"-e",
+				"GITHUB_PERSONAL_ACCESS_TOKEN",
+				"mcp/github"
+			],
+			"env": {
+				"GITHUB_PERSONAL_ACCESS_TOKEN": ""
+			}
 		},
 		"sequential-thinking": {
 			"command": "npx",
@@ -120,6 +113,6 @@
 			"env": {
 				"BRAVE_API_KEY": "BSA6Xfhvmic48OVz8tst9-_43F86H8L"
 			}
-		 
-  }
+		}
+	}
 }
