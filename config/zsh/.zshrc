@@ -554,6 +554,9 @@ alias zjl="fd --format="{/.}" . $HOME/.config/zellij/layouts | fzf --preview 'ca
 alias g="ghostty"
 
 
+# todoist
+alias td="todoist"
+
 # atuin
 alias at="atuin"
 alias ats="atuin store"

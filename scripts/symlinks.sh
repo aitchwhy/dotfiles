@@ -47,6 +47,8 @@ CONFIG_MAP=(
 
   "$HOME/dotfiles/config/atuin/config.toml:$HOME/.config/atuin/config.toml"
 
+  "$HOME/dotfiles/config/todoist/config.json:$HOME/.config/todoist/config.json"
+
   # Add more file or directory mappings as needed:
   # "$HOME/dotfiles/<app>:<target_path>"
 )
