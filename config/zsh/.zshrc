@@ -173,7 +173,10 @@ local additional_paths=(
     "$CARGO_HOME/bin"
     "$GOPATH/bin"
     "$PYENV_ROOT/bin"
+    "$HOMEBREW_PREFIX/rustup/bin"
 )
+
+# export PATH="/opt/homebrew/opt/rustup/bin:$PATH"
 
 for p in $additional_paths; do
     if [[ -d "$p" ]] && [[ ":$PATH:" != *":$p:"* ]]; then

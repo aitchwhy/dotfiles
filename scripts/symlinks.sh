@@ -26,8 +26,11 @@ CONFIG_MAP=(
   "$HOME/dotfiles/config/aide/keybindings.json:$HOME/Library/Application Support/Aide/User/keybindings.json"
   "$HOME/dotfiles/config/aide/settings.json:$HOME/Library/Application Support/Aide/User/settings.json"
 
+  "$HOME/dotfiles/config/cursor/keybindings.json:$HOME/Library/Application Support/Cursor/User/keybindings.json"
+  "$HOME/dotfiles/config/cursor/settings.json:$HOME/Library/Application Support/Cursor/User/settings.json"
+
   "$HOME/dotfiles/config/bat/config:$HOME/.config/bat/config"
-  
+
   "$HOME/dotfiles/config/ghostty/config:$HOME/.config/ghostty/config"
 
   "$HOME/dotfiles/config/karabiner/karabiner.json:$HOME/.config/karabiner/karabiner.json"
