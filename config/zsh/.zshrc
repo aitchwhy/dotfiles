@@ -502,6 +502,8 @@ alias bcin="brew install --cask"
 
 # brew bundle
 alias bb="brew bundle"
+alias bbin="brew bundle install --global --all"
+alias bbe="brew bundle edit --global"
 alias bbdump="bb dump --all --verbose --desc --file=-"
 alias bbdumpf="bb dump --all --verbose --global --force"
 alias bbcheck="bb check --all --verbose --global"
@@ -545,6 +547,8 @@ alias es="espanso"
 
 # Zellij
 alias zj="zellij"
+alias zje="nvim $HOME/.config/zellij/config.kdl"
+alias zjl="fd --format="{/.}" . $HOME/.config/zellij/layouts | fzf --preview 'cat {-1}' --bind 'enter:become(zellij --layout {-1})'"
 
 # ghostty
 alias g="ghostty"
