@@ -3,6 +3,17 @@ mkcd() {
     mkdir -p "$1" && cd "$1"
 }
 
+
+function symlinks_dead_configs() {
+  CONFIGS_DIR="$HOME/.config"
+  fd -H -t l . "$CONFIGS_DIR" | while read -r link; do
+    if [ ! -e "$(readlink -f "$link")" ]; then
+      echo "Found dead symlink @ $link --- removing..."
+      unlink $link
+    fi
+  done
+}
+
 # Extract various archive formats
 extract() {
     if [ -f $1 ]; then
