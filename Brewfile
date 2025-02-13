@@ -11,7 +11,6 @@ tap "typesense/tap"
 tap "waydabber/betterdisplay"
 tap "xo/xo"
 tap "yakitrak/yakitrak"
-brew "diff-so-fancy"
 # Run your GitHub Actions locally
 brew "act"
 # Static analysis and lint tool, for (ba)sh scripts
@@ -64,6 +63,8 @@ brew "wget"
 brew "dasht"
 # Open source multi-tool for exploring and publishing data
 brew "datasette"
+# Good-lookin' diffs with diff-highlight and more
+brew "diff-so-fancy"
 # Load/unload environment variables based on $PWD
 brew "direnv"
 # Disk Usage/Free Utility - a better 'df' alternative
