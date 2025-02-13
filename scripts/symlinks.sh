@@ -11,13 +11,26 @@ fi
 
 # Define the config mapping (source:destination pairs)
 CONFIG_MAP=(
-  "$HOME/dotfiles/Brewfile:$HOME/.Brewfile"
-
-  "$HOME/dotfiles/ai/claude/claude_desktop_config.json:$HOME/Library/Application Support/Claude/claude_desktop_config.json"
-
   "$HOME/dotfiles/config/zsh/.zshenv:$HOME/.config/zsh/.zshenv"
   "$HOME/dotfiles/config/zsh/.zshrc:$HOME/.config/zsh/.zshrc"
   "$HOME/dotfiles/config/zsh/.zprofile:$HOME/.config/zsh/.zprofile"
+  "$HOME/dotfiles/config/zsh-abbr/user-abbreviations:$HOME/.config/zsh-abbr/user-abbreviations"
+
+  "$HOME/dotfiles/config/starship.toml:$HOME/.config/starship.toml"
+
+  "$HOME/dotfiles/Brewfile:$HOME/.Brewfile"
+
+  "$HOME/dotfiles/config/bat/config:$HOME/.config/bat/config"
+
+  "$HOME/dotfiles/config/ghostty/config:$HOME/.config/ghostty/config"
+
+  "$HOME/dotfiles/config/karabiner/karabiner.json:$HOME/.config/karabiner/karabiner.json"
+
+  "$HOME/dotfiles/config/atuin/config.toml:$HOME/.config/atuin/config.toml"
+
+  "$HOME/dotfiles/config/zellij/config.kdl:$HOME/.config/zellij/config.kdl"
+  "$HOME/dotfiles/config/zellij/layouts:$HOME/.config/zellij/layouts"
+  "$HOME/dotfiles/config/zellij/plugins:$HOME/.config/zellij/plugins"
 
   "$HOME/dotfiles/config/git/.gitconfig:$HOME/.gitconfig"
   "$HOME/dotfiles/config/git/.gitignore:$HOME/.gitignore"
@@ -32,21 +45,7 @@ CONFIG_MAP=(
   "$HOME/dotfiles/config/cursor/keybindings.json:$HOME/Library/Application Support/Cursor/User/keybindings.json"
   "$HOME/dotfiles/config/cursor/settings.json:$HOME/Library/Application Support/Cursor/User/settings.json"
 
-  "$HOME/dotfiles/config/bat/config:$HOME/.config/bat/config"
-
-  "$HOME/dotfiles/config/ghostty/config:$HOME/.config/ghostty/config"
-
-  "$HOME/dotfiles/config/karabiner/karabiner.json:$HOME/.config/karabiner/karabiner.json"
-
-  "$HOME/dotfiles/config/starship.toml:$HOME/.config/starship.toml"
-
-  "$HOME/dotfiles/config/zellij/config.kdl:$HOME/.config/zellij/config.kdl"
-  "$HOME/dotfiles/config/zellij/layouts:$HOME/.config/zellij/layouts"
-  "$HOME/dotfiles/config/zellij/plugins:$HOME/.config/zellij/plugins"
-
-  "$HOME/dotfiles/config/zsh-abbr/user-abbreviations:$HOME/.config/zsh-abbr/user-abbreviations"
-
-  "$HOME/dotfiles/config/atuin/config.toml:$HOME/.config/atuin/config.toml"
+  "$HOME/dotfiles/ai/claude/claude_desktop_config.json:$HOME/Library/Application Support/Claude/claude_desktop_config.json"
 
   "$HOME/dotfiles/config/todoist/config.json:$HOME/.config/todoist/config.json"
 
