@@ -431,7 +431,7 @@ cask "miro"
 # Open-source download manager
 cask "motrix"
 # VPN client
-cask "mullvadvpn"
+# cask "mullvadvpn"
 # Developer IDE or Management Environment for Neo4j instances
 cask "neo4j"
 # Knowledge base that works on top of a local folder of plain text Markdown files
@@ -541,7 +541,7 @@ mas "KakaoTalk", id: 869223134
 mas "Keynote", id: 409183694
 mas "Kindle", id: 302584613
 mas "LanScan", id: 472226235
-mas "Logic Pro", id: 634148309
+# mas "Logic Pro", id: 634148309
 mas "Mela", id: 1568924476
 mas "NextDNS", id: 1464122853
 mas "Numbers", id: 409203825
@@ -554,12 +554,12 @@ mas "Paste", id: 967805235
 mas "Pixea", id: 1507782672
 mas "rcmd", id: 1596283165
 mas "Session", id: 1521432881
-mas "SnippetsLab", id: 1006087419
+# mas "SnippetsLab", id: 1006087419
 mas "Snippety", id: 1530751461
-mas "Snippit", id: 1465481124
+# mas "Snippit", id: 1465481124
 mas "Structured", id: 1499198946
 mas "Termius", id: 1176074088
-mas "Todoist", id: 585829637
+# mas "Todoist", id: 585829637
 mas "Toggl Track", id: 1291898086
 mas "Tripsy", id: 1429967544
 mas "Yoink", id: 457622435
