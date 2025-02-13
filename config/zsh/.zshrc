@@ -503,7 +503,7 @@ alias bcin="brew install --cask"
 # brew bundle
 alias bb="brew bundle"
 alias bbdump="bb dump --all --verbose --desc --file=-"
-alias bbdumpf="bb dump --all --verbose --global --froce"
+alias bbdumpf="bb dump --all --verbose --global --force"
 alias bbcheck="bb check --all --verbose --global"
 alias bblist="bb list --all --verbose --global"
 alias bbcleanup="bb cleanup --zap --all --verbose --global"
@@ -558,11 +558,9 @@ alias ati="atuin import auto"
 # python + uv
 alias py='python' # Quick access to python interpreter
 alias py3='python3' # Explicitly use python 3
-alias uv='uv pip' # Use pip3 for package management
-alias uvpip='uv pip' # Use pip3 for package management
-alias venv='python3 -m venv' # Create virtual environments
-alias activate='source venv/bin/activate' # Activate virtual environment
-alias deactivate='deactivate' # Deactivate virtual environment
+alias venv='python3 -m .venv' # Create virtual environments
+alias activate='source .venv/bin/activate' # Activate virtual environment
+# alias deactivate='deactivate' # Deactivate virtual environment
 alias pyrun='python -m' # Run a module as a script
 alias pydoc='pydoc3' # Access python documentation
 
