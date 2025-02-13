@@ -45,6 +45,9 @@ CONFIG_MAP=(
   "$HOME/dotfiles/config/cursor/keybindings.json:$HOME/Library/Application Support/Cursor/User/keybindings.json"
   "$HOME/dotfiles/config/cursor/settings.json:$HOME/Library/Application Support/Cursor/User/settings.json"
 
+  "$HOME/dotfiles/config/vscode/keybindings.json:$HOME/Library/Application Support/Code/User/keybindings.json"
+  "$HOME/dotfiles/config/vscode/settings.json:$HOME/Library/Application Support/Code/User/settings.json"
+
   "$HOME/dotfiles/ai/claude/claude_desktop_config.json:$HOME/Library/Application Support/Claude/claude_desktop_config.json"
 
   "$HOME/dotfiles/config/todoist/config.json:$HOME/.config/todoist/config.json"
