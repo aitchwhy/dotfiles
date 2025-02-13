@@ -22,20 +22,6 @@
 				"@modelcontextprotocol/server-memory"
 			]
 		},
-		"github": {
-			"command": "docker",
-			"args": [
-				"run",
-				"-i",
-				"--rm",
-				"-e",
-				"GITHUB_PERSONAL_ACCESS_TOKEN",
-				"mcp/github"
-			],
-			"env": {
-				"GITHUB_PERSONAL_ACCESS_TOKEN": ""
-			}
-		},
 		"sequential-thinking": {
 			"command": "npx",
 			"args": [
