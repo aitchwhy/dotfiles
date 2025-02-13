@@ -10,7 +10,16 @@ DOTFILES_DIR="$HOME/dotfiles"
 CONFIG_DIR="$HOME/.config"
 # XDG_STATE_HOME="$HOME/.local/state"
 # XDG_DATA_HOME="$HOME/.local/share"
-# ZDOTDIR="$HOME/.config/zsh"
+ZDOTDIR="$HOME/.config/zsh"
+
+# Config directory symlinks
+declare -A ZSH_CONFIGS=(
+    ["$HOME/dotfiles/config/zsh/.zshenv"]="$HOME/.config/zsh/.zshenv"
+    ["$HOME/dotfiles/config/zsh/.zprofile"]="$HOME/.config/zsh/.zprofile"
+    ["$HOME/dotfiles/config/zsh/.zshrc"]="$HOME/.config/zsh/.zshrc"
+)
+
+
 
 # Utility functions
 log() { echo "==> $*" >&2; }
@@ -20,9 +29,7 @@ error() { echo "ERROR: $*" >&2; exit 1; }
 setup_directories() {
     log "Creating XDG directories..."
     mkdir -p "$CONFIG_DIR"
-    
-    # Create state directory for zsh history
-    # mkdir -p "$XDG_STATE_HOME/zsh"
+    mkdir -p "$ZDOTDIR"
 }
 
 # Install Homebrew and packages
@@ -39,7 +46,7 @@ setup_homebrew() {
     
     if [[ -f "$DOTFILES_DIR/Brewfile" ]]; then
         log "Installing Homebrew packages..."
-        brew bundle install --file="$DOTFILES_DIR/Brewfile" --all --force --verbose
+        brew bundle install --file="$DOTFILES_DIR/Brewfile" --no-vscode --force --verbose
         # brew bundle --file="$DOTFILES_DIR/Brewfile" --force 
     else
         error "Brewfile not found in $DOTFILES_DIR"
@@ -98,18 +105,35 @@ create_symlinks() {
     #     fi
     # done
 }
+# Function to create symlink with parent directory
+link_config() {
+    local src="$1"
+    local dest="$2"
+    mkdir -p "$(dirname "$dest")"
+    ln -sf "$src" "$dest"
+}
 
 # Configure zshenv (2 files - ~/.zshenv and $DOTFILES/config/zsh/.zshenv)
 setup_zsh() {
-    if [[ ! -f "$CONFIG_DIR/git/config" ]]; then
-        log "Configuring ~/.zshenv..."
+    if [[ ! -f "$HOME/.zshenv" ]]; then
+        log "Configuring $HOME/.zshenv..."
         
         cat > "$HOME/.zshenv" << EOF
 # Minimal stub for Zsh to load configs from ~/.config/zsh
-# export ZDOTDIR="$ZDOTDIR"
+export ZDOTDIR="$ZDOTDIR"
 [[ -f "$ZDOTDIR/.zshenv" ]] && source "$ZDOTDIR/.zshenv"
 EOF
     fi
+
+    for src in "${!ZSH_CONFIGS[@]}"; do
+        local dest=${ZSH_CONFIGS[$src]}
+        # local full_src="$DOTFILES_DIR/config/$src"
+        # local full_dest="$CONFIG_DIR/$dest"
+        
+        log "Linking $src to $dest"
+        link_config "$src" "$dest"
+    done
+
 }
 
 # Configure git if not already set up
@@ -175,8 +199,8 @@ main() {
     clean_ds_store
     # backup_existing
     setup_directories
-    setup_homebrew
     create_symlinks
+    setup_homebrew
     # setup_git
     # setup_macos
     
