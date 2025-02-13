@@ -8,8 +8,9 @@
 # DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOTFILES_DIR="$HOME/dotfiles"
 CONFIG_DIR="$HOME/.config"
-XDG_STATE_HOME="$HOME/.local/state"
-XDG_DATA_HOME="$HOME/.local/share"
+# XDG_STATE_HOME="$HOME/.local/state"
+# XDG_DATA_HOME="$HOME/.local/share"
+# ZDOTDIR="$HOME/.config/zsh"
 
 # Utility functions
 log() { echo "==> $*" >&2; }
@@ -18,10 +19,10 @@ error() { echo "ERROR: $*" >&2; exit 1; }
 # Create necessary directories
 setup_directories() {
     log "Creating XDG directories..."
-    mkdir -p "$CONFIG_DIR" "$XDG_STATE_HOME" "$XDG_DATA_HOME"
+    mkdir -p "$CONFIG_DIR"
     
     # Create state directory for zsh history
-    mkdir -p "$XDG_STATE_HOME/zsh"
+    # mkdir -p "$XDG_STATE_HOME/zsh"
 }
 
 # Install Homebrew and packages
@@ -105,7 +106,7 @@ setup_zsh() {
         
         cat > "$HOME/.zshenv" << EOF
 # Minimal stub for Zsh to load configs from ~/.config/zsh
-export ZDOTDIR="$HOME/zsh"
+# export ZDOTDIR="$ZDOTDIR"
 [[ -f "$ZDOTDIR/.zshenv" ]] && source "$ZDOTDIR/.zshenv"
 EOF
     fi
@@ -177,7 +178,7 @@ main() {
     setup_homebrew
     create_symlinks
     # setup_git
-    setup_macos
+    # setup_macos
     
     log "Installation complete! Please restart your shell and Finder."
     log "Your old configurations have been backed up to ~/.dotfiles_backup if they existed."
