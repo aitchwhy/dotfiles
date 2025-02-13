@@ -104,25 +104,9 @@ setup_zsh() {
         log "Configuring ~/.zshenv..."
         
         cat > "$HOME/.zshenv" << EOF
-
-# Tool configurations
-export LANG=en_US.UTF-8
-export EDITOR="nvim"
-export VISUAL="nvim"
-
 # Minimal stub for Zsh to load configs from ~/.config/zsh
-# (Tell zsh to use XDG dirs)
-export XDG_CONFIG_HOME="$HOME/.config"
-export XDG_CACHE_HOME="$HOME/.cache"
-export XDG_DATA_HOME="$HOME/.local/share"
-export XDG_STATE_HOME="$HOME/.local/state"
-export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
-
-# Ensure directories exist
-mkdir -p "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME" "$XDG_STATE_HOME/zsh" "$ZDOTDIR"
-
+export ZDOTDIR="$HOME/zsh"
 [[ -f "$ZDOTDIR/.zshenv" ]] && source "$ZDOTDIR/.zshenv"
-
 EOF
     fi
 }
