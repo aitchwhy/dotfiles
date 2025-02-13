@@ -78,7 +78,7 @@ keybinds clear-defaults=true {
         bind "up" { MovePane "up"; }
         bind "right" { MovePane "right"; }
         bind "h" { MovePane "left"; }
-        bind "Ctrl h" { SwitchToMode "normal"; }
+        // bind "Ctrl h" { SwitchToMode "normal"; }
         bind "j" { MovePane "down"; }
         bind "k" { MovePane "up"; }
         bind "l" { MovePane "right"; }
@@ -87,15 +87,7 @@ keybinds clear-defaults=true {
         bind "tab" { MovePane; }
     }
     scroll {
-        bind "Alt left" { MoveFocusOrTab "left"; SwitchToMode "normal"; }
-        bind "Alt down" { MoveFocus "down"; SwitchToMode "normal"; }
-        bind "Alt up" { MoveFocus "up"; SwitchToMode "normal"; }
-        bind "Alt right" { MoveFocusOrTab "right"; SwitchToMode "normal"; }
         bind "e" { EditScrollback; SwitchToMode "normal"; }
-        bind "Alt h" { MoveFocusOrTab "left"; SwitchToMode "normal"; }
-        bind "Alt j" { MoveFocus "down"; SwitchToMode "normal"; }
-        bind "Alt k" { MoveFocus "up"; SwitchToMode "normal"; }
-        bind "Alt l" { MoveFocusOrTab "right"; SwitchToMode "normal"; }
         bind "s" { SwitchToMode "entersearch"; SearchInput 0; }
     }
     search {
@@ -135,11 +127,18 @@ keybinds clear-defaults=true {
         bind "Alt =" { Resize "Increase"; }
         bind "Alt [" { PreviousSwapLayout; }
         bind "Alt ]" { NextSwapLayout; }
+        bind "Alt down" { MoveFocus "down"; }
         bind "Alt f" { ToggleFloatingPanes; }
-        bind "Ctrl g" { SwitchToMode "locked"; }
         bind "Alt i" { MoveTab "left"; }
+        bind "Alt j" { MoveFocus "down"; }
+        bind "Alt k" { MoveFocus "up"; }
+        bind "Alt l" { MoveFocusOrTab "right"; }
+        bind "Alt left" { MoveFocusOrTab "left"; }
         bind "Alt n" { NewPane; }
         bind "Alt o" { MoveTab "right"; }
+        bind "Alt right" { MoveFocusOrTab "right"; }
+        bind "Alt up" { MoveFocus "up"; }
+        bind "Ctrl g" { SwitchToMode "locked"; }
         bind "Ctrl q" { Quit; }
     }
     shared_except "locked" "move" {
@@ -275,6 +274,7 @@ load_plugins {
 // Default: default
 // 
 // theme "dracula"
+theme "catppuccin-latte"
  
 // Choose the base input mode of zellij.
 // Default: normal
@@ -285,6 +285,7 @@ default_mode "normal"
 // Default: $SHELL
 // 
 // default_shell "fish"
+default_shell "zsh"
  
 // Choose the path to override cwd that zellij will use for opening new panes
 // 
@@ -294,11 +295,13 @@ default_mode "normal"
 // Default: "default"
 // 
 // default_layout "compact"
+default_layout "main"
  
 // The folder in which Zellij will look for layouts
 // (Requires restart)
 // 
 // layout_dir "/tmp"
+// layout_dir "$HOME/.config/zellij/layouts"
  
 // The folder in which Zellij will look for themes
 // (Requires restart)
@@ -313,6 +316,7 @@ default_mode "normal"
 //   - false
 // 
 // mouse_mode false
+mouse_mode true
  
 // Toggle having pane frames around the panes
 // Options:

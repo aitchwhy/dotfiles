@@ -40,6 +40,8 @@ CONFIG_MAP=(
   "$HOME/dotfiles/config/starship.toml:$HOME/.config/starship.toml"
 
   "$HOME/dotfiles/config/zellij/config.kdl:$HOME/.config/zellij/config.kdl"
+  "$HOME/dotfiles/config/zellij/layouts:$HOME/.config/zellij/layouts"
+  "$HOME/dotfiles/config/zellij/plugins:$HOME/.config/zellij/plugins"
 
   "$HOME/dotfiles/config/zsh-abbr/user-abbreviations:$HOME/.config/zsh-abbr/user-abbreviations"
 
