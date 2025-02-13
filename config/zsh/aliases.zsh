@@ -29,10 +29,11 @@ alias lg='lazygit'
 
 # Directory shortcuts
 alias dots='cd ~/.config'
-alias zconf='cd ~/.config/zsh'
+# Directory navigation
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
+alias -- -='cd -'
 
 # Homebrew
 alias brewup='brew update && brew upgrade && brew cleanup'
@@ -165,6 +166,11 @@ alias ll="ls -lahG"
 alias brewup="brew update && brew upgrade && brew cleanup"
 alias vi="nvim"
 
+
+# Utility aliases
+alias path='echo $PATH | tr ":" "\n"'
+alias reload='exec zsh'
+alias sz='source ~/.zshrc'
 
 
 #############################################
