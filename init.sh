@@ -5,7 +5,8 @@
 # set -euo pipefail
 
 # Configuration
-DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DOTFILES_DIR="$HOME/dotfiles"
 CONFIG_DIR="$HOME/.config"
 XDG_STATE_HOME="$HOME/.local/state"
 XDG_DATA_HOME="$HOME/.local/share"
@@ -36,10 +37,8 @@ setup_homebrew() {
     fi
     
     if [[ -f "$DOTFILES_DIR/Brewfile" ]]; then
-        log "Symlinking brewfile..."
-	ln -sf "$DOTFILES_DIR/Brewfile" ~/.Brewfile
         log "Installing Homebrew packages..."
-        brew bundle --global --force --verbose --cleanup --zap
+        brew bundle install --file="$DOTFILES_DIR/Brewfile" --all --force --verbose
         # brew bundle --file="$DOTFILES_DIR/Brewfile" --force 
     else
         error "Brewfile not found in $DOTFILES_DIR"
@@ -49,94 +48,94 @@ setup_homebrew() {
 # Create symbolic links for config files
 create_symlinks() {
     log "Creating symbolic links..."
-    
-    # Function to create symlink with parent directory
-    link_config() {
-        local src="$1"
-        local dest="$2"
-        mkdir -p "$(dirname "$dest")"
-        ln -sf "$src" "$dest"
-    }
-    
-    # Core configurations
-    link_config "$DOTFILES_DIR/config/zsh/.zshrc" "$HOME/.zshrc"
-    link_config "$DOTFILES_DIR/config/zsh/.zprofile" "$HOME/.zprofile"
 
-    # Config directory symlinks
-    declare -A configs=(
-        ["aide"]="VSCode/User"           # VSCode settings
-        ["atuin"]="atuin"
-        ["bat"]="bat"
-        ["cursor"]="cursor"
-        ["ghostty"]="ghostty"
-        ["git/.gitconfig"]="git/config"
-        ["git/.gitignore"]="git/ignore"
-        ["hammerspoon"]="../.hammerspoon" # Special case for home directory
-        ["karabiner"]="karabiner"
-        ["nvim"]="nvim"
-        ["starship.toml"]="starship.toml"
-        ["yazi"]="yazi"
-        ["zed"]="zed"
-        ["zellij"]="zellij"
-        ["zsh-abbr"]="zsh-abbr"
-    )
+    source "$DOTFILES_DIR/scripts/symlinks.sh"
     
-    for src in "${!configs[@]}"; do
-        local dest=${configs[$src]}
-        local full_src="$DOTFILES_DIR/config/$src"
-        local full_dest="$CONFIG_DIR/$dest"
+    # # Function to create symlink with parent directory
+    # link_config() {
+    #     local src="$1"
+    #     local dest="$2"
+    #     mkdir -p "$(dirname "$dest")"
+    #     ln -sf "$src" "$dest"
+    # }
+    
+    # # Core configurations
+    # link_config "$DOTFILES_DIR/config/zsh/.zshrc" "$HOME/.zshrc"
+    # link_config "$DOTFILES_DIR/config/zsh/.zprofile" "$HOME/.zprofile"
+
+    # # Config directory symlinks
+    # declare -A configs=(
+    #     ["aide"]="VSCode/User"           # VSCode settings
+    #     ["atuin"]="atuin"
+    #     ["bat"]="bat"
+    #     ["cursor"]="cursor"
+    #     ["ghostty"]="ghostty"
+    #     ["git/.gitconfig"]="git/config"
+    #     ["git/.gitignore"]="git/ignore"
+    #     ["hammerspoon"]="../.hammerspoon" # Special case for home directory
+    #     ["karabiner"]="karabiner"
+    #     ["nvim"]="nvim"
+    #     ["starship.toml"]="starship.toml"
+    #     ["yazi"]="yazi"
+    #     ["zed"]="zed"
+    #     ["zellij"]="zellij"
+    #     ["zsh-abbr"]="zsh-abbr"
+    # )
+    
+    # for src in "${!configs[@]}"; do
+    #     local dest=${configs[$src]}
+    #     local full_src="$DOTFILES_DIR/config/$src"
+    #     local full_dest="$CONFIG_DIR/$dest"
         
-        if [[ -e "$full_src" ]]; then
-            log "Linking $src to $dest"
-            if [[ "$dest" == "../.hammerspoon" ]]; then
-                link_config "$full_src" "$HOME/.hammerspoon"
-            else
-                link_config "$full_src" "$full_dest"
-            fi
-        fi
-    done
+    #     if [[ -e "$full_src" ]]; then
+    #         log "Linking $src to $dest"
+    #         if [[ "$dest" == "../.hammerspoon" ]]; then
+    #             link_config "$full_src" "$HOME/.hammerspoon"
+    #         else
+    #             link_config "$full_src" "$full_dest"
+    #         fi
+    #     fi
+    # done
 }
 
-# Configure git if not already set up
-setup_git() {
+# Configure zshenv (2 files - ~/.zshenv and $DOTFILES/config/zsh/.zshenv)
+setup_zsh() {
     if [[ ! -f "$CONFIG_DIR/git/config" ]]; then
-        log "Configuring git..."
-        read -p "Enter git user name: " git_name
-        read -p "Enter git email: " git_email
+        log "Configuring ~/.zshenv..."
         
-        mkdir -p "$CONFIG_DIR/git"
-        cat > "$CONFIG_DIR/git/config" << EOF
-[user]
-    name = $git_name
-    email = $git_email
-[init]
-    defaultBranch = main
-[core]
-    editor = nvim
+        cat > "$HOME/.zshenv" << EOF
+# Minimal stub for Zsh to load configs from ~/.config/zsh
+export ZDOTDIR="$HOME/.config/zsh"
+[[ -f "$ZDOTDIR/.zshenv" ]] && source "$ZDOTDIR/.zshenv"
 EOF
     fi
 }
 
+# Configure git if not already set up
+# setup_git() {
+#     if [[ ! -f "$CONFIG_DIR/git/config" ]]; then
+#         log "Configuring git..."
+#         read -p "Enter git user name: " git_name
+#         read -p "Enter git email: " git_email
+        
+#         mkdir -p "$CONFIG_DIR/git"
+#         cat > "$CONFIG_DIR/git/config" << EOF
+# [user]
+#     name = $git_name
+#     email = $git_email
+# [init]
+#     defaultBranch = main
+# [core]
+#     editor = nvim
+# EOF
+#     fi
+# }
+
 # Configure macOS defaults
 setup_macos() {
     log "Configuring macOS defaults..."
-    
-    # Show hidden files in Finder
-    defaults write com.apple.finder AppleShowAllFiles -bool true
-    
-    # Show path bar and status bar in Finder
-    defaults write com.apple.finder ShowPathbar -bool true
-    defaults write com.apple.finder ShowStatusBar -bool true
-    
-    # Use list view in Finder by default
-    defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
-    
-    # Set key repeat settings
-    defaults write NSGlobalDomain KeyRepeat -int 2
-    defaults write NSGlobalDomain InitialKeyRepeat -int 15
-    
-    # Enable tap-to-click
-    defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
+
+    source "$DOTFILES_DIR/scripts/macos-defaults.sh"
     
     # Restart affected applications
     for app in "Finder" "Dock"; do
@@ -145,22 +144,22 @@ setup_macos() {
 }
 
 # Backup existing configurations
-backup_existing() {
-    local backup_dir="$HOME/.dotfiles_backup/$(date +%Y%m%d_%H%M%S)"
-    local files_to_backup=(
-        "$HOME/.zshrc"
-        "$HOME/.hammerspoon"
-        "$CONFIG_DIR/git/config"
-    )
+# backup_existing() {
+#     local backup_dir="$HOME/.dotfiles_backup/$(date +%Y%m%d_%H%M%S)"
+#     local files_to_backup=(
+#         "$HOME/.zshrc"
+#         "$HOME/.hammerspoon"
+#         "$CONFIG_DIR/git/config"
+#     )
     
-    for file in "${files_to_backup[@]}"; do
-        if [[ -e "$file" ]] && [[ ! -L "$file" ]]; then
-            log "Backing up $file..."
-            mkdir -p "$backup_dir/$(dirname "${file#$HOME/}")"
-            mv "$file" "$backup_dir/${file#$HOME/}"
-        fi
-    done
-}
+#     for file in "${files_to_backup[@]}"; do
+#         if [[ -e "$file" ]] && [[ ! -L "$file" ]]; then
+#             log "Backing up $file..."
+#             mkdir -p "$backup_dir/$(dirname "${file#$HOME/}")"
+#             mv "$file" "$backup_dir/${file#$HOME/}"
+#         fi
+#     done
+# }
 
 # Clean .DS_Store files
 clean_ds_store() {
@@ -173,11 +172,11 @@ main() {
     log "Starting dotfiles installation..."
     
     clean_ds_store
-    backup_existing
+    # backup_existing
     setup_directories
     setup_homebrew
     create_symlinks
-    setup_git
+    # setup_git
     setup_macos
     
     log "Installation complete! Please restart your shell and Finder."

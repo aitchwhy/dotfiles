@@ -26,7 +26,7 @@ $HOME/dotfiles/init.sh
 ## (3) Setup
 
 Zsh shell  needs setting up
-```
+```shell
 # ~/.zshenv
 ```
 
