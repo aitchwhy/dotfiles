@@ -13,8 +13,8 @@ _load_brew_plugin() {
 _load_brew_plugin "syntax-highlighting"
 _load_brew_plugin "autosuggestions"
 
-# Initialize fzf
-if [[ -f "${HOMEBREW_PREFIX}/opt/fzf/shell/completion.zsh" ]]; then
-    source "${HOMEBREW_PREFIX}/opt/fzf/shell/completion.zsh"
-    source "${HOMEBREW_PREFIX}/opt/fzf/shell/key-bindings.zsh"
-fi
+# # Initialize fzf
+# if [[ -f "${HOMEBREW_PREFIX}/opt/fzf/shell/completion.zsh" ]]; then
+#     source "${HOMEBREW_PREFIX}/opt/fzf/shell/completion.zsh"
+#     source "${HOMEBREW_PREFIX}/opt/fzf/shell/key-bindings.zsh"
+# fi
