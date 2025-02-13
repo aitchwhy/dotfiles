@@ -189,7 +189,7 @@
 # .zshrc
 # ============================================================================ #
 
-source "${DOTFILES_DIR:-$HOME/dotfiles}/scripts/symlinks.sh"
+# source "${DOTFILES:-$HOME/dotfiles}/scripts/symlinks.sh"
 
 
 # Performance profiling (uncomment to debug slow startup)
@@ -249,15 +249,17 @@ else
     compinit -C
 fi
 
-# Load all configuration files
-for conf in "$ZDOTDIR"/conf.d/*.zsh; do
-    source "$conf"
-done
+
+# Source aliases and functions
+source "$HOME/dotfiles/config/zsh/aliases.zsh"
+source "$HOME/dotfiles/config/zsh/functions.zsh"
+source "$HOME/dotfiles/config/zsh/fzf.zsh"
+
 
 # Load plugins and tools
 _load_brew_plugin() {
     local plugin_name="$1"
-    local plugin_path="$(brew --prefix)/share/zsh-${plugin_name}/${plugin_name}.zsh"
+    local plugin_path="$(brew --prefix)/share/${plugin_name}/${plugin_name}.zsh"
     if [[ -f "$plugin_path" ]]; then
         source "$plugin_path"
     else
@@ -266,8 +268,8 @@ _load_brew_plugin() {
 }
 
 # Load essential plugins
-_load_brew_plugin "syntax-highlighting"
-_load_brew_plugin "autosuggestions"
+_load_brew_plugin "zsh-syntax-highlighting"
+_load_brew_plugin "zsh-autosuggestions"
 
 # Initialize tools if installed
 # (( $+commands[fzf] )) && eval "$( init zsh)" + fzf -> https://junegunn.github.io/fzf/shell-integration/
@@ -306,11 +308,6 @@ source <(fzf --zsh)
 # fi
 
 
-
-
-# Source aliases and functions
-source "$XDG_CONFIG_HOME/zsh/aliases.zsh"
-source "$XDG_CONFIG_HOME/zsh/functions.zsh"
 
 
 

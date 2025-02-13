@@ -53,7 +53,7 @@ fi
 export EDITOR="nvim"
 export VISUAL="nvim"
 export PAGER="bat --paging"
-export DOTFILES_DIR="$HOME/dotfiles/"
+export DOTFILES="$HOME/dotfiles/"
 export CODE_DIR="$HOME/src/"
 export CONFIGS_DIR='$HOME/.configs/'
 
