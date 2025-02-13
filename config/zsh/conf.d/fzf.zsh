@@ -74,4 +74,4 @@ export FZF_ALT_C_OPTS="
   --border-label='Directories'"
 
 # Load fzf keybindings
-source "$(brew --prefix)/opt/fzf/shell/key-bindings.zsh"
+# source "$(brew --prefix)/opt/fzf/shell/key-bindings.zsh"

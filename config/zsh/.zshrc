@@ -297,7 +297,7 @@ source <(fzf --zsh)
 # (( $+commands[pyenv] )) && eval "$(pyenv init -)"
 
 # uv
-(( $+commands[uv] ))  && eval "$(uv generate-shell-completion zsh)"
+# (( $+commands[uv] ))  && eval "$(uv generate-shell-completion zsh)"
 
 
 # # Python (pyenv)
@@ -314,4 +314,4 @@ source "$XDG_CONFIG_HOME/zsh/functions.zsh"
 
 
 
-zprof  # End profiling
+# zprof  # End profiling
