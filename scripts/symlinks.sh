@@ -12,9 +12,10 @@ fi
 # Define the config mapping (source:destination pairs)
 CONFIG_MAP=(
   # "$HOME/dotfiles/config/zsh:$HOME/.config/zsh"
-  "$HOME/dotfiles/config/zsh/.zshenv:$HOME/.config/zsh/.zshenv"
-  "$HOME/dotfiles/config/zsh/.zshrc:$HOME/.config/zsh/.zshrc"
-  "$HOME/dotfiles/config/zsh/.zprofile:$HOME/.config/zsh/.zprofile"
+  # "$HOME/dotfiles/config/zsh/.zshenv:$HOME/.config/zsh/.zshenv"
+  # "$HOME/dotfiles/config/zsh/.zshrc:$HOME/.config/zsh/.zshrc"
+  # "$HOME/dotfiles/config/zsh/.zprofile:$HOME/.config/zsh/.zprofile"
+  # "$HOME/dotfiles/config/zsh/:$HOME/.config/zsh/.zprofile"
   "$HOME/dotfiles/config/zsh-abbr/user-abbreviations:$HOME/.config/zsh-abbr/user-abbreviations"
 
   "$HOME/dotfiles/config/starship.toml:$HOME/.config/starship.toml"
@@ -94,7 +95,7 @@ for mapping in "${CONFIG_MAP[@]}"; do
   fi
 
   # At this point, $dest either didn't exist or was removed, safe to create link
-  ln -s "$src" "$dest"
+  ln -sf "$src" "$dest"
   echo "✅ Linked $dest -> $src"
 done
 
