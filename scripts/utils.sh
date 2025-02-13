@@ -7,7 +7,7 @@
 ################################################################################
 
 # Default paths (can be overridden before sourcing)
-DOTFILES_DIR="${DOTFILES_DIR:-$HOME/dotfiles}"
+DOTFILES="${DOTFILES:-$HOME/dotfiles}"
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
 BACKUP_DIR="${BACKUP_DIR:-$HOME/.backups}"
 
@@ -270,12 +270,12 @@ sync_dotfiles() {
     [ $# -ne 1 ] && log_error "Usage: sync_dotfiles <repo_url>" && return 1
     local repo_url="$1"
 
-    if [ -d "$DOTFILES_DIR/.git" ]; then
+    if [ -d "$DOTFILES/.git" ]; then
         log_info "Updating dotfiles repository..."
-        git -C "$DOTFILES_DIR" pull --ff-only || log_warning "Could not pull latest changes"
+        git -C "$DOTFILES" pull --ff-only || log_warning "Could not pull latest changes"
     else
         log_info "Cloning dotfiles repository..."
-        git clone "$repo_url" "$DOTFILES_DIR"
+        git clone "$repo_url" "$DOTFILES"
     fi
 }
 
