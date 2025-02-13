@@ -3,7 +3,7 @@
 -- Add any additional options here
 
 ------------------------
---
+
 -- -- Global options.
 -- vim.opt.syntax = "on" -- Syntax highlighting; also does an implicit filetype on
 -- vim.opt.foldenable = false -- Files will open with everything unfolded

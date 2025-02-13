@@ -2,7 +2,6 @@
 .zcompdump*
 .zsh_history
 .antidote/
-plugins/
 cache/
 
 # General ignores
