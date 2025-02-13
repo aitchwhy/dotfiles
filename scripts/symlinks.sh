@@ -15,9 +15,9 @@ CONFIG_MAP=(
 
   "$HOME/dotfiles/ai/claude/claude_desktop_config.json:$HOME/Library/Application Support/Claude/claude_desktop_config.json"
 
-  "$HOME/dotfiles/config/zsh/.zshenv:$HOME/.zshenv"
-  "$HOME/dotfiles/config/zsh/.zshrc:$HOME/.zshrc"
-  "$HOME/dotfiles/config/zsh/.zprofile:$HOME/.zprofile"
+  "$HOME/dotfiles/config/zsh/.zshenv:$HOME/.config/zsh/.zshenv"
+  "$HOME/dotfiles/config/zsh/.zshrc:$HOME/.config/zsh/.zshrc"
+  "$HOME/dotfiles/config/zsh/.zprofile:$HOME/.config/zsh/.zprofile"
 
   "$HOME/dotfiles/config/git/.gitconfig:$HOME/.gitconfig"
   "$HOME/dotfiles/config/git/.gitignore:$HOME/.gitignore"
