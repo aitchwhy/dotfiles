@@ -215,7 +215,6 @@ bindkey '^?' backward-delete-char
 ###########
 # autoload -Uz compinit
 # compinit
-
 # if [[ -n ${ZDOTDIR:-$HOME}/.zcompdump(#qN.mh+24) ]]; then
 #     compinit
 # else
@@ -231,13 +230,13 @@ if type brew &>/dev/null; then
 
     # FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
 
-    # # Load brew-installed completions
-    # local completion_file
-    # for completion_file in "$(brew --prefix)/share/zsh/site-functions"/_*; do
-    #     if [[ -f "$completion_file" ]]; then
-    #         source "$completion_file"
-    #     fi
-    # done
+    # Load brew-installed completions
+    local completion_file
+    for completion_file in "$(brew --prefix)/share/zsh/site-functions"/_*; do
+        if [[ -f "$completion_file" ]]; then
+            source "$completion_file"
+        fi
+    done
 fi
 
 
