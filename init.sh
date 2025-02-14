@@ -206,8 +206,8 @@ main() {
     clean_ds_store
     setup_zsh
     # backup_existing
-    create_symlinks
-    source ./scripts/symlinks.sh
+    # create_symlinks
+    source "$DOTFILES/scripts/symlinks.sh"
     setup_homebrew
     # setup_git
     # setup_macos

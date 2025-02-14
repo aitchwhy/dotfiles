@@ -38,10 +38,11 @@ CONFIG_MAP=(
   "$DOTFILES/config/zellij/layouts:$XDG_CONFIG_HOME/zellij/layouts"
   "$DOTFILES/config/zellij/plugins:$XDG_CONFIG_HOME/zellij/plugins"
 
-  "$DOTFILES/config/git/.gitconfig:$HOME/.gitconfig"
-  "$DOTFILES/config/git/.gitignore:$HOME/.gitignore"
+  "$DOTFILES/config/git/.gitconfig:$XDG_CONFIG_HOME/.config/git/config"
+  "$DOTFILES/config/git/.gitignore:$XDG_CONFIG_HOME/.config/git/ignore"
 
   "$DOTFILES/config/nvim:$XDG_CONFIG_HOME/nvim"
+  "$DOTFILES/config/todoist/config.json:$XDG_CONFIG_HOME/todoist/config.json"
 
   "$DOTFILES/config/espanso:$XDG_CONFIG_HOME/espanso"
 
@@ -56,7 +57,6 @@ CONFIG_MAP=(
 
   "$DOTFILES/ai/claude/claude_desktop_config.json:$HOME/Library/Application Support/Claude/claude_desktop_config.json"
 
-  "$DOTFILES/config/todoist/config.json:$XDG_CONFIG_HOME/todoist/config.json"
 
   # Add more file or directory mappings as needed:
   # "$DOTFILES/<app>:<target_path>"
