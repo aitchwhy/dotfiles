@@ -13,11 +13,11 @@ set -euo pipefail
 # ZDOTDIR="$HOME/.config/zsh"
 
 
-export XDG_CONFIG_HOME="$HOME/.config"
-export XDG_CACHE_HOME="$HOME/.cache"
-export XDG_DATA_HOME="$HOME/.local/share"
-export XDG_STATE_HOME="$HOME/.local/state"
-export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
+# export XDG_CONFIG_HOME="$HOME/.config"
+# export XDG_CACHE_HOME="$HOME/.cache"
+# export XDG_DATA_HOME="$HOME/.local/share"
+# export XDG_STATE_HOME="$HOME/.local/state"
+# export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
 
 export DOTFILES="$HOME/dotfiles"
 
@@ -26,93 +26,88 @@ export DOTFILES="$HOME/dotfiles"
 log() { echo "==> $*" >&2; }
 error() { echo "ERROR: $*" >&2; exit 1; }
 
-# # Create necessary directories
-# setup_directories() {
-#     log "Creating XDG directories..."
-#     mkdir -p "$CONFIG_DIR"
-#     mkdir -p "$ZDOTDIR"
-# }
-
 # Install Homebrew and packages
 setup_homebrew() {
     if ! command -v brew >/dev/null; then
         log "Installing Homebrew..."
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         
-        # Add Homebrew to PATH for the rest of the script
-        if [[ -f /opt/homebrew/bin/brew ]]; then
-            eval "$(/opt/homebrew/bin/brew shellenv)"
-        fi
+        # # Add Homebrew to PATH for the rest of the script
+        # if [[ -f /opt/homebrew/bin/brew ]]; then
+        #     eval "$(/opt/homebrew/bin/brew shellenv)"
+        # fi
     fi
     
-    if [[ -f "$DOTFILES/Brewfile" ]]; then
-        log "Installing Homebrew packages..."
-        brew bundle install --file="$DOTFILES/Brewfile" --no-vscode --force --verbose
-        # brew bundle --file="$DOTFILES/Brewfile" --force 
-    else
-        error "Brewfile not found in $DOTFILES"
-    fi
+    # if [[ -f "$DOTFILES/Brewfile" ]]; then
+    #     log "Installing Homebrew packages..."
+    #     brew bundle install --file="$DOTFILES/Brewfile" --no-vscode --force --verbose
+    #     # brew bundle --file="$DOTFILES/Brewfile" --force 
+    # else
+    #     error "Brewfile not found in $DOTFILES"
+    # fi
 }
 
-# Create symbolic links for config files
-create_symlinks() {
-    log "Creating symbolic links..."
 
-    source "$DOTFILES/scripts/symlinks.sh"
-    
-    # # Function to create symlink with parent directory
-    # link_config() {
-    #     local src="$1"
-    #     local dest="$2"
-    #     mkdir -p "$(dirname "$dest")"
-    #     ln -sf "$src" "$dest"
-    # }
-    
-    # # Core configurations
-    # link_config "$DOTFILES/config/zsh/.zshrc" "$HOME/.zshrc"
-    # link_config "$DOTFILES/config/zsh/.zprofile" "$HOME/.zprofile"
 
-    # # Config directory symlinks
-    # declare -A configs=(
-    #     ["aide"]="VSCode/User"           # VSCode settings
-    #     ["atuin"]="atuin"
-    #     ["bat"]="bat"
-    #     ["cursor"]="cursor"
-    #     ["ghostty"]="ghostty"
-    #     ["git/.gitconfig"]="git/config"
-    #     ["git/.gitignore"]="git/ignore"
-    #     ["hammerspoon"]="../.hammerspoon" # Special case for home directory
-    #     ["karabiner"]="karabiner"
-    #     ["nvim"]="nvim"
-    #     ["starship.toml"]="starship.toml"
-    #     ["yazi"]="yazi"
-    #     ["zed"]="zed"
-    #     ["zellij"]="zellij"
-    #     ["zsh-abbr"]="zsh-abbr"
-    # )
+# # Create symbolic links for config files
+# create_symlinks() {
+#     log "Creating symbolic links..."
+
+#     source "$DOTFILES/scripts/symlinks.sh"
     
-    # for src in "${!configs[@]}"; do
-    #     local dest=${configs[$src]}
-    #     local full_src="$DOTFILES/config/$src"
-    #     local full_dest="$CONFIG_DIR/$dest"
+#     # # Function to create symlink with parent directory
+#     # link_config() {
+#     #     local src="$1"
+#     #     local dest="$2"
+#     #     mkdir -p "$(dirname "$dest")"
+#     #     ln -sf "$src" "$dest"
+#     # }
+    
+#     # # Core configurations
+#     # link_config "$DOTFILES/config/zsh/.zshrc" "$HOME/.zshrc"
+#     # link_config "$DOTFILES/config/zsh/.zprofile" "$HOME/.zprofile"
+
+#     # # Config directory symlinks
+#     # declare -A configs=(
+#     #     ["aide"]="VSCode/User"           # VSCode settings
+#     #     ["atuin"]="atuin"
+#     #     ["bat"]="bat"
+#     #     ["cursor"]="cursor"
+#     #     ["ghostty"]="ghostty"
+#     #     ["git/.gitconfig"]="git/config"
+#     #     ["git/.gitignore"]="git/ignore"
+#     #     ["hammerspoon"]="../.hammerspoon" # Special case for home directory
+#     #     ["karabiner"]="karabiner"
+#     #     ["nvim"]="nvim"
+#     #     ["starship.toml"]="starship.toml"
+#     #     ["yazi"]="yazi"
+#     #     ["zed"]="zed"
+#     #     ["zellij"]="zellij"
+#     #     ["zsh-abbr"]="zsh-abbr"
+#     # )
+    
+#     # for src in "${!configs[@]}"; do
+#     #     local dest=${configs[$src]}
+#     #     local full_src="$DOTFILES/config/$src"
+#     #     local full_dest="$CONFIG_DIR/$dest"
         
-    #     if [[ -e "$full_src" ]]; then
-    #         log "Linking $src to $dest"
-    #         if [[ "$dest" == "../.hammerspoon" ]]; then
-    #             link_config "$full_src" "$HOME/.hammerspoon"
-    #         else
-    #             link_config "$full_src" "$full_dest"
-    #         fi
-    #     fi
-    # done
-}
-# Function to create symlink with parent directory
-link_config() {
-    local src="$1"
-    local dest="$2"
-    mkdir -p "$(dirname "$dest")"
-    ln -sf "$src" "$dest"
-}
+#     #     if [[ -e "$full_src" ]]; then
+#     #         log "Linking $src to $dest"
+#     #         if [[ "$dest" == "../.hammerspoon" ]]; then
+#     #             link_config "$full_src" "$HOME/.hammerspoon"
+#     #         else
+#     #             link_config "$full_src" "$full_dest"
+#     #         fi
+#     #     fi
+#     # done
+# }
+# # Function to create symlink with parent directory
+# link_config() {
+#     local src="$1"
+#     local dest="$2"
+#     mkdir -p "$(dirname "$dest")"
+#     ln -sf "$src" "$dest"
+# }
 
 # Configure zshenv (2 files - ~/.zshenv and $DOTFILES/config/zsh/.zshenv)
 setup_zsh() {
@@ -127,12 +122,6 @@ EOF
     fi
 
 
-    log "Linking $ZDOTDIR/.zshenv"
-    link_config "$DOTFILES/config/zsh/.zshenv" "$ZDOTDIR/.zshenv"
-    log "Linking $ZDOTDIR/.zprofile"
-    link_config "$DOTFILES/config/zsh/.zprofile" "$ZDOTDIR/.zprofile"
-    log "Linking $ZDOTDIR/.zshrc"
-    link_config "$DOTFILES/config/zsh/.zshrc" "$ZDOTDIR/.zshrc"
 
 
 
@@ -217,8 +206,8 @@ main() {
     clean_ds_store
     setup_zsh
     # backup_existing
-    # setup_directories
-    create_symlinks
+    # create_symlinks
+    source "$DOTFILES/scripts/symlinks.sh"
     setup_homebrew
     # setup_git
     # setup_macos

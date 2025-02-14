@@ -1,3 +1,6 @@
+###############################
+# fzf examples -> https://github.com/junegunn/fzf/wiki/examples#homebrew
+###############################
 
 # Default paths (can be overridden before sourcing)
 DOTFILES="${DOTFILES:-$HOME/dotfiles}"
@@ -59,14 +62,15 @@ is_bash() {
 
 ################################################################################
 # PACKAGE MANAGEMENT
+# https://github.com/junegunn/fzf/wiki/examples#homebrew
 ################################################################################
 
 # Homebrew utilities
-has_brew() {
+function has_brew() {
     command -v brew >/dev/null 2>&1
 }
 
-ensure_brew() {
+function ensure_brew() {
     if ! has_brew; then
         log_info "Installing Homebrew..."
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -80,7 +84,7 @@ ensure_brew() {
     fi
 }
 
-update_brew() {
+function update_brew() {
     if has_brew; then
         log_info "Updating Homebrew..."
         brew update
@@ -88,6 +92,8 @@ update_brew() {
         brew cleanup
     fi
 }
+
+
 
 ################################################################################
 # MACOS SPECIFIC UTILITIES

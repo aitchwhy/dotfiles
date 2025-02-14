@@ -1,6 +1,12 @@
 -- editor.lua: Editing UI, text manipulation, and AI plugins
 return {
 
+  -- nvim-web-devicons
+  { "nvim-tree/nvim-web-devicons", opts = {} },
+
+  -- mini.icons (standalone)
+  { "echasnovski/mini.icons",      version = false },
+
   -- flash.nvim (Flash enhances the built-in search functionality by showing labels at the end of each match, letting you quickly jump to a specific location.)
   {
     "folke/flash.nvim",
@@ -51,21 +57,6 @@ return {
     end,
   },
 
-  -- SURROUND: manipulate surrounding characters
-  { "kylechui/nvim-surround", event = "VeryLazy", config = true }, -- uses default setup
-
-  -- COMMENT: toggle comments easily
-  { "numToStr/Comment.nvim", event = "VeryLazy", config = true }, -- provides gc mapping&#8203;:contentReference[oaicite:48]{index=48}
-
-  -- TODO HIGHLIGHTER
-  {
-    "folke/todo-comments.nvim",
-    event = "VeryLazy",
-    dependencies = "nvim-lua/plenary.nvim",
-    config = function()
-      require("todo-comments").setup({})
-    end,
-  },
 
   -- HOP/LEAP: quick navigation within buffer
   {

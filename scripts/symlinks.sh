@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail # Enable strict mode (exit on error, unset var errors, pipeline errors)
 
+DOTFILES=${DOTFILES:-"$HOME/dotfiles"}
+XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-"$HOME/.config"}
+ZDOTDIR=${ZDOTDIR:-"$XDG_CONFIG_HOME/zsh"}
+
 # Optional: Ensure running on correct OS/arch (macOS + Apple Silicon)
 if [[ "$(uname -s)" != "Darwin" || "$(uname -m)" != "arm64" ]]; then
   echo "Error: This script is intended for macOS on Apple Silicon (arm64). Exiting."
@@ -11,52 +15,45 @@ fi
 
 # Define the config mapping (source:destination pairs)
 CONFIG_MAP=(
-  "$HOME/dotfiles/config/zsh:$HOME/.config/zsh"
-  # "$HOME/dotfiles/config/zsh/.zshenv:$HOME/.config/zsh/.zshenv"
-  # "$HOME/dotfiles/config/zsh/.zshrc:$HOME/.config/zsh/.zshrc"
-  # "$HOME/dotfiles/config/zsh/.zprofile:$HOME/.config/zsh/.zprofile"
-  # "$HOME/dotfiles/config/zsh/:$HOME/.config/zsh/.zprofile"
 
-  "$HOME/dotfiles/config/zsh-abbr/user-abbreviations:$HOME/.config/zsh-abbr/user-abbreviations"
+  "$DOTFILES/Brewfile:$HOME/.Brewfile"
 
-  "$HOME/dotfiles/config/starship.toml:$HOME/.config/starship.toml"
+  "$DOTFILES/config/zsh/.zshrc:$ZDOTDIR/.zshrc"
+  "$DOTFILES/config/zsh/.zprofile:$ZDOTDIR/.zprofile"
 
-  "$HOME/dotfiles/Brewfile:$HOME/.Brewfile"
+  "$DOTFILES/config/git/config:$XDG_CONFIG_HOME/.config/git/config"
+  "$DOTFILES/config/git/ignore:$XDG_CONFIG_HOME/.config/git/ignore"
 
-  "$HOME/dotfiles/config/bat/config:$HOME/.config/bat/config"
+  "$DOTFILES/config/karabiner/karabiner.json:$XDG_CONFIG_HOME/karabiner/karabiner.json"
+  "$DOTFILES/config/atuin/config.toml:$XDG_CONFIG_HOME/atuin/config.toml"
+  "$DOTFILES/config/ghostty/config:$XDG_CONFIG_HOME/ghostty/config"
+  "$DOTFILES/config/bat/config:$XDG_CONFIG_HOME/bat/config"
+  "$DOTFILES/config/starship.toml:$XDG_CONFIG_HOME/starship.toml"
+  "$DOTFILES/config/nvim:$XDG_CONFIG_HOME/nvim"
 
-  "$HOME/dotfiles/config/ghostty/config:$HOME/.config/ghostty/config"
+  "$DOTFILES/config/zsh-abbr/user-abbreviations:$XDG_CONFIG_HOME/zsh-abbr/user-abbreviations"
 
-  "$HOME/dotfiles/config/karabiner/karabiner.json:$HOME/.config/karabiner/karabiner.json"
+  "$DOTFILES/config/zellij/config.kdl:$XDG_CONFIG_HOME/zellij/config.kdl"
+  "$DOTFILES/config/zellij/layouts:$XDG_CONFIG_HOME/zellij/layouts"
+  "$DOTFILES/config/zellij/plugins:$XDG_CONFIG_HOME/zellij/plugins"
 
-  "$HOME/dotfiles/config/atuin/config.toml:$HOME/.config/atuin/config.toml"
+  "$DOTFILES/config/todoist/config.json:$XDG_CONFIG_HOME/todoist/config.json"
 
-  "$HOME/dotfiles/config/zellij/config.kdl:$HOME/.config/zellij/config.kdl"
-  "$HOME/dotfiles/config/zellij/layouts:$HOME/.config/zellij/layouts"
-  "$HOME/dotfiles/config/zellij/plugins:$HOME/.config/zellij/plugins"
+  "$DOTFILES/config/espanso:$XDG_CONFIG_HOME/espanso"
 
-  "$HOME/dotfiles/config/git/.gitconfig:$HOME/.gitconfig"
-  "$HOME/dotfiles/config/git/.gitignore:$HOME/.gitignore"
+  "$DOTFILES/config/aide/keybindings.json:$HOME/Library/Application Support/Aide/User/keybindings.json"
+  "$DOTFILES/config/aide/settings.json:$HOME/Library/Application Support/Aide/User/settings.json"
 
-  "$HOME/dotfiles/config/nvim:$HOME/.config/nvim"
+  "$DOTFILES/config/cursor/keybindings.json:$HOME/Library/Application Support/Cursor/User/keybindings.json"
+  "$DOTFILES/config/cursor/settings.json:$HOME/Library/Application Support/Cursor/User/settings.json"
 
-  "$HOME/dotfiles/config/espanso:$HOME/.config/espanso"
+  "$DOTFILES/config/vscode/keybindings.json:$HOME/Library/Application Support/Code/User/keybindings.json"
+  "$DOTFILES/config/vscode/settings.json:$HOME/Library/Application Support/Code/User/settings.json"
 
-  "$HOME/dotfiles/config/aide/keybindings.json:$HOME/Library/Application Support/Aide/User/keybindings.json"
-  "$HOME/dotfiles/config/aide/settings.json:$HOME/Library/Application Support/Aide/User/settings.json"
-
-  "$HOME/dotfiles/config/cursor/keybindings.json:$HOME/Library/Application Support/Cursor/User/keybindings.json"
-  "$HOME/dotfiles/config/cursor/settings.json:$HOME/Library/Application Support/Cursor/User/settings.json"
-
-  "$HOME/dotfiles/config/vscode/keybindings.json:$HOME/Library/Application Support/Code/User/keybindings.json"
-  "$HOME/dotfiles/config/vscode/settings.json:$HOME/Library/Application Support/Code/User/settings.json"
-
-  "$HOME/dotfiles/ai/claude/claude_desktop_config.json:$HOME/Library/Application Support/Claude/claude_desktop_config.json"
-
-  "$HOME/dotfiles/config/todoist/config.json:$HOME/.config/todoist/config.json"
+  "$DOTFILES/ai/claude/claude_desktop_config.json:$HOME/Library/Application Support/Claude/claude_desktop_config.json"
 
   # Add more file or directory mappings as needed:
-  # "$HOME/dotfiles/<app>:<target_path>"
+  # "$DOTFILES/<app>:<target_path>"
 )
 
 #######################################
