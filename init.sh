@@ -49,99 +49,21 @@ setup_homebrew() {
 
 
 
-# # Create symbolic links for config files
-# create_symlinks() {
-#     log "Creating symbolic links..."
-
-#     source "$DOTFILES/scripts/symlinks.sh"
-    
-#     # # Function to create symlink with parent directory
-#     # link_config() {
-#     #     local src="$1"
-#     #     local dest="$2"
-#     #     mkdir -p "$(dirname "$dest")"
-#     #     ln -sf "$src" "$dest"
-#     # }
-    
-#     # # Core configurations
-#     # link_config "$DOTFILES/config/zsh/.zshrc" "$HOME/.zshrc"
-#     # link_config "$DOTFILES/config/zsh/.zprofile" "$HOME/.zprofile"
-
-#     # # Config directory symlinks
-#     # declare -A configs=(
-#     #     ["aide"]="VSCode/User"           # VSCode settings
-#     #     ["atuin"]="atuin"
-#     #     ["bat"]="bat"
-#     #     ["cursor"]="cursor"
-#     #     ["ghostty"]="ghostty"
-#     #     ["git/.gitconfig"]="git/config"
-#     #     ["git/.gitignore"]="git/ignore"
-#     #     ["hammerspoon"]="../.hammerspoon" # Special case for home directory
-#     #     ["karabiner"]="karabiner"
-#     #     ["nvim"]="nvim"
-#     #     ["starship.toml"]="starship.toml"
-#     #     ["yazi"]="yazi"
-#     #     ["zed"]="zed"
-#     #     ["zellij"]="zellij"
-#     #     ["zsh-abbr"]="zsh-abbr"
-#     # )
-    
-#     # for src in "${!configs[@]}"; do
-#     #     local dest=${configs[$src]}
-#     #     local full_src="$DOTFILES/config/$src"
-#     #     local full_dest="$CONFIG_DIR/$dest"
-        
-#     #     if [[ -e "$full_src" ]]; then
-#     #         log "Linking $src to $dest"
-#     #         if [[ "$dest" == "../.hammerspoon" ]]; then
-#     #             link_config "$full_src" "$HOME/.hammerspoon"
-#     #         else
-#     #             link_config "$full_src" "$full_dest"
-#     #         fi
-#     #     fi
-#     # done
-# }
-# # Function to create symlink with parent directory
-# link_config() {
-#     local src="$1"
-#     local dest="$2"
-#     mkdir -p "$(dirname "$dest")"
-#     ln -sf "$src" "$dest"
-# }
-
 # Configure zshenv (2 files - ~/.zshenv and $DOTFILES/config/zsh/.zshenv)
 setup_zsh() {
     if [[ ! -f "$HOME/.zshenv" ]]; then
         log "Configuring $HOME/.zshenv..."
         
         cat > "$HOME/.zshenv" << EOF
-# Minimal stub for Zsh to load configs from $XDG_CONFIG_HOME/zsh
-export ZDOTDIR="$ZDOTDIR"
-[[ -f "$ZDOTDIR/.zshenv" ]] && source "$ZDOTDIR/.zshenv"
+# Set ZDOTDIR if you want to re-home Zsh.
+export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
+export XDG_DATA_HOME=${XDG_DATA_HOME:-$HOME/.local/share}
+export XDG_CACHE_HOME=${XDG_CACHE_HOME:-$HOME/.cache}
+export ZDOTDIR=${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}
 EOF
     fi
-
-
-
-
-
-# # Config directory symlinks
-#     declare -A ZSH_CONFIGS=(
-#         ["$HOME/dotfiles/config/zsh/.zshenv"]="$HOME/.config/zsh/.zshenv"
-#         ["$HOME/dotfiles/config/zsh/.zprofile"]="$HOME/.config/zsh/.zprofile"
-#         ["$HOME/dotfiles/config/zsh/.zshrc"]="$HOME/.config/zsh/.zshrc"
-#     )
-
-    # for src in "${!ZSH_CONFIGS[@]}"; do
-    #     local dest=${ZSH_CONFIGS[$src]}
-    #     # local full_src="$DOTFILES/config/$src"
-    #     # local full_dest="$CONFIG_DIR/$dest"
-        
-    #     log "Linking $src to $dest"
-    #     link_config "$src" "$dest"
-    # done
-
 }
+
 
 # Configure git if not already set up
 # setup_git() {
@@ -175,23 +97,6 @@ setup_macos() {
     done
 }
 
-# Backup existing configurations
-# backup_existing() {
-#     local backup_dir="$HOME/.dotfiles_backup/$(date +%Y%m%d_%H%M%S)"
-#     local files_to_backup=(
-#         "$HOME/.zshrc"
-#         "$HOME/.hammerspoon"
-#         "$CONFIG_DIR/git/config"
-#     )
-    
-#     for file in "${files_to_backup[@]}"; do
-#         if [[ -e "$file" ]] && [[ ! -L "$file" ]]; then
-#             log "Backing up $file..."
-#             mkdir -p "$backup_dir/$(dirname "${file#$HOME/}")"
-#             mv "$file" "$backup_dir/${file#$HOME/}"
-#         fi
-#     done
-# }
 
 # Clean .DS_Store files
 clean_ds_store() {

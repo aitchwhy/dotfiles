@@ -48,14 +48,6 @@ _load_brew_plugin "zsh-autosuggestions"
 # source $(brew --prefix)/share/zsh/site-functions/_todoist_fzf
 
 
-
-
-# Source aliases and functions
-source "$HOME/dotfiles/config/zsh/aliases.zsh"
-source "$HOME/dotfiles/config/zsh/functions.zsh"
-source "$HOME/dotfiles/config/zsh/fzf.zsh"
-
-
 # Initialize tools if installed
 # (( $+commands[fzf] )) && eval "$( init zsh)" + fzf -> https://junegunn.github.io/fzf/shell-integration/
 
@@ -100,5 +92,12 @@ source "$HOME/dotfiles/config/zsh/fzf.zsh"
 
 
 
-# zprof  # End profiling
+
+
+
+# Source aliases and functions
+source "$HOME/dotfiles/config/zsh/aliases.zsh"
+source "$HOME/dotfiles/config/zsh/functions.zsh"
+source "$HOME/dotfiles/config/zsh/fzf.zsh"
+
 

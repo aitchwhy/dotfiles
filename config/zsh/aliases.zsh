@@ -10,42 +10,6 @@ command -v dust >/dev/null && alias du='dust'
 command -v duf >/dev/null && alias df='duf'
 command -v nvim >/dev/null && alias vi='nvim' && alias vim='nvim'
 
-# ------------------------
-# Git shortcuts
-# ------------------------
-alias dif="git diff --no-index"                                                                   # Diff two files even if not in git repo! Can add -w (don't diff whitespaces)
-alias g='git'
-alias ga='git add'
-alias gaa='git add --all'
-alias gb='git branch '
-alias gblame='git blame'
-alias gblog="git for-each-ref --sort=committerdate refs/heads/ --format='%(HEAD) %(color:red)%(refname:short)%(color:reset) - %(color:yellow)%(objectname:short)%(color:reset) - %(contents:subject) - %(authorname) (%(color:blue)%(committerdate:relative)%(color:reset))'"                                                             # git log for each branches
-alias gc="git commit"
-alias gca='git commit --amend'
-alias gclean="git branch --merged | grep  -v '\\*\\|master\\|develop' | xargs -n 1 git branch -d" # Delete local branch merged with master
-alias gco='git checkout $(git branch -l | fzf)'
-alias gco='git checkout '
-alias gd='git diff'
-alias gj="git-jump"                                                                               # Open in vim quickfix list files of interest (git diff, merged...)
-alias gl='git log --oneline'
-alias gl='git pull'
-alias glog='git log --oneline --decorate --graph'
-alias glol='git log --graph --abbrev-commit --oneline --decorate'
-alias gp="git push"
-alias gplo='git pull origin'
-alias gpo='git push origin'
-alias gpof='git push origin --force-with-lease'
-alias gpofn='git push origin --force-with-lease --no-verify'
-alias gpt='git push --tag'
-alias gr='git remote'
-alias grb='git branch -r'                                                                           # display remote branch
-alias grs='git remote show'
-alias gs="git status"
-alias gss='git status -s'
-alias gst='git status -sb'
-alias gsub="git submodule update --remote"                                                        # pull submodules
-alias gtd='git tag --delete'
-alias gtdr='git tag --delete origin'
 
 
 ########################
