@@ -1,14 +1,12 @@
-# eval "$(/opt/homebrew/bin/brew shellenv)"
-
-################
+export LANG=en_US.UTF-8
+export EDITOR="nvim"
+export VISUAL="nvim"
 
 # ====== Path Configuration ======
 # Initialize Homebrew on Apple Silicon (this also sets up PATH)
+# eval "$(/opt/homebrew/bin/brew shellenv)"
 if [[ -x /opt/homebrew/bin/brew ]]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
-    # Use /opt/homebrew if on Apple Silicon
-    # export HOMEBREW_PREFIX="/opt/homebrew"
-    # export PATH="$HOMEBREW_PREFIX/bin:$PATH"
 fi
 
 # PATH Configuration
