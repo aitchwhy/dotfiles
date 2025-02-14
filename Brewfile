@@ -11,6 +11,8 @@ tap "typesense/tap"
 tap "waydabber/betterdisplay"
 tap "xo/xo"
 tap "yakitrak/yakitrak"
+# https://mac.install.guide/ruby/13
+brew "ruby
 # Run your GitHub Actions locally
 brew "act"
 # Static analysis and lint tool, for (ba)sh scripts

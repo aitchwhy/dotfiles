@@ -2,9 +2,14 @@
 # https://git-scm.com/docs/git-config.html
 # https://gist.github.com/pksunkara/988716
 
+
 [user]
   email = hank.lee.qed@gmail.com
   name = Hank Lee
+
+[core]
+  editor = nvim
+  pager = delta
 
 [color]
   ui = true
@@ -12,10 +17,43 @@
 [init]
   defaultBranch = main
 
-[core]
-  editor = nvim
-  excludesfile = ~/.gitignore
-  pager = delta
+[alias]
+  # Basic shortcuts
+  a = add
+  aa = add --all
+  b = branch
+  blame = blame
+  c = commit
+  ca = commit --amend
+  co = checkout
+  d = diff
+  l = log --oneline
+  p = push
+  s = status
+  ss = status -s
+  st = status -sb
+  # Log formatting
+  blog = for-each-ref --sort=committerdate refs/heads/ --format='%(HEAD) %(color:red)%(refname:short)%(color:reset) - %(color:yellow)%(objectname:short)%(color:reset) - %(contents:subject) - %(authorname) (%(color:blue)%(committerdate:relative)%(color:reset))'
+  log-graph = log --oneline --decorate --graph
+  lol = log --graph --abbrev-commit --oneline --decorate
+  # Branch management
+  rb = branch -r
+  clean = "!f() { git branch --merged | grep -v '\\*\\|master\\|develop' | xargs -n 1 git branch -d; }; f"
+  # Remote operations
+  plo = pull origin
+  po = push origin
+  pof = push origin --force-with-lease
+  pofn = push origin --force-with-lease --no-verify
+  pt = push --tag
+  r = remote
+  rs = remote show
+  # Submodule
+  sub = submodule update --remote
+  # Tag management
+  td = tag --delete
+  tdr = tag --delete origin
+  # FZF integration (requires fzf to be installed)
+  fuzzy-checkout = "!f() { git checkout $(git branch -l | fzf); }; f"
 
 [delta]
   syntax-theme = Dracula
@@ -42,9 +80,6 @@
   whitespace-error-style = reverse red
   keep-plus-minus-markers = false
 
-[interactive]
-  diffFilter = delta --color-only
-
 [merge]
   conflictstyle = zdiff3
   tool = Kaleidoscope
@@ -58,12 +93,6 @@
 [pull]
   rebase = false
 
-[filter "lfs"]
-  clean = git-lfs clean -- %f
-  smudge = git-lfs smudge -- %f
-  process = git-lfs filter-process
-  required = true
-
 [credential]
   helper = osxkeychain
 
@@ -73,33 +102,3 @@
 [credential "https://gist.github.com"]
   helper = !/opt/homebrew/bin/gh auth git-credential
 
-
-[format]
-  pretty = '%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
-
-[push]
-  default = simple
-
-[pager]
-  diff = diff-so-fancy | less --tabs=1,5 -RFX
-  show = diff-so-fancy | less --tabs=1,5 -RFX
-
-[page]
-  diff = delta
-  show = delta
-  log = delta
-  blame = delta
-  reflog = delta
-
-
-#############
-[difftool "Kaleidoscope"]
-	cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\"
-[difftool]
-	prompt = false
-	trustExitCode = true
-[mergetool "Kaleidoscope"]
-	cmd = ksdiff --merge --output \"$MERGED\" --base \"$BASE\" -- \"$LOCAL\" --snapshot \"$REMOTE\" --snapshot
-	trustExitCode = true
-[mergetool]
-	prompt = false
