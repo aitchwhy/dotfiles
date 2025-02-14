@@ -309,7 +309,7 @@ alias gicloud='cd ~/iCloud Drive'
 # Zsh configuration
 alias be="nvim ~/.Brewfile"
 alias ze="nvim ~/.zshrc"
-alias z="nvim ~/.zprofile"
+alias zp="nvim ~/.zprofile"
 alias zr="exec zsh"
 alias zreset="rm -f ~/.zcompdump; compinit && exec zsh"
 

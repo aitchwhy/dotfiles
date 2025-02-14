@@ -1,3 +1,133 @@
+
+# Default paths (can be overridden before sourcing)
+DOTFILES="${DOTFILES:-$HOME/dotfiles}"
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
+
+# Logging functions
+log_info() {
+    printf '%s[INFO]%s %s\n' "${BLUE}" "${RESET}" "$*"
+}
+
+log_success() {
+    printf '%s[SUCCESS]%s %s\n' "${GREEN}" "${RESET}" "$*"
+}
+
+log_warning() {
+    printf '%s[WARNING]%s %s\n' "${YELLOW}" "${RESET}" "$*" >&2
+}
+
+log_error() {
+    printf '%s[ERROR]%s %s\n' "${RED}" "${RESET}" "$*" >&2
+}
+
+# Progress indicator
+show_progress() {
+    printf '%s→%s %s...\n' "${BLUE}" "${RESET}" "$*"
+}
+
+
+################################################################################
+# SYSTEM AND ENVIRONMENT DETECTION
+################################################################################
+
+# OS detection
+is_macos() {
+    [ "$(uname)" = "Darwin" ]
+}
+
+is_linux() {
+    [ "$(uname)" = "Linux" ]
+}
+
+# Architecture detection
+is_arm64() {
+    [ "$(uname -m)" = "arm64" ] || [ "$(uname -m)" = "aarch64" ]
+}
+
+is_x86_64() {
+    [ "$(uname -m)" = "x86_64" ]
+}
+
+# Shell detection
+is_zsh() {
+    [ -n "$ZSH_VERSION" ]
+}
+
+is_bash() {
+    [ -n "$BASH_VERSION" ]
+}
+
+################################################################################
+# PACKAGE MANAGEMENT
+################################################################################
+
+# Homebrew utilities
+has_brew() {
+    command -v brew >/dev/null 2>&1
+}
+
+ensure_brew() {
+    if ! has_brew; then
+        log_info "Installing Homebrew..."
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        
+        # Add to PATH for current session if installed
+        if is_arm64; then
+            eval "$(/opt/homebrew/bin/brew shellenv)"
+        else
+            eval "$(/usr/local/bin/brew shellenv)"
+        fi
+    fi
+}
+
+update_brew() {
+    if has_brew; then
+        log_info "Updating Homebrew..."
+        brew update
+        brew upgrade
+        brew cleanup
+    fi
+}
+
+################################################################################
+# MACOS SPECIFIC UTILITIES
+################################################################################
+
+# Apply common macOS system preferences
+apply_macos_prefs() {
+    if ! is_macos; then
+        log_error "Not running on macOS"
+        return 1
+    fi
+
+    log_info "Applying macOS preferences..."
+    
+    # Finder preferences
+    defaults write com.apple.finder AppleShowAllFiles -bool true
+    defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+    defaults write com.apple.finder ShowPathbar -bool true
+    defaults write com.apple.finder ShowStatusBar -bool true
+
+    # Dock preferences
+    defaults write com.apple.dock autohide -bool true
+    defaults write com.apple.dock autohide-delay -float 0
+    defaults write com.apple.dock show-recents -bool false
+
+    # Keyboard preferences
+    defaults write NSGlobalDomain KeyRepeat -int 2
+    defaults write NSGlobalDomain InitialKeyRepeat -int 15
+    defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
+
+    # Restart affected applications
+    for app in "Finder" "Dock"; do
+        killall "$app" >/dev/null 2>&1
+    done
+
+    log_success "macOS preferences applied"
+}
+
+
+
 # Create directory and cd into it
 mkcd() {
     mkdir -p "$1" && cd "$1"
