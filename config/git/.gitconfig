@@ -1,4 +1,6 @@
 # This is Git's per-user configuration file.
+# https://git-scm.com/docs/git-config.html
+# https://gist.github.com/pksunkara/988716
 
 [user]
   email = hank.lee.qed@gmail.com
@@ -45,9 +47,13 @@
 
 [merge]
   conflictstyle = zdiff3
+  tool = Kaleidoscope
 
 [diff]
+  external = /opt/homebrew/bin/ksdiff
+  renames = true
   colorMoved = default
+  tool = Kaleidoscope
 
 [pull]
   rebase = false
@@ -74,9 +80,6 @@
 [push]
   default = simple
 
-######
-
-
 [pager]
   diff = diff-so-fancy | less --tabs=1,5 -RFX
   show = diff-so-fancy | less --tabs=1,5 -RFX
@@ -90,3 +93,13 @@
 
 
 #############
+[difftool "Kaleidoscope"]
+	cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\"
+[difftool]
+	prompt = false
+	trustExitCode = true
+[mergetool "Kaleidoscope"]
+	cmd = ksdiff --merge --output \"$MERGED\" --base \"$BASE\" -- \"$LOCAL\" --snapshot \"$REMOTE\" --snapshot
+	trustExitCode = true
+[mergetool]
+	prompt = false
