@@ -1,7 +1,8 @@
 
 # default command for fzf
-export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --exclude node_modules --exclude target'
-# export FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden'
+# export FZF_DEFAULT_COMMAND='fd --type f --hidden --exclude .git --exclude node_modules --exclude .venv'
+# export FZF_DEFAULT_COMMAND='fd --type f  --hidden --follow --exclude .git --exclude node_modules --exclude target'
+export FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden'
 
 # Default options
 export FZF_DEFAULT_OPTS="
@@ -34,6 +35,7 @@ export FZF_DEFAULT_OPTS="
 
 # History search (CTRL-R) - Integrated with Atuin
 export FZF_CTRL_R_OPTS="
+  --preview 'echo {}' --preview-window down:3:hidden:wrap --bind '?:toggle-preview'
   --bind 'ctrl-y:execute-silent(echo -n {2..} | pbcopy)+abort'
   --color header:italic
   --header 'CTRL-Y: Copy | CTRL-R: Toggle sort'
@@ -85,8 +87,36 @@ export FZF_ALT_C_OPTS="
 # ~/.config/zsh/functions/fzf-utils.zsh
 # Dependencies: fzf, ripgrep (rg), git (optional), docker (optional), brew (optional)
 
+
+
+# Process management
+function fkill() {
+  local pid=$(ps -ef | sed 1d | fzf -m | awk '{print $2}')
+  if [[ -n "$pid" ]]; then
+    echo "$pid" | xargs kill -"${1:-9}"
+  fi
+}
+
+# Homebrew functions
+function fbin() {
+  local inst=$(brew search | fzf -m)
+  if [[ -n "$inst" ]]; then
+    for prog in $(echo "$inst"); do
+      brew install "$prog"
+    done
+  fi
+}
+
+function fbunin() {
+  local inst=$(brew list | fzf -m)
+  if [[ -n "$inst" ]]; then
+    for prog in $(echo "$inst"); do
+      brew uninstall "$prog"
+    done
+  fi
+}
 # Chrome bookmark search
-function chrome-bookmark-browser() {
+function chromebm() {
   local bookmarks_path
   case "$(uname)" in
     "Darwin")
@@ -119,28 +149,28 @@ function chrome-bookmark-browser() {
 }
 
 # Docker container management functions
-function d-attach() {
+function dattach() {
   local container=$(docker ps | sed 1d | fzf -q "$1" | awk '{print $1}')
   if [[ -n "$container" ]]; then
     docker attach "$container"
   fi
 }
 
-function d-stop-container() {
+function dstop() {
   local container=$(docker ps | sed 1d | fzf -q "$1" | awk '{print $1}')
   if [[ -n "$container" ]]; then
     docker stop "$container"
   fi
 }
 
-function d-rm() {
+function drm() {
   local container=$(docker ps -a | sed 1d | fzf -q "$1" | awk '{print $1}')
   if [[ -n "$container" ]]; then
     docker rm "$container"
   fi
 }
 
-function d-image-rm() {
+function drmi() {
   local image=$(docker images | sed 1d | fzf -q "$1" | awk '{print $3}')
   if [[ -n "$image" ]]; then
     docker rmi "$image"
@@ -148,7 +178,7 @@ function d-image-rm() {
 }
 
 # File search and edit functions
-function fif() {
+function fse() {
   if [ ! "$#" -gt 0 ]; then
     echo "Need a string to search for!"
     return 1
@@ -156,14 +186,14 @@ function fif() {
   rg --files-with-matches --no-messages "$1" | fzf --preview "highlight -O ansi -l {} 2> /dev/null | rg --colors 'match:bg:yellow' --ignore-case --pretty --context 10 '$1' || rg --ignore-case --pretty --context 10 '$1' {}"
 }
 
-function fzf-find-edit() {
+function fe() {
   local file=$(fzf --preview 'bat --style=numbers --color=always --line-range :500 {}')
   if [[ -n "$file" ]]; then
     $EDITOR "$file"
   fi
 }
 
-function fzf-grep-edit() {
+function fgrepe() {
   if [[ $# == 0 ]]; then
     echo 'Error: search term was not provided.'
     return 1
@@ -178,7 +208,7 @@ function fzf-grep-edit() {
 }
 
 # Git utilities
-function fzf-git-branch() {
+function fgitbr() {
   git rev-parse HEAD > /dev/null 2>&1 || return
 
   local branch=$(git branch --color=always | \
@@ -192,61 +222,33 @@ function fzf-git-branch() {
   fi
 }
 
-function fzf-git-checkout() {
+function fgitco() {
   local branch=$(fzf-git-branch)
   if [[ -n "$branch" ]]; then
     git checkout "$branch"
   fi
 }
-
-# Process management
-function fzf-kill() {
-  local pid=$(ps -ef | sed 1d | fzf -m | awk '{print $2}')
-  if [[ -n "$pid" ]]; then
-    echo "$pid" | xargs kill -"${1:-9}"
-  fi
-}
-
 # VSCode integration
-function fzf-vscode() {
+function fvscode() {
   local file=$(rg --files | fzf --preview 'bat --style=numbers --color=always --line-range :500 {}')
   if [[ -n "$file" ]]; then
     code "$file"
   fi
 }
 
-# Homebrew functions
-function fzf-brew-install() {
-  local inst=$(brew search | fzf -m)
-  if [[ -n "$inst" ]]; then
-    for prog in $(echo "$inst"); do
-      brew install "$prog"
-    done
-  fi
-}
-
-function fzf-brew-uninstall() {
-  local inst=$(brew list | fzf -m)
-  if [[ -n "$inst" ]]; then
-    for prog in $(echo "$inst"); do
-      brew uninstall "$prog"
-    done
-  fi
-}
-
-# Tmux integration
-function tm() {
-  [[ -n "$TMUX" ]] && change="switch-client" || change="attach-session"
-  if [ "$1" ]; then
-    tmux $change -t "$1" 2>/dev/null || (tmux new-session -d -s "$1" && tmux $change -t "$1")
-    return
-  fi
-  
-  local session=$(tmux list-sessions -F "#{session_name}" 2>/dev/null | fzf --exit-0) && \
-    tmux $change -t "$session" || tmux
-}
-
-function tmux-kill() {
-  local session=$(tmux list-sessions -F "#{session_name}" | \
-    fzf --exit-0) && tmux kill-session -t "$session"
-}
+# # Tmux integration
+# function tm() {
+#   [[ -n "$TMUX" ]] && change="switch-client" || change="attach-session"
+#   if [ "$1" ]; then
+#     tmux $change -t "$1" 2>/dev/null || (tmux new-session -d -s "$1" && tmux $change -t "$1")
+#     return
+#   fi
+#
+#   local session=$(tmux list-sessions -F "#{session_name}" 2>/dev/null | fzf --exit-0) && \
+#     tmux $change -t "$session" || tmux
+# }
+#
+# function tmux-kill() {
+#   local session=$(tmux list-sessions -F "#{session_name}" | \
+#     fzf --exit-0) && tmux kill-session -t "$session"
+# }
