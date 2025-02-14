@@ -21,8 +21,8 @@ CONFIG_MAP=(
   "$DOTFILES/config/zsh/.zshrc:$ZDOTDIR/.zshrc"
   "$DOTFILES/config/zsh/.zprofile:$ZDOTDIR/.zprofile"
 
-  "$DOTFILES/config/git/config:$XDG_CONFIG_HOME/.config/git/config"
-  "$DOTFILES/config/git/ignore:$XDG_CONFIG_HOME/.config/git/ignore"
+  "$DOTFILES/config/git/config:$XDG_CONFIG_HOME/git/config"
+  "$DOTFILES/config/git/ignore:$XDG_CONFIG_HOME/git/ignore"
 
   "$DOTFILES/config/karabiner/karabiner.json:$XDG_CONFIG_HOME/karabiner/karabiner.json"
   "$DOTFILES/config/atuin/config.toml:$XDG_CONFIG_HOME/atuin/config.toml"
