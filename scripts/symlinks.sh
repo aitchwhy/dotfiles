@@ -21,27 +21,22 @@ CONFIG_MAP=(
   "$DOTFILES/config/zsh/.zshrc:$ZDOTDIR/.zshrc"
   "$DOTFILES/config/zsh/.zprofile:$ZDOTDIR/.zprofile"
 
-  "$DOTFILES/config/zsh-abbr/user-abbreviations:$XDG_CONFIG_HOME/zsh-abbr/user-abbreviations"
-
-  "$DOTFILES/config/starship.toml:$XDG_CONFIG_HOME/starship.toml"
-
-
-  "$DOTFILES/config/bat/config:$XDG_CONFIG_HOME/bat/config"
-
-  "$DOTFILES/config/ghostty/config:$XDG_CONFIG_HOME/ghostty/config"
+  "$DOTFILES/config/git/config:$XDG_CONFIG_HOME/.config/git/config"
+  "$DOTFILES/config/git/ignore:$XDG_CONFIG_HOME/.config/git/ignore"
 
   "$DOTFILES/config/karabiner/karabiner.json:$XDG_CONFIG_HOME/karabiner/karabiner.json"
-
   "$DOTFILES/config/atuin/config.toml:$XDG_CONFIG_HOME/atuin/config.toml"
+  "$DOTFILES/config/ghostty/config:$XDG_CONFIG_HOME/ghostty/config"
+  "$DOTFILES/config/bat/config:$XDG_CONFIG_HOME/bat/config"
+  "$DOTFILES/config/starship.toml:$XDG_CONFIG_HOME/starship.toml"
+  "$DOTFILES/config/nvim:$XDG_CONFIG_HOME/nvim"
+
+  "$DOTFILES/config/zsh-abbr/user-abbreviations:$XDG_CONFIG_HOME/zsh-abbr/user-abbreviations"
 
   "$DOTFILES/config/zellij/config.kdl:$XDG_CONFIG_HOME/zellij/config.kdl"
   "$DOTFILES/config/zellij/layouts:$XDG_CONFIG_HOME/zellij/layouts"
   "$DOTFILES/config/zellij/plugins:$XDG_CONFIG_HOME/zellij/plugins"
 
-  "$DOTFILES/config/git/.gitconfig:$XDG_CONFIG_HOME/.config/git/config"
-  "$DOTFILES/config/git/.gitignore:$XDG_CONFIG_HOME/.config/git/ignore"
-
-  "$DOTFILES/config/nvim:$XDG_CONFIG_HOME/nvim"
   "$DOTFILES/config/todoist/config.json:$XDG_CONFIG_HOME/todoist/config.json"
 
   "$DOTFILES/config/espanso:$XDG_CONFIG_HOME/espanso"
@@ -56,7 +51,6 @@ CONFIG_MAP=(
   "$DOTFILES/config/vscode/settings.json:$HOME/Library/Application Support/Code/User/settings.json"
 
   "$DOTFILES/ai/claude/claude_desktop_config.json:$HOME/Library/Application Support/Claude/claude_desktop_config.json"
-
 
   # Add more file or directory mappings as needed:
   # "$DOTFILES/<app>:<target_path>"

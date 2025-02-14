@@ -165,7 +165,7 @@ if command -v eza >/dev/null; then
     # new aliases than exa-zsh
     alias lT='eza --tree --long' # Tree view with extended details
     alias lr='eza --recurse --all' # Recursively list all files, including hidden ones
-    alias lg='eza --grid --color=always' # Display entries as a grid with color
+    # alias lg='eza --grid --color=always' # Display entries as a grid with color
     alias ld='eza --only-dirs' # List only directories
     alias lf='eza --only-files' # List only files
     alias lC='eza --color-scale=size --long' # Use color scale based on file size
@@ -338,7 +338,7 @@ alias gicloud='cd ~/iCloud Drive'
 # Zsh configuration
 alias be="nvim ~/.Brewfile"
 alias ze="nvim $ZDOTDIR/.zshrc"
-alias ze="nvim $ZDOTDIR/.zprofile"
+alias zp="nvim $ZDOTDIR/.zprofile"
 alias zr="exec zsh"
 alias zs="exec zsh"
 alias zreset="rm -f ~/.zcompdump; compinit && exec zsh"
