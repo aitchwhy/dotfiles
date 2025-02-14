@@ -11,6 +11,9 @@ tap "typesense/tap"
 tap "waydabber/betterdisplay"
 tap "xo/xo"
 tap "yakitrak/yakitrak"
+
+# Mac App Store command-line interface
+brew "mas"
 # Run your GitHub Actions locally
 brew "act"
 # Static analysis and lint tool, for (ba)sh scripts
@@ -149,8 +152,6 @@ brew "lua-language-server"
 brew "luarocks"
 # Language Server Protocol for Markdown
 brew "marksman"
-# Mac App Store command-line interface
-brew "mas"
 # Fly through your shell history
 brew "mcfly"
 # Like sed, awk, cut, join & sort for name-indexed data such as CSV
@@ -531,7 +532,6 @@ mas "Day One", id: 1055511498
 mas "Drafts", id: 1435957248
 mas "Dropover", id: 1355679052
 mas "ExcalidrawZ", id: 6636493997
-mas "Fantastical", id: 975937182
 mas "Flighty", id: 1358823008
 mas "Flow", id: 1423210932
 mas "Focus", id: 777233759
@@ -541,7 +541,6 @@ mas "KakaoTalk", id: 869223134
 mas "Keynote", id: 409183694
 mas "Kindle", id: 302584613
 mas "LanScan", id: 472226235
-# mas "Logic Pro", id: 634148309
 mas "Mela", id: 1568924476
 mas "NextDNS", id: 1464122853
 mas "Numbers", id: 409203825
@@ -554,12 +553,10 @@ mas "Paste", id: 967805235
 mas "Pixea", id: 1507782672
 mas "rcmd", id: 1596283165
 mas "Session", id: 1521432881
-# mas "SnippetsLab", id: 1006087419
+mas "SnippetsLab", id: 1006087419
 mas "Snippety", id: 1530751461
-# mas "Snippit", id: 1465481124
+mas "Snippit", id: 1465481124
 mas "Structured", id: 1499198946
-mas "Termius", id: 1176074088
-# mas "Todoist", id: 585829637
 mas "Toggl Track", id: 1291898086
 mas "Tripsy", id: 1429967544
 mas "Yoink", id: 457622435
