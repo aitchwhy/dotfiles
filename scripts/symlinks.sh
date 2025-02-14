@@ -18,18 +18,26 @@ CONFIG_MAP=(
 
   "$DOTFILES/Brewfile:$HOME/.Brewfile"
 
-  "$DOTFILES/config/zsh/.zshrc:$ZDOTDIR/.zshrc"
-  "$DOTFILES/config/zsh/.zprofile:$ZDOTDIR/.zprofile"
+  "$DOTFILES/config/zsh/.zshrc:$XDG_CONFIG_HOME/zsh/.zshrc"
+  "$DOTFILES/config/zsh/.zprofile:$XDG_CONFIG_HOME/zsh/.zprofile"
 
   "$DOTFILES/config/git/config:$XDG_CONFIG_HOME/git/config"
   "$DOTFILES/config/git/ignore:$XDG_CONFIG_HOME/git/ignore"
 
+  "$DOTFILES/config/atuin/config.toml:$XDG_CONFIG_HOME/a  tuin/config.toml"
   "$DOTFILES/config/karabiner/karabiner.json:$XDG_CONFIG_HOME/karabiner/karabiner.json"
-  "$DOTFILES/config/atuin/config.toml:$XDG_CONFIG_HOME/atuin/config.toml"
   "$DOTFILES/config/ghostty/config:$XDG_CONFIG_HOME/ghostty/config"
   "$DOTFILES/config/bat/config:$XDG_CONFIG_HOME/bat/config"
   "$DOTFILES/config/starship.toml:$XDG_CONFIG_HOME/starship.toml"
   "$DOTFILES/config/nvim:$XDG_CONFIG_HOME/nvim"
+
+  "$DOTFILES/config/hammerspoon:$XDG_CONFIG_HOME/hammerspoon"
+  "$DOTFILES/config/karabiner:$XDG_CONFIG_HOME/karabiner"
+
+  "$DOTFILES/config/yazi:$XDG_CONFIG_HOME/yazi"
+  "$DOTFILES/config/zed:$XDG_CONFIG_HOME/zed"
+  "$DOTFILES/config/snippety:$XDG_CONFIG_HOME/snippety"
+  "$DOTFILES/config/:$XDG_CONFIG_HOME/snippety"
 
   "$DOTFILES/config/zsh-abbr/user-abbreviations:$XDG_CONFIG_HOME/zsh-abbr/user-abbreviations"
 
@@ -43,14 +51,14 @@ CONFIG_MAP=(
 
   "$DOTFILES/config/aide/keybindings.json:$HOME/Library/Application Support/Aide/User/keybindings.json"
   "$DOTFILES/config/aide/settings.json:$HOME/Library/Application Support/Aide/User/settings.json"
-
   "$DOTFILES/config/cursor/keybindings.json:$HOME/Library/Application Support/Cursor/User/keybindings.json"
   "$DOTFILES/config/cursor/settings.json:$HOME/Library/Application Support/Cursor/User/settings.json"
-
   "$DOTFILES/config/vscode/keybindings.json:$HOME/Library/Application Support/Code/User/keybindings.json"
   "$DOTFILES/config/vscode/settings.json:$HOME/Library/Application Support/Code/User/settings.json"
 
   "$DOTFILES/ai/claude/claude_desktop_config.json:$HOME/Library/Application Support/Claude/claude_desktop_config.json"
+  "$DOTFILES/ai/config:$XDG_CONFIG_HOME/ai/config"
+  "$DOTFILES/ai/prompts:$XDG_CONFIG_HOME/ai/prompts"
 
   # Add more file or directory mappings as needed:
   # "$DOTFILES/<app>:<target_path>"
