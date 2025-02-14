@@ -24,7 +24,7 @@ CONFIG_MAP=(
   "$DOTFILES/config/git/config:$XDG_CONFIG_HOME/git/config"
   "$DOTFILES/config/git/ignore:$XDG_CONFIG_HOME/git/ignore"
 
-  "$DOTFILES/config/atuin/config.toml:$XDG_CONFIG_HOME/a  tuin/config.toml"
+  "$DOTFILES/config/atuin/config.toml:$XDG_CONFIG_HOME/atuin/config.toml"
   "$DOTFILES/config/karabiner/karabiner.json:$XDG_CONFIG_HOME/karabiner/karabiner.json"
   "$DOTFILES/config/ghostty/config:$XDG_CONFIG_HOME/ghostty/config"
   "$DOTFILES/config/bat/config:$XDG_CONFIG_HOME/bat/config"
@@ -37,7 +37,6 @@ CONFIG_MAP=(
   "$DOTFILES/config/yazi:$XDG_CONFIG_HOME/yazi"
   "$DOTFILES/config/zed:$XDG_CONFIG_HOME/zed"
   "$DOTFILES/config/snippety:$XDG_CONFIG_HOME/snippety"
-  "$DOTFILES/config/:$XDG_CONFIG_HOME/snippety"
 
   "$DOTFILES/config/zsh-abbr/user-abbreviations:$XDG_CONFIG_HOME/zsh-abbr/user-abbreviations"
 
