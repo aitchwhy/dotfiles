@@ -72,25 +72,25 @@ function rgv() {
 }
 
 # Homebrew bundle management
-function brewfile() {
-  case "$1" in
-    save)
-      brew bundle dump --force --describe --file="$HOMEBREW_BUNDLE_FILE"
-      ;;
-    install)
-      brew bundle --file="$HOMEBREW_BUNDLE_FILE"
-      ;;
-    check)
-      brew bundle check --verbose --file="$HOMEBREW_BUNDLE_FILE"
-      ;;
-    clean)
-      brew bundle cleanup --force --file="$HOMEBREW_BUNDLE_FILE"
-      ;;
-    *)
-      echo "Usage: brewfile [save|install|check|clean]"
-      ;;
-  esac
-}
+# function brewfile() {
+#   case "$1" in
+#     save)
+#       brew bundle dump --force --describe --file="$HOMEBREW_BUNDLE_FILE"
+#       ;;
+#     install)
+#       brew bundle --file="$HOMEBREW_BUNDLE_FILE"
+#       ;;
+#     check)
+#       brew bundle check --verbose --file="$HOMEBREW_BUNDLE_FILE"
+#       ;;
+#     clean)
+#       brew bundle cleanup --force --file="$HOMEBREW_BUNDLE_FILE"
+#       ;;
+#     *)
+#       echo "Usage: brewfile [save|install|check|clean]"
+#       ;;
+#   esac
+# }
 
 # Docker shortcuts
 function dex() {
