@@ -11,9 +11,6 @@ tap "typesense/tap"
 tap "waydabber/betterdisplay"
 tap "xo/xo"
 tap "yakitrak/yakitrak"
-
-# Mac App Store command-line interface
-brew "mas"
 # Run your GitHub Actions locally
 brew "act"
 # Static analysis and lint tool, for (ba)sh scripts
@@ -152,6 +149,8 @@ brew "lua-language-server"
 brew "luarocks"
 # Language Server Protocol for Markdown
 brew "marksman"
+# Mac App Store command-line interface
+brew "mas"
 # Fly through your shell history
 brew "mcfly"
 # Like sed, awk, cut, join & sort for name-indexed data such as CSV
@@ -431,8 +430,6 @@ cask "macwhisper"
 cask "miro"
 # Open-source download manager
 cask "motrix"
-# VPN client
-# cask "mullvadvpn"
 # Developer IDE or Management Environment for Neo4j instances
 cask "neo4j"
 # Knowledge base that works on top of a local folder of plain text Markdown files
@@ -541,6 +538,7 @@ mas "KakaoTalk", id: 869223134
 mas "Keynote", id: 409183694
 mas "Kindle", id: 302584613
 mas "LanScan", id: 472226235
+mas "Logic Pro", id: 634148309
 mas "Mela", id: 1568924476
 mas "NextDNS", id: 1464122853
 mas "Numbers", id: 409203825
@@ -557,6 +555,8 @@ mas "SnippetsLab", id: 1006087419
 mas "Snippety", id: 1530751461
 mas "Snippit", id: 1465481124
 mas "Structured", id: 1499198946
+mas "Termius", id: 1176074088
+mas "Todoist", id: 585829637
 mas "Toggl Track", id: 1291898086
 mas "Tripsy", id: 1429967544
 mas "Yoink", id: 457622435
