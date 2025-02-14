@@ -6,5 +6,7 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "keyring>=25.6.0",
+    "pyannote-audio>=3.3.2",
+    "pydub>=0.25.1",
     "requests>=2.32.3",
 ]
