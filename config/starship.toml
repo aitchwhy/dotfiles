@@ -1,49 +1,151 @@
+# docs : https://starship.rs/config/#prompt
 # pure preset (https://starship.rs/presets/pure-preset)
 
-format = """
-$username\
-$hostname\
-$directory\
-$git_branch\
-$git_state\
-$git_status\
-$cmd_duration\
-$line_break\
-$python\
-$character"""
+# Get editor completions based on the config schema
+"$schema" = 'https://starship.rs/config-schema.json'
 
-[directory]
-style = "blue"
+# Inserts a blank line between shell prompts
+add_newline = true
+
+format = "$all"
+
+[os]
+disabled = false
+
+# default OS symbols
+[os.symbols]
+Macos = " "
+
+# ~/.config/starship.toml
+
+[username]
+style_user = 'white bold'
+style_root = 'black bold'
+format = 'user: [$user]($style) '
+disabled = false
+show_always = true
+aliases = { "corpuser034g" = "matchai" }
+
+[localip]
+ssh_only = false
+format = '@[$localipv4](bold red) '
+disabled = false
+
+
+
+[memory_usage]
+disabled = false
+threshold = -1
+symbol = ' '
+
+
+
 
 [character]
-success_symbol = "[❯](purple)"
+success_symbol = "[❯](green)"
 error_symbol = "[❯](red)"
-vimcmd_symbol = "[❮](green)"
+vimcmd_symbol = "[❮](purple)"
 
-[git_branch]
-format = "[$branch]($style)"
-style = "bright-black"
 
-[git_status]
-format = "[[(*$conflicted$untracked$modified$staged$renamed$deleted)](218) ($ahead_behind$stashed)]($style)"
-style = "cyan"
-conflicted = "​"
-untracked = "​"
-modified = "​"
-staged = "​"
-renamed = "​"
-deleted = "​"
-stashed = "≡"
+[shell]
+fish_indicator = '󰈺 '
+powershell_indicator = '_'
+unknown_indicator = 'mystery shell'
+style = 'cyan bold'
+disabled = false
 
-[git_state]
-format = '\([$state( $progress_current/$progress_total)]($style)\) '
-style = "bright-black"
+
 
 [cmd_duration]
 format = "[$duration]($style) "
 style = "yellow"
 
+
+
+[directory]
+style = "italic white"
+
+
+[nix_shell]
+disabled = true
+impure_msg = '[impure shell](bold red)'
+pure_msg = '[pure shell](bold green)'
+unknown_msg = '[unknown shell](bold yellow)'
+format = 'via [☃️ $state( \($name\))](bold blue) '
+
+[package]
+format = 'via [🎁 $version](208 bold) '
+
+[nodejs]
+format = 'via [🤖 $version](bold green) '
+
+[direnv]
+disabled = false
+
+[docker_context]
+format = 'via [🐋 $context](blue bold)'
+
+[git_branch]
+# format = "[$branch]($style)"
+# style = "bright-black"
+symbol = '🌱 '
+truncation_length = 4
+truncation_symbol = ''
+ignore_branches = ['master', 'main']
+
+[git_commit]
+commit_hash_length = 7
+tag_symbol = '🔖 '
+
+[git_status]
+format = "[[(*$conflicted$untracked$modified$staged$renamed$deleted)](218) ($ahead_behind$stashed)]($style)"
+style = "cyan"
+conflicted = '🏳'
+untracked = '🤷'
+modified = '📝'
+staged = '[++\($count\)](green)'
+renamed = '👅'
+deleted = '🗑'
+stashed = '📦≡'
+behind = '😰'
+diverged = '😵'
+up_to_date = '✓'
+
+[git_state]
+# format = '[\($state( $progress_current of $progress_total)\)]($style) '
+format = '\([$state( $progress_current/$progress_total)]($style)\) '
+style = "bright-black"
+
+[git_metrics]
+added_style = 'bold blue'
+format = '[+$added]($added_style)/[-$deleted]($deleted_style) '
+
+[ruby]
+symbol = '🔺 '
+
+
 [python]
 format = "[$virtualenv]($style) "
 style = "bright-black"
+symbol = '👾 '
+pyenv_version_name = true
+
+[lua]
+format = 'via [🌕 $version](bold blue) '
+
+# [kubernetes]
+# format = 'on [($user on )($cluster in )$context \($namespace\)](dimmed green) '
+# disabled = false
+# contexts = [
+#   { context_pattern = "dev.local.cluster.k8s", style = "green", symbol = "💔 " },
+ # ]
+
+[pulumi]
+format = '[🛥 ($version )$stack]($style) '
+
+
+[rust]
+format = 'via [⚙️ $version](red bold)'
+
+
 

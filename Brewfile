@@ -314,8 +314,8 @@ brew "yakitrak/yakitrak/obsidian-cli"
 cask "a-better-finder-rename"
 # Note editor and whiteboard
 cask "affine"
-# Open-source AI-native IDE
-cask "aide-app"
+# # Open-source AI-native IDE
+# cask "aide-app"
 # Memory training application
 cask "anki"
 # API development platform
@@ -380,12 +380,15 @@ cask "font-jetbrains-mono-nerd-font"
 cask "font-mononoki-nerd-font"
 cask "font-roboto-mono-nerd-font"
 cask "font-symbols-only-nerd-font"
+cask "font-fira-code-nerd-font"
 # Software reverse engineering (SRE) suite of tools
 cask "ghidra"
 # Terminal emulator that uses platform-native UI and GPU acceleration
 cask "ghostty"
 # Git client focusing on productivity
 cask "gitkraken"
+# Git
+cask "fork"
 # Web browser
 cask "google-chrome"
 # Client for the Google Drive storage service

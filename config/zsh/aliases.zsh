@@ -17,8 +17,10 @@ alias cd='z'
 # Git shortcuts
 alias g='git'
 alias ga='git add'
+alias gaa='git add --all'
 alias gc='git commit'
-alias gco='git checkout'
+alias gca='git commit --amend'
+alias gco='git checkout $(git branch -l)'
 alias gd='git diff'
 alias gs='git status'
 alias gp='git push'
@@ -27,15 +29,25 @@ alias gst='git status -sb'
 alias glog='git log --oneline --decorate --graph'
 alias lg='lazygit'
 
-# Directory shortcuts
-alias dots='cd ~/.config'
-# Directory navigation
-alias ..='cd ..'
-alias ...='cd ../..'
-alias ....='cd ../../..'
-alias -- -='cd -'
 
+########################
 # Homebrew
+#
+#
+# "brew cleanup scrub" removes all downloaded files from the cache, including those for the latest versions of installed packages, while "brew cleanup --prune all" removes all cache files regardless of their age, essentially wiping the entire cache completely; the key difference is that "scrub" specifically targets even the newest downloads, while "prune all" just removes everything in the cache regardless of version. 
+# Key points to remember:
+#
+# brew cleanup scrub (-s flag):
+# - Aggressive cleaning, deleting even the latest downloaded files from the cache. 
+# - Useful when you want to completely free up disk space, even if it means potentially re-downloading the latest versions of packages on the next install. 
+#
+# brew cleanup --prune all:
+# - Removes all cached files, including old versions, from the cache. 
+# - Less aggressive than "scrub" as it only targets files older than a specific threshold (in this case, "all").
+#
+# https://mac.install.guide/homebrew/8#:~:text=Homebrew%20maintains%20a%20cache%20of,cleanup%20with%20%2D%2Dprune=all%20.
+#
+########################
 alias brewup='brew update && brew upgrade && brew cleanup'
 alias brewdeps='brew deps --tree --installed'
 alias brewin='brew info'
@@ -56,6 +68,12 @@ alias npms='npm start'
 alias npmt='npm test'
 
 
+# starship
+alias st=starship
+
+# starship
+
+
 ################################
 # Custom aliases
 ################################
@@ -65,10 +83,11 @@ alias npmt='npm test'
 
 
 # # Navigation
-# alias ..='cd ..'
-# alias ...='cd ../..'
-# alias ....='cd ../../..'
-# alias -- -='cd -'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias -- -='cd -'
+
 
 # Aliases
 # Modern CLI tool alternatives
@@ -148,16 +167,7 @@ alias showhidden="defaults write com.apple.finder AppleShowAllFiles YES; killall
 
 
 # Package management
-alias brewup='brew update && brew upgrade && brew cleanup'
-
-# Load Custom Functions
-# [[ -f "${ZDOTDIR}/functions.zsh" ]] && source "${ZDOTDIR}/functions.zsh"
-
-# ====== Local Configuration ======
-# Source local customizations if they exist
-# [[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
-# [[ -f "$ZDOTDIR/local.zsh" ]] && source "$ZDOTDIR/local.zsh"
-
+alias brewup='brew update && brew upgrade && brew cleanup --prune=all'
 
 #------------------------------------------------------------------------------
 # Useful Aliases
@@ -241,10 +251,10 @@ alias g='ghostty'
 
 alias b="brew"
 alias benv="brew --env"
-alias bp="brew --prefix"
+alias bpre="brew --prefix"
 alias bc="brew config"
 alias bh="brew home"
-alias bcmd="brew commands"
+alias bcmds="brew commands"
 alias bdr="brew doctor"
 alias bud="brew update"
 alias bug="brew upgrade"
@@ -254,7 +264,9 @@ alias bin="brew install"
 alias brein="brew reinstall"
 alias bi="brew info"
 alias bs="brew search --eval-all --desc"
-alias bl="brew leaves"
+alias bls="brew list"
+alias blv="brew leaves"
+alias btree="brew deps --tree --installed"
 
 ## Homebrew Cask/Bundle management
 alias bcl="brew list --cask"
@@ -270,6 +282,7 @@ alias bbcheck="bb check --all --verbose --global"
 alias bblist="bb list --all --verbose --global"
 alias bbcleanup="bb cleanup --zap --all --verbose --global"
 alias bbcleanupf="bb cleanup --zap --all --verbose --global --force"
+alias bbsave="bbcleanup"
 
 ## Directory navigation
 alias gdot='cd ~/dotfiles'
@@ -296,6 +309,7 @@ alias gicloud='cd ~/iCloud Drive'
 # Zsh configuration
 alias be="nvim ~/.Brewfile"
 alias ze="nvim ~/.zshrc"
+alias z="nvim ~/.zprofile"
 alias zr="exec zsh"
 alias zreset="rm -f ~/.zcompdump; compinit && exec zsh"
 
@@ -386,6 +400,7 @@ alias docker-compose-dev='docker-compose -f docker-compose-dev.yml' # run a diff
 # +----------+
 
 alias nvidia-settings='nvidia-settings --config="$XDG_CONFIG_HOME"/nvidia/settings'
+
 
 # Folders
 
