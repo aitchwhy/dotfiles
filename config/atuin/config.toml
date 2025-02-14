@@ -257,7 +257,7 @@ records = true
 strategy = "auto"
 # max_preview_height = 16  # Adjust based on preference
 
-[daemon]
+# [daemon]
 ## Enables using the daemon to sync. Requires the daemon to be running in the background. Start it with `atuin daemon`
 # enabled = false
 

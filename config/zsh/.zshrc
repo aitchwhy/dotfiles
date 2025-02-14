@@ -1,26 +1,3 @@
-############################
-# Consolidated Zsh configuration for interactive shells
-# Organized for performance and clarity
-############################
-
-# source "$HOME/dotfiles/scripts/utils.sh"
-
-
-# # Helper functions
-# _load_if_exists() 
-#     local cmd="$1"
-#     local setup_cmd="$2"
-#
-#     if command -v "$cmd" > /dev/null; then
-#         eval "$setup_cmd"
-#     fi
-# }
-#
-# _load_config_if_exists() {
-#     local config="$1"
-#     [[ -f "$config" ]] && source "$config"
-# }
-
 # ============================================================================ #
 # .zshenv
 # ============================================================================ #
@@ -189,9 +166,6 @@
 # .zshrc
 # ============================================================================ #
 
-# source "${DOTFILES:-$HOME/dotfiles}/scripts/symlinks.sh"
-
-
 # Performance profiling (uncomment to debug slow startup)
 # zmodload zsh/zprof
 
@@ -236,18 +210,36 @@ bindkey '^?' backward-delete-char
 #     done
 # fi
 
+###########
+# Initialize completion system
+###########
+# autoload -Uz compinit
+# compinit
+
+# if [[ -n ${ZDOTDIR:-$HOME}/.zcompdump(#qN.mh+24) ]]; then
+#     compinit
+# else
+#     compinit -C
+# fi
+
 # Load Homebrew completions
 if type brew &>/dev/null; then
-    FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
+    FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
+
+    autoload -Uz compinit
+    compinit
+
+    # FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
+
+    # # Load brew-installed completions
+    # local completion_file
+    # for completion_file in "$(brew --prefix)/share/zsh/site-functions"/_*; do
+    #     if [[ -f "$completion_file" ]]; then
+    #         source "$completion_file"
+    #     fi
+    # done
 fi
 
-# Initialize completion system
-autoload -Uz compinit
-if [[ -n ${ZDOTDIR:-$HOME}/.zcompdump(#qN.mh+24) ]]; then
-    compinit
-else
-    compinit -C
-fi
 
 
 # Source aliases and functions
@@ -271,6 +263,8 @@ _load_brew_plugin() {
 _load_brew_plugin "zsh-syntax-highlighting"
 _load_brew_plugin "zsh-autosuggestions"
 
+# source $(brew --prefix)/share/zsh/site-functions/_todoist_fzf
+
 # Initialize tools if installed
 # (( $+commands[fzf] )) && eval "$( init zsh)" + fzf -> https://junegunn.github.io/fzf/shell-integration/
 source <(fzf --zsh)
@@ -287,6 +281,7 @@ source <(fzf --zsh)
 (( $+commands[abbr] )) && eval "$(abbr init zsh)"
 
 (( $+commands[zoxide] )) && eval "$(zoxide init zsh)"
+
 
 # (( $+commands[fnm] )) && eval "$(fnm env --use-on-cd)"
 
