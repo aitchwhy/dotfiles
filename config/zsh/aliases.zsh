@@ -1,19 +1,14 @@
 
 # Modern CLI alternatives
-alias ls='eza --icons --group-directories-first'
-alias ll='eza -l --icons --group-directories-first'
-alias la='eza -la --icons --group-directories-first'
-alias lt='eza --tree --icons'
-alias cat='bat'
-alias grep='rg'
-alias find='fd'
-alias ps='procs'
-alias top='btm'
-alias du='dust'
-alias df='duf'
-alias vi='nvim'
-alias vim='nvim'
-alias cd='z'
+command -v bat >/dev/null && alias cat='bat --paging=never'
+command -v rg >/dev/null && alias grep='rg'
+command -v fd >/dev/null && alias find='fd'
+command -v lazygit >/dev/null && alias lg='lazygit'
+command -v procs >/dev/null && alias ps='procs'
+command -v htop >/dev/null && alias top='htop'
+command -v dust >/dev/null && alias du='dust'
+command -v duf >/dev/null && alias df='duf'
+command -v nvim >/dev/null && alias vi='nvim' && alias vim='nvim'
 
 # ------------------------
 # Git shortcuts
@@ -31,19 +26,12 @@ alias gclean="git branch --merged | grep  -v '\\*\\|master\\|develop' | xargs -n
 alias gco='git checkout $(git branch -l | fzf)'
 alias gco='git checkout '
 alias gd='git diff'
-alias gd='git diff'
 alias gj="git-jump"                                                                               # Open in vim quickfix list files of interest (git diff, merged...)
 alias gl='git log --oneline'
-alias gl='git pull'
-alias gl='git pull'
 alias gl='git pull'
 alias glog='git log --oneline --decorate --graph'
 alias glol='git log --graph --abbrev-commit --oneline --decorate'
 alias gp="git push"
-alias gp='git push'
-alias gp='git push'
-alias gp='git push'
-alias gp='git push'
 alias gplo='git pull origin'
 alias gpo='git push origin'
 alias gpof='git push origin --force-with-lease'
@@ -53,15 +41,11 @@ alias gr='git remote'
 alias grb='git branch -r'                                                                           # display remote branch
 alias grs='git remote show'
 alias gs="git status"
-alias gs='git status'
-alias gs='git status'
 alias gss='git status -s'
 alias gst='git status -sb'
 alias gsub="git submodule update --remote"                                                        # pull submodules
 alias gtd='git tag --delete'
 alias gtdr='git tag --delete origin'
-alias lg='lazygit'
-alias lg='lazygit'
 
 
 ########################
@@ -82,11 +66,9 @@ alias lg='lazygit'
 # https://mac.install.guide/homebrew/8#:~:text=Homebrew%20maintains%20a%20cache%20of,cleanup%20with%20%2D%2Dprune=all%20.
 #
 ########################
-alias brewup='brew update && brew upgrade && brew cleanup'
-alias brewdeps='brew deps --tree --installed'
-alias brewin='brew info'
-alias brewls='brew list'
-alias cask='brew cask'
+alias bup='brew update && brew upgrade && brew cleanup'
+alias bdeps='brew deps --tree --installed'
+# alias cask='brew cask'
 
 # System
 alias flushdns='sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder'
@@ -106,6 +88,45 @@ alias npmt='npm test'
 alias st=starship
 
 # starship
+
+# ------------------------
+# Git shortcuts
+# ------------------------
+alias dif="git diff --no-index"                                                                   # Diff two files even if not in git repo! Can add -w (don't diff whitespaces)
+alias g='git'
+alias ga='git add'
+alias gaa='git add --all'
+alias gb='git branch '
+alias gblame='git blame'
+alias gblog="git for-each-ref --sort=committerdate refs/heads/ --format='%(HEAD) %(color:red)%(refname:short)%(color:reset) - %(color:yellow)%(objectname:short)%(color:reset) - %(contents:subject) - %(authorname) (%(color:blue)%(committerdate:relative)%(color:reset))'"                                                             # git log for each branches
+alias gc="git commit"
+alias gca='git commit --amend'
+alias gclean="git branch --merged | grep  -v '\\*\\|master\\|develop' | xargs -n 1 git branch -d" # Delete local branch merged with master
+alias gco='git checkout $(git branch -l | fzf)'
+alias gco='git checkout '
+alias gd='git diff'
+alias gj="git-jump"                                                                               # Open in vim quickfix list files of interest (git diff, merged...)
+alias gl='git log --oneline'
+alias gl='git pull'
+alias glog='git log --oneline --decorate --graph'
+alias glol='git log --graph --abbrev-commit --oneline --decorate'
+alias gp="git push"
+alias gplo='git pull origin'
+alias gpo='git push origin'
+alias gpof='git push origin --force-with-lease'
+alias gpofn='git push origin --force-with-lease --no-verify'
+alias gpt='git push --tag'
+alias gr='git remote'
+alias grb='git branch -r'                                                                           # display remote branch
+alias grs='git remote show'
+alias gs="git status"
+alias gss='git status -s'
+alias gst='git status -sb'
+alias gsub="git submodule update --remote"                                                        # pull submodules
+alias gtd='git tag --delete'
+alias gtdr='git tag --delete origin'
+
+
 
 
 ################################
@@ -127,6 +148,10 @@ alias -- -='cd -'
 # Modern CLI tool alternatives
 # https://github.com/MohamedElashri/eza-zsh/blob/main/eza-zsh.plugin.zsh
 if command -v eza >/dev/null; then
+    # alias ls='eza --icons --group-directories-first'
+    # alias ll='eza -l --icons --group-directories-first'
+    # alias la='eza -la --icons --group-directories-first'
+    # alias lt='eza --tree --icons'
     # general use aliases updated for eza
     alias ls='eza' # Basic replacement for ls with eza
     alias l='eza --long -bF' # Extended details with binary sizes and type indicators
@@ -155,6 +180,7 @@ if command -v eza >/dev/null; then
     alias ldepth='eza --level=2' # Limit recursion depth to 2
     alias lignore='eza --git-ignore' # Ignore files mentioned in .gitignore
     alias lcontext='eza --long --context' # Show security context
+
 fi
 
 # TODO: improvements (https://news.ycombinator.com/item?id=41037197)
@@ -170,18 +196,7 @@ fi
 # TODO: hyperfine
 
 
-# Editor
-alias v='$EDITOR'
-alias vi='$EDITOR'
-alias vim='$EDITOR'
-alias ls="ls --color=auto"
-alias ll="ls -la"
-alias cat="bat"
 
-command -v bat >/dev/null && alias cat='bat --paging=never'
-command -v rg >/dev/null && alias grep='rg'
-command -v fd >/dev/null && alias find='fd'
-command -v lazygit >/dev/null && alias lg='lazygit'
 
 # Example: flush DNS
 alias flushdns="sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder"
@@ -322,9 +337,10 @@ alias gicloud='cd ~/iCloud Drive'
 #
 # Zsh configuration
 alias be="nvim ~/.Brewfile"
-alias ze="nvim ~/.zshrc"
-alias zp="nvim ~/.zprofile"
+alias ze="nvim $ZDOTDIR/.zshrc"
+alias ze="nvim $ZDOTDIR/.zprofile"
 alias zr="exec zsh"
+alias zs="exec zsh"
 alias zreset="rm -f ~/.zcompdump; compinit && exec zsh"
 
 
@@ -335,7 +351,7 @@ alias es="espanso"
 
 # Zellij
 alias zj="zellij"
-alias zje="nvim $HOME/.config/zellij/config.kdl"
+alias zje="nvim $XDG_CONFIG_HOME/zellij/config.kdl"
 alias zjl="fd --format="{/.}" . $HOME/.config/zellij/layouts | fzf --preview 'cat {-1}' --bind 'enter:become(zellij --layout {-1})'"
 
 # ghostty
@@ -353,11 +369,11 @@ alias ati="atuin import auto"
 # python + uv
 alias py='python' # Quick access to python interpreter
 alias py3='python3' # Explicitly use python 3
-alias venv='python3 -m .venv' # Create virtual environments
-alias activate='source .venv/bin/activate' # Activate virtual environment
+# alias venv='python3 -m .venv' # Create virtual environments
+# alias activate='source .venv/bin/activate' # Activate virtual environment
 # alias deactivate='deactivate' # Deactivate virtual environment
-alias pyrun='python -m' # Run a module as a script
-alias pydoc='pydoc3' # Access python documentation
+# alias pyrun='python -m' # Run a module as a script
+# alias pydoc='pydoc3' # Access python documentation
 
 
 

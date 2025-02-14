@@ -10,6 +10,10 @@ fi
 typeset -U path  # Ensure unique entries
 local additional_paths=(
     "$HOME/.local/bin"
+    "$HOMEBREW_PREFIX/opt/ruby/bin"
+    "$(gem environment gemdir)/bin"
+
+
 )
 for p in $additional_paths; do
     if [[ -d "$p" ]] && [[ ":$PATH:" != *":$p:"* ]]; then
