@@ -18,8 +18,13 @@ CONFIG_MAP=(
 
   "$DOTFILES/Brewfile:$HOME/.Brewfile"
 
-  "$DOTFILES/config/zsh/.zshrc:$XDG_CONFIG_HOME/zsh/.zshrc"
-  "$DOTFILES/config/zsh/.zprofile:$XDG_CONFIG_HOME/zsh/.zprofile"
+  "$DOTFILES/config/zsh:$XDG_CONFIG_HOME/zsh"
+  # "$DOTFILES/config/zsh/.zshrc:$XDG_CONFIG_HOME/zsh/.zshrc"
+  # "$DOTFILES/config/zsh/.zprofile:$XDG_CONFIG_HOME/zsh/.zprofile"
+  # "$DOTFILES/config/zsh/functions.zsh:$XDG_CONFIG_HOME/zsh/functions.zsh"
+  # "$DOTFILES/config/zsh/aliases.zsh:$XDG_CONFIG_HOME/zsh/aliases.zsh"
+  # "$DOTFILES/config/zsh/fzf.zsh:$XDG_CONFIG_HOME/zsh/fzf.zsh"
+  # "$DOTFILES/config/zsh/fzf.zsh:$XDG_CONFIG_HOME/zsh/fzf.zsh"
 
   "$DOTFILES/config/git/config:$XDG_CONFIG_HOME/git/config"
   "$DOTFILES/config/git/ignore:$XDG_CONFIG_HOME/git/ignore"
