@@ -7,8 +7,8 @@
 if [[ -x /opt/homebrew/bin/brew ]]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
     # Use /opt/homebrew if on Apple Silicon
-    export HOMEBREW_PREFIX="/opt/homebrew"
-    export PATH="$HOMEBREW_PREFIX/bin:$PATH"
+    # export HOMEBREW_PREFIX="/opt/homebrew"
+    # export PATH="$HOMEBREW_PREFIX/bin:$PATH"
 fi
 
 # PATH Configuration
@@ -22,7 +22,7 @@ local additional_paths=(
     "$CARGO_HOME/bin"
     "$GOPATH/bin"
     "$PYENV_ROOT/bin"
-    "$HOMEBREW_PREFIX/rustup/bin"
+    # "$HOMEBREW_PREFIX/rustup/bin"
 )
 
 for p in $additional_paths; do
