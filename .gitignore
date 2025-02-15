@@ -35,3 +35,6 @@ Network Trash Folder
 Temporary Items
 .apdisk
 config/zsh/.zcompcache
+
+# large data Files
+scripts/data/
