@@ -316,6 +316,7 @@ brew "temporalio/brew/tcld"
 brew "yakitrak/yakitrak/obsidian-cli"
 # Renamer for files, music and photos
 cask "a-better-finder-rename"
+cask "audacity"
 # Note editor and whiteboard
 cask "affine"
 # Open-source AI-native IDE
@@ -414,6 +415,8 @@ cask "iconjar"
 cask "istat-menus"
 # Menu bar calendar
 cask "itsycal"
+# jump desktop
+cask "jump"
 # Remote desktop app
 cask "jump-desktop-connect"
 # Spot and merge differences in text and image files or folders
