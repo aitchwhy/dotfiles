@@ -167,8 +167,6 @@ brew "nasm"
 brew "neovim"
 # Utility for managing network connections
 brew "netcat"
-# CLI for NextDNS's DNS-over-HTTPS (DoH)
-brew "nextdns"
 # Port scanning utility for large networks
 brew "nmap"
 # Tiny, lightning fast, feature-packed file manager
@@ -568,7 +566,6 @@ mas "Termius", id: 1176074088
 mas "Todoist", id: 585829637
 mas "Toggl Track", id: 1291898086
 mas "Tripsy", id: 1429967544
-mas "Yoink", id: 457622435
 vscode "42crunch.vscode-openapi"
 vscode "4ops.terraform"
 vscode "aaron-bond.better-comments"
