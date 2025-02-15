@@ -235,6 +235,70 @@ function fvscode() {
     code "$file"
   fi
 }
+#!/usr/bin/env zsh
+
+# fzf-brew - Browse and install Homebrew formulae using fzf
+fzf-brew() {
+  local inst=$(brew search | eval "fzf ${FZF_DEFAULT_OPTS} -m --header='[brew:install]'")
+
+  if [[ $inst ]]; then
+    for prog in $(echo $inst)
+    do brew install $prog
+    done
+  fi
+}
+
+# fzf-browse - Browse and cd into selected directory using fzf
+fzf-browse() {
+  local dir
+  dir=$(find ${1:-.} -path '*/\.*' -prune \
+                  -o -type d -print 2> /dev/null | fzf +m) &&
+  cd "$dir"
+}
+
+# fzf-find - Find files using fzf and fd/find
+fzf-find() {
+  local file
+
+  file="$(
+    if type fd > /dev/null 2>&1; then
+      fd --type f --hidden --follow --exclude .git 2> /dev/null | fzf
+    else
+      find . -type f -not -path '*/\.git/*' 2> /dev/null | fzf
+    fi
+  )"
+
+  if [[ -n $file ]]; then
+    ${EDITOR:-vim} "$file"
+  fi
+}
+
+# fzf-kill - Kill processes using fzf
+fzf-kill() {
+  local pid
+  pid=$(ps -ef | sed 1d | fzf -m | awk '{print $2}')
+
+  if [ "x$pid" != "x" ]; then
+    echo $pid | xargs kill -${1:-9}
+  fi
+}
+
+# fzf-history - Search command history using fzf
+fzf-history() {
+  local command
+  command=$(history | fzf --tac | sed 's/ *[0-9]* *//')
+  print -z $command
+}
+
+# fzf-git-branch - Checkout git branch using fzf
+fzf-git-branch() {
+  local branches branch
+  branches=$(git branch --all | grep -v HEAD) &&
+  branch=$(echo "$branches" |
+           fzf-tmux -d $(( 2 + $(wc -l <<< "$branches") )) +m) &&
+  git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
+}
+
 
 # # Tmux integration
 # function tm() {
@@ -252,3 +316,5 @@ function fvscode() {
 #   local session=$(tmux list-sessions -F "#{session_name}" | \
 #     fzf --exit-0) && tmux kill-session -t "$session"
 # }
+#
+#
