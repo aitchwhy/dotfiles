@@ -66,7 +66,6 @@ alias gblog="git for-each-ref --sort=committerdate refs/heads/ --format='%(HEAD)
 alias gc="git commit"
 alias gca='git commit --amend'
 alias gclean="git branch --merged | grep  -v '\\*\\|master\\|develop' | xargs -n 1 git branch -d" # Delete local branch merged with master
-alias gco='git checkout $(git branch -l | fzf)'
 alias gco='git checkout '
 alias gd='git diff'
 alias gj="git-jump"                                                                               # Open in vim quickfix list files of interest (git diff, merged...)
@@ -161,6 +160,18 @@ fi
 
 
 
+# Alias suggestions for your .zshrc:
+alias fbr='fzf-brew'
+alias fb='fzf-browse'
+alias ff='fzf-find'
+alias fk='fzf-kill'
+alias fh='fzf-history'
+alias fgb='fzf-git-branch'
+## FZF enhanced commands
+alias flog='fzf --preview "bat --style=numbers --color=always --line-range=:500 {}"'
+alias falias='alias | fzf'
+alias fman='man -k . | fzf --preview "man {}"'
+alias fls='man -k . | fzf --preview "man {}"'
 
 # Example: flush DNS
 alias flushdns="sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder"
@@ -197,11 +208,6 @@ alias ping='gping'
 alias diff='delta'
 
 
-## FZF enhanced commands
-alias flog='fzf --preview "bat --style=numbers --color=always --line-range=:500 {}"'
-alias falias='alias | fzf'
-alias fman='man -k . | fzf --preview "man {}"'
-alias fls='man -k . | fzf --preview "man {}"'
 
 alias ls='eza -al'
 # alias cheat='navi'
