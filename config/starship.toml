@@ -8,6 +8,9 @@
 add_newline = true
 
 format = "$all"
+# format = """
+# $all
+# """
 
 [os]
 disabled = false
@@ -21,31 +24,25 @@ Macos = " "
 [username]
 style_user = 'white bold'
 style_root = 'black bold'
-format = 'user: [$user]($style) '
+format = '\[[$user]($style)\] '
 disabled = false
 show_always = true
 aliases = { "corpuser034g" = "matchai" }
 
-[localip]
-ssh_only = false
-format = '@[$localipv4](bold red) '
-disabled = false
+# [localip]
+# ssh_only = true
+# format = '@[$localipv4](bold red) '
+# disabled = false
 
-
-
-[memory_usage]
-disabled = false
-threshold = -1
-symbol = ' '
-
-
-
+# [memory_usage]
+# disabled = false
+# threshold = -1
+# symbol = ' '
 
 [character]
 success_symbol = "[❯](green)"
 error_symbol = "[❯](red)"
 vimcmd_symbol = "[❮](purple)"
-
 
 [shell]
 fish_indicator = '󰈺 '
@@ -55,11 +52,9 @@ style = 'cyan bold'
 disabled = false
 
 
-
 [cmd_duration]
 format = "[$duration]($style) "
 style = "yellow"
-
 
 
 [directory]
@@ -76,26 +71,21 @@ format = 'via [☃️ $state( \($name\))](bold blue) '
 [package]
 format = 'via [🎁 $version](208 bold) '
 
-[nodejs]
-format = 'via [🤖 $version](bold green) '
 
 [direnv]
 disabled = false
 
-[docker_context]
-format = 'via [🐋 $context](blue bold)'
-
 [git_branch]
 # format = "[$branch]($style)"
 # style = "bright-black"
-symbol = '🌱 '
-truncation_length = 4
+symbol = ""
+truncation_length = 7
 truncation_symbol = ''
-ignore_branches = ['master', 'main']
+# ignore_branches = ['master', 'main']
 
 [git_commit]
 commit_hash_length = 7
-tag_symbol = '🔖 '
+tag_symbol = '􀋡 '
 
 [git_status]
 format = "[[(*$conflicted$untracked$modified$staged$renamed$deleted)](218) ($ahead_behind$stashed)]($style)"
@@ -106,7 +96,7 @@ modified = '📝'
 staged = '[++\($count\)](green)'
 renamed = '👅'
 deleted = '🗑'
-stashed = '📦≡'
+stashed = '≡'
 behind = '😰'
 diverged = '😵'
 up_to_date = '✓'
@@ -124,11 +114,80 @@ format = '[+$added]($added_style)/[-$deleted]($deleted_style) '
 symbol = '🔺 '
 
 
+[gradle]
+style = "bg:#86BBD8"
+format = '[ $symbol ($version) ]($style)'
+
+[julia]
+symbol = " "
+style = "bg:#86BBD8"
+format = '[ $symbol ($version) ]($style)'
+
+
+[scala]
+symbol = " "
+style = "bg:#86BBD8"
+format = '[ $symbol ($version) ]($style)'
+
+[elixir]
+symbol = " "
+style = "bg:#86BBD8"
+format = '[ $symbol ($version) ]($style)'
+
+
+[nodejs]
+symbol = ""
+style = "bg:color_blue"
+format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
+
+[c]
+symbol = " "
+style = "bg:color_blue"
+format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
+
+[rust]
+symbol = ""
+style = "bg:color_blue"
+format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
+
+[golang]
+symbol = ""
+style = "bg:color_blue"
+format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
+
+[php]
+symbol = ""
+style = "bg:color_blue"
+format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
+
+[java]
+symbol = ""
+style = "bg:color_blue"
+format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
+
+[kotlin]
+symbol = ""
+style = "bg:color_blue"
+format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
+
+[haskell]
+symbol = ""
+style = "bg:color_blue"
+format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
+
 [python]
-format = "[$virtualenv]($style) "
-style = "bright-black"
-symbol = '👾 '
-pyenv_version_name = true
+symbol = ""
+style = "bg:color_blue"
+format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
+
+[docker_context]
+symbol = ""
+style = "bg:color_bg3"
+format = '[[ $symbol( $context) ](fg:#83a598 bg:color_bg3)]($style)'
+
+[conda]
+style = "bg:color_bg3"
+format = '[[ $symbol( $environment) ](fg:#83a598 bg:color_bg3)]($style)'
 
 [lua]
 format = 'via [🌕 $version](bold blue) '
@@ -138,14 +197,7 @@ format = 'via [🌕 $version](bold blue) '
 # disabled = false
 # contexts = [
 #   { context_pattern = "dev.local.cluster.k8s", style = "green", symbol = "💔 " },
- # ]
+# ]
 
 [pulumi]
 format = '[🛥 ($version )$stack]($style) '
-
-
-[rust]
-format = 'via [⚙️ $version](red bold)'
-
-
-

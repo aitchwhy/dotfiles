@@ -29,10 +29,9 @@ clipboard-write = "allow"
 
 #theme = light:nord-light,dark:nord
 #theme = light:zenbones,dark:nord
-theme = tokyonight-storm
+# theme = tokyonight-storm
 # theme = nord
-# theme = catppuccin-frappe
-
+theme = catppuccin-frappe
 
 font-size = 12
 
@@ -40,10 +39,8 @@ window-decoration = true
 window-padding-x  = 12
 window-padding-y  = 12
 
-
 confirm-close-surface = false
 mouse-hide-while-typing = false
-
 
 # Quick terminal (floating)
 quick-terminal-animation-duration = 0
@@ -101,6 +98,15 @@ keybind = cmd+opt+i=inspector:toggle
 
 keybind = cmd+enter=toggle_fullscreen
 
-#keybind = global:cmd+period=toggle_quick_terminal
+# jumping between prompts
+keybind = opt+down=jump_to_prompt:1
+# keybind = cmd+shift+down=jump_to_prompt:1
+# keybind = cmd+shift+up=jump_to_prompt:-1
+keybind = opt+up=jump_to_prompt:-1
+
+
+
+# keybind = global:opt+period ~~ raycast toggle ghostty
+keybind = global:cmd+period=toggle_quick_terminal
 
 
