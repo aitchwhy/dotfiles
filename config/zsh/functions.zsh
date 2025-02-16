@@ -2,6 +2,14 @@
 # fzf examples -> https://github.com/junegunn/fzf/wiki/examples#homebrew
 ###############################
 
+
+
+# Clean .DS_Store files
+clean_ds_store() {
+  log "Cleaning .DS_Store files..."
+  find "$DOTFILES" -name ".DS_Store" -delete
+}
+
 # Default paths (can be overridden before sourcing)
 DOTFILES="${DOTFILES:-$HOME/dotfiles}"
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
