@@ -33,7 +33,7 @@ CONFIG_MAP=(
   "$DOTFILES/config/karabiner/karabiner.json:$XDG_CONFIG_HOME/karabiner/karabiner.json"
   "$DOTFILES/config/ghostty/config:$XDG_CONFIG_HOME/ghostty/config"
   "$DOTFILES/config/bat/config:$XDG_CONFIG_HOME/bat/config"
-  "$DOTFILES/config/starship.toml:$XDG_CONFIG_HOME/starship.toml"
+  "$DOTFILES/config/starship/starship.toml:$XDG_CONFIG_HOME/starship/starship.toml"
   "$DOTFILES/config/nvim:$XDG_CONFIG_HOME/nvim"
 
   "$DOTFILES/config/hammerspoon:$XDG_CONFIG_HOME/hammerspoon"
