@@ -35,7 +35,6 @@ declare -a CONFIG_MAP=(
   "$DOTFILES/config/nvim:$XDG_CONFIG_HOME/nvim"
 
   "$DOTFILES/config/hammerspoon:$XDG_CONFIG_HOME/hammerspoon"
-  "$DOTFILES/config/karabiner:$XDG_CONFIG_HOME/karabiner"
 
   "$DOTFILES/config/yazi:$XDG_CONFIG_HOME/yazi"
   "$DOTFILES/config/zed:$XDG_CONFIG_HOME/zed"
