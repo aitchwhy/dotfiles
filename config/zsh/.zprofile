@@ -2,6 +2,16 @@
 # ~/.zprofile (Invoked once at login on macOS)
 # -----------------------------------------------------------------------------
 
+# ============================================================================ #
+# XDG
+# ============================================================================ #
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_CACHE_HOME="$HOME/.cache"
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_STATE_HOME="$HOME/.local/state"
+
+
+
 # Reusable Function
 _add_to_path_if_exists() {
   local dir="$1"
