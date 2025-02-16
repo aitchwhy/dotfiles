@@ -11,13 +11,11 @@ if [[ "$(uname -s)" != "Darwin" || "$(uname -m)" != "arm64" ]]; then
   exit 1
 fi
 
-# TODO: slink $DOTFILES/.config/zellij/main-layout.kdl $HOME/.config/config.kdl
-
-# Define the config mapping (source:destination pairs)
-CONFIG_MAP=(
-
+# Define source -> destination mappings (source:destination pairs)
+declare -a CONFIG_MAP=(
+  # Add more file or directory mappings as needed:
+  # "$DOTFILES/<app>:<target_path>"
   "$DOTFILES/Brewfile:$HOME/.Brewfile"
-
   "$DOTFILES/config/zsh:$XDG_CONFIG_HOME/zsh"
   # "$DOTFILES/config/zsh/.zshrc:$XDG_CONFIG_HOME/zsh/.zshrc"
   # "$DOTFILES/config/zsh/.zprofile:$XDG_CONFIG_HOME/zsh/.zprofile"
@@ -64,49 +62,98 @@ CONFIG_MAP=(
   "$DOTFILES/ai/config:$XDG_CONFIG_HOME/ai/config"
   "$DOTFILES/ai/prompts:$XDG_CONFIG_HOME/ai/prompts"
 
-  # Add more file or directory mappings as needed:
-  # "$DOTFILES/<app>:<target_path>"
 )
 
 #######################################
 
-echo "Starting config symlink synchronization..."
-for mapping in "${CONFIG_MAP[@]}"; do
-  # Split the source and destination by the colon separator
-  IFS=':' read -r src dest <<<"$mapping"
+###########################
+# Helper function to link #
+###########################
+symlink_file() {
+  local src="$1"
+  local dest="$2"
 
-  # Ensure source exists
+  # Skip if source doesn't exist
   if [[ ! -e "$src" ]]; then
-    echo "Warning: Source '$src' not found. Skipping..."
-    continue
+    echo "Warning: Source '$src' does not exist. Skipping..."
+    return
   fi
 
-  # Ensure parent directory of destination exists
+  # Ensure destination directory exists
+  local dest_dir
   dest_dir="$(dirname "$dest")"
   if [[ ! -d "$dest_dir" ]]; then
     mkdir -p "$dest_dir"
-    echo "Created directory $dest_dir"
+    echo "Created directory: $dest_dir"
   fi
 
+  # If destination is already a symlink, verify correctness
   if [[ -L "$dest" ]]; then
-    # Destination is a symlink
+    local current_target
     current_target="$(readlink "$dest")"
     if [[ "$current_target" == "$src" ]]; then
-      echo "✔️  Symlink already correct: $dest -> $src"
-      continue # correct symlink, move to next
+      echo "✔️  Already linked: $dest -> $src"
+      return
     else
-      echo "🔄 Updating symlink: $dest (was -> $current_target)"
-      rm -f "$dest" # remove the wrong symlink
+      echo "🔄 Updating symlink: $dest (old -> $current_target)"
+      rm -f "$dest"
     fi
+  # If a regular file or directory exists, remove it
   elif [[ -e "$dest" ]]; then
-    # Destination exists but is not a symlink (could be file or directory)
-    echo "🔄 Removing existing $([[ -d \"$dest\" ]] && echo 'directory' || echo 'file'): $dest"
+    echo "🔄 Removing existing $([[ -d "$dest" ]] && echo 'directory' || echo 'file'): $dest"
     rm -rf "$dest"
   fi
 
-  # At this point, $dest either didn't exist or was removed, safe to create link
-  ln -sf "$src" "$dest"
-  echo "✅ Linked $dest -> $src"
+  # Create new symlink
+  ln -s "$src" "$dest"
+  echo "✅ Linked: $dest -> $src"
+}
+
+echo "Starting config symlink synchronization..."
+for mapping in "${CONFIG_MAP[@]}"; do
+  IFS=':' read -r src dest <<<"$mapping"
+  symlink_file "$src" "$dest"
 done
 
-echo "All config files synchronized."
+echo "All config files are now symlinked."
+#
+# echo "Starting config symlink synchronization..."
+# for mapping in "${CONFIG_MAP[@]}"; do
+#   # Split the source and destination by the colon separator
+#   IFS=':' read -r src dest <<<"$mapping"
+#
+#   # Ensure source exists
+#   if [[ ! -e "$src" ]]; then
+#     echo "Warning: Source '$src' not found. Skipping..."
+#     continue
+#   fi
+#
+#   # Ensure parent directory of destination exists
+#   dest_dir="$(dirname "$dest")"
+#   if [[ ! -d "$dest_dir" ]]; then
+#     mkdir -p "$dest_dir"
+#     echo "Created directory $dest_dir"
+#   fi
+#
+#   if [[ -L "$dest" ]]; then
+#     # Destination is a symlink
+#     current_target="$(readlink "$dest")"
+#     if [[ "$current_target" == "$src" ]]; then
+#       echo "✔️  Symlink already correct: $dest -> $src"
+#       continue # correct symlink, move to next
+#     else
+#       echo "🔄 Updating symlink: $dest (was -> $current_target)"
+#       rm -f "$dest" # remove the wrong symlink
+#     fi
+#   elif [[ -e "$dest" ]]; then
+#     # Destination exists but is not a symlink (could be file or directory)
+#     echo "🔄 Removing existing $([[ -d \"$dest\" ]] && echo 'directory' || echo 'file'): $dest"
+#     rm -rf "$dest"
+#   fi
+#
+#   # At this point, $dest either didn't exist or was removed, safe to create link
+#   ln -sf "$src" "$dest"
+#   echo "✅ Linked $dest -> $src"
+# done
+#
+# echo "All config files synchronized."
