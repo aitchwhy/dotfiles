@@ -8,9 +8,6 @@
 add_newline = true
 
 format = "$all"
-# format = """
-# $all
-# """
 
 [os]
 disabled = false
@@ -46,20 +43,17 @@ vimcmd_symbol = "[❮](purple)"
 
 [shell]
 fish_indicator = '󰈺 '
-powershell_indicator = '_'
+powershell_indicator = '_ '
 unknown_indicator = 'mystery shell'
 style = 'cyan bold'
 disabled = false
-
 
 [cmd_duration]
 format = "[$duration]($style) "
 style = "yellow"
 
-
 [directory]
 style = "italic white"
-
 
 [nix_shell]
 disabled = true
@@ -71,14 +65,13 @@ format = 'via [☃️ $state( \($name\))](bold blue) '
 [package]
 format = 'via [🎁 $version](208 bold) '
 
-
 [direnv]
 disabled = false
 
 [git_branch]
 # format = "[$branch]($style)"
 # style = "bright-black"
-symbol = ""
+symbol = " "
 truncation_length = 7
 truncation_symbol = ''
 # ignore_branches = ['master', 'main']
@@ -113,7 +106,6 @@ format = '[+$added]($added_style)/[-$deleted]($deleted_style) '
 [ruby]
 symbol = '🔺 '
 
-
 [gradle]
 style = "bg:#86BBD8"
 format = '[ $symbol ($version) ]($style)'
@@ -136,7 +128,7 @@ format = '[ $symbol ($version) ]($style)'
 
 
 [nodejs]
-symbol = ""
+symbol = " "
 style = "bg:color_blue"
 format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
 
@@ -146,42 +138,42 @@ style = "bg:color_blue"
 format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
 
 [rust]
-symbol = ""
+symbol = " "
 style = "bg:color_blue"
 format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
 
 [golang]
-symbol = ""
+symbol = " "
 style = "bg:color_blue"
 format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
 
 [php]
-symbol = ""
+symbol = " "
 style = "bg:color_blue"
 format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
 
 [java]
-symbol = ""
+symbol = " "
 style = "bg:color_blue"
 format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
 
 [kotlin]
-symbol = ""
+symbol = " "
 style = "bg:color_blue"
 format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
 
 [haskell]
-symbol = ""
+symbol = " "
 style = "bg:color_blue"
 format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
 
 [python]
-symbol = ""
+symbol = " "
 style = "bg:color_blue"
 format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
 
 [docker_context]
-symbol = ""
+symbol = " "
 style = "bg:color_bg3"
 format = '[[ $symbol( $context) ](fg:#83a598 bg:color_bg3)]($style)'
 
