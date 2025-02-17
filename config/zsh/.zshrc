@@ -10,6 +10,7 @@ source "$ZDOTDIR/conf.d/functions.zsh"
 source "$ZDOTDIR/conf.d/keybindings.zsh"
 source "$ZDOTDIR/conf.d/fzf.zsh"
 source "$ZDOTDIR/conf.d/fzf-extended.zsh"
+source "$ZDOTDIR/conf.d/completions.zsh"
 
 # Initialize completion system
 autoload -Uz compinit
