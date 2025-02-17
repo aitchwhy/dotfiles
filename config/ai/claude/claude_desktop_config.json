@@ -1,0 +1,104 @@
+{
+	"globalShortcut": "",
+	"mcpServers": {
+		"mcp-installer": {
+			"command": "npx",
+			"args": [
+				"@anaisbetts/mcp-installer"
+			]
+		},
+		"filesystem": {
+			"command": "npx",
+			"args": [
+				"-y",
+				"@modelcontextprotocol/server-filesystem",
+				"/Users/hank/src"
+			]
+		},
+		"memory": {
+			"command": "npx",
+			"args": [
+				"-y",
+				"@modelcontextprotocol/server-memory"
+			]
+		},
+		"sequential-thinking": {
+			"command": "npx",
+			"args": [
+				"-y",
+				"@modelcontextprotocol/server-sequential-thinking"
+			]
+		},
+		"brave-search": {
+			"command": "npx",
+			"args": [
+				"-y",
+				"@modelcontextprotocol/server-brave-search"
+			],
+			"env": {
+				"BRAVE_API_KEY": "BSA6Xfhvmic48OVz8tst9-_43F86H8L"
+			}
+		},
+		"@calclavia-mcp-obsidian": {
+			"command": "/Users/hank/.toolbase/toolbase-runner",
+			"args": [
+				"-m=https://esm.sh/mcp-obsidian@1.0.0/dist/index.js%3Fbundle-deps&pin=v135",
+				"-c=/Users/hank/.toolbase/cache",
+				"--",
+				"/Users/hank/obsidian/primary"
+			]
+		},
+		"@modelcontextprotocol-server-filesystem": {
+			"command": "/Users/hank/.toolbase/toolbase-runner",
+			"args": [
+				"-m=https://esm.sh/@modelcontextprotocol/server-filesystem@0.6.2/dist/index.js%3Fbundle-deps&pin=v135",
+				"-c=/Users/hank/.toolbase/cache",
+				"--",
+				"/Users/hank/Downloads"
+			]
+		},
+		"@kimtaeyoon83-mcp-server-youtube-transcript": {
+			"command": "/Users/hank/.toolbase/toolbase-runner",
+			"args": [
+				"-m=https://esm.sh/@kimtaeyoon83/mcp-server-youtube-transcript@0.1.1/dist/index.js%3Fbundle-deps&pin=v135",
+				"-c=/Users/hank/.toolbase/cache",
+				"--"
+			]
+		},
+		"@mcp-get-community-server-macos": {
+			"command": "/Users/hank/.toolbase/toolbase-runner",
+			"args": [
+				"-m=https://esm.sh/@mcp-get-community/server-macos@0.1.0/dist/index.js%3Fbundle-deps&pin=v135",
+				"-c=/Users/hank/.toolbase/cache",
+				"--"
+			]
+		},
+		"@mcp-get-community-server-curl": {
+			"command": "/Users/hank/.toolbase/toolbase-runner",
+			"args": [
+				"-m=https://esm.sh/@mcp-get-community/server-curl@0.1.0/dist/index.js%3Fbundle-deps&pin=v135",
+				"-c=/Users/hank/.toolbase/cache",
+				"--"
+			]
+		},
+		"@modelcontextprotocol-server-brave-search": {
+			"command": "/Users/hank/.toolbase/toolbase-runner",
+			"args": [
+				"-m=https://esm.sh/@modelcontextprotocol/server-brave-search@0.6.2/dist/index.js%3Fbundle-deps&pin=v135",
+				"-c=/Users/hank/.toolbase/cache",
+				"--"
+			],
+			"env": {
+				"BRAVE_API_KEY": "BSA6Xfhvmic48OVz8tst9-_43F86H8L"
+			}
+		},
+		"@modelcontextprotocol-server-sequential-thinking": {
+			"command": "/Users/hank/.toolbase/toolbase-runner",
+			"args": [
+				"-m=https://esm.sh/@modelcontextprotocol/server-sequential-thinking@0.6.2/dist/index.js%3Fbundle-deps&pin=v135",
+				"-c=/Users/hank/.toolbase/cache",
+				"--"
+			]
+		}
+	}
+}

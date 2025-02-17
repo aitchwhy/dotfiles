@@ -10,8 +10,11 @@ cache/
 
 # General
 .DS_Store
+*.log
 .AppleDouble
 .LSOverride
+.history/
+node_modules/
 
 # Icon must end with two \r
 Icon
@@ -38,3 +41,4 @@ config/zsh/.zcompcache
 
 # large data Files
 scripts/data/
+config/karabiner/automatic_backups
