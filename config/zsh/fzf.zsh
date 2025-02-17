@@ -22,6 +22,16 @@ export FZF_DEFAULT_OPTS="
   --color=marker:#9ece6a,spinner:#9ece6a,header:#9ece6a
 "
 
+# fzf completion options -> https://github.com/junegunn/fzf?tab=readme-ov-file#fuzzy-completion-for-bash-and-zsh
+# Options to fzf command
+export FZF_COMPLETION_OPTS='--border --info=inline'
+
+# Options for path completion (e.g. vim **<TAB>)
+export FZF_COMPLETION_PATH_OPTS='--walker file,dir,follow,hidden'
+
+# Options for directory completion (e.g. cd **<TAB>)
+export FZF_COMPLETION_DIR_OPTS='--walker dir,follow'
+
 #############
 # History search (CTRL-R) + atuin
 # Paste the selected command from history onto the command-line
@@ -107,7 +117,7 @@ function fbin() {
   fi
 }
 
-function fbunin() {
+function fbd() {
   local inst=$(brew list | fzf -m)
   if [[ -n "$inst" ]]; then
     for prog in $(echo "$inst"); do
@@ -116,7 +126,7 @@ function fbunin() {
   fi
 }
 # Chrome bookmark search
-function chromebm() {
+function fbm() {
   local bookmarks_path
   case "$(uname)" in
     "Darwin")
@@ -208,7 +218,7 @@ function fgrepe() {
 }
 
 # Git utilities
-function fgitbr() {
+function fgbr() {
   git rev-parse HEAD > /dev/null 2>&1 || return
 
   local branch=$(git branch --color=always | \
@@ -222,14 +232,14 @@ function fgitbr() {
   fi
 }
 
-function fgitco() {
+function fgco() {
   local branch=$(fzf-git-branch)
   if [[ -n "$branch" ]]; then
     git checkout "$branch"
   fi
 }
 # VSCode integration
-function fvscode() {
+function fcode() {
   local file=$(rg --files | fzf --preview 'bat --style=numbers --color=always --line-range :500 {}')
   if [[ -n "$file" ]]; then
     code "$file"
@@ -238,7 +248,7 @@ function fvscode() {
 #!/usr/bin/env zsh
 
 # fzf-brew - Browse and install Homebrew formulae using fzf
-fzf-brew() {
+function fb() {
   local inst=$(brew search | eval "fzf ${FZF_DEFAULT_OPTS} -m --header='[brew:install]'")
 
   if [[ $inst ]]; then
@@ -249,7 +259,7 @@ fzf-brew() {
 }
 
 # fzf-browse - Browse and cd into selected directory using fzf
-fzf-browse() {
+function fdir() {
   local dir
   dir=$(find ${1:-.} -path '*/\.*' -prune \
                   -o -type d -print 2> /dev/null | fzf +m) &&
@@ -257,7 +267,7 @@ fzf-browse() {
 }
 
 # fzf-find - Find files using fzf and fd/find
-fzf-find() {
+function ffile() {
   local file
 
   file="$(
@@ -274,7 +284,7 @@ fzf-find() {
 }
 
 # fzf-kill - Kill processes using fzf
-fzf-kill() {
+function fkill() {
   local pid
   pid=$(ps -ef | sed 1d | fzf -m | awk '{print $2}')
 
@@ -284,37 +294,17 @@ fzf-kill() {
 }
 
 # fzf-history - Search command history using fzf
-fzf-history() {
+function fhistory() {
   local command
   command=$(history | fzf --tac | sed 's/ *[0-9]* *//')
   print -z $command
 }
 
 # fzf-git-branch - Checkout git branch using fzf
-fzf-git-branch() {
+function fgb() {
   local branches branch
   branches=$(git branch --all | grep -v HEAD) &&
   branch=$(echo "$branches" |
            fzf-tmux -d $(( 2 + $(wc -l <<< "$branches") )) +m) &&
   git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
 }
-
-
-# # Tmux integration
-# function tm() {
-#   [[ -n "$TMUX" ]] && change="switch-client" || change="attach-session"
-#   if [ "$1" ]; then
-#     tmux $change -t "$1" 2>/dev/null || (tmux new-session -d -s "$1" && tmux $change -t "$1")
-#     return
-#   fi
-#
-#   local session=$(tmux list-sessions -F "#{session_name}" 2>/dev/null | fzf --exit-0) && \
-#     tmux $change -t "$session" || tmux
-# }
-#
-# function tmux-kill() {
-#   local session=$(tmux list-sessions -F "#{session_name}" | \
-#     fzf --exit-0) && tmux kill-session -t "$session"
-# }
-#
-#
