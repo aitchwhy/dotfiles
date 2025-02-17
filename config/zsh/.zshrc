@@ -84,6 +84,9 @@ export MANPAGER=bat
 # .zshrc
 # ============================================================================ #
 
+autoload -Uz compinit
+compinit
+
 # ====== Core Shell Options ======
 setopt AUTO_CD              # Change directory without cd
 setopt EXTENDED_GLOB        # Extended globbing
@@ -103,11 +106,11 @@ bindkey -v
 export KEYTIMEOUT=1
 
 # Maintain some emacs-style bindings in vi mode
-bindkey '^P' up-line-or-history
-bindkey '^N' down-line-or-history
-bindkey '^E' end-of-line
+# bindkey '^P' up-line-or-history
+# bindkey '^N' down-line-or-history
 bindkey '^A' beginning-of-line
-bindkey '^?' backward-delete-char
+bindkey '^E' end-of-line
+# bindkey '^?' backward-delete-char
 
 # ====== Completion System ======
 
@@ -130,11 +133,20 @@ _load_brew_plugin "zsh-autosuggestions"
 # source $(brew --prefix)/share/zsh/site-functions/_todoist_fzf
 
 
+
+# Source aliases and functions
+source "$HOME/dotfiles/config/zsh/aliases.zsh"
+source "$HOME/dotfiles/config/zsh/functions.zsh"
+source "$HOME/dotfiles/config/zsh/fzf.zsh"
+
+
 # Initialize tools if installed
 # (( $+commands[fzf] )) && eval "$( init zsh)" + fzf -> https://junegunn.github.io/fzf/shell-integration/
 
 # (( $+commands[fzf] )) && eval "$(starship init zsh)"
 (( $+commands[fzf] )) && source <(fzf --zsh) # eval "$(starship init zsh)"
+
+
 
 
 # Initialize starship prompt if installed
@@ -162,7 +174,7 @@ _load_brew_plugin "zsh-autosuggestions"
 # (( $+commands[pyenv] )) && eval "$(pyenv init -)"
 
 # uv
-# (( $+commands[uv] ))  && eval "$(uv generate-shell-completion zsh)"
+(( $+commands[uv] ))  && eval "$(uv generate-shell-completion zsh)"
 
 
 # # Python (pyenv)
@@ -173,13 +185,5 @@ _load_brew_plugin "zsh-autosuggestions"
 
 
 
-
-
-
-
-# Source aliases and functions
-source "$HOME/dotfiles/config/zsh/aliases.zsh"
-source "$HOME/dotfiles/config/zsh/functions.zsh"
-source "$HOME/dotfiles/config/zsh/fzf.zsh"
 
 
