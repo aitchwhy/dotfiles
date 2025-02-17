@@ -10,7 +10,7 @@ if [[ -x /opt/homebrew/bin/brew ]]; then
 fi
 
 # Ensure path arrays do not contain duplicates.
-typeset -gU path fpath
+typeset -U PATH path fpath
 
 # Path management function
 _add_to_path_if_exists() {
@@ -102,7 +102,6 @@ fi
 
 
 # Ensure path arrays do not contain duplicates.
-typeset -gU path fpath
 # Set up PATH (Path Configuration)
 # https://mac.install.guide/terminal/path
 # typeset -U PATH path
