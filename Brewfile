@@ -79,7 +79,7 @@ brew "dust"
 # Extremely fast JavaScript bundler and minifier
 brew "esbuild"
 # AST-based pattern checker for JavaScript
-brew "eslint"
+# brew "eslint"
 # Perl lib for reading and writing EXIF metadata
 brew "exiftool"
 # Modern, maintained replacement for ls
@@ -191,7 +191,7 @@ brew "posting"
 # portaudio + pyaudio (https://www.portaudio.com/)
 brew "portaudio"
 # Code formatter for JavaScript, CSS, JSON, GraphQL, Markdown, YAML
-brew "prettier"
+# brew "prettier"
 # Modern replacement for ps written in Rust
 brew "procs"
 # Service monitoring system and time series database
