@@ -187,6 +187,8 @@ brew "pkgconf"
 brew "poppler"
 # Modern API client that lives in your terminal
 brew "posting"
+# portaudio + pyaudio (https://www.portaudio.com/)
+brew "portaudio"
 # Code formatter for JavaScript, CSS, JSON, GraphQL, Markdown, YAML
 brew "prettier"
 # Modern replacement for ps written in Rust
