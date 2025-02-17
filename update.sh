@@ -1,4 +1,41 @@
 #!/usr/bin/env bash
+
+set -euo pipefail
+
+######################
+# Source the git util script (get project root)
+. "./git.sh"
+
+# Call the function to get the repo root of this script's location
+PROJECT_ROOT=$(get_repo_root "$0")
+######################
+
+source "${PROJECT_ROOT}/utils.sh"
+
+main() {
+  info "Updating dotfiles..."
+
+  # Pull latest changes
+  cd "$DOTFILES_DIR"
+  git pull origin main
+
+  # Update Homebrew packages
+  if has_command brew; then
+    info "Updating Homebrew packages..."
+    brew update
+    brew upgrade
+    brew cleanup
+  fi
+
+  # Relink configuration files
+  setup_zsh
+
+  success "Dotfiles update complete!"
+}
+
+main "$@"
+
+#!/usr/bin/env bash
 # # Update script for dotfiles and tools
 #
 # source "$(dirname "${BASH_SOURCE[0]}")/utils/helpers.sh"

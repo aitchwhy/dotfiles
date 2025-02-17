@@ -2,6 +2,7 @@
 # macOS system configuration
 
 source "$(dirname "${BASH_SOURCE[0]}")/../utils/helpers.sh"
+sourca
 
 # System Preferences
 configure_system() {
