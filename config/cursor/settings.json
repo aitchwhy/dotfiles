@@ -1424,7 +1424,7 @@
   "extensions.experimental.affinity": {
     "asvetliakov.vscode-neovim": 1
   },
-  "workbench.colorTheme": "Catppuccin Frappé",
+  "workbench.colorTheme": "Default Light+",
   "explorer.fileNesting.expand": false,
   "security.workspace.trust.untrustedFiles": "open",
   "files.autoSave": "onFocusChange",
@@ -1439,5 +1439,10 @@
   },
   "editor.wordWrapColumn": 120,
   "vim.textwidth": 120,
-  "editor.wordWrap": "wordWrapColumn"
+  "editor.wordWrap": "wordWrapColumn",
+  "shellcheck.run": "onSave",
+  "shellcheck.useWorkspaceRootAsCwd": true,
+  "shellcheck.customArgs": [
+    "-x"
+  ]
 }

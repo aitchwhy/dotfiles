@@ -1,3 +1,88 @@
+# Performance monitoring (uncomment to debug startup time)
+# zmodload zsh/zprof
+
+source "$HOME/dotfiles/utils.sh"
+
+# Shell Options
+setopt AUTO_CD              # Change directory without cd
+setopt AUTO_PUSHD           # Push directory to stack on cd
+setopt PUSHD_IGNORE_DUPS    # Don't store duplicates in stack
+setopt PUSHD_SILENT         # Don't print stack after pushd/popd
+setopt EXTENDED_GLOB        # Extended globbing
+setopt INTERACTIVE_COMMENTS # Allow comments in interactive shells
+setopt NO_CASE_GLOB         # Case insensitive globbing
+
+# History Options
+setopt EXTENDED_HISTORY       # Record timestamp
+setopt HIST_EXPIRE_DUPS_FIRST # Delete duplicates first
+setopt HIST_IGNORE_DUPS       # Don't record duplicates
+setopt HIST_VERIFY            # Don't execute immediately upon history expansion
+setopt SHARE_HISTORY          # Share history between sessions
+setopt HIST_IGNORE_SPACE      # Don't record commands starting with space
+
+# Completions
+# source "$ZDOTDIR/conf.d/completions.zsh"
+autoload -U compinit
+compinit
+
+# Load core configurations
+source "$ZDOTDIR/conf.d/keybindings.zsh"
+source "$ZDOTDIR/conf.d/functions.zsh"
+source "$ZDOTDIR/conf.d/fzf.zsh"
+source "$ZDOTDIR/conf.d/fzf-extended.zsh"
+source "$ZDOTDIR/conf.d/aliases.zsh"
+
+# -----------------------------------------------------------------------------
+# Brew Plugins
+# -----------------------------------------------------------------------------
+# Plugin installation path
+PLUGIN_DIR="$HOMEBREW_PREFIX/share"
+ensure_dir "$PLUGIN_DIR"
+
+# Load plugins if available
+plugins=(
+    "zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+    "zsh-autosuggestions/zsh-autosuggestions.zsh"
+    # "zsh-abbr/zsh-abbr.zsh"
+)
+# # source $(brew --prefix)/share/zsh/site-functions/_todoist_fzf
+for plugin in $plugins; do
+    plugin_path="$PLUGIN_DIR/$plugin"
+    if [[ ! -f "$plugin_path" ]]; then
+        echo "no zsh plugin file at $plugin_path... skipping..."
+    else
+        source "$plugin_path"
+    fi
+done
+
+# Load plugins (via Homebrew) source "$(/opt/homebrew/bin/brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+# BREW_PREFIX=$(brew --prefix)
+# source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+# -----------------------------------------------------------------------------
+# Initialize tools if installed
+# -----------------------------------------------------------------------------
+# (( $+commands[fzf] )) && eval "$( init zsh)" + fzf -> https://junegunn.github.io/fzf/shell-integration/
+
+has_command starship && eval "$(starship init zsh)"
+has_command atuin && eval "$(atuin init zsh)"
+has_command zoxide && eval "$(zoxide init zsh)"
+has_command uv && eval "$(uv generate-shell-completion zsh)"
+has_command direnv && eval "$(direnv hook zsh)"
+
+# # Performance monitoring (uncomment to debug startup time)
+# zprof
+
+########################## END
+
+# #
+# # # ============================================================================ #
+# # # .zshenv
+# # # ============================================================================ #
+# # export XDG_CONFIG_HOME="$HOME/.config"
+# # export XDG_CACHE_HOME="$HOME/.cache"
+# # export XDG_DATA_HOME="$HOME/.local/share"
+# # export XDG_STATE_HOME="$HOME/.local/state"
 #
 # # ============================================================================ #
 # # .zshenv
@@ -170,16 +255,27 @@ _load_brew_plugin "zsh-autosuggestions"
 #     eval "$(pyenv init -)"
 # fi
 
+# # -----------------------------------------------------------------------------
+# # ZSH Options
+# # -----------------------------------------------------------------------------
+# setopt AUTO_CD              # Change directory without cd
+# setopt AUTO_PUSHD          # Push directory to stack
+# setopt PUSHD_IGNORE_DUPS   # Don't push duplicates
+# setopt PUSHD_SILENT        # Don't print directory stack
+# setopt EXTENDED_GLOB       # Extended globbing
+# setopt INTERACTIVE_COMMENTS # Allow comments in interactive shell
+# setopt NO_CASE_GLOB        # Case insensitive globbing
+# setopt NUMERIC_GLOB_SORT   # Sort filenames numerically
+# setopt NO_BEEP             # No beep on error
+# setopt EXTENDED_HISTORY    # Write format/timestamp in history
+# setopt SHARE_HISTORY       # Share history between sessions
+# setopt HIST_EXPIRE_DUPS_FIRST # Expire duplicates first
+# setopt HIST_IGNORE_DUPS    # Don't store duplicates
+# setopt HIST_VERIFY         # Don't execute immediately upon history expansion
 
-
-
-
-
-
-
-# Source aliases and functions
-source "$HOME/dotfiles/config/zsh/aliases.zsh"
-source "$HOME/dotfiles/config/zsh/functions.zsh"
-source "$HOME/dotfiles/config/zsh/fzf.zsh"
-
+# # -----------------------------------------------------------------------------
+# # Completion
+# # -----------------------------------------------------------------------------
+# autoload -Uz compinit
+# compinit -d "$XDG_CACHE_HOME/zsh/zcompdump-$ZSH_VERSION"
 

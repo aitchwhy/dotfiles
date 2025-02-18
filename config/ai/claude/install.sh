@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # How to install:
 # Put this into your claude_desktop_config.json (either at ~/Library/Application Support/Claude on macOS or C:\Users\NAME\AppData\Roaming\Claude on Windows):
 #
@@ -11,7 +13,7 @@
 #   }
 #
 # Example prompts
-# 
+#
 # Hey Claude, install the MCP server named mcp-server-fetch
 # Hey Claude, install the @modelcontextprotocol/server-filesystem package as an MCP server. Use ['/Users/anibetts/Desktop'] for the arguments
 # Hi Claude, please install the MCP server at /Users/anibetts/code/mcp-youtube, I'm too lazy to do it myself.
@@ -23,10 +25,9 @@ npx @michaellatman/mcp-get@latest install @cloudflare/mcp-server-cloudflare
 # YT transcript (This is an MCP server that allows you to directly download transcripts of YouTube videos.)
 npx @michaellatman/mcp-get@latest install @kimtaeyoon83/mcp-server-youtube-transcript
 
-# Search1API 
+# Search1API
 npx @michaellatman/mcp-get@latest install @fatwang2/search1api-mcp
 # npx @michaellatman/mcp-get@latest install @modelcontextprotocol/search1api-mcp
-
 
 # install everything server - https://mcp-get.com/packages/%40modelcontextprotocol%2Fserver-everything
 # MCP server that exercises all the features of the MCP protocol
@@ -75,7 +76,6 @@ npx @michaellatman/mcp-get@latest install @modelcontextprotocol/server-google-ne
 # mcp-server (MCP server for interacting with MCP API)
 npx @michaellatman/mcp-get@latest install @modelcontextprotocol/server-mcp
 
-
 # server llm txt retrieval (MCP server for interacting with LLM API)
 npx @michaellatman/mcp-get@latest install @modelcontextprotocol/server-llm-txt-retrieval
 
@@ -90,7 +90,6 @@ npx @michaellatman/mcp-get@latest install @modelcontextprotocol/server-sqlite
 
 # curl (MCP server for interacting with Curl API)
 npx @michaellatman/mcp-get@latest install @modelcontextprotocol/server-curl
-
 
 # playwright (MCP server for interacting with Playwright API)
 npx @michaellatman/mcp-get@latest install @modelcontextprotocol/server-playwright
@@ -125,7 +124,6 @@ npx @michaellatman/mcp-get@latest install @modelcontextprotocol/server-docker
 # solver (MCP server for interacting with Solver API)
 npx @michaellatman/mcp-get@latest install @modelcontextprotocol/server-solver
 
-
 ################
 # Opentools version
 ################
@@ -145,7 +143,6 @@ npx opentools i stagehand
 # Automate browser interactions in the cloud (e.g. web navigation, data extraction, form filling, and more)
 npx opentools i browserbase
 
-
 npx opentools i cloudflare-workers-mcp
 
 # A proxy server that converts OpenAPI v3.1 specifications into Claude tools, enabling natural language interaction with APIs through Claude Desktop.
@@ -159,7 +156,6 @@ npx opentools i mcp-hfspace
 
 # An MCP server implementation that integrates Claude with Todoist, enabling natural language task management for creating, updating, completing, and deleting tasks.
 npx opentools i abhiz123-todoist-mcp-server
-
 
 # airtable
 npx opentools i domdomegg-airtable-mcp-server
@@ -182,7 +178,6 @@ npx opentools i quantgeekdev-docker-mcp
 # QDrant  - A Model Context Protocol server for storing and retrieving memories using the Qdrant vector search engine, acting as a semantic memory layer.
 npx opentools i qdrant-mcp-server-qdrant
 
-
 # Stability AI
 npx opentools i tadasant-mcp-server-stability-ai
 
@@ -191,7 +186,6 @@ npx opentools i mcp-get-community-servers-server-macos
 
 # everything search
 npx opentools i mamertofabian-mcp-everything-search
-
 
 # google workspace/suite
 npx opentools i markuspfundstein-mcp-gsuite
@@ -202,17 +196,9 @@ npx opentools i qpd-v-mcp-guide
 # A Model Context Protocol (MCP) server that extracts and serves context from llm.txt files, enabling AI models to understand file structure, dependencies, and code relationships in development environments.
 npx opentools i mcp-get-community-servers-server-llm-txt
 
-
 # mcp-pandoc - A Model Context Protocol (MCP) server that provides a simple interface for converting Markdown, HTML, and other common document formats to PDF, DOCX, and more.
 
 uv tool install mcp-pandoc
-
-
-
-
-
-
-
 
 ##############
 # Smithery.ai
