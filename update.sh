@@ -1,16 +1,12 @@
 #!/usr/bin/env bash
+# update.sh - Script for updating dotfiles
 
 set -euo pipefail
 
-######################
-# Source the git util script (get project root)
-. "./git.sh"
-
-# Call the function to get the repo root of this script's location
-PROJECT_ROOT=$(get_repo_root "$0")
-######################
-
-source "${PROJECT_ROOT}/utils.sh"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Make the path more explicit for shellcheck
+# shellcheck source=./utils.sh
+source "${SCRIPT_DIR}/utils.sh"
 
 main() {
   info "Updating dotfiles..."
@@ -100,7 +96,7 @@ DOTFILES="${DOTFILES:-$HOME/dotfiles}"
 DRY_RUN=false
 
 # Import common functions
-source "$DOTFILES/scripts/utils/helpers.sh"
+source "./utils.sh"
 
 # Process arguments
 while [[ $# -gt 0 ]]; do

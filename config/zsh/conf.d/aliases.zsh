@@ -1,33 +1,35 @@
+#!/usr/bin/env bash
+
+source "$HOME/dotfiles/utils.sh"
 
 #########################
 # Modern CLI alternatives with fallbacks
 #########################
 
-
 # Alias commands to newer versions IF modern alternatives are installed
-function alias_if_exists() {
-  local orig_cmd="$1"
-  local new_cmd="$2"
-  if [[ ! -z $orig_cmd ]] && [[ command -v $orig_cmd > /dev/null 2>&1 ]]; then
-    alias $orig_cmd = $new_cmd
-    # nvim --headless -c 'autocmd User PackerComplete quitall' -c 'PackerSync'
-  fi
-}
+# function alias_if_exists() {
+#   local orig_cmd="$1"
+#   local new_cmd="$2"
+#   if [[ ! -z $orig_cmd ]] && [[ command -v $orig_cmd >/dev/null 2>&1 ]]; then
+#     alias $orig_cmd=$new_cmd
+#     # nvim --headless -c 'autocmd User PackerComplete quitall' -c 'PackerSync'
+#   fi
+# }
 
-
-command -v bat > /dev/null && alias cat='bat --paging=never'
-command -v btop > /dev/null && alias top='btop'
-command -v delta > /dev/null && alias diff='delta'
-command -v duf > /dev/null && alias df='duf'
-command -v dust > /dev/null && alias du='dust'
-command -v fd > /dev/null && alias find='fd'
-command -v gping > /dev/null && alias ping='gping'
-command -v htop > /dev/null && alias top='htop'
-command -v lazygit > /dev/null && alias lg='lazygit'
-command -v nvim > /dev/null && alias vi='nvim' && alias vim='nvim'
-command -v procs > /dev/null && alias ps='procs'
-command -v rg > /dev/null && alias grep='rg'
-command -v yazi > /dev/null && alias ranger='yazi'
+has_command bat && alias cat='bat --paging=never'
+has_command delta && alias diff='delta'
+has_command duf && alias df='duf'
+has_command duf && alias du='dust'
+has_command fd && alias find='fd'
+has_command gping && alias ping='gping'
+has_command htop && alias top='htop'
+has_command nvim && alias lg='lazygit'
+has_command nvim && alias vi='nvim' && alias vim='nvim'
+has_command procs && alias ps='procs'
+has_command rg && alias grep='rg'
+has_command yazi && alias ranger='yazi'
+has_command sd && alias sed='sd'
+has_command mlr && alias miller='mlr'
 
 #
 # # TODO: improvements (https://news.ycombinator.com/item?id=41037197)
@@ -44,29 +46,32 @@ command -v yazi > /dev/null && alias ranger='yazi'
 #
 
 # File listing with eza
-if command -v eza >/dev/null; then
-    # Basic listings
-    alias ls='eza --icons --group-directories-first'
-    alias ll='eza -l --icons --group-directories-first'
-    alias la='eza -la --icons --group-directories-first'
-    
-    # Specialized listings
-    alias lt='eza --tree --icons'
-    alias lm='eza -l --sort=modified'
-    alias lsize='eza -l --sort=size'
-    alias ltype='eza -l --sort=extension'
-    alias ld='eza --only-dirs'
-    alias lf='eza --only-files'
-    
-    # Advanced options
-    alias ldepth='eza --level=2'
-    alias lignore='eza --git-ignore'
-    alias lcontext='eza --long --context'
+if has_command eza; then
+  # Basic listings
+  alias ls='eza --icons --group-directories-first'
+  alias l='eza --long -bF' # Extended details with binary sizes and type indicators
+  alias ll='eza -l --icons --group-directories-first'
+  alias la='eza -la --icons --group-directories-first'
+  alias lsize='eza -l --sort=size'
+  alias ltype='eza -l --sort=extension'
+
+  # Specialized listings
+  alias lt='eza --tree --icons'
+  alias lm='eza -l --sort=modified'
+  alias lsize='eza -l --sort=size'
+  alias ltype='eza -l --sort=extension'
+  alias ld='eza --only-dirs'
+  alias lf='eza --only-files'
+
+  # Advanced options
+  alias ldepth='eza --level=2'
+  alias lignore='eza --git-ignore'
+  alias lcontext='eza --long --context'
+fi
 
 # # https://github.com/MohamedElashri/eza-zsh/blob/main/eza-zsh.plugin.zsh
 # if command -v eza >/dev/null; then
 #     alias ls='eza --icons --group-directories-first'
-#     alias l='eza --long -bF' # Extended details with binary sizes and type indicators
 #     alias ll='eza -l --icons --group-directories-first'
 #     alias la='eza -la --icons --group-directories-first' # Show all files, with directories listed first
 #     alias lt='eza --tree --icons'
@@ -90,7 +95,6 @@ if command -v eza >/dev/null; then
 #     alias lh='eza --hyperlink --all' # Display all entries as hyperlinks
 #     alias lC='eza --color-scale=size --long' # Use color scale based on file size
 #
-fi
 
 # Directory navigation
 alias ..='cd ..'
@@ -156,7 +160,7 @@ alias grs='git remote show'
 alias gs="git status"
 alias gss='git status -s'
 alias gst='git status -sb'
-alias gsub="git submodule update --remote"                                                        # pull submodules
+alias gsub="git submodule update --remote" # pull submodules
 alias gt='git tag'
 alias gtd='git tag --delete'
 alias gtdr='git tag --delete origin'
@@ -232,7 +236,7 @@ alias ip='curl -s ipinfo.io | jq .'
 alias reload='exec zsh'
 alias zs='source ~/.config/zsh/.zshrc'
 
-# Utils 
+# Utils
 alias paths='echo $PATH | tr ":" "\n"'
 # alias src='cd ~/src'
 # alias dots='cd ~/dotfiles'
@@ -250,15 +254,15 @@ alias st='starship'
 # # Homebrew
 # #
 # #
-# # "brew cleanup scrub" removes all downloaded files from the cache, including those for the latest versions of installed packages, while "brew cleanup --prune all" removes all cache files regardless of their age, essentially wiping the entire cache completely; the key difference is that "scrub" specifically targets even the newest downloads, while "prune all" just removes everything in the cache regardless of version. 
+# # "brew cleanup scrub" removes all downloaded files from the cache, including those for the latest versions of installed packages, while "brew cleanup --prune all" removes all cache files regardless of their age, essentially wiping the entire cache completely; the key difference is that "scrub" specifically targets even the newest downloads, while "prune all" just removes everything in the cache regardless of version.
 # # Key points to remember:
 # #
 # # brew cleanup scrub (-s flag):
-# # - Aggressive cleaning, deleting even the latest downloaded files from the cache. 
-# # - Useful when you want to completely free up disk space, even if it means potentially re-downloading the latest versions of packages on the next install. 
+# # - Aggressive cleaning, deleting even the latest downloaded files from the cache.
+# # - Useful when you want to completely free up disk space, even if it means potentially re-downloading the latest versions of packages on the next install.
 # #
 # # brew cleanup --prune all:
-# # - Removes all cached files, including old versions, from the cache. 
+# # - Removes all cached files, including old versions, from the cache.
 # # - Less aggressive than "scrub" as it only targets files older than a specific threshold (in this case, "all").
 # #
 # # https://mac.install.guide/homebrew/8#:~:text=Homebrew%20maintains%20a%20cache%20of,cleanup%20with%20%2D%2Dprune=all%20.
@@ -667,7 +671,7 @@ alias st='starship'
 # # +--------+
 #
 # alias gob="go build"
-# alias gor="go run" 
+# alias gor="go run"
 # alias goc="go clean -i"
 # alias gta="go test ./..."       # go test all
 # alias gia="go install ./..."    # go install all
@@ -725,7 +729,7 @@ alias st='starship'
 # alias freelists="freemind $CLOUD/knowledge_base/_LISTS/*.mm &> /dev/null &"
 # alias freepain="freemind $CLOUD/knowledge_base/_PROBLEMS/*.mm &> /dev/null &"
 # alias freeproj="freemind $CLOUD/knowledge_base/_PROJECTS/*.mm &> /dev/null &"
-#  
+#
 # # Golang
 # alias gosrc="$GOPATH/src/" # golang src
 # alias gobin="$GOPATH/bin/" # golang bin
@@ -750,5 +754,3 @@ alias st='starship'
 #
 # alias ddg="duckduckgo"
 # alias wiki="wikipedia"
-
-
