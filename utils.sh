@@ -68,7 +68,9 @@ ensure_dir() {
 # Package management
 # -----------------------------------------------------------------------------
 ensure_homebrew() {
-  if ! has_command brew; then
+
+  # if ! has_command brew; then
+  if [[ -x /opt/homebrew/bin/brew ]]; then
     info "Installing Homebrew..."
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
@@ -84,7 +86,7 @@ brew_bundle() {
   local brewfile="${1:-$DOTFILES_DIR/Brewfile}"
   if [[ -f "$brewfile" ]]; then
     info "Installing Homebrew packages from $brewfile"
-    brew bundle --file="$brewfile"
+    brew bundle install --force --verbose --zap --file="$brewfile"
   fi
 }
 
@@ -99,27 +101,49 @@ setup_zshenv() {
     cat >"$HOME/.zshenv" <<EOF
 # Minimal stub for Zsh to load configs from ~/.config/zsh
 export ZDOTDIR="$HOME/.config/zsh"
-[[ -f "$ZDOTDIR/.zshenv" ]] && source "$ZDOTDIR/.zshenv"
+[[ -f "$ZDOTDIR/.zshenv.local" ]] && source "$ZDOTDIR/.zshenv.local"
 EOF
   fi
 }
 
 setup_zsh() {
   ensure_dir "$ZDOTDIR"
-  make_link "$HOME/dotfiles/config/zsh/.zshrc" "$ZDOTDIR/.zshrc"
-  make_link "$HOME/dotfiles/config/zsh/.zprofile" "$ZDOTDIR/.zprofile"
-
-  # # Change shell to zsh if needed
-  # if [[ "$SHELL" != *"zsh" ]]; then
-  #   local zsh_path="$(command -v zsh)"
-  #   if [[ -z "$zsh_path" ]]; then
-  #     error "ZSH not found"
-  #     return 1
-  #   fi
-  #   info "Changing shell to ZSH"
-  #   chsh -s "$zsh_path"
-  # fi
+  setup_zshenv
+  make_link "$ZDOTDIR/.zshrc" "$ZDOTDIR/.zshrc"
+  make_link "$ZDOTDIR/.zprofile" "$ZDOTDIR/.zprofile"
 }
+
+# Path management function
+_add_to_path_if_exists() {
+  local dir="$1"
+  local position="${2:-append}"
+  [[ -d "$dir" ]] || return
+  [[ ":$PATH:" == *":$dir:"* ]] && return
+  if [[ "$position" == "prepend" ]]; then
+    path=("$dir" $path)
+  else
+    path+=("$dir")
+  fi
+}
+#
+# # Reusable Function
+# _add_to_path_if_exists() {
+#   local dir="$1"
+#   local position="${2:-append}"  # default is 'append'
+#
+#   # Skip if the directory doesn’t exist
+#   [[ -d "$dir" ]] || return
+#
+#   # Skip if already in PATH
+#   [[ ":$PATH:" == *":$dir:"* ]] && return
+#
+#   if [[ "$position" == "prepend" ]]; then
+#     path=("$dir" $path)
+#   else
+#     path+=("$dir")
+#   fi
+# }
+#
 
 ######################
 # Finds the top-level Git repository directory for a given file/directory path.
