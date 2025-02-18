@@ -16,8 +16,8 @@ main() {
   ensure_dir "$XDG_DATA_HOME"
 
   # Install Homebrew and packages
-  ensure_homebrew
-  brew_bundle "$@"
+  # ensure_homebrew
+  # brew_bundle "$@"
 
   # Setup ZSH
   setup_zsh
