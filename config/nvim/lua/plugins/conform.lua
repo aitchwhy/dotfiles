@@ -1,44 +1,38 @@
 return {
-  --- https://github.com/stevearc/conform.nvim/blob/master/doc/recipes.md#lazy-loading-with-lazynvim
-  "stevearc/conform.nvim",
-  event = { "BufWritePre" },
-  cmd = { "ConformInfo" },
-  keys = {
+    -- Modern formatting
     {
-      -- Customize or remove this keymap to your liking
-      "<leader>f",
-      function()
-        require("conform").format({ async = true })
-      end,
-      mode = "",
-      desc = "Format buffer",
+        "stevearc/conform.nvim",
+        event = { "BufWritePre" },
+        cmd = { "ConformInfo" },
+        keys = {
+            {
+                "<leader>f",
+                function()
+                    require("conform").format({ async = true, lsp_fallback = true })
+                end,
+                desc = "Format buffer",
+            },
+        },
+        opts = {
+            formatters_by_ft = {
+                lua = { "stylua" },
+                python = { "ruff_format", "black" },
+                javascript = { { "prettierd", "prettier" } },
+                typescript = { { "prettierd", "prettier" } },
+                javascriptreact = { { "prettierd", "prettier" } },
+                typescriptreact = { { "prettierd", "prettier" } },
+                json = { { "prettierd", "prettier" } },
+                yaml = { { "prettierd", "prettier" } },
+                markdown = { { "prettierd", "prettier" } },
+                go = { "gofumpt" },
+                ruby = { "rubyfmt" },
+                rust = { "rustfmt" },
+                ["*"] = { "trim_whitespace", "trim_newlines" },
+            },
+            format_on_save = {
+                timeout_ms = 500,
+                lsp_fallback = true,
+            },
+        },
     },
-  },
-  -- This will provide type hinting with LuaLS
-  ---@module "conform"
-  ---@type conform.setupOpts
-  opts = {
-    -- Define your formatters
-    formatters_by_ft = {
-      lua = { "stylua" },
-      python = { "isort", "black" },
-      javascript = { "prettierd", "prettier", stop_after_first = true },
-    },
-    -- Set default options
-    default_format_opts = {
-      lsp_format = "fallback",
-    },
-    -- Set up format-on-save
-    format_on_save = { timeout_ms = 500 },
-    -- Customize formatters
-    formatters = {
-      shfmt = {
-        prepend_args = { "-i", "2" },
-      },
-    },
-  },
-  init = function()
-    -- If you want the formatexpr, here is the place to set it
-    vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
-  end,
 }

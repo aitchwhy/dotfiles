@@ -1,5 +1,0 @@
-return {
-    {
-        "pwntester/octo.nvim",
-    },
-}
