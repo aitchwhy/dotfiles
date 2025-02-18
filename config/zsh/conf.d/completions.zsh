@@ -6,9 +6,9 @@ else
     compinit -C -d "$XDG_CACHE_HOME/zsh/zcompdump-$ZSH_VERSION"
 fi
 
-# Load additional completions
-fpath=(${ASDF_DIR}/completions $fpath)
-fpath=(${HOMEBREW_PREFIX}/share/zsh/site-functions $fpath)
+# # Load additional completions
+# fpath=(${ASDF_DIR}/completions $fpath)
+# fpath=(${HOMEBREW_PREFIX}/share/zsh/site-functions $fpath)
 
 # Completion styles
 zstyle ':completion:*' menu select

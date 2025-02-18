@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # utils.sh - Core shell utilities for dotfiles management
-# POSIX-compliant, works with sh/bash/zsh
-#
+
 # Strict error handling
 set -euo pipefail
 
@@ -92,269 +91,90 @@ brew_bundle() {
 # -----------------------------------------------------------------------------
 # ZSH setup
 # -----------------------------------------------------------------------------
+
+setup_zshenv() {
+  if [[ ! -f "$HOME/.zshenv" ]]; then
+    log "Configuring $HOME/.zshenv..."
+
+    cat >"$HOME/.zshenv" <<EOF
+# Minimal stub for Zsh to load configs from ~/.config/zsh
+export ZDOTDIR="$HOME/.config/zsh"
+[[ -f "$ZDOTDIR/.zshenv" ]] && source "$ZDOTDIR/.zshenv"
+EOF
+  fi
+}
+
 setup_zsh() {
   ensure_dir "$ZDOTDIR"
-  make_link "$DOTFILES_DIR/zsh/.zshenv" "$HOME/.zshenv"
-  make_link "$DOTFILES_DIR/zsh/.zshrc" "$ZDOTDIR/.zshrc"
+  make_link "$DOTFILES_DIR/config/zsh/.zshrc" "$ZDOTDIR/.zshrc"
+  make_link "$DOTFILES_DIR/config/zsh/.zprofile" "$ZDOTDIR/.zprofile"
 
-  # Change shell to zsh if needed
-  if [[ "$SHELL" != *"zsh" ]]; then
-    local zsh_path="$(command -v zsh)"
-    if [[ -z "$zsh_path" ]]; then
-      error "ZSH not found"
-      return 1
-    fi
-    info "Changing shell to ZSH"
-    chsh -s "$zsh_path"
-  fi
+  # # Change shell to zsh if needed
+  # if [[ "$SHELL" != *"zsh" ]]; then
+  #   local zsh_path="$(command -v zsh)"
+  #   if [[ -z "$zsh_path" ]]; then
+  #     error "ZSH not found"
+  #     return 1
+  #   fi
+  #   info "Changing shell to ZSH"
+  #   chsh -s "$zsh_path"
+  # fi
 }
 
-##############
-
-# Core environment setup
-setup_core_env() {
-  # Core paths
-  DOTFILES="${DOTFILES:-$HOME/dotfiles}"
-  XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
-  XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
-  XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
-  XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
-  ZDOTDIR="${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}"
-  BACKUP_DIR="$HOME/.dotfiles_backup/$(date +%Y%m%d_%H%M%S)"
-
-  # Export all variables
-  export DOTFILES XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_HOME XDG_STATE_HOME ZDOTDIR BACKUP_DIR
-
-  # Create essential directories
-  for dir in "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME" "$XDG_STATE_HOME" "$ZDOTDIR"; do
-    ensure_dir "$dir"
-  done
-}
-
-# ANSI colors and formatting
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
-BOLD='\033[1m'
-NC='\033[0m'
-
-# Logging functions
-log() { printf "${BLUE}==>${NC} %s\n" "$*"; }
-success() { printf "${GREEN}✓${NC} %s\n" "$*"; }
-warn() { printf "${YELLOW}!${NC} %s\n" "$*"; }
-error() { printf "${RED}✗${NC} %s\n" "$*" >&2; }
-header() { printf "\n${BOLD}%s${NC}\n" "$*"; }
-
-# System detection
-is_macos() { [ "$(uname)" = "Darwin" ]; }
-is_arm64() { [ "$(uname -m)" = "arm64" ]; }
-is_apple_silicon() { is_macos && is_arm64; }
-
-# Command and file operations
-command_exists() { command -v "$1" >/dev/null 2>&1; }
-ensure_dir() { [ -d "$1" ] || mkdir -p "$1"; }
-ensure_file() { [ -f "$1" ] || touch "$1"; }
-
-# Backup functionality
-backup_file() {
-  local file="$1"
-  if [ -e "$file" ]; then
-    local backup="$BACKUP_DIR/$(basename "$file")"
-    ensure_dir "$(dirname "$backup")"
-    mv "$file" "$backup"
-    success "Backed up: $file → $backup"
-  fi
-}
-
-# File operations
-safe_remove() {
-  local target="$1"
-  if [ -e "$target" ]; then
-    backup_file "$target"
-    rm -rf "$target"
-    success "Removed: $target"
-  fi
-}
-
-# Symlink management
-create_symlink() {
-  local src="$1"
-  local dest="$2"
-  local force="${3:-false}"
-
-  # Validate source exists
-  if [ ! -e "$src" ]; then
-    error "Source doesn't exist: $src"
-    return 1
-  fi
-
-  # Create parent directory if needed
-  ensure_dir "$(dirname "$dest")"
-
-  # Handle existing destination
-  if [ -e "$dest" ] || [ -L "$dest" ]; then
-    if [ -L "$dest" ] && [ "$(readlink "$dest")" = "$src" ]; then
-      success "Already linked: $dest → $src"
-      return 0
-    fi
-
-    if [ "$force" = "true" ]; then
-      safe_remove "$dest"
-    else
-      warn "File exists: $dest"
-      printf "Replace? [y/N] "
-      read -r reply
-      case "$reply" in
-      [Yy]*) safe_remove "$dest" ;;
-      *)
-        warn "Skipping: $dest"
-        return 0
-        ;;
-      esac
-    fi
-  fi
-
-  # Create symlink
-  ln -sf "$src" "$dest"
-  success "Linked: $dest → $src"
-}
-
-# Path management
-prepend_path() {
-  [ -d "$1" ] || return 1
-  case ":$PATH:" in
-  *":$1:"*) return 1 ;;
-  *) export PATH="$1:$PATH" ;;
-  esac
-}
-
-append_path() {
-  [ -d "$1" ] || return 1
-  case ":$PATH:" in
-  *":$1:"*) return 1 ;;
-  *) export PATH="$PATH:$1" ;;
-  esac
-}
-
-# Clean broken symlinks
-clean_broken_links() {
-  local dir="$1"
-  if [ -d "$dir" ]; then
-    find "$dir" -type l ! -exec test -e {} \; -delete
-    success "Cleaned broken links in: $dir"
-  fi
-}
-
-# macOS specific utilities
-setup_macos_paths() {
-  if is_macos; then
-    for path in \
-      "/opt/homebrew/bin" \
-      "/opt/homebrew/sbin" \
-      "/usr/local/bin" \
-      "/usr/local/sbin" \
-      "$HOME/.local/bin"; do
-      prepend_path "$path"
-    done
-  fi
-}
-
-# Initialize environment
-init_env() {
-  setup_core_env
-  setup_macos_paths
-}
+######################
+# Finds the top-level Git repository directory for a given file/directory path.
+# Usage: get_repo_root [path]
+#        If no path is provided, defaults to $0 (the calling script).
 #
-# ########
-#
+# Call the function to get the repo root of this script's location
+###################### Usage example
 # #!/bin/sh
-# # Core shell utilities for dotfiles management
-# # Compatible with POSIX shell, zsh, and bash
+# some_script.sh
 #
-# # Core environment setup
-# setup_core_env() {
-#     DOTFILES="${DOTFILES:-$HOME/dotfiles}"
-#     XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
-#     XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
-#     XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
-#     XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
-#     ZDOTDIR="${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}"
-#     BACKUP_DIR="$HOME/.dotfiles_backup/$(date +%Y%m%d_%H%M%S)"
-#     export DOTFILES XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_HOME XDG_STATE_HOME ZDOTDIR
-# }
+# # Source the utilities
+# . /path/to/git_utils.sh
 #
-# # ANSI colors
-# RED='\033[0;31m'
-# GREEN='\033[0;32m'
-# YELLOW='\033[0;33m'
-# BLUE='\033[0;34m'
-# BOLD='\033[1m'
-# NC='\033[0m'
+# # Call the function to get the repo root of this script's location
+# root_dir=$(get_repo_root "$0")
+# echo "Repository root: $root_dir"
 #
-# # Logging functions
-# log() { echo -e "${BLUE}==>${NC} $*"; }
-# success() { echo -e "${GREEN}✓${NC} $*"; }
-# warn() { echo -e "${YELLOW}!${NC} $*"; }
-# error() { echo -e "${RED}✗${NC} $*" >&2; }
-# header() { echo -e "\n${BOLD}$*${NC}"; }
+# (optionally, pass a different path (e.g., a subdirectory) instead of $0 if needed
 #
-# # System detection
-# is_macos() { [ "$(uname)" = "Darwin" ]; }
-# is_arm64() { [ "$(uname -m)" = "arm64" ]; }
-# is_apple_silicon() { is_macos && is_arm64; }
-#
-# # Command and directory handling
-# command_exists() { command -v "$1" >/dev/null 2>&1; }
-# ensure_dir() { [ -d "$1" ] || mkdir -p "$1"; }
-#
-# # File operations
-# backup_file() {
-#     local file="$1"
-#     if [ -e "$file" ]; then
-#         local backup="$file.backup-$(date +%Y%m%d-%H%M%S)"
-#         mkdir -p "$(dirname "$backup")"
-#         mv "$file" "$backup"
-#         success "Backed up: $file → $backup"
-#     fi
-# }
-#
-# # Path management
-# prepend_path() {
-#     [ -d "$1" ] || return 1
-#     case ":$PATH:" in
-#         *":$1:"*) return 1 ;;
-#         *) export PATH="$1:$PATH" ;;
-#     esac
-# }
-#
-# # XDG directory setup
-# setup_xdg_dirs() {
-#     for dir in \
-#         "$XDG_CONFIG_HOME" \
-#         "$XDG_CACHE_HOME" \
-#         "$XDG_DATA_HOME" \
-#         "$XDG_STATE_HOME" \
-#         "$ZDOTDIR"
-#     do
-#         ensure_dir "$dir"
-#     done
-# }
-#
-# # Initialize core environment
-# init_core_env() {
-#     setup_core_env
-#     setup_xdg_dirs
-#
-#     if is_macos; then
-#         for path in \
-#             "/opt/homebrew/bin" \
-#             "/opt/homebrew/sbin" \
-#             "/usr/local/bin" \
-#             "/usr/local/sbin" \
-#             "$HOME/.local/bin"
-#         do
-#             prepend_path "$path"
-#         done
-#     fi
+# other_root=$(get_repo_root "/some/other/path")
+# echo "Repository root for that path: $other_root"
+######################
+
+get_repo_root() {
+  git -C "${1:-$PWD}" rev-parse --show-toplevel 2>/dev/null
+}
+
+# get_repo_root() {
+#   file="${1:-$0}"
+
+#   # Save the current directory to restore later
+#   saved_pwd=$(pwd)
+
+#   # cd to the directory of the provided path (resolving any symlinks if possible)
+#   script_dir=$(CDPATH= cd -- "$(dirname -- "$file")" && pwd -P) || {
+#     printf "Error: Failed to cd into '%s'\n" "$file" >&2
+#     return 1
+#   }
+
+#   cd "$script_dir" || {
+#     printf "Error: Cannot cd to script directory '%s'\n" "$script_dir" >&2
+#     return 1
+#   }
+
+#   # Obtain the top-level Git directory; exit non-zero on failure
+#   repo_root=$(git rev-parse --show-toplevel 2>/dev/null) || {
+#     printf "Error: '%s' is not in a Git repository.\n" "$script_dir" >&2
+#     cd "$saved_pwd" || exit 1
+#     return 1
+#   }
+
+#   # Return to original directory
+#   cd "$saved_pwd" || exit 1
+
+#   # Output the Git root
+#   printf "%s\n" "$repo_root"
 # }

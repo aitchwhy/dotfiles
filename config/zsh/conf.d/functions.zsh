@@ -35,50 +35,50 @@ extract() {
 # Git utilities
 
 # Unalias conflicting names (e.g. 'gco') before defining functions
-unalias gco 2>/dev/null
+# unalias gco 2>/dev/null
 
 # Enhanced git checkout
-gco() {
-    if [ $# -eq 0 ]; then
-        git branch | fzf | xargs git checkout
-    else
-        git checkout "$@"
-    fi
-}
+# gco() {
+#     if [ $# -eq 0 ]; then
+#         git branch | fzf | xargs git checkout
+#     else
+#         git checkout "$@"
+#     fi
+# }
 
 
 # Git add with fzf
-unalias ga 2>/dev/null
-ga() {
-    if [ $# -eq 0 ]; then
-        git status -s | fzf --multi | awk '{print $2}' | xargs git add
-    else
-        git add "$@"
-    fi
-}
+# unalias ga 2>/dev/null
+# ga() {
+#     if [ $# -eq 0 ]; then
+#         git status -s | fzf --multi | awk '{print $2}' | xargs git add
+#     else
+#         git add "$@"
+#     fi
+# }
 
 # Clean merged branches
-unalias gclean 2>/dev/null
+# unalias gclean 2>/dev/null
 gclean() {
     git branch --merged | grep -v '\*\|master\|main\|develop' | xargs -n 1 git branch -d
 }
 
 # Docker utilities
 # Docker exec with container selection
-unalias dex 2>/dev/null
-dex() {
-    local cid
-    cid=$(docker ps | sed 1d | fzf -q "$1" | awk '{print $1}')
-    [ -n "$cid" ] && docker exec -it "$cid" "${2:-bash}"
-}
+# unalias dex 2>/dev/null
+# dex() {
+#     local cid
+#     cid=$(docker ps | sed 1d | fzf -q "$1" | awk '{print $1}')
+#     [ -n "$cid" ] && docker exec -it "$cid" "${2:-bash}"
+# }
 
 # Docker container logs
-unalias dlog 2>/dev/null
-dlog() {
-    local cid
-    cid=$(docker ps | sed 1d | fzf -q "$1" | awk '{print $1}')
-    [ -n "$cid" ] && docker logs -f "$cid"
-}
+# unalias dlog 2>/dev/null
+# dlog() {
+#     local cid
+#     cid=$(docker ps | sed 1d | fzf -q "$1" | awk '{print $1}')
+#     [ -n "$cid" ] && docker logs -f "$cid"
+# }
 
 # System utilities
 # Find large files
@@ -101,11 +101,11 @@ bm() {
     ln -s "$(pwd)" "$mark_dir/$1"
 }
 
-jump() {
-    local mark_dir="$XDG_DATA_HOME/marks"
-    cd -P "$mark_dir/$1" 2>/dev/null || echo "No such mark: $1"
-}
-
+# jump() {
+#     local mark_dir="$XDG_DATA_HOME/marks"
+#     cd -P "$mark_dir/$1" 2>/dev/null || echo "No such mark: $1"
+# }
+#
 marks() {
     local mark_dir="$XDG_DATA_HOME/marks"
     ls -l "$mark_dir" | sed 's/  / /g' | cut -d' ' -f9- | sed 's/ -/\t-/g'
