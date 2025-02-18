@@ -2,19 +2,32 @@
 #########################
 # Modern CLI alternatives with fallbacks
 #########################
-command -v bat >/dev/null && alias cat='bat --paging=never'
-command -v btop >/dev/null && alias top='btop'
-command -v delta >/dev/null && alias diff='delta'
-command -v duf >/dev/null && alias df='duf'
-command -v dust >/dev/null && alias du='dust'
-command -v fd >/dev/null && alias find='fd'
-command -v gping >/dev/null && alias ping='gping'
-command -v htop >/dev/null && alias top='htop'
-command -v lazygit >/dev/null && alias lg='lazygit'
-command -v nvim >/dev/null && alias vi='nvim' && alias vim='nvim'
-command -v procs >/dev/null && alias ps='procs'
-command -v rg >/dev/null && alias grep='rg'
-command -v yazi >/dev/null && alias ranger='yazi'
+
+
+# Alias commands to newer versions IF modern alternatives are installed
+function alias_if_exists() {
+  local orig_cmd="$1"
+  local new_cmd="$2"
+  if [[ ! -z $orig_cmd ]] && [[ command -v $orig_cmd > /dev/null 2>&1 ]]; then
+    alias $orig_cmd = $new_cmd
+    # nvim --headless -c 'autocmd User PackerComplete quitall' -c 'PackerSync'
+  fi
+}
+
+
+command -v bat > /dev/null && alias cat='bat --paging=never'
+command -v btop > /dev/null && alias top='btop'
+command -v delta > /dev/null && alias diff='delta'
+command -v duf > /dev/null && alias df='duf'
+command -v dust > /dev/null && alias du='dust'
+command -v fd > /dev/null && alias find='fd'
+command -v gping > /dev/null && alias ping='gping'
+command -v htop > /dev/null && alias top='htop'
+command -v lazygit > /dev/null && alias lg='lazygit'
+command -v nvim > /dev/null && alias vi='nvim' && alias vim='nvim'
+command -v procs > /dev/null && alias ps='procs'
+command -v rg > /dev/null && alias grep='rg'
+command -v yazi > /dev/null && alias ranger='yazi'
 
 #
 # # TODO: improvements (https://news.ycombinator.com/item?id=41037197)
