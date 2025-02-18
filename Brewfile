@@ -11,6 +11,7 @@ tap "typesense/tap"
 tap "waydabber/betterdisplay"
 tap "xo/xo"
 tap "yakitrak/yakitrak"
+brew "tectonic"
 brew "huggingface-cli"
 # https://mac.install.guide/ruby/13
 brew "ruby"
