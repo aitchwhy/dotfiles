@@ -106,8 +106,8 @@ EOF
 
 setup_zsh() {
   ensure_dir "$ZDOTDIR"
-  make_link "$DOTFILES_DIR/config/zsh/.zshrc" "$ZDOTDIR/.zshrc"
-  make_link "$DOTFILES_DIR/config/zsh/.zprofile" "$ZDOTDIR/.zprofile"
+  make_link "$HOME/dotfiles/config/zsh/.zshrc" "$ZDOTDIR/.zshrc"
+  make_link "$HOME/dotfiles/config/zsh/.zprofile" "$ZDOTDIR/.zprofile"
 
   # # Change shell to zsh if needed
   # if [[ "$SHELL" != *"zsh" ]]; then
