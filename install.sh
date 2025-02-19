@@ -39,8 +39,8 @@ make_link "$DOTFILES/Brewfile" "$HOME/.Brewfile"
 make_link "$DOTFILES/config/ghostty/config" "$XDG_CONFIG_HOME/ghostty/config"
 
 # Link configuration file
-make_link "$DOTFILES/config/git/gitconfig" "$XDG_CONFIG_HOME/.gitconfig"
-make_link "$DOTFILES/config/git/gitignore" "$XDG_CONFIG_HOME/.gitignore"
+make_link "$DOTFILES/config/git/gitconfig" "$HOME/.gitconfig"
+make_link "$DOTFILES/config/git/gitignore" "$HOME/.gitignore"
 make_link "$DOTFILES/config/nvim" "$XDG_CONFIG_HOME/nvim"
 
 # ensure_dir "$ZDOTDIR"
