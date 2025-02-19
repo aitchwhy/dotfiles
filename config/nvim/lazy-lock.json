@@ -67,7 +67,7 @@
   "project.nvim": { "branch": "main", "commit": "8c6bad7d22eef1b71144b401c9f74ed01526a4fb" },
   "refactoring.nvim": { "branch": "master", "commit": "74f7aea37b4a5afcab7273f19bff72485c9c5c8a" },
   "render-markdown.nvim": { "branch": "main", "commit": "4a28c135bc3548e398ba38178fec3f705cb26fe6" },
-  "snacks.nvim": { "branch": "main", "commit": "ba3f2ab5e99fa705a2c08c3c70130450cbb0bfcd" },
+  "snacks.nvim": { "branch": "main", "commit": "830ac62815e70f3db35ed7a295710c836578c6e3" },
   "symbols-outline.nvim": { "branch": "master", "commit": "564ee65dfc9024bdde73a6621820866987cbb256" },
   "todo-comments.nvim": { "branch": "main", "commit": "304a8d204ee787d2544d8bc23cd38d2f929e7cc5" },
   "tokyonight.nvim": { "branch": "main", "commit": "057ef5d260c1931f1dffd0f052c685dcd14100a3" },
