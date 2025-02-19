@@ -8,7 +8,7 @@
   name = Hank Lee
 
 [core]
-  editor = nvim
+  editor = vim
   pager = delta
 
 [color]
@@ -101,4 +101,3 @@
 
 [credential "https://gist.github.com"]
   helper = !/opt/homebrew/bin/gh auth git-credential
-

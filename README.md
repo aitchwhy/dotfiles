@@ -11,7 +11,7 @@
 ├── Brewfile                      # Homebrew packages
 ├── config/                       # Tool configurations
 │   ├── zsh/                      # Zsh configuration
-│   │   ├── .zshenv.local         # Environment variables
+│   │   ├── .zshenv               # Environment variables
 │   │   ├── .zprofile             # Login shell config
 │   │   ├── .zshrc                # Interactive shell config
 │   │   └── conf.d/               # Modular configurations

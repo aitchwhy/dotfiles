@@ -1,7 +1,6 @@
 # Performance monitoring (uncomment to debug startup time)
 # zmodload zsh/zprof
 
-
 # Shell Options
 setopt AUTO_CD              # Change directory without cd
 setopt AUTO_PUSHD           # Push directory to stack on cd
@@ -54,8 +53,11 @@ export VOLTA_HOME="$HOME/.volta"
 
 # Load plugins if available
 # Plugin installation path
+source "$DOTFILES/utils.sh"
+
+
 PLUGIN_DIR="$HOMEBREW_PREFIX/share"
-ensure_dir "$PLUGIN_DIR"
+# ensure_dir "$PLUGIN_DIR"
 plugins=(
     "zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
     "zsh-autosuggestions/zsh-autosuggestions.zsh"
@@ -76,32 +78,37 @@ done
 # -----------------------------------------------------------------------------
 # (( $+commands[fzf] )) && eval "$( init zsh)" + fzf -> https://junegunn.github.io/fzf/shell-integration/
 
-source "$HOME/dotfiles/utils.sh"
+# setup_zsh() {
+#   ensure_dir "$ZDOTDIR"
+#   setup_zshenv
+#
+#   make_link "$DOTFILES/config/zsh/.zshrc" "$ZDOTDIR/.zshrc"
+#   make_link "$DOTFILES/config/zsh/.zprofile" "$ZDOTDIR/.zprofile"
+#   make_link "$DOTFILES/config/zsh/aliases.zsh" "$ZDOTDIR/aliases.zsh"
+#   make_link "$DOTFILES/config/zsh/functions.zsh" "$ZDOTDIR/functions.zsh"
+#   make_link "$DOTFILES/config/zsh/fzf.zsh" "$ZDOTDIR/fzf.zsh"
+# }
+
 has_command starship && eval "$(starship init zsh)"
 has_command atuin && eval "$(atuin init zsh)"
 has_command zoxide && eval "$(zoxide init zsh)"
-has_command uv && eval "$(uv generate-shell-completion zsh)"
-has_command direnv && eval "$(direnv hook zsh)"
+has_command atuin && eval "$(atuin init zsh)"
+# has_command uv && eval "$(uv generate-shell-completion zsh)"
+# has_command direnv && eval "$(direnv hook zsh)"
 
-# utils
-source "$ZDOTDIR/conf.d/fzf.zsh"
-source "$ZDOTDIR/conf.d/functions.zsh"
-source "$ZDOTDIR/conf.d/aliases.zsh"
-
-
-
+# has_command nvim && export EDITOR="nvim"
 
 # Initialize tools if installed
 # (( $+commands[fzf] )) && eval "$( init zsh)" + fzf -> https://junegunn.github.io/fzf/shell-integration/
 # (( $+commands[fzf] )) && eval "$(starship init zsh)"
-(( $+commands[fzf] )) && source <(fzf --zsh) # eval "$(starship init zsh)"
-(( $+commands[starship] )) && eval "$(starship init zsh)"
+# (( $+commands[fzf] )) && source <(fzf --zsh) # eval "$(starship init zsh)"
+# (( $+commands[starship] )) && eval "$(starship init zsh)"
 # (( $+commands[atuin] )) && eval "$(atuin init zsh --disable-up-arrow)"
 # (( $+commands[atuin] )) && eval "$(atuin init zsh --disable-ctrl-r)"
-(( $+commands[atuin] )) && eval "$(atuin init zsh)"
+# (( $+commands[atuin] )) && eval "$(atuin init zsh)"
 # Initialize zsh-abbr if installed
-(( $+commands[abbr] )) && eval "$(abbr init zsh)"
-(( $+commands[zoxide] )) && eval "$(zoxide init zsh)"
+# (( $+commands[abbr] )) && eval "$(abbr init zsh)"
+# (( $+commands[zoxide] )) && eval "$(zoxide init zsh)"
 # (( $+commands[fnm] )) && eval "$(fnm env --use-on-cd)"
 
 # pyenv
@@ -115,3 +122,13 @@ source "$ZDOTDIR/conf.d/aliases.zsh"
 #     eval "$(pyenv init -)"
 # fi
 
+# ruby (https://mac.install.guide/ruby/13)
+if [ -d "/opt/homebrew/opt/ruby/bin" ]; then
+  export PATH=/opt/homebrew/opt/ruby/bin:$PATH
+  export PATH=`gem environment gemdir`/bin:$PATH
+fi
+
+# utils
+# source "$ZDOTDIR/fzf.zsh"
+# source "$ZDOTDIR/functions.zsh"
+# source "$ZDOTDIR/aliases.zsh"
