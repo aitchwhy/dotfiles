@@ -1,3 +1,3 @@
 return {
-    { "zbirenbaum/copilot.lua" },
+    -- { "zbirenbaum/copilot.lua" },
 }
