@@ -37,12 +37,12 @@ return {
                 timeout_ms = 500,
                 lsp_fallback = true,
             },
-            -- Customize formatters
-            formatters = {
-                shfmt = {
-                    prepend_args = { "-i", "2" },
-                },
-            },
+            -- -- Customize formatters
+            -- formatters = {
+            --     shfmt = {
+            --         prepend_args = { "-i", "2" },
+            --     },
+            -- },
         },
     },
 }
