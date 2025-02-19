@@ -1444,5 +1444,8 @@
   "shellcheck.useWorkspaceRootAsCwd": true,
   "shellcheck.customArgs": [
     "-x"
-  ]
+  ],
+  "cursor.aipreview.enabled": true,
+  "cursor.composer.cmdPFilePicker2": true,
+  "cursor.general.enableShadowWorkspace": true
 }

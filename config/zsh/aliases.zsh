@@ -195,4 +195,3 @@ alias ke='kubectl exec -it'
 alias zj='zellij'
 alias zja='zellij attach'
 alias zjls='zellij list-sessions'
-

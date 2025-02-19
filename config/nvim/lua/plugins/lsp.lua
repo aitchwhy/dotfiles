@@ -1,6 +1,10 @@
 return {
     {
         "neovim/nvim-lspconfig",
+        dependencies = {
+            "mason.nvim",
+            { "williamboman/mason-lspconfig.nvim", config = function() end },
+        },
         opts = {
             servers = {
                 pyright = {}, -- Python LSP
@@ -11,4 +15,3 @@ return {
         },
     },
 }
-

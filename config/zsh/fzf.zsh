@@ -2,8 +2,8 @@
 # Base FZF configuration
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
 export FZF_DEFAULT_OPTS="
-    --height 80% 
-    --layout=reverse 
+    --height 80%
+    --layout=reverse
     --border sharp
     --margin=1
     --padding=1
@@ -64,7 +64,7 @@ ff() {
     file=$(fd --type f --hidden --follow --exclude .git | \
         fzf --preview "$FZF_PREVIEW_COMMAND" \
             --header 'Open file in editor')
-    
+
     [ -n "$file" ] && ${EDITOR:-nvim} "$file"
 }
 
@@ -74,7 +74,7 @@ fd() {
     dir=$(fd --type d --hidden --follow --exclude .git | \
         fzf --preview 'tree -C {} | head -200' \
             --header 'Change directory')
-    
+
     [ -n "$dir" ] && cd "$dir"
 }
 
@@ -86,7 +86,7 @@ falias() {
             --preview 'git diff --color=always {2}' \
             --header 'Aliases' | \
         awk '{print $0}')
-    
+
     [ -n "$aliases" ] && echo "$aliases"
 }
 
@@ -100,7 +100,7 @@ fga() {
             --preview 'git diff --color=always {2}' \
             --header 'Stage files' | \
         awk '{print $2}')
-    
+
     [ -n "$files" ] && echo "$files" | xargs git add
 }
 
@@ -112,7 +112,7 @@ fgco() {
         fzf --multi \
             --preview 'git diff --color=always {}' \
             --header 'Checkout files' )
-    
+
     [ -n "$files" ] && echo "$files" | xargs git checkout
 }
 
@@ -138,7 +138,7 @@ fkill() {
             --preview 'echo {}' \
             --header 'Kill processes' | \
         awk '{print $2}')
-    
+
     [ -n "$pid" ] && echo "$pid" | xargs kill -${1:-9}
 }
 
@@ -150,7 +150,7 @@ fbin() {
         fzf --multi \
             --preview 'brew info {}' \
             --header 'Install packages')
-    
+
     [ -n "$packages" ] && echo "$packages" | xargs brew install
 }
 
@@ -161,7 +161,7 @@ fbrm() {
         fzf --multi \
             --preview 'brew info {}' \
             --header 'Remove packages')
-    
+
     [ -n "$packages" ] && echo "$packages" | xargs brew uninstall
 }
 
@@ -172,7 +172,7 @@ fdocker() {
     container=$(docker ps --format "{{.Names}}" | \
         fzf --preview 'docker stats --no-stream {}' \
             --header 'Select container')
-    
+
     [ -n "$container" ] && docker exec -it "$container" bash
 }
 
@@ -182,14 +182,14 @@ fcode() {
     dir=$(fd --type d --max-depth 3 --exclude node_modules --exclude .git | \
         fzf --preview 'tree -C {} | head -200' \
             --header 'Open in VSCode')
-    
+
     [ -n "$dir" ] && code "$dir"
 }
 
 # Chrome bookmarks search
 fbm() {
     local bookmarks_path="$HOME/Library/Application Support/Google/Chrome/Default/Bookmarks"
-    
+
     if [[ ! -f "$bookmarks_path" ]]; then
         echo "Chrome Bookmarks file not found"
         return 1
@@ -296,11 +296,11 @@ fenv() {
 # Port process killer
 fport() {
     local port_pid
-    port_pid=$(lsof -i -P -n | grep LISTEN | 
+    port_pid=$(lsof -i -P -n | grep LISTEN |
         fzf --preview 'echo {}' \
             --preview-window=down:3:wrap \
             --bind='ctrl-/:toggle-preview' \
-            --header='Kill process on port' | 
+            --header='Kill process on port' |
         awk '{print $2}')
     if [ -n "$port_pid" ]; then
         echo "Killing process $port_pid..."
@@ -311,7 +311,7 @@ fport() {
 # Kubernetes context switcher
 fkctx() {
     local context
-    context=$(kubectl config get-contexts --no-headers | 
+    context=$(kubectl config get-contexts --no-headers |
         fzf --preview 'kubectl config get-contexts {}' \
             --preview-window=right:60% \
             --bind='ctrl-/:toggle-preview' \
@@ -325,7 +325,7 @@ fkctx() {
 # Dotfiles editor
 fdot() {
     local file
-    file=$(fd --type f . "$DOTFILES/config" | 
+    file=$(fd --type f . "$DOTFILES/config" |
         fzf --preview 'bat --style=numbers --color=always {}' \
             --preview-window=right:60% \
             --bind='ctrl-/:toggle-preview' \
@@ -390,7 +390,7 @@ rfv() {
   # --preview window ~8,+{1}-5
   #   this is a fzf feature
   #   ~8 - show first 8 lines (header)
-  #   +{2} - fzf delimits the input piped in to it and provides access via index variables {n}. 
+  #   +{2} - fzf delimits the input piped in to it and provides access via index variables {n}.
   #   the default delimiter fzf uses is space but can be specified via --delimiter <delimiter>
   #   pass the second index variable from bat (which is the line number)
   #   the number is signed, you can show eg the +n row or the -n row (the nth row from the bottom)

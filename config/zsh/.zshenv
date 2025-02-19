@@ -44,3 +44,5 @@ export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-$HOME/.xdg}
 #export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 #export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
 #export ZDOTDIR="${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}"
+export VOLTA_HOME="$HOME/.volta"
+export PATH="$VOLTA_HOME/bin:$PATH"
