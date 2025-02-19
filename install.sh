@@ -29,28 +29,6 @@ info "Starting dotfiles installation..."
 setup_zshenv
 setup_zsh
 
-# setup_zsh() {
-#   ensure_dir "$ZDOTDIR"
-#   setup_zshenv
-#
-#   make_link "$DOTFILES/config/zsh/.zshrc" "$ZDOTDIR/.zshrc"
-#   make_link "$DOTFILES/config/zsh/.zprofile" "$ZDOTDIR/.zprofile"
-#   make_link "$DOTFILES/config/zsh/aliases.zsh" "$ZDOTDIR/aliases.zsh"
-#   make_link "$DOTFILES/config/zsh/functions.zsh" "$ZDOTDIR/functions.zsh"
-#   make_link "$DOTFILES/config/zsh/fzf.zsh" "$ZDOTDIR/fzf.zsh"
-# }
-#
-# setup_zsh() {
-#   ensure_dir "$ZDOTDIR"
-#   setup_zshenv
-#
-#   make_link "$DOTFILES/config/zsh/.zshrc" "$ZDOTDIR/.zshrc"
-#   make_link "$DOTFILES/config/zsh/.zprofile" "$ZDOTDIR/.zprofile"
-#   make_link "$DOTFILES/config/zsh/aliases.zsh" "$ZDOTDIR/aliases.zsh"
-#   make_link "$DOTFILES/config/zsh/functions.zsh" "$ZDOTDIR/functions.zsh"
-#   make_link "$DOTFILES/config/zsh/fzf.zsh" "$ZDOTDIR/fzf.zsh"
-# }
-
 make_link "$DOTFILES/config/zsh/.zshrc" "$ZDOTDIR/.zshrc"
 make_link "$DOTFILES/config/zsh/.zprofile" "$ZDOTDIR/.zprofile"
 make_link "$DOTFILES/config/zsh/aliases.zsh" "$ZDOTDIR/aliases.zsh"
