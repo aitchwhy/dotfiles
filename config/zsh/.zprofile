@@ -14,7 +14,7 @@ fi
 export EDITOR="vim"
 export VISUAL="vim"
 export PAGER="cat"
-export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+# export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
 # Language configurations
 export LANG="en_US.UTF-8"
@@ -22,9 +22,9 @@ export LC_ALL="en_US.UTF-8"
 
 # Homebrew configuration
 # export HOMEBREW_NO_ENV_HINTS=1
-export HOMEBREW_NO_ANALYTICS=1
-export HOMEBREW_AUTOREMOVE=1
-export HOMEBREW_NO_BOTTLE_SOURCE_FALLBACK=1
+# export HOMEBREW_NO_ANALYTICS=1
+# export HOMEBREW_AUTOREMOVE=1
+# export HOMEBREW_NO_BOTTLE_SOURCE_FALLBACK=1
 
 # # Tool configuration paths
 # export STARSHIP_CONFIG="$XDG_CONFIG_HOME/starship/starship.toml"
@@ -48,13 +48,13 @@ export HOMEBREW_NO_BOTTLE_SOURCE_FALLBACK=1
 # fi
 
 
-# Ensure path arrays do not contain duplicates 
+# Ensure path arrays do not contain duplicates
 # - 2.5.11 "Path" section at (https://zsh.sourceforge.io/Guide/zshguide02.html#l6)
 # - https://mac.install.guide/terminal/path
-typeset -U PATH path fpath
+typeset -U path
 # path=(
 #     $HOME/.local/bin
 #     $HOME/bin
 #     $path
 # )
-export PATH
+# export PATH

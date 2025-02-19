@@ -2,16 +2,16 @@
 # utils.sh - Core shell utilities for dotfiles management
 
 # Strict error handling
-set -euo pipefail
+# set -euo pipefail
 
-# -----------------------------------------------------------------------------
-# Environment setup
-# -----------------------------------------------------------------------------
-export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
-export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
-export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
-export DOTFILES_DIR="${DOTFILES_DIR:-$HOME/dotfiles}"
-export ZDOTDIR="${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}"
+# # -----------------------------------------------------------------------------
+# # Environment setup
+# # -----------------------------------------------------------------------------
+# export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+# export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+# export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+# export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
+# export ZDOTDIR="${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}"
 
 # -----------------------------------------------------------------------------
 # Logging utilities
@@ -43,17 +43,18 @@ backup_file() {
 }
 
 make_link() {
-  local src="$1"
-  local dst="$2"
+  local src_orig="$1"
+  local dst_symlink="$2"
 
-  if [[ ! -e "$src" ]]; then
-    error "Source does not exist: $src"
-    return 1
+  if [[ ! -e "$src_orig" ]]; then
+    error "Source does not exist: $src_orig"
+    return 0
   fi
 
-  backup_file "$dst"
-  info "Linking $src → $dst"
-  ln -sf "$src" "$dst"
+  # backup_file "$dst_symlink"
+  info "Linking $src_orig → $dst_symlink"
+  # info "Linking $dst_symlink → $src_orig"
+  ln -sf "$src_orig" "$dst_symlink"
 }
 
 ensure_dir() {
@@ -83,7 +84,7 @@ ensure_homebrew() {
 }
 
 brew_bundle() {
-  local brewfile="${1:-$DOTFILES_DIR/Brewfile}"
+  local brewfile="${1:-$DOTFILES/Brewfile}"
   if [[ -f "$brewfile" ]]; then
     info "Installing Homebrew packages from $brewfile"
     brew bundle install --force --verbose --zap --file="$brewfile"
@@ -101,16 +102,22 @@ setup_zshenv() {
     cat >"$HOME/.zshenv" <<EOF
 # Minimal stub for Zsh to load configs from ~/.config/zsh
 export ZDOTDIR="$HOME/.config/zsh"
-[[ -f "$ZDOTDIR/.zshenv.local" ]] && source "$ZDOTDIR/.zshenv.local"
+[[ -f "$ZDOTDIR/.zshenv" ]] && source "$ZDOTDIR/.zshenv"
 EOF
   fi
 }
 
 setup_zsh() {
-  ensure_dir "$ZDOTDIR"
+  # ensure_dir "$ZDOTDIR"
+
   setup_zshenv
-  make_link "$ZDOTDIR/.zshrc" "$ZDOTDIR/.zshrc"
-  make_link "$ZDOTDIR/.zprofile" "$ZDOTDIR/.zprofile"
+
+  make_link "$ZDOTDIR/config/zsh/.zprofile" "$ZDOTDIR/.zprofile"
+  make_link "$DOTFILES/config/zsh/.zshrc" "$ZDOTDIR/.zshrc"
+  make_link "$DOTFILES/config/zsh/.zshenv" "$ZDOTDIR/.zshenv"
+  # make_link "$DOTFILES/config/zsh/aliases.zsh" "$ZDOTDIR/aliases.zsh"
+  # make_link "$DOTFILES/config/zsh/functions.zsh" "$ZDOTDIR/functions.zsh"
+  # make_link "$DOTFILES/config/zsh/fzf.zsh" "$ZDOTDIR/fzf.zsh"
 }
 
 # Path management function
@@ -120,7 +127,7 @@ _add_to_path_if_exists() {
   [[ -d "$dir" ]] || return
   [[ ":$PATH:" == *":$dir:"* ]] && return
   if [[ "$position" == "prepend" ]]; then
-    path=("$dir" $path)
+    path=("$dir" "$path")
   else
     path+=("$dir")
   fi

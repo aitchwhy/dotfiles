@@ -10,7 +10,7 @@ main() {
   info "Updating dotfiles..."
 
   # Pull latest changes
-  cd "$DOTFILES_DIR"
+  cd "$DOTFILES"
   git pull origin main
 
   # Update Homebrew packages

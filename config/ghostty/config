@@ -99,10 +99,10 @@ keybind = cmd+opt+i=inspector:toggle
 keybind = cmd+enter=toggle_fullscreen
 
 # jumping between prompts
-keybind = opt+down=jump_to_prompt:1
+# keybind = opt+down=jump_to_prompt:1
 # keybind = cmd+shift+down=jump_to_prompt:1
 # keybind = cmd+shift+up=jump_to_prompt:-1
-keybind = opt+up=jump_to_prompt:-1
+# keybind = opt+up=jump_to_prompt:-1
 
 
 

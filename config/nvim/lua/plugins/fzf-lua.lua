@@ -1,6 +1,4 @@
 return {
-
-    -- fzf-lua
     {
         "ibhagwan/fzf-lua",
         -- optional for icon support
@@ -9,5 +7,4 @@ return {
         -- dependencies = { "echasnovski/mini.icons" },
         opts = {},
     },
-
 }
