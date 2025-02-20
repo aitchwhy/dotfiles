@@ -19,12 +19,12 @@ export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-$HOME/.xdg}
 # : ${__zsh_cache_dir:=${XDG_CACHE_HOME:-$HOME/.cache}/zsh}
 
 # Ensure Zsh directories exist.
-() {
-  local zdir
-  for zdir in $@; do
-    [[ -d "${(P)zdir}" ]] || mkdir -p -- "${(P)zdir}"
-  done
-} __zsh_{config,user_data,cache}_dir XDG_{CONFIG,CACHE,DATA,STATE}_HOME
+# () {
+#   local zdir
+#   for zdir in $@; do
+#     [[ -d "${(P)zdir}" ]] || mkdir -p -- "${(P)zdir}"
+#   done
+# } __zsh_{config,user_data,cache}_dir XDG_{CONFIG,CACHE,DATA,STATE}_HOME
 # } __zsh_{config,user_data,cache}_dir XDG_{CONFIG,CACHE,DATA,STATE}_HOME XDG_{RUNTIME,PROJECTS}_DIR
 
 # # Make Terminal.app behave.

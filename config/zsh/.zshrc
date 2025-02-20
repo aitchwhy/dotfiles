@@ -33,7 +33,6 @@ bindkey '^E' end-of-line
 bindkey '^A' beginning-of-line
 bindkey '^?' backward-delete-char
 
-
 # History configuration
 export HISTFILE="$ZDOTDIR/history"
 export HISTSIZE=1000000
@@ -49,12 +48,9 @@ export GOBIN="$GOPATH/bin"
 export _ZO_DATA_DIR="$XDG_DATA_HOME/zoxide"
 export VOLTA_HOME="$HOME/.volta"
 
-
-
 # Load plugins if available
 # Plugin installation path
 source "$DOTFILES/utils.sh"
-
 
 PLUGIN_DIR="$HOMEBREW_PREFIX/share"
 # ensure_dir "$PLUGIN_DIR"
@@ -93,22 +89,20 @@ has_command starship && eval "$(starship init zsh)"
 has_command atuin && eval "$(atuin init zsh)"
 has_command zoxide && eval "$(zoxide init zsh)"
 has_command atuin && eval "$(atuin init zsh)"
-# has_command uv && eval "$(uv generate-shell-completion zsh)"
+has_command uv && eval "$(uv generate-shell-completion zsh)"
+has_command zoxide && eval "$(zoxide init zsh)"
 # has_command direnv && eval "$(direnv hook zsh)"
 
 # has_command nvim && export EDITOR="nvim"
 
 # Initialize tools if installed
 # (( $+commands[fzf] )) && eval "$( init zsh)" + fzf -> https://junegunn.github.io/fzf/shell-integration/
-# (( $+commands[fzf] )) && eval "$(starship init zsh)"
 # (( $+commands[fzf] )) && source <(fzf --zsh) # eval "$(starship init zsh)"
-# (( $+commands[starship] )) && eval "$(starship init zsh)"
 # (( $+commands[atuin] )) && eval "$(atuin init zsh --disable-up-arrow)"
 # (( $+commands[atuin] )) && eval "$(atuin init zsh --disable-ctrl-r)"
 # (( $+commands[atuin] )) && eval "$(atuin init zsh)"
 # Initialize zsh-abbr if installed
 # (( $+commands[abbr] )) && eval "$(abbr init zsh)"
-# (( $+commands[zoxide] )) && eval "$(zoxide init zsh)"
 # (( $+commands[fnm] )) && eval "$(fnm env --use-on-cd)"
 
 # pyenv
@@ -124,11 +118,11 @@ has_command atuin && eval "$(atuin init zsh)"
 
 # ruby (https://mac.install.guide/ruby/13)
 if [ -d "/opt/homebrew/opt/ruby/bin" ]; then
-  export PATH=/opt/homebrew/opt/ruby/bin:$PATH
-  export PATH=`gem environment gemdir`/bin:$PATH
+    export PATH=/opt/homebrew/opt/ruby/bin:$PATH
+    export PATH=$(gem environment gemdir)/bin:$PATH
 fi
 
 # utils
-# source "$ZDOTDIR/fzf.zsh"
-# source "$ZDOTDIR/functions.zsh"
-# source "$ZDOTDIR/aliases.zsh"
+source "$ZDOTDIR/fzf.zsh"
+source "$ZDOTDIR/functions.zsh"
+source "$ZDOTDIR/aliases.zsh"

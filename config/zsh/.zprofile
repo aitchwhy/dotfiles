@@ -7,6 +7,7 @@
 
 # Initialize Homebrew
 if [[ -x /opt/homebrew/bin/brew ]]; then
+    echo "found /opt/homebrew/bin/brew"
     eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
@@ -46,7 +47,6 @@ export LC_ALL="en_US.UTF-8"
 #     _add_to_path_if_exists "/opt/homebrew/opt/ruby/bin" "prepend"
 #     _add_to_path_if_exists "$(gem environment gemdir)/bin" "prepend"
 # fi
-
 
 # Ensure path arrays do not contain duplicates
 # - 2.5.11 "Path" section at (https://zsh.sourceforge.io/Guide/zshguide02.html#l6)
