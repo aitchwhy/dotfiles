@@ -54,7 +54,7 @@ brew "fzf"
 brew "gdrive"
 brew "gh"
 brew "ghi"
-brew "git"
+# brew "git"
 brew "git-delta"
 brew "glances"
 brew "glow"
@@ -83,14 +83,13 @@ brew "lua-language-server"
 brew "luarocks"
 brew "marksman"
 brew "mas"
-brew "mcfly"
+# brew "mcfly"
 brew "miller"
 brew "minio"
 brew "nasm"
 brew "neovim"
 brew "netcat"
 brew "nmap"
-brew "nnn"
 brew "odin"
 brew "onefetch"
 brew "pandoc"
@@ -167,7 +166,6 @@ brew "temporalio/brew/tcld"
 brew "yakitrak/yakitrak/obsidian-cli"
 cask "a-better-finder-rename"
 cask "affine"
-cask "aide-app"
 cask "anki"
 cask "apidog"
 cask "arc"
@@ -177,7 +175,6 @@ cask "bartender"
 cask "betterdisplay"
 cask "blackhole-16ch"
 cask "boltai"
-cask "brave-browser"
 cask "bunch"
 cask "canva"
 cask "carbon-copy-cloner"
@@ -216,7 +213,6 @@ cask "hoppscotch"
 cask "httpie"
 cask "iconjar"
 cask "istat-menus"
-cask "itsycal"
 cask "jump"
 cask "jump-desktop-connect"
 cask "kaleidoscope"
@@ -235,12 +231,9 @@ cask "ollama"
 cask "orbstack"
 cask "osquery"
 cask "paletro"
-cask "parallels"
 cask "parsec"
 cask "pdf-expert"
-cask "proton-drive"
 cask "proton-mail"
-cask "proton-pass"
 cask "protonvpn"
 cask "proxyman"
 cask "qflipper"
@@ -248,7 +241,6 @@ cask "quit-all"
 cask "raycast"
 cask "rize"
 cask "royal-tsx"
-cask "sensei"
 cask "signal"
 cask "slack"
 cask "soulver"
@@ -265,7 +257,6 @@ cask "todoist"
 cask "tower"
 cask "typora"
 cask "virtualbuddy"
-cask "visual-studio-code"
 cask "windsurf"
 cask "wireshark"
 cask "yubico-authenticator"
@@ -278,7 +269,6 @@ mas "Alpenglow", id: 978589174
 mas "Amphetamine", id: 937984704
 mas "Bear", id: 1091189122
 mas "Bitwarden", id: 1352778147
-mas "Cleaner One Pro", id: 1133028347
 mas "CleanMyMac", id: 1339170533
 mas "DaisyDisk", id: 411643860
 mas "Day One", id: 1055511498
@@ -299,7 +289,6 @@ mas "Logic Pro", id: 634148309
 mas "Mela", id: 1568924476
 mas "NextDNS", id: 1464122853
 mas "Numbers", id: 409203825
-mas "Obsidian Web Clipper", id: 6720708363
 mas "Omnivore", id: 1564031042
 mas "One Thing", id: 1604176982
 mas "Pages", id: 409201541
@@ -309,15 +298,10 @@ mas "Paste", id: 967805235
 mas "Pixea", id: 1507782672
 mas "rcmd", id: 1596283165
 mas "Session", id: 1521432881
-mas "SnippetsLab", id: 1006087419
-mas "Snippety", id: 1530751461
-mas "Snippit", id: 1465481124
-mas "Structured", id: 1499198946
 mas "Termius", id: 1176074088
 mas "Todoist", id: 585829637
 mas "Toggl Track", id: 1291898086
 mas "Tripsy", id: 1429967544
-mas "Yoink", id: 457622435
 mas "Yubico Authenticator", id: 1497506650
 vscode "42crunch.vscode-openapi"
 vscode "4ops.terraform"
