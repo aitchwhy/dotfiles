@@ -50,11 +50,16 @@ make_link "$DOTFILES/config/nvim" "$XDG_CONFIG_HOME/nvim"
 
 # Development tools
 
-make_link "$DOTFILES/config/nvim" "$XDG_CONFIG_HOME/nvim"
+make_link "$DOTFILES/config/nvim/init.lua" "$XDG_CONFIG_HOME/nvim/init.lua"
+make_link "$DOTFILES/config/nvim/lazyvim.json" "$XDG_CONFIG_HOME/nvim/lazyvim.json"
+make_link "$DOTFILES/config/nvim/lazy-lock.json" "$XDG_CONFIG_HOME/nvim/lazy-lock.json"
+make_link "$DOTFILES/config/nvim/README.md" "$XDG_CONFIG_HOME/nvim/README.md"
+make_link "$DOTFILES/config/nvim/lua" "$XDG_CONFIG_HOME/nvim/lua"
+
 make_link "$DOTFILES/config/starship.toml" "$XDG_CONFIG_HOME/starship.toml"
 make_link "$DOTFILES/config/atuin" "$XDG_CONFIG_HOME/atuin"
-make_link "$DOTFILES/config/bat" "$XDG_CONFIG_HOME/bat"
-make_link "$DOTFILES/config/zellij" "$XDG_CONFIG_HOME/zellij"
+make_link "$DOTFILES/config/bat/config" "$XDG_CONFIG_HOME/bat/config"
+make_link "$DOTFILES/config/zellij/config.yml" "$XDG_CONFIG_HOME/zellij/config.yml"
 
 ensure_dir "$XDG_CONFIG_HOME/espanso"
 ensure_dir "$XDG_CONFIG_HOME/espanso/match"
