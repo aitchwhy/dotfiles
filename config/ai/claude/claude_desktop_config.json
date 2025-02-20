@@ -1,6 +1,13 @@
 {
 	"globalShortcut": "",
 	"mcpServers": {
+		"toolbase-proxy": {
+			"command": "/Users/hank/.toolbase/toolbase-runner",
+			"args": [
+				"-p=proxy",
+				"-f=/Users/hank/.toolbase/config.json"
+			]
+		},
 		"mcp-installer": {
 			"command": "npx",
 			"args": [
