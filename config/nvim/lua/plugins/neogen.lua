@@ -1,3 +1,1 @@
-return {
-    { "danymat/neogen" },
-}
+/Users/hank/dotfiles/config/nvim/lua/plugins/neogen.lua

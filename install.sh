@@ -43,18 +43,24 @@ make_link "$DOTFILES/config/ghostty/config" "$XDG_CONFIG_HOME/ghostty/config"
 # Link configuration file
 make_link "$DOTFILES/config/git/gitconfig" "$HOME/.gitconfig"
 make_link "$DOTFILES/config/git/gitignore" "$HOME/.gitignore"
-make_link "$DOTFILES/config/nvim" "$XDG_CONFIG_HOME/nvim"
 
 # ensure_dir "$ZDOTDIR"
 # setup_zshenv
 
 # Development tools
-
+ensure_dir "$XDG_CONFIG_HOME/nvim"
 make_link "$DOTFILES/config/nvim/init.lua" "$XDG_CONFIG_HOME/nvim/init.lua"
 make_link "$DOTFILES/config/nvim/lazyvim.json" "$XDG_CONFIG_HOME/nvim/lazyvim.json"
 make_link "$DOTFILES/config/nvim/lazy-lock.json" "$XDG_CONFIG_HOME/nvim/lazy-lock.json"
 make_link "$DOTFILES/config/nvim/README.md" "$XDG_CONFIG_HOME/nvim/README.md"
-make_link "$DOTFILES/config/nvim/lua" "$XDG_CONFIG_HOME/nvim/lua"
+
+# Recursively link all lua files while preserving directory structure
+find "$DOTFILES/config/nvim/lua" -type f -name "*.lua" | while read -r file; do
+  relative_path="${file#$DOTFILES/config/nvim/}"
+  target_dir="$(dirname "$XDG_CONFIG_HOME/nvim/$relative_path")"
+  ensure_dir "$target_dir"
+  make_link "$file" "$XDG_CONFIG_HOME/nvim/$relative_path"
+done
 
 make_link "$DOTFILES/config/starship.toml" "$XDG_CONFIG_HOME/starship.toml"
 make_link "$DOTFILES/config/atuin" "$XDG_CONFIG_HOME/atuin"

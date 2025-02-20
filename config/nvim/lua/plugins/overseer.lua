@@ -1,6 +1,1 @@
-return {
-    {
-        "stevearc/overseer.nvim",
-        opts = {},
-    },
-}
+/Users/hank/dotfiles/config/nvim/lua/plugins/overseer.lua

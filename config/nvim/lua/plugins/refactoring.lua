@@ -1,3 +1,1 @@
-return {
-    { "ThePrimeagen/refactoring.nvim" },
-}
+/Users/hank/dotfiles/config/nvim/lua/plugins/refactoring.lua

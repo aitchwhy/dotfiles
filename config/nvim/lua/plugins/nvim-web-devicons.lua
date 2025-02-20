@@ -1,3 +1,1 @@
-return {
-    { "nvim-tree/nvim-web-devicons", opts = {} },
-}
+/Users/hank/dotfiles/config/nvim/lua/plugins/nvim-web-devicons.lua

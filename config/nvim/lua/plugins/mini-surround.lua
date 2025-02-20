@@ -1,17 +1,1 @@
-return {
-    -- change surround mappings
-    {
-        "echasnovski/mini.surround",
-        opts = {
-            mappings = {
-                add = "gsa",
-                delete = "gsd",
-                find = "gsf",
-                find_left = "gsF",
-                highlight = "gsh",
-                replace = "gsr",
-                update_n_lines = "gsn",
-            },
-        },
-    },
-}
+/Users/hank/dotfiles/config/nvim/lua/plugins/mini-surround.lua
