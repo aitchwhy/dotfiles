@@ -1,6 +1,1 @@
-return {
-    -- add blink.compat to dependencies
-    {
-        "rafamadriz/friendly-snippets",
-    },
-}
+/Users/hank/dotfiles/config/nvim/lua/plugins/friendly-snippets.lua

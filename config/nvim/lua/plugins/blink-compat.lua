@@ -1,6 +1,1 @@
-return {
-    {
-        "saghen/blink.compat",
-        opts = {},
-    },
-}
+/Users/hank/dotfiles/config/nvim/lua/plugins/blink-compat.lua

@@ -1,3 +1,1 @@
-return {
-    "hrsh7th/nvim-cmp",
-}
+/Users/hank/dotfiles/config/nvim/lua/plugins/nvim-cmp.lua

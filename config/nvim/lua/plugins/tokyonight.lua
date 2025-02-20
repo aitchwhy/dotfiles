@@ -1,17 +1,1 @@
-return {
-    -- add colorscheme
-    {
-        "folke/tokyonight.nvim",
-        opts = {
-            style = "moon",
-        },
-    },
-
-    -- Configure LazyVim to load gruvbox
-    {
-        "LazyVim/LazyVim",
-        opts = {
-            colorscheme = "tokyonight",
-        },
-    },
-}
+/Users/hank/dotfiles/config/nvim/lua/plugins/tokyonight.lua

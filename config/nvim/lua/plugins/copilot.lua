@@ -1,3 +1,1 @@
-return {
-    -- { "zbirenbaum/copilot.lua" },
-}
+/Users/hank/dotfiles/config/nvim/lua/plugins/copilot.lua

@@ -1,5 +1,1 @@
-return {
-    {
-        "L3MON4D3/LuaSnip",
-    },
-}
+/Users/hank/dotfiles/config/nvim/lua/plugins/luasnip.lua
