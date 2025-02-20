@@ -16,411 +16,408 @@ matches:
   - trigger: ";es"
     replace: "espanso"
 
-  - trigger: ";home"
-    replace: "30 Ridge Square NW Apt 621, Washington, DC 20016"
+  # - trigger: ";home"
+  #   replace: "30 Ridge Square NW Apt 621, Washington, DC 20016"
 
-  - trigger: ";home-zip"
-    replace: "20016"
+  # - trigger: ";home-zip"
+  #   replace: "20016"
 
-  - trigger: ";home-zip"
-    replace: "20016"
+  # - trigger: ";dev-home"
+  #   replace: "30 Ridge Square NW Apt 621, Washington, DC 20016"
 
-  - trigger: ";dev-home"
-    replace: "30 Ridge Square NW Apt 621, Washington, DC 20016"
+  # # Print the current date
+  # - trigger: ";today"
+  #   replace: "{{mydate}}"
+  #   vars:
+  #     - name: mydate
+  #       type: date
+  #       params:
+  #         format: "%m/%d/%Y"
 
-  # Print the current date
-  - trigger: ";today"
-    replace: "{{mydate}}"
-    vars:
-      - name: mydate
-        type: date
-        params:
-          format: "%m/%d/%Y"
+  # # Print the output of a shell command
+  # - trigger: ";shell"
+  #   replace: "{{output}}"
+  #   vars:
+  #     - name: output
+  #       type: shell
+  #       params:
+  #         cmd: "echo 'Hello from your shell'"
 
-  # Print the output of a shell command
-  - trigger: ";shell"
-    replace: "{{output}}"
-    vars:
-      - name: output
-        type: shell
-        params:
-          cmd: "echo 'Hello from your shell'"
+  # # Meeting & Scheduling
+  # - trigger: ";cal30"
+  #   replace: "Hi {{first_name}}, Excited to learn more about {{company_name}} and how I can contribute! Here's my Calendly link to schedule a quick 30-min chat: https://calendly.com/hank-lee/30min If none of the times work, just let me know and we'll find something else."
+  #   vars:
+  #     - name: "first_name"
+  #       type: "text"
+  #     - name: "company_name"
+  #       type: "text"
 
-  # Meeting & Scheduling
-  - trigger: ";cal30"
-    replace: "Hi {{first_name}}, Excited to learn more about {{company_name}} and how I can contribute! Here's my Calendly link to schedule a quick 30-min chat: https://calendly.com/hank-lee/30min If none of the times work, just let me know and we'll find something else."
-    vars:
-      - name: "first_name"
-        type: "text"
-      - name: "company_name"
-        type: "text"
+  # - trigger: ";calcq"
+  #   replace: "Here's my 30-minute Calendly link for scheduling: https://calendly.com/hank-lee/30min If none of the available times work, let me know."
 
-  - trigger: ";calcq"
-    replace: "Here's my 30-minute Calendly link for scheduling: https://calendly.com/hank-lee/30min If none of the available times work, let me know."
+  # - trigger: ";schedcc"
+  #   replace: "Thanks {{first_name}}! Adding Matti on CC who will find us time to connect."
+  #   vars:
+  #     - name: "first_name"
+  #       type: "text"
 
-  - trigger: ";schedcc"
-    replace: "Thanks {{first_name}}! Adding Matti on CC who will find us time to connect."
-    vars:
-      - name: "first_name"
-        type: "text"
+  # - trigger: ";zoom"
+  #   replace: "Here is my zoom link - https://us06web.zoom.us/j/5347018535"
 
-  - trigger: ";zoom"
-    replace: "Here is my zoom link - https://us06web.zoom.us/j/5347018535"
+  # - trigger: ";followup"
+  #   replace: "Hi {{first_name}}, Just following up on our recent chat—curious if any thoughts or ideas have come up?"
+  #   vars:
+  #     - name: "first_name"
+  #       type: "text"
 
-  - trigger: ";followup"
-    replace: "Hi {{first_name}}, Just following up on our recent chat—curious if any thoughts or ideas have come up?"
-    vars:
-      - name: "first_name"
-        type: "text"
+  # # Team Communication
+  # - trigger: ";teamupdate"
+  #   replace: |
+  #     Hey all,
+  #     TL;DR: We are {{status}} for {{milestone}}.
+  #     📋 Goals {{goals}}
+  #     {{links}}
+  #   vars:
+  #     - name: "status"
+  #       type: "choice"
+  #       values:
+  #         - "on track"
+  #         - "exceeding"
+  #         - "off track"
+  #     - name: "milestone"
+  #       type: "text"
+  #     - name: "goals"
+  #       type: "text"
+  #     - name: "links"
+  #       type: "text"
 
-  # Team Communication
-  - trigger: ";teamupdate"
-    replace: |
-      Hey all,
-      TL;DR: We are {{status}} for {{milestone}}.
-      📋 Goals {{goals}}
-      {{links}}
-    vars:
-      - name: "status"
-        type: "choice"
-        values:
-          - "on track"
-          - "exceeding"
-          - "off track"
-      - name: "milestone"
-        type: "text"
-      - name: "goals"
-        type: "text"
-      - name: "links"
-        type: "text"
+  # - trigger: ";meetnotes"
+  #   replace: |
+  #     Hey {{first_name}},
+  #     Quick recap, but looking forward to our next call on {{date}}:
+  #     Next Steps: {{next_steps}}
+  #   vars:
+  #     - name: "first_name"
+  #       type: "text"
+  #     - name: "date"
+  #       type: "text"
+  #     - name: "next_steps"
+  #       type: "text"
 
-  - trigger: ";meetnotes"
-    replace: |
-      Hey {{first_name}},
-      Quick recap, but looking forward to our next call on {{date}}:
-      Next Steps: {{next_steps}}
-    vars:
-      - name: "first_name"
-        type: "text"
-      - name: "date"
-        type: "text"
-      - name: "next_steps"
-        type: "text"
+  # # Professional Introductions & Responses
+  # - trigger: ";introme"
+  #   replace: "Hi {{first_name}}! 👋 I'm {{your_name}}, nice to meet you! I'm a {{your_role}} at {{your_company}}."
+  #   vars:
+  #     - name: "first_name"
+  #       type: "text"
+  #     - name: "your_name"
+  #       type: "text"
+  #     - name: "your_role"
+  #       type: "text"
+  #     - name: "your_company"
+  #       type: "text"
 
-  # Professional Introductions & Responses
-  - trigger: ";introme"
-    replace: "Hi {{first_name}}! 👋 I'm {{your_name}}, nice to meet you! I'm a {{your_role}} at {{your_company}}."
-    vars:
-      - name: "first_name"
-        type: "text"
-      - name: "your_name"
-        type: "text"
-      - name: "your_role"
-        type: "text"
-      - name: "your_company"
-        type: "text"
+  # - trigger: ";superhuman"
+  #   replace: 'Superhuman is the fastest email experience in the world. Our customers get through their inbox twice as fast as before, resulting in "Inbox Zero" like never before.'
 
-  - trigger: ";superhuman"
-    replace: 'Superhuman is the fastest email experience in the world. Our customers get through their inbox twice as fast as before, resulting in "Inbox Zero" like never before.'
+  # - trigger: ";reject"
+  #   replace: "Hey {{sender}}, Sorry to hear things didn't work out with {{company_name}}, but I appreciate you keeping me updated through the process."
+  #   vars:
+  #     - name: "sender"
+  #       type: "text"
+  #     - name: "company_name"
+  #       type: "text"
 
-  - trigger: ";reject"
-    replace: "Hey {{sender}}, Sorry to hear things didn't work out with {{company_name}}, but I appreciate you keeping me updated through the process."
-    vars:
-      - name: "sender"
-        type: "text"
-      - name: "company_name"
-        type: "text"
+  # - trigger: ";declinehr"
+  #   replace: "Hi {{first_name}}, Thanks for the note! I'm not interested right now, but perhaps later."
+  #   vars:
+  #     - name: "first_name"
+  #       type: "text"
 
-  - trigger: ";declinehr"
-    replace: "Hi {{first_name}}, Thanks for the note! I'm not interested right now, but perhaps later."
-    vars:
-      - name: "first_name"
-        type: "text"
+  # # And much more! For more information, visit the docs: https://espanso.org/docs/
+  # ########################################
+  # # claude zsh converted to snippets
+  # ########################################
+  # # System & Terminal Operations
+  # - trigger: ";sys"
+  #   form: |
+  #     {{command}}
+  #   vars:
+  #     - name: command
+  #       type: choice
+  #       values:
+  #         - "lsof -i -P -n | grep LISTEN  # Show open ports"
+  #         - "curl -s ipinfo.io | jq .  # Get IP info"
+  #         - "df -h  # Disk usage"
+  #         - "sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder  # Flush DNS"
+  #         - "docker system prune -af --volumes  # Clean Docker"
+  #         - "brew update && brew upgrade && brew cleanup --prune=all  # Update Homebrew"
+  #         - "git clean -fdx  # Clean git repo"
 
-  # And much more! For more information, visit the docs: https://espanso.org/docs/
-  ########################################
-  # claude zsh converted to snippets
-  ########################################
-  # System & Terminal Operations
-  - trigger: ";sys"
-    form: |
-      {{command}}
-    vars:
-      - name: command
-        type: choice
-        values:
-          - "lsof -i -P -n | grep LISTEN  # Show open ports"
-          - "curl -s ipinfo.io | jq .  # Get IP info"
-          - "df -h  # Disk usage"
-          - "sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder  # Flush DNS"
-          - "docker system prune -af --volumes  # Clean Docker"
-          - "brew update && brew upgrade && brew cleanup --prune=all  # Update Homebrew"
-          - "git clean -fdx  # Clean git repo"
+  # # Development Paths
+  # - trigger: ";goto"
+  #   form: |
+  #     cd {{path}}
+  #   vars:
+  #     - name: path
+  #       type: choice
+  #       values:
+  #         - "~/Development"
+  #         - "~/.config/nvim"
+  #         - "~/.config/zsh"
+  #         - "~/dotfiles"
+  #         - "~/Library/Application Support"
 
-  # Development Paths
-  - trigger: ";goto"
-    form: |
-      cd {{path}}
-    vars:
-      - name: path
-        type: choice
-        values:
-          - "~/Development"
-          - "~/.config/nvim"
-          - "~/.config/zsh"
-          - "~/dotfiles"
-          - "~/Library/Application Support"
+  # # Git Operations
+  # - trigger: ";git"
+  #   form: |
+  #     {{command}}
+  #   vars:
+  #     - name: command
+  #       type: choice
+  #       values:
+  #         - 'git add --all && git commit -m ""'
+  #         - "git push --force-with-lease origin HEAD"
+  #         - 'git stash push -m "" && git checkout main'
+  #         - "git rebase -i HEAD~"
+  #         - "git reset --soft HEAD~1"
+  #         - "git log --oneline --graph --decorate -n 10"
+  #         - "git commit --amend --no-edit"
 
-  # Git Operations
-  - trigger: ";git"
-    form: |
-      {{command}}
-    vars:
-      - name: command
-        type: choice
-        values:
-          - 'git add --all && git commit -m ""'
-          - "git push --force-with-lease origin HEAD"
-          - 'git stash push -m "" && git checkout main'
-          - "git rebase -i HEAD~"
-          - "git reset --soft HEAD~1"
-          - "git log --oneline --graph --decorate -n 10"
-          - "git commit --amend --no-edit"
+  # # Docker Operations
+  # - trigger: ";dk"
+  #   form: |
+  #     {{command}}
+  #   vars:
+  #     - name: command
+  #       type: choice
+  #       values:
+  #         - "docker compose up -d"
+  #         - "docker compose down"
+  #         - "docker logs -f "
+  #         - "docker exec -it "
+  #         - "docker build -t "
+  #         - "docker system prune -af --volumes"
+  #         - "docker stats"
 
-  # Docker Operations
-  - trigger: ";dk"
-    form: |
-      {{command}}
-    vars:
-      - name: command
-        type: choice
-        values:
-          - "docker compose up -d"
-          - "docker compose down"
-          - "docker logs -f "
-          - "docker exec -it "
-          - "docker build -t "
-          - "docker system prune -af --volumes"
-          - "docker stats"
+  # # Kubernetes Operations
+  # - trigger: ";k8s"
+  #   form: |
+  #     {{command}}
+  #   vars:
+  #     - name: command
+  #       type: choice
+  #       values:
+  #         - "kubectl get pods -A | grep "
+  #         - "kubectl describe pod "
+  #         - "kubectl logs -f "
+  #         - "kubectl port-forward "
+  #         - "kubectl exec -it "
+  #         - "kubectl get events --sort-by='.lastTimestamp'"
 
-  # Kubernetes Operations
-  - trigger: ";k8s"
-    form: |
-      {{command}}
-    vars:
-      - name: command
-        type: choice
-        values:
-          - "kubectl get pods -A | grep "
-          - "kubectl describe pod "
-          - "kubectl logs -f "
-          - "kubectl port-forward "
-          - "kubectl exec -it "
-          - "kubectl get events --sort-by='.lastTimestamp'"
+  # # Node.js Development
+  # - trigger: ";node"
+  #   form: |
+  #     {{command}}
+  #   vars:
+  #     - name: command
+  #       type: choice
+  #       values:
+  #         - "npm install"
+  #         - "npm run dev"
+  #         - "npm run build"
+  #         - "npm run test"
+  #         - "npm update"
+  #         - "npm audit fix"
+  #         - "volta install node@latest"
 
-  # Node.js Development
-  - trigger: ";node"
-    form: |
-      {{command}}
-    vars:
-      - name: command
-        type: choice
-        values:
-          - "npm install"
-          - "npm run dev"
-          - "npm run build"
-          - "npm run test"
-          - "npm update"
-          - "npm audit fix"
-          - "volta install node@latest"
+  # # Python Development
+  # - trigger: ";py"
+  #   form: |
+  #     {{command}}
+  #   vars:
+  #     - name: command
+  #       type: choice
+  #       values:
+  #         - "python -m venv venv && source venv/bin/activate"
+  #         - "pip install -r requirements.txt"
+  #         - "uv pip install "
+  #         - "pytest"
+  #         - "black ."
+  #         - "ruff check ."
+  #         - "python -m http.server 8000"
 
-  # Python Development
-  - trigger: ";py"
-    form: |
-      {{command}}
-    vars:
-      - name: command
-        type: choice
-        values:
-          - "python -m venv venv && source venv/bin/activate"
-          - "pip install -r requirements.txt"
-          - "uv pip install "
-          - "pytest"
-          - "black ."
-          - "ruff check ."
-          - "python -m http.server 8000"
+  # # Modern CLI Tools
+  # - trigger: ";cli"
+  #   form: |
+  #     {{command}}
+  #   vars:
+  #     - name: command
+  #       type: choice
+  #       values:
+  #         - "fd --type f --hidden --exclude .git "
+  #         - "rg --hidden --no-ignore "
+  #         - "bat --style=numbers --color=always "
+  #         - "dust -d 2"
+  #         - "duf"
+  #         - "htop"
+  #         - "procs | grep "
 
-  # Modern CLI Tools
-  - trigger: ";cli"
-    form: |
-      {{command}}
-    vars:
-      - name: command
-        type: choice
-        values:
-          - "fd --type f --hidden --exclude .git "
-          - "rg --hidden --no-ignore "
-          - "bat --style=numbers --color=always "
-          - "dust -d 2"
-          - "duf"
-          - "htop"
-          - "procs | grep "
+  # # Database Operations
+  # - trigger: ";db"
+  #   form: |
+  #     {{command}}
+  #   vars:
+  #     - name: command
+  #       type: choice
+  #       values:
+  #         - "psql -U postgres -d "
+  #         - "mongosh"
+  #         - "redis-cli"
+  #         - "mysql -u root -p"
 
-  # Database Operations
-  - trigger: ";db"
-    form: |
-      {{command}}
-    vars:
-      - name: command
-        type: choice
-        values:
-          - "psql -U postgres -d "
-          - "mongosh"
-          - "redis-cli"
-          - "mysql -u root -p"
+  # # Code Snippets
+  # # React
+  # - trigger: ";rfc"
+  #   text: |
+  #     import { FC } from 'react'
 
-  # Code Snippets
-  # React
-  - trigger: ";rfc"
-    text: |
-      import { FC } from 'react'
+  #     interface Props {
+  #       $|
+  #     }
 
-      interface Props {
-        $|
-      }
+  #     export const Component: FC<Props> = () => {
+  #       return null
+  #     }
 
-      export const Component: FC<Props> = () => {
-        return null
-      }
+  # - trigger: ";rh"
+  #   text: |
+  #     import { useState, useEffect } from 'react'
 
-  - trigger: ";rh"
-    text: |
-      import { useState, useEffect } from 'react'
+  #     export const use$|Hook = () => {
+  #       const [state, setState] = useState()
 
-      export const use$|Hook = () => {
-        const [state, setState] = useState()
+  #       useEffect(() => {
 
-        useEffect(() => {
+  #       }, [])
 
-        }, [])
+  #       return { state }
+  #     }
 
-        return { state }
-      }
+  # # TypeScript
+  # - trigger: ";ts"
+  #   text: |
+  #     interface $|Props {
 
-  # TypeScript
-  - trigger: ";ts"
-    text: |
-      interface $|Props {
+  #     }
 
-      }
+  #     type State = {
 
-      type State = {
+  #     }
 
-      }
+  # # Testing
+  # - trigger: ";test"
+  #   text: |
+  #     describe('$|', () => {
+  #       it('should ', () => {
 
-  # Testing
-  - trigger: ";test"
-    text: |
-      describe('$|', () => {
-        it('should ', () => {
+  #       })
+  #     })
 
-        })
-      })
+  # # API Endpoints
+  # - trigger: ";api"
+  #   text: |
+  #     export async function handler(req, res) {
+  #       try {
+  #         $|
 
-  # API Endpoints
-  - trigger: ";api"
-    text: |
-      export async function handler(req, res) {
-        try {
-          $|
+  #         return res.status(200).json({ })
+  #       } catch (error) {
+  #         return res.status(500).json({ error: error.message })
+  #       }
+  #     }
 
-          return res.status(200).json({ })
-        } catch (error) {
-          return res.status(500).json({ error: error.message })
-        }
-      }
+  # # Email Templates
+  # - trigger: ";reply"
+  #   form: |
+  #     {{template}}
+  #   vars:
+  #     - name: template
+  #       type: choice
+  #       values:
+  #         - "Thanks for reaching out! I'll take a look and get back to you shortly."
+  #         - "Thanks for the detailed feedback. I'll review and follow up with questions if needed."
+  #         - "Thanks for bringing this to my attention. I'm looking into it now."
+  #         - "Could we schedule a quick call to discuss this in more detail?"
 
-  # Email Templates
-  - trigger: ";reply"
-    form: |
-      {{template}}
-    vars:
-      - name: template
-        type: choice
-        values:
-          - "Thanks for reaching out! I'll take a look and get back to you shortly."
-          - "Thanks for the detailed feedback. I'll review and follow up with questions if needed."
-          - "Thanks for bringing this to my attention. I'm looking into it now."
-          - "Could we schedule a quick call to discuss this in more detail?"
+  # # Documentation
+  # - trigger: ";doc"
+  #   text: |
+  #     /**
+  #      * $|
+  #      * @param {type} name - description
+  #      * @returns {type} description
+  #      */
 
-  # Documentation
-  - trigger: ";doc"
-    text: |
-      /**
-       * $|
-       * @param {type} name - description
-       * @returns {type} description
-       */
+  # # Console Debug
+  # - trigger: ";debug"
+  #   text: |
+  #     console.log('$|:', JSON.stringify($|, null, 2))
 
-  # Console Debug
-  - trigger: ";debug"
-    text: |
-      console.log('$|:', JSON.stringify($|, null, 2))
+  # # Error Handling
+  # - trigger: ";try"
+  #   text: |
+  #     try {
+  #       $|
+  #     } catch (error) {
+  #       console.error('Error:', error.message)
+  #       throw error
+  #     }
 
-  # Error Handling
-  - trigger: ";try"
-    text: |
-      try {
-        $|
-      } catch (error) {
-        console.error('Error:', error.message)
-        throw error
-      }
+  # # Common Shell Commands
+  # - trigger: ";sh"
+  #   form: |
+  #     {{command}}
+  #   vars:
+  #     - name: command
+  #       type: choice
+  #       values:
+  #         - "chmod +x "
+  #         - 'ssh-keygen -t ed25519 -C ""'
+  #         - "tar -czf archive.tar.gz "
+  #         - 'curl -X POST -H "Content-Type: application/json" -d ''{"key":"value"}'' '
+  #         - "openssl rand -base64 32"
 
-  # Common Shell Commands
-  - trigger: ";sh"
-    form: |
-      {{command}}
-    vars:
-      - name: command
-        type: choice
-        values:
-          - "chmod +x "
-          - 'ssh-keygen -t ed25519 -C ""'
-          - "tar -czf archive.tar.gz "
-          - 'curl -X POST -H "Content-Type: application/json" -d ''{"key":"value"}'' '
-          - "openssl rand -base64 32"
+  # # Date/Time Formats
+  # - trigger: ";date"
+  #   replace: "{{mydate}}"
+  #   vars:
+  #     - name: mydate
+  #       type: date
+  #       params:
+  #         format: "%Y-%m-%d"
 
-  # Date/Time Formats
-  - trigger: ";date"
-    replace: "{{mydate}}"
-    vars:
-      - name: mydate
-        type: date
-        params:
-          format: "%Y-%m-%d"
+  # - trigger: ";now"
+  #   replace: "{{mytime}}"
+  #   vars:
+  #     - name: mytime
+  #       type: date
+  #       params:
+  #         format: "%Y-%m-%d %H:%M:%S"
 
-  - trigger: ";now"
-    replace: "{{mytime}}"
-    vars:
-      - name: mytime
-        type: date
-        params:
-          format: "%Y-%m-%d %H:%M:%S"
-
-  # Character Symbols (macOS)
-  - trigger: ";sym"
-    form: |
-      {{symbol}}
-    vars:
-      - name: symbol
-        type: choice
-        values:
-          - "⌘" # Command
-          - "⌥" # Option
-          - "⇧" # Shift
-          - "⌃" # Control
-          - "⌫" # Delete
-          - "⎋" # Escape
-          - "↩" # Return
-          - "⇥" # Tab
+  # # Character Symbols (macOS)
+  # - trigger: ";sym"
+  #   form: |
+  #     {{symbol}}
+  #   vars:
+  #     - name: symbol
+  #       type: choice
+  #       values:
+  #         - "⌘" # Command
+  #         - "⌥" # Option
+  #         - "⇧" # Shift
+  #         - "⌃" # Control
+  #         - "⌫" # Delete
+  #         - "⎋" # Escape
+  #         - "↩" # Return
+  #         - "⇥" # Tab
