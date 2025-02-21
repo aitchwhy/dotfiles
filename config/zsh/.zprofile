@@ -5,56 +5,54 @@
 # - Use ~/.zprofile to set the PATH and EDITOR environment variables.
 # -----------------------------------------------------------------------------
 
+# XDG Base Directory Specification
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+
+# editor
+export ZDOTDIR="${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}"
+export EDITOR="vim"
+export VISUAL="$EDITOR"
+
+# History configuration
+export HISTFILE="$HOME/.zsh_history"
+export HISTSIZE=1000000
+export SAVEHIST=1000000
+
+# Core paths
+export DOTFILES="$HOME/dotfiles"
+
+# Go configuration
+export GOPATH="$HOME/go"
+export GOBIN="$GOPATH/bin"
+
+export _ZO_DATA_DIR="$XDG_DATA_HOME/zoxide"
+export VOLTA_HOME="$HOME/.volta"
+
+# Ensure critical directories exist
+mkdir -p "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME" "$XDG_STATE_HOME"
+
 # Initialize Homebrew
 if [[ -x /opt/homebrew/bin/brew ]]; then
-    echo "found /opt/homebrew/bin/brew"
     eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
-# Editor configurations
-export EDITOR="vim"
-export VISUAL="vim"
-export PAGER="cat"
-# export MANPAGER="sh -c 'col -bx | bat -l man -p'"
-
-# Language configurations
-export LANG="en_US.UTF-8"
-export LC_ALL="en_US.UTF-8"
-
-# Homebrew configuration
-# export HOMEBREW_NO_ENV_HINTS=1
-# export HOMEBREW_NO_ANALYTICS=1
-# export HOMEBREW_AUTOREMOVE=1
-# export HOMEBREW_NO_BOTTLE_SOURCE_FALLBACK=1
-
-# # Tool configuration paths
-# export STARSHIP_CONFIG="$XDG_CONFIG_HOME/starship/starship.toml"
-# export STARSHIP_CACHE="$XDG_CACHE_HOME/starship"
-# export ATUIN_CONFIG_DIR="$XDG_CONFIG_HOME/atuin"
-# export ZELLIJ_CONFIG_DIR="$XDG_CONFIG_HOME/zellij"
-# export BAT_CONFIG_PATH="$XDG_CONFIG_HOME/bat/config"
-# export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/config"
-
-# # Additional tool configurations
-# export NODE_REPL_HISTORY="$XDG_STATE_HOME/node/repl_history"
-# export PYTHONSTARTUP="$XDG_CONFIG_HOME/python/startup.py"
-# export DOCKER_CONFIG="$XDG_CONFIG_HOME/docker"
-# export AWS_CONFIG_FILE="$XDG_CONFIG_HOME/aws/config"
-# export AWS_SHARED_CREDENTIALS_FILE="$XDG_CONFIG_HOME/aws/credentials"
-#
-# # Ruby configuration
-# if [ -d "/opt/homebrew/opt/ruby/bin" ]; then
-#     _add_to_path_if_exists "/opt/homebrew/opt/ruby/bin" "prepend"
-#     _add_to_path_if_exists "$(gem environment gemdir)/bin" "prepend"
-# fi
+# ruby (https://mac.install.guide/ruby/13)
+if [ -d "/opt/homebrew/opt/ruby/bin" ]; then
+    export PATH=/opt/homebrew/opt/ruby/bin:$PATH
+    export PATH=$(gem environment gemdir)/bin:$PATH
+fi
 
 # Ensure path arrays do not contain duplicates
 # - 2.5.11 "Path" section at (https://zsh.sourceforge.io/Guide/zshguide02.html#l6)
 # - https://mac.install.guide/terminal/path
-typeset -U path
-# path=(
-#     $HOME/.local/bin
-#     $HOME/bin
-#     $path
-# )
-# export PATH
+typeset -U path PATH
+PATH=(
+    $HOME/.local/bin
+    $HOME/bin
+    $VOLTA_HOME/bin
+    $PATH
+)
+export PATH
