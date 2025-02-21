@@ -1,3 +1,5 @@
+#!/bin/zsh
+
 # -----------------------------------------------------------------------------
 # ~/.zprofile (Invoked once at login on macOS)
 #
@@ -48,8 +50,9 @@ fi
 # Ensure path arrays do not contain duplicates
 # - 2.5.11 "Path" section at (https://zsh.sourceforge.io/Guide/zshguide02.html#l6)
 # - https://mac.install.guide/terminal/path
-typeset -U path PATH
-PATH=(
+# - https://tech.serhatteker.com/post/2019-11/how-to-add-path-uniquely-to-path/
+typeset -U path
+path=(
     $HOME/.local/bin
     $HOME/bin
     $VOLTA_HOME/bin
