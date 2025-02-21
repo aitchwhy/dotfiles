@@ -7,19 +7,21 @@
   "[jsonc]": {
     "editor.defaultFormatter": "vscode.json-language-features"
   },
-  "[lua]": {
-    "editor.defaultFormatter": "sumneko.lua"
-  },
   "[markdown]": {
-    "editor.defaultFormatter": "yzhang.markdown-all-in-one"
+    "editor.defaultFormatter": "vscode.markdown-language-features"
   },
   "bookmarks.saveBookmarksInProject": true,
   "bookmarks.sideBar.expanded": true,
   "breadcrumbs.enabled": false,
   "code-runner.clearPreviousOutput": true,
   "cursor.aipreview.enabled": true,
+  "cursor.cmdk.useThemedDiffBackground": true,
   "cursor.composer.cmdPFilePicker2": true,
+  "cursor.composer.shouldAutoScrollToBottom": false,
+  "cursor.cpp.enablePartialAccepts": true,
+  "cursor.diffs.useCharacterLevelDiffs": true,
   "cursor.general.enableShadowWorkspace": true,
+  "cursor.general.gitGraphIndexing": "enabled",
   "cursor.terminal.usePreviewBox": true,
   "dash.exactDocset": true,
   "dash.fileNameToDocsetMap": {
@@ -162,6 +164,7 @@
   },
   "files.autoSave": "onFocusChange",
   "gitlens.ai.model": "anthropic:claude-3-5-sonnet-latest",
+  "json.trace.server": "messages",
   "leetcode.defaultLanguage": "python3",
   "markdown.extension.completion.enabled": true,
   "nix.enableLanguageServer": true,
@@ -172,7 +175,10 @@
   "path-intellisense.showHiddenFiles": true,
   "problems.showCurrentInStatus": true,
   "projectManager.filterOnFullPath": true,
-  "projectManager.projectsLocation": "~/Dropbox/_WORKSPACE/projects.json",
+  "projectManager.git.baseFolders": [
+    "~/src"
+  ],
+  "projectManager.projectsLocation": "~/dotfiles/config/projects.json",
   "pythonIndent.trimLinesWithOnlyWhitespace": true,
   "raycast.loglevel": "info",
   "roo-cline.allowedCommands": [
@@ -231,6 +237,7 @@
     }
   },
   "terminal.integrated.sendKeybindingsToShell": true,
+  "terminal.integrated.shellIntegration.history": 10000,
   "vim.cursorStylePerMode.insert": "line-thin",
   "vim.cursorStylePerMode.normal": "block",
   "vim.cursorStylePerMode.replace": "underline-thin",
@@ -241,6 +248,7 @@
   "vim.highlightedyank.enable": true,
   "vim.hlsearch": true,
   "vim.leader": ",",
+  "vim.neovimPath": "/opt/homebrew/bin/nvim",
   "vim.shell": "/bin/zsh",
   "vim.textwidth": 120,
   "whichkey.bindings": [
@@ -1476,14 +1484,9 @@
   "workbench.editor.openPositioning": "last",
   "workbench.editor.revealIfOpen": true,
   "workbench.editor.sharedViewState": true,
+  "workbench.externalBrowser": "/Applications/",
   "workbench.layoutControl.type": "menu",
-  "workbench.preferredLightColorTheme": "Ayu Light Bordered",
+  "workbench.preferredLightColorTheme": "Gitpod Dark",
   "workbench.reduceMotion": "on",
-  "xstate.nestTypegenFiles": false,
-  "json.trace.server": "messages",
-  "cursor.cpp.enablePartialAccepts": true,
-  "cursor.composer.shouldAutoScrollToBottom": false,
-  "cursor.general.gitGraphIndexing": "enabled",
-  "cursor.cmdk.useThemedDiffBackground": true,
-  "cursor.diffs.useCharacterLevelDiffs": true
+  "xstate.nestTypegenFiles": false
 }
