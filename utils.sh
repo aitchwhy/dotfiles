@@ -48,12 +48,11 @@ make_link() {
 
   if [[ ! -e "$src_orig" ]]; then
     error "Source does not exist: $src_orig"
-    return 0
+    return 1
   fi
 
   # backup_file "$dst_symlink"
-  info "Linking $src_orig → $dst_symlink"
-  # info "Linking $dst_symlink → $src_orig"
+  info "Linking (file) $src_orig → $dst_symlink (new symlink)"
   ln -sf "$src_orig" "$dst_symlink"
 }
 
@@ -69,7 +68,6 @@ ensure_dir() {
 # Package management
 # -----------------------------------------------------------------------------
 ensure_homebrew() {
-
   # if ! has_command brew; then
   if [[ -x /opt/homebrew/bin/brew ]]; then
     info "Installing Homebrew..."
@@ -91,34 +89,6 @@ brew_bundle() {
   fi
 }
 
-# -----------------------------------------------------------------------------
-# ZSH setup
-# -----------------------------------------------------------------------------
-
-setup_zshenv() {
-  if [[ ! -f "$HOME/.zshenv" ]]; then
-    log "Configuring $HOME/.zshenv..."
-
-    cat >"$HOME/.zshenv" <<EOF
-# Minimal stub for Zsh to load configs from ~/.config/zsh
-export ZDOTDIR="$HOME/.config/zsh"
-[[ -f "$ZDOTDIR/.zshenv" ]] && source "$ZDOTDIR/.zshenv"
-EOF
-  fi
-}
-
-setup_zsh() {
-  # ensure_dir "$ZDOTDIR"
-
-  setup_zshenv
-
-  make_link "$ZDOTDIR/config/zsh/.zprofile" "$ZDOTDIR/.zprofile"
-  make_link "$DOTFILES/config/zsh/.zshrc" "$ZDOTDIR/.zshrc"
-  make_link "$DOTFILES/config/zsh/.zshenv" "$ZDOTDIR/.zshenv"
-  # make_link "$DOTFILES/config/zsh/aliases.zsh" "$ZDOTDIR/aliases.zsh"
-  # make_link "$DOTFILES/config/zsh/functions.zsh" "$ZDOTDIR/functions.zsh"
-  # make_link "$DOTFILES/config/zsh/fzf.zsh" "$ZDOTDIR/fzf.zsh"
-}
 
 # Path management function
 _add_to_path_if_exists() {
@@ -132,6 +102,7 @@ _add_to_path_if_exists() {
     path+=("$dir")
   fi
 }
+
 #
 # # Reusable Function
 # _add_to_path_if_exists() {

@@ -14,18 +14,18 @@ mkcd() {
 extract() {
     if [ -f "$1" ]; then
         case "$1" in
-            *.tar.bz2) tar xjf "$1" ;;
-            *.tar.gz)  tar xzf "$1" ;;
-            *.bz2)     bunzip2 "$1" ;;
-            *.rar)     unrar x "$1" ;;
-            *.gz)      gunzip "$1"  ;;
-            *.tar)     tar xf "$1"  ;;
-            *.tbz2)    tar xjf "$1" ;;
-            *.tgz)     tar xzf "$1" ;;
-            *.zip)     unzip "$1"   ;;
-            *.Z)       uncompress "$1" ;;
-            *.7z)      7z x "$1"    ;;
-            *)         echo "'$1' cannot be extracted" ;;
+        *.tar.bz2) tar xjf "$1" ;;
+        *.tar.gz) tar xzf "$1" ;;
+        *.bz2) bunzip2 "$1" ;;
+        *.rar) unrar x "$1" ;;
+        *.gz) gunzip "$1" ;;
+        *.tar) tar xf "$1" ;;
+        *.tbz2) tar xjf "$1" ;;
+        *.tgz) tar xzf "$1" ;;
+        *.zip) unzip "$1" ;;
+        *.Z) uncompress "$1" ;;
+        *.7z) 7z x "$1" ;;
+        *) echo "'$1' cannot be extracted" ;;
         esac
     else
         echo "'$1' is not a valid file"
@@ -45,7 +45,6 @@ extract() {
 #         git checkout "$@"
 #     fi
 # }
-
 
 # Git add with fzf
 # unalias ga 2>/dev/null
@@ -84,7 +83,7 @@ gclean() {
 # Find large files
 bigfiles() {
     local size="${1:-500M}"
-    fd --type f --size "+${size}" . "${2:-.}" 
+    fd --type f --size "+${size}" . "${2:-.}"
 }
 
 # Process management
@@ -492,7 +491,7 @@ marks() {
 # #   # --preview window ~8,+{1}-5
 # #   #   this is a fzf feature
 # #   #   ~8 - show first 8 lines (header)
-# #   #   +{2} - fzf delimits the input piped in to it and provides access via index variables {n}. 
+# #   #   +{2} - fzf delimits the input piped in to it and provides access via index variables {n}.
 # #   #   the default delimiter fzf uses is space but can be specified via --delimiter <delimiter>
 # #   #   pass the second index variable from bat (which is the line number)
 # #   #   the number is signed, you can show eg the +n row or the -n row (the nth row from the bottom)
