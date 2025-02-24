@@ -1,4 +1,6 @@
-#!/usr/bin/env bash
+#!/bin/zsh
+
+
 
 # Enhanced cd with ls
 # function cd() {
@@ -38,23 +40,23 @@ extract() {
 # unalias gco 2>/dev/null
 
 # Enhanced git checkout
-# gco() {
-#     if [ $# -eq 0 ]; then
-#         git branch | fzf | xargs git checkout
-#     else
-#         git checkout "$@"
-#     fi
-# }
+gco() {
+    if [ $# -eq 0 ]; then
+        git branch | fzf | xargs git checkout
+    else
+        git checkout "$@"
+    fi
+}
 
 # Git add with fzf
 # unalias ga 2>/dev/null
-# ga() {
-#     if [ $# -eq 0 ]; then
-#         git status -s | fzf --multi | awk '{print $2}' | xargs git add
-#     else
-#         git add "$@"
-#     fi
-# }
+ga() {
+    if [ $# -eq 0 ]; then
+        git status -s | fzf --multi | awk '{print $2}' | xargs git add
+    else
+        git add "$@"
+    fi
+}
 
 # Clean merged branches
 # unalias gclean 2>/dev/null
@@ -81,10 +83,10 @@ gclean() {
 
 # System utilities
 # Find large files
-bigfiles() {
-    local size="${1:-500M}"
-    fd --type f --size "+${size}" . "${2:-.}"
-}
+# bigfiles() {
+#     local size="${1:-500M}"
+#     fd --type f --size "+${size}" . "${2:-.}"
+# }
 
 # Process management
 killport() {
@@ -105,15 +107,15 @@ bm() {
 #     cd -P "$mark_dir/$1" 2>/dev/null || echo "No such mark: $1"
 # }
 #
-marks() {
-    local mark_dir="$XDG_DATA_HOME/marks"
-    ls -l "$mark_dir" | sed 's/  / /g' | cut -d' ' -f9- | sed 's/ -/\t-/g'
-}
+# marks() {
+#     local mark_dir="$XDG_DATA_HOME/marks"
+#     ls -l "$mark_dir" | sed 's/  / /g' | cut -d' ' -f9- | sed 's/ -/\t-/g'
+# }
 
 # # Enhanced tree command with eza
-# lstree() {
-#     eza --tree --level="${1:-2}" --icons
-# }
+lstree() {
+    eza --tree --level="${1:-2}" --icons
+}
 #
 # # Weather information
 # weather() {
@@ -129,17 +131,17 @@ marks() {
 #
 # # macOS specific
 # # Show/hide hidden files
-# togglehidden() {
-#     local current=$(defaults read com.apple.finder AppleShowAllFiles)
-#     defaults write com.apple.finder AppleShowAllFiles $((!current))
-#     killall Finder
-# }
+togglehidden() {
+    local current=$(defaults read com.apple.finder AppleShowAllFiles)
+    defaults write com.apple.finder AppleShowAllFiles $((!current))
+    killall Finder
+}
 #
 # # Quick Look from terminal
-# ql() {
-#     qlmanage -p "$@" &>/dev/null
-# }
-#
+ql() {
+    qlmanage -p "$@" &>/dev/null
+}
+
 # Additional utilities will be added as needed...
 #
 # ###############################
@@ -148,159 +150,6 @@ marks() {
 #
 #
 #
-# # Clean .DS_Store files
-# clean_ds_store() {
-#   log "Cleaning .DS_Store files..."
-#   find "$DOTFILES" -name ".DS_Store" -delete
-# }
-#
-# # Default paths (can be overridden before sourcing)
-# DOTFILES="${DOTFILES:-$HOME/dotfiles}"
-# CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
-#
-# # Logging functions
-# log_info() {
-#     printf '%s[INFO]%s %s\n' "${BLUE}" "${RESET}" "$*"
-# }
-#
-# log_success() {
-#     printf '%s[SUCCESS]%s %s\n' "${GREEN}" "${RESET}" "$*"
-# }
-#
-# log_warning() {
-#     printf '%s[WARNING]%s %s\n' "${YELLOW}" "${RESET}" "$*" >&2
-# }
-#
-# log_error() {
-#     printf '%s[ERROR]%s %s\n' "${RED}" "${RESET}" "$*" >&2
-# }
-#
-# # Progress indicator
-# show_progress() {
-#     printf '%s→%s %s...\n' "${BLUE}" "${RESET}" "$*"
-# }
-#
-#
-# ################################################################################
-# # SYSTEM AND ENVIRONMENT DETECTION
-# ################################################################################
-#
-# # OS detection
-# is_macos() {
-#     [ "$(uname)" = "Darwin" ]
-# }
-#
-# is_linux() {
-#     [ "$(uname)" = "Linux" ]
-# }
-#
-# # Architecture detection
-# is_arm64() {
-#     [ "$(uname -m)" = "arm64" ] || [ "$(uname -m)" = "aarch64" ]
-# }
-#
-# is_x86_64() {
-#     [ "$(uname -m)" = "x86_64" ]
-# }
-#
-# # Shell detection
-# is_zsh() {
-#     [ -n "$ZSH_VERSION" ]
-# }
-#
-# is_bash() {
-#     [ -n "$BASH_VERSION" ]
-# }
-#
-# ################################################################################
-# # PACKAGE MANAGEMENT
-# # https://github.com/junegunn/fzf/wiki/examples#homebrew
-# ################################################################################
-#
-# # Homebrew utilities
-# function has_brew() {
-#     command -v brew >/dev/null 2>&1
-# }
-#
-# function ensure_brew() {
-#     if ! has_brew; then
-#         log_info "Installing Homebrew..."
-#         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-#
-#         # Add to PATH for current session if installed
-#         if is_arm64; then
-#             eval "$(/opt/homebrew/bin/brew shellenv)"
-#         else
-#             eval "$(/usr/local/bin/brew shellenv)"
-#         fi
-#     fi
-# }
-#
-# function update_brew() {
-#     if has_brew; then
-#         log_info "Updating Homebrew..."
-#         brew update
-#         brew upgrade
-#         brew cleanup
-#     fi
-# }
-#
-#
-#
-# ################################################################################
-# # MACOS SPECIFIC UTILITIES
-# ################################################################################
-#
-# # Apply common macOS system preferences
-# apply_macos_prefs() {
-#     if ! is_macos; then
-#         log_error "Not running on macOS"
-#         return 1
-#     fi
-#
-#     log_info "Applying macOS preferences..."
-#
-#     # Finder preferences
-#     defaults write com.apple.finder AppleShowAllFiles -bool true
-#     defaults write NSGlobalDomain AppleShowAllExtensions -bool true
-#     defaults write com.apple.finder ShowPathbar -bool true
-#     defaults write com.apple.finder ShowStatusBar -bool true
-#
-#     # Dock preferences
-#     defaults write com.apple.dock autohide -bool true
-#     defaults write com.apple.dock autohide-delay -float 0
-#     defaults write com.apple.dock show-recents -bool false
-#
-#     # Keyboard preferences
-#     defaults write NSGlobalDomain KeyRepeat -int 2
-#     defaults write NSGlobalDomain InitialKeyRepeat -int 15
-#     defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
-#
-#     # Restart affected applications
-#     for app in "Finder" "Dock"; do
-#         killall "$app" >/dev/null 2>&1
-#     done
-#
-#     log_success "macOS preferences applied"
-# }
-#
-#
-#
-# # Create directory and cd into it
-# mkcd() {
-#     mkdir -p "$1" && cd "$1"
-# }
-#
-#
-# function symlinks_dead_configs() {
-#   CONFIGS_DIR="$HOME/.config"
-#   fd -H -t l . "$CONFIGS_DIR" | while read -r link; do
-#     if [ ! -e "$(readlink -f "$link")" ]; then
-#       echo "Found dead symlink @ $link --- removing..."
-#       unlink $link
-#     fi
-#   done
-# }
 #
 # # Extract various archive formats
 # extract() {

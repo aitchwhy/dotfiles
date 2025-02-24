@@ -37,6 +37,9 @@ export VOLTA_HOME="$HOME/.volta"
 mkdir -p "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME" "$XDG_STATE_HOME"
 
 # Initialize Homebrew
+
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
 if [[ -x /opt/homebrew/bin/brew ]]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
