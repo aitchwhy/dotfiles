@@ -4,7 +4,7 @@
 # Main ZSH configuration file for interactive shells
 
 # Source utilities
-[[ -f "$DOTFILES/utils.sh" ]] && source "$DOTFILES/utils.sh"
+# [[ -f "$DOTFILES/utils.sh" ]] && source "$DOTFILES/utils.sh"
 
 # Shell Options
 setopt AUTO_CD              # Change directory without cd
@@ -39,6 +39,18 @@ bindkey '^H' beginning-of-line
 bindkey '^R' history-incremental-search-backward
 bindkey '^?' backward-delete-char  # Backspace working after vi mode
 
+# Completions
+########
+autoload -U compinit
+compinit
+
+########
+#if type brew &>/dev/null; then
+#	FPATH=$(brew --prefix)/share/zsh-abbr:$FPATH
+#
+#	autoload -Uz compinit
+#	compinit
+#fi
 
 # Initialize tools if installed
 has_command() { command -v "$1" >/dev/null 2>&1; }
@@ -49,61 +61,6 @@ has_command zoxide && eval "$(zoxide init zsh)"
 has_command direnv && eval "$(direnv hook zsh)"
 has_command fnm && eval "$(fnm env --use-on-cd)"
 
-# Load plugins if available
-if [[ -d "$HOMEBREW_PREFIX/share" ]]; then
-  plugins=(
-    "zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-    "zsh-autosuggestions/zsh-autosuggestions.zsh"
-    "zsh-abbr/zsh-abbr.zsh"
-  )
-  for plugin in $plugins; do
-    plugin_path="$HOMEBREW_PREFIX/share/$plugin"
-    if [[ -f "$plugin_path" ]]; then
-      source "$plugin_path"
-    fi
-  done
-fi
-
-# FZF Configuration if available
-if [[ -f ~/.fzf.zsh ]]; then
-  source ~/.fzf.zsh
-elif [[ -f "$HOMEBREW_PREFIX/opt/fzf/shell/completion.zsh" ]]; then
-  source "$HOMEBREW_PREFIX/opt/fzf/shell/completion.zsh"
-  source "$HOMEBREW_PREFIX/opt/fzf/shell/key-bindings.zsh"
-fi
-
-# Load additional config files
-[[ -f "$ZDOTDIR/aliases.zsh" ]] && source "$ZDOTDIR/aliases.zsh"
-[[ -f "$ZDOTDIR/functions.zsh" ]] && source "$ZDOTDIR/functions.zsh"
-
-# Local customizations (not tracked by git)
-[[ -f "$ZDOTDIR/local.zsh" ]] && source "$ZDOTDIR/local.zsh"
-
-# Welcome message
-print -P "%F{blue}Welcome to ZSH %F{green}$(zsh --version)%f"
-
-############
-# Load plugins if available
-# Plugin installation path
-
-# Completions
-########
-# autoload -U compinit
-# compinit
-########
-
-if type brew &>/dev/null; then
-	FPATH=$(brew --prefix)/share/zsh-abbr:$FPATH
-
-	autoload -Uz compinit
-	compinit
-fi
-
-# Initialize tools if installed
-has_command starship && eval "$(starship init zsh)"
-has_command atuin && eval "$(atuin init zsh)"
-has_command zoxide && eval "$(zoxide init zsh)"
-has_command direnv && eval "$(direnv hook zsh)"
 
 # Load plugins if available
 if [[ -d "$HOMEBREW_PREFIX/share" ]]; then
@@ -137,6 +94,21 @@ fi
 if [[ -f "$ZDOTDIR/local.zsh" ]]; then
   source "$ZDOTDIR/local.zsh"
 fi
+
+
+# FZF Configuration if available
+if [[ -f ~/.fzf.zsh ]]; then
+  source ~/.fzf.zsh
+elif [[ -f "$HOMEBREW_PREFIX/opt/fzf/shell/completion.zsh" ]]; then
+  source "$HOMEBREW_PREFIX/opt/fzf/shell/completion.zsh"
+  source "$HOMEBREW_PREFIX/opt/fzf/shell/key-bindings.zsh"
+fi
+
+# Local customizations (not tracked by git)
+# [[ -f "$ZDOTDIR/local.zsh" ]] && source "$ZDOTDIR/local.zsh"
+
+# Welcome message
+print -P "%F{blue}Welcome to ZSH %F{green}$(zsh --version)%f"
 
 # ######################
 #
