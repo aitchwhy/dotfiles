@@ -21,7 +21,7 @@ has_command() { command -v "$1" >/dev/null 2>&1; }
 # File operations
 # -----------------------------------------------------------------------------
 # Create backup directory
-ensure_backup_dir() {
+function ensure_backup_dir() {
   if [[ ! -d "$BACKUP_DIR" ]]; then
     info "Creating backup directory: $BACKUP_DIR"
     mkdir -p "$BACKUP_DIR"
@@ -29,7 +29,7 @@ ensure_backup_dir() {
 }
 
 # Back up a file or directory with timestamp
-backup_file() {
+function backup_file() {
   local file="$1"
   
   if [[ ! -e "$file" ]]; then
@@ -53,7 +53,7 @@ backup_file() {
 }
 
 # Create a symlink with proper error handling
-make_link() {
+function make_link() {
   local src_orig="$1"
   local dst_symlink="$2"
 
@@ -69,17 +69,17 @@ make_link() {
     mkdir -p "$dst_dir"
   fi
 
-  # Check if destination already exists and handle it
-  if [[ -e "$dst_symlink" || -L "$dst_symlink" ]]; then
-    # If it's already linked to the right place, skip
-    if [[ -L "$dst_symlink" && "$(readlink "$dst_symlink")" == "$src_orig" ]]; then
-      info "Link already exists: $dst_symlink → $src_orig"
-      return 0
-    fi
-    # Otherwise backup and remove
-    backup_file "$dst_symlink"
-    rm -f "$dst_symlink"
-  fi
+  # # Check if destination already exists and handle it
+  # if [[ -e "$dst_symlink" || -L "$dst_symlink" ]]; then
+  #   # If it's already linked to the right place, skip
+  #   if [[ -L "$dst_symlink" && "$(readlink "$dst_symlink")" == "$src_orig" ]]; then
+  #     info "Link already exists: $dst_symlink → $src_orig"
+  #     return 0
+  #   fi
+  #   # Otherwise backup and remove
+  #   backup_file "$dst_symlink"
+  #   rm -f "$dst_symlink"
+  # fi
   
   info "Linking $src_orig → $dst_symlink"
   ln -sf "$src_orig" "$dst_symlink"
