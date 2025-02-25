@@ -1,1 +1,7 @@
-/Users/hank/dotfiles/config/nvim/lua/plugins/harpoon.lua
+return {
+    {
+        "ThePrimeagen/harpoon",
+        branch = "harpoon2",
+        dependencies = { "nvim-lua/plenary.nvim" },
+    },
+}

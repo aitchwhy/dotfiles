@@ -1,1 +1,11 @@
-/Users/hank/dotfiles/config/nvim/lua/plugins/treesitter.lua
+return {
+    {
+        "nvim-treesitter/nvim-treesitter",
+    },
+    {
+        "nvim-treesitter/nvim-treesitter-textobjects",
+    },
+    {
+        "windwp/nvim-ts-autotag",
+    },
+}

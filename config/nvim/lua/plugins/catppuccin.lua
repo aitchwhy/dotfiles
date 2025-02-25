@@ -1,1 +1,8 @@
-/Users/hank/dotfiles/config/nvim/lua/plugins/catppuccin.lua
+return {
+    {
+        "catppuccin",
+        opts = {
+            integrations = { blink_cmp = true },
+        },
+    },
+}

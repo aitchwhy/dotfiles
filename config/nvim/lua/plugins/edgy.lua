@@ -1,1 +1,7 @@
-/Users/hank/dotfiles/config/nvim/lua/plugins/edgy.lua
+return {
+    {
+        "folke/edgy.nvim",
+        event = "VeryLazy",
+        opts = {},
+    },
+}

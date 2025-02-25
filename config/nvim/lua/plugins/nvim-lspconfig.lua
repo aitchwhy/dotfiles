@@ -1,1 +1,13 @@
-/Users/hank/dotfiles/config/nvim/lua/plugins/nvim-lspconfig.lua
+return {
+    {
+        "neovim/nvim-lspconfig",
+        ---@class PluginLspOpts
+        opts = {
+            ---@type lspconfig.options
+            servers = {
+                -- pyright will be automatically installed with mason and loaded with lspconfig
+                pyright = {},
+            },
+        },
+    },
+}

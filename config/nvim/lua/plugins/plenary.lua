@@ -1,1 +1,3 @@
-/Users/hank/dotfiles/config/nvim/lua/plugins/plenary.lua
+return {
+    { "nvim-lua/plenary.nvim", lazy = true },
+}

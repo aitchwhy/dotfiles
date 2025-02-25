@@ -1,3 +1,4 @@
+tap "coder/coder"
 tap "dotenvx/brew"
 tap "homebrew/bundle"
 tap "homebrew/services"
@@ -11,16 +12,16 @@ tap "typesense/tap"
 tap "waydabber/betterdisplay"
 tap "xo/xo"
 tap "yakitrak/yakitrak"
-# tap "atuinsh/atuin"
 
-# brew "ruff"
 brew "act"
+brew "shellcheck"
 brew "actionlint"
 brew "aider"
 brew "angle-grinder"
 brew "aria2"
 brew "ast-grep"
-brew "atuin"
+brew "atuin", restart_service: :changed
+brew "localstack"
 brew "awscli-local"
 brew "bash-language-server"
 brew "bat"
@@ -31,17 +32,17 @@ brew "bottom"
 brew "broot"
 brew "cheat"
 brew "chrome-cli"
-brew "cloudflare-wrangler2"
+brew "cloudflare-wrangler"
 brew "cloudflared"
 brew "cmake"
 brew "curl"
 brew "curlie"
 brew "cutter"
+brew "wget"
 brew "dasht"
 brew "datasette"
 brew "diff-so-fancy"
 brew "direnv"
-brew "dotenvx/brew/dotenvx"
 brew "duf"
 brew "dust"
 brew "esbuild"
@@ -77,11 +78,8 @@ brew "jq"
 brew "just"
 brew "k9s"
 brew "kanata"
-brew "koekeishiya/formulae/skhd"
-brew "koekeishiya/formulae/yabai"
 brew "lazygit"
 brew "lnav"
-brew "localstack"
 brew "lsd"
 brew "lua-language-server"
 brew "luarocks"
@@ -89,13 +87,11 @@ brew "marksman"
 brew "mas"
 brew "mcfly"
 brew "miller"
+brew "minio"
 brew "nasm"
 brew "neovim"
 brew "netcat"
-brew "nmap"
 brew "odin"
-brew "olets/tap/zsh-abbr"
-brew "olets/tap/zsh-autosuggestions-abbreviations-strategy"
 brew "onefetch"
 brew "pandoc"
 brew "parallel"
@@ -110,7 +106,6 @@ brew "prometheus"
 brew "pyenv"
 brew "pyright"
 brew "rclone"
-brew "rfidresearchgroup/proxmark3/proxmark3"
 brew "ripgrep"
 brew "rollup"
 brew "ruby"
@@ -118,11 +113,9 @@ brew "rust"
 brew "rust-analyzer"
 brew "rustscan"
 brew "rustup"
-brew "sachaos/todoist/todoist"
 brew "scrapy"
 brew "sd"
 brew "sevenzip"
-brew "shellcheck"
 brew "shfmt"
 brew "skaffold"
 brew "sonic"
@@ -130,29 +123,25 @@ brew "speedtest-cli"
 brew "speexdsp"
 brew "sq"
 brew "starship"
-brew "stripe/stripe-cli/stripe"
 brew "stylua"
 brew "tectonic"
 brew "temporal"
-brew "temporalio/brew/tcld"
-brew "tlrc" # similar to tldr
+brew "tldr", link: false
+brew "tlrc"
 brew "tmux"
 brew "traefik"
 brew "tree"
 brew "trippy"
 brew "typescript-language-server"
-brew "utf8proc"
 brew "uv"
 brew "vite"
 brew "volta"
 brew "vscode-langservers-extracted"
 brew "weasyprint"
-brew "wget"
 brew "xclip"
 brew "xcodes"
 brew "xh"
 brew "xxh"
-brew "yakitrak/yakitrak/obsidian-cli"
 brew "yaml-language-server"
 brew "yazi"
 brew "yq"
@@ -164,6 +153,17 @@ brew "zsh-autosuggestions"
 brew "zsh-completions"
 brew "zsh-history-substring-search"
 brew "zsh-syntax-highlighting"
+brew "coder/coder/coder"
+brew "dotenvx/brew/dotenvx"
+brew "koekeishiya/formulae/skhd"
+brew "koekeishiya/formulae/yabai"
+brew "olets/tap/zsh-abbr"
+brew "olets/tap/zsh-autosuggestions-abbreviations-strategy"
+brew "rfidresearchgroup/proxmark3/proxmark3", args: ["with-generic"]
+brew "sachaos/todoist/todoist"
+brew "stripe/stripe-cli/stripe"
+brew "temporalio/brew/tcld"
+brew "yakitrak/yakitrak/obsidian-cli"
 
 cask "a-better-finder-rename"
 cask "affine"
@@ -243,7 +243,6 @@ cask "proxyman"
 cask "qflipper"
 cask "quit-all"
 cask "raycast"
-cask "relagit"
 cask "rize"
 cask "royal-tsx"
 cask "signal"
@@ -273,47 +272,48 @@ cask "zed"
 cask "zen-browser"
 cask "zoom"
 
-# mas "Dropover", id: 1355679052
-# mas "Fantastical", id: 975937182
-# mas "Flow", id: 1423210932
-# mas "Focus", id: 777233759
-# mas "Keynote", id: 409183694
-# mas "Logic Pro", id: 634148309
-# mas "NextDNS", id: 1464122853
-# mas "Numbers", id: 409203825
-# mas "Pages", id: 409201541
-# mas "Todoist", id: 585829637
-# mas "Termius", id: 1176074088
 mas "Aiko", id: 1672085276
 mas "Alpenglow", id: 978589174
 mas "Amphetamine", id: 937984704
 mas "Bear", id: 1091189122
 mas "Bitwarden", id: 1352778147
-mas "CleanMyMac", id: 1339170533
 mas "Cleaner One Pro", id: 1133028347
+mas "CleanMyMac", id: 1339170533
 mas "DaisyDisk", id: 411643860
 mas "Day One", id: 1055511498
 mas "Drafts", id: 1435957248
 mas "ExcalidrawZ", id: 6636493997
+mas "Fantastical", id: 975937182
 mas "Flighty", id: 1358823008
+mas "Flow", id: 1423210932
+mas "Focus", id: 777233759
 mas "HacKit", id: 1549557075
 mas "Journey", id: 1662059644
 mas "KakaoTalk", id: 869223134
+mas "Keynote", id: 409183694
 mas "Kindle", id: 302584613
 mas "LanScan", id: 472226235
+mas "Logic Pro", id: 634148309
 mas "Mela", id: 1568924476
+mas "NextDNS", id: 1464122853
+mas "Numbers", id: 409203825
+mas "Obsidian Web Clipper", id: 6720708363
 mas "Omnivore", id: 1564031042
 mas "One Thing", id: 1604176982
+mas "Pages", id: 409201541
 mas "Pandan", id: 1569600264
 mas "Parcel", id: 639968404
 mas "Paste", id: 967805235
 mas "Pixea", id: 1507782672
+mas "rcmd", id: 1596283165
 mas "Session", id: 1521432881
+mas "SnippetsLab", id: 1006087419
+mas "Snippety", id: 1530751461
+mas "Structured", id: 1499198946
+mas "Todoist", id: 585829637
 mas "Toggl Track", id: 1291898086
 mas "Tripsy", id: 1429967544
 mas "Yubico Authenticator", id: 1497506650
-mas "rcmd", id: 1596283165
-
 vscode "42crunch.vscode-openapi"
 vscode "4ops.terraform"
 vscode "aaron-bond.better-comments"
@@ -366,7 +366,6 @@ vscode "divyanshuagrawal.competitive-programming-helper"
 vscode "donjayamanne.python-environment-manager"
 vscode "donjayamanne.python-extension-pack"
 vscode "dzhavat.bracket-pair-toggler"
-vscode "eamodio.gitlens"
 vscode "ecmel.vscode-html-css"
 vscode "editorconfig.editorconfig"
 vscode "emmanuelbeziat.vscode-great-icons"
@@ -430,7 +429,6 @@ vscode "ms-azuretools.vscode-azureresourcegroups"
 vscode "ms-azuretools.vscode-azurestorage"
 vscode "ms-azuretools.vscode-docker"
 vscode "ms-kubernetes-tools.vscode-kubernetes-tools"
-vscode "ms-mssql.data-workspace-vscode"
 vscode "ms-playwright.playwright"
 vscode "ms-python.black-formatter"
 vscode "ms-python.debugpy"
@@ -518,7 +516,6 @@ vscode "tamasfe.even-better-toml"
 vscode "teabyii.ayu"
 vscode "teamhub.teamhub"
 vscode "techer.open-in-browser"
-vscode "terrastruct.d2"
 vscode "tim-koehler.helm-intellisense"
 vscode "tombonnike.vscode-status-bar-format-toggle"
 vscode "tomoki1207.pdf"
