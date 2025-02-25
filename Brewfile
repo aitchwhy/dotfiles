@@ -1,4 +1,4 @@
-tap "coder/coder"
+tap "dotenvx/brew"
 tap "homebrew/bundle"
 tap "homebrew/services"
 tap "koekeishiya/formulae"
@@ -11,18 +11,16 @@ tap "typesense/tap"
 tap "waydabber/betterdisplay"
 tap "xo/xo"
 tap "yakitrak/yakitrak"
+# tap "atuinsh/atuin"
 
-brew "cloudflared"
-brew "dotenvx/brew/dotenvx"
-brew "git"
-brew "mcfly"
+# brew "ruff"
 brew "act"
 brew "actionlint"
 brew "aider"
 brew "angle-grinder"
 brew "aria2"
 brew "ast-grep"
-brew "atuin", restart_service: :changed
+brew "atuin"
 brew "awscli-local"
 brew "bash-language-server"
 brew "bat"
@@ -34,8 +32,8 @@ brew "broot"
 brew "cheat"
 brew "chrome-cli"
 brew "cloudflare-wrangler2"
+brew "cloudflared"
 brew "cmake"
-brew "coder/coder/coder"
 brew "curl"
 brew "curlie"
 brew "cutter"
@@ -43,6 +41,7 @@ brew "dasht"
 brew "datasette"
 brew "diff-so-fancy"
 brew "direnv"
+brew "dotenvx/brew/dotenvx"
 brew "duf"
 brew "dust"
 brew "esbuild"
@@ -57,6 +56,7 @@ brew "fzf"
 brew "gdrive"
 brew "gh"
 brew "ghi"
+brew "git"
 brew "git-delta"
 brew "glances"
 brew "glow"
@@ -87,8 +87,8 @@ brew "lua-language-server"
 brew "luarocks"
 brew "marksman"
 brew "mas"
+brew "mcfly"
 brew "miller"
-brew "minio"
 brew "nasm"
 brew "neovim"
 brew "netcat"
@@ -114,7 +114,6 @@ brew "rfidresearchgroup/proxmark3/proxmark3"
 brew "ripgrep"
 brew "rollup"
 brew "ruby"
-# brew "ruff"
 brew "rust"
 brew "rust-analyzer"
 brew "rustscan"
@@ -136,7 +135,7 @@ brew "stylua"
 brew "tectonic"
 brew "temporal"
 brew "temporalio/brew/tcld"
-brew "tldr"
+brew "tlrc" # similar to tldr
 brew "tmux"
 brew "traefik"
 brew "tree"
@@ -166,10 +165,7 @@ brew "zsh-completions"
 brew "zsh-history-substring-search"
 brew "zsh-syntax-highlighting"
 
-cask "warp"
-cask "cloudflare-warp"
 cask "a-better-finder-rename"
-cask "relagit"
 cask "affine"
 cask "anki"
 cask "apidog"
@@ -180,6 +176,7 @@ cask "bartender"
 cask "betterdisplay"
 cask "blackhole-16ch"
 cask "boltai"
+cask "bruno"
 cask "bunch"
 cask "canva"
 cask "carbon-copy-cloner"
@@ -188,6 +185,7 @@ cask "charmstone"
 cask "chatgpt"
 cask "claude"
 cask "cleanshot"
+cask "cloudflare-warp"
 cask "copilot"
 cask "cork"
 cask "cursor"
@@ -195,6 +193,7 @@ cask "dash"
 cask "descript"
 cask "devonthink"
 cask "devutils"
+cask "draw-things"
 cask "espanso"
 cask "fantastical"
 cask "figma"
@@ -244,6 +243,7 @@ cask "proxyman"
 cask "qflipper"
 cask "quit-all"
 cask "raycast"
+cask "relagit"
 cask "rize"
 cask "royal-tsx"
 cask "signal"
@@ -263,6 +263,8 @@ cask "todoist"
 cask "tower"
 cask "typora"
 cask "virtualbuddy"
+cask "visual-studio-code"
+cask "warp"
 cask "windsurf"
 cask "wireshark"
 cask "yubico-authenticator"
@@ -271,46 +273,47 @@ cask "zed"
 cask "zen-browser"
 cask "zoom"
 
-
+# mas "Dropover", id: 1355679052
+# mas "Fantastical", id: 975937182
+# mas "Flow", id: 1423210932
+# mas "Focus", id: 777233759
+# mas "Keynote", id: 409183694
+# mas "Logic Pro", id: 634148309
+# mas "NextDNS", id: 1464122853
+# mas "Numbers", id: 409203825
+# mas "Pages", id: 409201541
+# mas "Todoist", id: 585829637
+# mas "Termius", id: 1176074088
 mas "Aiko", id: 1672085276
 mas "Alpenglow", id: 978589174
 mas "Amphetamine", id: 937984704
 mas "Bear", id: 1091189122
 mas "Bitwarden", id: 1352778147
 mas "CleanMyMac", id: 1339170533
+mas "Cleaner One Pro", id: 1133028347
 mas "DaisyDisk", id: 411643860
 mas "Day One", id: 1055511498
 mas "Drafts", id: 1435957248
-mas "Dropover", id: 1355679052
 mas "ExcalidrawZ", id: 6636493997
-mas "Fantastical", id: 975937182
 mas "Flighty", id: 1358823008
-mas "Flow", id: 1423210932
-mas "Focus", id: 777233759
 mas "HacKit", id: 1549557075
 mas "Journey", id: 1662059644
 mas "KakaoTalk", id: 869223134
-mas "Keynote", id: 409183694
 mas "Kindle", id: 302584613
 mas "LanScan", id: 472226235
-mas "Logic Pro", id: 634148309
 mas "Mela", id: 1568924476
-mas "NextDNS", id: 1464122853
-mas "Numbers", id: 409203825
 mas "Omnivore", id: 1564031042
 mas "One Thing", id: 1604176982
-mas "Pages", id: 409201541
 mas "Pandan", id: 1569600264
 mas "Parcel", id: 639968404
 mas "Paste", id: 967805235
 mas "Pixea", id: 1507782672
 mas "Session", id: 1521432881
-mas "Termius", id: 1176074088
-mas "Todoist", id: 585829637
 mas "Toggl Track", id: 1291898086
 mas "Tripsy", id: 1429967544
 mas "Yubico Authenticator", id: 1497506650
 mas "rcmd", id: 1596283165
+
 vscode "42crunch.vscode-openapi"
 vscode "4ops.terraform"
 vscode "aaron-bond.better-comments"
