@@ -1,126 +1,127 @@
-# dotfiles
+# Dotfiles for macOS
+
+A comprehensive dotfiles management system for macOS on Apple Silicon. This repository contains scripts and configuration files to set up a complete macOS environment with modern tools, sensible defaults, and productivity enhancements.
+
+## Quick Start
+
+```zsh
+# Clone the repository
+git clone https://github.com/yourusername/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+
+# Run the installer
+./install.zsh
+
+# Start a new shell session
+exec zsh
+```
+
+## Features
+
+- **ZSH Configuration**: Modern shell setup with plugins and useful functions
+- **Homebrew Integration**: Install and manage CLI tools and applications
+- **Development Environment**: Configuration for Python, Node.js, Rust, and more
+- **GUI Applications**: Configuration for VS Code, Cursor, Hammerspoon, etc.
+- **macOS Preferences**: Optimized system settings for productivity
+- **Robust Backup System**: Automatic backup of existing configurations
+- **Smart Symlink Management**: Clean handling of existing files and links
+
+## System Requirements
+
+- macOS on Apple Silicon (M1/M2/M3)
+- Git
+- Internet connection for downloading packages
+
+## Available Scripts
+
+- `install.zsh`: Main installation script
+- `update.zsh`: Update dotfiles and installed packages
+- `utils.sh`: Shared utility functions
+
+### Installation Options
+
+```
+./install.zsh [options]
+
+Options:
+  --no-brew     Skip Homebrew installation and updates
+  --no-macos    Skip macOS preferences configuration
+  --minimal     Install only essential configurations
+  --help        Show help message
+```
+
+### Update Options
+
+```
+./update.zsh [options]
+
+Options:
+  --no-brew     Skip Homebrew updates
+  --no-apps     Skip App Store and VSCode updates
+  --no-repo     Skip dotfiles repository update
+  --fix-links   Attempt to fix broken symlinks
+  --quick       Quick update (only dotfiles and relink)
+  --help        Show help message
+```
 
 ## Directory Structure
 
 ```
 ~/dotfiles/
-├── README.md
-├── install.sh
-├── update.sh
-├── utils.sh
-├── Brewfile                      # Homebrew packages
-├── config/                       # Tool configurations
-│   ├── zsh/                      # Zsh configuration
-│   │   ├── .zshenv               # Environment variables
-│   │   ├── .zprofile             # Login shell config
-│   │   ├── .zshrc                # Interactive shell config
-│   │   └── conf.d/               # Modular configurations
-│   │       ├── fzf.zsh
-│   │       ├── aliases.zsh
-│   │       └── functions.zsh
-│   ├── nvim/                     # Neovim configuration
-│   ├── git                      # Git configuration
-│   │   ├── config
-│   │   └── ignore
-│   └── ...                   # Other tool configs
-
-├── scripts/                   # Setup and utility scripts
-│
-└── docs/
+├── Brewfile               # Homebrew packages and applications
+├── install.zsh            # Main installation script
+├── update.zsh             # Update script
+├── utils.sh               # Shared utility functions
+├── config/                # Configuration files
+│   ├── zsh/               # ZSH configuration
+│   │   ├── .zshrc         # Main ZSH configuration
+│   │   ├── .zshenv        # ZSH environment variables
+│   │   └── .zprofile      # Login shell configuration
+│   ├── starship.toml      # Starship prompt configuration
+│   ├── nvim/              # Neovim configuration
+│   ├── vscode/            # VS Code settings
+│   ├── hammerspoon/       # Hammerspoon configuration
+│   └── ...                # Other app configurations
+└── README.md              # This file
 ```
 
-## Installation
+## What Gets Installed
 
-1. **Clone Repository**
+- **Shell Environment**: ZSH with modern plugins and prompt
+- **Command Line Tools**: Git, Homebrew, FZF, Ripgrep, Bat, etc.
+- **Programming Languages**: Python, Node.js, Rust toolchains
+- **Development Tools**: VS Code, Neovim, Git clients
+- **Productivity Apps**: Hammerspoon, Karabiner-Elements
 
-```bash
-git clone https://github.com/aitchwhy/dotfiles.git ~/dotfiles
-cd ~/dotfiles
-```
+## How It Works
 
-2. **Initial Setup**
+1. **Repository Verification**: Checks that the repository structure is valid
+2. **Backup**: Backs up existing configuration files to `~/.dotfiles_backup/DATE_TIME/`
+3. **ZSH Setup**: Creates `.zshenv` that points to the dotfiles ZSH configuration
+4. **Homebrew**: Installs and updates Homebrew packages from the Brewfile
+5. **Configuration**: Links configuration files to their proper locations
+6. **Development**: Sets up development environments if requested
+7. **macOS Preferences**: Configures system settings for productivity
 
-```bash
+## Customization
 
-# Run install script
-./install.sh
+1. **Fork the Repository**: Create your own fork of this repository
+2. **Edit the Brewfile**: Add or remove packages you need
+3. **Modify Configurations**: Edit the files in the `config/` directory
+4. **Run the Installer**: Execute `./install.zsh` to apply your changes
 
-```
+## Maintaining Your Dotfiles
 
-3. **Update Configuration**
+- **Regular Updates**: Run `./update.zsh` to keep everything in sync
+- **New Machine Setup**: Clone your repository and run `./install.zsh`
+- **Backing Up Changes**: Commit and push your changes to your GitHub repository
 
-```bash
-# Update everything
-./update.sh
-```
+## Troubleshooting
 
-## Core Tools
+- **Broken Symlinks**: Run `./update.zsh --fix-links` to repair
+- **Permission Issues**: Make sure scripts are executable with `chmod +x *.zsh`
+- **Path Problems**: Check `~/.zshenv` and ensure it points to the correct location
 
-### Shell Environment
+## License
 
-- **Shell**: Zsh with modern configuration
-- **Prompt**: Starship
-- **History**: Atuin for better history
-- **Multiplexer**: Zellij (modern tmux alternative)
-
-### Development
-
-- **Editor**: Neovim/VSCode/Cursor
-- **Git**: Enhanced with lazygit and delta
-- **Search**: ripgrep, fd, fzf
-- **File Manager**: yazi
-- **Terminal**: Ghostty
-
-### Additional Tools
-
-- **Window Management**: Hammerspoon
-- **Keyboard**: Karabiner-Elements
-- **Text Expansion**: Espanso
-- **Task Management**: Todoist CLI
-
-## Features
-
-### Enhanced Shell Experience
-
-- Modern command-line replacements:
-
-  - `ls` → `eza` (better file listing)
-  - `cat` → `bat` (syntax highlighting)
-  - `find` → `fd` (faster file search)
-  - `grep` → `ripgrep` (faster text search)
-  - `top` → `btop` (better system monitoring)
-
-- Improved navigation:
-  - Directory jumping with zoxide
-  - Fuzzy finding with fzf
-  - Enhanced history with atuin
-
-### Development Workflow
-
-- Full development environment:
-
-  - Python with uv for better package management
-  - Node.js with volta
-  - Go with proper path setup
-  - Rust with cargo
-
-- Git enhancements:
-  - Better diffs with delta
-  - Interactive UI with lazygit
-  - Fuzzy branch switching
-  - Custom aliases and functions
-
-### File Organization
-
-- XDG Base Directory compliance:
-  - Configurations in ~/.config
-  - Cache in ~/.cache
-  - Data in ~/.local/share
-  - State in ~/.local/state
-
-## References
-
-- TODO: <https://randomgeekery.org/config/shell/zsh/>
-- <https://claude.ai/chat/3aa18a69-65af-499a-b849-29e633ad15dc>
-- <https://chatgpt.com/c/67a3ecfb-9f94-8012-9c66-fd98cd4bb5b2>
-- <https://github.com/getantidote/zdotdir/blob/main/.zshenv>
+This project is open source and available under the MIT License.
