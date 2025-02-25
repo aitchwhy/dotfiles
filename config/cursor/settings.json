@@ -1488,5 +1488,6 @@
   "workbench.layoutControl.type": "menu",
   "workbench.preferredLightColorTheme": "Gitpod Dark",
   "workbench.reduceMotion": "on",
-  "xstate.nestTypegenFiles": false
+  "xstate.nestTypegenFiles": false,
+  "explorer.confirmDragAndDrop": false
 }
