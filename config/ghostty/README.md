@@ -2,6 +2,8 @@
 
 - <https://ghostty.org/docs/config#macos-specific-path-(macos-only)>:
 
+## Offline docs
+
 ```
 Offline Reference Documentation
 
