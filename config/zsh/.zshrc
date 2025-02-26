@@ -4,7 +4,7 @@
 # Main ZSH configuration file for interactive shells
 
 # Source utilities
-# [[ -f "$DOTFILES/utils.sh" ]] && source "$DOTFILES/utils.sh"
+[[ -f "$DOTFILES/utils.sh" ]] && source "$DOTFILES/utils.sh"
 
 # Shell Options
 setopt AUTO_CD              # Change directory without cd

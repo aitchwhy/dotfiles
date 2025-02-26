@@ -54,11 +54,48 @@ function backup_file() {
 
 # Create a symlink with proper error handling
 function make_link() {
-  local src_orig="$1"
+
+  ###################
+  # ln tldr entry
+  #
+  # ln -> Create links to files and directories (source  -> target)
+  # More information: https://www.gnu.org/software/coreutils/manual/html_node/ln-invocation.html.
+  #
+  # Create a symbolic link to a file or directory:
+  #   ln -s /path/to/file_or_directory path/to/symlink
+  #
+  # Overwrite an existing symbolic link to point to a different file:
+  #   ln -sf /path/to/new_file path/to/symlink
+  #
+  # Create a hard link to a file:
+  #   ln /path/to/file path/to/hardlink
+  #
+  ####################
+  # ln manpages 
+  #
+  # ln [-L | -P | -s [-F]] [-f | -iw] [-hnv] source_file [target_file]
+  #
+  # src orig file <- target symlink
+  #
+  # Flags
+  # -w    Warn if the source of a symbolic link does not currently exist.
+  # -f    If the target file already exists, then unlink it so that the link may occur.(The -f option overrides any previous -i and -w options.)
+  # -s    Create a symbolic link.
+  #
+  #
+  # EXAMPLES
+  #    Create a symbolic link named /home/src and point it to /usr/src:
+  #          # ln -s /usr/src /home/src
+  #
+  #    Hard link /usr/local/bin/fooprog to file /usr/local/bin/fooprog-1.0:
+  #          # ln /usr/local/bin/fooprog-1.0 /usr/local/bin/fooprog
+  ###################
+
+  local src_orig_file="$1"
   local dst_symlink="$2"
 
-  if [[ ! -e "$src_orig" ]]; then
-    error "Source does not exist: $src_orig"
+  if [[ ! -e "$src_orig_file" ]]; then
+    error "Source does not exist: $src_orig_file"
     return 1
   fi
 
@@ -85,6 +122,38 @@ function make_link() {
   ln -sf "$src_orig" "$dst_symlink"
   success "Created link: $dst_symlink → $src_orig"
 }
+
+function unlink_all_in_dir() {
+
+  #############
+  # Unlink all symbolic links in the specified directory
+  # $ unlink_all_in_dir /path/to/directory
+  # 
+  # Unlink all symbolic links in the current directory
+  # $ unlink_all_in_dir
+  #############
+
+  local dir="${1:-.}"  # Use the provided directory or default to current
+  
+  # Check if the directory exists
+  if [[ ! -d "$dir" ]]; then
+    echo "Error: '$dir' is not a directory or does not exist" >&2
+    return 1
+  fi
+  
+  echo "Finding and unlinking symbolic links in '$dir'..."
+  
+  # Find and unlink all symbolic links
+  local count=0
+  while IFS= read -r -d '' link; do
+    echo "Unlinking: $link -> $(readlink "$link")"
+    unlink "$link" || echo "Failed to unlink: $link" >&2
+    ((count++))
+  done < <(find "$dir" -type l -print0)
+  
+  echo "Successfully unlinked $count symbolic link(s) in '$dir'"
+}
+
 
 # Ensure a directory exists
 ensure_dir() {
