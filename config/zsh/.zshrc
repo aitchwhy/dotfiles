@@ -53,13 +53,23 @@ compinit
 #fi
 
 # Initialize tools if installed
-has_command() { command -v "$1" >/dev/null 2>&1; }
+has_command() {
+  command -v "$1" >/dev/null 2>&1;
+}
 
 has_command starship && eval "$(starship init zsh)"
+# has_command starship && eval "$(starship init zsh)"
 has_command atuin && eval "$(atuin init zsh --disable-up-arrow)"
+# has_command atuin && eval "$(atuin init zsh)"
 has_command zoxide && eval "$(zoxide init zsh)"
 has_command direnv && eval "$(direnv hook zsh)"
-has_command fnm && eval "$(fnm env --use-on-cd)"
+# has_command fnm && eval "$(fnm env --use-on-cd)"
+# has_command atuin && eval "$(atuin init zsh)"
+# has_command zoxide && eval "$(zoxide init zsh)"
+has_command uv && eval "$(uv generate-shell-completion zsh)"
+# has_command pyenv && eval "$(pyenv init -)"
+# has_command abbr && eval "$(abbr init zsh)"
+has_command nvim && export EDITOR="nvim" && export VISUAL="nvim"
 
 
 # Load plugins if available
@@ -132,13 +142,12 @@ print -P "%F{blue}Welcome to ZSH %F{green}$(zsh --version)%f"
 # has_command atuin && eval "$(atuin init zsh)"
 # has_command zoxide && eval "$(zoxide init zsh)"
 # has_command atuin && eval "$(atuin init zsh)"
-# has_command uv && eval "$(uv generate-shell-completion zsh)"
+has_command uv && eval "$(uv generate-shell-completion zsh)"
 # has_command pyenv && eval "$(pyenv init -)"
 # has_command zoxide && eval "$(zoxide init zsh)"
 # has_command direnv && eval "$(direnv hook zsh)"
 # has_command fnm && eval "$(fnm env --use-on-cd)"
 # has_command abbr && eval "$(abbr init zsh)"
-# has_command nvim && export EDITOR="nvim"
 #
 # # Initialize tools if installed
 # # (( $+commands[atuin] )) && eval "$(atuin init zsh --disable-up-arrow)"

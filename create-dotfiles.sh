@@ -25,10 +25,10 @@ ensure_dir() {
 # Main function to create dotfiles structure
 create_dotfiles_structure() {
   info "Creating dotfiles structure at $DOTFILES"
-  
+
   # Create main dotfiles directory
   ensure_dir "$DOTFILES"
-  
+
   # Create config directory
   ensure_dir "$DOTFILES/config"
   ensure_dir "$DOTFILES/config/zsh"
@@ -41,7 +41,7 @@ create_dotfiles_structure() {
   ensure_dir "$DOTFILES/config/cursor"
   ensure_dir "$DOTFILES/config/hammerspoon"
   ensure_dir "$DOTFILES/config/ai/claude"
-  
+
   # Create basic utils.sh file if it doesn't exist
   if [[ ! -f "$DOTFILES/utils.sh" ]]; then
     info "Creating basic utils.sh file"
@@ -95,7 +95,7 @@ ensure_dir() {
 EOF
     chmod +x "$DOTFILES/utils.sh"
   fi
-  
+
   # Create basic ZSH configuration files
   if [[ ! -f "$DOTFILES/config/zsh/.zshenv" ]]; then
     info "Creating basic ZSH environment file"
@@ -118,7 +118,7 @@ export HISTSIZE=1000000
 export SAVEHIST=1000000
 EOF
   fi
-  
+
   if [[ ! -f "$DOTFILES/config/zsh/.zshrc" ]]; then
     info "Creating basic ZSH rc file"
     cat > "$DOTFILES/config/zsh/.zshrc" << 'EOF'
@@ -185,14 +185,14 @@ if [[ -f "$ZDOTDIR/local.zsh" ]]; then
 fi
 EOF
   fi
-  
+
   # Create Brewfile from your provided file
   if [[ ! -f "$DOTFILES/Brewfile" ]]; then
     info "Creating Brewfile from the provided data"
     cp -f "$(dirname "$0")/paste-3.txt" "$DOTFILES/Brewfile"
     success "Created Brewfile with all your desired applications"
   fi
-  
+
   success "Dotfiles structure created successfully at $DOTFILES"
   info "You can now run the setup script to configure your system"
 }
