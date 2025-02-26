@@ -237,10 +237,16 @@ setup_cli_tools() {
     echo "[create link] orig dotfile ($k) <- ($v) new symlink"
     local parent_dir=$(basename "$v")
 
+    echo "ensuring dir exists $parent_dir"
     ensure_dir $parent_dir
+
+    # unlink ALL existing symlinks in ~/.config/
+    echo "unlinking all reachable from dir $parent_dir"
+    unlink_all_in_dir "$parent_dir"
+
     if [[ -f "$k" ]]; then
 	ln -sfw "$k" "$v"
-        make_link "$DOTFILES/config/ghostty/config" "$XDG_CONFIG_HOME/ghostty/config"
+        # make_link "$DOTFILES/config/ghostty/config" "$XDG_CONFIG_HOME/ghostty/config"
     fi
   done
 
@@ -465,8 +471,6 @@ function main() {
   ensure_dir "$XDG_DATA_HOME"
   ensure_dir "$XDG_STATE_HOME"
 
-  # unlink ALL existing symlinks in ~/.config/*
-  unlink_all_in_dir "$XDG_CONFIG_HOME"
 
   # Setup components
   setup_zsh
@@ -477,6 +481,7 @@ function main() {
     info "Skipping Homebrew setup (--no-brew flag used)"
   fi
 
+  # NOTE: MAIN setup (symlinks)
   setup_cli_tools
 
   if [[ "$NO_MACOS" == "false" ]]; then
