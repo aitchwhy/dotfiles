@@ -40,7 +40,6 @@ bindkey '^R' history-incremental-search-backward
 bindkey '^?' backward-delete-char  # Backspace working after vi mode
 
 # Completions
-########
 autoload -U compinit
 compinit
 
@@ -139,9 +138,8 @@ print -P "%F{blue}Welcome to ZSH %F{green}$(zsh --version)%f"
 # # }
 #
 # has_command starship && eval "$(starship init zsh)"
-# has_command atuin && eval "$(atuin init zsh)"
+has_command atuin && eval "$(atuin init zsh)"
 # has_command zoxide && eval "$(zoxide init zsh)"
-# has_command atuin && eval "$(atuin init zsh)"
 has_command uv && eval "$(uv generate-shell-completion zsh)"
 # has_command pyenv && eval "$(pyenv init -)"
 # has_command zoxide && eval "$(zoxide init zsh)"
