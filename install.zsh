@@ -111,7 +111,6 @@ EOF
   chmod 644 "$HOME/.zshenv"
   success "Created $HOME/.zshenv pointing to $ZDOTDIR_TARGET"
 
-
   # # Ensure XDG config directory exists
   # ensure_dir "$XDG_CONFIG_HOME"
   
@@ -246,142 +245,9 @@ setup_cli_tools() {
 
     if [[ -f "$k" ]]; then
 	ln -sfw "$k" "$v"
-        # make_link "$DOTFILES/config/ghostty/config" "$XDG_CONFIG_HOME/ghostty/config"
     fi
   done
-
-
-  # # Ghostty terminal
-  # declare -A 
-  # if [[ -d "$DOTFILES/config/ghostty" ]]; then
-  #   ensure_dir "$XDG_CONFIG_HOME/ghostty"
-  #
-  #   if [[ -f "$DOTFILES/config/ghostty/config" ]]; then
-  #     make_link "$DOTFILES/config/ghostty/config" "$XDG_CONFIG_HOME/ghostty/config"
-  #   fi
-  # fi
-  #
-  #
-  # # Starship prompt
-  # if [[ -f "$DOTFILES/config/starship.toml" ]]; then
-  #   ensure_dir "$XDG_CONFIG_HOME"
-  #   make_link "$DOTFILES/config/starship.toml" "$XDG_CONFIG_HOME/starship.toml"
-  # fi
-  #
-  # # Atuin shell history
-  # # TODO: fix
-  # # if [[ -d "$DOTFILES/config/atuin" ]]; then
-  # #   ensure_dir "$XDG_CONFIG_HOME/atuin"
-  # #   make_link "$DOTFILES/config/atuin/config.toml" "$XDG_CONFIG_HOME/atuin/config.toml"
-  # # fi
-  #
-  # # # Bat (cat replacement)
-  # # if [[ -d "$DOTFILES/config/bat" ]]; then
-  # #   ensure_dir "$XDG_CONFIG_HOME/bat"
-  # #   make_link "$DOTFILES/config/bat/config" "$XDG_CONFIG_HOME/bat/config"
-  # # fi
-  #
-  #
-  # # Neovim
-  # if [[ -d "$DOTFILES/config/nvim" ]]; then
-  #   # ensure_dir "$XDG_CONFIG_HOME/nvim"
-  #   ln -sf "$DOTFILES/config/nvim" "$XDG_CONFIG_HOME/nvim"
-  # fi
-
- # # Zellij terminal multiplexer
-  # if [[ -d "$DOTFILES/config/zellij" ]]; then
-  #   ensure_dir "$XDG_CONFIG_HOME/zellij"
-  #   make_link "$DOTFILES/config/zellij/config.kdl" "$XDG_CONFIG_HOME/zellij/config.kdl"
-  # fi
-  
-  # Neovim
-  # ln -sf "$DOTFILES/config/nvim" "$XDG_CONFIG_HOME/nvim"
-
-
-  # if [[ -d "$DOTFILES/config/nvim" ]]; then
-  #   ensure_dir "$XDG_CONFIG_HOME/nvim"
-
-  #   # Link critical Neovim files
-  #   if [[ -f "$DOTFILES/config/nvim/init.lua" ]]; then
-  #     make_link "$DOTFILES/config/nvim/init.lua" "$XDG_CONFIG_HOME/nvim/init.lua"
-  #   fi
-
-  #   # Link other Neovim config files
-  #   for file in "$DOTFILES/config/nvim/"*.{json,md,vim}; do
-  #     if [[ -f "$file" ]]; then
-  #       local filename=$(basename "$file")
-  #       make_link "$file" "$XDG_CONFIG_HOME/nvim/$filename"
-  #     fi
-  #   done
-
-  #   # Recursively link lua directory if it exists
-  #   if [[ -d "$DOTFILES/config/nvim/lua" ]]; then
-  #     ensure_dir "$XDG_CONFIG_HOME/nvim/lua"
-
-  #     # Find all lua files and link them
-  #     find "$DOTFILES/config/nvim/lua" -type f -name "*.lua" | while read -r file; do
-  #       local rel_path="${file#$DOTFILES/config/nvim/}"
-  #       local target_dir="$(dirname "$XDG_CONFIG_HOME/nvim/$rel_path")"
-  #       ensure_dir "$target_dir"
-  #       make_link "$file" "$XDG_CONFIG_HOME/nvim/$rel_path"
-  #     done
-  #   fi
-  # fi
-
-  # # Espanso text expander
-  # if [[ -d "$DOTFILES/config/espanso" ]]; then
-  #   ensure_dir "$XDG_CONFIG_HOME/espanso/match"
-  #   ensure_dir "$XDG_CONFIG_HOME/espanso/config"
-  #
-  #   if [[ -f "$DOTFILES/config/espanso/match/base.yml" ]]; then
-  #     make_link "$DOTFILES/config/espanso/match/base.yml" "$XDG_CONFIG_HOME/espanso/match/base.yml"
-  #   fi
-  #
-  #   if [[ -f "$DOTFILES/config/espanso/config/default.yml" ]]; then
-  #     make_link "$DOTFILES/config/espanso/config/default.yml" "$XDG_CONFIG_HOME/espanso/config/default.yml"
-  #   fi
-  # fi
 }
-
-# -----------------------------------------------------------------------------
-# GUI Apps Configuration
-# -----------------------------------------------------------------------------
-# setup_gui_apps() {
-#   info "Setting up GUI applications configuration..."
-#
-#   # Karabiner (keyboard customization)
-#   if [[ -d "$DOTFILES/config/karabiner" ]]; then
-#     ensure_dir "$XDG_CONFIG_HOME/karabiner"
-#     make_link "$DOTFILES/config/karabiner/karabiner.json" "$XDG_CONFIG_HOME/karabiner/karabiner.json"
-#   fi
-#
-#   # # VS Code
-#   # if [[ -d "$DOTFILES/config/vscode" ]]; then
-#   #   ensure_dir "$HOME/Library/Application Support/Code/User"
-#   #   make_link "$DOTFILES/config/vscode/settings.json" "$HOME/Library/Application Support/Code/User/settings.json"
-#   #   make_link "$DOTFILES/config/vscode/keybindings.json" "$HOME/Library/Application Support/Code/User/keybindings.json"
-#   # fi
-#   #
-#   # Cursor (VS Code-based editor)
-#   if [[ -d "$DOTFILES/config/cursor" ]]; then
-#     ensure_dir "$HOME/Library/Application Support/Cursor/User"
-#     make_link "$DOTFILES/config/cursor/settings.json" "$HOME/Library/Application Support/Cursor/User/settings.json"
-#     make_link "$DOTFILES/config/cursor/keybindings.json" "$HOME/Library/Application Support/Cursor/User/keybindings.json"
-#   fi
-#
-#   # Hammerspoon
-#   if [[ -d "$DOTFILES/config/hammerspoon" ]]; then
-#     ln -sf "$DOTFILES/config/hammerspoon" "$HOME/.hammerspoon"
-#     # ensure_dir "$HOME/.hammerspoon"
-#     # make_link "$DOTFILES/config/hammerspoon/init.lua" "$HOME/.hammerspoon/init.lua"
-#   fi
-#
-#   # Claude Desktop
-#   if [[ -d "$DOTFILES/config/ai/claude" ]]; then
-#     ensure_dir "$HOME/Library/Application Support/Claude"
-#     make_link "$DOTFILES/config/ai/claude/claude_desktop_config.json" "$HOME/Library/Application Support/Claude/claude_desktop_config.json"
-#   fi
-# }
 
 # -----------------------------------------------------------------------------
 # macOS System Preferences
