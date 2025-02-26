@@ -13,6 +13,8 @@
 auto-update = download
 window-save-state = always
 
+macos-non-native-fullscreen = true
+
 # This controls whether an initial window is created when Ghostty is run. 
 initial-window = true
 
@@ -42,11 +44,23 @@ window-padding-y  = 12
 confirm-close-surface = false
 mouse-hide-while-typing = false
 
+# toggle visibility
+keybind = global:cmd+period=toggle_visibility
+
+# keybind = global:cmd+period ~~ raycast toggle ghostty
+keybind = global:opt+period=toggle_quick_terminal
+
+
+########################
+# Quick terminal
+########################
+
 # Quick terminal (floating)
 quick-terminal-animation-duration = 0
 
 # center, top, bottom, left, right
-quick-terminal-position = top
+# quick-terminal-position = top
+quick-terminal-position = center
 
 # main, mouse, macos-menu-bar
 quick-terminal-screen = main
@@ -55,10 +69,16 @@ quick-terminal-screen = main
 # Set it to false for the quick terminal to remain open even when it loses focus.
 quick-terminal-autohide = true
 
-# Shell (Zsh) integration
-shell-integration = zsh
+# Shell (Zsh) integration (detect, none, zsh, bash, etc)
+shell-integration = detect
 
-cursor-style = block
+# shell intg features
+shell-integration-features = "cursor, title"
+
+bold-is-bright = true
+
+# cursor style (block, bar)
+cursor-style = bar
 cursor-style-blink = true
 
 # enables cmd+click to follow URL
@@ -91,6 +111,10 @@ fullscreen = false
 # - docs link : https://github.com/ghostty-org/ghostty/blob/d6e76858164d52cff460fedc61ddf2e560912d71/src/input/key.zig#L255
 ###########################
 
+##############################
+# General
+##############################
+
 keybind = cmd+comma=open_config
 keybind = cmd+shift+comma=reload_config
 
@@ -104,11 +128,87 @@ keybind = cmd+shift+down=jump_to_prompt:1
 keybind = cmd+shift+up=jump_to_prompt:-1
 # keybind = opt+up=jump_to_prompt:-1
 
+# Clipboard copy -> https://ghostty.org/docs/config/keybind#performable:
+keybind = performable:ctrl+c=copy_to_clipboard
+
+##############################
+# Selection
+##############################
+
+# Example: Extend selection to the right keybind = shift+right=adjust_selection:right
+# Adjust the current selection in a given direction. Does nothing if no selection exists.
+# Arguments:
+#    left, right, up, down, page_up, page_down, home, end, beginning_of_line, end_of_line
+# Example: Extend selection to the right 
+keybind = shift+right=adjust_selection:right
+keybind = shift+left=adjust_selection:left
+keybind = shift+up=adjust_selection:up
+keybind = shift+down=adjust_selection:down
+
+keybind = ctrl+up=adjust_selection:page_up
+keybind = ctrl+down=adjust_selection:page_down
+
+keybind = ctrl+h=adjust_selection:beginning_of_line
+keybind = ctrl+l=adjust_selection:end_of_line
+
+########################
+# Tabs
+########################
+
+keybind = ctrl+t>t=toggle_tab_overview
+keybind = ctrl+t>n=new_tab
+keybind = ctrl+t>h=previous_tab
+keybind = ctrl+t>l=next_tab
+keybind = ctrl+t>d=close_tab
+
+########################
+# Windows
+########################
+# https://ghostty.org/docs/config/keybind/sequence
+# keybind = ctrl+a>n=new_window
 
 
-# keybind = global:cmd+period ~~ raycast toggle ghostty
-keybind = global:opt+period=toggle_quick_terminal
 
-keybind = global:cmd+period=
+
+
+###############################################
+# Splits
+###############################################
+
+# new_split - Create a new split in the given direction.
+# Arguments:
+#     right, down, left, up, auto (splits along the larger direction)
+# Example: Create split on the right keybind = cmd+shift+d=new_split:right
+
+# Create split on the right 
+
+keybind = ctrl+shift+\=new_split:right
+keybind = ctrl+shift+-=new_split:down
+
+# keybind = cmd+left=goto_split:left
+# keybind = cmd+down=goto_split:down
+# keybind = cmd+up=goto_split:up
+# keybind = cmd+right=goto_split:right
+
+# keybind = cmd+shift+h=goto_split:left
+# keybind = cmd+shift+j=goto_split:down
+# keybind = cmd+shift+k=goto_split:up
+# keybind = cmd+shift+l=goto_split:right
+
+
+# Equalize splits (ctrl+w -> =)
+keybind = ctrl+w>equal=equalize_splits
+
+# Resize the current split in a given direction.
+# Arguments:
+#     up, down, left, right
+#     the number of pixels to resize the split by
+# Example: Move divider up 10 pixels keybind = cmd+shift+up=resize_split:up,10
+
+# Move divider up 10 pixels 
+keybind = cmd+shift+up=resize_split:up,10
+keybind = cmd+shift+down=resize_split:down,10
+keybind = cmd+shift+left=resize_split:left,10
+keybind = cmd+shift+right=resize_split:right,10
 
 
