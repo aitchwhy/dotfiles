@@ -1,15 +1,14 @@
 #!/usr/bin/env zsh
 
+# ========================================================================
 # install.zsh - macOS dotfiles installation script
-# Expects dotfiles repo to already be cloned at ~/dotfiles
+# ========================================================================
 
 set -euo pipefail
 
-
-
-# -----------------------------------------------------------------------------
+# ========================================================================
 # Environment Configuration
-# -----------------------------------------------------------------------------
+# ========================================================================
 export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
 export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
@@ -18,20 +17,17 @@ export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 export ZDOTDIR_TARGET="$DOTFILES/config/zsh"
 export BACKUP_DIR="$HOME/.dotfiles_backup/$(date +%Y%m%d_%H%M%S)"
 
-
-
 # Source utilities
 if [[ ! -f "$DOTFILES/utils.sh" ]]; then
   echo "Error: utils.sh not found in $DOTFILES. Please ensure the dotfiles repository is properly cloned."
   exit 1
 fi
 
-. "$DOTFILES/utils.sh"
+source "$DOTFILES/utils.sh"
 
-
-# -----------------------------------------------------------------------------
-# Verify Repository Structure
-# -----------------------------------------------------------------------------
+# ========================================================================
+# Repository Verification
+# ========================================================================
 verify_repo_structure() {
   info "Verifying dotfiles repository structure..."
 
@@ -58,7 +54,6 @@ verify_repo_structure() {
   [[ ! -f "$DOTFILES/config/zsh/.zshrc" ]] && missing_items+=("config/zsh/.zshrc file")
   [[ ! -f "$DOTFILES/config/zsh/.zprofile" ]] && missing_items+=("config/zsh/.zprofile file")
   [[ ! -d "$DOTFILES/config/nvim" ]] && missing_items+=("config/nvim dir")
-  # [[ ! -f "$DOTFILES/config/zsh/.zshenv" ]] && missing_items+=("config/zsh/.zshenv file")
 
   if (( ${#missing_items[@]} > 0 )); then
     error "The dotfiles repository is missing critical components:"
@@ -72,25 +67,10 @@ verify_repo_structure() {
   success "Repository structure verified successfully"
 }
 
-# -----------------------------------------------------------------------------
+# ========================================================================
 # ZSH Setup
-# -----------------------------------------------------------------------------
-# # Setup minimal .zshenv
-# setup_zshenv() {
-#   local zshenv="$HOME/.zshenv"
-#   info "Setting up .zshenv at $zshenv"
-#
-#   cat >"$zshenv" <<EOF
-# # Minimal stub for Zsh
-# export ZDOTDIR="$ZDOTDIR"
-# [[ -f "$ZDOTDIR/.zshenv" ]] && source "$ZDOTDIR/.zshenv"
-# EOF
-#
-#   success "Created $zshenv pointing to $ZDOTDIR"
-# }
-
+# ========================================================================
 setup_zsh() {
-
   info "Setting up ZSH configuration..."
 
   # Backup existing .zshenv if it exists
@@ -110,30 +90,15 @@ EOF
 
   chmod 644 "$HOME/.zshenv"
   success "Created $HOME/.zshenv pointing to $ZDOTDIR_TARGET"
-
-  # # Ensure XDG config directory exists
-  # ensure_dir "$XDG_CONFIG_HOME"
-  
-  # # Link ZSH config dir to XDG location for compatibility
-  # if [[ -e "$XDG_CONFIG_HOME/zsh" || -L "$XDG_CONFIG_HOME/zsh" ]]; then
-  #   backup_file "$XDG_CONFIG_HOME/zsh"
-  #   rm -rf "$XDG_CONFIG_HOME/zsh"
-  # fi
-  #
-  
-  # # Create dir symlink (symlink .config/zsh --pointing--> dotfiles/config/zsh
-  # ln -sf "$ZDOTDIR_TARGET" "$XDG_CONFIG_HOME/zsh"
-  # success "Linked ZSH configuration to $XDG_CONFIG_HOME/zsh"
 }
 
-# -----------------------------------------------------------------------------
+# ========================================================================
 # Homebrew Setup
-# -----------------------------------------------------------------------------
+# ========================================================================
 setup_homebrew() {
   info "Setting up Homebrew..."
 
-  # if ! has_command brew; then
-  if [[ ! -x /opt/homebrew/bin/brew ]]; then
+  if [[ ! -x /opt/homebrew/bin/brew ]] && [[ ! -x /usr/local/bin/brew ]]; then
     info "Installing Homebrew..."
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
@@ -150,127 +115,80 @@ setup_homebrew() {
   info "Updating Homebrew..."
   brew update
 
-  # # Install from Brewfile
-  # if [[ -f "$DOTFILES/Brewfile" ]]; then
-  #   info "Installing packages from Brewfile..."
-  #   # Ask user if they want to install all packages (could take time) or just essentials
-  #   local answer
-  #   read -q "answer? Install all Homebrew packages? This may take a while. [y/N] "
-  #   echo ""
+  # Install from Brewfile
+  if [[ -f "$DOTFILES/Brewfile" ]]; then
+    info "Installing packages from Brewfile..."
+    read -q "answer?Install all Homebrew packages? This may take a while. [y/N] "
+    echo ""
 
-  #   if [[ "$answer" =~ ^[Yy]$ ]]; then
-  #     # Full installation
-  #     brew bundle install --file="$DOTFILES/Brewfile" --no-lock
-  #   else
-  #     # Install just essential packages for dotfiles to work
-  #     info "Installing essential packages only..."
-  #     brew install starship atuin zoxide bat zsh-syntax-highlighting zsh-autosuggestions fzf git
-  #   fi
-  # else
-  #   warn "Brewfile not found at $DOTFILES/Brewfile"
-  # fi
+    if [[ "$answer" =~ ^[Yy]$ ]]; then
+      # Full installation
+      brew bundle install --file="$DOTFILES/Brewfile" --no-lock
+    else
+      # Install just essential packages
+      info "Installing essential packages only..."
+      brew install starship atuin zoxide bat zsh-syntax-highlighting zsh-autosuggestions fzf git
+    fi
+  else
+    warn "Brewfile not found at $DOTFILES/Brewfile"
+  fi
 }
 
-# -----------------------------------------------------------------------------
-# CLI Tools Configuration
-# -----------------------------------------------------------------------------
+# ========================================================================
+# Config File Linking
+# ========================================================================
 setup_cli_tools() {
   info "Setting up CLI tools configuration..."
 
   declare -A DOTFILES_TO_SYMLINK_MAP=(
-  	# ["$DOTFILES/config/zsh/.zshrc"]="$ZDOTDIR_TARGET/.zshrc"
-  	# ["$DOTFILES/config/zsh/.zprofile"]="$ZDOTDIR_TARGET/.zprofile"
-  	# ["zsh/aliases.zsh"]="$ZDOTDIR_TARGET/aliases.zsh"
-  	# ["zsh/functions.zsh"]="$ZDOTDIR_TARGET/functions.zsh"
-  	# ["zsh/fzf.zsh"]="$ZDOTDIR_TARGET/fzf.zsh"
-  
-  	["$DOTFILES/config/git/gitconfig"]="$HOME/.gitconfig"
-  	["$DOTFILES/config/git/gitignore"]="$HOME/.gitignore"
-  
-  	["$DOTFILES/config/starship.toml"]="$XDG_CONFIG_HOME/starship.toml"
-  	["$DOTFILES/config/nvim"]="$XDG_CONFIG_HOME/nvim"
-  	["$DOTFILES/config/ghostty"]="$XDG_CONFIG_HOME/ghostty"
-  	["$DOTFILES/config/atuin"]="$XDG_CONFIG_HOME/atuin"
-  	["$DOTFILES/config/bat"]="$XDG_CONFIG_HOME/bat"
-  	["$DOTFILES/config/zellij"]="$XDG_CONFIG_HOME/zellij"
-  	["$DOTFILES/config/espanso"]="$XDG_CONFIG_HOME/espanso"
-  	["$DOTFILES/config/karabiner/karabiner.json"]="$XDG_CONFIG_HOME/karabiner/karabiner.json"
-  
-  	["$DOTFILES/config/vscode/settings.json"]="$HOME/Library/Application\ Support/Code/User/settings.json"
-  	["$DOTFILES/config/vscode/keybindings.json"]="$HOME/Library/Application\ Support/Code/User/keybindings.json"
-  	# ["$DOTFILES/config/vscode/settings.json"]="$HOME/Library/Application Support/Cursor/User/settings.json"
-  	# ["$DOTFILES/config/vscode/keybindings.json"]="$HOME/Library/Application Support/Cursor/User/keybindings.json"
-  	# $HOME/Library/Application Support/Code/User/settings.json
-  	["$DOTFILES/config/cursor/settings.json"]="$HOME/Library/Application\ Support/Cursor/User/settings.json"
-  	["$DOTFILES/config/cursor/keybindings.json"]="$HOME/Library/Application\ Support/Cursor/User/keybindings.json"
-  	# $HOME/Library/Application Support/Cursor/User/settings.json
-  
-  	["$DOTFILES/config/hammerspoon"]="$HOME/.hammerspoon"
-  
-  	["$DOTFILES/config/ai/claude/claude_desktop_config.json"]="$HOME/Library/Application\ Support/Claude/claude_desktop_config.json"
+    ["$DOTFILES/config/git/gitconfig"]="$HOME/.gitconfig"
+    ["$DOTFILES/config/git/gitignore"]="$HOME/.gitignore"
+    ["$DOTFILES/config/starship.toml"]="$XDG_CONFIG_HOME/starship.toml"
+    ["$DOTFILES/config/karabiner/karabiner.json"]="$XDG_CONFIG_HOME/karabiner/karabiner.json"
+    ["$DOTFILES/config/nvim"]="$XDG_CONFIG_HOME/nvim"
+    ["$DOTFILES/config/ghostty"]="$XDG_CONFIG_HOME/ghostty"
+    ["$DOTFILES/config/atuin"]="$XDG_CONFIG_HOME/atuin"
+    ["$DOTFILES/config/bat"]="$XDG_CONFIG_HOME/bat"
+    ["$DOTFILES/config/zellij"]="$XDG_CONFIG_HOME/zellij"
+    ["$DOTFILES/config/espanso"]="$XDG_CONFIG_HOME/espanso"
+    ["$DOTFILES/config/vscode/settings.json"]="$HOME/Library/Application Support/Code/User/settings.json"
+    ["$DOTFILES/config/vscode/keybindings.json"]="$HOME/Library/Application Support/Code/User/keybindings.json"
+    ["$DOTFILES/config/cursor/settings.json"]="$HOME/Library/Application Support/Cursor/User/settings.json"
+    ["$DOTFILES/config/cursor/keybindings.json"]="$HOME/Library/Application Support/Cursor/User/keybindings.json"
+    ["$DOTFILES/config/hammerspoon"]="$HOME/.hammerspoon"
+    ["$DOTFILES/config/ai/claude/claude_desktop_config.json"]="$HOME/Library/Application Support/Claude/claude_desktop_config.json"
   )
 
-
-  ############
-  # # Zsh-specific, not POSIX compliant
-  # declare -A my_array
-  # my_array=(
-  #   [key1]=value1
-  #   [key2]=value2
-  #   [key3]=value3
-  # )
-  # for key in "${(@k)my_array}"; do
-  #   echo "Key: $key, Value: ${my_array[$key]}"
-  # done
-  ############
-
-  # Link (orig file) <- (new symlink)
-
-  for key in "${(@k)DOTFILES_TO_SYMLINK_MAP}"; do
-    # echo "Key: $key, Value: ${DOTFILES_TO_SYMLINK_MAP[$key]}"
-    local k="$key"
-    local v="${DOTFILES_TO_SYMLINK_MAP[$key]}"
-    # echo "Key: $k, Value: $v"
-    echo "[create link] orig dotfile ($k) <- ($v) new symlink"
-
-    # For both files and directories, get parent dir correctly
-    local parent_dir=$(dirname "$v")
-    echo "ensuring dir exists $parent_dir"
-    ensure_dir $parent_dir
+  for src in "${(@k)DOTFILES_TO_SYMLINK_MAP}"; do
+    local dst="${DOTFILES_TO_SYMLINK_MAP[$src]}"
+    local parent_dir=$(dirname "$dst")
     
-    # Clean up existing symlinks
-    echo "unlinking at target location $v"
-    if [[ -L "$v" ]]; then
-      unlink "$v"
-    elif [[ -d "$v" ]]; then
-      # If there's a directory at the target location, remove symlinks inside it
-      unlink_all_in_dir "$v"
+    # Create parent directory if it doesn't exist
+    ensure_dir "$parent_dir"
+    
+    if [[ -L "$dst" ]]; then
+      # If it's already a symlink, update it
+      rm -f "$dst"
+    elif [[ -e "$dst" ]]; then
+      # If it exists as a file or directory, back it up
+      backup_file "$dst"
+      rm -rf "$dst"
     fi
     
-    if [[ -f "$k" ]] || [[ -d "$k" ]]; then
-      ln -sfw "$k" "$v"
+    # Create the symlink
+    if [[ -e "$src" ]]; then
+      ln -sf "$src" "$dst"
+      success "Linked $src → $dst"
+    else
+      warn "Source '$src' does not exist, skipping"
     fi
-
-
-	#    local parent_dir=$(dirname "$v")
-	#
-	#    echo "ensuring dir exists $parent_dir"
-	#    ensure_dir $parent_dir
-	#
-	#    # unlink ALL existing symlinks in ~/.config/
-	#    echo "unlinking all reachable from dir $parent_dir"
-	#    unlink_all_in_dir "$parent_dir"
-	#
-	#    if [[ -f "$k" ]] || [[ -d "$k" ]]; then
-	# ln -sfw "$k" "$v"
-	#    fi
   done
 }
 
-# -----------------------------------------------------------------------------
+# ========================================================================
 # macOS System Preferences
-# -----------------------------------------------------------------------------
-function setup_macos_preferences() {
+# ========================================================================
+setup_macos_preferences() {
   info "Configuring macOS system preferences..."
 
   # Faster key repeat
@@ -310,10 +228,10 @@ function setup_macos_preferences() {
   success "macOS preferences configured"
 }
 
-# -----------------------------------------------------------------------------
-# Main Setup Function
-# -----------------------------------------------------------------------------
-function main() {
+# ========================================================================
+# Main Installation Function
+# ========================================================================
+main() {
   info "Starting dotfiles setup for macOS..."
 
   # Check if running on macOS
@@ -330,21 +248,7 @@ function main() {
   echo "  ✓ Set up ZSH configuration"
   [[ "$NO_BREW" == "false" ]] && echo "  ✓ Set up Homebrew packages"
   echo "  ✓ Configure CLI tools"
-  echo "  ✓ Configure GUI applications"
   [[ "$NO_MACOS" == "false" ]] && echo "  ✓ Configure macOS preferences"
-  [[ "$MINIMAL" == "false" ]] && echo "  ✓ Set up development environment"
-  [[ "$MINIMAL" == "false" ]] && echo "  ✓ Configure optional tools"
-  echo ""
-
-  # Ask for confirmation
-  # local answer
-  # read -q "answer?Continue with installation? [Y/n] "
-  # echo ""
-
-  # if [[ ! "$answer" =~ ^[Yy]$ && ! -z "$answer" ]]; then
-  #   info "Installation cancelled by user"
-  #   exit 0
-  # fi
 
   # Start installation timer
   local start_time=$(date +%s)
@@ -355,7 +259,6 @@ function main() {
   ensure_dir "$XDG_DATA_HOME"
   ensure_dir "$XDG_STATE_HOME"
 
-
   # Setup components
   setup_zsh
 
@@ -365,7 +268,6 @@ function main() {
     info "Skipping Homebrew setup (--no-brew flag used)"
   fi
 
-  # NOTE: MAIN setup (symlinks)
   setup_cli_tools
 
   if [[ "$NO_MACOS" == "false" ]]; then
@@ -393,7 +295,7 @@ function main() {
 }
 
 # Parse command-line arguments
-function parse_args() {
+parse_args() {
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --no-brew)
@@ -418,7 +320,7 @@ function parse_args() {
         exit 0
         ;;
       *)
-        echo "Unknown option: $1"  # Replace with your warning method
+        echo "Unknown option: $1"
         shift
         ;;
     esac
@@ -430,12 +332,6 @@ NO_BREW=false
 NO_MACOS=false
 MINIMAL=false
 
-# Run if script is executed directly
-# if [[ "${(%):-%x}" == "${0:A}" ]]; then
-#   parse_args "$@"
-#   main "$@"
-# fi
-#
-
+# Run the script
 parse_args "$@"
 main "$@"
