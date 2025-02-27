@@ -7,15 +7,14 @@
 # Empty values reset the configuration to the default value (font-family = )
 ########################
 
-
-# General 
+# General
 
 auto-update = download
 window-save-state = always
 
 macos-non-native-fullscreen = true
 
-# This controls whether an initial window is created when Ghostty is run. 
+# This controls whether an initial window is created when Ghostty is run.
 initial-window = true
 
 macos-option-as-alt = true
@@ -23,7 +22,6 @@ macos-non-native-fullscreen = true
 
 clipboard-read = "allow"
 clipboard-write = "allow"
-
 
 # favs
 # light : zenbones, nord-light
@@ -49,7 +47,6 @@ keybind = global:cmd+period=toggle_visibility
 
 # keybind = global:cmd+period ~~ raycast toggle ghostty
 keybind = global:opt+period=toggle_quick_terminal
-
 
 ########################
 # Quick terminal
@@ -87,21 +84,21 @@ link-url = true
 fullscreen = false
 
 ###########################
-# Keybindings 
+# Keybindings
 #
 # > Syntax is "keybind = trigger=action"
 ###########################
 # SPECIAL CHARS
 #
 # Numeric keys are written as words (e.g. one, two - not 1, 2)
-# Special chars can be both words or single chars (; and semicolon) - (list of chars https://github.com/ghostty-org/ghostty/blob/d6e76858164d52cff460fedc61ddf2e560912d71/src/input/key.zig#L255) 
+# Special chars can be both words or single chars (; and semicolon) - (list of chars https://github.com/ghostty-org/ghostty/blob/d6e76858164d52cff460fedc61ddf2e560912d71/src/input/key.zig#L255)
 ###########################
 # MODIFIER KEYS
 #
 # Valid modifiers are shift, ctrl/control, alt/opt/option, and cmd/command/super. NOT supported fn or "globe" key.
-########################### 
+###########################
 # LEADER KEYS / CHORD SEQUENCE
-# 
+#
 # Specify MULTIPLE triggers separated by > to require a sequence of triggers to activate the action.
 #  - For example, ctrl+a>n=new_window -> new_window action if ctrl+a followed separately by n
 #  - There is no hardcoded limit on the number of parts in a sequence.
@@ -129,7 +126,7 @@ keybind = cmd+shift+up=jump_to_prompt:-1
 # keybind = opt+up=jump_to_prompt:-1
 
 # Clipboard copy -> https://ghostty.org/docs/config/keybind#performable:
-keybind = performable:ctrl+c=copy_to_clipboard
+# keybind = performable:ctrl+c=copy_to_clipboard
 
 ##############################
 # Selection
@@ -139,17 +136,17 @@ keybind = performable:ctrl+c=copy_to_clipboard
 # Adjust the current selection in a given direction. Does nothing if no selection exists.
 # Arguments:
 #    left, right, up, down, page_up, page_down, home, end, beginning_of_line, end_of_line
-# Example: Extend selection to the right 
-keybind = shift+right=adjust_selection:right
-keybind = shift+left=adjust_selection:left
-keybind = shift+up=adjust_selection:up
-keybind = shift+down=adjust_selection:down
+# Example: Extend selection to the right
+keybind = cmd+shift+right=adjust_selection:right
+keybind = cmd+shift+left=adjust_selection:left
+keybind = cmd+shift+up=adjust_selection:up
+keybind = cmd+shift+down=adjust_selection:down
 
-keybind = ctrl+up=adjust_selection:page_up
-keybind = ctrl+down=adjust_selection:page_down
+# keybind = ctrl+up=adjust_selection:page_up
+# keybind = ctrl+down=adjust_selection:page_down
 
-keybind = ctrl+h=adjust_selection:beginning_of_line
-keybind = ctrl+l=adjust_selection:end_of_line
+# keybind = ctrl+h=adjust_selection:beginning_of_line
+# keybind = ctrl+l=adjust_selection:end_of_line
 
 ########################
 # Tabs
@@ -167,10 +164,6 @@ keybind = ctrl+t>d=close_tab
 # https://ghostty.org/docs/config/keybind/sequence
 # keybind = ctrl+a>n=new_window
 
-
-
-
-
 ###############################################
 # Splits
 ###############################################
@@ -180,10 +173,10 @@ keybind = ctrl+t>d=close_tab
 #     right, down, left, up, auto (splits along the larger direction)
 # Example: Create split on the right keybind = cmd+shift+d=new_split:right
 
-# Create split on the right 
+# Create split on the right
 
-keybind = ctrl+shift+\=new_split:right
-keybind = ctrl+shift+-=new_split:down
+# keybind = ctrl+shift+\=new_split:right
+# keybind = ctrl+shift+-=new_split:down
 
 # keybind = cmd+left=goto_split:left
 # keybind = cmd+down=goto_split:down
@@ -195,9 +188,8 @@ keybind = ctrl+shift+-=new_split:down
 # keybind = cmd+shift+k=goto_split:up
 # keybind = cmd+shift+l=goto_split:right
 
-
 # Equalize splits (ctrl+w -> =)
-keybind = ctrl+w>equal=equalize_splits
+# keybind = ctrl+w>equal=equalize_splits
 
 # Resize the current split in a given direction.
 # Arguments:
@@ -205,10 +197,8 @@ keybind = ctrl+w>equal=equalize_splits
 #     the number of pixels to resize the split by
 # Example: Move divider up 10 pixels keybind = cmd+shift+up=resize_split:up,10
 
-# Move divider up 10 pixels 
-keybind = cmd+shift+up=resize_split:up,10
-keybind = cmd+shift+down=resize_split:down,10
-keybind = cmd+shift+left=resize_split:left,10
-keybind = cmd+shift+right=resize_split:right,10
-
-
+# # Move divider up 10 pixels
+# keybind = cmd+shift+up=resize_split:up,10
+# keybind = cmd+shift+down=resize_split:down,10
+# keybind = cmd+shift+left=resize_split:left,10
+# keybind = cmd+shift+right=resize_split:right,10
