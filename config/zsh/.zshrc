@@ -40,7 +40,7 @@ bindkey '^R' history-incremental-search-backward
 bindkey '^?' backward-delete-char # Backspace working after vi mode
 
 # Completions
-autoload -U compinit
+autoload -Uz compinit
 compinit
 
 ########

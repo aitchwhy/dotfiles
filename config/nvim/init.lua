@@ -1,9 +1,24 @@
---------------------------
--- (init.lua) Lua config for neovim. Coming from Vim lanuage? See
--- https://neovim.io/doc/user/lua.html for the basics.
--- https://daler.github.io/dotfiles/vim.html
---------------------------
--- bootstrap lazy.nvim, LazyVim and your plugins
--- The files autocmds.lua, keymaps.lua, lazy.lua and options.lua under lua/config will be automatically loaded at the appropriate time, so you don't need to require those files manually.
--- LazyVim comes with a set of default config files that will be loaded before your own.
+-----------------------------------------------------------------------------------
+-- Neovim Configuration (init.lua) - Based on LazyVim (Updated February 2025)
+-----------------------------------------------------------------------------------
+-- 
+-- This file serves as the entry point for the Neovim configuration.
+-- LazyVim manages the loading of all plugins and configurations.
+--
+-- Key resources:
+-- * Lua for Neovim: https://neovim.io/doc/user/lua.html
+-- * LazyVim Documentation: https://www.lazyvim.org/
+--
+-- Directory structure:
+-- * lua/config/: Core configuration files
+--   - lazy.lua: Plugin manager setup (loaded here)
+--   - options.lua: Vim options (loaded on startup)
+--   - keymaps.lua: Custom key mappings (loaded on VeryLazy)
+--   - autocmds.lua: Auto commands (loaded on VeryLazy)
+-- * lua/plugins/: Custom plugin configurations (loaded by lazy.nvim)
+--
+-- LazyVim loads its default configurations before your custom ones,
+-- allowing you to override them as needed.
+
+-- Bootstrap lazy.nvim, LazyVim and plugins
 require("config.lazy")

@@ -17,7 +17,6 @@
   "cursor.aipreview.enabled": true,
   "cursor.cmdk.useThemedDiffBackground": true,
   "cursor.composer.cmdPFilePicker2": true,
-  "cursor.composer.shouldAutoScrollToBottom": false,
   "cursor.cpp.enablePartialAccepts": true,
   "cursor.diffs.useCharacterLevelDiffs": true,
   "cursor.general.enableShadowWorkspace": true,
@@ -1489,5 +1488,25 @@
   "workbench.preferredLightColorTheme": "Gitpod Dark",
   "workbench.reduceMotion": "on",
   "xstate.nestTypegenFiles": false,
-  "explorer.confirmDragAndDrop": false
+  "explorer.confirmDragAndDrop": false,
+  "yaml.schemas": {
+    "file:///Users/hank/.cursor/extensions/atlassian.atlascode-3.4.11/resources/schemas/pipelines-schema.json": "bitbucket-pipelines.yml"
+  },
+  "workbench.colorCustomizations": {},
+  "cursor.composer.shouldShowMarkdownHoverParticipantActions2": true,
+  "cursor.preferNotificationsSameAsChat": true,
+  "files.exclude": {
+    "**/.trunk/*actions/": true,
+    "**/.trunk/*logs/": true,
+    "**/.trunk/*notifications/": true,
+    "**/.trunk/*out/": true,
+    "**/.trunk/*plugins/": true
+  },
+  "files.watcherExclude": {
+    "**/.trunk/*actions/": true,
+    "**/.trunk/*logs/": true,
+    "**/.trunk/*notifications/": true,
+    "**/.trunk/*out/": true,
+    "**/.trunk/*plugins/": true
+  }
 }
