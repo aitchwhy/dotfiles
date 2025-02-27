@@ -9,7 +9,7 @@
         "git diff",
         "git show"
     ],
-    "workbench.colorTheme": "Tokyo Night Light",
+    "workbench.colorTheme": "Cursor Dark Midnight",
     "[lua]": {
         "editor.defaultFormatter": "sumneko.lua"
     },

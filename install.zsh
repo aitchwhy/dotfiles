@@ -178,14 +178,14 @@ setup_cli_tools() {
   info "Setting up CLI tools configuration..."
 
   declare -A DOTFILES_TO_SYMLINK_MAP=(
-  	# ["$DOTFILES/config/zsh/.zshrc"]="$ZDOTDIR_TARGET/.zshrc"
-  	# ["$DOTFILES/config/zsh/.zprofile"]="$ZDOTDIR_TARGET/.zprofile"
-  	# ["zsh/aliases.zsh"]="$ZDOTDIR/aliases.zsh"
-  	# ["zsh/functions.zsh"]="$ZDOTDIR/functions.zsh"
-  	# ["zsh/fzf.zsh"]="$ZDOTDIR/fzf.zsh"
+  	["$DOTFILES/config/zsh/.zshrc"]="$ZDOTDIR_TARGET/.zshrc"
+  	["$DOTFILES/config/zsh/.zprofile"]="$ZDOTDIR_TARGET/.zprofile"
+  	["zsh/aliases.zsh"]="$ZDOTDIR_TARGET/aliases.zsh"
+  	["zsh/functions.zsh"]="$ZDOTDIR_TARGET/functions.zsh"
+  	["zsh/fzf.zsh"]="$ZDOTDIR_TARGET/fzf.zsh"
   
   	["$DOTFILES/config/git/gitconfig"]="$HOME/.gitconfig"
-  	["$DOTFILES/config/git/gitignore"]="$HOME/.gitignore1"
+  	["$DOTFILES/config/git/gitignore"]="$HOME/.gitignore"
   
   	["$DOTFILES/config/starship.toml"]="$XDG_CONFIG_HOME/starship.toml"
   	["$DOTFILES/config/nvim"]="$XDG_CONFIG_HOME/nvim"
@@ -196,20 +196,18 @@ setup_cli_tools() {
   	["$DOTFILES/config/espanso"]="$XDG_CONFIG_HOME/espanso"
   	["$DOTFILES/config/karabiner/karabiner.json"]="$XDG_CONFIG_HOME/karabiner/karabiner.json"
   
-  	["$DOTFILES/config/vscode/settings.json"]="$XDG_CONFIG_HOME/vscode/settings.json"
-  	["$DOTFILES/config/vscode/settings.json"]="$HOME/Library/Application Support/Cursor/User/settings.json"
-  	["$DOTFILES/config/vscode/keybindings.json"]="$XDG_CONFIG_HOME/vscode/keybindings.json"
-  	["$DOTFILES/config/vscode/keybindings.json"]="$HOME/Library/Application Support/Cursor/User/keybindings.json"
+  	["$DOTFILES/config/vscode/settings.json"]="$HOME/Library/Application\ Support/Code/User/settings.json"
+  	["$DOTFILES/config/vscode/keybindings.json"]="$HOME/Library/Application\ Support/Code/User/keybindings.json"
+  	# ["$DOTFILES/config/vscode/settings.json"]="$HOME/Library/Application Support/Cursor/User/settings.json"
+  	# ["$DOTFILES/config/vscode/keybindings.json"]="$HOME/Library/Application Support/Cursor/User/keybindings.json"
   	# $HOME/Library/Application Support/Code/User/settings.json
-  	["$DOTFILES/config/cursor/settings.json"]="$XDG_CONFIG_HOME/cursor/settings.json"
-  	["$DOTFILES/config/cursor/settings.json"]="$HOME/Library/Application Support/Cursor/User/settings.json"
-  	["$DOTFILES/config/cursor/keybindings.json"]="$XDG_CONFIG_HOME/cursor/keybindings.json"
-  	["$DOTFILES/config/cursor/keybindings.json"]="$HOME/Library/Application Support/Cursor/User/keybindings.json"
+  	["$DOTFILES/config/cursor/settings.json"]="$HOME/Library/Application\ Support/Cursor/User/settings.json"
+  	["$DOTFILES/config/cursor/keybindings.json"]="$HOME/Library/Application\ Support/Cursor/User/keybindings.json"
   	# $HOME/Library/Application Support/Cursor/User/settings.json
   
   	["$DOTFILES/config/hammerspoon"]="$HOME/.hammerspoon"
   
-  	["$DOTFILES/config/ai/claude/claude_desktop_config.json"]="$HOME/Library/Application Support/Claude/claude_desktop_config.json"
+  	["$DOTFILES/config/ai/claude/claude_desktop_config.json"]="$HOME/Library/Application\ Support/Claude/claude_desktop_config.json"
   )
 
 
@@ -234,18 +232,38 @@ setup_cli_tools() {
     local v="${DOTFILES_TO_SYMLINK_MAP[$key]}"
     # echo "Key: $k, Value: $v"
     echo "[create link] orig dotfile ($k) <- ($v) new symlink"
-    local parent_dir=$(basename "$v")
 
+    # For both files and directories, get parent dir correctly
+    local parent_dir=$(dirname "$v")
     echo "ensuring dir exists $parent_dir"
     ensure_dir $parent_dir
-
-    # unlink ALL existing symlinks in ~/.config/
-    echo "unlinking all reachable from dir $parent_dir"
-    unlink_all_in_dir "$parent_dir"
-
-    if [[ -f "$k" ]] || [[ -d "$k" ]]; then
-	ln -sfw "$k" "$v"
+    
+    # Clean up existing symlinks
+    echo "unlinking at target location $v"
+    if [[ -L "$v" ]]; then
+      unlink "$v"
+    elif [[ -d "$v" ]]; then
+      # If there's a directory at the target location, remove symlinks inside it
+      unlink_all_in_dir "$v"
     fi
+    
+    if [[ -f "$k" ]] || [[ -d "$k" ]]; then
+      ln -sfw "$k" "$v"
+    fi
+
+
+	#    local parent_dir=$(dirname "$v")
+	#
+	#    echo "ensuring dir exists $parent_dir"
+	#    ensure_dir $parent_dir
+	#
+	#    # unlink ALL existing symlinks in ~/.config/
+	#    echo "unlinking all reachable from dir $parent_dir"
+	#    unlink_all_in_dir "$parent_dir"
+	#
+	#    if [[ -f "$k" ]] || [[ -d "$k" ]]; then
+	# ln -sfw "$k" "$v"
+	#    fi
   done
 }
 
