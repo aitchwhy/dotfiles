@@ -243,7 +243,7 @@ setup_cli_tools() {
     echo "unlinking all reachable from dir $parent_dir"
     unlink_all_in_dir "$parent_dir"
 
-    if [[ -f "$k" ]]; then
+    if [[ -f "$k" ]] || [[ -d "$k" ]]; then
 	ln -sfw "$k" "$v"
     fi
   done
