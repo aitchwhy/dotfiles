@@ -4,6 +4,11 @@
 # ZSH aliases - Organized by category
 # ========================================================================
 
+alias optbrew="/opt/homebrew/bin/brew"
+
+alias lg=lazygit
+
+
 # ========================================================================
 # Navigation Shortcuts
 # ========================================================================
@@ -68,8 +73,9 @@ alias flush="dscacheutil -flushcache && killall -HUP mDNSResponder" # Flush DNS
 # ========================================================================
 # Dotfiles Management
 # ========================================================================
-alias zdots='cd $ZDOTDIR'
-alias zedit="fd --no-ignore --hidden --follow --type f -x $EDITOR $ZDOTDIR"
+alias zdotdir='cd $ZDOTDIR'
+alias ze="fd --no-ignore --hidden --follow --type f -x $EDITOR $ZDOTDIR"
+alias ze="fd --hidden . $ZDOTDIR | xargs nvim"
 alias dots="cd $DOTFILES"
 alias dotedit="fd --no-ignore --hidden --follow --type f -x $EDITOR $DOTFILES"
 alias zreload="exec zsh"
