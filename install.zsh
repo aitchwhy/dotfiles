@@ -178,11 +178,11 @@ setup_cli_tools() {
   info "Setting up CLI tools configuration..."
 
   declare -A DOTFILES_TO_SYMLINK_MAP=(
-  	["$DOTFILES/config/zsh/.zshrc"]="$ZDOTDIR_TARGET/.zshrc"
-  	["$DOTFILES/config/zsh/.zprofile"]="$ZDOTDIR_TARGET/.zprofile"
-  	["zsh/aliases.zsh"]="$ZDOTDIR_TARGET/aliases.zsh"
-  	["zsh/functions.zsh"]="$ZDOTDIR_TARGET/functions.zsh"
-  	["zsh/fzf.zsh"]="$ZDOTDIR_TARGET/fzf.zsh"
+  	# ["$DOTFILES/config/zsh/.zshrc"]="$ZDOTDIR_TARGET/.zshrc"
+  	# ["$DOTFILES/config/zsh/.zprofile"]="$ZDOTDIR_TARGET/.zprofile"
+  	# ["zsh/aliases.zsh"]="$ZDOTDIR_TARGET/aliases.zsh"
+  	# ["zsh/functions.zsh"]="$ZDOTDIR_TARGET/functions.zsh"
+  	# ["zsh/fzf.zsh"]="$ZDOTDIR_TARGET/fzf.zsh"
   
   	["$DOTFILES/config/git/gitconfig"]="$HOME/.gitconfig"
   	["$DOTFILES/config/git/gitignore"]="$HOME/.gitignore"
