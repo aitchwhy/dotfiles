@@ -98,6 +98,8 @@ brew "gdrive"
 brew "gh"
 # Work on GitHub issues on the command-line
 brew "ghi"
+# Interpreter for PostScript and PDF
+brew "ghostscript"
 # Distributed revision control system
 brew "git"
 # Syntax-highlighting pager for git and diff output
@@ -146,6 +148,8 @@ brew "lazygit"
 brew "lnav"
 # Clone of ls with colorful output, file type icons, and more
 brew "lsd"
+# Powerful, lightweight programming language
+brew "lua"
 # Language Server for the Lua language
 brew "lua-language-server"
 # Package manager for the Lua programming language
@@ -309,11 +313,6 @@ brew "stripe/stripe-cli/stripe"
 # Temporal Cloud CLI (tcld)
 brew "temporalio/brew/tcld"
 brew "yakitrak/yakitrak/obsidian-cli"
-
-
-
-cask "font-fira-mono-nerd-font"
-cask "font-sf-mono-nerd-font-ligaturized"
 # Renamer for files, music and photos
 cask "a-better-finder-rename"
 # Note editor and whiteboard
@@ -342,8 +341,6 @@ cask "bruno"
 cask "bunch"
 # Design tool
 cask "canva"
-# Hard disk backup and cloning utility
-cask "carbon-copy-cloner"
 # Contacts manager
 cask "cardhop"
 # App launcher and switcher
@@ -382,9 +379,11 @@ cask "figma"
 cask "firefox"
 # Information browser
 cask "follow"
+cask "font-fira-mono-nerd-font"
 cask "font-jetbrains-mono-nerd-font"
 cask "font-mononoki-nerd-font"
 cask "font-roboto-mono-nerd-font"
+cask "font-sf-mono-nerd-font-ligaturized"
 cask "font-symbols-only-nerd-font"
 # GIT client
 cask "fork"
@@ -482,6 +481,8 @@ cask "soundsource"
 cask "spotify"
 # Email client
 cask "superhuman"
+# Dictation tool including LLM reformatting
+cask "superwhisper"
 # Control windows and applications right from your trackpad
 cask "swish"
 # Tool to manage Synology NAS's across a LAN
@@ -544,10 +545,15 @@ mas "Mela", id: 1568924476
 mas "Numbers", id: 409203825
 mas "Omnivore", id: 1564031042
 mas "One Thing", id: 1604176982
+mas "Pages", id: 409201541
+mas "Pandan", id: 1569600264
 mas "Parcel", id: 639968404
 mas "Paste", id: 967805235
+mas "Pixea", id: 1507782672
 mas "Session", id: 1521432881
+mas "Todoist", id: 585829637
 mas "Tripsy", id: 1429967544
+mas "Yubico Authenticator", id: 1497506650
 vscode "42crunch.vscode-openapi"
 vscode "4ops.terraform"
 vscode "aaron-bond.better-comments"
@@ -562,6 +568,7 @@ vscode "antfu.browse-lite"
 vscode "antfu.file-nesting"
 vscode "antfu.icons-carbon"
 vscode "antfu.vite"
+vscode "anysphere.pyright"
 vscode "arcticicestudio.nord-visual-studio-code"
 vscode "arianjamasb.protein-viewer"
 vscode "arrterian.nix-env-selector"
@@ -715,6 +722,7 @@ vscode "qassimfarid.ejs-language-support"
 vscode "qcz.text-power-tools"
 vscode "quicktype.quicktype"
 vscode "rangav.vscode-thunder-client"
+vscode "rapidapi.vscode-services"
 vscode "redhat.vscode-xml"
 vscode "redhat.vscode-yaml"
 vscode "reditorsupport.r"
@@ -772,8 +780,6 @@ vscode "wholroyd.jinja"
 vscode "wix.vscode-import-cost"
 vscode "xabikos.javascriptsnippets"
 vscode "xabikos.reactsnippets"
-vscode "anysphere.pyright"
-vscode "rapidapi.vscode-services"
 vscode "yinfei.luahelper"
 vscode "yoavbls.pretty-ts-errors"
 vscode "yzhang.markdown-all-in-one"
