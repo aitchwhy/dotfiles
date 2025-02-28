@@ -313,6 +313,11 @@ brew "stripe/stripe-cli/stripe"
 # Temporal Cloud CLI (tcld)
 brew "temporalio/brew/tcld"
 brew "yakitrak/yakitrak/obsidian-cli"
+
+
+
+cask "font-fira-mono-nerd-font"
+cask "font-sf-mono-nerd-font-ligaturized"
 # Renamer for files, music and photos
 cask "a-better-finder-rename"
 # Note editor and whiteboard
@@ -788,6 +793,8 @@ vscode "wholroyd.jinja"
 vscode "wix.vscode-import-cost"
 vscode "xabikos.javascriptsnippets"
 vscode "xabikos.reactsnippets"
+vscode "anysphere.pyright"
+vscode "rapidapi.vscode-services"
 vscode "yinfei.luahelper"
 vscode "yoavbls.pretty-ts-errors"
 vscode "yzhang.markdown-all-in-one"
