@@ -52,8 +52,6 @@ brew "cheat"
 brew "chrome-cli"
 # CLI tool for Cloudflare Workers
 brew "cloudflare-wrangler"
-# Cloudflare Tunnel client (formerly Argo Tunnel)
-brew "cloudflared"
 # Cross-platform make
 brew "cmake"
 # Get a file from an HTTP, HTTPS or FTP server
@@ -304,8 +302,6 @@ brew "koekeishiya/formulae/yabai"
 brew "olets/tap/zsh-abbr"
 # Zsh plugin to add zsh-abbr's abbreviations to zsh-autosuggestions' suggestions
 brew "olets/tap/zsh-autosuggestions-abbreviations-strategy"
-# RRG/Iceman Proxmark3 client, CDC flasher and firmware bundle
-brew "rfidresearchgroup/proxmark3/proxmark3", args: ["with-generic"]
 # Todoist CLI client
 brew "sachaos/todoist/todoist"
 # Stripe CLI utility
@@ -538,35 +534,20 @@ mas "Drafts", id: 1435957248
 mas "ExcalidrawZ", id: 6636493997
 mas "Fantastical", id: 975937182
 mas "Flighty", id: 1358823008
-mas "Flow", id: 1423210932
-mas "Focus", id: 777233759
 mas "HacKit", id: 1549557075
 mas "Journey", id: 1662059644
 mas "KakaoTalk", id: 869223134
 mas "Keynote", id: 409183694
 mas "Kindle", id: 302584613
 mas "LanScan", id: 472226235
-mas "Logic Pro", id: 634148309
 mas "Mela", id: 1568924476
-mas "NextDNS", id: 1464122853
 mas "Numbers", id: 409203825
-mas "Obsidian Web Clipper", id: 6720708363
 mas "Omnivore", id: 1564031042
 mas "One Thing", id: 1604176982
-mas "Pages", id: 409201541
-mas "Pandan", id: 1569600264
 mas "Parcel", id: 639968404
 mas "Paste", id: 967805235
-mas "Pixea", id: 1507782672
-mas "rcmd", id: 1596283165
 mas "Session", id: 1521432881
-mas "SnippetsLab", id: 1006087419
-mas "Snippety", id: 1530751461
-mas "Structured", id: 1499198946
-mas "Todoist", id: 585829637
-mas "Toggl Track", id: 1291898086
 mas "Tripsy", id: 1429967544
-mas "Yubico Authenticator", id: 1497506650
 vscode "42crunch.vscode-openapi"
 vscode "4ops.terraform"
 vscode "aaron-bond.better-comments"
@@ -688,7 +669,6 @@ vscode "ms-python.debugpy"
 vscode "ms-python.flake8"
 vscode "ms-python.isort"
 vscode "ms-python.python"
-vscode "ms-python.vscode-pylance"
 vscode "ms-toolsai.jupyter"
 vscode "ms-toolsai.jupyter-keymap"
 vscode "ms-toolsai.jupyter-renderers"
@@ -774,7 +754,6 @@ vscode "tombonnike.vscode-status-bar-format-toggle"
 vscode "tomoki1207.pdf"
 vscode "tomrijndorp.find-it-faster"
 vscode "tonka3000.raycast"
-vscode "trunk.io"
 vscode "tyriar.sort-lines"
 vscode "usernamehw.errorlens"
 vscode "vadimcn.vscode-lldb"
