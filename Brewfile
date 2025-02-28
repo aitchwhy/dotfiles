@@ -522,7 +522,7 @@ cask "zed"
 cask "zen-browser"
 # Video communication and virtual meeting platform
 cask "zoom"
-mas "Aiko", id: 1672085276
+# mas "Aiko", id: 1672085276
 mas "Alpenglow", id: 978589174
 mas "Amphetamine", id: 937984704
 mas "Bear", id: 1091189122
@@ -533,27 +533,23 @@ mas "DaisyDisk", id: 411643860
 mas "Day One", id: 1055511498
 mas "Drafts", id: 1435957248
 mas "ExcalidrawZ", id: 6636493997
-mas "Fantastical", id: 975937182
 mas "Flighty", id: 1358823008
 mas "HacKit", id: 1549557075
 mas "Journey", id: 1662059644
 mas "KakaoTalk", id: 869223134
-mas "Keynote", id: 409183694
+# mas "Keynote", id: 409183694
 mas "Kindle", id: 302584613
 mas "LanScan", id: 472226235
 mas "Mela", id: 1568924476
-mas "Numbers", id: 409203825
+# mas "Numbers", id: 409203825
 mas "Omnivore", id: 1564031042
-mas "One Thing", id: 1604176982
-mas "Pages", id: 409201541
-mas "Pandan", id: 1569600264
+# mas "One Thing", id: 1604176982
+# mas "Pages", id: 409201541
 mas "Parcel", id: 639968404
 mas "Paste", id: 967805235
 mas "Pixea", id: 1507782672
 mas "Session", id: 1521432881
-mas "Todoist", id: 585829637
 mas "Tripsy", id: 1429967544
-mas "Yubico Authenticator", id: 1497506650
 vscode "42crunch.vscode-openapi"
 vscode "4ops.terraform"
 vscode "aaron-bond.better-comments"
