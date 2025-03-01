@@ -242,13 +242,19 @@ function bb() {
     brew bundle install --global --all
     ;;
   check)
-    brew bundle check --verbose --global --all
+    brew bundle check --global --verbose --all
+    ;;
+  unlisted)
+    brew bundle cleanup --global --verbose --all --zap
     ;;
   clean)
-    brew bundle cleanup --force --zap --global
+    brew bundle cleanup --global --verbose --all --zap -f
+    ;;
+  edit)
+    brew bundle edit --global
     ;;
   *)
-    echo "Usage: bb [save|install|check|clean]"
+    echo "Usage: bb [save|install|check|unlisted|clean|edit]"
     ;;
   esac
 }
