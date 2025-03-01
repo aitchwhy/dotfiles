@@ -313,6 +313,8 @@ brew "stripe/stripe-cli/stripe"
 # Temporal Cloud CLI (tcld)
 brew "temporalio/brew/tcld"
 brew "yakitrak/yakitrak/obsidian-cli"
+
+cask "rippling"
 # Renamer for files, music and photos
 cask "a-better-finder-rename"
 # Note editor and whiteboard
@@ -550,6 +552,7 @@ mas "Paste", id: 967805235
 mas "Pixea", id: 1507782672
 mas "Session", id: 1521432881
 mas "Tripsy", id: 1429967544
+
 vscode "42crunch.vscode-openapi"
 vscode "4ops.terraform"
 vscode "aaron-bond.better-comments"
