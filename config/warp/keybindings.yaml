@@ -1,14 +1,14 @@
 ---
-"terminal:clear_blocks": cmd-r
-"workspace:set_a11y_verbose_verbosity_level": none
 "workspace:set_a11y_concise_verbosity_level": none
-"input:open_completion_suggestions": tab
-"editor_view:clear_lines": shift-cmd-R
-"workspace:show_settings_features_page": "cmd-,"
-"workspace:toggle_command_palette": cmd-k
 "workspace:create_personal_env_vars": cmd-e
-"workspace:show_settings_keyboard_shortcuts_page": "ctrl-,"
+"workspace:set_a11y_verbose_verbosity_level": none
 "editor_view:insert_autosuggestion": tab
-"pane_group:add_up": none
-"pane_group:add_left": none
+"editor_view:clear_lines": shift-cmd-R
+"workspace:show_settings_keyboard_shortcuts_page": "ctrl-,"
+"workspace:toggle_command_palette": cmd-k
 "editor_view:strikethrough": none
+"input:open_completion_suggestions": tab
+"terminal:clear_blocks": cmd-r
+"pane_group:add_left": none
+"workspace:show_settings_features_page": "cmd-,"
+"pane_group:add_up": none
