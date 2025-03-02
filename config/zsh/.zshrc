@@ -3,6 +3,10 @@
 
 # Main ZSH configuration file for interactive shells
 
+
+# TODO: https://github.com/mattmc3/zdotdir/blob/main/plugins/xdg/xdg.plugin.zsh
+# TODO: https://github.com/getantidote/zdotdir/blob/main/.zshenv
+
 # Source utilities
 [[ -f "$DOTFILES/utils.sh" ]] && source "$DOTFILES/utils.sh"
 

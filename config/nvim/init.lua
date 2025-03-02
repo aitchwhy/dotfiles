@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------------
 -- Neovim Configuration (init.lua) - Based on LazyVim (Updated February 2025)
 -----------------------------------------------------------------------------------
--- 
+--
 -- This file serves as the entry point for the Neovim configuration.
 -- LazyVim manages the loading of all plugins and configurations.
 --

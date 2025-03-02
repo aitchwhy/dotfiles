@@ -4,10 +4,17 @@
 # ZSH aliases - Organized by category
 # ========================================================================
 
-alias optbrew="/opt/homebrew/bin/brew"
+# alias optbrew="/opt/homebrew/bin/brew"
 
 alias lg=lazygit
 
+# ========================================================================
+# System utils
+# ========================================================================
+# Color with built-in ANSI codes, no external dependencies
+alias penv='printenv | sort | awk -F= '\''{ 
+  printf "\033[36m%-30s\033[0m \033[37m%s\033[0m\n", $1, $2 
+}'\'''
 
 
 # ========================================================================
@@ -42,10 +49,10 @@ fi
 # ========================================================================
 # File Operations - Safety Guards
 # ========================================================================
-alias cp="cp -i"       # Confirm before overwriting
-alias mv="mv -i"       # Confirm before overwriting
-alias rm="rm -i"       # Confirm before removal
-alias mkdir="mkdir -p" # Create parent directories as needed
+# alias cp="cp -i"       # Confirm before overwriting
+# alias mv="mv -i"       # Confirm before overwriting
+# alias rm="rm -i"       # Confirm before removal
+# alias mkdir="mkdir -p" # Create parent directories as needed
 
 # ========================================================================
 # Text Editors and Cat Replacement

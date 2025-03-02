@@ -94,10 +94,10 @@
 --       [".json5"] = "jsonc",
 --       [".mdx"] = "markdown",
 --     }
-    
+
 --     local filename = vim.fn.expand("%:t")
 --     local extension = vim.fn.expand("%:e")
-    
+
 --     for pattern, ft in pairs(filetype_map) do
 --       if filename:match(pattern) or extension:match(pattern) then
 --         vim.bo.filetype = ft
@@ -152,7 +152,7 @@
 --       rust = 4,
 --       go = 4,
 --     }
-    
+
 --     local ft = vim.bo.filetype
 --     if indent_map[ft] then
 --       vim.bo.tabstop = indent_map[ft]
