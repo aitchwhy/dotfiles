@@ -5,13 +5,6 @@
 # ========================================================================
 
 # ========================================================================
-# Environment Settings
-# ========================================================================
-DOTFILES="${DOTFILES:-$HOME/dotfiles}"
-CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
-XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
-
-# ========================================================================
 # Logging Functions
 # ========================================================================
 function log_info() {
@@ -34,6 +27,132 @@ function log_error() {
 function show_progress() {
   printf '%s→%s %s...\n' "${BLUE:-}" "${RESET:-}" "$*"
 }
+
+
+
+
+# ========================================================================
+# Environment Settings
+# ========================================================================
+
+# source $ZDOTDIR/.zprofile
+# export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+# export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+# export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+# export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+# export ZDOTDIR=${ZDOTDIR:-$HOME/.config/zsh}
+
+
+# Search environment variables with grep (built-in)
+function penvgrep() {
+  echo "======== env vars =========="
+  if [ -z "$1" ]; then
+    printenv | sort | awk -F= '{ printf "%-30s %s\n", $1, $2 }'
+  else
+    printenv | sort | grep -i "$1" | awk -F= '{ printf "%-30s %s\n", $1, $2 }'
+  fi
+  echo "============================"
+}
+
+
+# ========================================================================
+# System & macOS Utilities
+# ========================================================================
+
+
+# Toggle macOS hidden files
+function togglehidden() {
+  local current
+  current=$(defaults read com.apple.finder AppleShowAllFiles)
+  defaults write com.apple.finder AppleShowAllFiles $((!current))
+  killall Finder
+  log_success "Finder hidden files: $((!current))"
+}
+
+# Quick Look from terminal
+function ql() {
+  qlmanage -p "$@" &>/dev/null
+}
+
+# Weather information with optional location
+function weather() {
+  local city="${1:-}"
+  curl -s "wttr.in/$city?format=v2"
+}
+
+# Kill process running on a specified port
+function killport() {
+  local port="$1"
+  if [[ -z "$port" ]]; then
+    log_error "Please specify a port number"
+    return 1
+  fi
+
+  local pid
+  pid=$(lsof -i ":$port" | awk 'NR!=1 {print $2}')
+
+  if [[ -z "$pid" ]]; then
+    log_error "No process found on port $port"
+    return 1
+  fi
+
+  echo "Killing process(es) on port $port: $pid"
+  echo "$pid" | xargs kill -9
+  log_success "Process(es) killed"
+}
+
+# Show top 10 largest files in current directory
+function ducks() {
+  du -sh * | sort -rh | head -10
+}
+
+# Improved man pages with bat
+function batman() {
+  MANPAGER="sh -c 'col -bx | bat -l man -p'" man "$@"
+}
+
+# ========================================================================
+# Yazi File Manager Configuration
+# ========================================================================
+function y() {
+  local tmp cwd
+  tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
+  yazi "$@" --cwd-file="$tmp"
+  if cwd="$(command cat -- "$tmp")" && [[ -n "$cwd" ]] && [[ "$cwd" != "$PWD" ]]; then
+    builtin cd -- "$cwd" || return 1
+  fi
+  rm -f -- "$tmp"
+}
+
+# ========================================================================
+# Homebrew Bundle Management
+# ========================================================================
+function bb() {
+  case "$1" in
+  save)
+    brew bundle dump --force --describe --global
+    ;;
+  install)
+    brew bundle install --global --all
+    ;;
+  check)
+    brew bundle check --global --verbose --all
+    ;;
+  unlisted)
+    brew bundle cleanup --global --verbose --all --zap
+    ;;
+  clean)
+    brew bundle cleanup --global --verbose --all --zap -f
+    ;;
+  edit)
+    brew bundle edit --global
+    ;;
+  *)
+    echo "Usage: bb [save|install|check|unlisted|clean|edit]"
+    ;;
+  esac
+}
+
 
 # ========================================================================
 # File & Directory Management
@@ -134,6 +253,7 @@ function jump() {
   fi
 }
 
+
 # ========================================================================
 # Git Utilities
 # ========================================================================
@@ -160,103 +280,6 @@ function gclean() {
   else
     log_info "Operation canceled."
   fi
-}
-
-# ========================================================================
-# System & macOS Utilities
-# ========================================================================
-
-# Toggle macOS hidden files
-function togglehidden() {
-  local current
-  current=$(defaults read com.apple.finder AppleShowAllFiles)
-  defaults write com.apple.finder AppleShowAllFiles $((!current))
-  killall Finder
-  log_success "Finder hidden files: $((!current))"
-}
-
-# Quick Look from terminal
-function ql() {
-  qlmanage -p "$@" &>/dev/null
-}
-
-# Weather information with optional location
-function weather() {
-  local city="${1:-}"
-  curl -s "wttr.in/$city?format=v2"
-}
-
-# Kill process running on a specified port
-function killport() {
-  local port="$1"
-  if [[ -z "$port" ]]; then
-    log_error "Please specify a port number"
-    return 1
-  fi
-
-  local pid
-  pid=$(lsof -i ":$port" | awk 'NR!=1 {print $2}')
-
-  if [[ -z "$pid" ]]; then
-    log_error "No process found on port $port"
-    return 1
-  fi
-
-  echo "Killing process(es) on port $port: $pid"
-  echo "$pid" | xargs kill -9
-  log_success "Process(es) killed"
-}
-
-# Show top 10 largest files in current directory
-function ducks() {
-  du -sh * | sort -rh | head -10
-}
-
-# Improved man pages with bat
-function batman() {
-  MANPAGER="sh -c 'col -bx | bat -l man -p'" man "$@"
-}
-
-# ========================================================================
-# Yazi File Manager Configuration
-# ========================================================================
-function y() {
-  local tmp cwd
-  tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
-  yazi "$@" --cwd-file="$tmp"
-  if cwd="$(command cat -- "$tmp")" && [[ -n "$cwd" ]] && [[ "$cwd" != "$PWD" ]]; then
-    builtin cd -- "$cwd" || return 1
-  fi
-  rm -f -- "$tmp"
-}
-
-# ========================================================================
-# Homebrew Bundle Management
-# ========================================================================
-function bb() {
-  case "$1" in
-  save)
-    brew bundle dump --force --describe --global
-    ;;
-  install)
-    brew bundle install --global --all
-    ;;
-  check)
-    brew bundle check --global --verbose --all
-    ;;
-  unlisted)
-    brew bundle cleanup --global --verbose --all --zap
-    ;;
-  clean)
-    brew bundle cleanup --global --verbose --all --zap -f
-    ;;
-  edit)
-    brew bundle edit --global
-    ;;
-  *)
-    echo "Usage: bb [save|install|check|unlisted|clean|edit]"
-    ;;
-  esac
 }
 
 # ========================================================================

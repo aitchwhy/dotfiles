@@ -7,7 +7,7 @@ return {
         },
     },
 
-    -- Configure LazyVim to load gruvbox
+    -- Configure LazyVim to load tokyonight
     {
         "LazyVim/LazyVim",
         opts = {
