@@ -314,72 +314,38 @@ brew "stripe/stripe-cli/stripe"
 brew "temporalio/brew/tcld"
 brew "yakitrak/yakitrak/obsidian-cli"
 
-cask "rippling"
-# Renamer for files, music and photos
 cask "a-better-finder-rename"
-# Note editor and whiteboard
-cask "affine"
-# Memory training application
 cask "anki"
-# API development platform
 cask "apidog"
-# Chromium based browser
 cask "arc"
-# Manage team projects and tasks
 cask "asana"
-# Multi-track audio editor and recorder
 cask "audacity"
-# Menu bar icon organiser
+cask "bitwarden"
 cask "bartender"
-# Display management tool
 cask "betterdisplay"
-# Virtual Audio Driver
 cask "blackhole-16ch"
-# AI chat client
 cask "boltai"
-# Opensource IDE for exploring and testing api's
 cask "bruno"
-# Automation tool
 cask "bunch"
-# Design tool
 cask "canva"
-# Contacts manager
 cask "cardhop"
-# App launcher and switcher
 cask "charmstone"
-# OpenAI's official ChatGPT desktop app
 cask "chatgpt"
-# Anthropic's official Claude AI desktop app
 cask "claude"
-# Screen capturing tool
 cask "cleanshot"
-# Free app that makes your Internet safer
 cask "cloudflare-warp"
-# Track and budget money
 cask "copilot"
-# GUI companion app for Homebrew
 cask "cork"
-# Write, edit, and chat about your code with AI
 cask "cursor"
-# API documentation browser and code snippet manager
 cask "dash"
-# Audio and video editor
 cask "descript"
-# Collect, organise, edit and annotate documents
 cask "devonthink"
-# All-in-one toolbox for developers
 cask "devutils"
-# Run Stable Diffusion locally
 cask "draw-things"
-# Cross-platform Text Expander written in Rust
 cask "espanso"
-# Calendar software
 cask "fantastical"
-# Collaborative team software
 cask "figma"
-# Web browser
 cask "firefox"
-# Information browser
 cask "follow"
 cask "font-fira-mono-nerd-font"
 cask "font-jetbrains-mono-nerd-font"
@@ -387,170 +353,106 @@ cask "font-mononoki-nerd-font"
 cask "font-roboto-mono-nerd-font"
 cask "font-sf-mono-nerd-font-ligaturized"
 cask "font-symbols-only-nerd-font"
-# GIT client
-cask "fork"
-# Software reverse engineering (SRE) suite of tools
 cask "ghidra"
-# Terminal emulator that uses platform-native UI and GPU acceleration
 cask "ghostty"
-# Git client focusing on productivity
 cask "gitkraken"
-# Web browser
 cask "google-chrome"
-# Client for the Google Drive storage service
-cask "google-drive"
-# Desktop automation application
 cask "hammerspoon"
-# Automated organisation
 cask "hazel"
-# Keyboard shortcuts for every button on your screen
 cask "homerow"
-# Reverse engineering tool that lets you disassemble, decompile and debug your app
 cask "hopper-disassembler"
-# Open source API development ecosystem
 cask "hoppscotch"
-# Testing client for REST, GraphQL, and HTTP APIs
 cask "httpie"
-# Icon organiser
 cask "iconjar"
-# System monitoring app
 cask "istat-menus"
-# Remote desktop application
 cask "jump"
-# Remote desktop app
 cask "jump-desktop-connect"
-# Spot and merge differences in text and image files or folders
 cask "kaleidoscope"
-# Keyboard customiser
 cask "karabiner-elements"
-# File archiver
 cask "keka"
-# Helper application for the Keka file archiver
 cask "kekaexternalhelper"
-# Open-source keystroke visualiser
 cask "keycastr"
-# ZSA keyboard firmware flasher
 cask "keymapp"
-# Discover, download, and run local LLMs
 cask "lm-studio"
-# Speech recognition tool
 cask "macwhisper"
-# Online collaborative whiteboard platform
-cask "miro"
-# Open-source download manager
 cask "motrix"
-# Developer IDE or Management Environment for Neo4j instances
 cask "neo4j"
-# Knowledge base that works on top of a local folder of plain text Markdown files
 cask "obsidian"
-# Get up and running with large language models locally
 cask "ollama"
-# Replacement for Docker Desktop
 cask "orbstack"
-# SQL powered operating system instrumentation and analytics
 cask "osquery"
-# Command palette in any application
 cask "paletro"
-# Remote desktop
 cask "parsec"
-# PDF reader, editor and annotator
 cask "pdf-expert"
-# Client for Proton Mail and Proton Calendar
 cask "proton-mail"
-# VPN client focusing on security
 cask "protonvpn"
-# HTTP debugging proxy
 cask "proxyman"
-# Companion app for Flipper Zero devices
 cask "qflipper"
-# Quickly quit one, some, or all apps
 cask "quit-all"
-# Control your tools with a few keystrokes
 cask "raycast"
-# AI time tracker
+cask "rippling"
 cask "rize"
-# Remote management solution
 cask "royal-tsx"
-# Instant messaging application focusing on security
 cask "signal"
-# Team communication and collaboration software
 cask "slack"
-# Notepad with a built-in calculator
 cask "soulver"
-# Sound and audio controller
 cask "soundsource"
-# Music streaming service
 cask "spotify"
-# Email client
 cask "superhuman"
-# Dictation tool including LLM reformatting
 cask "superwhisper"
-# Control windows and applications right from your trackpad
 cask "swish"
-# Tool to manage Synology NAS's across a LAN
 cask "synologyassistant"
-# Quicklook extension for source files
 cask "syntax-highlight"
-# Native GUI tool for relational databases
 cask "tableplus"
-# Mesh VPN based on WireGuard
 cask "tailscale"
-# SSH client
 cask "termius"
 cask "timelane"
-# To-do list
 cask "todoist"
-# Git client focusing on power and productivity
 cask "tower"
-# Configurable document editor that supports Markdown
 cask "typora"
-# Virtualization tool
 cask "virtualbuddy"
-# Open-source code editor
 cask "visual-studio-code"
-# Rust-based terminal
 cask "warp"
-# Agentic IDE powered by AI Flow paradigm
 cask "windsurf"
-# Network protocol analyzer
 cask "wireshark"
-# Application for generating TOTP and HOTP codes
 cask "yubico-authenticator"
-# Application for configuring any YubiKey
 cask "yubico-yubikey-manager"
-# Multiplayer code editor
 cask "zed"
-# Gecko based web browser
 cask "zen-browser"
-# Video communication and virtual meeting platform
 cask "zoom"
+cask "daisydisk"
+cask "cleaneronepro"
+cask "cleanmymac"
+cask "excalidrawz"
+cask "session"
+
 # mas "Aiko", id: 1672085276
+# mas "Bitwarden", id: 1352778147
+# mas "CleanMyMac", id: 1339170533
+# mas "Cleaner One Pro", id: 1133028347
+# mas "DaisyDisk", id: 411643860
+# mas "ExcalidrawZ", id: 6636493997
+# mas "Keynote", id: 409183694
+# mas "Numbers", id: 409203825
+# mas "One Thing", id: 1604176982
+# mas "Pages", id: 409201541
+# mas "Session", id: 1521432881
 mas "Alpenglow", id: 978589174
 mas "Amphetamine", id: 937984704
 mas "Bear", id: 1091189122
-mas "Bitwarden", id: 1352778147
-mas "Cleaner One Pro", id: 1133028347
-mas "CleanMyMac", id: 1339170533
-mas "DaisyDisk", id: 411643860
 mas "Day One", id: 1055511498
 mas "Drafts", id: 1435957248
-mas "ExcalidrawZ", id: 6636493997
 mas "Flighty", id: 1358823008
 mas "HacKit", id: 1549557075
 mas "Journey", id: 1662059644
 mas "KakaoTalk", id: 869223134
-# mas "Keynote", id: 409183694
 mas "Kindle", id: 302584613
 mas "LanScan", id: 472226235
 mas "Mela", id: 1568924476
-# mas "Numbers", id: 409203825
 mas "Omnivore", id: 1564031042
-# mas "One Thing", id: 1604176982
-# mas "Pages", id: 409201541
 mas "Parcel", id: 639968404
 mas "Paste", id: 967805235
 mas "Pixea", id: 1507782672
-mas "Session", id: 1521432881
 mas "Tripsy", id: 1429967544
 
 vscode "42crunch.vscode-openapi"
