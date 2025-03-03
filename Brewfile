@@ -1,10 +1,61 @@
-tap "coder/coder"
+#######################################
+# Example Brewfile (https://github.com/Homebrew/homebrew-bundle?tab=readme-ov-file)
+#######################################
+# # 'brew tap'
+# tap "homebrew/cask"
+# # 'brew tap' with custom Git URL
+# tap "user/tap-repo", "https://user@bitbucket.org/user/homebrew-tap-repo.git"
+# # 'brew tap' with arguments
+# tap "user/tap-repo", "https://user@bitbucket.org/user/homebrew-tap-repo.git", force_auto_update: true
+#
+# # set arguments for all 'brew install --cask' commands
+# cask_args appdir: "~/Applications", require_sha: true
+#
+# # 'brew install'
+# brew "imagemagick"
+# # 'brew install --with-rmtp', 'brew link --overwrite', 'brew services restart' even if no install/upgrade
+# brew "denji/nginx/nginx-full", link: :overwrite, args: ["with-rmtp"], restart_service: :always
+# # 'brew install', always 'brew services restart', 'brew link', 'brew unlink mysql' (if it is installed)
+# brew "mysql@5.6", restart_service: :changed, link: true, conflicts_with: ["mysql"]
+# # 'brew install' and run a command if installer or upgraded.
+# brew "postgresql@16",
+#      postinstall: "${HOMEBREW_PREFIX}/opt/postgresql@16/bin/postgres -D ${HOMEBREW_PREFIX}/var/postgresql@16"
+# # install only on specified OS
+# brew "gnupg" if OS.mac?
+# brew "glibc" if OS.linux?
+#
+# # 'brew install --cask'
+# cask "google-chrome"
+# # 'brew install --cask --appdir=~/my-apps/Applications'
+# cask "firefox", args: { appdir: "~/my-apps/Applications" }
+# # bypass Gatekeeper protections (NOT RECOMMENDED)
+# cask "firefox", args: { no_quarantine: true }
+# # always upgrade auto-updated or unversioned cask to latest version even if already installed
+# cask "opera", greedy: true
+# # 'brew install --cask' only if '/usr/libexec/java_home --failfast' fails
+# cask "java" unless system "/usr/libexec/java_home", "--failfast"
+# # 'brew install --cask' and run a command if installer or upgraded.
+# cask "google-cloud-sdk", postinstall: "${HOMEBREW_PREFIX}/bin/gcloud components update"
+#
+# # 'mas install'
+# mas "1Password", id: 443_987_910
+#
+# # 'whalebrew install'
+# whalebrew "whalebrew/wget"
+#
+# # 'vscode --install-extension'
+# vscode "GitHub.codespaces"
+#
+# # Set an environment variable to be used e.g. inside `brew bundle exec`
+# # Mostly only `HOMEBREW_*` variables are passed through to other `brew` commands.
+# ENV["SOME_ENV_VAR"] = "some_value"
+#######################################
+
 tap "dotenvx/brew"
 tap "homebrew/bundle"
 tap "homebrew/services"
 tap "koekeishiya/formulae"
 tap "olets/tap"
-tap "rfidresearchgroup/proxmark3"
 tap "sachaos/todoist"
 tap "stripe/stripe-cli"
 tap "temporalio/brew"
@@ -241,7 +292,7 @@ brew "tectonic"
 # Command-line interface for running and interacting with Temporal Server and UI
 brew "temporal"
 # Simplified and community-driven man pages
-brew "tldr", link: false
+# brew "tldr", link: false
 # Official tldr client written in Rust
 brew "tlrc"
 # Terminal multiplexer
@@ -294,8 +345,6 @@ brew "zsh-completions"
 brew "zsh-history-substring-search"
 # Fish shell like syntax highlighting for zsh
 brew "zsh-syntax-highlighting"
-# Provisions remote development environments via Terraform
-brew "coder/coder/coder"
 # Better dotenv–from the creator of `dotenv`
 brew "dotenvx/brew/dotenvx"
 # Simple hotkey-daemon for macOS.
