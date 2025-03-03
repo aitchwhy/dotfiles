@@ -12,10 +12,9 @@ alias lg=lazygit
 # System utils
 # ========================================================================
 # Color with built-in ANSI codes, no external dependencies
-alias penv='printenv | sort | awk -F= '\''{ 
-  printf "\033[36m%-30s\033[0m \033[37m%s\033[0m\n", $1, $2 
+alias penv='printenv | sort | awk -F= '\''{
+  printf "\033[36m%-30s\033[0m \033[37m%s\033[0m\n", $1, $2
 }'\'''
-
 
 # ========================================================================
 # Navigation Shortcuts

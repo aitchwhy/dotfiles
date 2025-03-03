@@ -257,14 +257,14 @@ brew "ripgrep"
 brew "rollup"
 # Powerful, clean, object-oriented scripting language
 brew "ruby"
-# Safe, concurrent, practical language
-brew "rust"
+# # Safe, concurrent, practical language
+# brew "rust"
 # Experimental Rust compiler front-end for IDEs
 brew "rust-analyzer"
 # Modern Day Portscanner
 brew "rustscan"
-# Rust toolchain installer
-brew "rustup"
+# # Rust toolchain installer
+# brew "rustup"
 # Web crawling & scraping framework
 brew "scrapy"
 # Intuitive find & replace CLI
