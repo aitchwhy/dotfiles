@@ -4,8 +4,9 @@
 
 
 [user]
-  email = hank.lee.qed@gmail.com
-  name = Hank Lee
+	email = hank.lee.qed@gmail.com
+	name = Hank Lee
+	signingKey = FE1EF2465E55A3FDE919F8EA03B0943F3314E8BB
 
 [core]
   editor = vim
@@ -101,3 +102,11 @@
 
 [credential "https://gist.github.com"]
   helper = !/opt/homebrew/bin/gh auth git-credential
+[gpg]
+	format = openpgp
+[gpg "ssh"]
+	program = ssh-keygen
+[commit]
+	gpgSign = true
+[tag]
+	forceSignAnnotated = true
