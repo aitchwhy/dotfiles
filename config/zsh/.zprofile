@@ -20,11 +20,6 @@ export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
 export EDITOR="vim"
 export VISUAL="$EDITOR"
 
-# History
-# export HISTFILE="$HOME/.zsh_history"
-export HISTSIZE=100000
-export SAVEHIST=100000
-
 # If you need to have rustup first in your PATH, run:
 #   echo 'export PATH="/opt/homebrew/opt/rustup/bin:$PATH"' >> /Users/hank/dotfiles/config/zsh/.zshrc
 #

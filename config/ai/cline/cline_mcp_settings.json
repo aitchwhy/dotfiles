@@ -1,0 +1,12 @@
+{
+    "mcpServers": {
+        "github.com/modelcontextprotocol/servers/tree/main/src/time": {
+            "command": "uvx",
+            "args": [
+                "mcp-server-time"
+            ],
+            "disabled": false,
+            "autoApprove": []
+        }
+    }
+}
