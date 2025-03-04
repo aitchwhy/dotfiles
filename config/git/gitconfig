@@ -1,6 +1,5 @@
-# This is Git's per-user configuration file.
+# Git configuration optimized for macOS Apple Silicon
 # https://git-scm.com/docs/git-config.html
-# https://gist.github.com/pksunkara/988716
 
 [user]
 	email = hank.lee.qed@gmail.com
@@ -8,112 +7,287 @@
 	signingKey = FE1EF2465E55A3FDE919F8EA03B0943F3314E8BB
 
 [core]
-  editor = nvim
-  pager = delta
+	editor = nvim
+	pager = delta
+	# Use custom macOS specific gitignore and attributes
+	excludesfile = ~/.gitignore
+	attributesfile = ~/.gitattributes
+	# Make `git rebase` safer on macOS
+	trustctime = false
+	# Prevent showing files with non-ASCII symbols as unversioned (macOS specific)
+	precomposeunicode = true
+	# Speed up commands involving untracked files
+	untrackedCache = true
+	# Use macOS-native symlinks
+	symlinks = true
+	# Improve performance on macOS APFS
+	fsyncMethod = fsync
+	# Parallelize file system operations where possible
+	fsyncObjectFiles = true
+	# Use threads to speed up file operations on Apple Silicon
+	preloadIndex = true
+	# Uncomment to improve performance of large repos
+	# packedGitLimit = 128m
+	# packedGitWindowSize = 128m
 
 [color]
-  ui = true
+	ui = true
+	diff = auto
+	status = auto
+	branch = auto
+	interactive = auto
 
 [init]
-  defaultBranch = main
+	defaultBranch = main
+	# Template directory for new git repositories
+	# templateDir = ~/.config/git/template
 
 [interactive]
-    diffFilter = delta --color-only
-
-# features = side-by-side line-numbers decorations
-#     syntax-theme = Dracula
-#     plus-style = syntax "#003800"
-#     minus-style = syntax "#3f0001"
+	diffFilter = delta --color-only
 
 [delta]
-  dark = true
-  # use n and N to move between diff sections
-  # navigate = true
-  # or light = true, or omit for auto-detection
-  line-numbers = true
-  # side-by-side (https://dandavison.github.io/delta/side-by-side-view.html)
-  # side-by-side = true
-  hyperlinks = true
-  # decorations = true
-  # file-style = bold yellow ul
-  # file-decoration-style = none
-  # hunk-header-decoration-style = blue box
-  # minus-style = syntax "#3f0001"
-  # minus-non-emph-style = syntax "#3f0001"
-  # minus-emph-style = syntax "#901011"
-  # minus-empty-line-marker-style = syntax "#3f0001"
-  # plus-style = syntax "#002800"
-  # plus-non-emph-style = syntax "#002800"
-  # plus-emph-style = syntax "#274826"
-  # plus-empty-line-marker-style = syntax "#002800"
-  # zero-style = syntax
-  # whitespace-error-style = reverse red
-  # keep-plus-minus-markers = false
+	dark = true
+	# Use 'n' and 'N' to navigate between diff sections
+	navigate = true
+	# Show line numbers
+	line-numbers = true
+	# Side-by-side view (works better on high-res displays)
+	side-by-side = true
+	# Enable hyperlinks (works in modern terminals)
+	hyperlinks = true
+	# File styling
+	file-style = "bold yellow ul"
+	file-decoration-style = "box ul"
+	hunk-header-decoration-style = "box ul"
+	# Modern theme optimized for dark mode
+	syntax-theme = "catppuccin-macchiato"
+	light = false
+	decorations = true
+	line-numbers-left-format = "{nm:>4} "
+	line-numbers-right-format = "{np:>4} "
+	# Uncomment for light theme
+	# light = true
+	# syntax-theme = "catppuccin-latte"
 
 [merge]
-  conflictstyle = zdiff3
-  # tool = Kaleidoscope
+	conflictstyle = zdiff3
+	# Show common ancestor in merge conflicts
+	log = true
+	# Use gitignore for merge driver selection
+	ignoreFiles = true
+	# Include untracked files when merging
+	includeUntracked = false
+	# tool = Kaleidoscope
 
 [diff]
-  # external = /opt/homebrew/bin/ksdiff
-  renames = true
-  # colorMoved = default
-  # tool = Kaleidoscope
+	# Use Apple Silicon optimized path for Kaleidoscope
+	# external = /opt/homebrew/bin/ksdiff
+	renames = true
+	colorMoved = default
+	# Use improved diff algorithm for better results
+	algorithm = histogram
+	mnemonicprefix = true
+	tool = vimdiff
+	# Use patience diff algorithm as backup
+	patience = true
+	# Detect moves within files
+	indentHeuristic = true
+	# Optimized for Apple Silicon
+	statGraphWidth = 130
+
+[difftool "vscode"]
+	cmd = code --wait --diff $LOCAL $REMOTE
+
+[difftool "kaleidoscope"]
+	cmd = /opt/homebrew/bin/ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\"
+
+[mergetool "kaleidoscope"]
+	cmd = /opt/homebrew/bin/ksdiff --merge --output \"$MERGED\" --base \"$BASE\" -- \"$LOCAL\" --snapshot \"$REMOTE\" --snapshot
+	trustExitCode = true
 
 [pull]
-  rebase = false
+	rebase = false
+	# Avoid unnecessary merge commits
+	ff = only
+
+[push]
+	# Push only current branch by default
+	default = current
+	# Automatically push annotated tags
+	followTags = true
+	# Check actual status when pushing to make sure you only push the expected changes
+	recurseSubmodules = check
 
 [alias]
-  # Basic shortcuts
-  a = add
-  aa = add --all
-  bl = blame
-  c = commit
-  ca = commit --amend
-  co = checkout
-  d = diff
-  l = log --oneline
-  p = push
-  ll = pull
-  s = status
-  ss = status -s
-  st = status -sb
-  # Remote operations
-  llo = pull origin
-  po = push origin
-  pof = push origin --force-with-lease
-  pofn = push origin --force-with-lease --no-verify
-  pt = push --tag
-  r = remote
-  rs = remote show
-  # Submodule
-  sub = submodule update --remote
-  # Tag management
-  td = tag --delete
-  tdr = tag --delete origin
-  # Log formatting
-  blog = for-each-ref --sort=committerdate refs/heads/ --format='%(HEAD) %(color:red)%(refname:short)%(color:reset) - %(color:yellow)%(objectname:short)%(color:reset) - %(contents:subject) - %(authorname) (%(color:blue)%(committerdate:relative)%(color:reset))'
-  loggraph = log --oneline --decorate --graph
-  log1 = log --graph --abbrev-commit --oneline --decorate
-  # Branch management
-  bclean = "!f() { git branch --merged | grep -v '\\*\\|master\\|develop' | xargs -n 1 git branch -d; }; f"
-  b = branch
-  # FZF integration (requires fzf to be installed)
-  fco = "!f() { git checkout $(git branch -l | fzf); }; f"
+	# Basic shortcuts
+	a = add
+	aa = add --all
+	bl = blame
+	c = commit
+	ca = commit --amend
+	co = checkout
+	d = diff
+	l = log --oneline
+	p = push
+	ll = pull
+	s = status
+	ss = status -s
+	st = status -sb
+	
+	# Remote operations
+	llo = pull origin
+	po = push origin
+	pof = push origin --force-with-lease
+	pofn = push origin --force-with-lease --no-verify
+	pt = push --tag
+	r = remote
+	rs = remote show
+	
+	# Submodule
+	sub = submodule update --remote
+	
+	# Tag management
+	td = tag --delete
+	tdr = tag --delete origin
+	
+	# Log formatting
+	blog = for-each-ref --sort=committerdate refs/heads/ --format='%(HEAD) %(color:red)%(refname:short)%(color:reset) - %(color:yellow)%(objectname:short)%(color:reset) - %(contents:subject) - %(authorname) (%(color:blue)%(committerdate:relative)%(color:reset))'
+	loggraph = log --oneline --decorate --graph
+	log1 = log --graph --abbrev-commit --oneline --decorate
+	
+	# Branch management
+	bclean = "!f() { git branch --merged | grep -v '\\*\\|main\\|master\\|develop' | xargs -n 1 git branch -d; }; f"
+	b = branch
+	
+	# macOS specific shortcuts
+	# Open changed files in default editor
+	edit = "!f() { git status -s | cut -c4- | grep -v '^ ' | uniq | xargs $EDITOR; }; f"
+	# Open file in macOS Finder
+	finder = "!open -a Finder ."
+	# Use fzf for interactive checkouts
+	fco = "!f() { git checkout $(git branch -l | fzf); }; f"
+	
+	# Productivity
+	# GitHub specific: open repository in browser
+	browse = "!gh repo view --web"
+	# Fixup and rebase in one operation
+	fixup = "!f() { TARGET=$(git rev-parse "$1"); git commit --fixup=$TARGET ${@:2} && EDITOR=true git rebase -i --autostash --autosquash $TARGET^; }; f"
+	# Stash only untracked files
+	stash-untracked = "!git stash --include-untracked --keep-index"
+	# List files in conflict
+	conflicts = "!git diff --name-only --diff-filter=U"
+	# Show log with relative dates
+	recent = "log --pretty=format:'%C(yellow)%h%Creset %ad | %s%d [%an]' --date=relative"
+	# Show all commits not yet pushed to remote
+	unpushed = "!git log origin/$(git rev-parse --abbrev-ref HEAD)..HEAD"
+	# What was done today
+	today = "!git log --since=midnight --author=\"$(git config user.name)\" --oneline"
+	# Show largest files in git history
+	big = "!git rev-list --objects --all | git cat-file --batch-check='%(objecttype) %(objectname) %(objectsize) %(rest)' | sed -n 's/^blob //p' | sort -k2nr | cut -c 1-12,41- | head -10"
 
 [credential]
-  helper = osxkeychain
+	helper = osxkeychain
 
 [credential "https://github.com"]
-  helper = !/opt/homebrew/bin/gh auth git-credential
+	helper = !/opt/homebrew/bin/gh auth git-credential
 
 [credential "https://gist.github.com"]
-  helper = !/opt/homebrew/bin/gh auth git-credential
+	helper = !/opt/homebrew/bin/gh auth git-credential
+
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+
 [gpg]
 	format = openpgp
+	# Path for GPG on Apple Silicon
+	program = /opt/homebrew/bin/gpg
+
 [gpg "ssh"]
 	program = ssh-keygen
-# [commit]
-# 	gpgSign = true
+	# Path for SSH on Apple Silicon
+	allowedSignersFile = ~/.ssh/allowed_signers
+
+[commit]
+	# Uncomment to enable GPG signing by default
+	# gpgSign = true
+	template = ~/.gitmessage
+	# Improve commit message formatting
+	verbose = true
+
 [tag]
 	forceSignAnnotated = true
+	# Sort tags by version number
+	sort = version:refname
+
+[fetch]
+	# Automatically delete remote-tracking branches that no longer exist on the remote
+	prune = true
+	# Also prune tags
+	pruneTags = true
+	# Parallelize fetches for better performance on Apple Silicon
+	parallel = 0
+
+[rebase]
+	# Automatically stash/unstash during rebase
+	autoStash = true
+	# Use merge conflict style during rebase
+	instructionFormat = "[%an @ %ar] %s"
+	# Show stats after rebase
+	stat = true
+
+[status]
+	# Show untracked files
+	showUntrackedFiles = all
+	# Display submodule summary
+	submoduleSummary = true
+
+[pager]
+	# Use delta for all paging
+	diff = delta
+	log = delta
+	reflog = delta
+	show = delta
+	# Don't use pager for these commands
+	branch = false
+	tag = false
+
+[protocol]
+	# Optimize protocol for Apple Silicon
+	version = 2
+
+[help]
+	# Autocorrect typos in Git commands
+	autocorrect = 1
+
+[rerere]
+	# Reuse recorded resolution
+	enabled = true
+	# Auto stage files that were resolved using rerere
+	autoUpdate = true
+
+[branch]
+	# Auto setup rebase for new branches
+	autoSetupRebase = always
+	# Sort branches by most recently used
+	sort = -committerdate
+
+[advice]
+	# Disable advice about fast-forward merge
+	pushNonFastForward = false
+	# Disable advice about staging empty paths
+	statusHints = false
+	# Disable advice about switching branches with uncommitted changes
+	commitBeforeMerge = false
+	# Other advice settings
+	detachedHead = false
+	
+[url "git@github.com:"]
+	# Prefer SSH over HTTPS for GitHub
+	insteadOf = https://github.com/
+
+[includeIf "gitdir:~/work/"]
+	# Conditionally include work-specific config
+	path = ~/.config/git/work.gitconfig

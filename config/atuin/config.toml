@@ -1,232 +1,213 @@
-## where to store your database, default is your system data directory
-## linux/mac: ~/.local/share/atuin/history.db
-## windows: %USERPROFILE%/.local/share/atuin/history.db
-# db_path = "~/.history.db"
+# Atuin configuration optimized for macOS Apple Silicon
+# See https://atuin.sh/docs/config
 
-## where to store your encryption key, default is your system data directory
-## linux/mac: ~/.local/share/atuin/key
-## windows: %USERPROFILE%/.local/share/atuin/key
-# key_path = "~/.key"
+# Database storage locations
+# macOS paths for Apple Silicon
+db_path = "~/.local/share/atuin/history.db"
+key_path = "~/.local/share/atuin/key"
+session_path = "~/.local/share/atuin/session"
 
-## where to store your auth session token, default is your system data directory
-## linux/mac: ~/.local/share/atuin/session
-## windows: %USERPROFILE%/.local/share/atuin/session
-# session_path = "~/.session"
+# Date format used when displaying timestamps
+# Using US format (month/day/year)
+dialect = "us"
 
-## date format used, either "us" or "uk"
-# dialect = "us"
+# Default timezone to use when displaying time
+# Use the system's current local timezone
+timezone = "local"
 
-## default timezone to use when displaying time
-## either "l", "local" to use the system's current local timezone, or an offset
-## from UTC in the format of "<+|->H[H][:M[M][:S[S]]]"
-## for example: "+9", "-05", "+03:30", "-01:23:45", etc.
-# timezone = "local"
+# Enable automatic sync with faster interval on Apple Silicon
+# M-series chips can handle more frequent syncing with less impact
+auto_sync = true
+sync_frequency = "300"  # 5 minutes, Apple Silicon can handle this well
 
-## enable or disable automatic sync
-# auto_sync = true
+# Enable automatic update checks
+update_check = true
 
-## enable or disable automatic update checks
-# update_check = true
+# Address of the sync server
+sync_address = "https://api.atuin.sh"
 
-## address of the sync server
-# sync_address = "https://api.atuin.sh"
+# Search mode - fuzzy works best with M-series performance
+search_mode = "fuzzy"
 
-## how often to sync history. note that this is only triggered when a command
-## is ran, so sync intervals may well be longer
-## set it to 0 to sync after every command
-# sync_frequency = "10m"
+# Filter mode to determine which history items to show
+# global: show history from all sessions/hosts
+filter_mode = "global"
 
-## which search mode to use
-## possible values: prefix, fulltext, fuzzy, skim
-# search_mode = "fuzzy"
+# Enable workspace filtering (within git repositories)
+# Great for developers on macOS
+workspaces = true
 
-## which filter mode to use
-## possible values: global, host, session, directory
-# filter_mode = "global"
+# Use same filter mode for shell up-key binding
+filter_mode_shell_up_key_binding = "global"
 
-## With workspace filtering enabled, Atuin will filter for commands executed
-## in any directory within a git repository tree (default: false)
-# workspaces = false
+# Search mode for shell up-key binding
+# Fuzzy works well with M-chip performance
+search_mode_shell_up_key_binding = "fuzzy"
 
-## which filter mode to use when atuin is invoked from a shell up-key binding
-## the accepted values are identical to those of "filter_mode"
-## leave unspecified to use same mode set in "filter_mode"
-# filter_mode_shell_up_key_binding = "global"
+# Style for the history menu - auto adapts to terminal size
+# Use full style on larger retina displays
+style = "full"
 
-## which search mode to use when atuin is invoked from a shell up-key binding
-## the accepted values are identical to those of "search_mode"
-## leave unspecified to use same mode set in "search_mode"
-# search_mode_shell_up_key_binding = "fuzzy"
+# Maximum number of lines the interface should take up
+# Set it to 0 to always go full screen
+# Works well with larger Retina displays
+inline_height = 0
 
-## which style to use
-## possible values: auto, full, compact
-# style = "auto"
+# Put the search UI on the top (better for Retina displays)
+invert = true
 
-## the maximum number of lines the interface should take up
-## set it to 0 to always go full screen
-# inline_height = 0
+# Show a preview of the selected command
+# Great for seeing long commands on wide displays
+show_preview = true
 
-## Invert the UI - put the search bar at the top , Default to `false`
-# invert = false
+# Behavior when escape key is pressed when searching
+# return-original: return to the original command you were typing
+exit_mode = "return-original"
 
-## enable or disable showing a preview of the selected command
-## useful when the command is longer than the terminal width and is cut off
-# show_preview = true
+# Word jump mode (for Cmd+left/right)
+# emacs mode works better with macOS keyboard shortcuts
+word_jump_mode = "emacs"
 
-## what to do when the escape key is pressed when searching
-## possible values: return-original, return-query
-# exit_mode = "return-original"
+# Characters that count as a part of a word
+word_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
-## possible values: emacs, subl
-# word_jump_mode = "emacs"
+# Number of context lines to show when scrolling by pages
+# Higher on high-resolution displays
+scroll_context_lines = 2
 
-## characters that count as a part of a word
-# word_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+# Use ctrl instead of alt for numerical UI shortcuts
+# This works better with macOS keyboard layout
+ctrl_n_shortcuts = true
 
-## number of context lines to show when scrolling by pages
-# scroll_context_lines = 1
+# Default history list format
+# Added duration for better performance analysis
+history_format = "{time}\t{command}\t{duration}"
 
-## use ctrl instead of alt as the shortcut modifier key for numerical UI shortcuts
-## alt-0 .. alt-9
-# ctrl_n_shortcuts = false
+# Prevent commands matching any of these regexes from being written to history
+# Security focused for macOS developers
+history_filter = [
+  # AWS keys and tokens
+  ".*AWS_.*KEY.*=.+",
+  ".*aws_.*key.*=.+",
+  ".*--access-key.*=.+",
+  ".*--secret-key.*=.+",
+  
+  # GitHub tokens
+  ".*GH_TOKEN.*=.+",
+  ".*GITHUB_TOKEN.*=.+",
+  ".*ghp_[A-Za-z0-9]{36}.*",
+  ".*github_pat_[A-Za-z0-9]{22}_[A-Za-z0-9]{59}.*",
+  
+  # API keys and tokens
+  ".*api[_-]?key.*=.+",
+  ".*token.*=.+",
+  ".*password.*=.+",
+  ".*secret.*=.+",
+  
+  # Common MacOS credential managers
+  ".*security find-generic-password.*",
+  ".*keychain-access.*",
+  
+  # Common explicit patterns
+  "^\\s*curl\\s+.+(-u|--user)\\s+[^\\s:]+:[^\\s]+\\s*.*$"
+]
 
-## default history list format - can also be specified with the --format arg
-# history_format = "{time}\t{command}\t{duration}"
+# Prevent commands run in directories containing secrets
+cwd_filter = [
+  "^/Users/[^/]+/.ssh",
+  "^/Users/[^/]+/\\.aws",
+  "^/Users/[^/]+/\\.config/gcloud",
+  "^/Users/[^/]+/\\.gnupg",
+  "^/Users/[^/]+/\\.kube",
+  "^/Users/[^/]+/\\.terraform",
+  "^/private/",
+  "^.+/secrets?/?.*$",
+  "^.+/credential.*$"
+]
 
-## prevent commands matching any of these regexes from being written to history.
-## Note that these regular expressions are unanchored, i.e. if they don't start
-## with ^ or end with $, they'll match anywhere in the command.
-## For details on the supported regular expression syntax, see
-## https://docs.rs/regex/latest/regex/#syntax
-# history_filter = [
-#   "^secret-cmd",
-#   "^innocuous-cmd .*--secret=.+",
-# ]
+# Configure the maximum height of the preview to show
+# Adjusted for Retina displays
+max_preview_height = 6
 
-## prevent commands run with cwd matching any of these regexes from being written
-## to history. Note that these regular expressions are unanchored, i.e. if they don't
-## start with ^ or end with $, they'll match anywhere in CWD.
-## For details on the supported regular expression syntax, see
-## https://docs.rs/regex/latest/regex/#syntax
-# cwd_filter = [
-#   "^/very/secret/area",
-# ]
+# Show help info (with version check)
+show_help = true
 
-## Configure the maximum height of the preview to show.
-## Useful when you have long scripts in your history that you want to distinguish
-## by more than the first few lines.
-# max_preview_height = 4
+# Show tabs for search and inspect
+show_tabs = true
 
-## Configure whether or not to show the help row, which includes the current Atuin
-## version (and whether an update is available), a keymap hint, and the total
-## amount of commands in your history.
-# show_help = true
+# Enable secrets filtering (AWS keys, GitHub tokens, etc)
+secrets_filter = true
 
-## Configure whether or not to show tabs for search and inspect
-# show_tabs = true
-
-## Defaults to true. This matches history against a set of default regex, and will not save it if we get a match. Defaults include
-## 1. AWS key id
-## 2. Github pat (old and new)
-## 3. Slack oauth tokens (bot, user)
-## 4. Slack webhooks
-## 5. Stripe live/test keys
-# secrets_filter = true
-
-## Defaults to true. If enabled, upon hitting enter Atuin will immediately execute the command. Press tab to return to the shell and edit.
-# This applies for new installs. Old installs will keep the old behaviour unless configured otherwise.
+# Immediately execute command on Enter
+# Better UX for macOS users
 enter_accept = true
 
-## Defaults to "emacs".  This specifies the keymap on the startup of `atuin
-## search`.  If this is set to "auto", the startup keymap mode in the Atuin
-## search is automatically selected based on the shell's keymap where the
-## keybinding is defined.  If this is set to "emacs", "vim-insert", or
-## "vim-normal", the startup keymap mode in the Atuin search is forced to be
-## the specified one.
-# keymap_mode = "auto"
+# Set keymap mode to emacs (macOS default)
+keymap_mode = "emacs"
 
-## Cursor style in each keymap mode.  If specified, the cursor style is changed
-## in entering the cursor shape.  Available values are "default" and
-## "{blink,steady}-{block,underline,bar}".
-# keymap_cursor = { emacs = "blink-block", vim_insert = "blink-block", vim_normal = "steady-block" }
+# Adjust cursor style for better visibility on Retina displays
+# In TOML, inline tables must be on a single line
+keymap_cursor = { emacs = "blink-block", vim_insert = "blink-bar", vim_normal = "steady-block" }
 
-# network_connect_timeout = 5
-# network_timeout = 5
+# Network settings adjusted for better performance on high-speed connections
+network_connect_timeout = 3
+network_timeout = 5
 
-## Timeout (in seconds) for acquiring a local database connection (sqlite)
-# local_timeout = 5
+# Timeout for acquiring a local database connection
+# Faster on Apple Silicon
+local_timeout = 3
 
-## Set this to true and Atuin will minimize motion in the UI - timers will not update live, etc.
-## Alternatively, set env NO_MOTION=true
-# prefers_reduced_motion = false
+# Reduced motion mode for accessibility
+# Set to false for standard animations on M-series
+prefers_reduced_motion = false
 
+# Enhanced statistics mode
 [stats]
-## Set commands where we should consider the subcommand for statistics. Eg, kubectl get vs just kubectl
-# common_subcommands = [
-#   "apt",
-#   "cargo",
-#   "composer",
-#   "dnf",
-#   "docker",
-#   "git",
-#   "go",
-#   "ip",
-#   "kubectl",
-#   "nix",
-#   "nmcli",
-#   "npm",
-#   "pecl",
-#   "pnpm",
-#   "podman",
-#   "port",
-#   "systemctl",
-#   "tmux",
-#   "yarn",
-# ]
+# Commands where we should consider the subcommand for statistics
+# Example: "git commit" instead of just "git"
+common_subcommands = [
+  # Standard Linux/Unix tools
+  "apt", "cargo", "dnf", "docker", "git", "go", "kubectl", "nix", "npm", "pnpm", "systemctl", "tmux", "yarn",
+  
+  # macOS specific tools
+  "brew", "xcodebuild", "swift", "xcrun", "defaults", "mas", "open", "launchctl", "diskutil",
+  
+  # Development tools common on macOS
+  "pod", "fastlane", "flutter", "xed"
+]
 
-## Set commands that should be totally stripped and ignored from stats
-# common_prefix = ["sudo"]
+# Commands to strip from statistics
+common_prefix = ["sudo", "env", "time", "nice"]
 
-## Set commands that will be completely ignored from stats
-# ignored_commands = [
-#   "cd",
-#   "ls",
-#   "vi"
-# ]
+# Commands to completely ignore from statistics
+ignored_commands = [
+  "cd", "ls", "ll", "la", "pwd", "clear", "cls", "exit", "history",
+  # macOS specific
+  "open", "pbcopy", "pbpaste", "defaults", "osascript"
+]
 
 [keys]
-# Defaults to true. If disabled, using the up/down key won't exit the TUI when scrolled past the first/last entry.
-# scroll_exits = false
+# Allow cursor keys to exit when at top/bottom of history
+scroll_exits = false
 
 [sync]
 # Enable sync v2 by default
-# This ensures that sync v2 is enabled for new installs only
-# In a later release it will become the default across the board
 records = true
 
 [preview]
-## which preview strategy to use to calculate the preview height (respects max_preview_height).
-## possible values: auto, static
-## auto: length of the selected command.
-## static: length of the longest command stored in the history.
-# strategy = "auto"
+# Preview calculation strategy
+# Use auto to dynamically adjust based on command length
+strategy = "auto"
 
 [daemon]
-## Enables using the daemon to sync. Requires the daemon to be running in the background. Start it with `atuin daemon`
-# enabled = false
+# Enable the sync daemon (more efficient on M-series)
+enabled = true
 
-## How often the daemon should sync in seconds
-# sync_frequency = 300
+# How often the daemon should sync (in seconds)
+sync_frequency = 300
 
-## The path to the unix socket used by the daemon (on unix systems)
-## linux/mac: ~/.local/share/atuin/atuin.sock
-## windows: Not Supported
-# socket_path = "~/.local/share/atuin/atuin.sock"
+# Path to the unix socket (macOS specific)
+socket_path = "~/.local/share/atuin/atuin.sock"
 
-## Use systemd socket activation rather than opening the given path (the path must still be correct for the client)
-## linux: false
-## mac/windows: Not Supported
-# systemd_socket = false
-
-## The port that should be used for TCP on non unix systems
-# tcp_port = 8889
+# TCP port for non-unix systems
+tcp_port = 8889

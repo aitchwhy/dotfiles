@@ -1,0 +1,22 @@
+# <type>(<scope>): <subject>
+# |<----  Using a Maximum Of 50 Characters  ---->|
+
+# <body>
+# |<----   Try To Limit Each Line to a Maximum Of 72 Characters   ---->|
+
+# <footer>
+
+# --- Commit Message Format ---
+# type: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
+# scope: anything specifying place of the commit change (optional)
+# subject: short summary of the change in present tense, not capitalized, no period
+# body: detailed explanatory text, if necessary
+# footer: reference issues that this commit closes, e.g. Closes #123, #456
+
+# --- Example ---
+# feat(auth): add login button to navbar
+#
+# Implement OAuth login flow with GitHub provider.
+# Includes error handling and session persistence.
+#
+# Closes #42
