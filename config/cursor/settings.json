@@ -53,9 +53,9 @@
   "diffEditor.renderSideBySide": false,
   "editor.accessibilitySupport": "off",
   "editor.cursorStyle": "block",
-  "editor.formatOnPaste": false,
+  "editor.formatOnPaste": true,
   "editor.formatOnSave": true,
-  "editor.formatOnType": false,
+  "editor.formatOnType": true,
   "editor.inlineSuggest.syntaxHighlightingEnabled": true,
   "editor.minimap.enabled": false,
   "editor.wordWrap": "wordWrapColumn",
@@ -1508,5 +1508,8 @@
     "**/.trunk/*notifications/": true,
     "**/.trunk/*out/": true,
     "**/.trunk/*plugins/": true
+  },
+  "files.associations": {
+    "gitconfig": "gitconfig"
   }
 }
