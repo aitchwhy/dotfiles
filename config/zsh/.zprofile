@@ -25,6 +25,16 @@ export VISUAL="$EDITOR"
 export HISTSIZE=100000
 export SAVEHIST=100000
 
+# If you need to have rustup first in your PATH, run:
+#   echo 'export PATH="/opt/homebrew/opt/rustup/bin:$PATH"' >> /Users/hank/dotfiles/config/zsh/.zshrc
+#
+# zsh completions have been installed to:
+#   /opt/homebrew/opt/rustup/share/zsh/site-functions
+
+# docs
+# - https://wiki.archlinux.org/title/Zsh#Configuration_files
+# - https://gist.github.com/Linerre/f11ad4a6a934dcf01ee8415c9457e7b2
+
 # PATH configuration
 eval "$(/opt/homebrew/bin/brew shellenv)"
 

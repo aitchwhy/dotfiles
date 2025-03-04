@@ -1,127 +1,164 @@
-# Dotfiles for macOS
+# macOS Dotfiles
 
-A comprehensive dotfiles management system for macOS on Apple Silicon. This repository contains scripts and configuration files to set up a complete macOS environment with modern tools, sensible defaults, and productivity enhancements.
-
-## Quick Start
-
-```zsh
-# Clone the repository
-git clone https://github.com/yourusername/dotfiles.git ~/dotfiles
-cd ~/dotfiles
-
-# Run the installer
-./install.zsh
-
-# Start a new shell session
-exec zsh
-```
+A collection of dotfiles and configuration for macOS (Apple Silicon) development environment.
 
 ## Features
 
-- **ZSH Configuration**: Modern shell setup with plugins and useful functions
-- **Homebrew Integration**: Install and manage CLI tools and applications
-- **Development Environment**: Configuration for Python, Node.js, Rust, and more
-- **GUI Applications**: Configuration for VS Code, Cursor, Hammerspoon, etc.
-- **macOS Preferences**: Optimized system settings for productivity
-- **Robust Backup System**: Automatic backup of existing configurations
-- **Smart Symlink Management**: Clean handling of existing files and links
+- 🚀 One-command installation for fresh macOS systems
+- 🔄 Easy updates for existing installations
+- 🛠️ Comprehensive development tool setup
+- ⌨️ Optimized keyboard and system preferences
+- 🎨 Modern terminal and editor configurations
+- 🔒 Secure and maintainable setup
 
-## System Requirements
+## Prerequisites
 
-- macOS on Apple Silicon (M1/M2/M3)
+- macOS (Apple Silicon)
 - Git
-- Internet connection for downloading packages
+- Curl
+- Zsh
 
-## Available Scripts
+## Quick Start
 
-- `install.zsh`: Main installation script
-- `update.zsh`: Update dotfiles and installed packages
-- `utils.sh`: Shared utility functions
+### Fresh Installation
 
-### Installation Options
+For a fresh macOS installation:
 
+```bash
+# Download and run the install script
+curl -o install.zsh https://raw.githubusercontent.com/yourusername/dotfiles/main/install.zsh
+chmod +x install.zsh
+./install.zsh
 ```
+
+This will:
+1. Check system requirements
+2. Set up ZSH configuration
+3. Install Homebrew and packages
+4. Configure CLI tools
+5. Set up macOS preferences
+
+### Existing Installation
+
+For updating an existing installation:
+
+```bash
+# Download and run the update script
+curl -o update.zsh https://raw.githubusercontent.com/yourusername/dotfiles/main/update.zsh
+chmod +x update.zsh
+./update.zsh
+```
+
+This will:
+1. Update dotfiles repository
+2. Update Homebrew packages
+3. Update symlinks
+4. Update macOS preferences
+5. Refresh shell configuration
+
+## Installation Options
+
+### Install Script Options
+
+```bash
 ./install.zsh [options]
 
 Options:
   --no-brew     Skip Homebrew installation and updates
   --no-macos    Skip macOS preferences configuration
   --minimal     Install only essential configurations
-  --help        Show help message
-```
-
-### Update Options
-
-```
-./update.zsh [options]
-
-Options:
-  --no-brew     Skip Homebrew updates
-  --no-apps     Skip App Store and VSCode updates
-  --no-repo     Skip dotfiles repository update
-  --fix-links   Attempt to fix broken symlinks
-  --quick       Quick update (only dotfiles and relink)
-  --help        Show help message
+  --help        Show this help message
 ```
 
 ## Directory Structure
 
 ```
-~/dotfiles/
-├── Brewfile               # Homebrew packages and applications
-├── install.zsh            # Main installation script
-├── update.zsh             # Update script
-├── utils.sh               # Shared utility functions
-├── config/                # Configuration files
-│   ├── zsh/               # ZSH configuration
-│   │   ├── .zshrc         # Main ZSH configuration
-│   │   ├── .zshenv        # ZSH environment variables
-│   │   └── .zprofile      # Login shell configuration
-│   ├── starship.toml      # Starship prompt configuration
-│   ├── nvim/              # Neovim configuration
-│   ├── vscode/            # VS Code settings
-│   ├── hammerspoon/       # Hammerspoon configuration
-│   └── ...                # Other app configurations
-└── README.md              # This file
+dotfiles/
+├── config/           # Configuration files
+│   ├── zsh/         # ZSH configuration
+│   ├── nvim/        # Neovim configuration
+│   ├── git/         # Git configuration
+│   └── ...          # Other tool configurations
+├── install.zsh      # Fresh installation script
+├── update.zsh       # Update script
+├── utils.zsh        # Utility functions
+└── Brewfile         # Homebrew package list
 ```
 
-## What Gets Installed
+## Included Tools
 
-- **Shell Environment**: ZSH with modern plugins and prompt
-- **Command Line Tools**: Git, Homebrew, FZF, Ripgrep, Bat, etc.
-- **Programming Languages**: Python, Node.js, Rust toolchains
-- **Development Tools**: VS Code, Neovim, Git clients
-- **Productivity Apps**: Hammerspoon, Karabiner-Elements
-
-## How It Works
-
-1. **Repository Verification**: Checks that the repository structure is valid
-2. **Backup**: Backs up existing configuration files to `~/.dotfiles_backup/DATE_TIME/`
-3. **ZSH Setup**: Creates `.zshenv` that points to the dotfiles ZSH configuration
-4. **Homebrew**: Installs and updates Homebrew packages from the Brewfile
-5. **Configuration**: Links configuration files to their proper locations
-6. **Development**: Sets up development environments if requested
-7. **macOS Preferences**: Configures system settings for productivity
+- **Shell**: ZSH with modern plugins
+- **Package Manager**: Homebrew
+- **Terminal**: Ghostty
+- **Editor**: Neovim
+- **Version Control**: Git
+- **Shell Enhancements**: Starship, Atuin, Zoxide
+- **Development Tools**: Bat, Lazygit, Zellij
+- **Text Expansion**: Espanso
+- **Window Management**: Hammerspoon
+- **Editors**: VSCode, Cursor
+- **AI Tools**: Claude
 
 ## Customization
 
-1. **Fork the Repository**: Create your own fork of this repository
-2. **Edit the Brewfile**: Add or remove packages you need
-3. **Modify Configurations**: Edit the files in the `config/` directory
-4. **Run the Installer**: Execute `./install.zsh` to apply your changes
+1. Fork this repository
+2. Update the repository URL in the scripts
+3. Modify configurations in the `config/` directory
+4. Update the `Brewfile` with your preferred packages
 
-## Maintaining Your Dotfiles
+## Maintenance
 
-- **Regular Updates**: Run `./update.zsh` to keep everything in sync
-- **New Machine Setup**: Clone your repository and run `./install.zsh`
-- **Backing Up Changes**: Commit and push your changes to your GitHub repository
+### Updating
+
+Regular updates ensure you have the latest configurations and packages:
+
+```bash
+./update.zsh
+```
+
+### Backup
+
+The installation script automatically creates backups of existing configurations in:
+```
+$HOME/.dotfiles_backup/YYYYMMDD_HHMMSS/
+```
 
 ## Troubleshooting
 
-- **Broken Symlinks**: Run `./update.zsh --fix-links` to repair
-- **Permission Issues**: Make sure scripts are executable with `chmod +x *.zsh`
-- **Path Problems**: Check `~/.zshenv` and ensure it points to the correct location
+### Common Issues
+
+1. **Permission Issues**
+   ```bash
+   chmod +x install.zsh update.zsh
+   ```
+
+2. **Homebrew Issues**
+   ```bash
+   brew doctor
+   brew cleanup
+   ```
+
+3. **Shell Issues**
+   ```bash
+   exec zsh
+   ```
+
+### Getting Help
+
+1. Check the [Issues](https://github.com/yourusername/dotfiles/issues) page
+2. Create a new issue with:
+   - Your macOS version
+   - Error messages
+   - Steps to reproduce
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
 
 ## License
 
-This project is open source and available under the MIT License.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

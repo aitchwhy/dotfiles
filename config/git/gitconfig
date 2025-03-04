@@ -2,13 +2,13 @@
 # https://git-scm.com/docs/git-config.html
 # https://gist.github.com/pksunkara/988716
 
-
 [user]
-  email = hank.lee.qed@gmail.com
-  name = Hank Lee
+	email = hank.lee.qed@gmail.com
+	name = Hank Lee
+	signingKey = FE1EF2465E55A3FDE919F8EA03B0943F3314E8BB
 
 [core]
-  editor = vim
+  editor = nvim
   pager = delta
 
 [color]
@@ -17,30 +17,70 @@
 [init]
   defaultBranch = main
 
+[interactive]
+    diffFilter = delta --color-only
+
+# features = side-by-side line-numbers decorations
+#     syntax-theme = Dracula
+#     plus-style = syntax "#003800"
+#     minus-style = syntax "#3f0001"
+
+[delta]
+  syntax-theme = Zenburn
+  dark = true
+  # use n and N to move between diff sections
+  # navigate = true
+  # or light = true, or omit for auto-detection
+  line-numbers = true
+  # side-by-side (https://dandavison.github.io/delta/side-by-side-view.html)
+  # side-by-side = true
+  hyperlinks = true
+  # decorations = true
+  # file-style = bold yellow ul
+  # file-decoration-style = none
+  # hunk-header-decoration-style = blue box
+  # minus-style = syntax "#3f0001"
+  # minus-non-emph-style = syntax "#3f0001"
+  # minus-emph-style = syntax "#901011"
+  # minus-empty-line-marker-style = syntax "#3f0001"
+  # plus-style = syntax "#002800"
+  # plus-non-emph-style = syntax "#002800"
+  # plus-emph-style = syntax "#274826"
+  # plus-empty-line-marker-style = syntax "#002800"
+  # zero-style = syntax
+  # whitespace-error-style = reverse red
+  # keep-plus-minus-markers = false
+
+[merge]
+  conflictstyle = zdiff3
+  # tool = Kaleidoscope
+
+[diff]
+  # external = /opt/homebrew/bin/ksdiff
+  renames = true
+  # colorMoved = default
+  # tool = Kaleidoscope
+
+[pull]
+  rebase = false
+
 [alias]
   # Basic shortcuts
   a = add
   aa = add --all
-  b = branch
-  blame = blame
+  bl = blame
   c = commit
   ca = commit --amend
   co = checkout
   d = diff
   l = log --oneline
   p = push
+  ll = pull
   s = status
   ss = status -s
   st = status -sb
-  # Log formatting
-  blog = for-each-ref --sort=committerdate refs/heads/ --format='%(HEAD) %(color:red)%(refname:short)%(color:reset) - %(color:yellow)%(objectname:short)%(color:reset) - %(contents:subject) - %(authorname) (%(color:blue)%(committerdate:relative)%(color:reset))'
-  log-graph = log --oneline --decorate --graph
-  lol = log --graph --abbrev-commit --oneline --decorate
-  # Branch management
-  rb = branch -r
-  clean = "!f() { git branch --merged | grep -v '\\*\\|master\\|develop' | xargs -n 1 git branch -d; }; f"
   # Remote operations
-  plo = pull origin
+  llo = pull origin
   po = push origin
   pof = push origin --force-with-lease
   pofn = push origin --force-with-lease --no-verify
@@ -52,46 +92,15 @@
   # Tag management
   td = tag --delete
   tdr = tag --delete origin
+  # Log formatting
+  blog = for-each-ref --sort=committerdate refs/heads/ --format='%(HEAD) %(color:red)%(refname:short)%(color:reset) - %(color:yellow)%(objectname:short)%(color:reset) - %(contents:subject) - %(authorname) (%(color:blue)%(committerdate:relative)%(color:reset))'
+  loggraph = log --oneline --decorate --graph
+  log1 = log --graph --abbrev-commit --oneline --decorate
+  # Branch management
+  bclean = "!f() { git branch --merged | grep -v '\\*\\|master\\|develop' | xargs -n 1 git branch -d; }; f"
+  b = branch
   # FZF integration (requires fzf to be installed)
-  fuzzy-checkout = "!f() { git checkout $(git branch -l | fzf); }; f"
-
-[delta]
-  syntax-theme = Dracula
-  # use n and N to move between diff sections
-  navigate = true
-  # or light = true, or omit for auto-detection
-  dark = true
-  line-numbers = true
-  side-by-side = true
-  hyperlinks = true
-  decorations = true
-  file-style = bold yellow ul
-  file-decoration-style = none
-  hunk-header-decoration-style = blue box
-  minus-style = syntax "#3f0001"
-  minus-non-emph-style = syntax "#3f0001"
-  minus-emph-style = syntax "#901011"
-  minus-empty-line-marker-style = syntax "#3f0001"
-  plus-style = syntax "#002800"
-  plus-non-emph-style = syntax "#002800"
-  plus-emph-style = syntax "#274826"
-  plus-empty-line-marker-style = syntax "#002800"
-  zero-style = syntax
-  whitespace-error-style = reverse red
-  keep-plus-minus-markers = false
-
-[merge]
-  conflictstyle = zdiff3
-  tool = Kaleidoscope
-
-[diff]
-  external = /opt/homebrew/bin/ksdiff
-  renames = true
-  colorMoved = default
-  tool = Kaleidoscope
-
-[pull]
-  rebase = false
+  fco = "!f() { git checkout $(git branch -l | fzf); }; f"
 
 [credential]
   helper = osxkeychain
@@ -101,3 +110,11 @@
 
 [credential "https://gist.github.com"]
   helper = !/opt/homebrew/bin/gh auth git-credential
+[gpg]
+	format = openpgp
+[gpg "ssh"]
+	program = ssh-keygen
+# [commit]
+# 	gpgSign = true
+[tag]
+	forceSignAnnotated = true

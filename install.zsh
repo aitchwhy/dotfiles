@@ -14,17 +14,53 @@ export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
-export ZDOTDIR_TARGET="$DOTFILES/config/zsh"
+export ZDOTDIR_TARGET="$XDG_CONFIG_HOME/zsh"
 export BACKUP_DIR="$HOME/.dotfiles_backup/$(date +%Y%m%d_%H%M%S)"
 
-# Source utilities
-if [[ ! -f "$DOTFILES/utils.sh" ]]; then
-  echo "Error: utils.sh not found in $DOTFILES. Please ensure the dotfiles repository is properly cloned."
+# Source utilities and configurations
+if [[ ! -f "$DOTFILES/utils.zsh" ]]; then
+  echo "Error: utils.zsh not found in $DOTFILES. Please ensure the dotfiles repository is properly cloned."
   exit 1
 fi
 
-source "$DOTFILES/utils.sh"
+source "$DOTFILES/utils.zsh"
 source "$DOTFILES/config/zsh/functions.zsh"
+source "$DOTFILES/config/zsh/symlinks.zsh"
+
+# ========================================================================
+# System Requirements Check
+# ========================================================================
+check_requirements() {
+  info "Checking system requirements..."
+
+  # Check if running on macOS
+  if ! is_macos; then
+    error "This script is designed for macOS only."
+    exit 1
+  fi
+
+  # Check if running on Apple Silicon
+  if ! is_apple_silicon; then
+    error "This script is designed for Apple Silicon Macs only."
+    exit 1
+  fi
+
+  # Check for required commands
+  local required_commands=(
+    "git"
+    "curl"
+    "zsh"
+  )
+
+  for cmd in "${required_commands[@]}"; do
+    if ! has_command "$cmd"; then
+      error "Required command not found: $cmd"
+      exit 1
+    fi
+  done
+
+  success "System requirements met"
+}
 
 # ========================================================================
 # Repository Verification
@@ -76,7 +112,6 @@ setup_zsh() {
 
   # Backup existing .zshenv if it exists
   if [[ -f "$HOME/.zshenv" ]]; then
-    # backup_file "$HOME/.zshenv"
     rm -f "$HOME/.zshenv"
   fi
 
@@ -91,6 +126,13 @@ EOF
 
   chmod 644 "$HOME/.zshenv"
   success "Created $HOME/.zshenv pointing to $ZDOTDIR_TARGET"
+
+  # Create symlink from XDG_CONFIG_HOME/zsh to dotfiles config/zsh
+  if [[ ! -L "$ZDOTDIR_TARGET" ]]; then
+    rm -rf "$ZDOTDIR_TARGET"
+    ln -sf "$DOTFILES/config/zsh" "$ZDOTDIR_TARGET"
+    success "Linked ZSH configuration to $ZDOTDIR_TARGET"
+  fi
 }
 
 # ========================================================================
@@ -122,19 +164,7 @@ setup_homebrew() {
   # Install from Brewfile
   if [[ -f "$DOTFILES/Brewfile" ]]; then
     info "(sudo) Installing packages from Brewfile..."
-    # read -q "answer?Install all Homebrew packages? This may take a while. [y/N] "
-    # echo ""
-    # sudo -v
     sudo brew bundle install --verbose --global --all --no-lock --cleanup --force
-    # sudo -v
-    # if [[ "$answer" =~ ^[Yy]$ ]]; then
-    #   # Full installation
-    #   brew bundle install --file="$DOTFILES/Brewfile" --no-lock
-    # else
-    #   # Install just essential packages
-    #   info "Installing essential packages only..."
-    #   brew install starship atuin zoxide bat zsh-syntax-highlighting zsh-autosuggestions fzf git
-    # fi
   else
     warn "Brewfile not found at $DOTFILES/Brewfile"
   fi
@@ -146,41 +176,27 @@ setup_homebrew() {
 setup_cli_tools() {
   info "Setting up CLI tools configuration..."
 
-  declare -A DOTFILES_TO_SYMLINK_MAP=(
-    ["$DOTFILES/config/git/gitconfig"]="$HOME/.gitconfig"
-    ["$DOTFILES/config/git/gitignore"]="$HOME/.gitignore"
-    ["$DOTFILES/config/starship.toml"]="$XDG_CONFIG_HOME/starship.toml"
-    ["$DOTFILES/config/karabiner/karabiner.json"]="$XDG_CONFIG_HOME/karabiner/karabiner.json"
-    ["$DOTFILES/config/nvim"]="$XDG_CONFIG_HOME/nvim"
-    ["$DOTFILES/config/ghostty"]="$XDG_CONFIG_HOME/ghostty"
-    ["$DOTFILES/config/atuin"]="$XDG_CONFIG_HOME/atuin"
-    ["$DOTFILES/config/bat"]="$XDG_CONFIG_HOME/bat"
-    ["$DOTFILES/config/lazygit"]="$XDG_CONFIG_HOME/lazygit"
-    ["$DOTFILES/config/zellij"]="$XDG_CONFIG_HOME/zellij"
-    ["$DOTFILES/config/espanso"]="$XDG_CONFIG_HOME/espanso"
-    ["$DOTFILES/config/vscode/settings.json"]="$HOME/Library/Application Support/Code/User/settings.json"
-    ["$DOTFILES/config/vscode/keybindings.json"]="$HOME/Library/Application Support/Code/User/keybindings.json"
-    ["$DOTFILES/config/cursor/settings.json"]="$HOME/Library/Application Support/Cursor/User/settings.json"
-    ["$DOTFILES/config/cursor/keybindings.json"]="$HOME/Library/Application Support/Cursor/User/keybindings.json"
-    ["$DOTFILES/config/hammerspoon"]="$HOME/.hammerspoon"
-    ["$DOTFILES/config/ai/claude/claude_desktop_config.json"]="$HOME/Library/Application Support/Claude/claude_desktop_config.json"
-  )
+  # First, remove all existing symlinks and files that we'll be managing
+  info "Cleaning up existing configurations..."
+  for key in ${(k)DOTFILES_TO_SYMLINK_MAP}; do
+    local dst="${DOTFILES_TO_SYMLINK_MAP[$key]}"
+    
+    # Remove existing symlink or file/directory
+    if [[ -L "$dst" || -e "$dst" ]]; then
+      rm -rf "$dst"
+      success "Removed existing: $dst"
+    fi
+  done
 
-  for src in "${(@k)DOTFILES_TO_SYMLINK_MAP}"; do
-    local dst="${DOTFILES_TO_SYMLINK_MAP[$src]}"
+  # Now create fresh symlinks
+  info "Creating new symlinks..."
+  for key in ${(k)DOTFILES_TO_SYMLINK_MAP}; do
+    local src="$key"
+    local dst="${DOTFILES_TO_SYMLINK_MAP[$key]}"
     local parent_dir=$(dirname "$dst")
 
     # Create parent directory if it doesn't exist
     ensure_dir "$parent_dir"
-
-    if [[ -L "$dst" ]]; then
-      # If it's already a symlink, update it
-      rm -f "$dst"
-    elif [[ -e "$dst" ]]; then
-      # If it exists as a file or directory, back it up
-      # backup_file "$dst"
-      rm -rf "$dst"
-    fi
 
     # Create the symlink
     if [[ -e "$src" ]]; then
@@ -195,7 +211,7 @@ setup_cli_tools() {
 # ========================================================================
 # macOS System Preferences
 # ========================================================================
-function setup_macos_preferences() {
+setup_macos_preferences() {
   info "Configuring macOS system preferences..."
 
   # Faster key repeat
@@ -241,13 +257,10 @@ function setup_macos_preferences() {
 main() {
   info "Starting dotfiles setup for macOS..."
 
-  # Check if running on macOS
-  if ! is_macos; then
-    error "This script is designed for macOS only."
-    exit 1
-  fi
+  # Check system requirements
+  check_requirements
 
-  # Verify repository structure first
+  # Verify repository structure
   verify_repo_structure
 
   # Show install plan

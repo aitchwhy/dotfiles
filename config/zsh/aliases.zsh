@@ -1,12 +1,19 @@
 #!/usr/bin/env zsh
 
+source "$DOTFILES/utils.sh"
+
 # ========================================================================
 # ZSH aliases - Organized by category
 # ========================================================================
 
 # alias optbrew="/opt/homebrew/bin/brew"
 
-alias lg=lazygit
+# ========================================================================
+# Git Utilities
+# ========================================================================
+
+# Lazygit alias
+has_command alias lg='lazygit'
 
 # ========================================================================
 # System utils
@@ -56,17 +63,17 @@ fi
 # ========================================================================
 # Text Editors and Cat Replacement
 # ========================================================================
-alias vim="nvim"
-alias vi="nvim"
-alias cat="bat"
+has_command nvim && alias vim="nvim"
+has_command nvim && alias vi="nvim"
+has_command bat && alias cat="bat"
 
 # ========================================================================
 # Homebrew Shortcuts
 # ========================================================================
-alias brewup="brew update && brew upgrade && brew cleanup"
-alias bi="brew install"
-alias bs="brew search"
-alias bci="brew cask install"
+# alias brewup="brew update && brew upgrade && brew cleanup"
+# alias bi="brew install"
+# alias bs="brew search"
+# alias bci="brew cask install"
 
 # ========================================================================
 # Networking Utilities
@@ -80,12 +87,19 @@ alias flush="dscacheutil -flushcache && killall -HUP mDNSResponder" # Flush DNS
 # ========================================================================
 # Dotfiles Management
 # ========================================================================
+
+# Keep individual aliases for quick access (see functions.zsh for util func "dot()")
 alias zdir='cd $ZDOTDIR'
-alias ze="fd --no-ignore --hidden --follow --type f -x $EDITOR $ZDOTDIR"
-alias ze="fd --hidden . $ZDOTDIR | xargs nvim"
 alias dots="cd $DOTFILES"
-alias dotedit="fd --no-ignore --hidden --follow --type f -x $EDITOR $DOTFILES"
-alias zreload="exec zsh"
+alias zr="exec zsh"
+
+# alias zdir='cd $ZDOTDIR'
+# alias ze="fd --no-ignore --hidden --follow --type f -x $EDITOR $ZDOTDIR"
+# alias ze="fd --hidden . $ZDOTDIR | xargs nvim"
+# alias dots="cd $DOTFILES"
+# alias dotedit="fd --no-ignore --hidden --follow --type f -x $EDITOR $DOTFILES"
+# alias zr="exec zsh"
+# alias zreload="exec zsh"
 
 # ========================================================================
 # System Information
@@ -100,5 +114,5 @@ alias printfpath='pfpath'
 # ========================================================================
 # Misc Shortcuts
 # ========================================================================
-alias c="clear"
+# alias c="clear"
 alias hf="huggingface-cli"

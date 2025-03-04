@@ -3,7 +3,6 @@
 
 # Main ZSH configuration file for interactive shells
 
-
 # TODO: https://github.com/mattmc3/zdotdir/blob/main/plugins/xdg/xdg.plugin.zsh
 # TODO: https://github.com/getantidote/zdotdir/blob/main/.zshenv
 
@@ -43,6 +42,30 @@ bindkey '^H' beginning-of-line
 bindkey '^R' history-incremental-search-backward
 bindkey '^?' backward-delete-char # Backspace working after vi mode
 
+# Editor
+export EDITOR="vim"
+export VISUAL="$EDITOR"
+
+# History
+# export HISTFILE="$HOME/.zsh_history"
+export HISTSIZE=100000
+export SAVEHIST=100000
+
+# git env vars
+export
+
+has_command nvim && export EDITOR="nvim" && export VISUAL="nvim"
+
+# If you need to have rustup first in your PATH, run:
+#   echo 'export PATH="/opt/homebrew/opt/rustup/bin:$PATH"' >> /Users/hank/dotfiles/config/zsh/.zshrc
+#
+# zsh completions have been installed to:
+#   /opt/homebrew/opt/rustup/share/zsh/site-functions
+
+# docs
+# - https://wiki.archlinux.org/title/Zsh#Configuration_files
+# - https://gist.github.com/Linerre/f11ad4a6a934dcf01ee8415c9457e7b2
+
 # Completions
 autoload -Uz compinit
 compinit
@@ -54,21 +77,6 @@ compinit
 #	autoload -Uz compinit
 #	compinit
 #fi
-
-# Initialize tools if installed
-has_command() {
-  command -v "$1" >/dev/null 2>&1
-}
-
-has_command starship && eval "$(starship init zsh)"
-has_command atuin && eval "$(atuin init zsh)"
-has_command zoxide && eval "$(zoxide init zsh)"
-has_command direnv && eval "$(direnv hook zsh)"
-has_command fnm && eval "$(fnm env --use-on-cd)"
-has_command uv && eval "$(uv generate-shell-completion zsh)"
-# has_command pyenv && eval "$(pyenv init -)"
-# has_command abbr && eval "$(abbr init zsh)"
-has_command nvim && export EDITOR="nvim" && export VISUAL="nvim"
 
 # Load plugins if available
 if [[ -d "$HOMEBREW_PREFIX/share" ]]; then
@@ -85,25 +93,103 @@ if [[ -d "$HOMEBREW_PREFIX/share" ]]; then
   done
 fi
 
+# Initialize tools if installed
+has_command() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+has_command starship && eval "$(starship init zsh)"
+has_command atuin && eval "$(atuin init zsh)"
+has_command zoxide && eval "$(zoxide init zsh)"
+has_command direnv && eval "$(direnv hook zsh)"
+has_command fnm && eval "$(fnm env --use-on-cd)"
+has_command uv && eval "$(uv generate-shell-completion zsh)"
+# has_command pyenv && eval "$(pyenv init -)"
+# has_command abbr && eval "$(abbr init zsh)"
+
+# install rustup if command "rustup" not found
+if ! has_command rustup; then
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+fi
+
+#########################################
+# rustup completions zsh > ~/.zfunc/_rustup
+# rustup completions zsh > $ZDOTDIR/.zfunc/_rustup
+
+# # TODO:
+#
+# Last login: Mon Mar  3 15:23:37 on ttys003
+# info: downloading installer
+# warn: It looks like you have an existing rustup settings file at:
+# warn: /Users/hank/.rustup/settings.toml
+# warn: Rustup will install the default toolchain as specified in the settings file,
+# warn: instead of the one inferred from the default host triple.
+#
+# Welcome to Rust!
+#
+# This will download and install the official compiler for the Rust
+# programming language, and its package manager, Cargo.
+#
+# Rustup metadata and toolchains will be installed into the Rustup
+# home directory, located at:
+#
+#   /Users/hank/.rustup
+#
+# This can be modified with the RUSTUP_HOME environment variable.
+#
+# The Cargo home directory is located at:
+#
+#   /Users/hank/.cargo
+#
+# This can be modified with the CARGO_HOME environment variable.
+#
+# The cargo, rustc, rustup and other commands will be added to
+# Cargo's bin directory, located at:
+#
+#   /Users/hank/.cargo/bin
+#
+# This path will then be added to your PATH environment variable by
+# modifying the profile files located at:
+#
+#   /Users/hank/.profile
+#   /Users/hank/.zshenv
+#
+# You can uninstall at any time with rustup self uninstall and
+# these changes will be reverted.
+#
+# Current installation options:
+#
+#
+#    default host triple: aarch64-apple-darwin
+#      default toolchain: stable (default)
+#                profile: default
+#   modify PATH variable: yes
+#
+# 1) Proceed with standard installation (default - just press enter)
+# 2) Customize installation
+# 3) Cancel installation
+# >
+#########################################
+
 # Load additional config files
 if [[ -f "$ZDOTDIR/aliases.zsh" ]]; then
-  echo "source $ZDOTDIR/aliases.zsh"
+  # echo "source $ZDOTDIR/aliases.zsh"
   source "$ZDOTDIR/aliases.zsh"
 fi
 
 if [[ -f "$ZDOTDIR/functions.zsh" ]]; then
-  echo "source $ZDOTDIR/functions.zsh"
+  # echo "source $ZDOTDIR/functions.zsh"
   source "$ZDOTDIR/functions.zsh"
 fi
 
 if [[ -f "$ZDOTDIR/fzf.zsh" ]]; then
-  echo "source $ZDOTDIR/fzf.zsh"
+  # echo "source $ZDOTDIR/fzf.zsh"
   source "$ZDOTDIR/fzf.zsh"
 fi
 
 # Local customizations, not tracked by git
 if [[ -f "$ZDOTDIR/local.zsh" ]]; then
-  echo "source $ZDOTDIR/local.zsh"
+  # echo "source $ZDOTDIR/local.zsh"
   source "$ZDOTDIR/local.zsh"
 fi
 

@@ -4,29 +4,6 @@
 # ZSH Functions - Core utility functions organized by category
 # ========================================================================
 
-# ========================================================================
-# Logging Functions
-# ========================================================================
-function log_info() {
-  printf '%s[INFO]%s %s\n' "${BLUE:-}" "${RESET:-}" "$*"
-}
-
-function log_success() {
-  printf '%s[SUCCESS]%s %s\n' "${GREEN:-}" "${RESET:-}" "$*"
-}
-
-function log_warning() {
-  printf '%s[WARNING]%s %s\n' "${YELLOW:-}" "${RESET:-}" "$*" >&2
-}
-
-function log_error() {
-  printf '%s[ERROR]%s %s\n' "${RED:-}" "${RESET:-}" "$*" >&2
-}
-
-# Progress indicator
-function show_progress() {
-  printf '%s→%s %s...\n' "${BLUE:-}" "${RESET:-}" "$*"
-}
 
 # ========================================================================
 # Environment Settings
@@ -38,6 +15,76 @@ function show_progress() {
 # export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 # export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 # export ZDOTDIR=${ZDOTDIR:-$HOME/.config/zsh}
+
+# ========================================================================
+# Dotfiles Management
+# ========================================================================
+
+function dot() {
+  if [[ "$1" == "help" || -z "$1" ]]; then
+    echo "Usage: dot [command]"
+    echo ""
+    echo "Commands:"
+    # Extract commands and their descriptions from the function itself
+    grep -E '^\s{2}[a-z|]*\)$' "$ZDOTDIR/functions.zsh" | 
+      grep -A 1 -B 0 ")" | 
+      sed -n '/)/N;s/\s\s\([a-z|]*\))\n\s\s\s\s\(.*\) #\(.*\)/  \1 - \3/p' |
+      sort
+  else
+    case "$1" in
+      z|zdir)
+        cd $ZDOTDIR # Navigate to Zsh config directory
+        ;;
+      ze|zedit)
+        fd --hidden --follow --type f . $ZDOTDIR | fzf --preview "bat --color=always {}" | xargs -r $EDITOR # Edit Zsh config files with fuzzy finder
+        ;;
+      cd|dots)
+        cd $DOTFILES # Navigate to dotfiles directory
+        ;;
+      edit|e)
+        fd --no-ignore --hidden --follow --type f . $DOTFILES | fzf --preview "bat --color=always {}" | xargs -r $EDITOR # Edit dotfiles with fuzzy finder
+        ;;
+      reload|r)
+        exec zsh # Reload Zsh configuration
+        ;;
+      find|f)
+        fd --no-ignore --hidden --follow --type f . "${2:-$DOTFILES}" | fzf --preview "bat --color=always {}" # Find files in dotfiles
+        ;;
+      grep|g)
+        rg --hidden --follow --glob "!.git" "$2" "${3:-$DOTFILES}" # Search for pattern in dotfiles
+        ;;
+      sync|s)
+        pushd $DOTFILES > /dev/null
+        echo "📦 Syncing dotfiles repository..."
+        git pull && git push
+        popd > /dev/null # Sync dotfiles repository
+        ;;
+      backup|b)
+        pushd $DOTFILES > /dev/null
+        echo "💾 Backing up dotfiles..."
+        timestamp=$(date +%Y%m%d-%H%M%S)
+        git add -A && git commit -m "Backup: $timestamp" && git push
+        popd > /dev/null # Backup dotfiles to git
+        ;;
+      install|i)
+        pushd $DOTFILES > /dev/null
+        echo "🔧 Installing dotfiles..."
+        ./install.sh
+        popd > /dev/null # Run dotfiles install script
+        ;;
+      update|u)
+        pushd $DOTFILES > /dev/null
+        echo "🔄 Updating dotfiles dependencies..."
+        ./update.sh
+        popd > /dev/null # Run dotfiles update script
+        ;;
+      *)
+        echo "Unknown command: $1"
+        dot help
+        ;;
+    esac
+  fi
+}
 
 # Search environment variables with grep (built-in)
 function penvgrep() {
@@ -121,8 +168,137 @@ function y() {
 # ========================================================================
 # Homebrew Bundle Management
 # ========================================================================
+
+# ========================================================================
+# Brew Bundle Management
+# ========================================================================
+function bb() {
+  if [[ "$1" == "help" || -z "$1" ]]; then
+    echo "Usage: bb [command]"
+    echo ""
+    echo "Commands:"
+    # Extract commands and their descriptions from the function itself
+    grep -E '^\s{2}[a-z|]*\)$' "$ZDOTDIR/functions.zsh" | 
+      grep -A 1 -B 0 ")" | 
+      sed -n '/)/N;s/\s\s\([a-z|]*\))\n\s\s\s\s\(.*\) #\(.*\)/  \1 - \3/p' |
+      sort
+  else
+    case "$1" in
+      sudoinstall)
+        sudo brew bundle install --verbose --global --all --no-lock --cleanup --force # Install Brewfile bundles with sudo
+        ;;
+      install)
+        brew bundle install --verbose --global --all --cleanup # Install Brewfile bundles
+        ;;
+      check)
+        brew bundle check --verbose --global --all # Check if all dependencies are installed
+        ;;
+      save)
+        brew bundle dump --verbose --global --all --force # Save current packages to Brewfile
+        ;;
+      unlisted)
+        brew bundle cleanup --verbose --global --all --zap # Show packages not in Brewfile
+        ;;
+      clean)
+        brew bundle cleanup --verbose --global --all --zap --force # Remove packages not in Brewfile
+        ;;
+      edit)
+        brew bundle edit --global # Edit global Brewfile
+        ;;
+      outdated)
+        brew bundle outdated --verbose --global # Show outdated packages in Brewfile
+        ;;
+      upgrade)
+        brew upgrade && brew cleanup # Upgrade all packages and cleanup
+        ;;
+      doctor)
+        brew doctor && brew missing # Run brew diagnostics
+        ;;
+      deps)
+        brew deps --tree --installed "$2" # Show dependency tree for a package
+        ;;
+      leaves)
+        brew leaves # List installed formulae that aren't dependencies
+        ;;
+      *)
+        echo "Unknown command: $1"
+        bb help
+        ;;
+    esac
+  fi
+}
+# function bb() {
+#   if [[ "$1" == "help" || -z "$1" ]]; then
+#     echo "Usage: bb [command]"
+#     echo ""
+#     echo "Commands:"
+#     # Extract commands and their descriptions from the function itself
+#     grep -E '^\s{2}[a-z|]*\)$' "$ZDOTDIR/functions.zsh" | 
+#       grep -A 1 -B 0 ")" | 
+#       sed -n '/)/N;s/\s\s\([a-z|]*\))\n\s\s\s\s\(.*\) #\(.*\)/  \1 - \3/p' |
+#       sort
+#   else
+#     case "$1" in
+#       sudoinstall)
+#         sudo brew bundle install --verbose --global --all --no-lock --cleanup --force # Install Brewfile bundles with sudo
+#         ;;
+#       install)
+#         brew bundle install --verbose --global --all --cleanup # Install Brewfile bundles
+#         ;;
+#       check)
+#         brew bundle check --verbose --global --all # Check if all dependencies are installed
+#         ;;
+#       save)
+#         brew bundle dump --verbose --global --all --force # Save current packages to Brewfile
+#         ;;
+#       unlisted)
+#         brew bundle cleanup --verbose --global --all --zap # Show packages not in Brewfile
+#         ;;
+#       clean)
+#         brew bundle cleanup --verbose --global --all --zap --force # Remove packages not in Brewfile
+#         ;;
+#       edit)
+#         brew bundle edit --global # Edit global Brewfile
+#         ;;
+#       outdated)
+#         brew bundle outdated --verbose --global # Show outdated packages in Brewfile
+#         ;;
+#       upgrade)
+#         brew upgrade && brew cleanup # Upgrade all packages and cleanup
+#         ;;
+#       doctor)
+#         brew doctor && brew missing # Run brew diagnostics
+#         ;;
+#       deps)
+#         brew deps --tree --installed "$2" # Show dependency tree for a package
+#         ;;
+#       leaves)
+#         brew leaves # List installed formulae that aren't dependencies
+#         ;;
+#       *)
+#         echo "Unknown command: $1"
+#         bb help
+#         ;;
+#     esac
+#   fi
+# }
+
+
+
 function b() {
   case "$1" in
+    "up")
+      brew update && brew upgrade && brew cleanup --scrub
+      ;;
+    "in")
+      brew install "$2"
+      ;;
+    "s")
+      brew search "$2"
+      ;;
+    "ini")
+      brew install --cask "$2"
+      ;;
     # Interactive remove with fzf multi-select
     "rmi")
       local selected
@@ -196,137 +372,143 @@ function b() {
   esac
 }
 
-function bb() {
-  case "$1" in
-  sudoinstall)
-    sudo brew bundle install --verbose --global --all --no-lock --cleanup --force
-    ;;
-  install)
-    brew bundle install --verbose --global --all --cleanup
-    ;;
-  check)
-    brew bundle check --verbose --global --all
-    ;;
-  save)
-    brew bundle dump --verbose --global --all --force
-    ;;
-  unlisted)
-    brew bundle cleanup --verbose --global --all --zap
-    ;;
-  clean)
-    brew bundle cleanup --verbose --global --all --zap --force
-    ;;
-  edit)
-    brew bundle edit --global
-    ;;
-  *)
-    echo "Usage: bb [ sudoinstall | install | check | save | unlisted | edit | help ]"
-    ;;
-  esac
-}
 
 # ========================================================================
 # File & Directory Management
 # ========================================================================
 
-# Create and enter directory
-function mkcd() {
-  mkdir -p "$1" && cd "$1" || return 1
-}
-
-# Create symbolic link with parent directory creation if needed
-function slink() {
-  local src_orig="$1"
-  local dst_link="$2"
-  local dst_dir
-
-  dst_dir=$(dirname "$dst_link")
-  mkdir -p "$dst_dir"
-  ln -sf "$src_orig" "$dst_link"
-}
-
-# Clean .DS_Store files
-function clean_ds_store() {
-  log_info "Cleaning .DS_Store files..."
-  find "${1:-$DOTFILES}" -name ".DS_Store" -delete
-  log_success "Finished cleaning .DS_Store files"
-}
-
-# Extract various archive formats
-function extract() {
-  if [[ ! -f "$1" ]]; then
-    log_error "'$1' is not a valid file"
-    return 1
-  fi
-
+# ========================================================================
+# System & macOS Utilities
+# ========================================================================
+function sys() {
   case "$1" in
-  *.tar.bz2) tar xjf "$1" ;;
-  *.tar.gz) tar xzf "$1" ;;
-  *.bz2) bunzip2 "$1" ;;
-  *.rar) unrar x "$1" ;;
-  *.gz) gunzip "$1" ;;
-  *.tar) tar xf "$1" ;;
-  *.tbz2) tar xjf "$1" ;;
-  *.tgz) tar xzf "$1" ;;
-  *.zip) unzip "$1" ;;
-  *.Z) uncompress "$1" ;;
-  *.7z) 7z x "$1" ;;
-  *) log_error "'$1' cannot be extracted" ;;
+    env | env-grep)
+      echo "======== env vars =========="
+      if [ -z "$2" ]; then
+        printenv | sort | awk -F= '{ printf "%-30s %s\n", $1, $2 }'
+      else
+        printenv | sort | grep -i "$2" | awk -F= '{ printf "%-30s %s\n", $1, $2 }'
+      fi
+      echo "============================" # Search environment variables
+      ;;
+    
+    hidden | toggle-hidden)
+      local current
+      current=$(defaults read com.apple.finder AppleShowAllFiles)
+      defaults write com.apple.finder AppleShowAllFiles $((!current))
+      killall Finder
+      echo "Finder hidden files: $((!current))" # Toggle macOS hidden files
+      ;;
+    
+    ql | quick-look)
+      if [ -z "$2" ]; then
+        echo "Usage: sys ql <file>"
+        return 1
+      fi
+      qlmanage -p "${@:2}" &>/dev/null # Quick Look files from terminal
+      ;;
+    
+    weather | wttr)
+      local city="${2:-}"
+      curl -s "wttr.in/$city?format=v2" # Get weather information
+      ;;
+    
+    killport | kill-port)
+      local port="$2"
+      if [[ -z "$port" ]]; then
+        echo "Please specify a port number"
+        return 1
+      fi
+
+      local pid
+      pid=$(lsof -i ":$port" | awk 'NR!=1 {print $2}')
+
+      if [[ -z "$pid" ]]; then
+        echo "No process found on port $port"
+        return 1
+      fi
+
+      echo "Killing process(es) on port $port: $pid"
+      echo "$pid" | xargs kill -9
+      echo "Process(es) killed" # Kill process on specified port
+      ;;
+    
+    ducks | top-files)
+      local count="${2:-10}"
+      du -sh * | sort -rh | head -"$count" # Show largest files in directory
+      ;;
+    
+    man | batman)
+      MANPAGER="sh -c 'col -bx | bat -l man -p'" man "${@:2}" # Improved man pages with bat
+      ;;
+
+    ports | listening)
+      sudo lsof -iTCP -sTCP:LISTEN -n -P # Show all listening ports
+      ;;
+    
+    space | disk)
+      df -h # Check disk space usage
+      ;;
+    
+    cpu)
+      top -l 1 | grep -E "^CPU" # Show CPU usage
+      ;;
+    
+    mem | memory)
+      vm_stat | perl -ne '/page size of (\d+)/ and $size=$1; /Pages\s+([^:]+)[^\d]+(\d+)/ and printf("%-16s % 16.2f MB\n", "$1:", $2 * $size / 1048576);' # Show memory usage
+      ;;
+    
+    path)
+      echo $PATH | tr ':' '\n' | nl # List PATH entries
+      ;;
+    
+    ip | myip)
+      echo "Public IP: $(curl -s https://ipinfo.io/ip)"
+      echo "Local IP: $(ipconfig getifaddr en0)" # Show IP addresses
+      ;;
+    
+    help | *)
+      if [[ "$1" != "help" && ! -z "$1" ]]; then
+        echo "Unknown command: $1"
+      fi
+      
+      echo "Usage: sys [command]"
+      echo ""
+      echo "Commands:"
+      echo "  env [pattern]      - Display environment variables, optionally filtered"
+      echo "  hidden             - Toggle hidden files in Finder"
+      echo "  ql <file>          - Quick Look a file"
+      echo "  weather [city]     - Show weather information"
+      echo "  killport <port>    - Kill process running on specified port"
+      echo "  ducks [count]      - Show largest files in current directory"
+      echo "  man <command>      - Show man pages with syntax highlighting"
+      echo "  ports              - Show all listening ports"
+      echo "  space              - Check disk space usage"
+      echo "  cpu                - Show CPU usage"
+      echo "  mem                - Show memory usage"
+      echo "  path               - List PATH entries"
+      echo "  ip                 - Show public and local IP addresses"
+      ;;
   esac
-}
-
-# Enhanced tree command with eza/exa if available
-function lstree() {
-  local level="${1:-2}"
-
-  if command -v eza &>/dev/null; then
-    eza --tree --level="$level" --icons
-  elif command -v exa &>/dev/null; then
-    exa --tree --level="$level" --icons
-  else
-    find . -type d -not -path "*/\.*" -not -path "*/node_modules/*" -maxdepth "$level" | sort | sed -e 's/[^-][^\/]*\//  |/g' -e 's/|\([^ ]\)/|-\1/'
-  fi
-}
-
-# ========================================================================
-# Directory Bookmarks
-# ========================================================================
-
-# Create directory bookmark
-function bm() {
-  local mark_dir="$XDG_DATA_HOME/marks"
-  mkdir -p "$mark_dir"
-  ln -sf "$(pwd)" "$mark_dir/$1"
-  log_success "Created bookmark '$1' -> $(pwd)"
-}
-
-# List all bookmarks
-function marks() {
-  local mark_dir="$XDG_DATA_HOME/marks"
-  if [[ ! -d "$mark_dir" ]]; then
-    log_error "No bookmarks directory found at $mark_dir"
-    return 1
-  fi
-
-  ls -l "$mark_dir" | sed 's/  / /g' | cut -d' ' -f9- | sed 's/ -/\t-/g'
-}
-
-# Jump to bookmark
-function jump() {
-  local mark_dir="$XDG_DATA_HOME/marks"
-  local mark="$1"
-
-  if [[ -L "$mark_dir/$mark" ]]; then
-    cd "$(readlink "$mark_dir/$mark")" || return 1
-  else
-    log_error "No such bookmark: $mark"
-    return 1
-  fi
 }
 
 # ========================================================================
 # Git Utilities
 # ========================================================================
+
+# Lazygit alias
+alias lg='lazygit'
+
+# # Custom function to open lazygit in current repo 
+# function lgit() {
+#   export LAZYGIT_NEW_DIR_FILE=~/.lazygit/newdir
+#   lazygit "$@"
+  
+#   if [ -f $LAZYGIT_NEW_DIR_FILE ]; then
+#     cd "$(cat $LAZYGIT_NEW_DIR_FILE)"
+#     rm -f $LAZYGIT_NEW_DIR_FILE > /dev/null
+#   fi
+# }
 
 # Clean merged branches
 function gclean() {
@@ -373,3 +555,11 @@ function rfv() {
     --preview-window '~4,+{2}+4/3,<80(up)' \
     --query "$*"
 }
+
+
+# Keep commonly used aliases for convenience
+alias penv='sys env'
+alias weather='sys weather'
+alias ql='sys ql'
+alias batman='sys man'
+alias ducks='sys ducks'
