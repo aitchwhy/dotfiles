@@ -1,0 +1,30 @@
+gui:
+  theme:
+    lightTheme: false
+    activeBorderColor:
+      - green
+      - bold
+    selectedLineBgColor:
+      - default
+    optionsTextColor:
+      - blue
+  showCommandLog: true
+  expandFocusedSidePanel: true
+  showFileTree: true
+
+git:
+  paging:
+    colorArg: always
+    pager: delta --dark --paging=never
+  commit:
+    signOff: false
+  merging:
+    manualCommit: false
+  skipHookPrefix: WIP
+  autoFetch: true
+  branchLogCmd: "git log --graph --color=always --abbrev-commit --decorate --date=relative --pretty=medium {{branchName}} --"
+
+os:
+  editCommand: 'nvim'
+  editCommandTemplate: '{{editor}} +{{line}} {{filename}}'
+  openCommand: 'open {{filename}}'

@@ -51,6 +51,10 @@
 # ENV["SOME_ENV_VAR"] = "some_value"
 #######################################
 
+
+# set cask install dir to ~/Applications (user level)
+cask_args appdir: "~/Applications", require_sha: true
+
 tap "dotenvx/brew"
 tap "homebrew/bundle"
 tap "homebrew/services"

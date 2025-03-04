@@ -21,7 +21,7 @@ export EDITOR="vim"
 export VISUAL="$EDITOR"
 
 # History
-export HISTFILE="$HOME/.zsh_history"
+# export HISTFILE="$HOME/.zsh_history"
 export HISTSIZE=100000
 export SAVEHIST=100000
 
@@ -29,11 +29,11 @@ export SAVEHIST=100000
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # Remove duplicate paths
-typeset -U path
-path=(
-  "$HOME/.local/bin"
-  "$HOME/bin"
-  $path
-)
+# typeset -U path PATH
+# path=(
+#   "$HOME/.local/bin"
+#   "$HOME/bin"
+#   $path
+# )
 
-export PATH
+# export PATH
