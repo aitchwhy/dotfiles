@@ -24,6 +24,7 @@ if [[ ! -f "$DOTFILES/utils.sh" ]]; then
 fi
 
 source "$DOTFILES/utils.sh"
+source "$DOTFILES/config/zsh/functions.zsh"
 
 # ========================================================================
 # Repository Verification
@@ -75,7 +76,7 @@ setup_zsh() {
 
   # Backup existing .zshenv if it exists
   if [[ -f "$HOME/.zshenv" ]]; then
-    backup_file "$HOME/.zshenv"
+    # backup_file "$HOME/.zshenv"
     rm -f "$HOME/.zshenv"
   fi
 
@@ -98,7 +99,10 @@ EOF
 setup_homebrew() {
   info "Setting up Homebrew..."
 
-  if [[ ! -x /opt/homebrew/bin/brew ]] && [[ ! -x /usr/local/bin/brew ]]; then
+  info "Brew cleanup (scrub)..."
+  brew cleanup --scrub
+
+  if [[ ! -x /opt/homebrew/bin/brew ]]; then
     info "Installing Homebrew..."
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
@@ -117,18 +121,20 @@ setup_homebrew() {
 
   # Install from Brewfile
   if [[ -f "$DOTFILES/Brewfile" ]]; then
-    info "Installing packages from Brewfile..."
-    read -q "answer?Install all Homebrew packages? This may take a while. [y/N] "
-    echo ""
-
-    if [[ "$answer" =~ ^[Yy]$ ]]; then
-      # Full installation
-      brew bundle install --file="$DOTFILES/Brewfile" --no-lock
-    else
-      # Install just essential packages
-      info "Installing essential packages only..."
-      brew install starship atuin zoxide bat zsh-syntax-highlighting zsh-autosuggestions fzf git
-    fi
+    info "(sudo) Installing packages from Brewfile..."
+    # read -q "answer?Install all Homebrew packages? This may take a while. [y/N] "
+    # echo ""
+    # sudo -v
+    sudo brew bundle install --verbose --global --all --no-lock --cleanup --force
+    # sudo -v
+    # if [[ "$answer" =~ ^[Yy]$ ]]; then
+    #   # Full installation
+    #   brew bundle install --file="$DOTFILES/Brewfile" --no-lock
+    # else
+    #   # Install just essential packages
+    #   info "Installing essential packages only..."
+    #   brew install starship atuin zoxide bat zsh-syntax-highlighting zsh-autosuggestions fzf git
+    # fi
   else
     warn "Brewfile not found at $DOTFILES/Brewfile"
   fi
@@ -149,6 +155,7 @@ setup_cli_tools() {
     ["$DOTFILES/config/ghostty"]="$XDG_CONFIG_HOME/ghostty"
     ["$DOTFILES/config/atuin"]="$XDG_CONFIG_HOME/atuin"
     ["$DOTFILES/config/bat"]="$XDG_CONFIG_HOME/bat"
+    ["$DOTFILES/config/lazygit"]="$XDG_CONFIG_HOME/lazygit"
     ["$DOTFILES/config/zellij"]="$XDG_CONFIG_HOME/zellij"
     ["$DOTFILES/config/espanso"]="$XDG_CONFIG_HOME/espanso"
     ["$DOTFILES/config/vscode/settings.json"]="$HOME/Library/Application Support/Code/User/settings.json"
@@ -162,23 +169,23 @@ setup_cli_tools() {
   for src in "${(@k)DOTFILES_TO_SYMLINK_MAP}"; do
     local dst="${DOTFILES_TO_SYMLINK_MAP[$src]}"
     local parent_dir=$(dirname "$dst")
-    
+
     # Create parent directory if it doesn't exist
     ensure_dir "$parent_dir"
-    
+
     if [[ -L "$dst" ]]; then
       # If it's already a symlink, update it
       rm -f "$dst"
     elif [[ -e "$dst" ]]; then
       # If it exists as a file or directory, back it up
-      backup_file "$dst"
+      # backup_file "$dst"
       rm -rf "$dst"
     fi
-    
+
     # Create the symlink
     if [[ -e "$src" ]]; then
       ln -sf "$src" "$dst"
-      success "Linked $src → $dst"
+      success "Symlinked $dst -> $src source file"
     else
       warn "Source '$src' does not exist, skipping"
     fi
@@ -188,7 +195,7 @@ setup_cli_tools() {
 # ========================================================================
 # macOS System Preferences
 # ========================================================================
-setup_macos_preferences() {
+function setup_macos_preferences() {
   info "Configuring macOS system preferences..."
 
   # Faster key repeat

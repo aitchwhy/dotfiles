@@ -28,9 +28,6 @@ function show_progress() {
   printf '%s→%s %s...\n' "${BLUE:-}" "${RESET:-}" "$*"
 }
 
-
-
-
 # ========================================================================
 # Environment Settings
 # ========================================================================
@@ -41,7 +38,6 @@ function show_progress() {
 # export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 # export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 # export ZDOTDIR=${ZDOTDIR:-$HOME/.config/zsh}
-
 
 # Search environment variables with grep (built-in)
 function penvgrep() {
@@ -54,11 +50,9 @@ function penvgrep() {
   echo "============================"
 }
 
-
 # ========================================================================
 # System & macOS Utilities
 # ========================================================================
-
 
 # Toggle macOS hidden files
 function togglehidden() {
@@ -127,32 +121,109 @@ function y() {
 # ========================================================================
 # Homebrew Bundle Management
 # ========================================================================
+function b() {
+  case "$1" in
+    # Interactive remove with fzf multi-select
+    "rmi")
+      local selected
+      selected=$(brew list | fzf -m --header="Select packages to remove (use TAB to select multiple)" --preview="brew info {}" --preview-window=:hidden --bind=space:toggle-preview)
+
+      if [[ -n "$selected" ]]; then
+        echo "The following packages will be removed:"
+        echo "$selected"
+        echo ""
+        echo "Proceed? (y/n)"
+        read -q proceed
+
+        if [[ "$proceed" == "y" ]]; then
+          echo "\nRemoving packages..."
+          brew remove $selected
+          echo "Packages removed successfully."
+        else
+          echo "\nOperation cancelled."
+        fi
+      else
+        echo "No packages selected."
+      fi
+      ;;
+
+    # Interactive install with fzf multi-select and Brewfile update
+    "insi")
+      local selected
+      local brewfile="${BREWFILE:-$HOME/Brewfile}"
+      selected=$(brew search | fzf -m --header="Select packages to install (use TAB to select multiple)" --preview="brew info {}" --preview-window=:hidden --bind=space:toggle-preview)
+
+      if [[ -n "$selected" ]]; then
+        echo "The following packages will be installed and added to $brewfile:"
+        echo "$selected"
+        echo ""
+        echo "Proceed? (y/n)"
+        read -q proceed
+
+        if [[ "$proceed" == "y" ]]; then
+          echo "\nInstalling packages..."
+          brew install $selected
+
+          # Add to Brewfile if it exists or create it
+          if [[ ! -f "$brewfile" ]]; then
+            touch "$brewfile"
+          fi
+
+          # Add each package to Brewfile if not already there
+          for pkg in ${(f)selected}; do
+            if ! grep -q "^brew \"$pkg\"$" "$brewfile"; then
+              echo "brew \"$pkg\"" >> "$brewfile"
+              echo "Added $pkg to Brewfile"
+            fi
+          done
+
+          echo "Packages installed and Brewfile updated."
+        else
+          echo "\nOperation cancelled."
+        fi
+      else
+        echo "No packages selected."
+      fi
+      ;;
+
+    # Add more cases as needed
+    *)
+      echo "Usage: b [command]"
+      echo "Commands:"
+      echo "  rmi    - Interactive remove brew packages with fzf"
+      echo "  insi   - Interactive install brew packages with fzf and update Brewfile"
+      ;;
+  esac
+}
+
 function bb() {
   case "$1" in
-  save)
-    brew bundle dump --force --describe --global
+  sudoinstall)
+    sudo brew bundle install --verbose --global --all --no-lock --cleanup --force
     ;;
   install)
-    brew bundle install --global --all
+    brew bundle install --verbose --global --all --cleanup
     ;;
   check)
-    brew bundle check --global --verbose --all
+    brew bundle check --verbose --global --all
+    ;;
+  save)
+    brew bundle dump --verbose --global --all --force
     ;;
   unlisted)
-    brew bundle cleanup --global --verbose --all --zap
+    brew bundle cleanup --verbose --global --all --zap
     ;;
   clean)
-    brew bundle cleanup --global --verbose --all --zap -f
+    brew bundle cleanup --verbose --global --all --zap --force
     ;;
   edit)
     brew bundle edit --global
     ;;
   *)
-    echo "Usage: bb [save|install|check|unlisted|clean|edit]"
+    echo "Usage: bb [ sudoinstall | install | check | save | unlisted | edit | help ]"
     ;;
   esac
 }
-
 
 # ========================================================================
 # File & Directory Management
@@ -252,7 +323,6 @@ function jump() {
     return 1
   fi
 }
-
 
 # ========================================================================
 # Git Utilities

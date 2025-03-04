@@ -12,10 +12,9 @@ alias lg=lazygit
 # System utils
 # ========================================================================
 # Color with built-in ANSI codes, no external dependencies
-alias penv='printenv | sort | awk -F= '\''{ 
-  printf "\033[36m%-30s\033[0m \033[37m%s\033[0m\n", $1, $2 
+alias penv='printenv | sort | awk -F= '\''{
+  printf "\033[36m%-30s\033[0m \033[37m%s\033[0m\n", $1, $2
 }'\'''
-
 
 # ========================================================================
 # Navigation Shortcuts
@@ -81,7 +80,7 @@ alias flush="dscacheutil -flushcache && killall -HUP mDNSResponder" # Flush DNS
 # ========================================================================
 # Dotfiles Management
 # ========================================================================
-alias zdotdir='cd $ZDOTDIR'
+alias zdir='cd $ZDOTDIR'
 alias ze="fd --no-ignore --hidden --follow --type f -x $EDITOR $ZDOTDIR"
 alias ze="fd --hidden . $ZDOTDIR | xargs nvim"
 alias dots="cd $DOTFILES"
@@ -91,9 +90,12 @@ alias zreload="exec zsh"
 # ========================================================================
 # System Information
 # ========================================================================
-alias printpath='echo $PATH | tr ":" "\n"'
-alias printfuncs='print -l ${(k)functions[(I)[^_]*]} | sort'
-alias printfpath='for fp in $fpath; do echo $fp; done; unset fp'
+alias ppath='echo $PATH | tr ":" "\n"'
+alias pfuncs='print -l ${(k)functions[(I)[^_]*]} | sort'
+alias pfpath='for fp in $fpath; do echo $fp; done; unset fp'
+alias printpath='ppath'
+alias printfuncs='pfuncs'
+alias printfpath='pfpath'
 
 # ========================================================================
 # Misc Shortcuts
