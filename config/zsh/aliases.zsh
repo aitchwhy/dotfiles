@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-source "$DOTFILES/utils.sh"
+source "$DOTFILES/utils.zsh"
 
 # ========================================================================
 # ZSH aliases - Organized by category

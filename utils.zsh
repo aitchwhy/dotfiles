@@ -32,6 +32,25 @@ function is_apple_silicon() {
     [[ "$(uname -m)" == "arm64" ]]
 }
 
+function is_rosetta() {
+    # Check if a process is running under Rosetta translation
+    if is_apple_silicon; then
+        local arch_output
+        arch_output=$(arch)
+        [[ "$arch_output" != "arm64" ]]
+    else
+        false
+    fi
+}
+
+function get_macos_version() {
+    if is_macos; then
+        sw_vers -productVersion
+    else
+        echo "Not macOS"
+    fi
+}
+
 function has_command() {
     command -v "$1" &>/dev/null
 }
@@ -131,11 +150,28 @@ function sys() {
         ;;
 
     cpu)
-        top -l 1 | grep -E "^CPU" # Show CPU usage
+        if is_apple_silicon; then
+            # Special handling for Apple Silicon
+            echo "Apple Silicon CPU details:"
+            sysctl -n machdep.cpu.brand_string
+            echo "Performance cores: $(sysctl -n hw.perflevel0.physicalcpu)"
+            echo "Efficiency cores: $(sysctl -n hw.perflevel1.physicalcpu)"
+            top -l 1 | grep -E "^CPU"
+        else
+            # Intel Mac
+            sysctl -n machdep.cpu.brand_string
+            top -l 1 | grep -E "^CPU"
+        fi
         ;;
 
     mem | memory)
-        vm_stat | perl -ne '/page size of (\d+)/ and $size=$1; /Pages\s+([^:]+)[^\d]+(\d+)/ and printf("%-16s % 16.2f MB\n", "$1:", $2 * $size / 1048576);' # Show memory usage
+        if is_apple_silicon; then
+            # Special handling for Apple Silicon unified memory
+            vm_stat | perl -ne '/page size of (\d+)/ and $size=$1; /Pages\s+([^:]+)[^\d]+(\d+)/ and printf("%-16s % 16.2f MB\n", "$1:", $2 * $size / 1048576);'
+            echo "Unified memory: $(($(sysctl -n hw.memsize) / 1024 / 1024)) MB"
+        else
+            vm_stat | perl -ne '/page size of (\d+)/ and $size=$1; /Pages\s+([^:]+)[^\d]+(\d+)/ and printf("%-16s % 16.2f MB\n", "$1:", $2 * $size / 1048576);'
+        fi
         ;;
 
     path)
@@ -145,6 +181,33 @@ function sys() {
     ip | myip)
         echo "Public IP: $(curl -s https://ipinfo.io/ip)"
         echo "Local IP: $(ipconfig getifaddr en0)" # Show IP addresses
+        ;;
+
+    sysinfo)
+        echo "System Information:"
+        echo "-------------------"
+        echo "OS: macOS $(sw_vers -productVersion) ($(sw_vers -buildVersion))"
+        echo "Host: $(scutil --get ComputerName)"
+        if is_apple_silicon; then
+            echo "Processor: Apple Silicon $(sysctl -n machdep.cpu.brand_string)"
+            echo "Architecture: $(uname -m) (native)"
+            if is_rosetta; then
+                echo "Running under Rosetta 2 translation"
+            fi
+        else
+            echo "Processor: $(sysctl -n machdep.cpu.brand_string)"
+            echo "Architecture: $(uname -m)"
+        fi
+        echo "Memory: $(( $(sysctl -n hw.memsize) / 1024 / 1024 / 1024 )) GB"
+        echo "Shell: $SHELL"
+        # Add homebrew specific info
+        if has_command brew; then
+            echo ""
+            echo "Homebrew:"
+            echo "-------------------"
+            echo "Prefix: $(brew --prefix)"
+            echo "Version: $(brew --version | head -1)"
+        fi
         ;;
 
     help | *)
@@ -164,10 +227,11 @@ function sys() {
         echo "  man <command>      - Show man pages with syntax highlighting"
         echo "  ports              - Show all listening ports"
         echo "  space              - Check disk space usage"
-        echo "  cpu                - Show CPU usage"
+        echo "  cpu                - Show CPU usage and information"
         echo "  mem                - Show memory usage"
         echo "  path               - List PATH entries"
         echo "  ip                 - Show public and local IP addresses"
+        echo "  sysinfo            - Show comprehensive system information"
         ;;
     esac
 }
@@ -178,23 +242,3 @@ function sys() {
 # alias ql='sys ql'
 # alias batman='sys man'
 # alias ducks='sys ducks'
-
-# declare -A DOTFILES_TO_SYMLINK_MAP=(
-#     ["$DOTFILES/config/git/gitconfig"]="$HOME/.gitconfig"
-#     ["$DOTFILES/config/git/gitignore"]="$HOME/.gitignore"
-#     ["$DOTFILES/config/starship.toml"]="$XDG_CONFIG_HOME/starship.toml"
-#     ["$DOTFILES/config/karabiner/karabiner.json"]="$XDG_CONFIG_HOME/karabiner/karabiner.json"
-#     ["$DOTFILES/config/nvim"]="$XDG_CONFIG_HOME/nvim"
-#     ["$DOTFILES/config/ghostty"]="$XDG_CONFIG_HOME/ghostty"
-#     ["$DOTFILES/config/atuin"]="$XDG_CONFIG_HOME/atuin"
-#     ["$DOTFILES/config/bat"]="$XDG_CONFIG_HOME/bat"
-#     ["$DOTFILES/config/lazygit"]="$XDG_CONFIG_HOME/lazygit"
-#     ["$DOTFILES/config/zellij"]="$XDG_CONFIG_HOME/zellij"
-#     ["$DOTFILES/config/espanso"]="$XDG_CONFIG_HOME/espanso"
-#     ["$DOTFILES/config/vscode/settings.json"]="$HOME/Library/Application Support/Code/User/settings.json"
-#     ["$DOTFILES/config/vscode/keybindings.json"]="$HOME/Library/Application Support/Code/User/keybindings.json"
-#     ["$DOTFILES/config/cursor/settings.json"]="$HOME/Library/Application Support/Cursor/User/settings.json"
-#     ["$DOTFILES/config/cursor/keybindings.json"]="$HOME/Library/Application Support/Cursor/User/keybindings.json"
-#     ["$DOTFILES/config/hammerspoon"]="$HOME/.hammerspoon"
-#     ["$DOTFILES/config/ai/claude/claude_desktop_config.json"]="$HOME/Library/Application Support/Claude/claude_desktop_config.json"
-# )

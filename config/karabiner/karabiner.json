@@ -409,8 +409,8 @@
                         ]
                     },
                     {
-                        "description": "Use (TODO: fn?) right_command+h/l to switch tabs in an application.",
-                        "enabled": false,
+                        "description": "Use right_command+h/l to switch tabs in an application",
+                        "enabled": true,
                         "manipulators": [
                             {
                                 "from": {
@@ -454,8 +454,8 @@
                         ]
                     },
                     {
-                        "description": "Use (TODO: fn?) right_command+j/k to switch windows of the foreground application .",
-                        "enabled": false,
+                        "description": "Use right_command+j/k to switch windows of the foreground application",
+                        "enabled": true,
                         "manipulators": [
                             {
                                 "from": {
@@ -500,7 +500,7 @@
                     },
                     {
                         "description": "Change cmd+backslach to cmd+f11 if pressed in VSCode or Cursor",
-                        "enabled": false,
+                        "enabled": true,
                         "manipulators": [
                             {
                                 "conditions": [
@@ -567,8 +567,8 @@
                         ]
                     },
                     {
-                        "description": "o Launcher",
-                        "enabled": false,
+                        "description": "o Launcher for quick app access",
+                        "enabled": true,
                         "manipulators": [
                             {
                                 "conditions": [

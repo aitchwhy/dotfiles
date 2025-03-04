@@ -1,13 +1,224 @@
+# Yazi File Manager Configuration
+# Optimized for macOS Apple Silicon (2025)
+# https://yazi-rs.github.io/docs/configuration/yazi
+
+# ==================================================
+# General Configuration
+# ==================================================
+
 [manager]
+# Show hidden files by default (useful for development work on macOS)
 show_hidden = true
 
+# Layout for file listings - cleaner for macOS and Retina displays
+layout = [1, 4, 3]
+sort_by = "natural"
+sort_sensitive = false
+sort_reverse = false
+sort_dir_first = true
 
-[[plugin.prepend_fetchers]]
-id   = "git"
-name = "*"
-run  = "git"
+# Make full use of space on Apple Silicon Macs with large displays
+linemode = "size"
+show_preview = true  # File previews - M-series can handle these well
+show_icons = true    # Show file icons for better UX
+show_symlink = true  # Show symlink targets
 
-[[plugin.prepend_fetchers]]
-id   = "git"
-name = "*/"
-run  = "git"
+# Optimized preview size - since macOS typically has larger displays
+preview_ratio = 0.5  # 50% of the window for previews
+folder_preview = true
+
+# Make scrolling smoother on Apple trackpads
+scroll_offset = 5
+case_sensitive = false    # Default macOS behavior
+mouse = true              # Enable mouse support for trackpad gestures
+
+# ==================================================
+# Plugin Configuration for Apple Silicon
+# ==================================================
+
+[plugins]
+# Enable parallel processing for faster performance on M-series chips
+preload = ["maxpreview", "border"]
+prepend_preload = ["icons", "git"]
+
+# ==================================================
+# Search Configuration
+# ==================================================
+
+[search]
+# Fuzzy search works well with M-chip performance
+fuzzy = true
+incsearch = true  # Incremental search
+smart_case = true
+# Wrap-around search (matches macOS UI patterns)
+wrap_around = true
+
+# ==================================================
+# Tasks Configuration
+# ==================================================
+
+[tasks]
+# Apple Silicon can handle more parallel tasks
+micro_workers = 5
+macro_workers = 10
+# Improve responsiveness of the interface
+bizarre_retry = 5
+
+# ==================================================
+# Opener for file types (macOS specific)
+# ==================================================
+
+[opener]
+# Default tools for common file operations
+edit = [
+  { exec = 'nvim "$@"', block = true },
+  { exec = 'code "$@"', orphan = true },
+]
+
+# macOS-specific openers
+open = [
+  { exec = 'open "$@"', desc = "Open with default macOS app" },
+  { exec = 'open -a Safari "$@"', desc = "Open with Safari", for = "url" },
+  { exec = 'qlmanage -p "$@" &>/dev/null', desc = "QuickLook preview", for = "file" },
+  { exec = 'open -a Preview "$@"', desc = "Open with Preview", for = "image" },
+  { exec = 'open -a "Visual Studio Code" "$@"', desc = "Open with VS Code", for = ["text", "code"] },
+  { exec = 'open -a "TextEdit" "$@"', desc = "Open with TextEdit" },
+]
+
+# Archive handling with native macOS utilities where possible
+extract = [
+  { exec = 'unar "$1"', desc = "Extract with unar", for = ["application", "archive"] },
+  { exec = 'tar -xf "$1"', desc = "Extract TAR archive", for = ["application/x-tar"] },
+]
+
+# Archive creation - prefer built-in tools
+archive = [
+  { exec = 'zip -r "$1" "${@:2}"', desc = "Compress to ZIP", for = ["application/zip"] },
+  { exec = 'tar -czvf "$1" "${@:2}"', desc = "Compress to TAR.GZ" },
+]
+
+reveal = [
+  { exec = 'open -R "$@"', desc = "Reveal in Finder" }
+]
+
+# ==================================================
+# Input Configuration (Apple keyboard friendly)
+# ==================================================
+
+[input]
+# OS X style key handling
+cd_shortcuts = true
+# macOS-style history
+dial_as_in_vim = true
+# number of command history entries
+history_dedup = 10000
+
+# ==================================================
+# Preview Configuration (optimized for M-series)
+# ==================================================
+
+[preview]
+# Maximize the performance benefits of Apple Silicon
+max_width = 1920
+max_height = 1080
+
+# Cache preview images for faster navigation
+cache_dir = "~/.cache/yazi"
+
+keybinding = true
+
+# Maximum file size for previews (in bytes)
+# M-series chips can handle larger files
+max_file_size = "10MB"
+
+# Preview script handling
+tab_size = 2
+
+# Direct output of previews
+preload = 5
+
+# ==================================================
+# Command Presets (macOS optimized)
+# ==================================================
+
+[open]
+rules = [
+  # Images
+  { mime = "image/*", use = "image" },
+  
+  # Audio
+  { mime = "audio/*", use = "audio" },
+  
+  # Video
+  { mime = "video/*", use = "video" },
+  
+  # PDF
+  { mime = "application/pdf", use = "pdf" },
+  
+  # Archives
+  { mime = "application/zip", use = "archive" },
+  { mime = "application/gzip", use = "archive" },
+  { mime = "application/x-tar", use = "archive" },
+  
+  # Fallback: Use text for anything else
+  { mime = "*", use = "text" },
+]
+
+# ==================================================
+# Colors & Style (optimized for macOS)
+# ==================================================
+
+[theme]
+# Modern style that matches macOS aesthetic
+
+# Transparency for UI elements
+# Can be enabled on Apple Silicon without performance issues
+opacity = { selected = 1.0, unselected = 0.7 }
+
+# ==================================================
+# Icons (optimized for macOS)
+# ==================================================
+
+[icons]
+prepend_rules = [
+  # macOS-specific files
+  { name = ".DS_Store", text = "" },
+  { name = ".Trash", text = "󰈑" },
+  { name = "Applications", text = "󰇮" },
+  { name = "Desktop", text = "󰟀" },
+  { name = "Developer", text = "󰏓" },
+  { name = "Documents", text = "󰈙" },
+  { name = "Downloads", text = "󰇚" },
+  { name = "Library", text = "󰂺" },
+  { name = "Movies", text = "󰎁" },
+  { name = "Music", text = "󰎄" },
+  { name = "Pictures", text = "󰋩" },
+  { name = "Public", text = "󰄛" },
+  
+  # Development
+  { name = ".git", text = "󰊢" },
+  { name = ".github", text = "" },
+  { name = "node_modules", text = "󰎙" },
+  { name = "package.json", text = "󰎙" },
+  { name = "package-lock.json", text = "󰎙" },
+  { name = "Cargo.toml", text = "󱘗" },
+  { name = "Cargo.lock", text = "󱘗" },
+  { name = "go.mod", text = "󰟓" },
+  { name = "go.sum", text = "󰟓" },
+  { name = "Brewfile", text = "󰜙" },
+]
+
+# ==================================================
+# Syntax-specific Configurations
+# ==================================================
+
+[syntax]
+# Apple Silicon can handle more complex syntax highlighting
+theme = "Catppuccin Macchiato"
+
+# Custom theme directory (Catppuccin, Nord, Tokyo Night recommended)
+theme_dir = "~/.config/yazi/syntect/themes"
+
+# ==================================================
+# End of configuration
+# ==================================================

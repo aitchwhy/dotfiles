@@ -1,156 +1,127 @@
-#######################
-# Docs - https://ghostty.org/docs/
-#
-# The syntax is "key = value". The whitespace around the equals doesn't matter.
-# Comments start with a `#` and are only valid on their own line.
-# Blank lines are ignored!
-# Empty values reset the configuration to the default value (font-family = )
-########################
+# Ghostty Terminal Configuration
+# Optimized for macOS Apple Silicon (2025)
+# https://ghostty.org/docs/config
 
-# General
+# ============================
+# General Settings
+# ============================
 
+# Performance optimizations for Apple Silicon
+gpu-accelerated = true
+background-opacity = 1.0
+background-blur-radius = 10.0
+background-image-opacity = 0.08
+foreground-text-hsb = [1.0, 1.0, 1.0]
+
+# Enable automatic updates (recommended for macOS)
 auto-update = download
 window-save-state = always
 
+# Disable native full screen to allow more versatile window management
 macos-non-native-fullscreen = true
 
-# This controls whether an initial window is created when Ghostty is run.
-initial-window = true
-
+# Enable Option as Alt key (common for development work)
 macos-option-as-alt = true
-macos-non-native-fullscreen = true
 
+# Clipboard handling
 clipboard-read = "allow"
 clipboard-write = "allow"
 
-# favs
-# light : zenbones, nord-light
-# dark : catppuccin-frappe, nord, tokyonight-storm
+# ============================
+# Appearance
+# ============================
 
-#theme = light:nord-light,dark:nord
-#theme = light:zenbones,dark:nord
-theme = tokyonight-storm
-# theme = nord
-# theme = catppuccin-frappe
+# Themes optimized for macOS and Apple displays
+# Light/dark variations
+# Uncomment your preferred theme
+theme = "tokyonight-storm"
+#theme = "light:nord-light,dark:nord"
+#theme = "light:zenbones,dark:nord"
+#theme = "catppuccin-frappe"
+#theme = "nord"
 
-font-size = 12
+# Font settings optimized for Retina displays
+font-family = "JetBrains Mono"
+font-features = "JetBrains Mono:liga=1:calt=1:ss01=1:ss02=1:ss03=1:ss04=1:ss05=1:ss06=1:ss07=1:ss08=1:ss09=1:ss10=1"
+font-size = 13
+line-height = 1.2
 
+# Window appearance
 window-decoration = true
-window-padding-x  = 12
-window-padding-y  = 12
+window-padding-x = 16
+window-padding-y = 16
+window-theme = "dark"  # Matches macOS themes
 
+# Dialog confirmation settings
 confirm-close-surface = false
-mouse-hide-while-typing = false
 
-# toggle visibility
+# Better cursor visibility for Retina displays
+cursor-style = "bar"
+cursor-style-blink = true
+mouse-hide-while-typing = true
+
+# ============================
+# Keyboard Shortcuts
+# ============================
+
+# macOS-friendly keybindings optimized for developers
 keybind = global:cmd+period=toggle_visibility
-
-# keybind = global:cmd+period ~~ raycast toggle ghostty
 keybind = global:opt+period=toggle_quick_terminal
 
-########################
-# Quick terminal
-########################
+# ============================
+# Quick Terminal Configuration
+# ============================
 
-# Quick terminal (floating)
+# Quick terminal (floating window) settings
 quick-terminal-animation-duration = 0
-
-# center, top, bottom, left, right
-# quick-terminal-position = top
 quick-terminal-position = center
-
-# main, mouse, macos-menu-bar
 quick-terminal-screen = main
-
-# Automatically hide the quick terminal when focus shifts to another window.
-# Set it to false for the quick terminal to remain open even when it loses focus.
 quick-terminal-autohide = true
 
-# Shell (Zsh) integration (detect, none, zsh, bash, etc)
-shell-integration = detect
+# ============================
+# Shell Integration
+# ============================
 
-# shell intg features
+# Enable shell integration for better terminal experience
+shell-integration = detect
 shell-integration-features = "cursor, title"
 
+# ============================
+# Appearance Settings
+# ============================
+
+# Make bold text brighter for better visibility
 bold-is-bright = true
 
-# cursor style (block, bar)
-cursor-style = bar
-cursor-style-blink = true
-
-# enables cmd+click to follow URL
+# Enable URL detection and clicking
 link-url = true
-# NO full screen on app startup
+
+# Don't start in fullscreen
 fullscreen = false
 
-###########################
-# Keybindings
-#
-# > Syntax is "keybind = trigger=action"
-###########################
-# SPECIAL CHARS
-#
-# Numeric keys are written as words (e.g. one, two - not 1, 2)
-# Special chars can be both words or single chars (; and semicolon) - (list of chars https://github.com/ghostty-org/ghostty/blob/d6e76858164d52cff460fedc61ddf2e560912d71/src/input/key.zig#L255)
-###########################
-# MODIFIER KEYS
-#
-# Valid modifiers are shift, ctrl/control, alt/opt/option, and cmd/command/super. NOT supported fn or "globe" key.
-###########################
-# LEADER KEYS / CHORD SEQUENCE
-#
-# Specify MULTIPLE triggers separated by > to require a sequence of triggers to activate the action.
-#  - For example, ctrl+a>n=new_window -> new_window action if ctrl+a followed separately by n
-#  - There is no hardcoded limit on the number of parts in a sequence.
-###########################
-# LIST OF ACTIONS
-# - list with command ($ ghostty +list-actions command)
-# - docs link : https://github.com/ghostty-org/ghostty/blob/d6e76858164d52cff460fedc61ddf2e560912d71/src/input/key.zig#L255
-###########################
+# ============================
+# Custom Key Bindings
+# ============================
 
-##############################
-# General
-##############################
-
+# General navigation
 keybind = cmd+comma=open_config
 keybind = cmd+shift+comma=reload_config
-
 keybind = cmd+opt+i=inspector:toggle
-
 keybind = cmd+enter=toggle_fullscreen
 
-# jumping between prompts
-# keybind = opt+down=jump_to_prompt:1
+# Navigation between shell prompts
 keybind = cmd+shift+down=jump_to_prompt:1
 keybind = cmd+shift+up=jump_to_prompt:-1
-# keybind = opt+up=jump_to_prompt:-1
 
-# Clipboard copy -> https://ghostty.org/docs/config/keybind#performable:
-# keybind = performable:ctrl+c=copy_to_clipboard
-
-##############################
-# Selection
-##############################
-
-# Example: Extend selection to the right keybind = shift+right=adjust_selection:right
-# Adjust the current selection in a given direction. Does nothing if no selection exists.
-# Arguments:
-#    left, right, up, down, page_up, page_down, home, end, beginning_of_line, end_of_line
-# Example: Extend selection to the right
+# Selection handling
 keybind = cmd+shift+right=adjust_selection:right
 keybind = cmd+shift+left=adjust_selection:left
 keybind = cmd+shift+up=adjust_selection:up
 keybind = cmd+shift+down=adjust_selection:down
 
-# keybind = ctrl+up=adjust_selection:page_up
-# keybind = ctrl+down=adjust_selection:page_down
-
-# keybind = ctrl+h=adjust_selection:beginning_of_line
-# keybind = ctrl+l=adjust_selection:end_of_line
-
-########################
-# Tabs
-########################
+# ============================
+# Tab Management
+# ============================
 
 keybind = ctrl+t>t=toggle_tab_overview
 keybind = ctrl+t>n=new_tab
@@ -158,47 +129,83 @@ keybind = ctrl+t>h=previous_tab
 keybind = ctrl+t>l=next_tab
 keybind = ctrl+t>d=close_tab
 
-########################
-# Windows
-########################
-# https://ghostty.org/docs/config/keybind/sequence
-# keybind = ctrl+a>n=new_window
+# ============================
+# Split Management
+# ============================
 
-###############################################
-# Splits
-###############################################
+# Create new splits in different directions
+keybind = ctrl+shift+\=new_split:right
+keybind = ctrl+shift+-=new_split:down
 
-# new_split - Create a new split in the given direction.
-# Arguments:
-#     right, down, left, up, auto (splits along the larger direction)
-# Example: Create split on the right keybind = cmd+shift+d=new_split:right
+# Navigate between splits (Vim-style)
+keybind = ctrl+h=goto_split:left
+keybind = ctrl+j=goto_split:down
+keybind = ctrl+k=goto_split:up
+keybind = ctrl+l=goto_split:right
 
-# Create split on the right
+# ============================
+# Window Management
+# ============================
 
-# keybind = ctrl+shift+\=new_split:right
-# keybind = ctrl+shift+-=new_split:down
+# Resize splits with arrow keys when holding Cmd+Shift
+keybind = cmd+shift+left=resize_split:left,10
+keybind = cmd+shift+down=resize_split:down,10
+keybind = cmd+shift+up=resize_split:up,10
+keybind = cmd+shift+right=resize_split:right,10
 
-# keybind = cmd+left=goto_split:left
-# keybind = cmd+down=goto_split:down
-# keybind = cmd+up=goto_split:up
-# keybind = cmd+right=goto_split:right
+# ============================
+# Font Size Adjustment
+# ============================
 
-# keybind = cmd+shift+h=goto_split:left
-# keybind = cmd+shift+j=goto_split:down
-# keybind = cmd+shift+k=goto_split:up
-# keybind = cmd+shift+l=goto_split:right
+# Font size adjustments (standard macOS shortcuts)
+keybind = cmd+equal=increase_font_size
+keybind = cmd+minus=decrease_font_size
+keybind = cmd+0=reset_font_size
 
-# Equalize splits (ctrl+w -> =)
-# keybind = ctrl+w>equal=equalize_splits
+# ============================
+# Advanced Features
+# ============================
 
-# Resize the current split in a given direction.
-# Arguments:
-#     up, down, left, right
-#     the number of pixels to resize the split by
-# Example: Move divider up 10 pixels keybind = cmd+shift+up=resize_split:up,10
+# Terminal bell configuration
+bell = false
+bell-sound = false
 
-# # Move divider up 10 pixels
-# keybind = cmd+shift+up=resize_split:up,10
-# keybind = cmd+shift+down=resize_split:down,10
-# keybind = cmd+shift+left=resize_split:left,10
-# keybind = cmd+shift+right=resize_split:right,10
+# Better search capabilities
+keybind = cmd+f=search:start
+keybind = shift+cmd+f=search:start:regex
+
+# Copy mode (for better text selection)
+keybind = cmd+shift+c=copy_mode:start
+
+# ============================
+# macOS Specific Settings
+# ============================
+
+# Native macOS settings
+macos-titlebar-tabs = true
+macos-window-background-blur = true
+
+# Ensure proper rendering on Retina displays
+use-ime = true
+text-antialiasing = true
+macos-retina-scale = true
+
+# ============================
+# Performance Settings
+# ============================
+
+# Optimizations for Apple Silicon processors
+renderer-set-title = true
+renderer-use-pow2-texture = true
+
+# Frame rate for smoother experience on M-series chips
+unfocused-fps = 30
+focused-fps = 120
+
+# Buffer size optimized for terminal performance
+scrollback = 20000
+resize-increments = false
+
+# ============================
+# End of Configuration
+# ============================

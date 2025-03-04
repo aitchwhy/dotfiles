@@ -1,4 +1,544 @@
-hs.hotkey.bind({"cmd", "alt", "ctrl"}, "W", function()
-  hs.alert.show("Hello World!")
+-- Hammerspoon Configuration for macOS on Apple Silicon
+-- Optimized for 2025 and Apple Silicon Macs
+-- For documentation, see: https://www.hammerspoon.org/docs/
+
+-- Set up Lua path to find our modules (for standard setup and potential plugins)
+package.path = package.path .. ";" .. hs.configdir .. "/?.lua" .. ";" .. hs.configdir .. "/Spoons/?.spoon/init.lua"
+
+-- ===========================
+-- Global Configurations
+-- ===========================
+
+-- Suppress animations for better performance on Apple Silicon
+hs.window.animationDuration = 0
+
+-- Set logger level (can be 'verbose', 'debug', 'info', 'warning', 'error', 'nothing')
+hs.logger.defaultLogLevel = 'warning'
+
+-- Auto-reload config on changes (great for development)
+local function reloadConfig(files)
+    local doReload = false
+    for _, file in pairs(files) do
+        if file:sub(-4) == ".lua" then
+            doReload = true
+            break
+        end
+    end
+    if doReload then
+        hs.reload()
+    end
+end
+
+-- Watch for config changes to auto-reload
+configWatcher = hs.pathwatcher.new(hs.configdir, reloadConfig):start()
+
+-- Notify when config is loaded
+hs.notify.new({title="Hammerspoon", informativeText="Config loaded"}):send()
+
+-- ===========================
+-- Window Management
+-- ===========================
+
+-- Window grid for precise window placement (adjust grid size as needed)
+hs.grid.setGrid('6x4')
+hs.grid.setMargins({w = 10, h = 10})
+
+-- Key hyper for window operations - Right Option and Shift
+-- Works well with Apple keyboards including MacBooks
+hyper = {"alt", "shift"}
+
+-- Window manipulation functions
+local windowActions = {
+    -- Basic window positions
+    fullScreen = function() 
+        local win = hs.window.focusedWindow()
+        if win then win:maximize() end 
+    end,
+    
+    leftHalf = function() 
+        local win = hs.window.focusedWindow()
+        if win then 
+            local f = win:frame()
+            local screen = win:screen()
+            local max = screen:frame()
+            
+            f.x = max.x
+            f.y = max.y
+            f.w = max.w / 2
+            f.h = max.h
+            win:setFrame(f)
+        end 
+    end,
+    
+    rightHalf = function() 
+        local win = hs.window.focusedWindow()
+        if win then 
+            local f = win:frame()
+            local screen = win:screen()
+            local max = screen:frame()
+            
+            f.x = max.x + (max.w / 2)
+            f.y = max.y
+            f.w = max.w / 2
+            f.h = max.h
+            win:setFrame(f)
+        end 
+    end,
+    
+    topHalf = function() 
+        local win = hs.window.focusedWindow()
+        if win then 
+            local f = win:frame()
+            local screen = win:screen()
+            local max = screen:frame()
+            
+            f.x = max.x
+            f.y = max.y
+            f.w = max.w
+            f.h = max.h / 2
+            win:setFrame(f)
+        end 
+    end,
+    
+    bottomHalf = function() 
+        local win = hs.window.focusedWindow()
+        if win then 
+            local f = win:frame()
+            local screen = win:screen()
+            local max = screen:frame()
+            
+            f.x = max.x
+            f.y = max.y + (max.h / 2)
+            f.w = max.w
+            f.h = max.h / 2
+            win:setFrame(f)
+        end 
+    end,
+    
+    -- Quarter screen positions
+    topLeft = function() 
+        local win = hs.window.focusedWindow()
+        if win then 
+            local f = win:frame()
+            local screen = win:screen()
+            local max = screen:frame()
+            
+            f.x = max.x
+            f.y = max.y
+            f.w = max.w / 2
+            f.h = max.h / 2
+            win:setFrame(f)
+        end 
+    end,
+    
+    topRight = function() 
+        local win = hs.window.focusedWindow()
+        if win then 
+            local f = win:frame()
+            local screen = win:screen()
+            local max = screen:frame()
+            
+            f.x = max.x + (max.w / 2)
+            f.y = max.y
+            f.w = max.w / 2
+            f.h = max.h / 2
+            win:setFrame(f)
+        end 
+    end,
+    
+    bottomLeft = function() 
+        local win = hs.window.focusedWindow()
+        if win then 
+            local f = win:frame()
+            local screen = win:screen()
+            local max = screen:frame()
+            
+            f.x = max.x
+            f.y = max.y + (max.h / 2)
+            f.w = max.w / 2
+            f.h = max.h / 2
+            win:setFrame(f)
+        end 
+    end,
+    
+    bottomRight = function() 
+        local win = hs.window.focusedWindow()
+        if win then 
+            local f = win:frame()
+            local screen = win:screen()
+            local max = screen:frame()
+            
+            f.x = max.x + (max.w / 2)
+            f.y = max.y + (max.h / 2)
+            f.w = max.w / 2
+            f.h = max.h / 2
+            win:setFrame(f)
+        end 
+    end,
+    
+    -- Center window
+    center = function() 
+        local win = hs.window.focusedWindow()
+        if win then 
+            local f = win:frame()
+            local screen = win:screen()
+            local max = screen:frame()
+            
+            f.x = max.x + (max.w * 0.125)
+            f.y = max.y + (max.h * 0.125)
+            f.w = max.w * 0.75
+            f.h = max.h * 0.75
+            win:setFrame(f)
+        end 
+    end,
+    
+    -- Center without resizing
+    centerNoResize = function() 
+        local win = hs.window.focusedWindow()
+        if win then 
+            local f = win:frame()
+            local screen = win:screen()
+            local max = screen:frame()
+            
+            f.x = max.x + ((max.w - f.w) / 2)
+            f.y = max.y + ((max.h - f.h) / 2)
+            win:setFrame(f)
+        end 
+    end,
+    
+    -- Next/previous screen (multi-monitor setups)
+    nextScreen = function() 
+        local win = hs.window.focusedWindow()
+        if win then 
+            win:moveToScreen(win:screen():next())
+        end 
+    end,
+    
+    prevScreen = function() 
+        local win = hs.window.focusedWindow()
+        if win then 
+            win:moveToScreen(win:screen():previous())
+        end 
+    end,
+}
+
+-- Keybindings for window management
+-- Using consistent modifiers for window operations
+hs.hotkey.bind(hyper, "f", windowActions.fullScreen)
+hs.hotkey.bind(hyper, "left", windowActions.leftHalf)
+hs.hotkey.bind(hyper, "right", windowActions.rightHalf)
+hs.hotkey.bind(hyper, "up", windowActions.topHalf)
+hs.hotkey.bind(hyper, "down", windowActions.bottomHalf)
+hs.hotkey.bind(hyper, "1", windowActions.topLeft)
+hs.hotkey.bind(hyper, "2", windowActions.topRight)
+hs.hotkey.bind(hyper, "3", windowActions.bottomLeft)
+hs.hotkey.bind(hyper, "4", windowActions.bottomRight)
+hs.hotkey.bind(hyper, "c", windowActions.center)
+hs.hotkey.bind(hyper, "m", windowActions.centerNoResize)
+hs.hotkey.bind(hyper, "n", windowActions.nextScreen)
+hs.hotkey.bind(hyper, "p", windowActions.prevScreen)
+
+-- ===========================
+-- Application Shortcuts
+-- ===========================
+
+-- Quick application launcher with Hyper+letter
+local appShortcuts = {
+    t = "Terminal",           -- Terminal
+    b = "Brave Browser",      -- Browser
+    w = "Warp",               -- Warp terminal 
+    f = "Finder",             -- Finder
+    s = "Slack",              -- Slack
+    v = "Visual Studio Code", -- VS Code
+    g = "Ghostty",            -- Ghostty terminal
+    o = "Obsidian",           -- Obsidian
+    z = "Zed",                -- Zed editor
+    i = "iTerm",              -- iTerm
+    c = "Claude",             -- Claude AI
+    d = "Cursor",             -- Cursor editor
+}
+
+-- Register app shortcuts
+for key, app in pairs(appShortcuts) do
+    hs.hotkey.bind({"ctrl", "alt"}, key, function()
+        hs.application.launchOrFocus(app)
+    end)
+end
+
+-- ===========================
+-- Clipboard Manager
+-- ===========================
+
+-- Simple clipboard history (stores recent items)
+local clipboardHistory = {}
+local maxClipboardHistory = 10
+local lastChange = hs.pasteboard.changeCount()
+
+-- Check for clipboard changes
+local clipboardWatcher = hs.timer.new(0.5, function()
+    local currentChange = hs.pasteboard.changeCount()
+    if currentChange ~= lastChange then
+        lastChange = currentChange
+        local clipboardContent = hs.pasteboard.getContents()
+        
+        if clipboardContent then
+            -- Only store if it's not already at the top of history
+            if #clipboardHistory == 0 or clipboardHistory[1] ~= clipboardContent then
+                table.insert(clipboardHistory, 1, clipboardContent)
+                if #clipboardHistory > maxClipboardHistory then
+                    table.remove(clipboardHistory)
+                end
+            end
+        end
+    end
 end)
 
+-- Start the clipboard watcher
+clipboardWatcher:start()
+
+-- Show clipboard history
+hs.hotkey.bind({"ctrl", "cmd"}, "v", function()
+    if #clipboardHistory == 0 then
+        return
+    end
+    
+    local chooser = hs.chooser.new(function(choice)
+        if choice then
+            hs.pasteboard.setContents(choice.text)
+            -- Simulate paste for immediate use
+            hs.eventtap.keyStroke({"cmd"}, "v")
+        end
+    end)
+    
+    local choices = {}
+    for i, item in ipairs(clipboardHistory) do
+        -- Truncate long items for display
+        local displayText = item
+        if #displayText > 60 then
+            displayText = string.sub(displayText, 1, 57) .. "..."
+        end
+        
+        -- Replace newlines and tabs for display
+        displayText = displayText:gsub("\n", "⏎ ")
+        displayText = displayText:gsub("\t", "⇥ ")
+        
+        table.insert(choices, {
+            text = item,
+            subText = "Item " .. i .. " of " .. #clipboardHistory,
+            uuid = i,
+            id = i,
+            display = displayText
+        })
+    end
+    
+    chooser:choices(choices)
+    chooser:searchSubText(true)
+    chooser:show()
+end)
+
+-- ===========================
+-- Caffeine/Caffeinate replacement
+-- ===========================
+
+-- Create a menubar item for toggling system sleep
+local caffeine = hs.menubar.new()
+
+-- Function to update menu bar icon
+local function setCaffeineDisplay(state)
+    if state then
+        caffeine:setTitle("☕️")
+        caffeine:setTooltip("Hammerspoon: System sleep is disabled")
+    else
+        caffeine:setTitle("💤")
+        caffeine:setTooltip("Hammerspoon: System sleep is enabled")
+    end
+end
+
+-- Function to toggle system sleep
+local function toggleCaffeine()
+    local current = hs.caffeinate.toggle("displayIdle")
+    setCaffeineDisplay(current)
+end
+
+-- Initialize
+if caffeine then
+    caffeine:setClickCallback(toggleCaffeine)
+    setCaffeineDisplay(hs.caffeinate.get("displayIdle"))
+end
+
+-- Also add keyboard shortcut to toggle
+hs.hotkey.bind({"ctrl", "alt"}, "c", toggleCaffeine)
+
+-- ===========================
+-- Screen Management
+-- ===========================
+
+-- Detect when screens change (e.g., connecting to external monitor)
+hs.screen.watcher.new(function()
+    -- You can add custom handling for screen changes here
+    -- For example, reorganize windows when connecting to a dock
+    
+    -- Notify of screen change
+    hs.notify.new({title="Hammerspoon", informativeText="Screen configuration changed"}):send()
+end):start()
+
+-- ===========================
+-- Audio Device Manager
+-- ===========================
+
+-- Quick toggle between audio outputs
+local function toggleAudioOutput()
+    local currentOutput = hs.audiodevice.defaultOutputDevice()
+    local devices = hs.audiodevice.allOutputDevices()
+    
+    if #devices <= 1 then
+        hs.alert.show("Only one audio output available")
+        return
+    end
+    
+    -- Find current device index
+    local currentIndex = 0
+    for i, device in ipairs(devices) do
+        if device:uid() == currentOutput:uid() then
+            currentIndex = i
+            break
+        end
+    end
+    
+    -- Move to next device (cycling)
+    local nextIndex = (currentIndex % #devices) + 1
+    local nextDevice = devices[nextIndex]
+    
+    -- Set next device as default
+    nextDevice:setDefaultOutputDevice()
+    
+    -- Show alert with new device name
+    hs.alert.show("🔊 " .. nextDevice:name())
+end
+
+-- Keyboard shortcut for audio toggle
+hs.hotkey.bind({"ctrl", "alt"}, "a", toggleAudioOutput)
+
+-- ===========================
+-- WiFi Watcher
+-- ===========================
+
+-- Monitor WiFi status changes
+local wifiWatcher = nil
+local homeSSID = "YourHomeWiFi" -- Replace with your home WiFi name
+local lastSSID = hs.wifi.currentNetwork()
+
+-- Function called when WiFi status changes
+local function ssidChangedCallback()
+    local newSSID = hs.wifi.currentNetwork()
+    
+    -- Store new SSID for comparison
+    if newSSID ~= lastSSID then
+        -- Different actions based on network
+        if newSSID == homeSSID then
+            -- At home - maybe adjust volume or turn on certain apps
+            hs.audiodevice.defaultOutputDevice():setVolume(50)
+        elseif newSSID == nil and lastSSID ~= nil then
+            -- WiFi disconnected
+            hs.notify.new({title="Hammerspoon", informativeText="WiFi disconnected"}):send()
+        elseif newSSID ~= nil and lastSSID == nil then
+            -- WiFi connected
+            hs.notify.new({title="Hammerspoon", informativeText="WiFi connected to " .. newSSID}):send()
+        end
+        
+        lastSSID = newSSID
+    end
+end
+
+-- Start the WiFi watcher
+wifiWatcher = hs.wifi.watcher.new(ssidChangedCallback)
+wifiWatcher:start()
+
+-- ===========================
+-- URL Dispatch Handler
+-- ===========================
+
+-- Custom URL handler (hammerspoon://command)
+hs.urlevent.bind("command", function(eventName, params)
+    if params["name"] == "reload" then
+        hs.reload()
+    elseif params["name"] == "caffeine" then
+        toggleCaffeine()
+    elseif params["name"] == "launch" and params["app"] then
+        hs.application.launchOrFocus(params["app"])
+    end
+end)
+
+-- ===========================
+-- Spoons (Optional Plugins)
+-- ===========================
+
+-- Load Spoons if they exist in the Spoons directory
+-- Examples below - uncomment as needed
+
+-- Color picker
+-- hs.loadSpoon("ColorPicker")
+-- spoon.ColorPicker:bindHotkeys({show = {hyper, "p"}})
+
+-- Window layout manager
+-- hs.loadSpoon("WindowGrid")
+-- spoon.WindowGrid:bindHotkeys({show_grid = {hyper, "g"}})
+
+-- ===========================
+-- Custom Functions
+-- ===========================
+
+-- Lock the screen 
+hs.hotkey.bind({"ctrl", "cmd"}, "l", function()
+    hs.caffeinate.lockScreen()
+end)
+
+-- Show date and time in large font overlay
+hs.hotkey.bind({"ctrl", "cmd"}, "t", function()
+    local timeString = os.date("%I:%M %p")
+    local dateString = os.date("%A, %B %d")
+    hs.alert.show(timeString .. "\n" .. dateString, 2)
+end)
+
+-- Emoji picker
+hs.hotkey.bind({"ctrl", "cmd"}, "e", function()
+    local chooser = hs.chooser.new(function(choice)
+        if choice then
+            hs.pasteboard.setContents(choice.text)
+            hs.eventtap.keyStroke({"cmd"}, "v")
+        end
+    end)
+    
+    -- Common emojis - add or remove as needed
+    local emojis = {
+        {text = "👍", subText = "Thumbs Up"},
+        {text = "👌", subText = "OK"},
+        {text = "😊", subText = "Smile"},
+        {text = "😂", subText = "Laugh"},
+        {text = "❤️", subText = "Heart"},
+        {text = "🎉", subText = "Party"},
+        {text = "🔥", subText = "Fire"},
+        {text = "👏", subText = "Clap"},
+        {text = "🙏", subText = "Please/Thanks"},
+        {text = "💯", subText = "100"},
+        {text = "🤔", subText = "Thinking"},
+        {text = "👀", subText = "Eyes"},
+        {text = "💪", subText = "Flex"},
+        {text = "✅", subText = "Check"},
+        {text = "⚠️", subText = "Warning"},
+        {text = "🚀", subText = "Rocket"},
+        {text = "🎯", subText = "Target"},
+        {text = "⏱️", subText = "Timer"}
+    }
+    
+    chooser:choices(emojis)
+    chooser:searchSubText(true)
+    chooser:show()
+end)
+
+-- ===========================
+-- End of Configuration
+-- ===========================
+
+-- Display success message when everything is loaded
+hs.alert.show("✅ Hammerspoon config loaded", 1)
