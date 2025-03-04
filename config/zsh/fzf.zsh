@@ -306,7 +306,7 @@ function f() {
 alias ff='f file'            # Find files
 alias fd='f dir'             # Find directories
 alias fe='f edit'            # Find and edit
-alias fg='f grep'            # Fuzzy grep
+alias fgrep='f grep'            # Fuzzy grep
 alias fs='f search'          # Search in files
 alias fgc='f gco'            # Git checkout
 alias fga='f ga'             # Git add

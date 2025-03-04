@@ -47,7 +47,7 @@ update_symlinks() {
   info "Cleaning up existing configurations..."
   for key in ${(k)DOTFILES_TO_SYMLINK_MAP}; do
     local dst="${DOTFILES_TO_SYMLINK_MAP[$key]}"
-    
+
     # Remove existing symlink or file/directory
     if [[ -L "$dst" || -e "$dst" ]]; then
       rm -rf "$dst"

@@ -24,6 +24,7 @@ declare -gA DOTFILES_TO_SYMLINK_MAP=(
     ["$DOTFILES/config/cursor/keybindings.json"]="$HOME/Library/Application Support/Cursor/User/keybindings.json"
     ["$DOTFILES/config/hammerspoon"]="$HOME/.hammerspoon"
     ["$DOTFILES/config/ai/claude/claude_desktop_config.json"]="$HOME/Library/Application Support/Claude/claude_desktop_config.json"
+    ["$DOTFILES/config/ai/cline/cline_mcp_settings.json"]="$HOME/Library/Application Support/Cursor/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json"
 )
 
 # Export the map for use in other scripts

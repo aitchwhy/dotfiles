@@ -89,8 +89,8 @@ alias flush="dscacheutil -flushcache && killall -HUP mDNSResponder" # Flush DNS
 # ========================================================================
 
 # Keep individual aliases for quick access (see functions.zsh for util func "dot()")
-alias zdir='cd $ZDOTDIR'
-alias dots="cd $DOTFILES"
+# alias zdir='cd $ZDOTDIR'
+# alias dots="cd $DOTFILES"
 alias zr="exec zsh"
 
 # alias zdir='cd $ZDOTDIR'

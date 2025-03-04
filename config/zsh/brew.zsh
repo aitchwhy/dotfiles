@@ -1,35 +1,69 @@
+
+# ################################################################################
+# # PACKAGE MANAGEMENT
+# # https://github.com/junegunn/fzf/wiki/examples#homebrew
+# ################################################################################
+#
+# Homebrew utilities
+function has_brew() {
+    command -v brew >/dev/null 2>&1
+}
+
+function ensure_brew() {
+    if ! has_brew; then
+        log_info "Installing Homebrew..."
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+        # Add to PATH for current session if installed
+        if is_arm64; then
+            eval "$(/opt/homebrew/bin/brew shellenv)"
+        else
+            eval "$(/usr/local/bin/brew shellenv)"
+        fi
+    fi
+}
+
+function update_brew() {
+    if has_brew; then
+        log_info "Updating Homebrew..."
+        brew update
+        brew upgrade
+        brew cleanup
+    fi
+}
+
 # ========================================================================
 # Brew Management
 # ========================================================================
 function bb() {
   # Function to display help text
   _bb_help() {
-    local cmd_list=$(grep -E '^\s+[a-z|,-]+\)' <<< "$(declare -f bb)" | 
+    local cmd_list=$(grep -E '^\s+[a-z|,-]+\)' <<< "$(declare -f bb)" |
       sed 's/)//' | sed 's/|/, /g' | sort)
-    
+
     echo "Usage: bb [command]"
     echo ""
     echo "Regular Brew Commands:"
-    grep -E '^\s+[a-z|,-]+\) # Regular:' <<< "$(declare -f bb)" | 
-      sed 's/)//' | sed 's/|/, /g' | 
-      sed -E 's/^\s+([a-z, -]+) # Regular: (.*)/  \1\t- \2/' | 
+    grep -E '^\s+[a-z|,-]+\) # Regular:' <<< "$(declare -f bb)" |
+      sed 's/)//' | sed 's/|/, /g' |
+      sed -E 's/^\s+([a-z, -]+) # Regular: (.*)/  \1\t- \2/' |
       sort
-    
+
     echo ""
     echo "Interactive Commands:"
-    grep -E '^\s+[a-z|,-]+\) # Interactive:' <<< "$(declare -f bb)" | 
-      sed 's/)//' | sed 's/|/, /g' | 
-      sed -E 's/^\s+([a-z, -]+) # Interactive: (.*)/  \1\t- \2/' | 
+    grep -E '^\s+[a-z|,-]+\) # Interactive:' <<< "$(declare -f bb)" |
+      sed 's/)//' | sed 's/|/, /g' |
+      sed -E 's/^\s+([a-z, -]+) # Interactive: (.*)/  \1\t- \2/' |
       sort
-    
+
     echo ""
     echo "Brewfile Commands:"
-    grep -E '^\s+[a-z|,-]+\) # Brewfile:' <<< "$(declare -f bb)" | 
-      sed 's/)//' | sed 's/|/, /g' | 
-      sed -E 's/^\s+([a-z, -]+) # Brewfile: (.*)/  \1\t- \2/' | 
+    grep -E '^\s+[a-z|,-]+\) # Brewfile:' <<< "$(declare -f bb)" |
+      sed 's/)//' | sed 's/|/, /g' |
+      sed -E 's/^\s+([a-z, -]+) # Brewfile: (.*)/  \1\t- \2/' |
       sort
   }
-  
+
   # Function for interactive package operations
   _bb_interactive() {
     local mode="$1"
@@ -38,30 +72,30 @@ function bb() {
     local install_cmd="$4"
     local brewfile_prefix="$5"
     local search_cmd="$6"
-    
+
     local selected
     local brewfile="${BREWFILE:-$HOME/.Brewfile}"
-    
+
     selected=$(eval "$search_cmd" | fzf -m --header="$header" --preview="$preview_cmd" --preview-window=:hidden --bind=space:toggle-preview)
-    
+
     if [[ -n "$selected" ]]; then
       echo "The following will be ${mode}ed:"
       echo "$selected"
       echo ""
       echo "Proceed? (y/n)"
       read -q proceed
-      
+
       if [[ "$proceed" == "y" ]]; then
         echo "\n${mode^}ing..."
         eval "$install_cmd $selected"
-        
+
         # Add to Brewfile if installing
         if [[ "$mode" == "install" && -n "$brewfile_prefix" ]]; then
           # Create Brewfile if it doesn't exist
           if [[ ! -f "$brewfile" ]]; then
             touch "$brewfile"
           fi
-          
+
           # Add each package to Brewfile if not already there
           for pkg in ${(f)selected}; do
             if ! grep -q "^$brewfile_prefix \"$pkg\"$" "$brewfile"; then
@@ -69,7 +103,7 @@ function bb() {
               echo "Added $pkg to Brewfile"
             fi
           done
-          
+
           echo "${mode^}ed and Brewfile updated."
         else
           echo "${mode^}ed successfully."
@@ -86,7 +120,7 @@ function bb() {
     _bb_help
     return 0
   fi
-  
+
   case "$1" in
     # Regular brew commands
     up|update) # Regular: Update and upgrade all packages
@@ -119,7 +153,7 @@ function bb() {
     leaves) # Regular: List installed formulae that aren't dependencies
       brew leaves
       ;;
-    
+
     # Interactive commands with fzf
     rmi) # Interactive: Remove packages interactively
       _bb_interactive "remove" "Select packages to remove (use TAB to select multiple)" "brew info {}" "brew remove" "" "brew list"
@@ -156,7 +190,7 @@ function bb() {
     bundle-outdated|bo) # Brewfile: Show outdated packages in Brewfile
       brew bundle outdated --verbose --global
       ;;
-      
+
     # Unknown command
     *)
       echo "Unknown command: $1"
@@ -166,9 +200,9 @@ function bb() {
   esac
 }
 
-# Common aliases for convenience
-alias brew-up='bb up'
-alias brew-install='bb in'
-alias brew-search='bb s'
-alias brewi='bb insi'
-alias caski='bb caski'
+# # Common aliases for convenience
+# alias brewup='bb up'
+# alias brew='bb in'
+# alias brew-search='bb s'
+# alias brewi='bb insi'
+# alias caski='bb caski'

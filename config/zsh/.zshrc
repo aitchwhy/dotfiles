@@ -7,7 +7,7 @@
 # TODO: https://github.com/getantidote/zdotdir/blob/main/.zshenv
 
 # Source utilities
-[[ -f "$DOTFILES/utils.sh" ]] && source "$DOTFILES/utils.sh"
+[[ -f "$DOTFILES/utils.zsh" ]] && source "$DOTFILES/utils.zsh"
 
 # Shell Options
 setopt AUTO_CD              # Change directory without cd
@@ -43,7 +43,7 @@ bindkey '^R' history-incremental-search-backward
 bindkey '^?' backward-delete-char # Backspace working after vi mode
 
 # Editor
-export EDITOR="vim"
+export EDITOR="nvim"
 export VISUAL="$EDITOR"
 
 # History
@@ -52,7 +52,6 @@ export HISTSIZE=100000
 export SAVEHIST=100000
 
 # git env vars
-export
 
 has_command nvim && export EDITOR="nvim" && export VISUAL="nvim"
 
@@ -242,39 +241,39 @@ print -P "%F{blue}Welcome to ZSH %F{green}$(zsh --version)%f"
 # #     [ -n "$BASH_VERSION" ]
 # # }
 # #
-# # ################################################################################
-# # # PACKAGE MANAGEMENT
-# # # https://github.com/junegunn/fzf/wiki/examples#homebrew
-# # ################################################################################
-# #
-# # Homebrew utilities
-# function has_brew() {
-#     command -v brew >/dev/null 2>&1
-# }
+# ################################################################################
+# # PACKAGE MANAGEMENT
+# # https://github.com/junegunn/fzf/wiki/examples#homebrew
+# ################################################################################
 #
-# function ensure_brew() {
-#     if ! has_brew; then
-#         log_info "Installing Homebrew..."
-#         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-#
-#         # Add to PATH for current session if installed
-#         if is_arm64; then
-#             eval "$(/opt/homebrew/bin/brew shellenv)"
-#         else
-#             eval "$(/usr/local/bin/brew shellenv)"
-#         fi
-#     fi
-# }
-#
-# function update_brew() {
-#     if has_brew; then
-#         log_info "Updating Homebrew..."
-#         brew update
-#         brew upgrade
-#         brew cleanup
-#     fi
-# }
-#
+# Homebrew utilities
+function has_brew() {
+    command -v brew >/dev/null 2>&1
+}
+
+function ensure_brew() {
+    if ! has_brew; then
+        log_info "Installing Homebrew..."
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+        # Add to PATH for current session if installed
+        if is_arm64; then
+            eval "$(/opt/homebrew/bin/brew shellenv)"
+        else
+            eval "$(/usr/local/bin/brew shellenv)"
+        fi
+    fi
+}
+
+function update_brew() {
+    if has_brew; then
+        log_info "Updating Homebrew..."
+        brew update
+        brew upgrade
+        brew cleanup
+    fi
+}
+
 # #################################################################################
 # # MacOS utils
 # #################################################################################
