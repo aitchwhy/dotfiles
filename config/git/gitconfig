@@ -26,7 +26,6 @@
 #     minus-style = syntax "#3f0001"
 
 [delta]
-  syntax-theme = Zenburn
   dark = true
   # use n and N to move between diff sections
   # navigate = true

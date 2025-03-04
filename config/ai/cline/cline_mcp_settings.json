@@ -7,6 +7,17 @@
             ],
             "disabled": false,
             "autoApprove": []
+        },
+        "github.com/stripe/agent-toolkit": {
+            "command": "node",
+            "args": [
+                "/Users/hank/dotfiles/config/ai/cline/mcp/stripe-agent-toolkit/run-stripe-mcp.js"
+            ],
+            "env": {
+                "STRIPE_SECRET_KEY": "sk_test_placeholder_key_for_demonstration"
+            },
+            "disabled": false,
+            "autoApprove": []
         }
     }
 }
