@@ -6,12 +6,12 @@
 # General Settings
 # ============================
 
-# Performance optimizations for Apple Silicon
-gpu-accelerated = true
-background-opacity = 1.0
-background-blur-radius = 10.0
-background-image-opacity = 0.08
-foreground-text-hsb = [1.0, 1.0, 1.0]
+# # Performance optimizations for Apple Silicon
+# gpu-accelerated = true
+# background-opacity = 1.0
+# background-blur-radius = 10.0
+# background-image-opacity = 0.08
+# foreground-text-hsb = [1.0, 1.0, 1.0]
 
 # Enable automatic updates (recommended for macOS)
 auto-update = download
@@ -40,17 +40,17 @@ theme = "tokyonight-storm"
 #theme = "catppuccin-frappe"
 #theme = "nord"
 
-# Font settings optimized for Retina displays
-font-family = "JetBrains Mono"
-font-features = "JetBrains Mono:liga=1:calt=1:ss01=1:ss02=1:ss03=1:ss04=1:ss05=1:ss06=1:ss07=1:ss08=1:ss09=1:ss10=1"
-font-size = 13
-line-height = 1.2
+# # Font settings optimized for Retina displays
+# font-family = "JetBrains Mono"
+# font-features = "JetBrains Mono:liga=1:calt=1:ss01=1:ss02=1:ss03=1:ss04=1:ss05=1:ss06=1:ss07=1:ss08=1:ss09=1:ss10=1"
+# font-size = 13
+# line-height = 1.2
 
 # Window appearance
-window-decoration = true
-window-padding-x = 16
-window-padding-y = 16
-window-theme = "dark"  # Matches macOS themes
+# window-decoration = true
+# window-padding-x = 16
+# window-padding-y = 16
+# window-theme = "dark"  # Matches macOS themes
 
 # Dialog confirmation settings
 confirm-close-surface = false
@@ -152,60 +152,6 @@ keybind = cmd+shift+left=resize_split:left,10
 keybind = cmd+shift+down=resize_split:down,10
 keybind = cmd+shift+up=resize_split:up,10
 keybind = cmd+shift+right=resize_split:right,10
-
-# ============================
-# Font Size Adjustment
-# ============================
-
-# Font size adjustments (standard macOS shortcuts)
-keybind = cmd+equal=increase_font_size
-keybind = cmd+minus=decrease_font_size
-keybind = cmd+0=reset_font_size
-
-# ============================
-# Advanced Features
-# ============================
-
-# Terminal bell configuration
-bell = false
-bell-sound = false
-
-# Better search capabilities
-keybind = cmd+f=search:start
-keybind = shift+cmd+f=search:start:regex
-
-# Copy mode (for better text selection)
-keybind = cmd+shift+c=copy_mode:start
-
-# ============================
-# macOS Specific Settings
-# ============================
-
-# Native macOS settings
-macos-titlebar-tabs = true
-macos-window-background-blur = true
-
-# Ensure proper rendering on Retina displays
-use-ime = true
-text-antialiasing = true
-macos-retina-scale = true
-
-# ============================
-# Performance Settings
-# ============================
-
-# Optimizations for Apple Silicon processors
-renderer-set-title = true
-renderer-use-pow2-texture = true
-
-# Frame rate for smoother experience on M-series chips
-unfocused-fps = 30
-focused-fps = 120
-
-# Buffer size optimized for terminal performance
-scrollback = 20000
-resize-increments = false
-
 # ============================
 # End of Configuration
 # ============================

@@ -21,11 +21,10 @@ export BACKUP_DIR="$HOME/.dotfiles_backup/$(date +%Y%m%d_%H%M%S)"
 # Source utilities and configurations
 # if [[ ! -f "$DOTFILES/utils.zsh" ]]; then
 
-if [[ ! -f "$ZDOTDIR_SRC/.zshrc" ]]; then
-  echo "Error: utils.zsh not found in $ZDOTDIR_SRC/.zshrc. Please ensure the dotfiles repository is properly cloned."
-  exit 1
-fi
-source "$ZDOTDIR_SRC/.zshrc"
+source "$DOTFILES/config/zsh/brew.zsh"
+source "$DOTFILES/config/zsh/aliases.zsh"
+source "$DOTFILES/config/zsh/system.zsh"
+source "$DOTFILES/config/zsh/symlinks.zsh"
 
 if [[ ! -f "$ZDOTDIR_SRC/.zprofile" ]]; then
   echo "Error: utils.zsh not found in $ZDOTDIR_SRC/.zprofile. Please ensure the dotfiles repository is properly cloned."
@@ -33,6 +32,14 @@ if [[ ! -f "$ZDOTDIR_SRC/.zprofile" ]]; then
 fi
 
 source "$ZDOTDIR_SRC/.zprofile"
+
+
+if [[ ! -f "$ZDOTDIR_SRC/.zshrc" ]]; then
+  echo "Error: utils.zsh not found in $ZDOTDIR_SRC/.zshrc. Please ensure the dotfiles repository is properly cloned."
+  exit 1
+fi
+
+source "$ZDOTDIR_SRC/.zshrc"
 
 # source "$DOTFILES/config/zsh/system.zsh"
 # source "$DOTFILES/config/zsh/functions.zsh"
