@@ -283,3 +283,7 @@ has_command fzf && source <(fzf --zsh)
 # [[ -f "$ZDOTDIR/local.zsh" ]] && source "$ZDOTDIR/local.zsh"
 
 # source $(brew --prefix)/share/zsh/site-functions/_todoist_fzf
+
+. "$HOME/.atuin/bin/env"
+
+. "$HOME/.local/state/env"
