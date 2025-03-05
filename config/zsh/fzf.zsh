@@ -85,7 +85,7 @@ function f() {
 
     case "$1" in
     # File and directory navigation
-    file | ff) # Find files and open selected
+    file | f) # Find files and open selected
         local target="${2:-.}"
         _f_search \
             "$FZF_PREVIEW_COMMAND" \
@@ -95,7 +95,7 @@ function f() {
             "--multi"
         ;;
 
-    dir | fd) # Find directories
+    dir | d) # Find directories
         local target="${2:-.}"
         fd --type d --hidden --follow --exclude .git . "$target" |
             _f_search \
@@ -104,7 +104,7 @@ function f() {
                 "cd {}"
         ;;
 
-    edit | fe) # Find files and edit with nvim
+    edit | e) # Find files and edit with nvim
         local target="${2:-.}"
         find "$target" -type f -not -path "*/node_modules/*" -not -path "*/\.git/*" -not -path "*/.venv/*" 2>/dev/null |
             _f_search \
@@ -114,7 +114,7 @@ function f() {
         ;;
 
     # Search and grep utilities
-    grep | fg) # Fuzzy grep with ripgrep
+    grep | g) # Fuzzy grep with ripgrep
         local query="${*:2}"
         local RELOAD='reload:rg --column --color=always --smart-case {q} || :'
         local OPENER='if [[ $FZF_SELECT_COUNT -eq 0 ]]; then
@@ -134,7 +134,7 @@ function f() {
             --query "$query"
         ;;
 
-    rg | search) # Enhanced search with ripgrep
+    rg | r) # Enhanced search with ripgrep
         local query="${*:2}"
         rg --line-number --no-heading --color=always --smart-case "$query" |
             fzf --ansi \
@@ -149,7 +149,7 @@ function f() {
         ;;
 
     # Git operations
-    gco | checkout) # Git checkout with FZF
+    gco | co) # Git checkout with FZF
         local branches branch
         branches=$(git branch --all | grep -v HEAD) &&
             branch=$(echo "$branches" |
@@ -157,7 +157,7 @@ function f() {
             git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
         ;;
 
-    ga | add) # Git add with FZF
+    ga | a) # Git add with FZF
         git -c color.status=always status --short |
             _f_search \
                 "git diff --color=always {2}" \
@@ -188,7 +188,7 @@ function f() {
         ;;
 
     # System utilities
-    kill | fk) # Process killing with FZF
+    kill | k) # Process killing with FZF
         ps -ef | sed 1d |
             _f_search \
                 "echo {}" \
@@ -198,7 +198,7 @@ function f() {
                 "--multi"
         ;;
 
-    port | fp) # Kill process on port
+    port | p) # Kill process on port
         lsof -i -P -n | grep LISTEN |
             _f_search \
                 "echo {}" \
@@ -209,7 +209,7 @@ function f() {
         ;;
 
     # Package management
-    brew | fb) # Brew operations
+    brew | b) # Brew operations
         local subcommand="${2:-install}"
 
         case "$subcommand" in
@@ -239,7 +239,7 @@ function f() {
         esac
         ;;
 
-    docker | fd) # Docker container management
+    docker | d) # Docker container management
         docker ps --format "{{.Names}}" |
             _f_search \
                 "docker stats --no-stream {}" \
@@ -247,7 +247,7 @@ function f() {
                 "xargs -r docker exec -it bash"
         ;;
 
-    npm | fn) # NPM script runner
+    npm | n) # NPM script runner
         if [[ ! -f package.json ]]; then
             echo "No package.json found in current directory"
             return 1
@@ -260,7 +260,7 @@ function f() {
                 'xargs -I{} sh -c "echo \"Running npm run {}...\" && npm run {}"'
         ;;
 
-    man | fm) # Man page browser
+    man | m) # Man page browser
         man -k . |
             _f_search \
                 "echo {} | cut -d\" \" -f1 | xargs -I% man %" \
@@ -271,7 +271,7 @@ function f() {
         ;;
 
     # Miscellaneous utilities
-    alias | fa) # Alias browser
+    alias | a) # Alias browser
         alias |
             _f_search \
                 "echo {}" \
@@ -281,7 +281,7 @@ function f() {
                 "--multi"
         ;;
 
-    history | fh) # Enhanced history search
+    history | h) # Enhanced history search
         history |
             _f_search \
                 "echo {}" \
@@ -303,24 +303,23 @@ function f() {
 # ========================================================================
 # Common Aliases for Quick Access
 # ========================================================================
-alias ff='f file'            # Find files
-alias fd='f dir'             # Find directories
-alias fe='f edit'            # Find and edit
-alias fgrep='f grep'         # Fuzzy grep
-alias fs='f search'          # Search in files
-alias fgc='f gco'            # Git checkout
-alias fga='f ga'             # Git add
-alias fgl='f glog'           # Git log
-alias fk='f kill'            # Kill process
-alias fp='f port'            # Kill port
-alias fb='f brew'            # Brew operations
-alias fbi='f brew install'   # Brew install
-alias fbr='f brew uninstall' # Brew remove
-alias fd='f docker'          # Docker operations
-alias fn='f npm'             # NPM operations
-alias fm='f man'             # Man pages
-alias fa='f alias'           # Browse aliases
-alias fh='f history'         # Search history
+alias fa='f alias'         # Browse aliases
+alias fb='f brew'          # Brew operations
+alias fbi='f brew install' # Brew install
+alias fdir='f dir'         # Find directories
+alias fdocker='f docker'   # Docker operations
+alias fnvim='f edit'       # Find and edit
+alias ff='f file'          # Find files
+alias fga='f ga'           # Git add
+alias fgco='f gco'         # Git checkout
+alias fglog='f glog'       # Git log
+alias fgrep='f grep'       # Fuzzy grep
+alias fhistory='f history' # Search history
+alias fman='f man'         # Man pages
+alias fnpm='f npm'         # NPM operations
+alias fkill='f kill'       # Kill process
+alias fkilllport='f port'      # Kill port
+alias f='f search'        # Search in files
 
 # Load FZF completion and key bindings if available
 [[ -f ~/.fzf.zsh ]] && source ~/.fzf.zsh

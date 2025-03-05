@@ -6,7 +6,7 @@
   "editor.formatOnSave": true,
   "editor.tabSize": 2,
   "editor.wordWrap": "on",
-  "workbench.colorTheme": "Catppuccin Macchiato Bordered",
+  "workbench.colorTheme": "Catppuccin Frappé",
   "terminal.integrated.fontFamily": "JetBrains Mono, monospace",
   "terminal.integrated.fontSize": 14,
   "files.autoSave": "afterDelay",
@@ -20,5 +20,6 @@
   "cline.modelSettings.o3Mini.reasoningEffort": "high",
   "aws.telemetry": false,
   "editor.accessibilitySupport": "off",
-  "vscode-aiconfig.version": "0.0.22"
+  "vscode-aiconfig.version": "0.0.22",
+  "cursor.cpp.enablePartialAccepts": true
 }
