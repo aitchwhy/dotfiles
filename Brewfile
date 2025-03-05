@@ -17,13 +17,13 @@ tap "xo/xo"
 tap "yakitrak/yakitrak"
 
 # Set cask install dir to ~/Applications (user level)
-cask_args appdir: "$HOME/Applications", require_sha: true
+cask_args appdir: "~/Applications", require_sha: true
 
 ###############################################################################
 # Development Tools & Languages
 ###############################################################################
 # Databases
-brew "postgresql@17", postinstall: "${HOMEBREW_PREFIX}/opt/postgresql@17/bin/postgres -D ${HOMEBREW_PREFIX}/var/postgresql@17"
+brew "postgresql@17" 
 brew "minio"                     # High Performance, Kubernetes Native Object Storage
 brew "neo4j"                     # Graph database
 
@@ -77,7 +77,7 @@ brew "neovim"                    # Ambitious Vim-fork focused on extensibility a
 # CLI Utilities & Shell Tools
 ###############################################################################
 # Shell Enhancements
-brew "atuin", restart_service: :changed  # Improved shell history for zsh, bash, fish and nushell
+# brew "atuin", restart_service: :changed  # Improved shell history for zsh, bash, fish and nushell
 brew "direnv"                    # Load/unload environment variables based on $PWD
 brew "starship"                  # Cross-shell prompt for astronauts
 brew "zoxide"                    # Shell extension to navigate your filesystem faster
@@ -129,7 +129,7 @@ brew "sq"                        # Data wrangler with jq-like query language
 brew "yq"                        # Process YAML, JSON, XML, CSV and properties documents from the CLI
 
 # CLI Apps & Utilities
-brew "cheat"                     # Create and view interactive cheat sheets for *nix commands
+# brew "cheat"                     # Create and view interactive cheat sheets for *nix commands
 brew "dasht"                     # Search API docs offline, in your terminal or browser
 brew "tlrc"                      # Official tldr client written in Rust
 brew "xxh"                       # Bring your favorite shell wherever you go through the ssh
@@ -168,7 +168,7 @@ brew "traefik"                   # Modern reverse proxy
 # AWS & Cloud Tools
 brew "awscli-local"              # Thin wrapper around the `aws` command-line interface for use with LocalStack
 brew "cloudflare-wrangler"       # CLI tool for Cloudflare Workers
-brew "gdrive"                    # Google Drive CLI Client
+# brew "gdrive"                    # Google Drive CLI Client
 brew "localstack"                # Fully functional local AWS cloud stack
 brew "rclone"                    # Rsync for cloud storage
 brew "stripe/stripe-cli/stripe"  # Stripe CLI utility
@@ -257,7 +257,7 @@ cask "charmstone"                # Quick actions
 cask "cleanshot"                 # Screenshot utility
 cask "cork"                      # Note taking
 cask "dash"                      # API documentation
-cask "devonthink"                # Document management
+# cask "devonthink"                # Document management
 cask "espanso"                   # Text expander
 cask "fantastical"               # Calendar app
 cask "hazel"                     # File automation
@@ -265,9 +265,9 @@ cask "homerow"                   # Keyboard navigation
 cask "iconjar"                   # Icon manager
 cask "linear-linear"             # Project management
 cask "obsidian"                  # Note taking
-cask "paletro"                   # Command palette
+# cask "paletro"                   # Command palette
 cask "pdf-expert"                # PDF editor
-cask "quit-all"                  # Quit all apps
+# cask "quit-all"                  # Quit all apps
 cask "raycast"                   # App launcher
 cask "rippling"                  # HR platform
 cask "rize"                      # Time tracker
@@ -275,46 +275,43 @@ cask "soulver"                   # Smart calculator
 cask "swish"                     # Window manager
 cask "timelane"                  # Time tracking
 cask "todoist"                   # Todo list
-cask "typora"                    # Markdown editor
+# cask "typora"                    # Markdown editor
 
 # Development & Design
 cask "apidog"                    # API development
 cask "bruno"                     # API client
-cask "canva"                     # Design tool
+# cask "canva"                     # Design tool
 cask "devutils"                  # Developer utilities
 cask "excalidrawz"               # Diagramming
-cask "figma"                     # Design tool
+# cask "figma"                     # Design tool
 cask "ghostty"                   # Terminal emulator
-cask "gitkraken"                 # Git client
 cask "hammerspoon"               # Automation tool
 cask "hopper-disassembler"       # Disassembler
-cask "hoppscotch"                # API client
 cask "httpie"                    # API client
 cask "istat-menus"               # System monitor
 cask "kaleidoscope"              # Diff tool
 cask "karabiner-elements"        # Keyboard customizer
 cask "proxyman"                  # HTTP debugging proxy
-cask "sublime-text"              # Text editor
 cask "syntax-highlight"          # Syntax highlighter
 cask "termius"                   # SSH client
 cask "tower"                     # Git client
 cask "visual-studio-code"        # Code editor
 cask "warp"                      # Terminal
-cask "zed"                       # Code editor
+# cask "zed"                       # Code editor
 
 # System Utilities
 cask "betterdisplay"             # Display management
-cask "blackhole-16ch"            # Audio routing
+# cask "blackhole-16ch"            # Audio routing
 cask "cleanmymac"                # System cleaner
-cask "cleaneronepro"             # System cleaner
-cask "cloudflare-warp"           # Secure DNS
+# cask "cleaneronepro"             # System cleaner
+# cask "cloudflare-warp"           # Secure DNS
 cask "daisydisk"                 # Disk space analyzer
 cask "keka"                      # File archiver
 cask "kekaexternalhelper"        # Helper for Keka
-cask "keycastr"                  # Key visualizer
+# cask "keycastr"                  # Key visualizer
 cask "keymapp"                   # Keyboard mapping
 cask "motrix"                    # Download manager
-cask "osquery"                   # OS instrumentation
+# cask "osquery"                   # OS instrumentation
 cask "proton-mail"               # Email client
 cask "protonvpn"                 # VPN client
 cask "qflipper"                  # Flipper Zero utility
@@ -322,19 +319,19 @@ cask "royal-tsx"                 # Remote connections
 cask "soundsource"               # Audio control
 cask "tailscale"                 # Mesh VPN
 cask "virtualbuddy"              # macOS VM manager
-cask "windsurf"                  # Window management
+# cask "windsurf"                  # Window management
 cask "yubico-authenticator"      # YubiKey tool
 cask "yubico-yubikey-manager"    # YubiKey manager
 
 # Communication & Media
-cask "arc"                       # Web browser
+# cask "arc"                       # Web browser
 cask "descript"                  # Audio/video editor
 cask "firefox"                   # Web browser
 cask "follow"                    # RSS reader
 cask "google-chrome"             # Web browser
 cask "jump"                      # Remote desktop
 cask "jump-desktop-connect"      # Remote desktop
-cask "parsec"                    # Remote desktop
+# cask "parsec"                    # Remote desktop
 cask "signal"                    # Messaging
 cask "slack"                     # Team communication
 cask "spotify"                   # Music streaming
@@ -372,6 +369,7 @@ mas "HacKit", id: 1549557075          # Markdown editor
 mas "Omnivore", id: 1564031042        # Read-it-later
 mas "Parcel", id: 639968404           # Package tracking
 mas "Paste", id: 967805235            # Clipboard manager
+# mas "Monica AI: Deep Chat & Search", id: 6450770590
 
 # Travel & Lifestyle
 mas "Flighty", id: 1358823008         # Flight tracking
@@ -385,11 +383,12 @@ mas "Kindle", id: 302584613           # E-book reader
 mas "Pixea", id: 1507782672           # Image viewer
 
 # Utilities
+mas "Bitwarden", id: 1352778147      # Already have cask
 mas "LanScan", id: 472226235          # Network scanner
 
 # Commented out less frequently used Mac App Store apps
+
 # mas "Aiko", id: 1672085276
-# mas "Bitwarden", id: 1352778147      # Already have cask
 # mas "CleanMyMac", id: 1339170533     # Already have cask
 # mas "Cleaner One Pro", id: 1133028347 # Already have cask
 # mas "DaisyDisk", id: 411643860       # Already have cask

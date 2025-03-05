@@ -6,10 +6,12 @@
 
 set -euo pipefail
 
-function has_command() {
-  # command -v "$1" &>/dev/null
-  command -v "$1" >/dev/null 2>&1
-}
+source "$DOTFILES/config/zsh/system.zsh"
+
+# function has_command() {
+#   # command -v "$1" &>/dev/null
+#   command -v "$1" >/dev/null 2>&1
+# }
 
 
 # ========================================================================
@@ -27,25 +29,23 @@ export BACKUP_DIR="$HOME/.dotfiles_backup/$(date +%Y%m%d_%H%M%S)"
 # Source utilities and configurations
 # if [[ ! -f "$DOTFILES/utils.zsh" ]]; then
 
-source "$DOTFILES/config/zsh/brew.zsh"
-source "$DOTFILES/config/zsh/aliases.zsh"
+# source "$DOTFILES/config/zsh/brew.zsh"
 source "$DOTFILES/config/zsh/system.zsh"
-source "$DOTFILES/config/zsh/symlinks.zsh"
 
-if [[ ! -f "$ZDOTDIR_SRC/.zprofile" ]]; then
-  echo "Error: utils.zsh not found in $ZDOTDIR_SRC/.zprofile. Please ensure the dotfiles repository is properly cloned."
-  exit 1
-fi
+# if [[ ! -f "$ZDOTDIR_SRC/.zprofile" ]]; then
+#   echo "Error: utils.zsh not found in $ZDOTDIR_SRC/.zprofile. Please ensure the dotfiles repository is properly cloned."
+#   exit 1
+# fi
 
-source "$ZDOTDIR_SRC/.zprofile"
+# source "$ZDOTDIR_SRC/.zprofile"
 
 
-if [[ ! -f "$ZDOTDIR_SRC/.zshrc" ]]; then
-  echo "Error: utils.zsh not found in $ZDOTDIR_SRC/.zshrc. Please ensure the dotfiles repository is properly cloned."
-  exit 1
-fi
+# if [[ ! -f "$ZDOTDIR_SRC/.zshrc" ]]; then
+#   echo "Error: utils.zsh not found in $ZDOTDIR_SRC/.zshrc. Please ensure the dotfiles repository is properly cloned."
+#   exit 1
+# fi
 
-source "$ZDOTDIR_SRC/.zshrc"
+# source "$ZDOTDIR_SRC/.zshrc"
 
 # source "$DOTFILES/config/zsh/system.zsh"
 # source "$DOTFILES/config/zsh/functions.zsh"
@@ -193,8 +193,8 @@ setup_homebrew() {
 
   # Install from Brewfile
   if [[ -f "$DOTFILES/Brewfile" ]]; then
-    info "(sudo) Installing packages from Brewfile..."
-    sudo brew bundle install --verbose --global --all --no-lock --cleanup --force
+    info "Installing packages from Brewfile..."
+    brew bundle install --verbose --global --all --force
   else
     warn "Brewfile not found at $DOTFILES/Brewfile"
   fi
