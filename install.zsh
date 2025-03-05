@@ -6,6 +6,12 @@
 
 set -euo pipefail
 
+function has_command() {
+  # command -v "$1" &>/dev/null
+  command -v "$1" >/dev/null 2>&1
+}
+
+
 # ========================================================================
 # Environment Configuration
 # ========================================================================
