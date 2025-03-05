@@ -1,6 +1,132 @@
 #!/usr/bin/env zsh
 
 # ========================================================================
+# Dotfiles Symlink Map Configuration
+# ========================================================================
+
+# This file defines the mapping between dotfiles source locations and their
+# target locations in the user's home directory. It's used by the installation
+# script and other dotfiles management tools.
+
+declare -gA DOTFILES_TO_SYMLINK_MAP=(
+  # Git configurations
+  ["$DOTFILES/config/git/gitconfig"]="$HOME/.gitconfig"
+  ["$DOTFILES/config/git/gitignore"]="$HOME/.gitignore"
+  ["$DOTFILES/config/git/gitattributes"]="$HOME/.gitattributes"
+  ["$DOTFILES/config/git/gitmessage"]="$HOME/.gitmessage"
+
+  # XDG configurations
+  ["$DOTFILES/config/starship.toml"]="$XDG_CONFIG_HOME/starship.toml"
+  ["$DOTFILES/config/karabiner/karabiner.json"]="$XDG_CONFIG_HOME/karabiner/karabiner.json"
+  ["$DOTFILES/config/nvim"]="$XDG_CONFIG_HOME/nvim"
+  ["$DOTFILES/config/ghostty"]="$XDG_CONFIG_HOME/ghostty"
+  ["$DOTFILES/config/atuin"]="$XDG_CONFIG_HOME/atuin"
+  ["$DOTFILES/config/bat"]="$XDG_CONFIG_HOME/bat"
+  ["$DOTFILES/config/lazygit"]="$XDG_CONFIG_HOME/lazygit"
+  ["$DOTFILES/config/zellij"]="$XDG_CONFIG_HOME/zellij"
+  ["$DOTFILES/config/zed"]="$XDG_CONFIG_HOME/zed"
+  ["$DOTFILES/config/espanso"]="$XDG_CONFIG_HOME/espanso"
+  ["$DOTFILES/config/yazi"]="$XDG_CONFIG_HOME/yazi"
+  ["$DOTFILES/config/warp/keybindings.yaml"]="$XDG_CONFIG_HOME/warp/keybindings.yaml"
+
+  # Editor configurations
+  ["$DOTFILES/config/vscode/settings.json"]="$HOME/Library/Application Support/Code/User/settings.json"
+  ["$DOTFILES/config/vscode/keybindings.json"]="$HOME/Library/Application Support/Code/User/keybindings.json"
+  ["$DOTFILES/config/cursor/settings.json"]="$HOME/Library/Application Support/Cursor/User/settings.json"
+  ["$DOTFILES/config/cursor/keybindings.json"]="$HOME/Library/Application Support/Cursor/User/keybindings.json"
+
+  # macOS-specific configurations
+  ["$DOTFILES/config/hammerspoon"]="$HOME/.hammerspoon"
+
+  # AI tools configurations
+  ["$DOTFILES/config/ai/claude/claude_desktop_config.json"]="$HOME/Library/Application Support/Claude/claude_desktop_config.json"
+  ["$DOTFILES/config/ai/cline/cline_mcp_settings.json"]="$HOME/Library/Application Support/Cursor/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json"
+)
+
+# Define additional paths that might have specific Apple Silicon considerations
+# if needed in the future
+
+# Export the map for use in other scripts
+export DOTFILES_TO_SYMLINK_MAP
+
+# ========================================================================
+# ZSH aliases - Organized by category
+# ========================================================================
+
+# alias optbrew="/opt/homebrew/bin/brew"
+# ========================================================================
+# System utils
+# ========================================================================
+# Color with built-in ANSI codes, no external dependencies
+# alias penv='printenv | sort | awk -F= '\''{
+#   printf "\033[36m%-30s\033[0m \033[37m%s\033[0m\n", $1, $2
+# }'\'''
+
+# ========================================================================
+# Navigation Shortcuts
+# ========================================================================
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+alias home="cd ~"
+
+# ========================================================================
+# List Files - Prioritize eza/exa with fallback to ls
+# ========================================================================
+if command -v eza &>/dev/null; then
+  alias ls="eza --icons --group-directories-first"
+  alias ll="eza --icons --group-directories-first -la"
+  alias la="eza --icons --group-directories-first -a"
+  alias lt="eza --icons --group-directories-first --tree"
+  alias lt2="eza --icons --group-directories-first --tree --level=2"
+else
+  alias ls="ls -G"
+  alias ll="ls -la"
+  alias la="ls -a"
+fi
+
+# ========================================================================
+# File Operations - Safety Guards
+# ========================================================================
+# alias cp="cp -i"       # Confirm before overwriting
+# alias mv="mv -i"       # Confirm before overwriting
+# alias rm="rm -i"       # Confirm before removal
+# alias mkdir="mkdir -p" # Create parent directories as needed
+
+# ========================================================================
+# Networking Utilities
+# ========================================================================
+alias ip="ipconfig getifaddr en0"
+alias localip="ipconfig getifaddr en0"
+alias publicip="curl -s https://api.ipify.org"
+alias ports="sudo lsof -i -P -n | grep LISTEN"
+alias flush="dscacheutil -flushcache && killall -HUP mDNSResponder" # Flush DNS
+
+# ========================================================================
+# Dotfiles Management
+# ========================================================================
+
+# Keep individual aliases for quick access (see functions.zsh for util func "dot()")
+alias cdz='cd $ZDOTDIR'
+alias cdd="cd $DOTFILES"
+
+# alias ze="fd --no-ignore --hidden --follow --type f -x $EDITOR $ZDOTDIR"
+alias zr="exec zsh"
+alias ze="fd --hidden . $ZDOTDIR | xargs nvim"
+alias dot="fd --hidden . $DOTFILES | xargs nvim"
+# alias dotedit="fd --no-ignore --hidden --follow --type f -x $EDITOR $DOTFILES"
+
+# ========================================================================
+# System Information
+# ========================================================================
+alias ppath='echo $PATH | tr ":" "\n"'
+alias pfuncs='print -l ${(k)functions[(I)[^_]*]} | sort'
+alias pfpath='for fp in $fpath; do echo $fp; done; unset fp'
+alias printpath='ppath'
+alias printfuncs='pfuncs'
+alias printfpath='pfpath'
+
+# ========================================================================
 # Logging Functions
 # ========================================================================
 function info() {
@@ -50,8 +176,8 @@ function get_macos_version() {
 }
 
 function has_command() {
-  # command -v "$1" &>/dev/null
-  command -v "$1" >/dev/null 2>&1
+  command -v "$1" &>/dev/null
+  # command -v "$1" >/dev/null 2>&1
 }
 
 # # Initialize tools if installed
@@ -82,73 +208,72 @@ function backup_file() {
 # ========================================================================
 # System & macOS Utilities
 # ========================================================================
+
+# OS detection
+is_macos() {
+  [ "$(uname)" = "Darwin" ]
+}
+
+is_linux() {
+  [ "$(uname)" = "Linux" ]
+}
+
+# Architecture detection
+is_arm64() {
+  [ "$(uname -m)" = "arm64" ] || [ "$(uname -m)" = "aarch64" ]
+}
+
+is_x86_64() {
+  [ "$(uname -m)" = "x86_64" ]
+}
+
+# Shell detection
+is_zsh() {
+  [ -n "$ZSH_VERSION" ]
+}
+
+is_bash() {
+  [ -n "$BASH_VERSION" ]
+}
 #
-# #
-# # # OS detection
-# # is_macos() {
-# #     [ "$(uname)" = "Darwin" ]
-# # }
-# #
-# # is_linux() {
-# #     [ "$(uname)" = "Linux" ]
-# # }
-# #
-# # # Architecture detection
-# # is_arm64() {
-# #     [ "$(uname -m)" = "arm64" ] || [ "$(uname -m)" = "aarch64" ]
-# # }
-# #
-# # is_x86_64() {
-# #     [ "$(uname -m)" = "x86_64" ]
-# # }
-# #
-# # # Shell detection
-# # is_zsh() {
-# #     [ -n "$ZSH_VERSION" ]
-# # }
-# #
-# # is_bash() {
-# #     [ -n "$BASH_VERSION" ]
-# # }
-# #
 
 # #################################################################################
 # # MacOS utils
 # #################################################################################
 #
-# # Apply common macOS system preferences
-# defaults_apply() {
-#     if ! is_macos; then
-#         log_error "Not running on macOS"
-#         return 1
-#     fi
-#
-#     log_info "Applying macOS preferences..."
-#
-#     defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
-#     defaults write NSGlobalDomain AppleShowAllExtensions -bool true
-#     defaults write NSGlobalDomain InitialKeyRepeat -int 15
-#     defaults write NSGlobalDomain KeyRepeat -int 2
-#     defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool TRUE
-#     defaults write com.apple.dock autohide -bool false
-#     defaults write com.apple.dock autohide -bool true
-#     defaults write com.apple.dock autohide-delay -float 0
-#     defaults write com.apple.dock show-recents -bool false
-#     defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
-#     defaults write com.apple.finder AppleShowAllFiles -bool true
-#     defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
-#     defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
-#     defaults write com.apple.finder ShowPathbar -bool true
-#     defaults write com.apple.finder ShowStatusBar -bool true
-#     defaults write com.apple.finder _FXSortFoldersFirst -bool true
-#
-#     # Restart affected applications
-#     for app in "Finder" "Dock"; do
-#         killall "$app" >/dev/null 2>&1
-#     done
-#
-#     log_success "macOS preferences applied"
-# }
+# Apply common macOS system preferences
+function defaults_apply() {
+  if ! is_macos; then
+    log_error "Not running on macOS"
+    return 1
+  fi
+
+  log_info "Applying macOS preferences..."
+
+  defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
+  defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+  defaults write NSGlobalDomain InitialKeyRepeat -int 15
+  defaults write NSGlobalDomain KeyRepeat -int 2
+  defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool TRUE
+  defaults write com.apple.dock autohide -bool false
+  defaults write com.apple.dock autohide -bool true
+  defaults write com.apple.dock autohide-delay -float 0
+  defaults write com.apple.dock show-recents -bool false
+  defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
+  defaults write com.apple.finder AppleShowAllFiles -bool true
+  defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
+  defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
+  defaults write com.apple.finder ShowPathbar -bool true
+  defaults write com.apple.finder ShowStatusBar -bool true
+  defaults write com.apple.finder _FXSortFoldersFirst -bool true
+
+  # Restart affected applications
+  for app in "Finder" "Dock"; do
+    killall "$app" >/dev/null 2>&1
+  done
+
+  log_success "macOS preferences applied"
+}
 
 # ========================================================================
 # System & macOS Utilities
@@ -290,6 +415,18 @@ function rfv() {
 # # Keep commonly used aliases for convenience
 alias penv='sys env'
 # alias weather='sys weather'
-# alias ql='sys ql'
-# alias batman='sys man'
+alias ql='sys ql'
+alias batman='sys man'
 # alias ducks='sys ducks'
+
+# ========================================================================
+# Text Editors and Cat Replacement
+# ========================================================================
+# has_command nvim && alias vim="nvim" && alias vi="nvim"
+# has_command bat && alias cat="bat"
+
+# ========================================================================
+# Misc Shortcuts
+# ========================================================================
+alias c="clear"
+alias hf="huggingface-cli"

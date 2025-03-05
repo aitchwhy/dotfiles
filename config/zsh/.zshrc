@@ -47,37 +47,98 @@ has_command nvim && export EDITOR="nvim" && export VISUAL="nvim"
 
 # History
 # export HISTFILE="$HOME/.zsh_history"
-export HISTSIZE=100000
-export SAVEHIST=100000
+# export HISTSIZE=100000
+# export SAVEHIST=100000
+
+# [[ -f "$ZDOTDIR/system.zsh" ]] && source "$ZDOTDIR/system.zsh"
+# [[ -f "$ZDOTDIR/brew.zsh" ]] && source "$ZDOTDIR/brew.zsh"
+# [[ -f "$ZDOTDIR/git.zsh" ]] && source "$ZDOTDIR/git.zsh"
+# [[ -f "$ZDOTDIR/fzf.zsh" ]] && source "$ZDOTDIR/fzf.zsh"
 
 # Source utilities in specific order
 local files=(
-  # "./utils.zsh"     # Load core utilities first
-  "$ZDOTDIR/system.zsh" # system
-  "$ZDOTDIR/brew.zsh"   # Package manager setup
-  "$ZDOTDIR/git.zsh"    # Git configuration
-  # "./rust.zsh"      # Rust development setup
+  # "./rust.zsh" # Rust development setup
   # "./nvim.zsh"      # Neovim configuration
-  "$ZDOTDIR/fzf.zsh"     # Fuzzy finder setup
-  "$ZDOTDIR/aliases.zsh" # Command aliases
+  "$ZDOTDIR/system.zsh"
+  "$ZDOTDIR/brew.zsh"
+  "$ZDOTDIR/git.zsh"
+  "$ZDOTDIR/fzf.zsh"
+  "$ZDOTDIR/nvim.zsh"
+  "$ZDOTDIR/atuin.zsh"
+  "$ZDOTDIR/nodejs.zsh"
+  "$ZDOTDIR/python.zsh"
+  "$ZDOTDIR/rust.zsh"
   # "./functions.zsh" # Custom functions
   # "./local.zsh" # Local machine specific config (load last)
-  "$ZDOTDIR/symlinks.zsh" # symlinks
 )
 
+# # Helper function to check if a command exists
+# has_command() {
+#   command -v "$1" &>/dev/null
+# }
+
+# Helper function to log messages
+log_info() {
+  printf '\033[0;34m[INFO]\033[0m %s\n' "$*"
+}
+
+# Install a tool if it's missing
+install_tool() {
+  local tool="$1"
+  local install_cmd="$2"
+
+  if ! has_command "$tool"; then
+    log_info "Installing $tool..."
+    eval "$install_cmd"
+  fi
+}
+
+# # Install core tools if missing
+# if ! has_command brew; then
+#   log_info "Installing Homebrew..."
+#   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+#   if [[ "$(uname -m)" == "arm64" ]]; then
+#     eval "$(/opt/homebrew/bin/brew shellenv)"
+#   else
+#     eval "$(/usr/local/bin/brew shellenv)"
+#   fi
+# fi
+
+# Source and potentially install each tool
 for file in $files; do
+  # Get the base name without path and extension
+  base_name="${file##*/}"
+  tool_name="${base_name%.zsh}"
+
+  # Install missing tools before sourcing their config
+  case "$tool_name" in
+  fzf)
+    install_tool "fzf" "brew install fzf"
+    ;;
+  nvim)
+    install_tool "nvim" "brew install neovim"
+    ;;
+  atuin)
+    install_tool "atuin" "curl https://setup.atuin.sh | bash"
+    ;;
+  nodejs)
+    install_tool "volta" "curl https://get.volta.sh | bash"
+    ;;
+  python)
+    install_tool "uv" "curl -LsSf https://astral.sh/uv/install.sh | sh"
+    ;;
+  rust)
+    install_tool "rustup" "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
+    ;;
+  esac
+
+  # Source the configuration file
   echo "source $file..."
   [[ -f "$file" ]] && source "$file"
+  echo "source $file done"
 done
 
 # [[ -f "$DOTFILES/utils.zsh" ]] && source "$DOTFILES/utils.zsh"
-
-# git env vars
-
-# install rustup if command "rustup" not found
-if ! has_command rustup; then
-  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-fi
 
 # # install nvim if not exist
 # if ! has_command nvim; then
@@ -86,10 +147,6 @@ fi
 
 # If you need to have rustup first in your PATH, run:
 #   echo 'export PATH="/opt/homebrew/opt/rustup/bin:$PATH"' >> /Users/hank/dotfiles/config/zsh/.zshrc
-#
-# zsh completions have been installed to:
-#   /opt/homebrew/opt/rustup/share/zsh/site-functions
-
 # docs
 # - https://wiki.archlinux.org/title/Zsh#Configuration_files
 # - https://gist.github.com/Linerre/f11ad4a6a934dcf01ee8415c9457e7b2
@@ -97,14 +154,6 @@ fi
 # Completions
 autoload -Uz compinit
 compinit
-
-########
-#if type brew &>/dev/null; then
-#	FPATH=$(brew --prefix)/share/zsh-abbr:$FPATH
-#
-#	autoload -Uz compinit
-#	compinit
-#fi
 
 # Load plugins if available
 if [[ -d "$HOMEBREW_PREFIX/share" ]]; then
@@ -131,7 +180,9 @@ has_command atuin && eval "$(atuin init zsh)"
 has_command zoxide && eval "$(zoxide init zsh)"
 has_command direnv && eval "$(direnv hook zsh)"
 has_command fnm && eval "$(fnm env --use-on-cd)"
+has_command volta && eval "$(volta setup)"
 has_command uv && eval "$(uv generate-shell-completion zsh)"
+has_command uvx && eval "$(uvx --generate-shell-completion zsh)"
 # has_command pyenv && eval "$(pyenv init -)"
 # has_command abbr && eval "$(abbr init zsh)"
 

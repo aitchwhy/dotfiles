@@ -4,43 +4,9 @@
 # mac.install.guide tips (https://mac.install.guide/terminal/zshrc-zprofile)
 # - Use ~/.zprofile to set the PATH and EDITOR environment variables.
 # -----------------------------------------------------------------------------
-
-# Environment variables that should be set for all shells
-# XDG Base Directory specification
-export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
-export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
-export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
-export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
-export ZDOTDIR=${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}
-
-# Dotfiles location
-export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
-
-# Editor
-export EDITOR="vim"
-export VISUAL="$EDITOR"
-# export PAGER="less -FRX"
-
-# macOS specific
-
-# brew https://docs.brew.sh/Manpage#environment
-
-export HOMEBREW_NO_ANALYTICS=1 # Disable Homebrew analytics
-# export HOMEBREW_NO_INSTALL_CLEANUP=1 # Don't clean up after install
-
-# export HOMEBREW_FORCE_BREWED_GIT=1 # Use brewed git
-# export HOMEBREW_BUNDLE_NO_LOCK=1            # Don't create Brewfile.lock.json
-export HOMEBREW_AUTOREMOVE=1 # Auto remove unused dependencies
-export HOMEBREW_BAT=1        # Use bat for man pages
-# export HOMEBREW_CASK_OPTS="--no-quarantine" # Disable macOS quarantine for casks
-export HOMEBREW_CASK_OPTS="--appdir=${HOME}/Applications --fontdir=/Library/Fonts"
-
 # Application directories for macOS
 # export APPLICATIONS="/Applications"
 # export USER_APPLICATIONS="$HOME/Applications"
-
-# If you need to have rustup first in your PATH, run:
-#   echo 'export PATH="/opt/homebrew/opt/rustup/bin:$PATH"' >> /Users/hank/dotfiles/config/zsh/.zshrc
 
 # docs
 # - https://wiki.archlinux.org/title/Zsh#Configuration_files
@@ -57,8 +23,13 @@ fi
 # Remove duplicate paths
 typeset -U path PATH
 path=(
-  "$HOME/.local/bin"
-  "$HOME/bin"
+  "$VOLTA_HOME/bin"
+  "$HOME/.cargo/bin" # Rust
+  # "$HOME/.deno/bin"  # Deno
+  # "$HOME/.bun/bin" # Bun
+  "$HOME/go/bin" # Go
+  # "$HOME/.local/bin"
+  # "$HOME/bin"
   # "$HOMEBREW_PREFIX/opt/llvm/bin"
   # "$HOMEBREW_PREFIX/opt/ruby/bin"
   # "$HOMEBREW_PREFIX/opt/python/libexec/bin"
@@ -66,34 +37,9 @@ path=(
   # "$HOMEBREW_PREFIX/opt/sqlite/bin"
   # "$HOMEBREW_PREFIX/opt/openssl/bin"
   # "$HOMEBREW_PREFIX/opt/curl/bin"
-  "$HOME/.cargo/bin" # Rust
-  # "$HOME/.deno/bin"  # Deno
-  "$HOME/.bun/bin" # Bun
-  "$HOME/go/bin"   # Go
   $path
 )
 
 # Rust
 # TODO: may not need this if adding rustup to PATH directly
 # [[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
-
-# Go
-export GOPATH="$HOME/go"
-export GOBIN="$GOPATH/bin"
-
-# Python
-export PYTHONSTARTUP="$XDG_CONFIG_HOME/python/pythonrc"
-export PYTHONDONTWRITEBYTECODE=1 # Don't create .pyc files
-# [[ -d "$HOME/.pyenv" ]] && {
-#   export PYENV_ROOT="$HOME/.pyenv"
-#   path=("$PYENV_ROOT/bin" $path)
-#   eval "$(pyenv init --path)"
-# }
-
-# Node.js
-export NODE_REPL_HISTORY="$XDG_STATE_HOME/node_history"
-export NPM_CONFIG_USERCONFIG="$XDG_CONFIG_HOME/npm/npmrc"
-
-# Terminal
-export COLORTERM=truecolor
-export TERM_PROGRAM="${TERM_PROGRAM:-Apple_Terminal}"

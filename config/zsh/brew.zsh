@@ -9,19 +9,26 @@ function has_brew() {
     command -v brew >/dev/null 2>&1
 }
 
-function ensure_brew() {
-    if ! has_brew; then
-        log_info "Installing Homebrew..."
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+########
+#if type brew &>/dev/null; then
+#	FPATH=$(brew --prefix)/share/zsh-abbr:$FPATH
+#
+#	autoload -Uz compinit
+#	compinit
+#fi
 
-        # Add to PATH for current session if installed
-        if is_arm64; then
-            eval "$(/opt/homebrew/bin/brew shellenv)"
-        else
-            eval "$(/usr/local/bin/brew shellenv)"
-        fi
+# Install Homebrew if not already installed
+if ! command -v brew &>/dev/null; then
+    log_info "Installing Homebrew..."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+    # Add to PATH for current session if installed
+    if [[ "$(uname -m)" == "arm64" ]]; then
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+    else
+        eval "$(/usr/local/bin/brew shellenv)"
     fi
-}
+fi
 
 function update_brew() {
     if has_brew; then
