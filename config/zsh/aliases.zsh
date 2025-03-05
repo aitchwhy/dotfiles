@@ -1,20 +1,12 @@
 #!/usr/bin/env zsh
 
-source "$DOTFILES/utils.zsh"
+# source "$DOTFILES/utils.zsh"
 
 # ========================================================================
 # ZSH aliases - Organized by category
 # ========================================================================
 
 # alias optbrew="/opt/homebrew/bin/brew"
-
-# ========================================================================
-# Git Utilities
-# ========================================================================
-
-# Lazygit alias
-has_command alias lg='lazygit'
-
 # ========================================================================
 # System utils
 # ========================================================================
@@ -63,17 +55,8 @@ fi
 # ========================================================================
 # Text Editors and Cat Replacement
 # ========================================================================
-has_command nvim && alias vim="nvim"
-has_command nvim && alias vi="nvim"
+has_command nvim && alias vim="nvim" && alias vi="nvim"
 has_command bat && alias cat="bat"
-
-# ========================================================================
-# Homebrew Shortcuts
-# ========================================================================
-# alias brewup="brew update && brew upgrade && brew cleanup"
-# alias bi="brew install"
-# alias bs="brew search"
-# alias bci="brew cask install"
 
 # ========================================================================
 # Networking Utilities
@@ -104,12 +87,12 @@ alias zr="exec zsh"
 # ========================================================================
 # System Information
 # ========================================================================
-alias ppath='echo $PATH | tr ":" "\n"'
-alias pfuncs='print -l ${(k)functions[(I)[^_]*]} | sort'
-alias pfpath='for fp in $fpath; do echo $fp; done; unset fp'
-alias printpath='ppath'
-alias printfuncs='pfuncs'
-alias printfpath='pfpath'
+# alias ppath='echo $PATH | tr ":" "\n"'
+# alias pfuncs='print -l ${(k)functions[(I)[^_]*]} | sort'
+# alias pfpath='for fp in $fpath; do echo $fp; done; unset fp'
+# alias printpath='ppath'
+# alias printfuncs='pfuncs'
+# alias printfpath='pfpath'
 
 # ========================================================================
 # Misc Shortcuts

@@ -1,4 +1,3 @@
-
 # Clean merged branches
 function gclean() {
   local branches_to_delete
@@ -22,3 +21,10 @@ function gclean() {
     log_info "Operation canceled."
   fi
 }
+
+# ========================================================================
+# Git Utilities
+# ========================================================================
+
+# Lazygit alias
+has_command lazygit && alias lg='lazygit'

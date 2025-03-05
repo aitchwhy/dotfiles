@@ -6,9 +6,6 @@
 # TODO: https://github.com/mattmc3/zdotdir/blob/main/plugins/xdg/xdg.plugin.zsh
 # TODO: https://github.com/getantidote/zdotdir/blob/main/.zshenv
 
-# Source utilities
-[[ -f "$DOTFILES/utils.zsh" ]] && source "$DOTFILES/utils.zsh"
-
 # Shell Options
 setopt AUTO_CD              # Change directory without cd
 setopt AUTO_PUSHD           # Push directory to stack on cd
@@ -31,29 +28,61 @@ bindkey -v
 export KEYTIMEOUT=1
 
 # Basic key bindings
-# bindkey '^P' up-line-or-history
-# bindkey '^N' down-line-or-history
-# bindkey '^E' end-of-line
-# bindkey '^A' beginning-of-line
-bindkey '^K' up-line-or-history
-bindkey '^J' down-line-or-history
-bindkey '^L' end-of-line
-bindkey '^H' beginning-of-line
-bindkey '^R' history-incremental-search-backward
-bindkey '^?' backward-delete-char # Backspace working after vi mode
+bindkey '^P' up-line-or-history
+bindkey '^N' down-line-or-history
+bindkey '^E' end-of-line
+bindkey '^A' beginning-of-line
+# bindkey '^K' up-line-or-history
+# bindkey '^J' down-line-or-history
+# bindkey '^L' end-of-line
+# bindkey '^H' beginning-of-line
+# bindkey '^R' history-incremental-search-backward
+# bindkey '^?' backward-delete-char # Backspace working after vi mode
 
 # Editor
-export EDITOR="nvim"
-export VISUAL="$EDITOR"
+# export EDITOR="nvim"
+# export VISUAL="$EDITOR"
+
+has_command nvim && export EDITOR="nvim" && export VISUAL="nvim"
 
 # History
 # export HISTFILE="$HOME/.zsh_history"
 export HISTSIZE=100000
 export SAVEHIST=100000
 
+# Source utilities in specific order
+local files=(
+  # "./utils.zsh"     # Load core utilities first
+  "$ZDOTDIR/system.zsh" # system
+  "$ZDOTDIR/brew.zsh"   # Package manager setup
+  "$ZDOTDIR/git.zsh"    # Git configuration
+  # "./rust.zsh"      # Rust development setup
+  # "./nvim.zsh"      # Neovim configuration
+  "$ZDOTDIR/fzf.zsh"     # Fuzzy finder setup
+  "$ZDOTDIR/aliases.zsh" # Command aliases
+  # "./functions.zsh" # Custom functions
+  # "./local.zsh" # Local machine specific config (load last)
+  "$ZDOTDIR/symlinks.zsh" # symlinks
+)
+
+for file in $files; do
+  echo "source $file..."
+  [[ -f "$file" ]] && source "$file"
+done
+
+# [[ -f "$DOTFILES/utils.zsh" ]] && source "$DOTFILES/utils.zsh"
+
 # git env vars
 
-has_command nvim && export EDITOR="nvim" && export VISUAL="nvim"
+# install rustup if command "rustup" not found
+if ! has_command rustup; then
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+fi
+
+# # install nvim if not exist
+# if ! has_command nvim; then
+#   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+# fi
 
 # If you need to have rustup first in your PATH, run:
 #   echo 'export PATH="/opt/homebrew/opt/rustup/bin:$PATH"' >> /Users/hank/dotfiles/config/zsh/.zshrc
@@ -92,10 +121,10 @@ if [[ -d "$HOMEBREW_PREFIX/share" ]]; then
   done
 fi
 
-# Initialize tools if installed
-has_command() {
-  command -v "$1" >/dev/null 2>&1
-}
+# # Initialize tools if installed
+# has_command() {
+#   command -v "$1" >/dev/null 2>&1
+# }
 
 has_command starship && eval "$(starship init zsh)"
 has_command atuin && eval "$(atuin init zsh)"
@@ -106,16 +135,15 @@ has_command uv && eval "$(uv generate-shell-completion zsh)"
 # has_command pyenv && eval "$(pyenv init -)"
 # has_command abbr && eval "$(abbr init zsh)"
 
-# install rustup if command "rustup" not found
-if ! has_command rustup; then
-  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-fi
+# homebrew fzf
+has_command fzf && source <(fzf --zsh)
+# curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 #########################################
+# # TODO:
 # rustup completions zsh > ~/.zfunc/_rustup
 # rustup completions zsh > $ZDOTDIR/.zfunc/_rustup
 
-# # TODO:
 #
 # Last login: Mon Mar  3 15:23:37 on ttys003
 # info: downloading installer
@@ -170,33 +198,29 @@ fi
 # >
 #########################################
 
-# Load additional config files
-if [[ -f "$ZDOTDIR/aliases.zsh" ]]; then
-  # echo "source $ZDOTDIR/aliases.zsh"
-  source "$ZDOTDIR/aliases.zsh"
-fi
+# # Load additional config files
+# if [[ -f "$ZDOTDIR/aliases.zsh" ]]; then
+#   # echo "source $ZDOTDIR/aliases.zsh"
+#   source "$ZDOTDIR/aliases.zsh"
+# fi
 
-if [[ -f "$ZDOTDIR/functions.zsh" ]]; then
-  # echo "source $ZDOTDIR/functions.zsh"
-  source "$ZDOTDIR/functions.zsh"
-fi
+# if [[ -f "$ZDOTDIR/functions.zsh" ]]; then
+#   # echo "source $ZDOTDIR/functions.zsh"
+#   source "$ZDOTDIR/functions.zsh"
+# fi
 
-if [[ -f "$ZDOTDIR/fzf.zsh" ]]; then
-  # echo "source $ZDOTDIR/fzf.zsh"
-  source "$ZDOTDIR/fzf.zsh"
-fi
+# if [[ -f "$ZDOTDIR/fzf.zsh" ]]; then
+#   # echo "source $ZDOTDIR/fzf.zsh"
+#   source "$ZDOTDIR/fzf.zsh"
+# fi
 
-# Local customizations, not tracked by git
-if [[ -f "$ZDOTDIR/local.zsh" ]]; then
-  # echo "source $ZDOTDIR/local.zsh"
-  source "$ZDOTDIR/local.zsh"
-fi
+# # Local customizations, not tracked by git
+# if [[ -f "$ZDOTDIR/local.zsh" ]]; then
+#   # echo "source $ZDOTDIR/local.zsh"
+#   source "$ZDOTDIR/local.zsh"
+# fi
 
 # FZF Configuration if available
-
-# homebrew fzf
-has_command fzf && source <(fzf --zsh)
-
 # if [[ -f ~/.fzf.zsh ]]; then
 #   source ~/.fzf.zsh
 # elif [[ -f "$HOMEBREW_PREFIX/opt/fzf/shell/completion.zsh" ]]; then
@@ -207,107 +231,4 @@ has_command fzf && source <(fzf --zsh)
 # Local customizations (not tracked by git)
 # [[ -f "$ZDOTDIR/local.zsh" ]] && source "$ZDOTDIR/local.zsh"
 
-# Welcome message
-print -P "%F{blue}Welcome to ZSH %F{green}$(zsh --version)%f"
-
 # source $(brew --prefix)/share/zsh/site-functions/_todoist_fzf
-
-#
-# #
-# # # OS detection
-# # is_macos() {
-# #     [ "$(uname)" = "Darwin" ]
-# # }
-# #
-# # is_linux() {
-# #     [ "$(uname)" = "Linux" ]
-# # }
-# #
-# # # Architecture detection
-# # is_arm64() {
-# #     [ "$(uname -m)" = "arm64" ] || [ "$(uname -m)" = "aarch64" ]
-# # }
-# #
-# # is_x86_64() {
-# #     [ "$(uname -m)" = "x86_64" ]
-# # }
-# #
-# # # Shell detection
-# # is_zsh() {
-# #     [ -n "$ZSH_VERSION" ]
-# # }
-# #
-# # is_bash() {
-# #     [ -n "$BASH_VERSION" ]
-# # }
-# #
-# ################################################################################
-# # PACKAGE MANAGEMENT
-# # https://github.com/junegunn/fzf/wiki/examples#homebrew
-# ################################################################################
-#
-# Homebrew utilities
-function has_brew() {
-    command -v brew >/dev/null 2>&1
-}
-
-function ensure_brew() {
-    if ! has_brew; then
-        log_info "Installing Homebrew..."
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-        # Add to PATH for current session if installed
-        if is_arm64; then
-            eval "$(/opt/homebrew/bin/brew shellenv)"
-        else
-            eval "$(/usr/local/bin/brew shellenv)"
-        fi
-    fi
-}
-
-function update_brew() {
-    if has_brew; then
-        log_info "Updating Homebrew..."
-        brew update
-        brew upgrade
-        brew cleanup
-    fi
-}
-
-# #################################################################################
-# # MacOS utils
-# #################################################################################
-#
-# # Apply common macOS system preferences
-# defaults_apply() {
-#     if ! is_macos; then
-#         log_error "Not running on macOS"
-#         return 1
-#     fi
-#
-#     log_info "Applying macOS preferences..."
-#
-#     defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
-#     defaults write NSGlobalDomain AppleShowAllExtensions -bool true
-#     defaults write NSGlobalDomain InitialKeyRepeat -int 15
-#     defaults write NSGlobalDomain KeyRepeat -int 2
-#     defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool TRUE
-#     defaults write com.apple.dock autohide -bool false
-#     defaults write com.apple.dock autohide -bool true
-#     defaults write com.apple.dock autohide-delay -float 0
-#     defaults write com.apple.dock show-recents -bool false
-#     defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
-#     defaults write com.apple.finder AppleShowAllFiles -bool true
-#     defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
-#     defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
-#     defaults write com.apple.finder ShowPathbar -bool true
-#     defaults write com.apple.finder ShowStatusBar -bool true
-#     defaults write com.apple.finder _FXSortFoldersFirst -bool true
-#
-#     # Restart affected applications
-#     for app in "Finder" "Dock"; do
-#         killall "$app" >/dev/null 2>&1
-#     done
-#
-#     log_success "macOS preferences applied"
-# }

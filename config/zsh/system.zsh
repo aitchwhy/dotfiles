@@ -1,6 +1,156 @@
 #!/usr/bin/env zsh
 
 # ========================================================================
+# Logging Functions
+# ========================================================================
+function info() {
+  printf '%s[INFO]%s %s\n' "${BLUE:-}" "${RESET:-}" "$*"
+}
+
+function success() {
+  printf '%s[SUCCESS]%s %s\n' "${GREEN:-}" "${RESET:-}" "$*"
+}
+
+function warn() {
+  printf '%s[WARNING]%s %s\n' "${YELLOW:-}" "${RESET:-}" "$*" >&2
+}
+
+function error() {
+  printf '%s[ERROR]%s %s\n' "${RED:-}" "${RESET:-}" "$*" >&2
+}
+
+# ========================================================================
+# System Detection
+# ========================================================================
+function is_macos() {
+  [[ "$(uname -s)" == "Darwin" ]]
+}
+
+function is_apple_silicon() {
+  [[ "$(uname -m)" == "arm64" ]]
+}
+
+function is_rosetta() {
+  # Check if a process is running under Rosetta translation
+  if is_apple_silicon; then
+    local arch_output
+    arch_output=$(arch)
+    [[ "$arch_output" != "arm64" ]]
+  else
+    false
+  fi
+}
+
+function get_macos_version() {
+  if is_macos; then
+    sw_vers -productVersion
+  else
+    echo "Not macOS"
+  fi
+}
+
+function has_command() {
+  # command -v "$1" &>/dev/null
+  command -v "$1" >/dev/null 2>&1
+}
+
+# # Initialize tools if installed
+# has_command() {
+#   command -v "$1" >/dev/null 2>&1
+# }
+
+# ========================================================================
+# File & Directory Operations
+# ========================================================================
+function ensure_dir() {
+  local dir="$1"
+  if [[ ! -d "$dir" ]]; then
+    mkdir -p "$dir"
+    success "Created directory: $dir"
+  fi
+}
+
+function backup_file() {
+  local file="$1"
+  if [[ -e "$file" ]]; then
+    local backup_dir="$HOME/.dotfiles_backup/$(date +%Y%m%d_%H%M%S)"
+    ensure_dir "$backup_dir"
+    mv "$file" "$backup_dir/"
+    success "Backed up $file to $backup_dir"
+  fi
+}
+# ========================================================================
+# System & macOS Utilities
+# ========================================================================
+#
+# #
+# # # OS detection
+# # is_macos() {
+# #     [ "$(uname)" = "Darwin" ]
+# # }
+# #
+# # is_linux() {
+# #     [ "$(uname)" = "Linux" ]
+# # }
+# #
+# # # Architecture detection
+# # is_arm64() {
+# #     [ "$(uname -m)" = "arm64" ] || [ "$(uname -m)" = "aarch64" ]
+# # }
+# #
+# # is_x86_64() {
+# #     [ "$(uname -m)" = "x86_64" ]
+# # }
+# #
+# # # Shell detection
+# # is_zsh() {
+# #     [ -n "$ZSH_VERSION" ]
+# # }
+# #
+# # is_bash() {
+# #     [ -n "$BASH_VERSION" ]
+# # }
+# #
+
+# #################################################################################
+# # MacOS utils
+# #################################################################################
+#
+# # Apply common macOS system preferences
+# defaults_apply() {
+#     if ! is_macos; then
+#         log_error "Not running on macOS"
+#         return 1
+#     fi
+#
+#     log_info "Applying macOS preferences..."
+#
+#     defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
+#     defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+#     defaults write NSGlobalDomain InitialKeyRepeat -int 15
+#     defaults write NSGlobalDomain KeyRepeat -int 2
+#     defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool TRUE
+#     defaults write com.apple.dock autohide -bool false
+#     defaults write com.apple.dock autohide -bool true
+#     defaults write com.apple.dock autohide-delay -float 0
+#     defaults write com.apple.dock show-recents -bool false
+#     defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
+#     defaults write com.apple.finder AppleShowAllFiles -bool true
+#     defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
+#     defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
+#     defaults write com.apple.finder ShowPathbar -bool true
+#     defaults write com.apple.finder ShowStatusBar -bool true
+#     defaults write com.apple.finder _FXSortFoldersFirst -bool true
+#
+#     # Restart affected applications
+#     for app in "Finder" "Dock"; do
+#         killall "$app" >/dev/null 2>&1
+#     done
+#
+#     log_success "macOS preferences applied"
+# }
+
+# ========================================================================
 # System & macOS Utilities
 # ========================================================================
 function sys() {
@@ -137,9 +287,9 @@ function rfv() {
     --query "$*"
 }
 
-# Keep commonly used aliases for convenience
+# # Keep commonly used aliases for convenience
 alias penv='sys env'
-alias weather='sys weather'
-alias ql='sys ql'
-alias batman='sys man'
-alias ducks='sys ducks'
+# alias weather='sys weather'
+# alias ql='sys ql'
+# alias batman='sys man'
+# alias ducks='sys ducks'
