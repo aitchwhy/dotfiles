@@ -16,9 +16,9 @@ export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 
 # Source utilities and configurations
-source "$DOTFILES/utils.zsh"
-source "$DOTFILES/config/zsh/functions.zsh"
-source "$DOTFILES/config/zsh/symlinks.zsh"
+# source "$DOTFILES/utils.zsh"
+# source "$DOTFILES/config/zsh/functions.zsh"
+# source "$DOTFILES/config/zsh/symlinks.zsh"
 
 # ========================================================================
 # Update Functions

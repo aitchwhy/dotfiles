@@ -18,7 +18,7 @@ timezone = "local"
 # Enable automatic sync with faster interval on Apple Silicon
 # M-series chips can handle more frequent syncing with less impact
 auto_sync = true
-sync_frequency = "300"  # 5 minutes, Apple Silicon can handle this well
+sync_frequency = "300" # 5 minutes, Apple Silicon can handle this well
 
 # Enable automatic update checks
 update_check = true
@@ -91,25 +91,25 @@ history_filter = [
   ".*aws_.*key.*=.+",
   ".*--access-key.*=.+",
   ".*--secret-key.*=.+",
-  
+
   # GitHub tokens
   ".*GH_TOKEN.*=.+",
   ".*GITHUB_TOKEN.*=.+",
   ".*ghp_[A-Za-z0-9]{36}.*",
   ".*github_pat_[A-Za-z0-9]{22}_[A-Za-z0-9]{59}.*",
-  
+
   # API keys and tokens
   ".*api[_-]?key.*=.+",
   ".*token.*=.+",
   ".*password.*=.+",
   ".*secret.*=.+",
-  
+
   # Common MacOS credential managers
   ".*security find-generic-password.*",
   ".*keychain-access.*",
-  
+
   # Common explicit patterns
-  "^\\s*curl\\s+.+(-u|--user)\\s+[^\\s:]+:[^\\s]+\\s*.*$"
+  "^\\s*curl\\s+.+(-u|--user)\\s+[^\\s:]+:[^\\s]+\\s*.*$",
 ]
 
 # Prevent commands run in directories containing secrets
@@ -122,7 +122,7 @@ cwd_filter = [
   "^/Users/[^/]+/\\.terraform",
   "^/private/",
   "^.+/secrets?/?.*$",
-  "^.+/credential.*$"
+  "^.+/credential.*$",
 ]
 
 # Configure the maximum height of the preview to show
@@ -167,13 +167,39 @@ prefers_reduced_motion = false
 # Example: "git commit" instead of just "git"
 common_subcommands = [
   # Standard Linux/Unix tools
-  "apt", "cargo", "dnf", "docker", "git", "go", "kubectl", "nix", "npm", "pnpm", "systemctl", "tmux", "yarn",
-  
+  "apt",
+  "cargo",
+  "dnf",
+  "docker",
+  "lazygit",
+  "git",
+  "go",
+  "kubectl",
+  "nix",
+  "npm",
+  "pnpm",
+  "bun",
+  "systemctl",
+  "tmux",
+  "zellij",
+  "yarn",
+
   # macOS specific tools
-  "brew", "xcodebuild", "swift", "xcrun", "defaults", "mas", "open", "launchctl", "diskutil",
-  
+  "brew",
+  "xcodebuild",
+  "swift",
+  "xcrun",
+  "defaults",
+  "mas",
+  "open",
+  "launchctl",
+  "diskutil",
+
   # Development tools common on macOS
-  "pod", "fastlane", "flutter", "xed"
+  "pod",
+  "fastlane",
+  "flutter",
+  "xed",
 ]
 
 # Commands to strip from statistics
@@ -181,9 +207,21 @@ common_prefix = ["sudo", "env", "time", "nice"]
 
 # Commands to completely ignore from statistics
 ignored_commands = [
-  "cd", "ls", "ll", "la", "pwd", "clear", "cls", "exit", "history",
+  "cd",
+  "ls",
+  "ll",
+  "la",
+  "pwd",
+  "clear",
+  "cls",
+  "exit",
+  "history",
   # macOS specific
-  "open", "pbcopy", "pbpaste", "defaults", "osascript"
+  "open",
+  "pbcopy",
+  "pbpaste",
+  "defaults",
+  "osascript",
 ]
 
 [keys]
@@ -207,7 +245,7 @@ enabled = true
 sync_frequency = 300
 
 # Path to the unix socket (macOS specific)
-socket_path = "~/.local/share/atuin/atuin.sock"
+# socket_path = "~/.local/share/atuin/atuin.sock"
 
 # TCP port for non-unix systems
 tcp_port = 8889

@@ -19,5 +19,6 @@
   "GitLive.Special branches": "main|master|trunk|dev|develop|qa|test|release[-/].*",
   "cline.modelSettings.o3Mini.reasoningEffort": "high",
   "aws.telemetry": false,
-  "editor.accessibilitySupport": "off"
+  "editor.accessibilitySupport": "off",
+  "vscode-aiconfig.version": "0.0.22"
 }
