@@ -205,37 +205,6 @@ function backup_file() {
     success "Backed up $file to $backup_dir"
   fi
 }
-# ========================================================================
-# System & macOS Utilities
-# ========================================================================
-
-# OS detection
-is_macos() {
-  [ "$(uname)" = "Darwin" ]
-}
-
-is_linux() {
-  [ "$(uname)" = "Linux" ]
-}
-
-# Architecture detection
-is_arm64() {
-  [ "$(uname -m)" = "arm64" ] || [ "$(uname -m)" = "aarch64" ]
-}
-
-is_x86_64() {
-  [ "$(uname -m)" = "x86_64" ]
-}
-
-# Shell detection
-is_zsh() {
-  [ -n "$ZSH_VERSION" ]
-}
-
-is_bash() {
-  [ -n "$BASH_VERSION" ]
-}
-#
 
 # #################################################################################
 # # MacOS utils
