@@ -1,21 +1,17 @@
+# ========================================================================
+# Homebrew Package Management
+# ========================================================================
+# A comprehensive set of utilities for managing Homebrew packages
+# https://brew.sh
 
-# ################################################################################
-# # PACKAGE MANAGEMENT
-# # https://github.com/junegunn/fzf/wiki/examples#homebrew
-# ################################################################################
-#
-# Homebrew utilities
+# ========================================================================
+# Core Homebrew Setup & Detection
+# ========================================================================
+
+# Check if Homebrew is available
 function has_brew() {
     command -v brew >/dev/null 2>&1
 }
-
-########
-#if type brew &>/dev/null; then
-#	FPATH=$(brew --prefix)/share/zsh-abbr:$FPATH
-#
-#	autoload -Uz compinit
-#	compinit
-#fi
 
 # Install Homebrew if not already installed
 if ! command -v brew &>/dev/null; then
@@ -30,6 +26,16 @@ if ! command -v brew &>/dev/null; then
     fi
 fi
 
+# Set environment variables for Homebrew
+export HOMEBREW_NO_ANALYTICS=1  # Disable Homebrew analytics
+export HOMEBREW_BAT=1           # Use bat for man pages
+export HOMEBREW_CASK_OPTS="--appdir=${HOME}/Applications --fontdir=/Library/Fonts"
+
+# ========================================================================
+# Basic Brew Management Functions
+# ========================================================================
+
+# Update all Homebrew packages
 function update_brew() {
     if has_brew; then
         log_info "Updating Homebrew..."
@@ -40,7 +46,7 @@ function update_brew() {
 }
 
 # ========================================================================
-# Brew Management
+# Advanced Brew Management (bb function)
 # ========================================================================
 function bb() {
   # Function to display help text
@@ -207,9 +213,20 @@ function bb() {
   esac
 }
 
-# # Common aliases for convenience
-# alias brewup='bb up'
-# alias brew='bb in'
-# alias brew-search='bb s'
-# alias brewi='bb insi'
-# alias caski='bb caski'
+# ========================================================================
+# Homebrew Convenience Aliases
+# ========================================================================
+# Uncomment the ones you want to use
+
+# alias brewup='bb up'      # Update and upgrade packages
+# alias brewi='bb insi'     # Interactive install
+# alias caski='bb caski'    # Interactive cask install
+# alias bi='bb bi'          # Install from Brewfile
+# alias be='bb be'          # Edit Brewfile
+
+# Completions setup
+# if type brew &>/dev/null; then
+# 	FPATH=$(brew --prefix)/share/zsh-abbr:$FPATH
+# 	autoload -Uz compinit
+# 	compinit
+# fi

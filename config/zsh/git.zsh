@@ -1,5 +1,10 @@
-# Clean merged branches
+# ========================================================================
+# Git Configuration & Utilities
+# ========================================================================
+
+# Git branch management
 function gclean() {
+  # Clean merged branches (excluding main branches)
   local branches_to_delete
 
   branches_to_delete=$(git branch --merged | grep -v "^\*" | grep -v "master\|main\|develop")
@@ -23,8 +28,18 @@ function gclean() {
 }
 
 # ========================================================================
-# Git Utilities
+# Git Aliases & Wrappers
 # ========================================================================
 
-# Lazygit alias
+# Lazygit terminal UI
 has_command lazygit && alias lg='lazygit'
+
+# Common git aliases
+# alias gs='git status'
+# alias ga='git add'
+# alias gc='git commit'
+# alias gco='git checkout'
+# alias gp='git push'
+# alias gl='git pull'
+# alias gd='git diff'
+# alias gb='git branch'
