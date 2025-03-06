@@ -4,27 +4,24 @@
 # A comprehensive set of utilities for managing Homebrew packages
 # https://brew.sh
 
+# Source common utilities if not already loaded
+[[ -f "$ZDOTDIR/utils.zsh" ]] && source "$ZDOTDIR/utils.zsh"
+
 # ========================================================================
 # Core Homebrew Setup & Detection
 # ========================================================================
 
-# Check if Homebrew is available
-function has_brew() {
-    command -v brew >/dev/null 2>&1
-}
+# ========================================================================
+# macOS Specific Settings
+# ========================================================================
 
-# Install Homebrew if not already installed
-if ! command -v brew &>/dev/null; then
-    log_info "Installing Homebrew..."
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+# Homebrew
+# https://docs.brew.sh/Manpage#environment
+export HOMEBREW_NO_ANALYTICS=1 # Disable Homebrew analytics
+export HOMEBREW_BAT=1          # Use bat for man pages
+export HOMEBREW_CASK_OPTS="--appdir=${HOME}/Applications --fontdir=/Library/Fonts"
+# export HOMEBREW_NO_AUTO_UPDATE=1      # Uncomment to disable auto updates
 
-    # Add to PATH for current session if installed
-    if [[ "$(uname -m)" == "arm64" ]]; then
-        eval "$(/opt/homebrew/bin/brew shellenv)"
-    else
-        eval "$(/usr/local/bin/brew shellenv)"
-    fi
-fi
 
 # Set environment variables for Homebrew
 export HOMEBREW_NO_ANALYTICS=1  # Disable Homebrew analytics
@@ -44,6 +41,8 @@ function update_brew() {
         brew cleanup
     fi
 }
+
+
 
 # ========================================================================
 # Advanced Brew Management (bb function)
@@ -218,15 +217,8 @@ function bb() {
 # ========================================================================
 # Uncomment the ones you want to use
 
-# alias brewup='bb up'      # Update and upgrade packages
-# alias brewi='bb insi'     # Interactive install
-# alias caski='bb caski'    # Interactive cask install
-# alias bi='bb bi'          # Install from Brewfile
-# alias be='bb be'          # Edit Brewfile
-
-# Completions setup
-# if type brew &>/dev/null; then
-# 	FPATH=$(brew --prefix)/share/zsh-abbr:$FPATH
-# 	autoload -Uz compinit
-# 	compinit
-# fi
+alias brewup='bb up'      # Update and upgrade packages
+alias brewin='bb insi'     # Interactive install
+alias caskin='bb caski'    # Interactive cask install
+alias bi='bb bi'          # Install from Brewfile
+alias be='bb be'          # Edit Brewfile
