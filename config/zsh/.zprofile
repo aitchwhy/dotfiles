@@ -9,6 +9,14 @@
 # - https://mac.install.guide/terminal/zshrc-zprofile
 
 # ========================================================================
+# Source Utility Functions (Non-Interactive Mode)
+# ========================================================================
+
+# Source utils.zsh for environment variables and utility functions
+# This provides XDG_* variables and other core environment settings
+[[ -f "$ZDOTDIR/utils.zsh" ]] && source "$ZDOTDIR/utils.zsh"
+
+# ========================================================================
 # Homebrew Setup
 # ========================================================================
 
@@ -23,42 +31,36 @@ fi
 
 # ========================================================================
 # Path Configuration
+#
+# https://stackoverflow.com/questions/11530090/adding-a-new-entry-to-the-path-variable-in-zsh
+# # append
+# path+=('/home/david/pear/bin')
+# # or prepend
+# path=('/home/david/pear/bin' $path)
 # ========================================================================
 
+# export VOLTA_HOME="$HOME/.volta"
+# export PATH="$VOLTA_HOME/bin:$PATH"
+
 # Remove duplicate entries from PATH
-typeset -U path PATH
+# typeset -U path PATH
+typeset -U path
 
 # Add prioritized paths
 path=(
-  # Language-specific paths
-  "$VOLTA_HOME/bin"  # Node.js via Volta
+  # Version managers (need to be before Homebrew)
+  "$HOME/.volta/bin" # Node.js version manager
+
+  # Other language-specific paths
   "$HOME/.cargo/bin" # Rust
   "$HOME/go/bin"     # Go
 
-  # Uncomment paths as needed
-  # "$HOME/.deno/bin"         # Deno
-  # "$HOME/.bun/bin"          # Bun
+  # System paths
   "$HOME/.local/bin" # User local binaries
   "$HOME/bin"        # User personal binaries
 
-  # Homebrew-managed packages (uncomment as needed)
-  # "$HOMEBREW_PREFIX/opt/llvm/bin"
-  # "$HOMEBREW_PREFIX/opt/ruby/bin"
-  # "$HOMEBREW_PREFIX/opt/python/libexec/bin"
-  # "$HOMEBREW_PREFIX/opt/node/bin"
-  # "$HOMEBREW_PREFIX/opt/sqlite/bin"
-  # "$HOMEBREW_PREFIX/opt/openssl/bin"
-  # "$HOMEBREW_PREFIX/opt/curl/bin"
-
-  # Maintain existing PATH
+  # Keep existing PATH (includes Homebrew)
   $path
 )
 
-# ========================================================================
-# Additional Environment Setup
-# ========================================================================
-
-# Load OS-specific configurations
-# if [[ -f "$ZDOTDIR/os/$(uname -s).zsh" ]]; then
-#   source "$ZDOTDIR/os/$(uname -s).zsh"
-# fi
+export PATH

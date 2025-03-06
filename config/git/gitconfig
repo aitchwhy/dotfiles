@@ -20,6 +20,7 @@ attributesfile = ~/.gitattributes
 # untrackedCache = true
 # Use macOS-native symlinks
 symlinks = true
+# fsync = true
 # Improve performance on macOS APFS (fsync recommended for macOS)
 # fsync = true
 # fsyncMethod = fsync
@@ -118,72 +119,72 @@ followTags = true
 # Check actual status when pushing to make sure you only push the expected changes
 recurseSubmodules = check
 
-[alias]
-# Basic shortcuts
-a = add
-aa = add --all
-bl = blame
-c = commit
-ca = commit --amend
-co = checkout
-d = diff
-l = log --oneline
-p = push
-ll = pull
-s = status
-ss = status -s
-st = status -sb
+# [alias]
+# # Basic shortcuts
+# a = add
+# aa = add --all
+# bl = blame
+# c = commit
+# ca = commit --amend
+# co = checkout
+# d = diff
+# l = log --oneline
+# p = push
+# ll = pull
+# s = status
+# ss = status -s
+# st = status -sb
 
-# Remote operations
-llo = pull origin
-po = push origin
-pof = push origin --force-with-lease
-pofn = push origin --force-with-lease --no-verify
-pt = push --tag
-r = remote
-rs = remote show
+# # Remote operations
+# llo = pull origin
+# po = push origin
+# pof = push origin --force-with-lease
+# pofn = push origin --force-with-lease --no-verify
+# pt = push --tag
+# r = remote
+# rs = remote show
 
-# Submodule
-sub = submodule update --remote
+# # Submodule
+# sub = submodule update --remote
 
-# Tag management
-td = tag --delete
-tdr = tag --delete origin
+# # Tag management
+# td = tag --delete
+# tdr = tag --delete origin
 
-# Log formatting
-blog = for-each-ref --sort=committerdate refs/heads/ --format='%(HEAD) %(color:red)%(refname:short)%(color:reset) - %(color:yellow)%(objectname:short)%(color:reset) - %(contents:subject) - %(authorname) (%(color:blue)%(committerdate:relative)%(color:reset))'
-loggraph = log --oneline --decorate --graph
-log1 = log --graph --abbrev-commit --oneline --decorate
+# # Log formatting
+# blog = for-each-ref --sort=committerdate refs/heads/ --format='%(HEAD) %(color:red)%(refname:short)%(color:reset) - %(color:yellow)%(objectname:short)%(color:reset) - %(contents:subject) - %(authorname) (%(color:blue)%(committerdate:relative)%(color:reset))'
+# loggraph = log --oneline --decorate --graph
+# log1 = log --graph --abbrev-commit --oneline --decorate
 
-# Branch management
-bclean = "!f() { git branch --merged | grep -v '\\*\\|main\\|master\\|develop' | xargs -n 1 git branch -d; }; f"
-b = branch
+# # Branch management
+# bclean = "!f() { git branch --merged | grep -v '\\*\\|main\\|master\\|develop' | xargs -n 1 git branch -d; }; f"
+# b = branch
 
-# macOS specific shortcuts
-# Open changed files in default editor
-edit = "!f() { git status -s | cut -c4- | grep -v '^ ' | uniq | xargs $EDITOR; }; f"
-# Open file in macOS Finder
-finder = "!open -a Finder ."
-# Use fzf for interactive checkouts
-fco = "!f() { git checkout $(git branch -l | fzf); }; f"
+# # macOS specific shortcuts
+# # Open changed files in default editor
+# edit = "!f() { git status -s | cut -c4- | grep -v '^ ' | uniq | xargs $EDITOR; }; f"
+# # Open file in macOS Finder
+# finder = "!open -a Finder ."
+# # Use fzf for interactive checkouts
+# fco = "!f() { git checkout $(git branch -l | fzf); }; f"
 
-# Productivity
-# GitHub specific: open repository in browser
-browse = "!gh repo view --web"
-# Fixup and rebase in one operation
-fixup = "!f() { TARGET=$(git rev-parse "$1"); git commit --fixup=$TARGET ${@:2} && EDITOR=true git rebase -i --autostash --autosquash $TARGET^; }; f"
-# Stash only untracked files
-stash-untracked = "!git stash --include-untracked --keep-index"
-# List files in conflict
-conflicts = "!git diff --name-only --diff-filter=U"
-# Show log with relative dates
-recent = "log --pretty=format:'%C(yellow)%h%Creset %ad | %s%d [%an]' --date=relative"
-# Show all commits not yet pushed to remote
-unpushed = "!git log origin/$(git rev-parse --abbrev-ref HEAD)..HEAD"
-# What was done today
-today = "!git log --since=midnight --author=\"$(git config user.name)\" --oneline"
-# Show largest files in git history
-big = "!git rev-list --objects --all | git cat-file --batch-check='%(objecttype) %(objectname) %(objectsize) %(rest)' | sed -n 's/^blob //p' | sort -k2nr | cut -c 1-12,41- | head -10"
+# # Productivity
+# # GitHub specific: open repository in browser
+# browse = "!gh repo view --web"
+# # Fixup and rebase in one operation
+# fixup = "!f() { TARGET=$(git rev-parse "$1"); git commit --fixup=$TARGET ${@:2} && EDITOR=true git rebase -i --autostash --autosquash $TARGET^; }; f"
+# # Stash only untracked files
+# stash-untracked = "!git stash --include-untracked --keep-index"
+# # List files in conflict
+# conflicts = "!git diff --name-only --diff-filter=U"
+# # Show log with relative dates
+# recent = "log --pretty=format:'%C(yellow)%h%Creset %ad | %s%d [%an]' --date=relative"
+# # Show all commits not yet pushed to remote
+# unpushed = "!git log origin/$(git rev-parse --abbrev-ref HEAD)..HEAD"
+# # What was done today
+# today = "!git log --since=midnight --author=\"$(git config user.name)\" --oneline"
+# # Show largest files in git history
+# big = "!git rev-list --objects --all | git cat-file --batch-check='%(objecttype) %(objectname) %(objectsize) %(rest)' | sed -n 's/^blob //p' | sort -k2nr | cut -c 1-12,41- | head -10"
 
 [credential]
 helper = osxkeychain
@@ -288,6 +289,6 @@ detachedHead = false
 # Prefer SSH over HTTPS for GitHub
 insteadOf = https://github.com/
 
-[includeIf "gitdir:~/work/"]
-# Conditionally include work-specific config
-path = ~/.config/git/work.gitconfig
+# [includeIf "gitdir:~/work/"]
+# # Conditionally include work-specific config
+# path = ~/.config/git/work.gitconfig

@@ -55,50 +55,39 @@ bindkey '^A' beginning-of-line
 # bindkey '^?' backward-delete-char # Backspace working after vi mode
 
 # ========================================================================
-# Dotfiles Symlink Map Configuration
+# Source Utility Functions
 # ========================================================================
 
-# This defines the mapping between dotfiles source locations and their
-# target locations in the user's home directory. It's used by the installation
-# script and other dotfiles management tools.
+# This file contains the main utility functions and environment variables
+[[ -f "$ZDOTDIR/utils.zsh" ]] && source "$ZDOTDIR/utils.zsh"
 
-declare -gA DOTFILES_TO_SYMLINK_MAP=(
-  # Git configurations
-  ["$DOTFILES/config/git/gitconfig"]="$HOME/.gitconfig"
-  ["$DOTFILES/config/git/gitignore"]="$HOME/.gitignore"
-  ["$DOTFILES/config/git/gitattributes"]="$HOME/.gitattributes"
-  ["$DOTFILES/config/git/gitmessage"]="$HOME/.gitmessage"
+# Initialize dotfiles - ensure essential symlinks exist
+# This is a lightweight version of setup_cli_tools from install.zsh
+# that won't disrupt the user's shell experience
+dotfiles_init() {
+  # Only run in interactive shells to avoid slowing down scripts
+  if [[ -o interactive ]]; then
+    # Create missing symlinks silently
+    for key in ${(k)DOTFILES_TO_SYMLINK_MAP}; do
+      local src="$key"
+      local dst="${DOTFILES_TO_SYMLINK_MAP[$key]}"
+      
+      # Only create symlink if source exists and destination doesn't
+      if [[ -e "$src" ]] && [[ ! -e "$dst" ]]; then
+        local parent_dir=$(dirname "$dst")
+        
+        # Create parent directory if needed
+        [[ ! -d "$parent_dir" ]] && mkdir -p "$parent_dir"
+        
+        # Create the symlink
+        ln -sf "$src" "$dst"
+      fi
+    done
+  fi
+}
 
-  # XDG configurations
-  ["$DOTFILES/config/starship.toml"]="$XDG_CONFIG_HOME/starship.toml"
-  ["$DOTFILES/config/karabiner/karabiner.json"]="$XDG_CONFIG_HOME/karabiner/karabiner.json"
-  ["$DOTFILES/config/nvim"]="$XDG_CONFIG_HOME/nvim"
-  ["$DOTFILES/config/ghostty"]="$XDG_CONFIG_HOME/ghostty"
-  ["$DOTFILES/config/atuin"]="$XDG_CONFIG_HOME/atuin"
-  ["$DOTFILES/config/bat"]="$XDG_CONFIG_HOME/bat"
-  ["$DOTFILES/config/lazygit"]="$XDG_CONFIG_HOME/lazygit"
-  ["$DOTFILES/config/zellij"]="$XDG_CONFIG_HOME/zellij"
-  ["$DOTFILES/config/zed"]="$XDG_CONFIG_HOME/zed"
-  ["$DOTFILES/config/espanso"]="$XDG_CONFIG_HOME/espanso"
-  ["$DOTFILES/config/yazi"]="$XDG_CONFIG_HOME/yazi"
-  ["$DOTFILES/config/warp/keybindings.yaml"]="$XDG_CONFIG_HOME/warp/keybindings.yaml"
-
-  # Editor configurations
-  ["$DOTFILES/config/vscode/settings.json"]="$HOME/Library/Application Support/Code/User/settings.json"
-  ["$DOTFILES/config/vscode/keybindings.json"]="$HOME/Library/Application Support/Code/User/keybindings.json"
-  ["$DOTFILES/config/cursor/settings.json"]="$HOME/Library/Application Support/Cursor/User/settings.json"
-  ["$DOTFILES/config/cursor/keybindings.json"]="$HOME/Library/Application Support/Cursor/User/keybindings.json"
-
-  # macOS-specific configurations
-  ["$DOTFILES/config/hammerspoon"]="$HOME/.hammerspoon"
-
-  # AI tools configurations
-  ["$DOTFILES/config/ai/claude/claude_desktop_config.json"]="$HOME/Library/Application Support/Claude/claude_desktop_config.json"
-  ["$DOTFILES/config/ai/cline/cline_mcp_settings.json"]="$HOME/Library/Application Support/Cursor/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json"
-)
-
-# Export the map for use in other scripts
-export DOTFILES_TO_SYMLINK_MAP
+# Run the initialization
+dotfiles_init
 
 # ========================================================================
 # Editor & Terminal Settings
@@ -114,32 +103,16 @@ export COLORTERM=truecolor
 export TERM_PROGRAM="${TERM_PROGRAM:-Apple_Terminal}"
 
 # ========================================================================
-# Source Utility Functions
-# ========================================================================
-
-[[ -f "$ZDOTDIR/utils.zsh" ]] && source "$ZDOTDIR/utils.zsh"
-
-# ========================================================================
 # Module Loading
 # ========================================================================
 
-# Install a tool if it's missing
-function install_tool() {
-  local tool="$1"
-  local install_cmd="$2"
-
-  if ! has_command "$tool"; then
-    log_info "Installing $tool..."
-    eval "$install_cmd"
-  fi
-}
-# Load configuration files in specific order
+# Load configuration files in specific order, installing required tools if needed
 local files=(
   "$ZDOTDIR/brew.zsh"     # Homebrew package management
   "$ZDOTDIR/eza.zsh"      # eza file system explorer
   "$ZDOTDIR/git.zsh"      # Git utilities and configurations
   "$ZDOTDIR/nodejs.zsh"   # Node.js development
-  "$ZDOTDIR/go.zsh"       # Node.js development
+  "$ZDOTDIR/go.zsh"       # Go development
   "$ZDOTDIR/python.zsh"   # Python development
   "$ZDOTDIR/rust.zsh"     # Rust development
   "$ZDOTDIR/atuin.zsh"    # Atuin shell history
@@ -148,102 +121,73 @@ local files=(
   "$ZDOTDIR/starship.zsh" # starship prompt
 )
 
-# Source configuration modules and handle tool installation
+# Define installation commands for tools as an associative array
+declare -A TOOL_INSTALL_COMMANDS=(
+  [brew]="/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
+  [starship]="curl -sS https://starship.rs/install.sh | sh"
+  [git]="brew install git"
+  [atuin]="curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh"
+  [volta]="curl https://get.volta.sh | bash"
+  [uv]="curl -LsSf https://astral.sh/uv/install.sh | sh"
+  [rustup]="curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
+  [fzf]="brew install fzf"
+  [eza]="brew install eza"
+  [go]="brew install go"
+  [nvim]="brew install neovim"
+  [zoxide]="brew install zoxide"
+)
+
+# Define which tools are essential (will always be installed if missing)
+declare -A TOOL_IS_ESSENTIAL=(
+  [brew]=true
+  [starship]=true
+  [git]=true
+  [atuin]=false
+  [volta]=false
+  [uv]=false
+  [rustup]=false
+  [fzf]=false
+  [eza]=false
+  [go]=false
+  [nvim]=false
+  [zoxide]=false
+)
+
+# Install tools in order of importance
+local tool_names=(brew starship git atuin volta uv rustup fzf eza go nvim zoxide)
+for tool_name in "${tool_names[@]}"; do
+  local install_cmd="${TOOL_INSTALL_COMMANDS[$tool_name]}"
+  local is_essential="${TOOL_IS_ESSENTIAL[$tool_name]}"
+  ensure_tool_installed "$tool_name" "$install_cmd" "$is_essential"
+done
+
+# Source individual configuration modules
 for file in $files; do
-  # Get the base name without path and extension
-  base_name="${file##*/}"
-  tool_name="${base_name%.zsh}"
-
-  # Install missing tools before sourcing their config
-  case "$tool_name" in
-  brew)
-    if ! has_command "brew"; then
-      echo "Installing missing brew..."
-      /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    fi
-    # Add to PATH for current session if installed
-    if is_apple_silicon; then
-      eval "$(/opt/homebrew/bin/brew shellenv)"
-    else
-      eval "$(/usr/local/bin/brew shellenv)"
-    fi
-    ;;
-  starship)
-    if ! has_command "starship"; then
-      echo "Installing missing starship..."
-      curl -sS https://starship.rs/install.sh | sh
-    fi
-    ;;
-  atuin)
-    if ! has_command "atuin"; then
-      echo "Installing missing atuin..."
-      curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
-      log_info "First-time Atuin setup: importing shell history"
-      log_info "Sync with Atuin server if network is available"
-      atuin import auto
-      atuin sync -f
-    fi
-    ;;
-  nodejs)
-    if ! has_command "volta"; then
-      echo "Installing missing volta..."
-      curl https://get.volta.sh | bash
-      volta install node
-    fi
-    ;;
-  python)
-    if ! has_command "uv"; then
-      echo "Installing missing uv..."
-      curl -LsSf https://astral.sh/uv/install.sh | sh
-    fi
-    ;;
-  rust)
-    if ! has_command "rustup"; then
-      echo "Installing missing rustup..."
-      curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-    fi
-    ;;
-  fzf)
-    if ! has_command "fzf"; then
-      echo "Installing missing fzf..."
-      brew install fzf
-    fi
-    ;;
-  git)
-    if ! has_command "git"; then
-      echo "Installing missing git..."
-      brew install git
-    fi
-    ;;
-  eza)
-    if ! has_command "eza"; then
-      echo "Installing missing eza..."
-      brew install eza
-    fi
-    ;;
-  go)
-    if ! has_command "go"; then
-      echo "Installing missing go..."
-      brew install go
-    fi
-    ;;
-  nvim)
-    if ! has_command "nvim"; then
-      echo "Installing missing nvim..."
-      brew install neovim
-    fi
-    ;;
-  zoxide)
-    if ! has_command "zoxide"; then
-      echo "Installing missing zoxide..."
-      brew install zoxide
-    fi
-    ;;
-  esac
-
-  # Source the configuration file (silently)
   [[ -f "$file" ]] && source "$file"
 done
+
+# Special case for Homebrew PATH
+if has_command "brew"; then
+  if is_apple_silicon; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  else
+    eval "$(/usr/local/bin/brew shellenv)"
+  fi
+fi
+
+# Special cases for tools that need post-installation configuration
+if has_command "atuin" && [[ ! -f "$XDG_DATA_HOME/atuin/.initialized" ]]; then
+  # Only run first-time setup if atuin was just installed
+  log_info "First-time Atuin setup: importing shell history"
+  atuin import auto
+  atuin sync -f
+  touch "$XDG_DATA_HOME/atuin/.initialized"
+fi
+
+if has_command "volta" && [[ ! -d "$HOME/.volta/bin/node" ]]; then
+  log_info "Installing Node.js via Volta"
+  volta install node
+fi
 
 # ========================================================================
 # Completions
