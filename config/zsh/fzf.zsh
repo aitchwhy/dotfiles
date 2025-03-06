@@ -301,6 +301,28 @@ function f() {
 }
 
 # ========================================================================
+# Advanced Search with ripgrep + fzf + nvim
+# ========================================================================
+function rfv() {
+    local RELOAD='reload:rg --column --color=always --smart-case {q} || :'
+    local OPENER='if [[ $FZF_SELECT_COUNT -eq 0 ]]; then
+                  ${EDITOR:-nvim} {1} +{2}     # No selection. Open the current line in editor.
+                else
+                  ${EDITOR:-nvim} +cw -q {+f}  # Build quickfix list for the selected items.
+                fi'
+
+    fzf --disabled --ansi --multi \
+        --bind "start:$RELOAD" --bind "change:$RELOAD" \
+        --bind "enter:become:$OPENER" \
+        --bind "ctrl-o:execute:$OPENER" \
+        --bind 'alt-a:select-all,alt-d:deselect-all,ctrl-/:toggle-preview' \
+        --delimiter : \
+        --preview 'bat --style=full --color=always --highlight-line {2} {1}' \
+        --preview-window '~4,+{2}+4/3,<80(up)' \
+        --query "$*"
+}
+
+# ========================================================================
 # Common Aliases for Quick Access
 # ========================================================================
 alias fa='f alias'         # Browse aliases
@@ -318,8 +340,8 @@ alias fhistory='f history' # Search history
 alias fman='f man'         # Man pages
 alias fnpm='f npm'         # NPM operations
 alias fkill='f kill'       # Kill process
-alias fkilllport='f port'      # Kill port
-alias f='f search'        # Search in files
+alias fkilllport='f port'  # Kill port
+alias f='f search'         # Search in files
 
 # Load FZF completion and key bindings if available
 [[ -f ~/.fzf.zsh ]] && source ~/.fzf.zsh
