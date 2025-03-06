@@ -35,18 +35,31 @@ setopt SHARE_HISTORY          # Share history between sessions
 setopt HIST_IGNORE_SPACE      # Don't record commands starting with space
 
 # ========================================================================
+# Editor & Terminal Settings
+# ========================================================================
+
+# Default editor
+export EDITOR="nvim"
+export VISUAL="$EDITOR"
+# export PAGER="less -FRX"
+
+# Terminal settings
+export COLORTERM=truecolor
+export TERM_PROGRAM="${TERM_PROGRAM:-Apple_Terminal}"
+
+# ========================================================================
 # Keyboard & Input Configuration
 # ========================================================================
 
 # Vi Mode
-bindkey -v
+# bindkey -v
 export KEYTIMEOUT=1
 
 # Basic key bindings
-bindkey '^P' up-line-or-history
-bindkey '^N' down-line-or-history
-bindkey '^E' end-of-line
-bindkey '^A' beginning-of-line
+# bindkey '^P' up-line-or-history
+# bindkey '^N' down-line-or-history
+# bindkey '^E' end-of-line
+# bindkey '^A' beginning-of-line
 # bindkey '^K' up-line-or-history
 # bindkey '^J' down-line-or-history
 # bindkey '^L' end-of-line
@@ -61,47 +74,8 @@ bindkey '^A' beginning-of-line
 # This file contains the main utility functions and environment variables
 [[ -f "$ZDOTDIR/utils.zsh" ]] && source "$ZDOTDIR/utils.zsh"
 
-# Initialize dotfiles - ensure essential symlinks exist
-# This is a lightweight version of setup_cli_tools from install.zsh
-# that won't disrupt the user's shell experience
-dotfiles_init() {
-  # Only run in interactive shells to avoid slowing down scripts
-  if [[ -o interactive ]]; then
-    # Create missing symlinks silently
-    for key in ${(k)DOTFILES_TO_SYMLINK_MAP}; do
-      local src="$key"
-      local dst="${DOTFILES_TO_SYMLINK_MAP[$key]}"
-      
-      # Only create symlink if source exists and destination doesn't
-      if [[ -e "$src" ]] && [[ ! -e "$dst" ]]; then
-        local parent_dir=$(dirname "$dst")
-        
-        # Create parent directory if needed
-        [[ ! -d "$parent_dir" ]] && mkdir -p "$parent_dir"
-        
-        # Create the symlink
-        ln -sf "$src" "$dst"
-      fi
-    done
-  fi
-}
-
 # Run the initialization
 dotfiles_init
-
-# ========================================================================
-# Editor & Terminal Settings
-# ========================================================================
-
-# Default editor
-export EDITOR="vim"
-export VISUAL="$EDITOR"
-# export PAGER="less -FRX"
-
-# Terminal settings
-export COLORTERM=truecolor
-export TERM_PROGRAM="${TERM_PROGRAM:-Apple_Terminal}"
-
 # ========================================================================
 # Module Loading
 # ========================================================================
@@ -119,6 +93,7 @@ local files=(
   "$ZDOTDIR/fzf.zsh"      # Fuzzy finder configuration
   "$ZDOTDIR/nvim.zsh"     # Neovim editor configuration
   "$ZDOTDIR/starship.zsh" # starship prompt
+  "$ZDOTDIR/fd.zsh"       # starship prompt
 )
 
 # Define installation commands for tools as an associative array
@@ -135,6 +110,7 @@ declare -A TOOL_INSTALL_COMMANDS=(
   [go]="brew install go"
   [nvim]="brew install neovim"
   [zoxide]="brew install zoxide"
+  [fd]="brew install fd"
 )
 
 # Define which tools are essential (will always be installed if missing)
@@ -142,15 +118,15 @@ declare -A TOOL_IS_ESSENTIAL=(
   [brew]=true
   [starship]=true
   [git]=true
-  [atuin]=false
-  [volta]=false
-  [uv]=false
-  [rustup]=false
-  [fzf]=false
-  [eza]=false
-  [go]=false
-  [nvim]=false
-  [zoxide]=false
+  [atuin]=true
+  [volta]=true
+  [uv]=true
+  [rustup]=true
+  [fzf]=true
+  [eza]=rtrue
+  [go]=true
+  [nvim]=true
+  [zoxide]=true
 )
 
 # Install tools in order of importance
@@ -175,19 +151,19 @@ if has_command "brew"; then
   fi
 fi
 
-# Special cases for tools that need post-installation configuration
-if has_command "atuin" && [[ ! -f "$XDG_DATA_HOME/atuin/.initialized" ]]; then
-  # Only run first-time setup if atuin was just installed
-  log_info "First-time Atuin setup: importing shell history"
-  atuin import auto
-  atuin sync -f
-  touch "$XDG_DATA_HOME/atuin/.initialized"
-fi
+# # Special cases for tools that need post-installation configuration
+# if ! has_command "atuin" && [[ ! -f "$XDG_DATA_HOME/atuin/.initialized" ]]; then
+#   # Only run first-time setup if atuin was just installed
+#   log_info "First-time Atuin setup: importing shell history"
+#   atuin import auto
+#   atuin sync -f
+#   touch "$XDG_DATA_HOME/atuin/.initialized"
+# fi
 
-if has_command "volta" && [[ ! -d "$HOME/.volta/bin/node" ]]; then
-  log_info "Installing Node.js via Volta"
-  volta install node
-fi
+# if has_command "volta" && [[ ! -d "$HOME/.volta/bin/node" ]]; then
+#   log_info "Installing Node.js via Volta"
+#   volta install node
+# fi
 
 # ========================================================================
 # Completions
@@ -236,7 +212,7 @@ has_command atuin && eval "$(atuin init zsh)"
 has_command zoxide && eval "$(zoxide init zsh)"
 has_command direnv && eval "$(direnv hook zsh)"
 has_command fnm && eval "$(fnm env --use-on-cd)"
-has_command volta && eval "$(volta setup)"
+# has_command volta && eval "$(volta setup)"
 has_command uv && eval "$(uv generate-shell-completion zsh)"
 has_command uvx && eval "$(uvx --generate-shell-completion zsh)"
 # has_command pyenv && eval "$(pyenv init -)"
@@ -313,7 +289,7 @@ alias lg="lazygit"
 # ========================================================================
 
 # Load local environment variables if they exist
-[[ -f "$HOME/.local/state/env" ]] && . "$HOME/.local/state/env"
+# [[ -f "$HOME/.local/state/env" ]] && . "$HOME/.local/state/env"
 
 # # Configure Atuin path if it exists
 # # Note: This should eventually be moved to atuin.zsh
@@ -326,3 +302,9 @@ alias lg="lazygit"
 #     . "$HOME/.atuin/bin/env"
 #   fi
 # fi
+
+# The actual initialization happens in .zshrc via:
+# has_command atuin && eval "$(atuin init zsh)"
+. "$HOME/.local/bin/env"
+
+. "$HOME/.local/share/../bin/env"

@@ -2,16 +2,16 @@
 # https://git-scm.com/docs/git-config.html
 
 [user]
-email = hank.lee.qed@gmail.com
-name = Hank Lee
+	email = hank.lee.qed@gmail.com
+	name = Hank Lee
 # signingKey = FE1EF2465E55A3FDE919F8EA03B0943F3314E8BB
 
 [core]
 editor = nvim
 pager = delta
 # Use custom macOS specific gitignore and attributes
-excludesfile = ~/.gitignore
-attributesfile = ~/.gitattributes
+excludesfile = ~/dotfiles/config/git/gitattributes
+attributesfile = ~/dotfiles/config/git/gitattributes
 # # Make `git rebase` safer on macOS
 # trustctime = false
 # # Prevent showing files with non-ASCII symbols as unversioned (macOS specific)
@@ -45,40 +45,6 @@ defaultBranch = main
 [interactive]
 diffFilter = delta --color-only
 
-[delta]
-dark = true
-# Use 'n' and 'N' to navigate between diff sections
-navigate = true
-# Show line numbers
-line-numbers = true
-# Side-by-side view (works better on high-res displays)
-side-by-side = true
-# Enable hyperlinks (works in modern terminals)
-hyperlinks = true
-# # File styling
-# file-style = "bold yellow ul"
-# file-decoration-style = "box ul"
-# hunk-header-decoration-style = "box ul"
-# # Modern theme optimized for dark mode
-# syntax-theme = "catppuccin-macchiato"
-# light = false
-# decorations = true
-# line-numbers-left-format = "{nm:>4} "
-# line-numbers-right-format = "{np:>4} "
-# Uncomment for light theme
-# light = true
-# syntax-theme = "catppuccin-latte"
-
-[merge]
-conflictstyle = zdiff3
-# Show common ancestor in merge conflicts
-log = true
-# Use gitignore for merge driver selection
-ignoreFiles = true
-# Include untracked files when merging
-includeUntracked = false
-# tool = Kaleidoscope
-
 # [diff]
 # Use Apple Silicon optimized path for Kaleidoscope
 # algorithm = zdiff3
@@ -96,20 +62,10 @@ includeUntracked = false
 # # Optimized for Apple Silicon
 # statGraphWidth = 130
 
-[difftool "vscode"]
-cmd = code --wait --diff $LOCAL $REMOTE
-
-[difftool "kaleidoscope"]
-cmd = /opt/homebrew/bin/ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\"
-
-[mergetool "kaleidoscope"]
-cmd = /opt/homebrew/bin/ksdiff --merge --output \"$MERGED\" --base \"$BASE\" -- \"$LOCAL\" --snapshot \"$REMOTE\" --snapshot
-trustExitCode = true
-
-[pull]
-rebase = false
+#[pull]
+#rebase = false
 # Avoid unnecessary merge commits
-ff = only
+#ff = only
 
 [push]
 # Push only current branch by default
@@ -195,33 +151,33 @@ helper = !/opt/homebrew/bin/gh auth git-credential
 [credential "https://gist.github.com"]
 helper = !/opt/homebrew/bin/gh auth git-credential
 
-[filter "lfs"]
-clean = git-lfs clean -- %f
-smudge = git-lfs smudge -- %f
-process = git-lfs filter-process
-required = true
+#[filter "lfs"]
+#clean = git-lfs clean -- %f
+#smudge = git-lfs smudge -- %f
+#process = git-lfs filter-process
+#required = true
 
-[gpg]
-format = openpgp
+#[gpg]
+#format = openpgp
 # Path for GPG on Apple Silicon
-program = /opt/homebrew/bin/gpg
+#program = /opt/homebrew/bin/gpg
 
-[gpg "ssh"]
+#[gpg "ssh"]
 program = ssh-keygen
 # Path for SSH on Apple Silicon
-allowedSignersFile = ~/.ssh/allowed_signers
+#allowedSignersFile = ~/.ssh/allowed_signers
 
 [commit]
 # Uncomment to enable GPG signing by default
 # gpgSign = true
-template = ~/.gitmessage
+#template = ~/.gitmessage
 # Improve commit message formatting
 verbose = true
 
 [tag]
-forceSignAnnotated = true
+#forceSignAnnotated = true
 # Sort tags by version number
-sort = version:refname
+#sort = version:rename
 
 [fetch]
 # Automatically delete remote-tracking branches that no longer exist on the remote
@@ -255,35 +211,11 @@ show = delta
 branch = false
 tag = false
 
-[protocol]
-# Optimize protocol for Apple Silicon
-version = 2
-
-[help]
-# Autocorrect typos in Git commands
-autocorrect = 1
-
-[rerere]
-# Reuse recorded resolution
-enabled = true
-# Auto stage files that were resolved using rerere
-autoUpdate = true
-
 [branch]
 # Auto setup rebase for new branches
 autoSetupRebase = always
 # Sort branches by most recently used
 sort = -committerdate
-
-[advice]
-# Disable advice about fast-forward merge
-pushNonFastForward = false
-# Disable advice about staging empty paths
-statusHints = false
-# Disable advice about switching branches with uncommitted changes
-commitBeforeMerge = false
-# Other advice settings
-detachedHead = false
 
 [url "git@github.com:"]
 # Prefer SSH over HTTPS for GitHub

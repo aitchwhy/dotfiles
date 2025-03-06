@@ -5,65 +5,60 @@
 # This file contains utility functions that are shared across multiple
 # shell scripts and configuration files.
 
+# # ========================================================================
+# # Core Environment Variables
+# # ========================================================================
+# local DOTFILES="${DOTFILES:-$HOME/dotfiles}"
+# local XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+# local XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+# local XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+# local XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+# local ZDOTDIR_TARGET="$XDG_CONFIG_HOME/zsh"
+# local ZDOTDIR_SRC="$DOTFILES/config/zsh"
+# local BACKUP_DIR="$HOME/.dotfiles_backup/$(date +%Y%m%d_%H%M%S)"
 # ========================================================================
-# Core Environment Variables
-# ========================================================================
-export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
-export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
-export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
-export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
-export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
-export ZDOTDIR_TARGET="$XDG_CONFIG_HOME/zsh"
-export ZDOTDIR_SRC="$DOTFILES/config/zsh"
-export BACKUP_DIR="$HOME/.dotfiles_backup/$(date +%Y%m%d_%H%M%S)"
-
-# ========================================================================
-# Dotfiles Symlink Map Configuration
+# Logging Functions
 # ========================================================================
 
-# This defines the mapping between dotfiles source locations and their
-# target locations in the user's home directory. It's used by the installation
-# script and other dotfiles management tools.
+# ANSI color codes
+RESET="\033[0m"
+BLACK="\033[0;30m"
+RED="\033[0;31m"
+GREEN="\033[0;32m"
+YELLOW="\033[0;33m"
+BLUE="\033[0;34m"
+MAGENTA="\033[0;35m"
+CYAN="\033[0;36m"
+WHITE="\033[0;37m"
 
-declare -gA DOTFILES_TO_SYMLINK_MAP=(
-  # Git configurations
-  ["$DOTFILES/config/git/gitconfig"]="$HOME/.gitconfig"
-  ["$DOTFILES/config/git/gitignore"]="$HOME/.gitignore"
-  ["$DOTFILES/config/git/gitattributes"]="$HOME/.gitattributes"
-  ["$DOTFILES/config/git/gitmessage"]="$HOME/.gitmessage"
+# Log information message
+function log_info() {
+  printf "${BLUE}[INFO]${RESET} %s\n" "$*"
+}
 
-  # XDG configurations
-  ["$DOTFILES/config/starship.toml"]="$XDG_CONFIG_HOME/starship.toml"
-  ["$DOTFILES/config/karabiner/karabiner.json"]="$XDG_CONFIG_HOME/karabiner/karabiner.json"
-  ["$DOTFILES/config/nvim"]="$XDG_CONFIG_HOME/nvim"
-  ["$DOTFILES/config/ghostty"]="$XDG_CONFIG_HOME/ghostty"
-  ["$DOTFILES/config/atuin"]="$XDG_CONFIG_HOME/atuin"
-  ["$DOTFILES/config/bat"]="$XDG_CONFIG_HOME/bat"
-  ["$DOTFILES/config/lazygit"]="$XDG_CONFIG_HOME/lazygit"
-  ["$DOTFILES/config/zellij"]="$XDG_CONFIG_HOME/zellij"
-  ["$DOTFILES/config/zed"]="$XDG_CONFIG_HOME/zed"
-  ["$DOTFILES/config/espanso"]="$XDG_CONFIG_HOME/espanso"
-  ["$DOTFILES/config/yazi"]="$XDG_CONFIG_HOME/yazi"
-  ["$DOTFILES/config/warp/keybindings.yaml"]="$XDG_CONFIG_HOME/warp/keybindings.yaml"
+# Log success message
+function log_success() {
+  printf "${GREEN}[SUCCESS]${RESET} %s\n" "$*"
+}
 
-  # Editor configurations
-  ["$DOTFILES/config/vscode/settings.json"]="$HOME/Library/Application Support/Code/User/settings.json"
-  ["$DOTFILES/config/vscode/keybindings.json"]="$HOME/Library/Application Support/Code/User/keybindings.json"
-  ["$DOTFILES/config/cursor/settings.json"]="$HOME/Library/Application Support/Cursor/User/settings.json"
-  ["$DOTFILES/config/cursor/keybindings.json"]="$HOME/Library/Application Support/Cursor/User/keybindings.json"
+# Log warning message
+function log_warn() {
+  printf "${YELLOW}[WARNING]${RESET} %s\n" "$*" >&2
+}
 
-  # macOS-specific configurations
-  ["$DOTFILES/config/hammerspoon"]="$HOME/.hammerspoon"
+# Log error message
+function log_error() {
+  printf "${RED}[ERROR]${RESET} %s\n" "$*" >&2
+}
 
-  # AI tools configurations
-  ["$DOTFILES/config/ai/claude/claude_desktop_config.json"]="$HOME/Library/Application Support/Claude/claude_desktop_config.json"
-  ["$DOTFILES/config/ai/cline/cline_mcp_settings.json"]="$HOME/Library/Application Support/Cursor/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json"
-)
+# Aliases for different naming conventions
+function info() { log_info "$@"; }
+function success() { log_success "$@"; }
+function warn() { log_warn "$@"; }
+function error() { log_error "$@"; }
 
-# Export the map for use in other scripts
-export DOTFILES_TO_SYMLINK_MAP
-
-# ========================================================================
+ 
+ # ========================================================================
 # Shell Detection and Environment
 # ========================================================================
 
@@ -123,47 +118,6 @@ function get_macos_version() {
     echo "Not macOS"
   fi
 }
-# ========================================================================
-# Logging Functions
-# ========================================================================
-
-# ANSI color codes
-RESET="\033[0m"
-BLACK="\033[0;30m"
-RED="\033[0;31m"
-GREEN="\033[0;32m"
-YELLOW="\033[0;33m"
-BLUE="\033[0;34m"
-MAGENTA="\033[0;35m"
-CYAN="\033[0;36m"
-WHITE="\033[0;37m"
-
-# Log information message
-function log_info() {
-  printf "${BLUE}[INFO]${RESET} %s\n" "$*"
-}
-
-# Log success message
-function log_success() {
-  printf "${GREEN}[SUCCESS]${RESET} %s\n" "$*"
-}
-
-# Log warning message
-function log_warn() {
-  printf "${YELLOW}[WARNING]${RESET} %s\n" "$*" >&2
-}
-
-# Log error message
-function log_error() {
-  printf "${RED}[ERROR]${RESET} %s\n" "$*" >&2
-}
-
-# Aliases for different naming conventions
-function info() { log_info "$@"; }
-function success() { log_success "$@"; }
-function warn() { log_warn "$@"; }
-function error() { log_error "$@"; }
-
 # ========================================================================
 # File & Directory Operations
 # ========================================================================
@@ -243,7 +197,6 @@ function path_print() {
   echo "PATH components:"
   path_list | awk '{printf "  %2d: %s\n", $1, $2}'
 }
-
 
 # ========================================================================
 # System & macOS Utilities
@@ -403,6 +356,7 @@ function defaults_apply() {
 # The actual initialization happens in .zshrc via:
 # has_command atuin && eval "$(atuin init zsh)"
 
+
 # ========================================================================
 # Core Installation Functions
 # ========================================================================
@@ -457,6 +411,51 @@ EOF
   chmod 644 "$HOME/.zshenv"
   success "Created $HOME/.zshenv pointing to $ZDOTDIR_SRC"
 }
+
+# ========================================================================
+# Repository Verification
+# ========================================================================
+verify_repo_structure() {
+  info "Verifying dotfiles repository structure..."
+
+  # Check if dotfiles directory exists
+  if [[ ! -d "$DOTFILES" ]]; then
+    error "Dotfiles directory not found at $DOTFILES"
+    error "Please clone the repository first: git clone <repo-url> $DOTFILES"
+    exit 1
+  fi
+
+  # Check if it's a git repository
+  if [[ ! -d "$DOTFILES/.git" ]]; then
+    error "The dotfiles directory is not a git repository"
+    error "Please clone the repository properly: git clone <repo-url> $DOTFILES"
+    exit 1
+  fi
+
+  # Check for critical directories and files
+  local missing_items=()
+
+  [[ ! -f "$DOTFILES/Brewfile" ]] && missing_items+=("Brewfile")
+  [[ ! -d "$DOTFILES/config" ]] && missing_items+=("config dir")
+  [[ ! -d "$DOTFILES/config/zsh" ]] && missing_items+=("config/zsh dir")
+  [[ ! -f "$DOTFILES/config/zsh/.zshenv" ]] && missing_items+=("config/zsh/.zshenv file")
+  [[ ! -f "$DOTFILES/config/zsh/.zprofile" ]] && missing_items+=("config/zsh/.zprofile file")
+  [[ ! -f "$DOTFILES/config/zsh/.zshrc" ]] && missing_items+=("config/zsh/.zshrc file")
+  [[ ! -f "$DOTFILES/config/zsh/utils.zsh" ]] && missing_items+=("config/zsh/utils.zsh file")
+
+  if ((${#missing_items[@]} > 0)); then
+    error "The dotfiles repository is missing critical components:"
+    for item in "${missing_items[@]}"; do
+      error "  - Missing $item"
+    done
+    error "Please ensure you've cloned the correct repository."
+    exit 1
+  fi
+
+  success "Repository structure verified successfully"
+}
+
+
 
 # Apply macOS System Preferences
 setup_macos_preferences() {
@@ -659,4 +658,4 @@ install_essential_tools() {
 
 # Export the functions so they're available in other scripts
 # export -f has_command is_macos is_linux is_apple_silicon is_rosetta sys defaults_apply 2>/dev/null || true
-export has_command is_macos is_linux is_apple_silicon is_rosetta sys defaults_apply setup_cli_tools 2>/dev/null || true
+# export has_command is_macos is_linux is_apple_silicon is_rosetta sys defaults_apply setup_cli_tools 2>/dev/null || true

@@ -41,13 +41,13 @@ function gst() {
     log_error "Git is not installed."
     return 1
   fi
-  
+
   echo "=== Git Status ==="
   git status -s
-  
+
   echo "\n=== Branch Info ==="
   git branch -v
-  
+
   echo "\n=== Stash List ==="
   git stash list
 }
@@ -59,14 +59,14 @@ function gst() {
 # Lazygit terminal UI
 has_command lazygit && alias lg='lazygit'
 
-# Conditional git aliases - only if git is installed
-if has_command git; then
-  alias gs='git status'
-  alias ga='git add'
-  alias gc='git commit'
-  alias gco='git checkout'
-  alias gp='git push'
-  alias gl='git pull'
-  alias gd='git diff'
-  alias gb='git branch'
-fi
+# # Conditional git aliases - only if git is installed
+# if has_command git; then
+#   alias gs='git status'
+#   alias ga='git add'
+#   alias gc='git commit'
+#   alias gco='git checkout'
+#   alias gp='git push'
+#   alias gl='git pull'
+#   alias gd='git diff'
+#   alias gb='git branch'
+# fi

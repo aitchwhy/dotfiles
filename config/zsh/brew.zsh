@@ -17,8 +17,9 @@
 
 # Homebrew
 # https://docs.brew.sh/Manpage#environment
-export HOMEBREW_NO_ANALYTICS=1 # Disable Homebrew analytics
-export HOMEBREW_BAT=1          # Use bat for man pages
+# export HOMEBREW_BREWFILE="~/.Brewfile"
+# export HOMEBREW_NO_ANALYTICS=1 # Disable Homebrew analytics
+# export HOMEBREW_BAT=1          # Use bat for man pages
 export HOMEBREW_CASK_OPTS="--appdir=${HOME}/Applications"
 # export HOMEBREW_NO_AUTO_UPDATE=1      # Uncomment to disable auto updates
 
@@ -35,8 +36,6 @@ function update_brew() {
         brew cleanup --prune=all
     fi
 }
-
-
 
 # ========================================================================
 # Advanced Brew Management (bb function)
@@ -211,8 +210,8 @@ function bb() {
 # ========================================================================
 # Uncomment the ones you want to use
 
-alias brewup='bb up'      # Update and upgrade packages
-alias brewin='bb insi'     # Interactive install
-alias caskin='bb caski'    # Interactive cask install
-alias bi='bb bi'          # Install from Brewfile
-alias be='bb be'          # Edit Brewfile
+# alias brewup='bb up'      # Update and upgrade packages
+# alias brewin='bb insi'     # Interactive install
+# alias caskin='bb caski'    # Interactive cask install
+# alias bi='bb bi'          # Install from Brewfile
+# alias be='bb be'          # Edit Brewfile

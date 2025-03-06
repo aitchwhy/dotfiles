@@ -5,7 +5,8 @@
 			"command": "/Users/hank/.toolbase/toolbase-runner",
 			"args": [
 				"-p=proxy",
-				"-f=/Users/hank/.toolbase/config.json"
+				"-f=/Users/hank/.toolbase/config.json",
+				"-v=claude"
 			]
 		},
 		"mcp-installer": {
