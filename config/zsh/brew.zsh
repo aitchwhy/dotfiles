@@ -19,14 +19,8 @@
 # https://docs.brew.sh/Manpage#environment
 export HOMEBREW_NO_ANALYTICS=1 # Disable Homebrew analytics
 export HOMEBREW_BAT=1          # Use bat for man pages
-export HOMEBREW_CASK_OPTS="--appdir=${HOME}/Applications --fontdir=/Library/Fonts"
+export HOMEBREW_CASK_OPTS="--appdir=${HOME}/Applications"
 # export HOMEBREW_NO_AUTO_UPDATE=1      # Uncomment to disable auto updates
-
-
-# Set environment variables for Homebrew
-export HOMEBREW_NO_ANALYTICS=1  # Disable Homebrew analytics
-export HOMEBREW_BAT=1           # Use bat for man pages
-export HOMEBREW_CASK_OPTS="--appdir=${HOME}/Applications --fontdir=/Library/Fonts"
 
 # ========================================================================
 # Basic Brew Management Functions
@@ -38,7 +32,7 @@ function update_brew() {
         log_info "Updating Homebrew..."
         brew update
         brew upgrade
-        brew cleanup
+        brew cleanup --prune=all
     fi
 }
 
