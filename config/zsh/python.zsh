@@ -12,16 +12,16 @@ export PYTHONDONTWRITEBYTECODE=1 # Don't create .pyc files
 
 # UV Package Manager (https://astral.sh/uv)
 # Installation check and setup
-if ! has_command uv; then
-  log_info "Installing uv Python package manager..."
-  curl -LsSf https://astral.sh/uv/install.sh | sh
+# if ! has_command uv; then
+#   log_info "Installing uv Python package manager..."
+#   curl -LsSf https://astral.sh/uv/install.sh | sh
 
-  # Uncomment if needed to add uv to PATH for current session
-  # if [[ -d "$HOME/.cargo/bin" ]] && [[ -x "$HOME/.cargo/bin/uv" ]]; then
-  #   path_add "$HOME/.cargo/bin"
-  #   log_info "uv installed and available in PATH"
-  # fi
-fi
+#   # Uncomment if needed to add uv to PATH for current session
+#   # if [[ -d "$HOME/.cargo/bin" ]] && [[ -x "$HOME/.cargo/bin/uv" ]]; then
+#   #   path_add "$HOME/.cargo/bin"
+#   #   log_info "uv installed and available in PATH"
+#   # fi
+# fi
 
 # PyEnv configuration
 # Uncomment to enable PyEnv support

@@ -343,8 +343,8 @@ alias fkill='f kill'       # Kill process
 alias fkilllport='f port'  # Kill port
 alias f='f search'         # Search in files
 
-# Load FZF completion and key bindings if available
-[[ -f ~/.fzf.zsh ]] && source ~/.fzf.zsh
+# # Load FZF completion and key bindings if available
+# [[ -f ~/.fzf.zsh ]] && source ~/.fzf.zsh
 
 ############################
 # # ========================================================================

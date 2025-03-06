@@ -10,22 +10,22 @@
 export CARGO_HOME="${CARGO_HOME:-$HOME/.cargo}"
 export RUSTUP_HOME="${RUSTUP_HOME:-$HOME/.rustup}"
 
-# Installation check and setup
-if ! has_command rustup; then
-  log_info "Installing Rust via rustup..."
-  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-  
-  # Source the cargo environment if installed
-  if [[ -f "$CARGO_HOME/env" ]]; then
-    source "$CARGO_HOME/env"
-    log_success "Rust installed and environment loaded"
-  else
-    log_warn "Rust installation may need manual configuration"
-  fi
-fi
+# # Installation check and setup
+# if ! has_command rustup; then
+#   log_info "Installing Rust via rustup..."
+#   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+#   # Source the cargo environment if installed
+#   if [[ -f "$CARGO_HOME/env" ]]; then
+#     source "$CARGO_HOME/env"
+#     log_success "Rust installed and environment loaded"
+#   else
+#     log_warn "Rust installation may need manual configuration"
+#   fi
+# fi
 
 # Add cargo bin to PATH if not already there
-[[ -d "$CARGO_HOME/bin" ]] && path_add "$CARGO_HOME/bin"
+# [[ -d "$CARGO_HOME/bin" ]] && path_add "$CARGO_HOME/bin"
 
 # Optional: Add cargo completions
 # if has_command rustup; then

@@ -12,96 +12,52 @@ set -euo pipefail
 # Source Utility Functions
 # ========================================================================
 
+
+
 # Determine DOTFILES path and utils location
-export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
-export UTILS_PATH="$DOTFILES/config/zsh/utils.zsh"
+# export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
+# export UTILS_PATH="$DOTFILES/config/zsh/utils.zsh"
 
-# Set installation mode for utils functions
-export INSTALL_MODE=true
+# # Source utils.zsh if available, or define minimal required functions for bootstrapping
+# if [[ -f "$UTILS_PATH" ]]; then
+#   source "$UTILS_PATH"
+# else
+#   # Define minimal required utility functions for bootstrapping
+#   has_command() { command -v "$1" >/dev/null 2>&1; }
+#   # Colored output
+#   log_info() { printf '\033[0;34m[INFO]\033[0m %s\n' "$*"; }
+#   log_success() { printf '\033[0;32m[SUCCESS]\033[0m %s\n' "$*"; }
+#   log_warn() { printf '\033[0;33m[WARNING]\033[0m %s\n' "$*" >&2; }
+#   log_error() { printf '\033[0;31m[ERROR]\033[0m %s\n' "$*" >&2; }
 
-# Source utils.zsh if available, or define minimal required functions for bootstrapping
-if [[ -f "$UTILS_PATH" ]]; then
-  source "$UTILS_PATH"
-else
-  # Define minimal required utility functions for bootstrapping
-  has_command() { command -v "$1" >/dev/null 2>&1; }
-  # Colored output
-  log_info() { printf '\033[0;34m[INFO]\033[0m %s\n' "$*"; }
-  log_success() { printf '\033[0;32m[SUCCESS]\033[0m %s\n' "$*"; }
-  log_warn() { printf '\033[0;33m[WARNING]\033[0m %s\n' "$*" >&2; }
-  log_error() { printf '\033[0;31m[ERROR]\033[0m %s\n' "$*" >&2; }
-  
-  # Directory operations
-  ensure_dir() {
-    local dir="$1"
-    if [[ ! -d "$dir" ]]; then
-      mkdir -p "$dir"
-      log_success "Created directory: $dir"
-    fi
-  }
-  
-  # System detection
-  is_macos() { [[ "$(uname -s)" == "Darwin" ]]; }
-  is_apple_silicon() { [[ "$(uname -m)" == "arm64" ]]; }
-  
-  # Aliases for different naming conventions
-  info() { log_info "$@"; }
-  success() { log_success "$@"; }
-  warn() { log_warn "$@"; }
-  error() { log_error "$@"; }
-  
-  # Define required XDG environment variables if we can't load utils.zsh
-  export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
-  export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
-  export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
-  export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
-  export ZDOTDIR_TARGET="$XDG_CONFIG_HOME/zsh"
-  export ZDOTDIR_SRC="$DOTFILES/config/zsh"
-  export BACKUP_DIR="$HOME/.dotfiles_backup/$(date +%Y%m%d_%H%M%S)"
-fi
+#   # Directory operations
+#   ensure_dir() {
+#     local dir="$1"
+#     if [[ ! -d "$dir" ]]; then
+#       mkdir -p "$dir"
+#       log_success "Created directory: $dir"
+#     fi
+#   }
 
-# ========================================================================
-# Repository Verification
-# ========================================================================
-verify_repo_structure() {
-  info "Verifying dotfiles repository structure..."
+#   # System detection
+#   is_macos() { [[ "$(uname -s)" == "Darwin" ]]; }
+#   is_apple_silicon() { [[ "$(uname -m)" == "arm64" ]]; }
 
-  # Check if dotfiles directory exists
-  if [[ ! -d "$DOTFILES" ]]; then
-    error "Dotfiles directory not found at $DOTFILES"
-    error "Please clone the repository first: git clone <repo-url> $DOTFILES"
-    exit 1
-  fi
+#   # Aliases for different naming conventions
+#   info() { log_info "$@"; }
+#   success() { log_success "$@"; }
+#   warn() { log_warn "$@"; }
+#   error() { log_error "$@"; }
 
-  # Check if it's a git repository
-  if [[ ! -d "$DOTFILES/.git" ]]; then
-    error "The dotfiles directory is not a git repository"
-    error "Please clone the repository properly: git clone <repo-url> $DOTFILES"
-    exit 1
-  fi
-
-  # Check for critical directories and files
-  local missing_items=()
-
-  [[ ! -f "$DOTFILES/Brewfile" ]] && missing_items+=("Brewfile")
-  [[ ! -d "$DOTFILES/config" ]] && missing_items+=("config dir")
-  [[ ! -d "$DOTFILES/config/zsh" ]] && missing_items+=("config/zsh dir")
-  [[ ! -f "$DOTFILES/config/zsh/.zshrc" ]] && missing_items+=("config/zsh/.zshrc file")
-  [[ ! -f "$DOTFILES/config/zsh/.zprofile" ]] && missing_items+=("config/zsh/.zprofile file")
-  [[ ! -f "$DOTFILES/config/zsh/utils.zsh" ]] && missing_items+=("config/zsh/utils.zsh file")
-
-  if ((${#missing_items[@]} > 0)); then
-    error "The dotfiles repository is missing critical components:"
-    for item in "${missing_items[@]}"; do
-      error "  - Missing $item"
-    done
-    error "Please ensure you've cloned the correct repository."
-    exit 1
-  fi
-
-  success "Repository structure verified successfully"
-}
-
+#   # Define required XDG environment variables if we can't load utils.zsh
+#   export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+#   export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+#   export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+#   export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+#   export ZDOTDIR_TARGET="$XDG_CONFIG_HOME/zsh"
+#   export ZDOTDIR_SRC="$DOTFILES/config/zsh"
+#   export BACKUP_DIR="$HOME/.dotfiles_backup/$(date +%Y%m%d_%H%M%S)"
+# fi
 # ========================================================================
 # Main Installation Function
 # ========================================================================
@@ -115,10 +71,10 @@ main() {
     error "Please ensure the dotfiles repository is correctly cloned"
     exit 1
   fi
-  
+
   # Re-source utils.zsh to ensure all functions are available
   source "$UTILS_PATH"
-  
+
   # Check system requirements
   check_requirements
 
@@ -147,7 +103,7 @@ main() {
 
   # Setup components using refactored functions
   setup_zsh
-  
+
   if [[ "$NO_BREW" == "false" ]]; then
     setup_homebrew
   else

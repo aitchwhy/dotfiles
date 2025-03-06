@@ -1,3 +1,3 @@
-# Go
-export GOPATH="$HOME/go"
-export GOBIN="$GOPATH/bin"
+# # Go
+# export GOPATH="$HOME/go"
+# export GOBIN="$GOPATH/bin"
