@@ -82,14 +82,13 @@ dotfiles_init
 
 # Load configuration files in specific order, installing required tools if needed
 local files=(
-  "$ZDOTDIR/brew.zsh"     # Homebrew package management
-  "$ZDOTDIR/eza.zsh"      # eza file system explorer
-  "$ZDOTDIR/git.zsh"      # Git utilities and configurations
-  "$ZDOTDIR/nodejs.zsh"   # Node.js development
-  "$ZDOTDIR/go.zsh"       # Go development
-  "$ZDOTDIR/python.zsh"   # Python development
-  "$ZDOTDIR/rust.zsh"     # Rust development
-  "$ZDOTDIR/atuin.zsh"    # Atuin shell history
+  "$ZDOTDIR/brew.zsh" # Homebrew package management
+  # "$ZDOTDIR/git.zsh"      # Git utilities and configurations
+  # "$ZDOTDIR/nodejs.zsh"   # Node.js development
+  "$ZDOTDIR/go.zsh"     # Go development
+  "$ZDOTDIR/python.zsh" # Python development
+  "$ZDOTDIR/rust.zsh"   # Rust development
+  # "$ZDOTDIR/atuin.zsh"    # Atuin shell history
   "$ZDOTDIR/fzf.zsh"      # Fuzzy finder configuration
   "$ZDOTDIR/nvim.zsh"     # Neovim editor configuration
   "$ZDOTDIR/starship.zsh" # starship prompt
@@ -100,7 +99,6 @@ local files=(
 declare -A TOOL_INSTALL_COMMANDS=(
   [brew]="/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
   [starship]="curl -sS https://starship.rs/install.sh | sh"
-  [git]="brew install git"
   [atuin]="curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh"
   [volta]="curl https://get.volta.sh | bash"
   [uv]="curl -LsSf https://astral.sh/uv/install.sh | sh"

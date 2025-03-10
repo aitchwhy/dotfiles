@@ -30,6 +30,18 @@ set -euo pipefail
 #   log_warn() { printf '\033[0;33m[WARNING]\033[0m %s\n' "$*" >&2; }
 #   log_error() { printf '\033[0;31m[ERROR]\033[0m %s\n' "$*" >&2; }
 
+# # Source utils.zsh if available, or define minimal required functions for bootstrapping
+# if [[ -f "$UTILS_PATH" ]]; then
+#   source "$UTILS_PATH"
+# else
+#   # Define minimal required utility functions for bootstrapping
+#   has_command() { command -v "$1" >/dev/null 2>&1; }
+#   # Colored output
+#   log_info() { printf '\033[0;34m[INFO]\033[0m %s\n' "$*"; }
+#   log_success() { printf '\033[0;32m[SUCCESS]\033[0m %s\n' "$*"; }
+#   log_warn() { printf '\033[0;33m[WARNING]\033[0m %s\n' "$*" >&2; }
+#   log_error() { printf '\033[0;31m[ERROR]\033[0m %s\n' "$*" >&2; }
+#
 #   # Directory operations
 #   ensure_dir() {
 #     local dir="$1"
@@ -38,6 +50,59 @@ set -euo pipefail
 #       log_success "Created directory: $dir"
 #     fi
 #   }
+#
+#   # System detection
+#   is_macos() { [[ "$(uname -s)" == "Darwin" ]]; }
+#   is_apple_silicon() { [[ "$(uname -m)" == "arm64" ]]; }
+#
+#   # Aliases for different naming conventions
+#   info() { log_info "$@"; }
+#   success() { log_success "$@"; }
+#   warn() { log_warn "$@"; }
+#   error() { log_error "$@"; }
+#
+#   # Define required XDG environment variables if we can't load utils.zsh
+#   export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+#   export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+#   export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+#   export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+#   export ZDOTDIR_TARGET="$XDG_CONFIG_HOME/zsh"
+#   export ZDOTDIR_SRC="$DOTFILES/config/zsh"
+#   export BACKUP_DIR="$HOME/.dotfiles_backup/$(date +%Y%m%d_%H%M%S)"
+# fi
+
+# Check system requirements
+function check_requirements() {
+  info "Checking system requirements..."
+
+  # Check if running on macOS
+  if ! is_macos; then
+    error "This configuration is designed for macOS."
+    return 1
+  fi
+
+  # Check for required commands
+  local required_commands=(
+    "git"
+    "curl"
+    "zsh"
+  )
+
+  local missing_commands=()
+  for cmd in "${required_commands[@]}"; do
+    if ! has_command "$cmd"; then
+      missing_commands+=("$cmd")
+    fi
+  done
+
+  if ((${#missing_commands[@]} > 0)); then
+    error "Required commands not found: ${missing_commands[*]}"
+    return 1
+  fi
+
+  success "System requirements met"
+  return 0
+}
 
 #   # System detection
 #   is_macos() { [[ "$(uname -s)" == "Darwin" ]]; }
@@ -61,8 +126,8 @@ set -euo pipefail
 # ========================================================================
 # Main Installation Function
 # ========================================================================
-main() {
-  info "Starting dotfiles setup for macOS..."
+function main() {
+  log_info "Starting dotfiles setup for macOS..."
 
   # Ensure utils.zsh is available for core functions
   if [[ ! -f "$UTILS_PATH" ]]; then
@@ -84,7 +149,6 @@ main() {
   # Show install plan
   info "Installation plan:"
   echo "  ✓ Set up ZSH configuration"
-  [[ "$NO_BREW" == "false" ]] && echo "  ✓ Set up Homebrew packages"
   echo "  ✓ Configure CLI tools"
   [[ "$NO_MACOS" == "false" ]] && echo "  ✓ Configure macOS preferences"
 
@@ -97,9 +161,9 @@ main() {
   ensure_dir "$XDG_DATA_HOME"
   ensure_dir "$XDG_STATE_HOME"
 
-  # Create Atuin directories
-  ensure_dir "$XDG_DATA_HOME/atuin"
-  ensure_dir "$XDG_CONFIG_HOME/atuin"
+  # # Create Atuin directories
+  # ensure_dir "$XDG_DATA_HOME/atuin"
+  # ensure_dir "$XDG_CONFIG_HOME/atuin"
 
   # Setup components using refactored functions
   setup_zsh
@@ -113,12 +177,7 @@ main() {
   # Install essential tools and create symlinks
   install_essential_tools
   setup_cli_tools
-
-  if [[ "$NO_MACOS" == "false" ]]; then
-    setup_macos_preferences
-  else
-    info "Skipping macOS preferences (--no-macos flag used)"
-  fi
+  setup_macos_preferences
 
   # Calculate time taken
   local end_time=$(date +%s)
@@ -144,10 +203,6 @@ main() {
 parse_args() {
   while [[ $# -gt 0 ]]; do
     case "$1" in
-    --no-brew)
-      NO_BREW=true
-      shift
-      ;;
     --no-macos)
       NO_MACOS=true
       shift
@@ -174,7 +229,6 @@ parse_args() {
 }
 
 # Initialize optional flags
-NO_BREW=false
 NO_MACOS=false
 MINIMAL=false
 

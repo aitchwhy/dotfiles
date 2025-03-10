@@ -34,12 +34,45 @@ export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
 
 
 # ========================================================================
-# Source Utility Functions (Non-Interactive Mode)
+# XDG Base Directory Specification
+# ========================================================================
+export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+export XDG_BIN_HOME="${XDG_BIN_HOME:-$HOME/.local/bin}"
+
+# Ensure XDG directories exist
+# if [[ ! -d "$XDG_DATA_HOME" ]]; then mkdir -p "$XDG_DATA_HOME"; fi
+# if [[ ! -d "$XDG_CONFIG_HOME" ]]; then mkdir -p "$XDG_CONFIG_HOME"; fi
+# if [[ ! -d "$XDG_STATE_HOME" ]]; then mkdir -p "$XDG_STATE_HOME"; fi
+# if [[ ! -d "$XDG_CACHE_HOME" ]]; then mkdir -p "$XDG_CACHE_HOME"; fi
+# if [[ ! -d "$XDG_BIN_HOME" ]]; then mkdir -p "$XDG_BIN_HOME"; fi
+[[ ! -d "$XDG_DATA_HOME" ]] && mkdir -p "$XDG_DATA_HOME"
+[[ ! -d "$XDG_CONFIG_HOME" ]] && mkdir -p "$XDG_CONFIG_HOME"
+[[ ! -d "$XDG_STATE_HOME" ]] && mkdir -p "$XDG_STATE_HOME"
+[[ ! -d "$XDG_CACHE_HOME" ]] && mkdir -p "$XDG_CACHE_HOME"
+[[ ! -d "$XDG_BIN_HOME" ]] && mkdir -p "$XDG_BIN_HOME"
+
+# Ensure ZSH config directory is set
+# export ZDOTDIR=${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}
+# export ZDOTDIR=${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}
+
+# Dotfiles location
+export DOTFILES="$HOME/dotfiles"
+export ZDOTDIR="$DOTFILES/config/zsh"
+
+# This file contains the main utility functions and environment variables
+[[ -f "$ZDOTDIR/utils.zsh" ]] && source "$ZDOTDIR/utils.zsh"
+
+# ========================================================================
+# Editor & Terminal Settings
 # ========================================================================
 
-# Source utils.zsh for environment variables and utility functions
-# This provides XDG_* variables and other core environment settings
-[[ -f "$ZDOTDIR/utils.zsh" ]] && source "$ZDOTDIR/utils.zsh"
+# Default editor
+export EDITOR="vim"
+export VISUAL="$EDITOR"
+# export PAGER="less -FRX"
 
 
 # ========================================================================
@@ -138,9 +171,10 @@ fi
 # path+=('/home/david/pear/bin')
 # # or prepend
 # path=('/home/david/pear/bin' $path)
+# Add a new path, if it's not already there
+# path+=(~/my_bin)
 # ========================================================================
 
-# export VOLTA_HOME="$HOME/.volta"
 # export PATH="$VOLTA_HOME/bin:$PATH"
 
 # Remove duplicate entries from PATH
@@ -160,8 +194,29 @@ path=(
   # "$HOME/.local/bin" # User local binaries
   # "$HOME/bin"        # User personal binaries
 
-  # Keep existing PATH (includes Homebrew)
-  $path
-)
+# # user compiled python as default python
+# export PATH=$HOME/python/bin:$PATH
+# export PYTHONPATH=$HOME/python/
+#
+# # user installed node as default node
+# export PATH="$HOME/node/node-v16.0.0-${KERNEL_NAME}-x64"/bin:$PATH
+# export NODE_MIRROR=https://mirrors.ustc.edu.cn/node/
 
+# # Add prioritized paths
+# path=(
+#   # Version managers (need to be before Homebrew)
+#   "$HOME/.volta/bin" # Node.js version manager
+#
+#   # Other language-specific paths
+#   "$HOME/.cargo/bin" # Rust
+#   "$HOME/go/bin"     # Go
+#
+#   # System paths
+#   "$HOME/.local/bin" # User local binaries
+#   "$HOME/bin"        # User personal binaries
+#
+#   # Keep existing PATH (includes Homebrew)
+#   $path
+# )
+#
 export PATH
