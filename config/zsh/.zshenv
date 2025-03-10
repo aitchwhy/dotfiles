@@ -27,3 +27,5 @@
 
 # # Dotfiles location
 # export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
+export VOLTA_HOME="$HOME/.volta"
+export PATH="$VOLTA_HOME/bin:$PATH"
