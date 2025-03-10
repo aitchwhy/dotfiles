@@ -22,8 +22,8 @@
   "editor.fontLigatures": true,
   "editor.formatOnSave": true,
   "editor.formatOnType": true,
-  "editor.guides.bracketPairs": true,
-  "editor.guides.indentation": true,
+  "editor.guides.bracketPairs": false,
+  "editor.guides.indentation": false,
   "editor.lineHeight": 1.5,
   "editor.suggest.showStatusBar": true,
   "editor.tabSize": 2,
@@ -135,8 +135,11 @@
   "terminal.integrated.fontSize": 14,
   "vim.shell": "/bin/zsh",
   "vscode-aiconfig.version": "0.0.22",
-  "workbench.colorCustomizations": {},
-  "workbench.colorTheme": "Quiet Light",
+  "workbench.colorCustomizations": {
+    "editor.lineHighlightBackground": "#1073cf2d",
+    "editor.lineHighlightBorder": "#9fced11f"
+  },
+  "workbench.colorTheme": "Tokyo Night Light",
   "workbench.iconTheme": "vscode-icons",
   "yaml.schemas": {
     "file:///Users/hank/.cursor/extensions/atlassian.atlascode-3.4.12/resources/schemas/pipelines-schema.json": "bitbucket-pipelines.yml"
@@ -152,5 +155,8 @@
   "update.releaseTrack": "prerelease",
   "[lua]": {
     "editor.defaultFormatter": "sumneko.lua"
-  }
+  },
+  "blockman.n04ColorComboPreset": "Classic Light (Gradients)",
+  "editor.inlayHints.enabled": "off",
+  "scratchpads.defaultFiletype": "texi"
 }
