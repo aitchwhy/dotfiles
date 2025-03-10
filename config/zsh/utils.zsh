@@ -63,19 +63,13 @@ function error() { log_error "$@"; }
 # ========================================================================
 
 # Detect if running interactively
-function is_interactive() {
+export function is_interactive() {
   [[ -o interactive ]]
 }
 
 # Detect if being sourced
-function is_sourced() {
+export function is_sourced() {
   [[ "${FUNCNAME[1]-main}" != main ]]
-}
-
-# Get the directory of the current script
-function get_script_dir() {
-  local source="${BASH_SOURCE[0]:-${(%):-%x}}"
-  dirname "$(readlink -f "$source")"
 }
 
 # ========================================================================
@@ -83,24 +77,24 @@ function get_script_dir() {
 # ========================================================================
 
 # Check if a command exists
-function has_command() {
+export function has_command() {
   command -v "$1" &>/dev/null
 }
 
 # System detection functions
-function is_macos() {
+export function is_macos() {
   [[ "$(uname -s)" == "Darwin" ]]
 }
 
-function is_linux() {
+export function is_linux() {
   [[ "$(uname -s)" == "Linux" ]]
 }
 
-function is_apple_silicon() {
+export function is_apple_silicon() {
   [[ "$(uname -m)" == "arm64" ]] && is_macos
 }
 
-function is_rosetta() {
+export function is_rosetta() {
   # Check if a process is running under Rosetta translation
   if is_apple_silicon; then
     local arch_output
@@ -111,19 +105,39 @@ function is_rosetta() {
   fi
 }
 
-function get_macos_version() {
+export function get_macos_version() {
   if is_macos; then
     sw_vers -productVersion
   else
     echo "Not macOS"
   fi
 }
+
+# Install a tool if it's missing
+export function ensure_tool_installed() {
+  local tool="$1"
+  local install_cmd="$2"
+  local is_essential="${3:-false}"
+
+  if ! has_command "$tool"; then
+    if [[ "$is_essential" == "true" ]] || [[ "${INSTALL_MODE:-false}" == "true" ]]; then
+      log_info "Installing missing $tool..."
+      eval "$install_cmd"
+      return $?
+    else
+      log_info "Tool '$tool' is not installed but not marked essential. Skipping."
+      return 0
+    fi
+  fi
+  return 0
+}
+
 # ========================================================================
 # File & Directory Operations
 # ========================================================================
 
 # Create a directory if it doesn't exist
-function ensure_dir() {
+export function dir_exists() {
   local dir="$1"
   if [[ ! -d "$dir" ]]; then
     mkdir -p "$dir"
@@ -132,10 +146,10 @@ function ensure_dir() {
 }
 
 # Create a backup of a file
-function backup_file() {
+export function backup_file() {
   local file="$1"
   local backup_dir="${2:-$HOME/.dotfiles_backup/$(date +%Y%m%d_%H%M%S)}"
-  
+
   if [[ -e "$file" ]]; then
     ensure_dir "$backup_dir"
     cp -a "$file" "$backup_dir/"
@@ -146,12 +160,12 @@ function backup_file() {
 }
 
 # Check if a file exists and is readable
-function file_exists() {
+export function file_exists() {
   [[ -r "$1" ]]
 }
 
 # Safe source - source a file if it exists
-function safe_source() {
+export function safe_source() {
   local file="$1"
   if file_exists "$file"; then
     source "$file"
@@ -166,7 +180,7 @@ function safe_source() {
 # ========================================================================
 
 # Add a directory to PATH if it exists and isn't already in PATH
-function path_add() {
+export function path_add() {
   local dir="$1"
   if [[ -d "$dir" ]] && [[ ":$PATH:" != *":$dir:"* ]]; then
     export PATH="$dir:$PATH"
@@ -176,7 +190,7 @@ function path_add() {
 }
 
 # Remove a directory from PATH
-function path_remove() {
+export function path_remove() {
   local dir="$1"
   if [[ ":$PATH:" == *":$dir:"* ]]; then
     export PATH=${PATH//:$dir:/:}  # Remove middle
@@ -188,12 +202,12 @@ function path_remove() {
 }
 
 # List PATH entries
-function path_list() {
+export function path_list() {
   echo $PATH | tr ':' '\n' | nl
 }
 
 # Print the expanded PATH as a list
-function path_print() {
+export function path_print() {
   echo "PATH components:"
   path_list | awk '{printf "  %2d: %s\n", $1, $2}'
 }
@@ -201,16 +215,16 @@ function path_print() {
 # ========================================================================
 # System & macOS Utilities
 # ========================================================================
-function sys() {
+export function sys() {
   case "$1" in
-  env | env-grep)
+  env-grep)
     echo "======== env vars =========="
     if [ -z "$2" ]; then
       printenv | sort | awk -F= '{ printf "%-30s %s\n", $1, $2 }'
     else
       printenv | sort | grep -i "$2" | awk -F= '{ printf "%-30s %s\n", $1, $2 }'
     fi
-    echo "============================" # Search environment variables
+    echo "============================"
     ;;
 
   hidden | toggle-hidden)
@@ -227,11 +241,6 @@ function sys() {
       return 1
     fi
     qlmanage -p "${@:2}" &>/dev/null # Quick Look files from terminal
-    ;;
-
-  weather | wttr)
-    local city="${2:-}"
-    curl -s "wttr.in/$city?format=v2" # Get weather information
     ;;
 
   killport | kill-port)
@@ -254,11 +263,6 @@ function sys() {
     echo "Process(es) killed" # Kill process on specified port
     ;;
 
-  ducks | top-files)
-    local count="${2:-10}"
-    du -sh * | sort -rh | head -"$count" # Show largest files in directory
-    ;;
-
   man | batman)
     MANPAGER="sh -c 'col -bx | bat -l man -p'" man "${@:2}" # Improved man pages with bat
     ;;
@@ -269,7 +273,7 @@ function sys() {
 
   space | disk)
     df -h # Check disk space usage
-    ;;
+   export  ;;
 
   cpu)
     top -l 1 | grep -E "^CPU" # Show CPU usage
@@ -313,14 +317,14 @@ function sys() {
   esac
 }
 
-
 #
 # ========================================================================
 # macOS System Preferences
 # ========================================================================
 
 # Apply common macOS system preferences
-function defaults_apply() {
+# setup_macos_preferences() {
+export function defaults_apply() {
   if ! is_macos; then
     log_error "Not running on macOS"
     return 1
@@ -458,7 +462,6 @@ verify_repo_structure() {
 
 
 # Apply macOS System Preferences
-setup_macos_preferences() {
   if ! is_macos; then
     warn "Not running on macOS, skipping preferences"
     return 1
@@ -500,33 +503,38 @@ setup_macos_preferences() {
     killall "$app" &>/dev/null || true
   done
 
-  success "macOS preferences configured"
+  log_success "macOS preferences configured"
 }
 
-# Install a tool if it's missing
-function ensure_tool_installed() {
-  local tool="$1"
-  local install_cmd="$2"
-  local is_essential="${3:-false}"
+# The actual initialization happens in .zshrc via:
+# has_command atuin && eval "$(atuin init zsh)"
 
-  if ! has_command "$tool"; then
-    if [[ "$is_essential" == "true" ]] || [[ "${INSTALL_MODE:-false}" == "true" ]]; then
-      log_info "Installing missing $tool..."
-      eval "$install_cmd"
-      return $?
-    else
-      log_info "Tool '$tool' is not installed but not marked essential. Skipping."
-      return 0
-    fi
+# ========================================================================
+# Core Installation Functions
+# ========================================================================
+
+# Setup Homebrew and install packages
+setup_homebrew() {
+  info "Setting up Homebrew..."
+
+  if [[ ! -x /opt/homebrew/bin/brew ]]; then
+    info "Installing Homebrew..."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  else
+    info "Homebrew is already installed"
   fi
-  return 0
+
+  info "Updating Homebrew..."
+  brew update && brew upgrade
 }
 
 # Setup CLI tools and configurations
 # ========================================================================
 # Config File Linking
 # ========================================================================
-setup_cli_tools() {
+export function setup_cli_tools() {
   info "Setting up CLI tools configuration..."
 
   # First, remove all existing symlinks and files that we'll be managing
@@ -566,41 +574,8 @@ setup_cli_tools() {
   done
 }
 
-# Check system requirements
-check_requirements() {
-  info "Checking system requirements..."
-
-  # Check if running on macOS
-  if ! is_macos; then
-    error "This configuration is designed for macOS."
-    return 1
-  fi
-
-  # Check for required commands
-  local required_commands=(
-    "git"
-    "curl"
-    "zsh"
-  )
-
-  local missing_commands=()
-  for cmd in "${required_commands[@]}"; do
-    if ! has_command "$cmd"; then
-      missing_commands+=("$cmd")
-    fi
-  done
-
-  if ((${#missing_commands[@]} > 0)); then
-    error "Required commands not found: ${missing_commands[*]}"
-    return 1
-  fi
-
-  success "System requirements met"
-  return 0
-}
-
 # Install essential tools
-install_essential_tools() {
+export function install_essential_tools() {
   info "Installing essential tools..."
 
   # Install Homebrew if needed
@@ -608,38 +583,8 @@ install_essential_tools() {
     setup_homebrew
   fi
 
-  # Define installation commands for tools
-  declare -A TOOL_INSTALL_COMMANDS=(
-    [starship]="curl -sS https://starship.rs/install.sh | sh"
-    [git]="brew install git"
-    [nvim]="brew install neovim"
-    [fzf]="brew install fzf"
-    [eza]="brew install eza"
-    [zoxide]="brew install zoxide"
-    [atuin]="curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh"
-    [volta]="curl https://get.volta.sh | bash"
-    [uv]="curl -LsSf https://astral.sh/uv/install.sh | sh"
-    [rustup]="curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
-    [go]="brew install go"
-  )
-
-  # Define which tools are essential
-  declare -A TOOL_IS_ESSENTIAL=(
-    [starship]=true
-    [git]=true
-    [nvim]=false
-    [fzf]=false
-    [eza]=false
-    [zoxide]=false
-    [atuin]=false
-    [volta]=false
-    [uv]=false
-    [rustup]=false
-    [go]=false
-  )
-
   # Order of tool installation (prioritize essential tools)
-  local tool_names=(starship git nvim fzf eza zoxide atuin volta uv rustup go)
+  local tool_names=(starship nvim fzf eza zoxide atuin volta uv rustup go)
 
   # Install each tool if missing
   for tool_name in "${tool_names[@]}"; do
@@ -651,9 +596,8 @@ install_essential_tools() {
   success "Essential tools installed"
 }
 
-
 # ========================================================================
-# Function Exports
+# export Function Exports
 # ========================================================================
 
 # Export the functions so they're available in other scripts

@@ -4,7 +4,7 @@
 # https://github.com/atuinsh/atuin
 
 # Source common utilities if not already loaded
-[[ -f "$ZDOTDIR/utils.zsh" ]] && source "$ZDOTDIR/utils.zsh"
+# [[ -f "$ZDOTDIR/utils.zsh" ]] && source "$ZDOTDIR/utils.zsh"
 
 # Note: Installation logic is handled in .zshrc via the install_tool function
 
