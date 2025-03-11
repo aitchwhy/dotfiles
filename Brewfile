@@ -12,13 +12,14 @@ tap "xo/xo"
 tap "yakitrak/yakitrak"
 
 # Set cask install dir to ~/Applications (user level)
-cask_args appdir: "~/Applications", require_sha: true
+# cask_args appdir: "~/Applications", require_sha: true
+cask_args appdir: "/Applications", require_sha: true
 
 ###############################################################################
 # Development Tools & Languages
 ###############################################################################
 # Databases
-brew "postgresql@17" 
+brew "postgresql@17"
 brew "minio"                     # High Performance, Kubernetes Native Object Storage
 brew "neo4j"                     # Graph database
 
@@ -28,10 +29,9 @@ brew "esbuild"                   # Extremely fast JavaScript bundler and minifie
 brew "eslint"                    # AST-based pattern checker for JavaScript
 brew "prettier"                  # Code formatter for JavaScript, CSS, JSON, GraphQL, Markdown, YAML
 brew "rollup"                    # Next-generation ES module bundler
-brew "typescript-language-server" # Language Server Protocol implementation for TypeScript
 brew "vite"                      # Next generation frontend tooling
 brew "volta"                     # JavaScript toolchain manager for reproducible environments
-brew "vscode-langservers-extracted" # Language servers for HTML, CSS, JavaScript, and JSON
+# brew "vscode-langservers-extracted" # Language servers for HTML, CSS, JavaScript, and JSON
 
 # Python
 brew "black"                     # Python code formatter
@@ -41,7 +41,6 @@ brew "scrapy"                    # Web crawling & scraping framework
 
 # Lua
 brew "lua"                       # Powerful, lightweight programming language
-brew "lua-language-server"       # Language Server for the Lua language
 brew "luarocks"                  # Package manager for the Lua programming language
 brew "stylua"                    # Opinionated Lua code formatter
 
@@ -55,12 +54,9 @@ brew "gopls"                     # Language server for the Go language
 brew "ruby"                      # Powerful, clean, object-oriented scripting language
 
 # Other Languages & Language Servers
-brew "bash-language-server"      # Language Server for Bash
 brew "cmake"                     # Cross-platform make
 brew "marksman"                  # Language Server Protocol for Markdown
-brew "nasm"                      # Netwide Assembler (NASM) is an 80x86 assembler
 brew "tectonic"                  # Modernized, complete, self-contained TeX/LaTeX engine
-brew "yaml-language-server"      # Language Server for Yaml Files
 
 ###############################################################################
 # Editors & IDEs
@@ -224,7 +220,7 @@ brew "yakitrak/yakitrak/obsidian-cli" # CLI for Obsidian
 # Applications (Casks)
 ###############################################################################
 # Cloud & Development Tools
-cask "google-cloud-sdk", postinstall: "${HOMEBREW_PREFIX}/bin/gcloud components update"
+# cask "google-cloud-sdk", postinstall: "${HOMEBREW_PREFIX}/bin/gcloud components update"
 cask "orbstack"                  # Container and VM manager
 cask "tableplus"                 # Database management
 
@@ -317,6 +313,7 @@ cask "virtualbuddy"              # macOS VM manager
 # cask "windsurf"                  # Window management
 cask "yubico-authenticator"      # YubiKey tool
 cask "yubico-yubikey-manager"    # YubiKey manager
+cask "kawa"    # key input language
 
 # Communication & Media
 # cask "arc"                       # Web browser
@@ -347,7 +344,7 @@ cask "audacity"                  # Audio editor
 cask "ghidra"                    # Software reverse engineering
 
 # Commented out less frequently used apps
-# cask "session"                 # Messaging app
+cask "session"                 # Messaging app
 # cask "synologyassistant"       # Synology management
 # cask "wireshark"               # Network protocol analyzer
 
@@ -358,13 +355,13 @@ cask "ghidra"                    # Software reverse engineering
 mas "Alpenglow", id: 978589174        # Sunset times
 mas "Amphetamine", id: 937984704      # Keep Mac awake
 mas "Bear", id: 1091189122            # Note-taking
-mas "Day One", id: 1055511498         # Journaling
+# mas "Day One", id: 1055511498         # Journaling
 mas "Drafts", id: 1435957248          # Text capture
 mas "HacKit", id: 1549557075          # Markdown editor
 mas "Omnivore", id: 1564031042        # Read-it-later
 mas "Parcel", id: 639968404           # Package tracking
 mas "Paste", id: 967805235            # Clipboard manager
-# mas "Monica AI: Deep Chat & Search", id: 6450770590
+mas "Monica AI: Deep Chat & Search", id: 6450770590
 
 # Travel & Lifestyle
 mas "Flighty", id: 1358823008         # Flight tracking
@@ -412,7 +409,7 @@ vscode "oderwat.indent-rainbow"             # Makes indentation more readable
 vscode "usernamehw.errorlens"               # Inline error messages
 vscode "vscode-icons-team.vscode-icons"     # File and folder icons
 
-# Utility & Navigation  
+# Utility & Navigation
 vscode "alefragnani.project-manager"        # Project management
 vscode "christian-kohler.path-intellisense" # Autocomplete filenames
 vscode "patbenatar.advanced-new-file"       # Advanced file creation

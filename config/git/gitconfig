@@ -2,16 +2,16 @@
 # https://git-scm.com/docs/git-config.html
 
 [user]
-	email = hank.lee.qed@gmail.com
-	name = Hank Lee
+email = hank.lee.qed@gmail.com
+name = Hank Lee
 # signingKey = FE1EF2465E55A3FDE919F8EA03B0943F3314E8BB
 
 [core]
 editor = nvim
 pager = delta
-# Use custom macOS specific gitignore and attributes
-excludesfile = ~/dotfiles/config/git/gitattributes
-attributesfile = ~/dotfiles/config/git/gitattributes
+# # Use custom macOS specific gitignore and attributes
+# excludesfile = ~/dotfiles/config/git/gitattributes
+# attributesfile = ~/dotfiles/config/git/gitattributes
 # # Make `git rebase` safer on macOS
 # trustctime = false
 # # Prevent showing files with non-ASCII symbols as unversioned (macOS specific)
@@ -19,7 +19,7 @@ attributesfile = ~/dotfiles/config/git/gitattributes
 # # Speed up commands involving untracked files
 # untrackedCache = true
 # Use macOS-native symlinks
-symlinks = true
+# symlinks = true
 # fsync = true
 # Improve performance on macOS APFS (fsync recommended for macOS)
 # fsync = true
@@ -163,7 +163,7 @@ helper = !/opt/homebrew/bin/gh auth git-credential
 #program = /opt/homebrew/bin/gpg
 
 #[gpg "ssh"]
-program = ssh-keygen
+# program = ssh-keygen
 # Path for SSH on Apple Silicon
 #allowedSignersFile = ~/.ssh/allowed_signers
 
@@ -174,7 +174,7 @@ program = ssh-keygen
 # Improve commit message formatting
 verbose = true
 
-[tag]
+# [tag]
 #forceSignAnnotated = true
 # Sort tags by version number
 #sort = version:rename

@@ -139,7 +139,7 @@
     "editor.lineHighlightBackground": "#1073cf2d",
     "editor.lineHighlightBorder": "#9fced11f"
   },
-  "workbench.colorTheme": "Tokyo Night Light",
+  "workbench.colorTheme": "Catppuccin Frappé",
   "workbench.iconTheme": "vscode-icons",
   "yaml.schemas": {
     "file:///Users/hank/.cursor/extensions/atlassian.atlascode-3.4.12/resources/schemas/pipelines-schema.json": "bitbucket-pipelines.yml"
