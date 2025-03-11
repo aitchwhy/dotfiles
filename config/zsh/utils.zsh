@@ -3,62 +3,76 @@
 # ZSH Utils - Common utilities for shell scripts and configurations
 # ========================================================================
 # This file contains utility functions that are shared across multiple
-# shell scripts and configuration files.
+# shell scripts and configuration files. All functions are exported for
+# sourcing and use in various zsh scripts.
+#
+# USAGE: Source this file in your .zprofile or other zsh configuration
+# files to make these utilities available to your shell.
+# Recommended: source "${ZDOTDIR:-$HOME/dotfiles/config/zsh}/utils.zsh"
 
-# # ========================================================================
-# # Core Environment Variables
-# # ========================================================================
-# local DOTFILES="${DOTFILES:-$HOME/dotfiles}"
-# local XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
-# local XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
-# local XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
-# local XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
-# local ZDOTDIR_TARGET="$XDG_CONFIG_HOME/zsh"
-# local ZDOTDIR_SRC="$DOTFILES/config/zsh"
-# local BACKUP_DIR="$HOME/.dotfiles_backup/$(date +%Y%m%d_%H%M%S)"
+# ========================================================================
+# Internal Variables - Not Exported
+# ========================================================================
+# These variables are used within this file but NOT exported globally
+# The environment variables should be set in .zshenv for consistent
+# cross-shell access
+typeset -g _DOTFILES="${DOTFILES:-$HOME/dotfiles}"
+typeset -g _BACKUP_DIR="$HOME/.dotfiles_backup/$(date +%Y%m%d_%H%M%S)"
+
+# ========================================================================
+# ANSI Color Codes - For Internal Use
+# ========================================================================
+# These color codes are used within the logging functions
+typeset -g RESET="\033[0m"
+typeset -g BLACK="\033[0;30m"
+typeset -g RED="\033[0;31m"
+typeset -g GREEN="\033[0;32m"
+typeset -g YELLOW="\033[0;33m"
+typeset -g BLUE="\033[0;34m"
+typeset -g MAGENTA="\033[0;35m"
+typeset -g CYAN="\033[0;36m"
+typeset -g WHITE="\033[0;37m"
+
 # ========================================================================
 # Logging Functions
 # ========================================================================
 
-# ANSI color codes
-RESET="\033[0m"
-BLACK="\033[0;30m"
-RED="\033[0;31m"
-GREEN="\033[0;32m"
-YELLOW="\033[0;33m"
-BLUE="\033[0;34m"
-MAGENTA="\033[0;35m"
-CYAN="\033[0;36m"
-WHITE="\033[0;37m"
-
 # Log information message
-function log_info() {
+export function log_info() {
   printf "${BLUE}[INFO]${RESET} %s\n" "$*"
 }
 
 # Log success message
-function log_success() {
+export function log_success() {
   printf "${GREEN}[SUCCESS]${RESET} %s\n" "$*"
 }
 
 # Log warning message
-function log_warn() {
+export function log_warn() {
   printf "${YELLOW}[WARNING]${RESET} %s\n" "$*" >&2
 }
 
 # Log error message
-function log_error() {
+export function log_error() {
   printf "${RED}[ERROR]${RESET} %s\n" "$*" >&2
 }
 
 # Aliases for different naming conventions
-function info() { log_info "$@"; }
-function success() { log_success "$@"; }
-function warn() { log_warn "$@"; }
-function error() { log_error "$@"; }
+export function info() { log_info "$@"; }
+export function success() { log_success "$@"; }
+export function warn() { log_warn "$@"; }
+export function error() { log_error "$@"; }
 
- 
- # ========================================================================
+# List all utility functions exported by this file
+export function list_utils() {
+  local util_funcs=$(functions | grep "^[a-z].*() {" | grep -v "^_" | sort)
+  local count=$(echo "$util_funcs" | wc -l | tr -d ' ')
+  
+  log_info "Available utility functions ($count total):"
+  echo "$util_funcs" | sed 's/() {.*//' | column
+}
+
+# ========================================================================
 # Shell Detection and Environment
 # ========================================================================
 
@@ -137,7 +151,7 @@ export function ensure_tool_installed() {
 # ========================================================================
 
 # Create a directory if it doesn't exist
-export function dir_exists() {
+export function ensure_dir() {
   local dir="$1"
   if [[ ! -d "$dir" ]]; then
     mkdir -p "$dir"
@@ -145,10 +159,15 @@ export function dir_exists() {
   fi
 }
 
+# Alias for backward compatibility
+export function dir_exists() {
+  ensure_dir "$@"
+}
+
 # Create a backup of a file
 export function backup_file() {
   local file="$1"
-  local backup_dir="${2:-$HOME/.dotfiles_backup/$(date +%Y%m%d_%H%M%S)}"
+  local backup_dir="${2:-$_BACKUP_DIR}"
 
   if [[ -e "$file" ]]; then
     ensure_dir "$backup_dir"
@@ -174,6 +193,73 @@ export function safe_source() {
     return 1
   fi
 }
+# ========================================================================
+# Homebrew Installation Functions
+# ========================================================================
+
+# Initialize Homebrew path based on architecture
+export function brew_init() {
+  # Skip if brew is already in PATH
+  if has_command brew; then
+    return 0
+  fi
+
+  if is_apple_silicon; then
+    if [[ -x /opt/homebrew/bin/brew ]]; then
+      eval "$(/opt/homebrew/bin/brew shellenv)"
+      log_success "Initialized Homebrew for Apple Silicon"
+      return 0
+    fi
+  else
+    if [[ -x /usr/local/bin/brew ]]; then
+      eval "$(/usr/local/bin/brew shellenv)"
+      log_success "Initialized Homebrew for Intel Mac"
+      return 0
+    fi
+  fi
+
+  log_warn "Homebrew not found. Install it with: /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
+  return 1
+}
+
+# Automatically initialize brew when this file is sourced
+brew_init
+export function uninstall_brew() {
+  if has_command brew; then
+    log_info "Uninstalling Homebrew..."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"
+    log_success "Homebrew uninstalled"
+  else
+    log_warn "Homebrew is not installed"
+  fi
+}
+
+
+###########################################################################
+# # TODO: zsh util functions
+###########################################################################
+# ❯ tldr --platform osx zsh
+#   zsh
+#   Z SHell, a Bash-compatible command-line interpreter.
+#   See also: bash, histexpand.
+#   More information: https://www.zsh.org.
+#   Start an interactive shell session:
+#     zsh
+#   Execute specific [c]ommands:
+#     zsh -c "echo Hello world"
+#   Execute a specific script:
+#     zsh path/to/script.zsh
+#   Check a specific script for syntax errors without executing it:
+#     zsh --no-exec path/to/script.zsh
+#   Execute specific commands from stdin:
+#     echo Hello world | zsh
+#   Execute a specific script, printing each command in the script before executing it:
+#     zsh --xtrace path/to/script.zsh
+#   Start an interactive shell session in verbose mode, printing each command before executing it:
+#     zsh --verbose
+#   Execute a specific command inside zsh with disabled glob patterns:
+#     noglob command
+###########################################################################
 
 # ========================================================================
 # Path Management Functions
@@ -273,7 +359,7 @@ export function sys() {
 
   space | disk)
     df -h # Check disk space usage
-   export  ;;
+    ;;
 
   cpu)
     top -l 1 | grep -E "^CPU" # Show CPU usage
@@ -303,9 +389,7 @@ export function sys() {
     echo "  env [pattern]      - Display environment variables, optionally filtered"
     echo "  hidden             - Toggle hidden files in Finder"
     echo "  ql <file>          - Quick Look a file"
-    echo "  weather [city]     - Show weather information"
     echo "  killport <port>    - Kill process running on specified port"
-    echo "  ducks [count]      - Show largest files in current directory"
     echo "  man <command>      - Show man pages with syntax highlighting"
     echo "  ports              - Show all listening ports"
     echo "  space              - Check disk space usage"
@@ -317,13 +401,11 @@ export function sys() {
   esac
 }
 
-#
 # ========================================================================
 # macOS System Preferences
 # ========================================================================
 
 # Apply common macOS system preferences
-# setup_macos_preferences() {
 export function defaults_apply() {
   if ! is_macos; then
     log_error "Not running on macOS"
@@ -332,16 +414,24 @@ export function defaults_apply() {
 
   log_info "Applying macOS preferences..."
 
+  # Keyboard settings
   defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
   defaults write NSGlobalDomain AppleShowAllExtensions -bool true
   defaults write NSGlobalDomain InitialKeyRepeat -int 15
   defaults write NSGlobalDomain KeyRepeat -int 2
-  defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool TRUE
-  defaults write com.apple.dock autohide -bool false
+  
+  # File system behavior
+  defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+  
+  # Dock settings
   defaults write com.apple.dock autohide -bool true
   defaults write com.apple.dock autohide-delay -float 0
   defaults write com.apple.dock show-recents -bool false
+  
+  # Trackpad settings
   defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
+  
+  # Finder settings
   defaults write com.apple.finder AppleShowAllFiles -bool true
   defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
   defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
@@ -351,25 +441,27 @@ export function defaults_apply() {
 
   # Restart affected applications
   for app in "Finder" "Dock"; do
-    killall "$app" >/dev/null 2>&1
+    killall "$app" >/dev/null 2>&1 || true
   done
 
   log_success "macOS preferences applied"
 }
-
-# The actual initialization happens in .zshrc via:
-# has_command atuin && eval "$(atuin init zsh)"
-
 
 # ========================================================================
 # Core Installation Functions
 # ========================================================================
 
 # Setup Homebrew and install packages
-setup_homebrew() {
+export function setup_homebrew() {
   info "Setting up Homebrew..."
 
-  if [[ ! -x /opt/homebrew/bin/brew ]] && [[ ! -x /usr/local/bin/brew ]]; then
+  if is_apple_silicon; then
+    local brew_path="/opt/homebrew/bin/brew"
+  else
+    local brew_path="/usr/local/bin/brew"
+  fi
+
+  if [[ ! -x $brew_path ]]; then
     info "Installing Homebrew..."
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
@@ -386,66 +478,69 @@ setup_homebrew() {
   if [[ "${INSTALL_MODE:-false}" == "true" ]]; then
     info "Updating Homebrew..."
     brew update
-  fi
-
-  # Install from Brewfile
-  if [[ -f "$DOTFILES/Brewfile" ]]; then
-    if [[ "${INSTALL_MODE:-false}" == "true" ]]; then
+    
+    # Install from Brewfile
+    if [[ -f "$_DOTFILES/Brewfile" ]]; then
       info "Installing packages from Brewfile..."
       brew bundle install --verbose --global --all --force
+    else
+      warn "Brewfile not found at $_DOTFILES/Brewfile"
     fi
-  else
-    warn "Brewfile not found at $DOTFILES/Brewfile"
   fi
 }
 
 # Setup ZSH configuration
-setup_zsh() {
+export function setup_zsh() {
   info "Setting up ZSH configuration..."
+
+  # Use environment vars if set, fall back to internal vars if not
+  local zdotdir_src="${ZDOTDIR_SRC:-$_DOTFILES/config/zsh}"
 
   # Create .zshenv in home directory pointing to dotfiles
   info "Creating .zshenv to point to dotfiles ZSH configuration"
   cat >"$HOME/.zshenv" <<EOF
 # ZSH configuration bootstrapper
 # Auto-generated by dotfiles setup
-export ZDOTDIR="$ZDOTDIR_SRC"
-[[ -f "$ZDOTDIR_SRC/.zshenv" ]] && source "$ZDOTDIR_SRC/.zshenv"
+export ZDOTDIR="$zdotdir_src"
+[[ -f "$zdotdir_src/.zshenv" ]] && source "$zdotdir_src/.zshenv"
 EOF
 
   chmod 644 "$HOME/.zshenv"
-  success "Created $HOME/.zshenv pointing to $ZDOTDIR_SRC"
+  success "Created $HOME/.zshenv pointing to $zdotdir_src"
 }
 
 # ========================================================================
 # Repository Verification
 # ========================================================================
-verify_repo_structure() {
+
+# Verify the dotfiles repository structure
+export function verify_repo_structure() {
   info "Verifying dotfiles repository structure..."
 
   # Check if dotfiles directory exists
-  if [[ ! -d "$DOTFILES" ]]; then
-    error "Dotfiles directory not found at $DOTFILES"
-    error "Please clone the repository first: git clone <repo-url> $DOTFILES"
-    exit 1
+  if [[ ! -d "$_DOTFILES" ]]; then
+    error "Dotfiles directory not found at $_DOTFILES"
+    error "Please clone the repository first: git clone <repo-url> $_DOTFILES"
+    return 1
   fi
 
   # Check if it's a git repository
-  if [[ ! -d "$DOTFILES/.git" ]]; then
+  if [[ ! -d "$_DOTFILES/.git" ]]; then
     error "The dotfiles directory is not a git repository"
-    error "Please clone the repository properly: git clone <repo-url> $DOTFILES"
-    exit 1
+    error "Please clone the repository properly: git clone <repo-url> $_DOTFILES"
+    return 1
   fi
 
   # Check for critical directories and files
   local missing_items=()
 
-  [[ ! -f "$DOTFILES/Brewfile" ]] && missing_items+=("Brewfile")
-  [[ ! -d "$DOTFILES/config" ]] && missing_items+=("config dir")
-  [[ ! -d "$DOTFILES/config/zsh" ]] && missing_items+=("config/zsh dir")
-  [[ ! -f "$DOTFILES/config/zsh/.zshenv" ]] && missing_items+=("config/zsh/.zshenv file")
-  [[ ! -f "$DOTFILES/config/zsh/.zprofile" ]] && missing_items+=("config/zsh/.zprofile file")
-  [[ ! -f "$DOTFILES/config/zsh/.zshrc" ]] && missing_items+=("config/zsh/.zshrc file")
-  [[ ! -f "$DOTFILES/config/zsh/utils.zsh" ]] && missing_items+=("config/zsh/utils.zsh file")
+  [[ ! -f "$_DOTFILES/Brewfile" ]] && missing_items+=("Brewfile")
+  [[ ! -d "$_DOTFILES/config" ]] && missing_items+=("config dir")
+  [[ ! -d "$_DOTFILES/config/zsh" ]] && missing_items+=("config/zsh dir")
+  [[ ! -f "$_DOTFILES/config/zsh/.zshenv" ]] && missing_items+=("config/zsh/.zshenv file")
+  [[ ! -f "$_DOTFILES/config/zsh/.zprofile" ]] && missing_items+=("config/zsh/.zprofile file")
+  [[ ! -f "$_DOTFILES/config/zsh/.zshrc" ]] && missing_items+=("config/zsh/.zshrc file")
+  [[ ! -f "$_DOTFILES/config/zsh/utils.zsh" ]] && missing_items+=("config/zsh/utils.zsh file")
 
   if ((${#missing_items[@]} > 0)); then
     error "The dotfiles repository is missing critical components:"
@@ -453,89 +548,23 @@ verify_repo_structure() {
       error "  - Missing $item"
     done
     error "Please ensure you've cloned the correct repository."
-    exit 1
-  fi
-
-  success "Repository structure verified successfully"
-}
-
-
-
-# Apply macOS System Preferences
-  if ! is_macos; then
-    warn "Not running on macOS, skipping preferences"
     return 1
   fi
 
-  info "Configuring macOS system preferences..."
-
-  # Faster key repeat
-  defaults write NSGlobalDomain KeyRepeat -int 2
-  defaults write NSGlobalDomain InitialKeyRepeat -int 15
-
-  # Disable press-and-hold for keys in favor of key repeat
-  default write NSGlobalDomain ApplePressAndHoldEnabled -bool false
-
-  # Always show file extensions
-  defaults write NSGlobalDomain AppleShowAllExtensions -bool true
-
-  # Don't write .DS_Store files on network drives
-  defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
-
-  # Dock settings
-  defaults write com.apple.dock autohide -bool true
-  defaults write com.apple.dock autohide-delay -float 0
-  defaults write com.apple.dock show-recents -bool false
-
-  # Enable trackpad tap to click
-  defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
-
-  # Finder settings
-  defaults write com.apple.finder AppleShowAllFiles -bool true
-  defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
-  defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
-  defaults write com.apple.finder ShowPathbar -bool true
-  defaults write com.apple.finder ShowStatusBar -bool true
-  defaults write com.apple.finder _FXSortFoldersFirst -bool true
-
-  # Restart affected applications
-  for app in "Finder" "Dock"; do
-    killall "$app" &>/dev/null || true
-  done
-
-  log_success "macOS preferences configured"
+  success "Repository structure verified successfully"
+  return 0
 }
 
-# The actual initialization happens in .zshrc via:
-# has_command atuin && eval "$(atuin init zsh)"
-
 # ========================================================================
-# Core Installation Functions
+# Setup CLI Tools and Configuration
 # ========================================================================
-
-# Setup Homebrew and install packages
-setup_homebrew() {
-  info "Setting up Homebrew..."
-
-  if [[ ! -x /opt/homebrew/bin/brew ]]; then
-    info "Installing Homebrew..."
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-  else
-    info "Homebrew is already installed"
-  fi
-
-  info "Updating Homebrew..."
-  brew update && brew upgrade
-}
 
 # Setup CLI tools and configurations
-# ========================================================================
-# Config File Linking
-# ========================================================================
 export function setup_cli_tools() {
   info "Setting up CLI tools configuration..."
+
+  # Get the correct path map based on environment vars or fallback
+  local dotfiles="${DOTFILES:-$_DOTFILES}"
 
   # First, remove all existing symlinks and files that we'll be managing
   # Only do this in full installation mode to avoid disrupting the user's session
@@ -595,11 +624,3 @@ export function install_essential_tools() {
 
   success "Essential tools installed"
 }
-
-# ========================================================================
-# export Function Exports
-# ========================================================================
-
-# Export the functions so they're available in other scripts
-# export -f has_command is_macos is_linux is_apple_silicon is_rosetta sys defaults_apply 2>/dev/null || true
-# export has_command is_macos is_linux is_apple_silicon is_rosetta sys defaults_apply setup_cli_tools 2>/dev/null || true

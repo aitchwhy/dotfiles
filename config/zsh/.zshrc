@@ -35,17 +35,34 @@ setopt SHARE_HISTORY          # Share history between sessions
 setopt HIST_IGNORE_SPACE      # Don't record commands starting with space
 
 # ========================================================================
-# Editor & Terminal Settings
+# XDG Base Directory Specification
 # ========================================================================
 
-# Default editor
-export EDITOR="nvim"
-export VISUAL="$EDITOR"
-# export PAGER="less -FRX"
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+# export XDG_BIN_HOME="${XDG_BIN_HOME:-$HOME/.local/bin}"
 
-# Terminal settings
-export COLORTERM=truecolor
-export TERM_PROGRAM="${TERM_PROGRAM:-Apple_Terminal}"
+# Ensure ZSH config directory is set
+# export ZDOTDIR=${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}
+export ZDOTDIR=:"$XDG_CONFIG_HOME/zsh"
+
+# Dotfiles location
+# export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
+export DOTFILES="$HOME/dotfiles"
+
+# Ensure XDG directories exist
+# if [[ ! -d "$XDG_DATA_HOME" ]]; then mkdir -p "$XDG_DATA_HOME"; fi
+# if [[ ! -d "$XDG_CONFIG_HOME" ]]; then mkdir -p "$XDG_CONFIG_HOME"; fi
+# if [[ ! -d "$XDG_STATE_HOME" ]]; then mkdir -p "$XDG_STATE_HOME"; fi
+# if [[ ! -d "$XDG_CACHE_HOME" ]]; then mkdir -p "$XDG_CACHE_HOME"; fi
+# if [[ ! -d "$XDG_BIN_HOME" ]]; then mkdir -p "$XDG_BIN_HOME"; fi
+[[ ! -d "$XDG_DATA_HOME" ]] && mkdir -p "$XDG_DATA_HOME"
+[[ ! -d "$XDG_CONFIG_HOME" ]] && mkdir -p "$XDG_CONFIG_HOME"
+[[ ! -d "$XDG_STATE_HOME" ]] && mkdir -p "$XDG_STATE_HOME"
+[[ ! -d "$XDG_CACHE_HOME" ]] && mkdir -p "$XDG_CACHE_HOME"
+[[ ! -d "$XDG_BIN_HOME" ]] && mkdir -p "$XDG_BIN_HOME"
 
 # ========================================================================
 # Keyboard & Input Configuration
@@ -56,43 +73,344 @@ export TERM_PROGRAM="${TERM_PROGRAM:-Apple_Terminal}"
 export KEYTIMEOUT=1
 
 # Basic key bindings
-# bindkey '^P' up-line-or-history
-# bindkey '^N' down-line-or-history
-# bindkey '^E' end-of-line
-# bindkey '^A' beginning-of-line
-# bindkey '^K' up-line-or-history
-# bindkey '^J' down-line-or-history
-# bindkey '^L' end-of-line
-# bindkey '^H' beginning-of-line
-# bindkey '^R' history-incremental-search-backward
-# bindkey '^?' backward-delete-char # Backspace working after vi mode
+bindkey '^P' up-line-or-history
+bindkey '^N' down-line-or-history
+bindkey '^E' end-of-line
+bindkey '^A' beginning-of-line
 
 # ========================================================================
 # Source Utility Functions
 # ========================================================================
 
-# This file contains the main utility functions and environment variables
-[[ -f "$ZDOTDIR/utils.zsh" ]] && source "$ZDOTDIR/utils.zsh"
+# Source our utility functions from utils.zsh
+export UTILS_PATH="$DOTFILES/config/zsh/utils.zsh"
+if [[ -f "$UTILS_PATH" ]]; then
+  source "$UTILS_PATH"
+  log_success "Successfully loaded utils.zsh with $(functions | grep -c "^[a-z].*() {") utility functions"
 
-# Run the initialization
-dotfiles_init
+  # List some key utility functions that should be available
+  log_info "Available utility functions include: has_command, is_macos, path_add, sys, etc."
+else
+  echo "Error: $UTILS_PATH not found. Some functionality will be unavailable."
+fi
+
 # ========================================================================
-# Module Loading
+# Path Configuration
+#
+# https://stackoverflow.com/questions/11530090/adding-a-new-entry-to-the-path-variable-in-zsh
+# # append
+# path+=('/home/david/pear/bin')
+# # or prepend
+# path=('/home/david/pear/bin' $path)
+# Add a new path, if it's not already there
+# path+=(~/my_bin)
+# ========================================================================
+
+# # Add prioritized paths
+# path=(
+#   # Version managers (need to be before Homebrew)
+#   $HOME/.volta/bin # Node.js version manager
+
+#   # Other language-specific paths
+#   $HOME/.cargo/bin # Rust
+#   $HOME/go/bin     # Go
+
+#   # # System paths
+#   # "$HOME/.local/bin" # User local binaries
+#   # "$HOME/bin"        # User personal binaries
+# )
+# export PATH
+
+# # user compiled python as default python
+# export PATH=$HOME/python/bin:$PATH
+# export PYTHONPATH=$HOME/python/
+#
+# # user installed node as default node
+# export PATH="$HOME/node/node-v16.0.0-${KERNEL_NAME}-x64"/bin:$PATH
+# export NODE_MIRROR=https://mirrors.ustc.edu.cn/node/
+
+# ========================================================================
+# Dotfiles Symlink Map Configuration
+# ========================================================================
+
+# This defines the mapping between dotfiles source locations and their
+# target locations in the user's home directory. It's used by the installation
+# script and other dotfiles management tools.
+
+# declare -gA DOTFILES_TO_SYMLINK_MAP=(
+#   # Git configurations
+#   # ["$DOTFILES/config/git/config"]="$XDG_CONFIG_HOME/.gitconfig"
+#   # ["$DOTFILES/config/git/ignore"]="$XDG_CONFIG_HOME/git/.gitignore"
+#   # ["$DOTFILES/config/git/gitattributes"]="$HOME/.gitattributes"
+#   # ["$DOTFILES/config/git/gitmessage"]="$HOME/.gitmessage"
+
+#   # ["$DOTFILES/config/starship.toml"]="$XDG_CONFIG_HOME/starship.toml"
+#   # ["$DOTFILES/config/ghostty/config"]="$XDG_CONFIG_HOME/ghostty"
+#   # ["$DOTFILES/config/atuin/config.toml"]="$XDG_CONFIG_HOME/atuin/config.toml"
+#   # ["$DOTFILES/config/lazygit/config.yml"]="$XDG_CONFIG_HOME/lazygit/config.yml"
+#   ["$DOTFILES/config/karabiner/karabiner.json"]="$XDG_CONFIG_HOME/karabiner/karabiner.json"
+
+#   # Editor configurations
+#   ["$DOTFILES/config/vscode/settings.json"]="$HOME/Library/Application Support/Code/User/settings.json"
+#   ["$DOTFILES/config/vscode/keybindings.json"]="$HOME/Library/Application Support/Code/User/keybindings.json"
+#   ["$DOTFILES/config/cursor/settings.json"]="$HOME/Library/Application Support/Cursor/User/settings.json"
+#   ["$DOTFILES/config/cursor/keybindings.json"]="$HOME/Library/Application Support/Cursor/User/keybindings.json"
+
+#   # ["$DOTFILES/config/yazi"]="$XDG_CONFIG_HOME/yazi"
+#   # ["$DOTFILES/config/nvim"]="$XDG_CONFIG_HOME/nvim"
+#   # ["$DOTFILES/config/bat"]="$XDG_CONFIG_HOME/bat"
+#   # ["$DOTFILES/config/zellij"]="$XDG_CONFIG_HOME/zellij"
+#   # ["$DOTFILES/config/zed"]="$XDG_CONFIG_HOME/zed"
+#   # ["$DOTFILES/config/espanso"]="$XDG_CONFIG_HOME/espanso"
+#   # ["$DOTFILES/config/warp/keybindings.yaml"]="$XDG_CONFIG_HOME/warp/keybindings.yaml"
+
+#   # ["$DOTFILES/config/hammerspoon"]="$HOME/.hammerspoon"
+
+#   # AI tools configurations
+
+#   # ["$DOTFILES/config/ai/claude/claude_desktop_config.json"]="$HOME/Library/Application Support/Claude/claude_desktop_config.json"
+#   # ["$DOTFILES/config/ai/cline/cline_mcp_settings.json"]="$HOME/Library/Application Support/Cursor/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json"
+# )
+
+# # Export the map for use in other scripts
+# export DOTFILES_TO_SYMLINK_MAP
+
+# # Initialize dotfiles - ensure essential symlinks exist
+# # This is a lightweight version of setup_cli_tools from install.zsh
+# # that won't disrupt the user's shell experience
+# dotfiles_init() {
+#   # Only run in interactive shells to avoid slowing down scripts
+#   if [[ -o interactive ]]; then
+#     # Create missing symlinks silently
+#     for key in ${(k)DOTFILES_TO_SYMLINK_MAP}; do
+#       local src="$key"
+#       local dst="${DOTFILES_TO_SYMLINK_MAP[$key]}"
+
+#       # Only create symlink if source exists and destination doesn't
+#       if [[ -e "$src" ]] && [[ ! -e "$dst" ]]; then
+#         local parent_dir=$(dirname "$dst")
+
+#         # Create parent directory if needed
+#         [[ ! -d "$parent_dir" ]] && mkdir -p "$parent_dir"
+
+#         # Create the symlink
+#         echo "Creating symlink: $dst -> $src"
+#         ln -sf "$src" "$dst"
+#       fi
+#     done
+#   fi
+# }
+
+# ========================================================================
+# git
+# ========================================================================
+
+if ! has_command git; then
+  echo "git not found. Installing git..."
+  brew install git
+fi
+
+if ! has_command lazygit; then
+  echo "lazygit not found. Installing lazygit..."
+  brew install lazygit
+fi
+
+export GIT_EDITOR="nvim"
+export GIT_PAGER="bat --pager"
+export GIT_AUTHOR_NAME="Hank"
+export GIT_AUTHOR_EMAIL="hank.lee.qed@gmail.com"
+export GIT_COMMITTER_NAME="Hank"
+export GIT_COMMITTER_EMAIL="hank.lee.qed@gmail.com"
+
+if [[ ! -f "$XDG_CONFIG_HOME/.gitconfig" ]]; then
+  echo "Linking gitconfig..."
+  ln -sf "$DOTFILES/config/git/config" "$XDG_CONFIG_HOME/.gitconfig"
+fi
+
+if [[ ! -f "$XDG_CONFIG_HOME/.gitignore" ]]; then
+  echo "Linking gitignore..."
+  ln -sf "$DOTFILES/config/git/ignore" "$XDG_CONFIG_HOME/.gitignore"
+fi
+
+# lazygit config link
+if [[ ! -f "$XDG_CONFIG_HOME/lazygit/config.yml" ]]; then
+  echo "Linking lazygit config..."
+  ln -sf "$DOTFILES/config/lazygit/config.yml" "$XDG_CONFIG_HOME/lazygit/config.yml"
+fi
+
+# ========================================================================
+# starship
+# ========================================================================
+
+if ! has_command starship; then
+  echo "starship not found. Installing starship..."
+  curl -sS https://starship.rs/install.sh | sh
+fi
+
+if [[ ! -f "$XDG_CONFIG_HOME/starship.toml" ]]; then
+  echo "Linking starship.toml..."
+  ln -sf "$DOTFILES/config/starship.toml" "$XDG_CONFIG_HOME/starship.toml"
+fi
+
+# ========================================================================
+# ghostty
+# ========================================================================
+if ! has_command ghostty; then
+  echo "ghostty not found. Installing ghostty..."
+  brew install ghostty
+fi
+
+if [[ ! -f "$XDG_CONFIG_HOME/ghostty/config" ]]; then
+  echo "Linking ghostty config..."
+  ln -sf "$DOTFILES/config/ghostty/config" "$XDG_CONFIG_HOME/ghostty/config"
+fi
+
+# ========================================================================
+# zoxide
+# ========================================================================
+if ! has_command zoxide; then
+  echo "zoxide not found. Installing zoxide..."
+  brew install zoxide
+fi
+
+if [[ ! -f "$XDG_CONFIG_HOME/zoxide/config.toml" ]]; then
+  echo "Linking zoxide config..."
+  ln -sf "$DOTFILES/config/zoxide/config.toml" "$XDG_CONFIG_HOME/zoxide/config.toml"
+fi
+
+# ========================================================================
+# atuin
+# ========================================================================
+
+if ! has_command atuin; then
+  echo "atuin not found. Installing atuin..."
+  curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
+fi
+
+if [[ ! -f "$XDG_CONFIG_HOME/atuin/config.toml" ]]; then
+  echo "Linking atuin config..."
+  ln -sf "$DOTFILES/config/atuin/config.toml" "$XDG_CONFIG_HOME/atuin/config.toml"
+fi
+
+# ========================================================================
+# warp
+# ========================================================================
+
+if ! has_command warp; then
+  echo "warp not found. Installing warp..."
+  brew install warp
+fi
+
+if [[ ! -f "$XDG_CONFIG_HOME/warp/keybindings.yaml" ]]; then
+  echo "Linking warp keybindings..."
+  ln -sf "$DOTFILES/config/warp/keybindings.yaml" "$XDG_CONFIG_HOME/warp/keybindings.yaml"
+fi
+
+# ========================================================================
+# claude
+# ========================================================================
+
+if ! has_command claude; then
+  echo "claude not found. Installing claude..."
+  brew install claude
+fi
+
+if [[ ! -f "$XDG_CONFIG_HOME/claude/config.json" ]]; then
+  echo "Linking claude config..."
+  ln -sf "$DOTFILES/config/claude/config.json" "$XDG_CONFIG_HOME/claude/config.json"
+fi
+
+# ========================================================================
+# chatgpt
+# ========================================================================
+
+if ! has_command chatgpt; then
+  echo "chatgpt not found. Installing chatgpt..."
+  brew install chatgpt
+fi
+
+# ========================================================================
+# bun (nodejs)
+# ========================================================================
+
+if ! has_command bun; then
+  echo "Bun not found. Installing bun (nodejs)..."
+  curl -fsSL https://bun.sh/install | bash # for macOS, Linux, and WSL
+fi
+
+# add to ~/.zshrc
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+# ========================================================================
+# nvim
+# ========================================================================
+
+if ! has_command nvim; then
+  echo "nvim not found. Installing nvim..."
+  brew install neovim
+fi
+
+export EDITOR="nvim"
+export VISUAL="$EDITOR"
+
+# ========================================================================
+# fzf
+# ========================================================================
+if ! has_command fzf; then
+  echo "fzf not found. Installing fzf..."
+  brew install fzf
+fi
+
+# ========================================================================
+# bat
+# ========================================================================
+if ! has_command bat; then
+  echo "bat not found. Installing bat..."
+  brew install bat
+fi
+
+export PAGER="bat --pager"
+
+# ========================================================================
+# rust (rustup)
+# ========================================================================
+
+if ! has_command rustup; then
+  echo "rustup not found. Installing rustup..."
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -y | sh
+  echo "rustup installed"
+  echo "installing stable toolchain"
+  rustup toolchain install stable
+  echo "installing rustfmt"
+  rustup component add rustfmt
+  echo "rustfmt installed"
+fi
+
+# ========================================================================
+# Go
+# ========================================================================
+# export GOPATH="$HOME/go"
+# export GOBIN="$GOPATH/bin"
+
+# ========================================================================
+#
 # ========================================================================
 
 # Load configuration files in specific order, installing required tools if needed
 local files=(
-  "$ZDOTDIR/brew.zsh" # Homebrew package management
-  # "$ZDOTDIR/git.zsh"      # Git utilities and configurations
-  # "$ZDOTDIR/nodejs.zsh"   # Node.js development
-  "$ZDOTDIR/go.zsh"     # Go development
-  "$ZDOTDIR/python.zsh" # Python development
-  "$ZDOTDIR/rust.zsh"   # Rust development
-  # "$ZDOTDIR/atuin.zsh"    # Atuin shell history
+  "$ZDOTDIR/brew.zsh"     # Homebrew package management
+  "$ZDOTDIR/starship.zsh" # starship prompt
   "$ZDOTDIR/fzf.zsh"      # Fuzzy finder configuration
   "$ZDOTDIR/nvim.zsh"     # Neovim editor configuration
-  "$ZDOTDIR/starship.zsh" # starship prompt
-  "$ZDOTDIR/fd.zsh"       # starship prompt
+  # "$ZDOTDIR/fd.zsh"  # starship prompt
+  # "$ZDOTDIR/bat.zsh" # starship prompt
+  # "$ZDOTDIR/git.zsh"      # Git utilities and configurations
+  # "$ZDOTDIR/python.zsh" # Python development
+  # "$ZDOTDIR/nodejs.zsh"   # Node.js development
+  # "$ZDOTDIR/go.zsh"     # Go development
+  # "$ZDOTDIR/rust.zsh"   # Rust development
+  # "$ZDOTDIR/atuin.zsh"    # Atuin shell history
 )
 
 # Define installation commands for tools as an associative array
@@ -303,6 +621,6 @@ alias lg="lazygit"
 
 # The actual initialization happens in .zshrc via:
 # has_command atuin && eval "$(atuin init zsh)"
-. "$HOME/.local/bin/env"
+# . "$HOME/.local/bin/env"
 
-. "$HOME/.local/share/../bin/env"
+# . "$HOME/.local/share/../bin/env"
