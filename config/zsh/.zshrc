@@ -207,12 +207,12 @@ fi
 
 if ! has_command git; then
   echo "git not found. Installing git..."
-  brew install git
+  brew install --quiet git
 fi
 
 if ! has_command lazygit; then
   echo "lazygit not found. Installing lazygit..."
-  brew install lazygit
+  brew install --quiet lazygit
 fi
 
 export GIT_EDITOR="nvim"
@@ -257,7 +257,7 @@ fi
 # ========================================================================
 if ! has_command ghostty; then
   echo "ghostty not found. Installing ghostty..."
-  brew install ghostty
+  brew install --quiet ghostty
 fi
 
 if [[ ! -f "$XDG_CONFIG_HOME/ghostty/config" ]]; then
@@ -270,7 +270,7 @@ fi
 # ========================================================================
 if ! has_command zoxide; then
   echo "zoxide not found. Installing zoxide..."
-  brew install zoxide
+  brew install --quiet zoxide
 fi
 
 if [[ ! -f "$XDG_CONFIG_HOME/zoxide/config.toml" ]]; then
@@ -298,7 +298,7 @@ fi
 
 if ! has_command warp; then
   echo "warp not found. Installing warp..."
-  brew install warp
+  brew install --quiet warp
 fi
 
 if [[ ! -f "$XDG_CONFIG_HOME/warp/keybindings.yaml" ]]; then
@@ -312,7 +312,7 @@ fi
 
 if ! has_command claude; then
   echo "claude not found. Installing claude..."
-  brew install claude
+  brew install --quiet claude
 fi
 
 if [[ ! -f "$XDG_CONFIG_HOME/claude/config.json" ]]; then
@@ -326,7 +326,7 @@ fi
 
 if ! has_command chatgpt; then
   echo "chatgpt not found. Installing chatgpt..."
-  brew install chatgpt
+  brew install --quiet chatgpt
 fi
 
 # ========================================================================
@@ -348,7 +348,7 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 
 if ! has_command nvim; then
   echo "nvim not found. Installing nvim..."
-  brew install neovim
+  brew install --quiet neovim
 fi
 
 export EDITOR="nvim"
@@ -359,7 +359,7 @@ export VISUAL="$EDITOR"
 # ========================================================================
 if ! has_command fzf; then
   echo "fzf not found. Installing fzf..."
-  brew install fzf
+  brew install --quiet fzf
 fi
 
 # ========================================================================
@@ -367,7 +367,7 @@ fi
 # ========================================================================
 if ! has_command bat; then
   echo "bat not found. Installing bat..."
-  brew install bat
+  brew install --quiet bat
 fi
 
 export PAGER="bat --pager"
@@ -399,10 +399,10 @@ fi
 
 # Load configuration files in specific order, installing required tools if needed
 local files=(
-  "$ZDOTDIR/brew.zsh"     # Homebrew package management
-  "$ZDOTDIR/starship.zsh" # starship prompt
-  "$ZDOTDIR/fzf.zsh"      # Fuzzy finder configuration
-  "$ZDOTDIR/nvim.zsh"     # Neovim editor configuration
+  "$ZDOTDIR/brew.zsh" # Homebrew package management
+  # "$ZDOTDIR/starship.zsh" # starship prompt
+  "$ZDOTDIR/fzf.zsh"  # Fuzzy finder configuration
+  "$ZDOTDIR/nvim.zsh" # Neovim editor configuration
   # "$ZDOTDIR/fd.zsh"  # starship prompt
   # "$ZDOTDIR/bat.zsh" # starship prompt
   # "$ZDOTDIR/git.zsh"      # Git utilities and configurations
