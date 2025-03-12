@@ -38,30 +38,30 @@ typeset -g WHITE="\033[0;37m"
 # ========================================================================
 
 # Log information message
-export function log_info() {
+function log_info() {
   printf "${BLUE}[INFO]${RESET} %s\n" "$*"
 }
 
 # Log success message
-export function log_success() {
+function log_success() {
   printf "${GREEN}[SUCCESS]${RESET} %s\n" "$*"
 }
 
 # Log warning message
-export function log_warn() {
+function log_warn() {
   printf "${YELLOW}[WARNING]${RESET} %s\n" "$*" >&2
 }
 
 # Log error message
-export function log_error() {
+function log_error() {
   printf "${RED}[ERROR]${RESET} %s\n" "$*" >&2
 }
 
 # Aliases for different naming conventions
-export function info() { log_info "$@"; }
-export function success() { log_success "$@"; }
-export function warn() { log_warn "$@"; }
-export function error() { log_error "$@"; }
+function info() { log_info "$@"; }
+function success() { log_success "$@"; }
+function warn() { log_warn "$@"; }
+function error() { log_error "$@"; }
 
 # List all utility functions exported by this file
 export function list_utils() {
