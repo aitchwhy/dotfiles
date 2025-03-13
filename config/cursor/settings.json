@@ -158,5 +158,8 @@
   },
   "blockman.n04ColorComboPreset": "Classic Light (Gradients)",
   "editor.inlayHints.enabled": "off",
-  "scratchpads.defaultFiletype": "texi"
+  "scratchpads.defaultFiletype": "texi",
+  "[json]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  }
 }
