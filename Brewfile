@@ -386,161 +386,162 @@ mas "LanScan", id: 472226235          # Network scanner
 # mas "Pages", id: 409201541           # Apple productivity suite
 # mas "Session", id: 1521432881        # Already have cask
 
-###############################################################################
-# VSCode Extensions
-###############################################################################
-# Essential Extensions
-
-# Core Functionality
-vscode "dbaeumer.vscode-eslint"             # ESLint integration
-vscode "esbenp.prettier-vscode"             # Code formatting
-vscode "editorconfig.editorconfig"          # EditorConfig support
-vscode "formulahendry.auto-close-tag"       # Automatically close HTML/XML tags
-vscode "formulahendry.auto-rename-tag"      # Automatically rename paired HTML/XML tags
-vscode "github.copilot"                     # AI code completion
-vscode "github.copilot-chat"                # AI chat interface
-vscode "gruntfuggly.todo-tree"              # Find and highlight TODOs
-vscode "oderwat.indent-rainbow"             # Makes indentation more readable
-vscode "usernamehw.errorlens"               # Inline error messages
-vscode "vscode-icons-team.vscode-icons"     # File and folder icons
-
-# Utility & Navigation
-vscode "alefragnani.project-manager"        # Project management
-vscode "christian-kohler.path-intellisense" # Autocomplete filenames
-vscode "patbenatar.advanced-new-file"       # Advanced file creation
-vscode "sleistner.vscode-fileutils"         # File operations in VSCode
-vscode "tyriar.sort-lines"                  # Sort lines of text
-vscode "vspacecode.whichkey"                # Keybinding menu
-
-# Git & Collaboration
-vscode "github.vscode-github-actions"       # GitHub Actions
-vscode "vivaxy.vscode-conventional-commits" # Conventional commit support
-
-# Languages & Frameworks
-
-# JavaScript/TypeScript
-vscode "biomejs.biome"                      # JavaScript/TypeScript formatting
-vscode "bradlc.vscode-tailwindcss"          # Tailwind CSS support
-vscode "christian-kohler.npm-intellisense"  # Auto-completes npm modules
-vscode "wix.vscode-import-cost"             # Display import size
-vscode "mgmcdermott.vscode-language-babel"  # Babel syntax highlighting
-vscode "prisma.prisma"                      # Prisma ORM support
-vscode "golang.go"                          # Go support
-vscode "rust-lang.rust-analyzer"            # Rust support
-vscode "ms-python.python"                   # Python support
-vscode "ms-python.black-formatter"          # Python formatter
-vscode "charliermarsh.ruff"                 # Python linter
-vscode "bierner.markdown-mermaid"           # Mermaid diagram support in markdown
-vscode "redhat.vscode-yaml"                 # YAML support
-vscode "hashicorp.terraform"                # Terraform support
-vscode "ms-azuretools.vscode-docker"        # Docker support
-vscode "ms-kubernetes-tools.vscode-kubernetes-tools" # Kubernetes support
-vscode "mtxr.sqltools"                      # SQL tools
-vscode "ckolkman.vscode-postgres"           # PostgreSQL support
-
-# Remote Development & APIs
-vscode "ms-vscode-remote.vscode-remote-extensionpack" # Remote development
-vscode "rangav.vscode-thunder-client"       # HTTP client
-vscode "humao.rest-client"                  # REST client
-vscode "ms-vscode.remote-explorer"          # Remote Explorer
-vscode "redocly.openapi-vs-code"            # OpenAPI support
-
-# Themes & UI
-vscode "sdras.night-owl"                    # Night Owl theme
-vscode "catppuccin.catppuccin-vsc"          # Catppuccin theme
-vscode "zhuangtongfa.material-theme"        # One Dark Pro theme
-
-# VSCode Neovim & Vim
-vscode "asvetliakov.vscode-neovim"          # Neovim integration
-vscode "vscodevim.vim"                      # Vim emulation
-vscode "vspacecode.vspacecode"              # Spacemacs-like bindings
-
-# AI & Documentation
-vscode "saoudrizwan.claude-dev"             # Claude AI integration
-vscode "mintlify.document"                  # Documentation generator
-
-# Markdown & Documentation
-vscode "yzhang.markdown-all-in-one"         # Markdown tools
-vscode "davidanson.vscode-markdownlint"     # Markdown linting
-
-# Commented out extensions (less essential or redundant)
-# vscode "42crunch.vscode-openapi"            # Already have redocly.openapi-vs-code
-# vscode "4ops.terraform"                     # Already have hashicorp.terraform
-# vscode "aaron-bond.better-comments"         # Not essential
-# vscode "actboy168.lua-debug"                # Specialized
-# vscode "akamud.vscode-javascript-snippet-pack" # Snippet packs can be redundant
-# vscode "alefragnani.bookmarks"              # Not essential for most workflows
-# vscode "alefragnani.rtf"                    # Very specialized
-# vscode "amazonemr.emr-tools"                # Specialized AWS service
-# vscode "amazonwebservices.aws-toolkit-vscode" # Specialized cloud service
-# vscode "antfu.browse-lite"                  # Not essential
-# vscode "antfu.file-nesting"                 # Nice to have but not essential
-# vscode "antfu.icons-carbon"                 # UI enhancement, not essential
-# vscode "antfu.vite"                         # Specialized for Vite users
-# vscode "anysphere.pyright"                  # Redundant with ms-python
-# vscode "arcticicestudio.nord-visual-studio-code" # Additional theme
-# vscode "arianjamasb.protein-viewer"         # Very specialized
-# vscode "arrterian.nix-env-selector"         # Specialized for Nix users
-# vscode "atishay-jain.all-autocomplete"      # Can conflict with other completions
-# vscode "atlassian.atlascode"                # Specialized for Atlassian users
-# vscode "aykutsarac.jsoncrack-vscode"        # Nice to have but not essential
-# vscode "batisteo.vscode-django"             # Specialized for Django users
-# vscode "bbenoist.nix"                       # Specialized for Nix users
-# vscode "bodil.file-browser"                 # Alternative file browser
-# vscode "bpruitt-goddard.mermaid-markdown-syntax-highlighting" # Already have bierner.markdown-mermaid
-# vscode "buenon.scratchpads"                 # Nice to have but not essential
-# vscode "burkeholland.simple-react-snippets" # Specialized for React
-# vscode "bysabi.prettier-vscode-standard"    # Redundant with prettier
-# vscode "catppuccin.catppuccin-vsc-icons"    # UI enhancement
-# vscode "chaitanyashahare.lazygit"           # Not essential if using Git extension
-# vscode "chrmarti.regex"                     # Specialized
-# vscode "clinyong.vscode-css-modules"        # Specialized for CSS modules
-# vscode "codezombiech.gitignore"             # Nice to have but not essential
-# vscode "cstrap.flask-snippets"              # Specialized for Flask
-# vscode "cstrap.python-snippets"             # Specialized Python snippets
-# vscode "dart-code.dart-code"                # Specialized for Dart
-# vscode "dart-code.flutter"                  # Specialized for Flutter
-# vscode "deerawan.vscode-dash"               # Integration with Dash app
-# vscode "divyanshuagrawal.competitive-programming-helper" # Very specialized
-# vscode "donjayamanne.python-environment-manager" # Specialized Python tool
-# vscode "donjayamanne.python-extension-pack" # Includes multiple Python extensions
-# vscode "dzhavat.bracket-pair-toggler"       # Not essential with newer VSCode
-# vscode "ecmel.vscode-html-css"              # HTML/CSS support
-# vscode "emmanuelbeziat.vscode-great-icons"  # Alternative icon theme
-# vscode "enkia.tokyo-night"                  # Alternative theme
-# vscode "equimper.react-native-react-redux"  # Specialized for React Native
-# vscode "ericsia.pythonsnippets3"            # Python snippets
-# vscode "eriklynd.json-tools"                # JSON tools
-# vscode "evan-buss.font-switcher"            # Font management
-# vscode "file-icons.file-icons"              # Alternative file icons
-# vscode "firsttris.vscode-jest-runner"       # Jest test runner
-# vscode "formulahendry.code-runner"          # Code runner
-# vscode "foxundermoon.shell-format"          # Shell formatting
-# vscode "frhtylcn.pythonsnippets"            # Python snippets
-# vscode "george-alisson.html-preview-vscode" # HTML preview
-# vscode "github.codespaces"                  # GitHub Codespaces
-# vscode "github.remotehub"                   # GitHub remote
-# vscode "gitpod.gitpod-theme"                # Gitpod theme
-# vscode "graphql.vscode-graphql-syntax"      # GraphQL syntax
-# vscode "honnamkuan.golang-snippets"         # Go snippets
-# vscode "ibm.output-colorizer"               # Output colorizer
-# vscode "idered.npm"                         # npm support
-# vscode "infeng.vscode-react-typescript"     # React TypeScript
-# vscode "infracost.infracost"                # Cost estimates for Terraform
-# vscode "jacano.vscode-pnpm"                 # pnpm support
-# vscode "jacobdufault.fuzzy-search"          # Fuzzy search
-# vscode "jasonnutter.search-node-modules"    # Search node modules
-# vscode "jawandarajbir.react-vscode-extension-pack" # React extension pack
-# vscode "jebbs.plantuml"                     # PlantUML support
-# vscode "jithurjacob.nbpreviewer"            # Jupyter notebook previewer
-# vscode "jnoortheen.nix-ide"                 # Nix IDE
-# vscode "kahole.magit"                       # Magit-like Git interface
-# vscode "kamadorueda.alejandra"              # Nix formatter
-# vscode "kamikillerto.vscode-colorize"       # Colorize CSS
-
-##################
-# NPM global install (Bun)
-##################
-# brew "biome"                     # bun add --dev --exact @biomejs/biome
-# esbuild # npm install --save-exact --save-dev esbuild
-# typescript #  npm install -g typescript  # (project-wide) npm install typescript --save-dev
+# ###############################################################################
+# # VSCode Extensions
+# ###############################################################################
+# # Essential Extensions
+# 
+# # Core Functionality
+# vscode "dbaeumer.vscode-eslint"             # ESLint integration
+# vscode "esbenp.prettier-vscode"             # Code formatting
+# vscode "editorconfig.editorconfig"          # EditorConfig support
+# vscode "formulahendry.auto-close-tag"       # Automatically close HTML/XML tags
+# vscode "formulahendry.auto-rename-tag"      # Automatically rename paired HTML/XML tags
+# vscode "github.copilot"                     # AI code completion
+# vscode "github.copilot-chat"                # AI chat interface
+# vscode "gruntfuggly.todo-tree"              # Find and highlight TODOs
+# vscode "oderwat.indent-rainbow"             # Makes indentation more readable
+# vscode "usernamehw.errorlens"               # Inline error messages
+# vscode "vscode-icons-team.vscode-icons"     # File and folder icons
+# 
+# # Utility & Navigation
+# vscode "alefragnani.project-manager"        # Project management
+# vscode "christian-kohler.path-intellisense" # Autocomplete filenames
+# vscode "patbenatar.advanced-new-file"       # Advanced file creation
+# vscode "sleistner.vscode-fileutils"         # File operations in VSCode
+# vscode "tyriar.sort-lines"                  # Sort lines of text
+# vscode "vspacecode.whichkey"                # Keybinding menu
+# 
+# # Git & Collaboration
+# vscode "github.vscode-github-actions"       # GitHub Actions
+# vscode "vivaxy.vscode-conventional-commits" # Conventional commit support
+# 
+# # Languages & Frameworks
+# 
+# # JavaScript/TypeScript
+# vscode "biomejs.biome"                      # JavaScript/TypeScript formatting
+# vscode "bradlc.vscode-tailwindcss"          # Tailwind CSS support
+# vscode "christian-kohler.npm-intellisense"  # Auto-completes npm modules
+# vscode "wix.vscode-import-cost"             # Display import size
+# vscode "mgmcdermott.vscode-language-babel"  # Babel syntax highlighting
+# vscode "prisma.prisma"                      # Prisma ORM support
+# vscode "golang.go"                          # Go support
+# vscode "rust-lang.rust-analyzer"            # Rust support
+# vscode "ms-python.python"                   # Python support
+# vscode "ms-python.black-formatter"          # Python formatter
+# vscode "charliermarsh.ruff"                 # Python linter
+# vscode "bierner.markdown-mermaid"           # Mermaid diagram support in markdown
+# vscode "redhat.vscode-yaml"                 # YAML support
+# vscode "hashicorp.terraform"                # Terraform support
+# vscode "ms-azuretools.vscode-docker"        # Docker support
+# vscode "ms-kubernetes-tools.vscode-kubernetes-tools" # Kubernetes support
+# vscode "mtxr.sqltools"                      # SQL tools
+# vscode "ckolkman.vscode-postgres"           # PostgreSQL support
+# 
+# # Remote Development & APIs
+# vscode "ms-vscode-remote.vscode-remote-extensionpack" # Remote development
+# vscode "rangav.vscode-thunder-client"       # HTTP client
+# vscode "humao.rest-client"                  # REST client
+# vscode "ms-vscode.remote-explorer"          # Remote Explorer
+# vscode "redocly.openapi-vs-code"            # OpenAPI support
+# 
+# # Themes & UI
+# vscode "sdras.night-owl"                    # Night Owl theme
+# vscode "catppuccin.catppuccin-vsc"          # Catppuccin theme
+# vscode "zhuangtongfa.material-theme"        # One Dark Pro theme
+# 
+# # VSCode Neovim & Vim
+# vscode "asvetliakov.vscode-neovim"          # Neovim integration
+# vscode "vscodevim.vim"                      # Vim emulation
+# vscode "vspacecode.vspacecode"              # Spacemacs-like bindings
+# 
+# # AI & Documentation
+# vscode "saoudrizwan.claude-dev"             # Claude AI integration
+# vscode "mintlify.document"                  # Documentation generator
+# 
+# # Markdown & Documentation
+# vscode "yzhang.markdown-all-in-one"         # Markdown tools
+# vscode "davidanson.vscode-markdownlint"     # Markdown linting
+# 
+# # Commented out extensions (less essential or redundant)
+# # vscode "42crunch.vscode-openapi"            # Already have redocly.openapi-vs-code
+# # vscode "4ops.terraform"                     # Already have hashicorp.terraform
+# # vscode "aaron-bond.better-comments"         # Not essential
+# # vscode "actboy168.lua-debug"                # Specialized
+# # vscode "akamud.vscode-javascript-snippet-pack" # Snippet packs can be redundant
+# # vscode "alefragnani.bookmarks"              # Not essential for most workflows
+# # vscode "alefragnani.rtf"                    # Very specialized
+# # vscode "amazonemr.emr-tools"                # Specialized AWS service
+# # vscode "amazonwebservices.aws-toolkit-vscode" # Specialized cloud service
+# # vscode "antfu.browse-lite"                  # Not essential
+# # vscode "antfu.file-nesting"                 # Nice to have but not essential
+# # vscode "antfu.icons-carbon"                 # UI enhancement, not essential
+# # vscode "antfu.vite"                         # Specialized for Vite users
+# # vscode "anysphere.pyright"                  # Redundant with ms-python
+# # vscode "arcticicestudio.nord-visual-studio-code" # Additional theme
+# # vscode "arianjamasb.protein-viewer"         # Very specialized
+# # vscode "arrterian.nix-env-selector"         # Specialized for Nix users
+# # vscode "atishay-jain.all-autocomplete"      # Can conflict with other completions
+# # vscode "atlassian.atlascode"                # Specialized for Atlassian users
+# # vscode "aykutsarac.jsoncrack-vscode"        # Nice to have but not essential
+# # vscode "batisteo.vscode-django"             # Specialized for Django users
+# # vscode "bbenoist.nix"                       # Specialized for Nix users
+# # vscode "bodil.file-browser"                 # Alternative file browser
+# # vscode "bpruitt-goddard.mermaid-markdown-syntax-highlighting" # Already have bierner.markdown-mermaid
+# # vscode "buenon.scratchpads"                 # Nice to have but not essential
+# # vscode "burkeholland.simple-react-snippets" # Specialized for React
+# # vscode "bysabi.prettier-vscode-standard"    # Redundant with prettier
+# # vscode "catppuccin.catppuccin-vsc-icons"    # UI enhancement
+# # vscode "chaitanyashahare.lazygit"           # Not essential if using Git extension
+# # vscode "chrmarti.regex"                     # Specialized
+# # vscode "clinyong.vscode-css-modules"        # Specialized for CSS modules
+# # vscode "codezombiech.gitignore"             # Nice to have but not essential
+# # vscode "cstrap.flask-snippets"              # Specialized for Flask
+# # vscode "cstrap.python-snippets"             # Specialized Python snippets
+# # vscode "dart-code.dart-code"                # Specialized for Dart
+# # vscode "dart-code.flutter"                  # Specialized for Flutter
+# # vscode "deerawan.vscode-dash"               # Integration with Dash app
+# # vscode "divyanshuagrawal.competitive-programming-helper" # Very specialized
+# # vscode "donjayamanne.python-environment-manager" # Specialized Python tool
+# # vscode "donjayamanne.python-extension-pack" # Includes multiple Python extensions
+# # vscode "dzhavat.bracket-pair-toggler"       # Not essential with newer VSCode
+# # vscode "ecmel.vscode-html-css"              # HTML/CSS support
+# # vscode "emmanuelbeziat.vscode-great-icons"  # Alternative icon theme
+# # vscode "enkia.tokyo-night"                  # Alternative theme
+# # vscode "equimper.react-native-react-redux"  # Specialized for React Native
+# # vscode "ericsia.pythonsnippets3"            # Python snippets
+# # vscode "eriklynd.json-tools"                # JSON tools
+# # vscode "evan-buss.font-switcher"            # Font management
+# # vscode "file-icons.file-icons"              # Alternative file icons
+# # vscode "firsttris.vscode-jest-runner"       # Jest test runner
+# # vscode "formulahendry.code-runner"          # Code runner
+# # vscode "foxundermoon.shell-format"          # Shell formatting
+# # vscode "frhtylcn.pythonsnippets"            # Python snippets
+# # vscode "george-alisson.html-preview-vscode" # HTML preview
+# # vscode "github.codespaces"                  # GitHub Codespaces
+# # vscode "github.remotehub"                   # GitHub remote
+# # vscode "gitpod.gitpod-theme"                # Gitpod theme
+# # vscode "graphql.vscode-graphql-syntax"      # GraphQL syntax
+# # vscode "honnamkuan.golang-snippets"         # Go snippets
+# # vscode "ibm.output-colorizer"               # Output colorizer
+# # vscode "idered.npm"                         # npm support
+# # vscode "infeng.vscode-react-typescript"     # React TypeScript
+# # vscode "infracost.infracost"                # Cost estimates for Terraform
+# # vscode "jacano.vscode-pnpm"                 # pnpm support
+# # vscode "jacobdufault.fuzzy-search"          # Fuzzy search
+# # vscode "jasonnutter.search-node-modules"    # Search node modules
+# # vscode "jawandarajbir.react-vscode-extension-pack" # React extension pack
+# # vscode "jebbs.plantuml"                     # PlantUML support
+# # vscode "jithurjacob.nbpreviewer"            # Jupyter notebook previewer
+# # vscode "jnoortheen.nix-ide"                 # Nix IDE
+# # vscode "kahole.magit"                       # Magit-like Git interface
+# # vscode "kamadorueda.alejandra"              # Nix formatter
+# # vscode "kamikillerto.vscode-colorize"       # Colorize CSS
+# 
+# ##################
+# # NPM global install (Bun)
+# ##################
+# # brew "biome"                     # bun add --dev --exact @biomejs/biome
+# # esbuild # npm install --save-exact --save-dev esbuild
+# # typescript #  npm install -g typescript  # (project-wide) npm install typescript --save-dev
+# 
