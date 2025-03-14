@@ -67,7 +67,7 @@ function error() { log_error "$@"; }
 export function list_utils() {
   local util_funcs=$(functions | grep "^[a-z].*() {" | grep -v "^_" | sort)
   local count=$(echo "$util_funcs" | wc -l | tr -d ' ')
-  
+
   log_info "Available utility functions ($count total):"
   echo "$util_funcs" | sed 's/() {.*//' | column
 }
@@ -223,7 +223,9 @@ export function brew_init() {
 }
 
 # Automatically initialize brew when this file is sourced
-brew_init
+# brew_init
+
+# uninstall brew
 export function uninstall_brew() {
   if has_command brew; then
     log_info "Uninstalling Homebrew..."
@@ -233,7 +235,6 @@ export function uninstall_brew() {
     log_warn "Homebrew is not installed"
   fi
 }
-
 
 ###########################################################################
 # # TODO: zsh util functions
@@ -419,18 +420,18 @@ export function defaults_apply() {
   defaults write NSGlobalDomain AppleShowAllExtensions -bool true
   defaults write NSGlobalDomain InitialKeyRepeat -int 15
   defaults write NSGlobalDomain KeyRepeat -int 2
-  
+
   # File system behavior
   defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
-  
+
   # Dock settings
   defaults write com.apple.dock autohide -bool true
   defaults write com.apple.dock autohide-delay -float 0
   defaults write com.apple.dock show-recents -bool false
-  
+
   # Trackpad settings
   defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
-  
+
   # Finder settings
   defaults write com.apple.finder AppleShowAllFiles -bool true
   defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
@@ -478,7 +479,7 @@ export function setup_homebrew() {
   if [[ "${INSTALL_MODE:-false}" == "true" ]]; then
     info "Updating Homebrew..."
     brew update
-    
+
     # Install from Brewfile
     if [[ -f "$_DOTFILES/Brewfile" ]]; then
       info "Installing packages from Brewfile..."
