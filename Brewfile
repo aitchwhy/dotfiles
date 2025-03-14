@@ -355,12 +355,11 @@ mas "Drafts", id: 1435957248          # Text capture
 mas "HacKit", id: 1549557075          # Markdown editor
 mas "Omnivore", id: 1564031042        # Read-it-later
 mas "Parcel", id: 639968404           # Package tracking
-mas "Paste", id: 967805235            # Clipboard manager
-mas "Monica AI: Deep Chat & Search", id: 6450770590
+# mas "Paste", id: 967805235            # Clipboard manager
+# TODO: monica
 
 # Travel & Lifestyle
 mas "Flighty", id: 1358823008         # Flight tracking
-mas "Journey", id: 1662059644         # Journaling
 mas "Mela", id: 1568924476            # Recipe manager
 mas "Tripsy", id: 1429967544          # Trip planning
 
@@ -384,7 +383,7 @@ mas "LanScan", id: 472226235          # Network scanner
 # mas "Numbers", id: 409203825         # Apple productivity suite
 # mas "One Thing", id: 1604176982      # Simple todo app
 # mas "Pages", id: 409201541           # Apple productivity suite
-# mas "Session", id: 1521432881        # Already have cask
+mas "Session", id: 1521432881        # Already have cask
 
 # ###############################################################################
 # # VSCode Extensions
