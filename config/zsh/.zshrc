@@ -46,7 +46,7 @@ export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 
 # Ensure ZSH config directory is set
 # export ZDOTDIR=${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}
-export ZDOTDIR=:"$XDG_CONFIG_HOME/zsh"
+export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
 
 # Dotfiles location
 # export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
