@@ -13,55 +13,58 @@ tap "yakitrak/yakitrak"
 
 # Set cask install dir to ~/Applications (user level)
 # cask_args appdir: "~/Applications", require_sha: true
-cask_args appdir: "/Applications", require_sha: true
+# cask_args appdir: "/Applications", require_sha: true
+
+brew "mas"                       # Mac App Store command-line interface
+
 
 ###############################################################################
 # Development Tools & Languages
 ###############################################################################
+
 # Databases
 brew "postgresql@17"
 brew "minio"                     # High Performance, Kubernetes Native Object Storage
 brew "neo4j"                     # Graph database
 
 # JavaScript/TypeScript
-brew "biome"                     # Toolchain of the web
-brew "esbuild"                   # Extremely fast JavaScript bundler and minifier
-brew "eslint"                    # AST-based pattern checker for JavaScript
-brew "prettier"                  # Code formatter for JavaScript, CSS, JSON, GraphQL, Markdown, YAML
-brew "rollup"                    # Next-generation ES module bundler
-brew "vite"                      # Next generation frontend tooling
-brew "volta"                     # JavaScript toolchain manager for reproducible environments
+# brew "esbuild"                   # Extremely fast JavaScript bundler and minifier
+# brew "eslint"                    # AST-based pattern checker for JavaScript
+# brew "prettier"                  # Code formatter for JavaScript, CSS, JSON, GraphQL, Markdown, YAML
+# brew "rollup"                    # Next-generation ES module bundler
+# brew "vite"                      # Next generation frontend tooling
+#brew "volta"                     # JavaScript toolchain manager for reproducible environments
 # brew "vscode-langservers-extracted" # Language servers for HTML, CSS, JavaScript, and JSON
 
 # Python
 brew "black"                     # Python code formatter
-brew "pyenv"                     # Python version management
+# brew "pyenv"                     # Python version management
 brew "pyright"                   # Static type checker for Python
 brew "scrapy"                    # Web crawling & scraping framework
 
 # Lua
 brew "lua"                       # Powerful, lightweight programming language
 brew "luarocks"                  # Package manager for the Lua programming language
-brew "stylua"                    # Opinionated Lua code formatter
+# brew "stylua"                    # Opinionated Lua code formatter
 
 # Rust
-brew "rust-analyzer"             # Experimental Rust compiler front-end for IDEs
+# brew "rust-analyzer"             # Experimental Rust compiler front-end for IDEs
 
 # Go
-brew "gopls"                     # Language server for the Go language
+# brew "gopls"                     # Language server for the Go language
 
 # Ruby
-brew "ruby"                      # Powerful, clean, object-oriented scripting language
+# brew "ruby"                      # Powerful, clean, object-oriented scripting language
 
 # Other Languages & Language Servers
-brew "cmake"                     # Cross-platform make
-brew "marksman"                  # Language Server Protocol for Markdown
-brew "tectonic"                  # Modernized, complete, self-contained TeX/LaTeX engine
+# brew "cmake"                     # Cross-platform make
+#brew "marksman"                  # Language Server Protocol for Markdown
+# brew "tectonic"                  # Modernized, complete, self-contained TeX/LaTeX engine
 
 ###############################################################################
 # Editors & IDEs
 ###############################################################################
-brew "helix"                     # Post-modern modal text editor
+# brew "helix"                     # Post-modern modal text editor
 brew "neovim"                    # Ambitious Vim-fork focused on extensibility and agility
 
 ###############################################################################
@@ -70,18 +73,18 @@ brew "neovim"                    # Ambitious Vim-fork focused on extensibility a
 # Shell Enhancements
 # brew "atuin", restart_service: :changed  # Improved shell history for zsh, bash, fish and nushell
 brew "direnv"                    # Load/unload environment variables based on $PWD
-brew "starship"                  # Cross-shell prompt for astronauts
+# brew "starship"                  # Cross-shell prompt for astronauts
 brew "zoxide"                    # Shell extension to navigate your filesystem faster
 brew "zsh-autopair"              # Auto-close and delete matching delimiters in zsh
 brew "zsh-autosuggestions"       # Fish-like fast/unobtrusive autosuggestions for zsh
 brew "zsh-completions"           # Additional completion definitions for zsh
 brew "zsh-history-substring-search" # Zsh port of Fish shell's history search
 brew "zsh-syntax-highlighting"   # Fish shell like syntax highlighting for zsh
-brew "olets/tap/zsh-abbr"        # Auto-expanding abbreviations manager for zsh, inspired by fish
-brew "olets/tap/zsh-autosuggestions-abbreviations-strategy" # Plugin for zsh-abbr
+# brew "olets/tap/zsh-abbr"        # Auto-expanding abbreviations manager for zsh, inspired by fish
+# brew "olets/tap/zsh-autosuggestions-abbreviations-strategy" # Plugin for zsh-abbr
 
 # Terminal Multiplexers & Managers
-brew "tmux"                      # Terminal multiplexer
+# brew "tmux"                      # Terminal multiplexer
 brew "zellij"                    # Pluggable terminal workspace, with terminal multiplexer
 
 # Terminal File Managers & Navigation
@@ -95,7 +98,7 @@ brew "yazi"                      # Blazing fast terminal file manager written in
 # System Monitoring & Information
 brew "duf"                       # Disk Usage/Free Utility - a better 'df' alternative
 brew "dust"                      # More intuitive version of du in rust
-brew "glances"                   # Alternative to top/htop
+# brew "glances"                   # Alternative to top/htop
 brew "gping"                     # Ping, but with a graph
 brew "htop"                      # Improved top (interactive process viewer)
 brew "hyperfine"                 # Command-line benchmarking tool
@@ -104,7 +107,6 @@ brew "speedtest-cli"             # Command-line interface for speedtest.net band
 brew "trippy"                    # Network diagnostic tool, inspired by mtr
 
 # Text Processing & Viewing
-brew "angle-grinder"             # Slice and dice log files on the command-line
 brew "bat"                       # Clone of cat(1) with syntax highlighting and Git integration
 brew "diff-so-fancy"             # Good-lookin' diffs with diff-highlight and more
 brew "glow"                      # Render markdown on the CLI
@@ -123,25 +125,22 @@ brew "yq"                        # Process YAML, JSON, XML, CSV and properties d
 # brew "cheat"                     # Create and view interactive cheat sheets for *nix commands
 brew "dasht"                     # Search API docs offline, in your terminal or browser
 brew "tlrc"                      # Official tldr client written in Rust
-brew "xxh"                       # Bring your favorite shell wherever you go through the ssh
+# brew "xxh"                       # Bring your favorite shell wherever you go through the ssh
 
 ###############################################################################
 # Development Tools & Utilities
 ###############################################################################
 # Version Control
-brew "git"                       # Distributed revision control system
-brew "git-delta"                 # Syntax-highlighting pager for git and diff output
 brew "gh"                        # GitHub command-line tool
-brew "ghi"                       # Work on GitHub issues on the command-line
 brew "lazygit"                   # Simple terminal UI for git commands
 
 # Code Quality & Analysis
-brew "actionlint"                # Static checker for GitHub Actions workflow files
+# brew "actionlint"                # Static checker for GitHub Actions workflow files
 brew "ast-grep"                  # Code searching, linting, rewriting
 brew "grex"                      # Command-line tool for generating regular expressions
 brew "jd"                        # JSON diff and patch
-brew "shfmt"                     # Autoformat shell script source code
-brew "shellcheck"                # Static analysis and lint tool, for (ba)sh scripts
+# brew "shfmt"                     # Autoformat shell script source code
+# brew "shellcheck"                # Static analysis and lint tool, for (ba)sh scripts
 
 # AI & ML Tools
 brew "aider"                     # AI pair programming in your terminal
@@ -158,22 +157,22 @@ brew "traefik"                   # Modern reverse proxy
 
 # AWS & Cloud Tools
 brew "awscli-local"              # Thin wrapper around the `aws` command-line interface for use with LocalStack
-brew "cloudflare-wrangler"       # CLI tool for Cloudflare Workers
+# brew "cloudflare-wrangler"       # CLI tool for Cloudflare Workers
 # brew "gdrive"                    # Google Drive CLI Client
 brew "localstack"                # Fully functional local AWS cloud stack
-brew "rclone"                    # Rsync for cloud storage
-brew "stripe/stripe-cli/stripe"  # Stripe CLI utility
-brew "temporal"                  # Command-line interface for Temporal Server and UI
-brew "temporalio/brew/tcld"      # Temporal Cloud CLI
+# brew "rclone"                    # Rsync for cloud storage
+# brew "stripe/stripe-cli/stripe"  # Stripe CLI utility
+# brew "temporal"                  # Command-line interface for Temporal Server and UI
+# brew "temporalio/brew/tcld"      # Temporal Cloud CLI
 
 # Security & Network
-brew "gnupg" if OS.mac?          # GNU Privacy Guard
+# brew "gnupg" if OS.mac?          # GNU Privacy Guard
 brew "kanata"                    # Cross-platform software keyboard remapper
-brew "netcat"                    # Utility for managing network connections
-brew "pinentry-mac"              # Pinentry for GPG on Mac
+# brew "netcat"                    # Utility for managing network connections
+# brew "pinentry-mac"              # Pinentry for GPG on Mac
 brew "prometheus"                # Service monitoring system and time series database
 brew "rustscan"                  # Modern Day Portscanner
-brew "sonic"                     # Fast, lightweight & schema-less search backend
+# brew "sonic"                     # Fast, lightweight & schema-less search backend
 brew "tailscale"                 # Mesh VPN built on WireGuard
 
 ###############################################################################
@@ -183,38 +182,35 @@ brew "tailscale"                 # Mesh VPN built on WireGuard
 brew "exiftool"                  # Perl lib for reading and writing EXIF metadata
 brew "ffmpeg"                    # Play, record, convert, and stream audio and video
 brew "imagemagick"               # Tools and libraries to manipulate images in many formats
-brew "portaudio"                 # Cross-platform library for audio I/O
-brew "speexdsp"                  # Speex audio processing library
+# brew "portaudio"                 # Cross-platform library for audio I/O
+# brew "speexdsp"                  # Speex audio processing library
 brew "weasyprint"                # Convert HTML to PDF
 brew "yt-dlp"                    # Feature-rich command-line audio/video downloader
 
 # File & System Operations
-brew "aria2"                     # Download with resuming and segmented downloading
+# brew "aria2"                     # Download with resuming and segmented downloading
 brew "bitwarden-cli"             # Secure and free password manager
 brew "curl"                      # Get a file from an HTTP, HTTPS or FTP server
-brew "curlie"                    # Power of curl, ease of use of httpie
+# brew "curlie"                    # Power of curl, ease of use of httpie
 brew "datasette"                 # Open source multi-tool for exploring and publishing data
 brew "httpx"                     # http toolkit
-brew "httrack"                   # Website copier/offline browser
-brew "mas"                       # Mac App Store command-line interface
+# brew "httrack"                   # Website copier/offline browser
 brew "parallel"                  # Shell command parallelization utility
-brew "pkgconf"                   # Package compiler and linker metadata toolkit
+# brew "pkgconf"                   # Package compiler and linker metadata toolkit
 brew "posting"                   # Modern API client that lives in your terminal
-brew "sevenzip"                  # 7-Zip is a file archiver with a high compression ratio
+# brew "sevenzip"                  # 7-Zip is a file archiver with a high compression ratio
 brew "wget"                      # Internet file retriever
 brew "xclip"                     # Access X11 clipboards from the command-line
 brew "xcodes"                    # Tool to install and switch between multiple Xcode versions
 brew "xh"                        # Friendly and fast tool for sending HTTP requests
 
 # Special Purpose Tools
-brew "cutter"                    # Unit Testing Framework for C and C++
 brew "chrome-cli"                # Control Google Chrome from the command-line
 brew "dotenvx/brew/dotenvx"      # Better dotenv from the creator of `dotenv`
 brew "fx"                        # Terminal JSON viewer
-brew "koekeishiya/formulae/skhd" # Simple hotkey-daemon for macOS
-brew "koekeishiya/formulae/yabai" # Tiling window manager for macOS
-brew "sachaos/todoist/todoist"   # Todoist CLI client
-brew "yakitrak/yakitrak/obsidian-cli" # CLI for Obsidian
+# brew "koekeishiya/formulae/skhd" # Simple hotkey-daemon for macOS
+# brew "koekeishiya/formulae/yabai" # Tiling window manager for macOS
+#brew "yakitrak/yakitrak/obsidian-cli" # CLI for Obsidian
 
 ###############################################################################
 # Applications (Casks)
@@ -225,12 +221,12 @@ cask "orbstack"                  # Container and VM manager
 cask "tableplus"                 # Database management
 
 # AI & ML Tools
-cask "boltai"                    # AI assistant
+# cask "boltai"                    # AI assistant
 cask "chatgpt"                   # ChatGPT desktop client
 cask "claude"                    # Claude AI assistant
-cask "copilot"                   # GitHub Copilot desktop
+cask "copilot"                   # copilot.money
 cask "cursor"                    # Code editor with AI
-cask "draw-things"               # AI image generation
+# cask "draw-things"               # AI image generation
 cask "lm-studio"                 # Language model studio
 cask "macwhisper"                # Audio transcription
 cask "ollama"                    # Run LLMs locally
@@ -239,17 +235,17 @@ cask "superwhisper"              # Audio transcription
 # Productivity & Organization
 cask "a-better-finder-rename"    # File renaming utility
 cask "anki"                      # Flashcard app
-cask "asana"                     # Project management
+# cask "asana"                     # Project management
 cask "bartender"                 # Menu bar organizer
 cask "bitwarden"                 # Password manager
-cask "bunch"                     # App automation
+# cask "bunch"                     # App automation
 cask "cardhop"                   # Contact manager
-cask "charmstone"                # Quick actions
+# cask "charmstone"                # Quick actions
 cask "cleanshot"                 # Screenshot utility
 cask "cork"                      # Note taking
 cask "dash"                      # API documentation
 # cask "devonthink"                # Document management
-cask "espanso"                   # Text expander
+# cask "espanso"                   # Text expander
 cask "fantastical"               # Calendar app
 cask "hazel"                     # File automation
 cask "homerow"                   # Keyboard navigation
@@ -258,9 +254,8 @@ cask "linear-linear"             # Project management
 cask "obsidian"                  # Note taking
 # cask "paletro"                   # Command palette
 cask "pdf-expert"                # PDF editor
-# cask "quit-all"                  # Quit all apps
+cask "quit-all"                  # Quit all apps
 cask "raycast"                   # App launcher
-cask "rippling"                  # HR platform
 cask "rize"                      # Time tracker
 cask "soulver"                   # Smart calculator
 cask "swish"                     # Window manager
@@ -269,24 +264,24 @@ cask "todoist"                   # Todo list
 # cask "typora"                    # Markdown editor
 
 # Development & Design
-cask "apidog"                    # API development
+# cask "apidog"                    # API development
 cask "bruno"                     # API client
 # cask "canva"                     # Design tool
 cask "devutils"                  # Developer utilities
 cask "excalidrawz"               # Diagramming
-# cask "figma"                     # Design tool
 cask "ghostty"                   # Terminal emulator
 cask "hammerspoon"               # Automation tool
-cask "hopper-disassembler"       # Disassembler
-cask "httpie"                    # API client
+# cask "hopper-disassembler"       # Disassembler
+# cask "httpie"                    # API client
 cask "istat-menus"               # System monitor
 cask "kaleidoscope"              # Diff tool
 cask "karabiner-elements"        # Keyboard customizer
 cask "proxyman"                  # HTTP debugging proxy
 cask "syntax-highlight"          # Syntax highlighter
 cask "termius"                   # SSH client
-cask "tower"                     # Git client
-cask "visual-studio-code"        # Code editor
+# cask "tower"                     # Git client
+cask "fork"                     # Git client
+# cask "visual-studio-code"        # Code editor
 cask "warp"                      # Terminal
 # cask "zed"                       # Code editor
 
@@ -301,14 +296,14 @@ cask "keka"                      # File archiver
 cask "kekaexternalhelper"        # Helper for Keka
 # cask "keycastr"                  # Key visualizer
 cask "keymapp"                   # Keyboard mapping
-cask "motrix"                    # Download manager
+# cask "motrix"                    # Download manager
 # cask "osquery"                   # OS instrumentation
 cask "proton-mail"               # Email client
 cask "protonvpn"                 # VPN client
 cask "qflipper"                  # Flipper Zero utility
 cask "royal-tsx"                 # Remote connections
-cask "soundsource"               # Audio control
-cask "tailscale"                 # Mesh VPN
+# cask "soundsource"               # Audio control
+# cask "tailscale"                 # Mesh VPN
 cask "virtualbuddy"              # macOS VM manager
 # cask "windsurf"                  # Window management
 cask "yubico-authenticator"      # YubiKey tool
@@ -318,7 +313,7 @@ cask "kawa"    # key input language
 # Communication & Media
 # cask "arc"                       # Web browser
 cask "descript"                  # Audio/video editor
-cask "firefox"                   # Web browser
+# cask "firefox"                   # Web browser
 cask "follow"                    # RSS reader
 cask "google-chrome"             # Web browser
 cask "jump"                      # Remote desktop
@@ -332,12 +327,12 @@ cask "zen-browser"               # Minimal browser
 cask "zoom"                      # Video conferencing
 
 # Fonts
-cask "font-fira-mono-nerd-font"  # Nerd Font
-cask "font-jetbrains-mono-nerd-font" # Nerd Font
-cask "font-mononoki-nerd-font"   # Nerd Font
-cask "font-roboto-mono-nerd-font" # Nerd Font
-cask "font-sf-mono-nerd-font-ligaturized" # Nerd Font
-cask "font-symbols-only-nerd-font" # Nerd Font
+# cask "font-fira-mono-nerd-font"  # Nerd Font
+# cask "font-jetbrains-mono-nerd-font" # Nerd Font
+# cask "font-mononoki-nerd-font"   # Nerd Font
+# cask "font-roboto-mono-nerd-font" # Nerd Font
+# cask "font-sf-mono-nerd-font-ligaturized" # Nerd Font
+# cask "font-symbols-only-nerd-font" # Nerd Font
 
 # Specialist Tools
 cask "audacity"                  # Audio editor
@@ -542,4 +537,10 @@ vscode "davidanson.vscode-markdownlint"     # Markdown linting
 # vscode "kahole.magit"                       # Magit-like Git interface
 # vscode "kamadorueda.alejandra"              # Nix formatter
 # vscode "kamikillerto.vscode-colorize"       # Colorize CSS
-# vscode
+
+##################
+# NPM global install (Bun)
+##################
+# brew "biome"                     # bun add --dev --exact @biomejs/biome
+# esbuild # npm install --save-exact --save-dev esbuild
+# typescript #  npm install -g typescript  # (project-wide) npm install typescript --save-dev

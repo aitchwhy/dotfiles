@@ -19,26 +19,24 @@ if [[ ! -x /opt/homebrew/bin/brew ]]; then
 fi
 
 # setup homebrew shell path
-echo "------------ Run eval to set Homebrew shell path"
 eval "$(/opt/homebrew/bin/brew shellenv)"
-echo "------------ Homebrew shell path set"
 
-# install core utils
-brew install \
-  nvim \
-  bat \
-  fzf \
-  gh \
-  ghostty \
-  lazygit \
-  go \
-  starship \
-  atuin \
-  zoxide \
-  zsh-completions \
-  zsh-syntax-highlighting \
-  zsh-autosuggestions \
-  zsh-history-substring-search
+# # install core utils
+# brew install --quiet \
+#   nvim \
+#   bat \
+#   fzf \
+#   gh \
+#   ghostty \
+#   lazygit \
+#   go \
+#   starship \
+#   atuin \
+#   zoxide \
+#   zsh-completions \
+#   zsh-syntax-highlighting \
+#   zsh-autosuggestions \
+#   zsh-history-substring-search
 
 # zsh setu
 # TODO: fzf-zsh https://github.com/unixorn/fzf-zsh-plugin

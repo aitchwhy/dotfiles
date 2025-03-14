@@ -804,7 +804,14 @@ log_info "Use 'b' for brew commands and 'bb' for brewfile commands"
 log_info "Run without arguments for interactive selection (if fzf is installed)"
 
 # Initialize Homebrew
-brew_init
+# brew_init
+
+if ! has_command brew; then
+  log_error "Homebrew is not installed"
+  log_info "Installing Homebrew..."
+  
+  return 1
+fi
 
 # Automatically check setup
 if has_command brew; then

@@ -58,11 +58,11 @@ export DOTFILES="$HOME/dotfiles"
 # if [[ ! -d "$XDG_STATE_HOME" ]]; then mkdir -p "$XDG_STATE_HOME"; fi
 # if [[ ! -d "$XDG_CACHE_HOME" ]]; then mkdir -p "$XDG_CACHE_HOME"; fi
 # if [[ ! -d "$XDG_BIN_HOME" ]]; then mkdir -p "$XDG_BIN_HOME"; fi
-[[ ! -d "$XDG_DATA_HOME" ]] && mkdir -p "$XDG_DATA_HOME"
 [[ ! -d "$XDG_CONFIG_HOME" ]] && mkdir -p "$XDG_CONFIG_HOME"
-[[ ! -d "$XDG_STATE_HOME" ]] && mkdir -p "$XDG_STATE_HOME"
 [[ ! -d "$XDG_CACHE_HOME" ]] && mkdir -p "$XDG_CACHE_HOME"
-[[ ! -d "$XDG_BIN_HOME" ]] && mkdir -p "$XDG_BIN_HOME"
+[[ ! -d "$XDG_DATA_HOME" ]] && mkdir -p "$XDG_DATA_HOME"
+[[ ! -d "$XDG_STATE_HOME" ]] && mkdir -p "$XDG_STATE_HOME"
+# [[ ! -d "$XDG_BIN_HOME" ]] && mkdir -p "$XDG_BIN_HOME"
 
 # ========================================================================
 # Keyboard & Input Configuration
@@ -222,14 +222,14 @@ export GIT_AUTHOR_EMAIL="hank.lee.qed@gmail.com"
 export GIT_COMMITTER_NAME="Hank"
 export GIT_COMMITTER_EMAIL="hank.lee.qed@gmail.com"
 
-if [[ ! -f "$XDG_CONFIG_HOME/.gitconfig" ]]; then
+if [[ ! -f "$HOME/.gitconfig" ]]; then
   echo "Linking gitconfig..."
-  ln -sf "$DOTFILES/config/git/config" "$XDG_CONFIG_HOME/.gitconfig"
+  ln -sf "$DOTFILES/config/git/config" "$HOME/.gitconfig"
 fi
 
-if [[ ! -f "$XDG_CONFIG_HOME/.gitignore" ]]; then
+if [[ ! -f "$HOME/.gitignore" ]]; then
   echo "Linking gitignore..."
-  ln -sf "$DOTFILES/config/git/ignore" "$XDG_CONFIG_HOME/.gitignore"
+  ln -sf "$DOTFILES/config/git/ignore" "$HOME/.gitignore"
 fi
 
 # lazygit config link
@@ -273,10 +273,10 @@ if ! has_command zoxide; then
   brew install --quiet zoxide
 fi
 
-if [[ ! -f "$XDG_CONFIG_HOME/zoxide/config.toml" ]]; then
-  echo "Linking zoxide config..."
-  ln -sf "$DOTFILES/config/zoxide/config.toml" "$XDG_CONFIG_HOME/zoxide/config.toml"
-fi
+# if [[ ! -f "$XDG_CONFIG_HOME/zoxide/config.toml" ]]; then
+#   echo "Linking zoxide config..."
+#   ln -sf "$DOTFILES/config/zoxide/config.toml" "$XDG_CONFIG_HOME/zoxide/config.toml"
+# fi
 
 # ========================================================================
 # atuin
@@ -296,63 +296,63 @@ fi
 # warp
 # ========================================================================
 
-if ! has_command warp; then
-  echo "warp not found. Installing warp..."
-  brew install --quiet warp
-fi
-
-if [[ ! -f "$XDG_CONFIG_HOME/warp/keybindings.yaml" ]]; then
-  echo "Linking warp keybindings..."
-  ln -sf "$DOTFILES/config/warp/keybindings.yaml" "$XDG_CONFIG_HOME/warp/keybindings.yaml"
-fi
+# if ! has_command warp; then
+#   echo "warp not found. Installing warp..."
+#   brew install --quiet warp
+# fi
+#
+# if [[ ! -f "$XDG_CONFIG_HOME/warp/keybindings.yaml" ]]; then
+#   echo "Linking warp keybindings..."
+#   ln -sf "$DOTFILES/config/warp/keybindings.yaml" "$XDG_CONFIG_HOME/warp/keybindings.yaml"
+# fi
 
 # ========================================================================
 # claude
 # ========================================================================
 
-if ! has_command claude; then
-  echo "claude not found. Installing claude..."
-  brew install --quiet claude
-fi
-
-if [[ ! -f "$XDG_CONFIG_HOME/claude/config.json" ]]; then
-  echo "Linking claude config..."
-  ln -sf "$DOTFILES/config/claude/config.json" "$XDG_CONFIG_HOME/claude/config.json"
-fi
-
+# if ! has_command claude; then
+#   echo "claude not found. Installing claude..."
+#   brew install --quiet claude
+# fi
+#
+# if [[ ! -f "$XDG_CONFIG_HOME/claude/config.json" ]]; then
+#   echo "Linking claude config..."
+#   ln -sf "$DOTFILES/config/claude/config.json" "$XDG_CONFIG_HOME/claude/config.json"
+# fi
+#
 # ========================================================================
 # chatgpt
 # ========================================================================
 
-if ! has_command chatgpt; then
-  echo "chatgpt not found. Installing chatgpt..."
-  brew install --quiet chatgpt
-fi
+# if ! has_command chatgpt; then
+#   echo "chatgpt not found. Installing chatgpt..."
+#   brew install --quiet chatgpt
+# fi
 
 # ========================================================================
 # bun (nodejs)
 # ========================================================================
+
+# add to ~/.zshrc
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
 
 if ! has_command bun; then
   echo "Bun not found. Installing bun (nodejs)..."
   curl -fsSL https://bun.sh/install | bash # for macOS, Linux, and WSL
 fi
 
-# add to ~/.zshrc
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
-
 # ========================================================================
 # nvim
 # ========================================================================
+
+export EDITOR="nvim"
+export VISUAL="$EDITOR"
 
 if ! has_command nvim; then
   echo "nvim not found. Installing nvim..."
   brew install --quiet neovim
 fi
-
-export EDITOR="nvim"
-export VISUAL="$EDITOR"
 
 # ========================================================================
 # fzf
@@ -365,12 +365,13 @@ fi
 # ========================================================================
 # bat
 # ========================================================================
+
+export PAGER="bat --pager"
+
 if ! has_command bat; then
   echo "bat not found. Installing bat..."
   brew install --quiet bat
 fi
-
-export PAGER="bat --pager"
 
 # ========================================================================
 # rust (rustup)
@@ -397,75 +398,88 @@ fi
 #
 # ========================================================================
 
-# Load configuration files in specific order, installing required tools if needed
-local files=(
-  "$ZDOTDIR/brew.zsh" # Homebrew package management
-  # "$ZDOTDIR/starship.zsh" # starship prompt
-  "$ZDOTDIR/fzf.zsh"  # Fuzzy finder configuration
-  "$ZDOTDIR/nvim.zsh" # Neovim editor configuration
-  # "$ZDOTDIR/fd.zsh"  # starship prompt
-  # "$ZDOTDIR/bat.zsh" # starship prompt
-  # "$ZDOTDIR/git.zsh"      # Git utilities and configurations
-  # "$ZDOTDIR/python.zsh" # Python development
-  # "$ZDOTDIR/nodejs.zsh"   # Node.js development
-  # "$ZDOTDIR/go.zsh"     # Go development
-  # "$ZDOTDIR/rust.zsh"   # Rust development
-  # "$ZDOTDIR/atuin.zsh"    # Atuin shell history
-)
+# # Define installation commands for tools as an associative array
+# declare -A TOOL_INSTALL_COMMANDS=(
+#   [brew]="/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
+#   [starship]="curl -sS https://starship.rs/install.sh | sh"
+#   [atuin]="curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh"
+#   [volta]="curl https://get.volta.sh | bash"
+#   [uv]="curl -LsSf https://astral.sh/uv/install.sh | sh"
+#   [rustup]="curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
+#   [fzf]="brew install fzf"
+#   [eza]="brew install eza"
+#   [go]="brew install go"
+#   [nvim]="brew install neovim"
+#   [zoxide]="brew install zoxide"
+#   [fd]="brew install fd"
+# )
+#
+# # Define which tools are essential (will always be installed if missing)
+# declare -A TOOL_IS_ESSENTIAL=(
+#   [brew]=true
+#   [starship]=true
+#   [git]=true
+#   [atuin]=true
+#   [volta]=true
+#   [uv]=true
+#   [rustup]=true
+#   [fzf]=true
+#   [eza]=rtrue
+#   [go]=true
+#   [nvim]=true
+#   [zoxide]=true
+# )
+#
+# # Install tools in order of importance
+# local tool_names=(
+#   brew
+#   starship
+#   git
+#   atuin
+#   volta
+#   uv
+#   rustup
+#   fzf
+#   eza
+#   go
+#   nvim
+#   # zoxide
+# )
+# for tool_name in "${tool_names[@]}"; do
+#   local install_cmd="${TOOL_INSTALL_COMMANDS[$tool_name]}"
+#   local is_essential="${TOOL_IS_ESSENTIAL[$tool_name]}"
+#   log_info "Ensuring $tool_name is installed"
+#   ensure_tool_installed "$tool_name" "$install_cmd" "$is_essential"
+# done
 
-# Define installation commands for tools as an associative array
-declare -A TOOL_INSTALL_COMMANDS=(
-  [brew]="/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
-  [starship]="curl -sS https://starship.rs/install.sh | sh"
-  [atuin]="curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh"
-  [volta]="curl https://get.volta.sh | bash"
-  [uv]="curl -LsSf https://astral.sh/uv/install.sh | sh"
-  [rustup]="curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
-  [fzf]="brew install fzf"
-  [eza]="brew install eza"
-  [go]="brew install go"
-  [nvim]="brew install neovim"
-  [zoxide]="brew install zoxide"
-  [fd]="brew install fd"
-)
+# # Load configuration files in specific order, installing required tools if needed
+# local files=(
+#   "$ZDOTDIR/brew.zsh" # Homebrew package management
+#   # "$ZDOTDIR/starship.zsh" # starship prompt
+#   "$ZDOTDIR/fzf.zsh"  # Fuzzy finder configuration
+#   "$ZDOTDIR/nvim.zsh" # Neovim editor configuration
+#   # "$ZDOTDIR/fd.zsh"  # starship prompt
+#   # "$ZDOTDIR/bat.zsh" # starship prompt
+#   # "$ZDOTDIR/git.zsh"      # Git utilities and configurations
+#   # "$ZDOTDIR/python.zsh" # Python development
+#   # "$ZDOTDIR/nodejs.zsh"   # Node.js development
+#   # "$ZDOTDIR/go.zsh"     # Go development
+#   # "$ZDOTDIR/rust.zsh"   # Rust development
+#   # "$ZDOTDIR/atuin.zsh"    # Atuin shell history
+# )
+# # Source individual configuration modules
+# for file in $files; do
+#   [[ -f "$file" ]] && source "$file"
+# done
 
-# Define which tools are essential (will always be installed if missing)
-declare -A TOOL_IS_ESSENTIAL=(
-  [brew]=true
-  [starship]=true
-  [git]=true
-  [atuin]=true
-  [volta]=true
-  [uv]=true
-  [rustup]=true
-  [fzf]=true
-  [eza]=rtrue
-  [go]=true
-  [nvim]=true
-  [zoxide]=true
-)
-
-# Install tools in order of importance
-local tool_names=(brew starship git atuin volta uv rustup fzf eza go nvim zoxide)
-for tool_name in "${tool_names[@]}"; do
-  local install_cmd="${TOOL_INSTALL_COMMANDS[$tool_name]}"
-  local is_essential="${TOOL_IS_ESSENTIAL[$tool_name]}"
-  ensure_tool_installed "$tool_name" "$install_cmd" "$is_essential"
-done
-
-# Source individual configuration modules
-for file in $files; do
-  [[ -f "$file" ]] && source "$file"
-done
-
-# Special case for Homebrew PATH
-if has_command "brew"; then
-  if is_apple_silicon; then
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-  else
-    eval "$(/usr/local/bin/brew shellenv)"
-  fi
-fi
+## Special case for Homebrew PATH
+#if has_command "brew"; then
+#  if is_apple_silicon; then
+#    eval "$(/opt/homebrew/bin/brew shellenv)"
+#  else
+#    eval "$(/usr/local/bin/brew shellenv)"
+#  fi
+#fi
 
 # # Special cases for tools that need post-installation configuration
 # if ! has_command "atuin" && [[ ! -f "$XDG_DATA_HOME/atuin/.initialized" ]]; then
