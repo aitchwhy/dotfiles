@@ -5,11 +5,12 @@
 ## linux/mac: ~/.local/share/atuin/history.db
 ## windows: %USERPROFILE%/.local/share/atuin/history.db
 # db_path = "~/.history.db"
+db_path = "~/.history.db"
 
 ## where to store your encryption key, default is your system data directory
 ## linux/mac: ~/.local/share/atuin/key
 ## windows: %USERPROFILE%/.local/share/atuin/key
-# key_path = "~/.key"
+#key_path = "~/.key"
 
 ## where to store your auth session token, default is your system data directory
 ## linux/mac: ~/.local/share/atuin/session
@@ -25,11 +26,11 @@
 ## for example: "+9", "-05", "+03:30", "-01:23:45", etc.
 # timezone = "local"
 
-## enable or disable automatic sync
-# auto_sync = true
+# enable or disable automatic sync
+auto_sync = true
 
-## enable or disable automatic update checks
-# update_check = true
+# enable or disable automatic update checks
+update_check = true
 
 ## address of the sync server
 # sync_address = "https://api.atuin.sh"
@@ -39,14 +40,14 @@
 ## set it to 0 to sync after every command
 # sync_frequency = "10m"
 
-## which search mode to use
-## possible values: prefix, fulltext, fuzzy, skim
-# search_mode = "fuzzy"
+# which search mode to use
+# possible values: prefix, fulltext, fuzzy, skim
+search_mode = "fuzzy"
 
-## which filter mode to use by default
-## possible values: "global", "host", "session", "directory", "workspace"
-## consider using search.filters to customize the enablement and order of filter modes
-# filter_mode = "global"
+# which filter mode to use by default
+# possible values: "global", "host", "session", "directory", "workspace"
+# consider using search.filters to customize the enablement and order of filter modes
+filter_mode = "global"
 
 ## With workspace filtering enabled, Atuin will filter for commands executed
 ## in any directory within a git repository tree (default: false).
@@ -56,26 +57,27 @@
 ## set search.filters to include "workspace" before other filter modes.
 # workspaces = false
 
-## which filter mode to use when atuin is invoked from a shell up-key binding
-## the accepted values are identical to those of "filter_mode"
-## leave unspecified to use same mode set in "filter_mode"
+# which filter mode to use when atuin is invoked from a shell up-key binding
+# It can be useful to use a different filter or search mode on the up arrow. For example, you could use ctrl-r for searching globally, but the up arrow for searching history from the current directory only.
+# the accepted values are identical to those of "filter_mode"
 # filter_mode_shell_up_key_binding = "global"
+filter_mode_shell_up_key_binding = "directory"
 
-## which search mode to use when atuin is invoked from a shell up-key binding
-## the accepted values are identical to those of "search_mode"
-## leave unspecified to use same mode set in "search_mode"
-# search_mode_shell_up_key_binding = "fuzzy"
+# which search mode to use when atuin is invoked from a shell up-key binding
+# the accepted values are identical to those of "search_mode"
+# leave unspecified to use same mode set in "search_mode"
+search_mode_shell_up_key_binding = "fuzzy"
 
-## which style to use
-## possible values: auto, full, compact
+# which style to use
+# possible values: auto, full, compact
 # style = "auto"
+style = "compact"
 
-## the maximum number of lines the interface should take up
-## set it to 0 to always go full screen
-# inline_height = 0
+# the maximum number of lines the interface should take up
+inline_height = 40
 
-## Invert the UI - put the search bar at the top , Default to `false`
-# invert = false
+# Invert the UI - put the search bar at the top , Default to `false`
+invert = true
 
 ## enable or disable showing a preview of the selected command
 ## useful when the command is longer than the terminal width and is cut off
@@ -83,6 +85,7 @@
 
 ## what to do when the escape key is pressed when searching
 ## possible values: return-original, return-query
+# default is "return-original"
 # exit_mode = "return-original"
 
 ## possible values: emacs, subl
@@ -151,6 +154,7 @@
 ## Defaults to true. If enabled, upon hitting enter Atuin will immediately execute the command. Press tab to return to the shell and edit.
 # This applies for new installs. Old installs will keep the old behaviour unless configured otherwise.
 # enter_accept = true
+enter_accept = false
 
 ## Defaults to "emacs".  This specifies the keymap on the startup of `atuin
 ## search`.  If this is set to "auto", the startup keymap mode in the Atuin
@@ -213,11 +217,9 @@
 # Defaults to true. If disabled, using the up/down key won't exit the TUI when scrolled past the first/last entry.
 # scroll_exits = true
 
-# [sync]
-# Enable sync v2 by default
-# This ensures that sync v2 is enabled for new installs only
-# In a later release it will become the default across the board
-# records = true
+# Enable sync v2
+[sync]
+records = true
 
 #[preview]
 ## which preview strategy to use to calculate the preview height (respects max_preview_height).

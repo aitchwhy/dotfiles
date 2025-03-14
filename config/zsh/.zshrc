@@ -282,15 +282,31 @@ fi
 # atuin
 # ========================================================================
 
+# https://docs.atuin.sh/configuration/config/
+export ATUIN_CONFIG_DIR="$DOTFILES/config/atuin/"
+
 if ! has_command atuin; then
   echo "atuin not found. Installing atuin..."
   curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
+  echo "sourcing $HOME/.atuin/bin/env to add it to PATH"
+  source $HOME/.atuin/bin/env
 fi
 
 if [[ ! -f "$XDG_CONFIG_HOME/atuin/config.toml" ]]; then
   echo "Linking atuin config..."
   ln -sf "$DOTFILES/config/atuin/config.toml" "$XDG_CONFIG_HOME/atuin/config.toml"
 fi
+
+# atuin zsh shell plugin
+eval "$(atuin init zsh)"
+
+# # Bind ctrl-r but not up arrow
+# eval "$(atuin init zsh --disable-up-arrow)"
+#
+# # Bind up-arrow but not ctrl-r
+# eval "$(atuin init zsh --disable-ctrl-r)"
+
+# atuin import auto
 
 # ========================================================================
 # warp
@@ -484,8 +500,7 @@ fi
 # # Special cases for tools that need post-installation configuration
 # if ! has_command "atuin" && [[ ! -f "$XDG_DATA_HOME/atuin/.initialized" ]]; then
 #   # Only run first-time setup if atuin was just installed
-#   log_info "First-time Atuin setup: importing shell history"
-#   atuin import auto
+#   log_info "First-time Atuin setup: importing shell history" atuin import auto
 #   atuin sync -f
 #   touch "$XDG_DATA_HOME/atuin/.initialized"
 # fi
