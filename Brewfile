@@ -17,7 +17,6 @@ tap "yakitrak/yakitrak"
 
 brew "mas"                       # Mac App Store command-line interface
 
-
 ###############################################################################
 # Development Tools & Languages
 ###############################################################################
@@ -389,7 +388,7 @@ mas "Session", id: 1521432881        # Already have cask
 # # VSCode Extensions
 # ###############################################################################
 # # Essential Extensions
-# 
+#
 # # Core Functionality
 # vscode "dbaeumer.vscode-eslint"             # ESLint integration
 # vscode "esbenp.prettier-vscode"             # Code formatting
@@ -402,7 +401,7 @@ mas "Session", id: 1521432881        # Already have cask
 # vscode "oderwat.indent-rainbow"             # Makes indentation more readable
 # vscode "usernamehw.errorlens"               # Inline error messages
 # vscode "vscode-icons-team.vscode-icons"     # File and folder icons
-# 
+#
 # # Utility & Navigation
 # vscode "alefragnani.project-manager"        # Project management
 # vscode "christian-kohler.path-intellisense" # Autocomplete filenames
@@ -410,13 +409,13 @@ mas "Session", id: 1521432881        # Already have cask
 # vscode "sleistner.vscode-fileutils"         # File operations in VSCode
 # vscode "tyriar.sort-lines"                  # Sort lines of text
 # vscode "vspacecode.whichkey"                # Keybinding menu
-# 
+#
 # # Git & Collaboration
 # vscode "github.vscode-github-actions"       # GitHub Actions
 # vscode "vivaxy.vscode-conventional-commits" # Conventional commit support
-# 
+#
 # # Languages & Frameworks
-# 
+#
 # # JavaScript/TypeScript
 # vscode "biomejs.biome"                      # JavaScript/TypeScript formatting
 # vscode "bradlc.vscode-tailwindcss"          # Tailwind CSS support
@@ -436,32 +435,32 @@ mas "Session", id: 1521432881        # Already have cask
 # vscode "ms-kubernetes-tools.vscode-kubernetes-tools" # Kubernetes support
 # vscode "mtxr.sqltools"                      # SQL tools
 # vscode "ckolkman.vscode-postgres"           # PostgreSQL support
-# 
+#
 # # Remote Development & APIs
 # vscode "ms-vscode-remote.vscode-remote-extensionpack" # Remote development
 # vscode "rangav.vscode-thunder-client"       # HTTP client
 # vscode "humao.rest-client"                  # REST client
 # vscode "ms-vscode.remote-explorer"          # Remote Explorer
 # vscode "redocly.openapi-vs-code"            # OpenAPI support
-# 
+#
 # # Themes & UI
 # vscode "sdras.night-owl"                    # Night Owl theme
 # vscode "catppuccin.catppuccin-vsc"          # Catppuccin theme
 # vscode "zhuangtongfa.material-theme"        # One Dark Pro theme
-# 
+#
 # # VSCode Neovim & Vim
 # vscode "asvetliakov.vscode-neovim"          # Neovim integration
 # vscode "vscodevim.vim"                      # Vim emulation
 # vscode "vspacecode.vspacecode"              # Spacemacs-like bindings
-# 
+#
 # # AI & Documentation
 # vscode "saoudrizwan.claude-dev"             # Claude AI integration
 # vscode "mintlify.document"                  # Documentation generator
-# 
+#
 # # Markdown & Documentation
 # vscode "yzhang.markdown-all-in-one"         # Markdown tools
 # vscode "davidanson.vscode-markdownlint"     # Markdown linting
-# 
+#
 # # Commented out extensions (less essential or redundant)
 # # vscode "42crunch.vscode-openapi"            # Already have redocly.openapi-vs-code
 # # vscode "4ops.terraform"                     # Already have hashicorp.terraform
@@ -536,11 +535,49 @@ mas "Session", id: 1521432881        # Already have cask
 # # vscode "kahole.magit"                       # Magit-like Git interface
 # # vscode "kamadorueda.alejandra"              # Nix formatter
 # # vscode "kamikillerto.vscode-colorize"       # Colorize CSS
-# 
+#
 # ##################
 # # NPM global install (Bun)
 # ##################
 # # brew "biome"                     # bun add --dev --exact @biomejs/biome
 # # esbuild # npm install --save-exact --save-dev esbuild
 # # typescript #  npm install -g typescript  # (project-wide) npm install typescript --save-dev
-# 
+#
+#
+#
+# Uninstalled apps
+# Would uninstall casks:
+# apidog                              espanso                             font-symbols-only-nerd-font
+# arq                                 firefox                             google-drive
+# asana                               font-fira-mono-nerd-font            httpie
+# bunch                               font-jetbrains-mono-nerd-font       notion
+# carbon-copy-cloner                  font-mononoki-nerd-font             tailscale
+# dropbox                             font-roboto-mono-nerd-font
+# Would uninstall formulae:
+# atuin                                                 rollup
+# cloudflare-wrangler                                   sevenzip
+# dotnet@8                                              shfmt
+# esbuild                                               sonic
+# eslint                                                speexdsp
+# git                                                   starship
+# git-delta                                             stylua
+# glances                                               tectonic
+# libgpg-error                                          temporal
+# libassuan                                             utf8proc
+# libgcrypt                                             tmux
+# libksba                                               todoist
+# libusb                                                typescript
+# npth                                                  typescript-language-server
+# pinentry                                              vite
+# gnupg                                                 volta
+# go                                                    vscode-langservers-extracted
+# gopls                                                 xxh
+# helix                                                 yaml-language-server
+# openjdk                                               koekeishiya/formulae/skhd
+# kawa                                                  koekeishiya/formulae/yabai
+# marksman                                              olets/tap/zsh-abbr
+# netcat                                                olets/tap/zsh-autosuggestions-abbreviations-strategy
+# pinentry-mac                                          stripe/stripe-cli/stripe
+# pkgconf                                               temporalio/brew/tcld
+# portaudio                                             yakitrak/yakitrak/obsidian-cli
+# prettier
