@@ -384,7 +384,7 @@ fi
 # bat
 # ========================================================================
 
-export PAGER="bat --pager"
+export PAGER="bat --pager always"
 
 if ! has_command bat; then
   echo "bat not found. Installing bat..."
