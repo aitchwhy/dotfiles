@@ -285,6 +285,8 @@ fi
 # https://docs.atuin.sh/configuration/config/
 export ATUIN_CONFIG_DIR="$DOTFILES/config/atuin/"
 
+path_add "$HOME/.atuin/bin"
+
 if ! has_command atuin; then
   echo "atuin not found. Installing atuin..."
   curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh

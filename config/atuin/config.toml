@@ -11,11 +11,12 @@ db_path = "~/.history.db"
 ## linux/mac: ~/.local/share/atuin/key
 ## windows: %USERPROFILE%/.local/share/atuin/key
 #key_path = "~/.key"
+key_path = "~/.key"
 
 ## where to store your auth session token, default is your system data directory
 ## linux/mac: ~/.local/share/atuin/session
 ## windows: %USERPROFILE%/.local/share/atuin/session
-# session_path = "~/.session"
+session_path = "~/.session"
 
 ## date format used, either "us" or "uk"
 # dialect = "us"
@@ -38,7 +39,7 @@ update_check = true
 ## how often to sync history. note that this is only triggered when a command
 ## is ran, so sync intervals may well be longer
 ## set it to 0 to sync after every command
-# sync_frequency = "10m"
+sync_frequency = "10m"
 
 # which search mode to use
 # possible values: prefix, fulltext, fuzzy, skim
@@ -61,7 +62,8 @@ filter_mode = "global"
 # It can be useful to use a different filter or search mode on the up arrow. For example, you could use ctrl-r for searching globally, but the up arrow for searching history from the current directory only.
 # the accepted values are identical to those of "filter_mode"
 # filter_mode_shell_up_key_binding = "global"
-filter_mode_shell_up_key_binding = "directory"
+filter_mode_shell_up_key_binding = "session"
+# filter_mode_shell_up_key_binding = "directory"
 
 # which search mode to use when atuin is invoked from a shell up-key binding
 # the accepted values are identical to those of "search_mode"
@@ -82,6 +84,7 @@ invert = true
 ## enable or disable showing a preview of the selected command
 ## useful when the command is longer than the terminal width and is cut off
 # show_preview = true
+show_preview = true
 
 ## what to do when the escape key is pressed when searching
 ## possible values: return-original, return-query
@@ -96,6 +99,7 @@ invert = true
 
 ## number of context lines to show when scrolling by pages
 # scroll_context_lines = 1
+scroll_context_lines = 3
 
 ## use ctrl instead of alt as the shortcut modifier key for numerical UI shortcuts
 ## alt-0 .. alt-9
@@ -127,6 +131,7 @@ invert = true
 ## Useful when you have long scripts in your history that you want to distinguish
 ## by more than the first few lines.
 # max_preview_height = 4
+max_preview_height = 4
 
 ## Configure whether or not to show the help row, which includes the current Atuin
 ## version (and whether an update is available), a keymap hint, and the total
@@ -163,11 +168,12 @@ enter_accept = false
 ## "vim-normal", the startup keymap mode in the Atuin search is forced to be
 ## the specified one.
 # keymap_mode = "auto"
+keymap_mode = "auto"
 
 ## Cursor style in each keymap mode.  If specified, the cursor style is changed
 ## in entering the cursor shape.  Available values are "default" and
 ## "{blink,steady}-{block,underline,bar}".
-# keymap_cursor = { emacs = "blink-block", vim_insert = "blink-block", vim_normal = "steady-block" }
+keymap_cursor = { emacs = "blink-block", vim_insert = "blink-block", vim_normal = "steady-block" }
 
 # network_connect_timeout = 5
 # network_timeout = 5
@@ -181,30 +187,26 @@ enter_accept = false
 
 # [stats]
 ## Set commands where we should consider the subcommand for statistics. Eg, kubectl get vs just kubectl
-# common_subcommands = [
-#   "apt",
-#   "cargo",
-#   "composer",
-#   "dnf",
-#   "docker",
-#   "git",
-#   "go",
-#   "ip",
-#   "kubectl",
-#   "nix",
-#   "nmcli",
-#   "npm",
-#   "pecl",
-#   "pnpm",
-#   "podman",
-#   "port",
-#   "systemctl",
-#   "tmux",
-#   "yarn",
-# ]
+common_subcommands = [
+  "brew",
+  "cargo",
+  "docker",
+  "git",
+  "go",
+  "ip",
+  "kubectl",
+  "tldr",
+  "nix",
+  "npm",
+  "pnpm",
+  "bun",
+  "zellij",
+  "yarn",
+  # "podman",
+]
 
 ## Set commands that should be totally stripped and ignored from stats
-# common_prefix = ["sudo"]
+common_prefix = ["sudo"]
 
 ## Set commands that will be completely ignored from stats
 # ignored_commands = [
@@ -233,9 +235,6 @@ records = true
 ## Enables using the daemon to sync. Requires the daemon to be running in the background. Start it with `atuin daemon`
 # enabled = false
 
-## How often the daemon should sync in seconds
-# sync_frequency = 300
-
 ## The path to the unix socket used by the daemon (on unix systems)
 ## linux/mac: ~/.local/share/atuin/atuin.sock
 ## windows: Not Supported
@@ -259,7 +258,7 @@ records = true
 ##    https://ogeon.github.io/docs/palette/master/palette/named/index.html
 ## If you provide a custom theme file, it should be  called "NAME.toml" and the theme below
 ## should be the stem, i.e. `theme = "NAME"` for your chosen NAME.
-# name = "autumn"
+name = "autumn"
 
 ## Whether the theme manager should output normal or extra information to help fix themes.
 ## Boolean, true or false. If unset, left up to the theme manager.
