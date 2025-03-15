@@ -336,7 +336,6 @@ cask "audacity"                  # Audio editor
 cask "ghidra"                    # Software reverse engineering
 
 # Commented out less frequently used apps
-cask "session"                 # Messaging app
 # cask "synologyassistant"       # Synology management
 # cask "wireshark"               # Network protocol analyzer
 
@@ -579,3 +578,73 @@ mas "Session", id: 1521432881        # Already have cask
 # pkgconf                                               temporalio/brew/tcld
 # portaudio                                             yakitrak/yakitrak/obsidian-cli
 # prettier
+#
+#
+#
+#
+# …/dotfiles  main [📦2!1?2]
+# ❯ brew bundle cleanup --global --all --verbose
+# ==> Downloading https://formulae.brew.sh/api/cask.jws.json
+# ==> Downloading https://formulae.brew.sh/api/cask_tap_migrations.jws.json
+# ==> Downloading https://formulae.brew.sh/api/formula.jws.json
+# ==> Downloading https://formulae.brew.sh/api/formula_tap_migrations.jws.json
+# Would uninstall casks:
+# apidog                                  devonthink                              google-cloud-sdk                        paletro
+# arc                                     draw-things                             hopper-disassembler                     parsec
+# asana                                   espanso                                 hoppscotch                              rippling
+# backblaze                               figma                                   httpie                                  session
+# blackhole-16ch                          firefox                                 kawa                                    soundsource
+# boltai                                  font-fira-mono-nerd-font                keycastr                                tower
+# bunch                                   font-jetbrains-mono-nerd-font           mactex                                  typora
+# canva                                   font-mononoki-nerd-font                 mist                                    visual-studio-code
+# carbon-copy-cloner                      font-roboto-mono-nerd-font              motion                                  wireshark
+# charmstone                              font-sf-mono-nerd-font-ligaturized      motrix                                  zed
+# cleaneronepro                           font-symbols-only-nerd-font             neo4j
+# cloudflare-warp                         gitkraken                               osquery
+# Would uninstall formulae:
+# shellcheck                                                                      netcat
+# actionlint                                                                      nspr
+# angle-grinder                                                                   nss
+# aria2                                                                           raylib
+# atuin                                                                           odin
+# autoconf                                                                        onefetch
+# bash-language-server                                                            pinentry-mac
+# biome                                                                           pkgconf
+# bottom                                                                          poppler
+# cheat                                                                           portaudio
+# cloudflare-wrangler                                                             prettier
+# cmake                                                                           pyenv
+# curlie                                                                          python@3.11
+# cutter                                                                          rclone
+# dotnet@8                                                                        rollup
+# esbuild                                                                         ruby
+# eslint                                                                          rust-analyzer
+# fastfetch                                                                       sevenzip
+# gdrive                                                                          shfmt
+# ghi                                                                             sonic
+# git                                                                             speexdsp
+# git-delta                                                                       starship
+# glances                                                                         stylua
+# glfw                                                                            tectonic
+# libgpg-error                                                                    temporal
+# libassuan                                                                       utf8proc
+# libgcrypt                                                                       tmux
+# libksba                                                                         tree
+# libusb                                                                          typescript
+# npth                                                                            typescript-language-server
+# pinentry                                                                        uv
+# gnupg                                                                           vite
+# go                                                                              volta
+# gopls                                                                           vscode-langservers-extracted
+# gpgme                                                                           xxh
+# helix                                                                           yaml-language-server
+# httrack                                                                         koekeishiya/formulae/skhd
+# hurl                                                                            koekeishiya/formulae/yabai
+# z3                                                                              olets/tap/zsh-abbr
+# llvm                                                                            olets/tap/zsh-autosuggestions-abbreviations-strategy
+# lsd                                                                             sachaos/todoist/todoist
+# lua-language-server                                                             stripe/stripe-cli/stripe
+# marksman                                                                        temporalio/brew/tcld
+# mcfly                                                                           yakitrak/yakitrak/obsidian-cli
+# nasm
+# Run `brew bundle cleanup --force` to make these changes.
