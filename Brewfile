@@ -172,7 +172,6 @@ brew "kanata"                    # Cross-platform software keyboard remapper
 brew "prometheus"                # Service monitoring system and time series database
 brew "rustscan"                  # Modern Day Portscanner
 # brew "sonic"                     # Fast, lightweight & schema-less search backend
-brew "tailscale"                 # Mesh VPN built on WireGuard
 
 ###############################################################################
 # Media, Files & System Utilities
@@ -302,12 +301,11 @@ cask "protonvpn"                 # VPN client
 cask "qflipper"                  # Flipper Zero utility
 cask "royal-tsx"                 # Remote connections
 # cask "soundsource"               # Audio control
-# cask "tailscale"                 # Mesh VPN
+cask "tailscale"                 # Mesh VPN
 cask "virtualbuddy"              # macOS VM manager
 # cask "windsurf"                  # Window management
 cask "yubico-authenticator"      # YubiKey tool
 cask "yubico-yubikey-manager"    # YubiKey manager
-cask "kawa"    # key input language
 
 # Communication & Media
 # cask "arc"                       # Web browser
