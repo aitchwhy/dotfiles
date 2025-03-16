@@ -323,7 +323,10 @@ cask "superhuman"                # Email client
 cask "zen-browser"               # Minimal browser
 cask "zoom"                      # Video conferencing
 
-# Fonts
+# Nerd Fonts (https://www.nerdfonts.com/font-downloads)
+cask "font-symbols-only-nerd-font"
+cask "font-fira-code-nerd-font"  # Nerd Font
+
 # cask "font-fira-mono-nerd-font"  # Nerd Font
 # cask "font-jetbrains-mono-nerd-font" # Nerd Font
 # cask "font-mononoki-nerd-font"   # Nerd Font
