@@ -214,11 +214,6 @@ if ! has_command git; then
   brew install --quiet git
 fi
 
-if ! has_command lazygit; then
-  echo "lazygit not found. Installing lazygit..."
-  brew install --quiet lazygit
-fi
-
 export GIT_EDITOR="nvim"
 export GIT_PAGER="bat --pager"
 export GIT_AUTHOR_NAME="Hank"
@@ -236,11 +231,21 @@ if [[ ! -f "$HOME/.gitignore" ]]; then
   ln -sf "$DOTFILES/config/git/ignore" "$HOME/.gitignore"
 fi
 
-# lazygit config link
-if [[ ! -f "$XDG_CONFIG_HOME/lazygit/config.yml" ]]; then
-  echo "Linking lazygit config..."
-  ln -sf "$DOTFILES/config/lazygit/config.yml" "$XDG_CONFIG_HOME/lazygit/config.yml"
+if ! has_command lazygit; then
+  echo "lazygit not found. Installing lazygit..."
+  brew install --quiet lazygit
 fi
+
+# Lazygit custom config file location (https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md#overriding-default-config-file-location)
+# Dir
+CONFIG_DIR="$DOTFILES/config/lazygit"
+# file path
+LG_CONFIG_FILE="$DOTFILES/config/lazygit/config.yml"
+
+# if [[ ! -f "$XDG_CONFIG_HOME/lazygit/config.yml" ]]; then
+#   echo "Linking lazygit config..."
+#   ln -sf "$DOTFILES/config/lazygit/config.yml" "$XDG_CONFIG_HOME/lazygit/config.yml"
+# fi
 
 # ========================================================================
 # starship
