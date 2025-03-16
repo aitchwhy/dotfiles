@@ -48,6 +48,10 @@ export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 # export ZDOTDIR=${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}
 export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
 
+export CLOUD="~/Library/CloudStorage"
+export GDRIVE="~/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com"
+export DROPBOX="~/Library/CloudStorage/Dropbox"
+
 # Dotfiles location
 # export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
 export DOTFILES="$HOME/dotfiles"
