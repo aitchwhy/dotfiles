@@ -414,6 +414,46 @@ if ! has_command rustup; then
 fi
 
 # ========================================================================
+# postgresql@17
+# ========================================================================
+# postgresql@17 is keg-only, which means it was not symlinked into /opt/homebrew,
+# because this is an alternate version of another formula.
+#
+# If you need to have postgresql@17 first in your PATH, run:
+#   echo 'export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"' >> /Users/hank/.config/zsh/.zshrc
+#
+# For compilers to find postgresql@17 you may need to set:
+#   export LDFLAGS="-L/opt/homebrew/opt/postgresql@17/lib"
+#   export CPPFLAGS="-I/opt/homebrew/opt/postgresql@17/include"
+#
+# To start postgresql@17 now and restart at login:
+#   brew services start postgresql@17
+# Or, if you don't want/need a background service you can just run:
+#   LC_ALL="C" /opt/homebrew/opt/postgresql@17/bin/postgres -D /opt/homebrew/var/postgresql@17
+
+# export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"
+path_add "/opt/homebrew/opt/postgresql@17/bin"
+
+export LDFLAGS="-L/opt/homebrew/opt/postgresql@17/lib"
+export CPPFLAGS="-I/opt/homebrew/opt/postgresql@17/include"
+
+brew services start postgresql@17
+
+# postgresql://[user[:password]@][host][:port][/dbname][?param1=value1&...]
+# Here's an example of how you might set up a connection string:
+#
+# postgresql://username:password@localhost:5432/mydatabase
+# 	•	username: Your PostgreSQL username.
+# 	•	password: Your PostgreSQL password.
+# 	•	localhost: The host where your PostgreSQL server is running. If it's on your local machine, you can use localhost.
+# 	•	5432: The default port for PostgreSQL. Change it if your server uses a different port.
+# 	•	mydatabase: The name of the database you want to connect to.
+# If you have PostgreSQL installed on your Mac and want to connect to it locally, ensure that the PostgreSQL server is running. You can start the server using:
+#
+# brew services start postgresql
+# Make sure to replace the placeholders in the connection string with your actual database credentials and details.
+
+# ========================================================================
 # Go
 # ========================================================================
 # export GOPATH="$HOME/go"
