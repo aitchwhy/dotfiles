@@ -1,8 +1,9 @@
-tap "dotenvx/brew"
 tap "homebrew/bundle"
-tap "homebrew/services"
+# tap "homebrew/services"
 tap "koekeishiya/formulae"
 tap "olets/tap"
+tap "dotenvx/brew"
+# tap "sachaos/todoist"
 tap "stripe/stripe-cli"
 tap "temporalio/brew"
 tap "typesense/tap"
@@ -218,6 +219,7 @@ brew "fx"                        # Terminal JSON viewer
 # cask "google-cloud-sdk", postinstall: "${HOMEBREW_PREFIX}/bin/gcloud components update"
 cask "orbstack"                  # Container and VM manager
 cask "tableplus"                 # Database management
+cask "carbon-copy-cloner"
 
 # AI & ML Tools
 # cask "boltai"                    # AI assistant
@@ -225,18 +227,18 @@ cask "chatgpt"                   # ChatGPT desktop client
 cask "claude"                    # Claude AI assistant
 cask "copilot"                   # copilot.money
 cask "cursor"                    # Code editor with AI
-# cask "draw-things"               # AI image generation
+cask "draw-things"               # AI image generation
 cask "lm-studio"                 # Language model studio
 cask "macwhisper"                # Audio transcription
 cask "ollama"                    # Run LLMs locally
-cask "superwhisper"              # Audio transcription
+# cask "superwhisper"              # Audio transcription
 
 # Productivity & Organization
 cask "a-better-finder-rename"    # File renaming utility
 cask "anki"                      # Flashcard app
 # cask "asana"                     # Project management
 cask "bartender"                 # Menu bar organizer
-#cask "bitwarden"                 # Password manager
+# cask "bitwarden"                 # Password manager
 # cask "bunch"                     # App automation
 cask "cardhop"                   # Contact manager
 # cask "charmstone"                # Quick actions
@@ -248,14 +250,14 @@ cask "dash"                      # API documentation
 cask "fantastical"               # Calendar app
 cask "hazel"                     # File automation
 cask "homerow"                   # Keyboard navigation
-cask "iconjar"                   # Icon manager
+# cask "iconjar"                   # Icon manager
 cask "linear-linear"             # Project management
 cask "obsidian"                  # Note taking
 # cask "paletro"                   # Command palette
 cask "pdf-expert"                # PDF editor
 cask "quit-all"                  # Quit all apps
 cask "raycast"                   # App launcher
-cask "rize"                      # Time tracker
+# cask "rize"                      # Time tracker
 cask "soulver"                   # Smart calculator
 cask "swish"                     # Window manager
 cask "timelane"                  # Time tracking
@@ -311,18 +313,17 @@ cask "virtualbuddy"              # macOS VM manager
 # Communication & Media
 # cask "arc"                       # Web browser
 cask "descript"                  # Audio/video editor
-# cask "firefox"                   # Web browser
 cask "follow"                    # RSS reader
 cask "google-chrome"             # Web browser
 cask "jump"                      # Remote desktop
 cask "jump-desktop-connect"      # Remote desktop
-# cask "parsec"                    # Remote desktop
 cask "signal"                    # Messaging
 cask "slack"                     # Team communication
 cask "spotify"                   # Music streaming
 cask "superhuman"                # Email client
 cask "zen-browser"               # Minimal browser
 cask "zoom"                      # Video conferencing
+cask "maccy"
 
 # Nerd Fonts (https://www.nerdfonts.com/font-downloads)
 cask "font-symbols-only-nerd-font"
@@ -365,7 +366,6 @@ mas "Tripsy", id: 1429967544          # Trip planning
 
 # Reading & Media
 mas "KakaoTalk", id: 869223134        # Messaging
-mas "Kindle", id: 302584613           # E-book reader
 mas "Pixea", id: 1507782672           # Image viewer
 
 # Utilities
@@ -375,15 +375,10 @@ mas "LanScan", id: 472226235          # Network scanner
 # Commented out less frequently used Mac App Store apps
 
 # mas "Aiko", id: 1672085276
-# mas "CleanMyMac", id: 1339170533     # Already have cask
+#as "CleanMyMac", id: 1339170533     # Already have cask
 # mas "Cleaner One Pro", id: 1133028347 # Already have cask
 # mas "DaisyDisk", id: 411643860       # Already have cask
-# mas "ExcalidrawZ", id: 6636493997    # Already have cask
-# mas "Keynote", id: 409183694         # Apple productivity suite
-# mas "Numbers", id: 409203825         # Apple productivity suite
 # mas "One Thing", id: 1604176982      # Simple todo app
-# mas "Pages", id: 409201541           # Apple productivity suite
-# mas "Session", id: 1521432881        # Already have cask
 
 # ###############################################################################
 # # VSCode Extensions
