@@ -221,15 +221,13 @@ export GIT_AUTHOR_EMAIL="hank.lee.qed@gmail.com"
 export GIT_COMMITTER_NAME="Hank"
 export GIT_COMMITTER_EMAIL="hank.lee.qed@gmail.com"
 
-if [[ ! -f "$HOME/.gitconfig" ]]; then
-  echo "Linking gitconfig..."
-  ln -sf "$DOTFILES/config/git/config" "$HOME/.gitconfig"
-fi
+# Backup existing config if needed
+[[ -f ~/.gitconfig ]] && mv ~/.gitconfig ~/.gitconfig.backup
+[[ -f ~/.gitignore ]] && mv ~/.gitignore ~/.gitignore.backup
 
-if [[ ! -f "$HOME/.gitignore" ]]; then
-  echo "Linking gitignore..."
-  ln -sf "$DOTFILES/config/git/ignore" "$HOME/.gitignore"
-fi
+# Create symbolic link
+ln -s ~/dotfiles/config/git/gitconfig ~/.gitconfig
+ln -s ~/dotfiles/config/git/gitignore ~/.gitignore
 
 if ! has_command lazygit; then
   echo "lazygit not found. Installing lazygit..."
