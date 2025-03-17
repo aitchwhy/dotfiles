@@ -95,3 +95,43 @@ cscope.po.out
 
 # Aider AI coding helper
 .aider*
+
+#-------------------------------------------------------------------------------
+# Emacs projectile project specific configs
+#-------------------------------------------------------------------------------
+# Application-specific files
+*.app
+# **/Linear.app/Contents/
+
+# Common macOS files
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+.Trash
+
+# Xcode
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+xcuserdata/
+*.xcscmblueprint
+*.xccheckout
+
+# Node/npm
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Build outputs
+build/
+dist/

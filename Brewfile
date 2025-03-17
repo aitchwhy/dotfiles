@@ -3,7 +3,6 @@ tap "homebrew/bundle"
 tap "homebrew/services"
 tap "koekeishiya/formulae"
 tap "olets/tap"
-tap "sachaos/todoist"
 tap "stripe/stripe-cli"
 tap "temporalio/brew"
 tap "typesense/tap"
@@ -235,7 +234,7 @@ cask "a-better-finder-rename"    # File renaming utility
 cask "anki"                      # Flashcard app
 # cask "asana"                     # Project management
 cask "bartender"                 # Menu bar organizer
-cask "bitwarden"                 # Password manager
+#cask "bitwarden"                 # Password manager
 # cask "bunch"                     # App automation
 cask "cardhop"                   # Contact manager
 # cask "charmstone"                # Quick actions
@@ -304,8 +303,8 @@ cask "royal-tsx"                 # Remote connections
 cask "tailscale"                 # Mesh VPN
 cask "virtualbuddy"              # macOS VM manager
 # cask "windsurf"                  # Window management
-cask "yubico-authenticator"      # YubiKey tool
-cask "yubico-yubikey-manager"    # YubiKey manager
+# cask "yubico-authenticator"      # YubiKey tool
+# cask "yubico-yubikey-manager"    # YubiKey manager
 
 # Communication & Media
 # cask "arc"                       # Web browser
@@ -382,7 +381,7 @@ mas "LanScan", id: 472226235          # Network scanner
 # mas "Numbers", id: 409203825         # Apple productivity suite
 # mas "One Thing", id: 1604176982      # Simple todo app
 # mas "Pages", id: 409201541           # Apple productivity suite
-mas "Session", id: 1521432881        # Already have cask
+# mas "Session", id: 1521432881        # Already have cask
 
 # ###############################################################################
 # # VSCode Extensions
