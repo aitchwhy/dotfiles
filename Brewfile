@@ -39,6 +39,8 @@ brew "black"                     # Python code formatter
 # brew "pyenv"                     # Python version management
 brew "pyright"                   # Static type checker for Python
 brew "scrapy"                    # Web crawling & scraping framework
+brew "delta"
+brew "git-delta"
 
 # Lua
 brew "lua"                       # Powerful, lightweight programming language
