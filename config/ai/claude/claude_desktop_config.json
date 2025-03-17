@@ -9,15 +9,6 @@
 				"-v=claude"
 			]
 		},
-		"@calclavia-mcp-obsidian": {
-			"command": "/Users/hank/.toolbase/toolbase-runner",
-			"args": [
-				"-m=https://esm.sh/mcp-obsidian@1.0.0/dist/index.js%3Fbundle-deps&pin=v135",
-				"-c=/Users/hank/.toolbase/cache",
-				"--",
-				"/Users/hank/obsidian/primary"
-			]
-		},
 		"@modelcontextprotocol-server-filesystem": {
 			"command": "/Users/hank/.toolbase/toolbase-runner",
 			"args": [
