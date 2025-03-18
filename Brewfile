@@ -93,7 +93,6 @@ brew "pyright"                   # Static type checker for Python
 brew "scrapy"                    # Web crawling & scraping framework
 brew "delta"
 brew "git-delta"
-brew "git-credential-manager"
 
 brew "harfbuzz" # OpenType text shaping engine
 
@@ -302,6 +301,7 @@ cask "lm-studio"                 # Language model studio
 cask "macwhisper"                # Audio transcription
 cask "ollama"                    # Run LLMs locally
 # cask "superwhisper"              # Audio transcription
+cask "git-credential-manager"
 
 # Productivity & Organization
 cask "a-better-finder-rename"    # File renaming utility
