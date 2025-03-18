@@ -333,6 +333,9 @@ cask "swish"                     # Window manager
 cask "timelane"                  # Time tracking
 cask "todoist"                   # Todo list
 # cask "typora"                    # Markdown editor
+cask "betterzip"
+cask "quicklook-json"
+cask "quicklook-csv"
 
 # Development & Design
 # cask "apidog"                    # API development
