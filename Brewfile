@@ -75,7 +75,7 @@ brew "node@22"                     # NodeJS
 brew "xcbeautify"                     # xcodebuild beautify
 brew "mint" # swift lint
 brew "poppler" # PDF rendering library (based on the xpdf-3.0 code base)
-brew "typesense"
+brew "typesense/tap/typesense-server@28.0"
 
 # JavaScript/TypeScript
 # brew "esbuild"                   # Extremely fast JavaScript bundler and minifier
@@ -426,6 +426,7 @@ mas "Drafts", id: 1435957248          # Text capture
 mas "HacKit", id: 1549557075          # Markdown editor
 mas "Omnivore", id: 1564031042        # Read-it-later
 mas "Parcel", id: 639968404           # Package tracking
+mas "Snippety", id: 1530751461 # snippet manager (mac,ios,ipad)
 # mas "Paste", id: 967805235            # Clipboard manager
 # TODO: monica
 
@@ -439,8 +440,9 @@ mas "KakaoTalk", id: 869223134        # Messaging
 mas "Pixea", id: 1507782672           # Image viewer
 
 # Utilities
-mas "Bitwarden", id: 1352778147      # Already have cask
+mas "Bitwarden", id: 1352778147
 mas "LanScan", id: 472226235          # Network scanner
+mas "Peek", id: 1554235898 # quicklook extension
 
 # Commented out less frequently used Mac App Store apps
 
