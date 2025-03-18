@@ -288,7 +288,7 @@ cask "tableplus"                 # Database management
 cask "carbon-copy-cloner"
 cask "ngrok"
 cask "maccy" # clipboard manager
-brew "qlmarkdown" # Markdown quicklook
+cask "qlmarkdown" # Markdown quicklook
 cask "mactex"
 
 # AI & ML Tools
