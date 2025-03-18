@@ -1,9 +1,29 @@
-tap "homebrew/bundle"
-# tap "homebrew/services"
+# TODO: advanced brewfile wrapper (https://homebrew-file.readthedocs.io/en/latest/installation.html)
+# brew "rcmdnk/file/brew-file"
+# or install script
+# $ curl -o install.sh -fsSL https://raw.github.com/rcmdnk/homebrew-file/install/install.sh
+# $ chmod 755 ./install.sh
+# $ ./install.sh
+# $ rm -f install.sh
+#
+# then after install add to .bashrc or .zshrc to warp "brew" command
+# if [ -f $(brew --prefix)/etc/brew-wrap ];then
+#  source $(brew --prefix)/etc/brew-wrap
+# fi
+#
+# NOTE: By default, Brewfile is $XDG_CONFIG_HOME/brewfile/Brewfile.
+# If you don’t have above Brewfile and have ~/.brewfile/Brewfile (old version place), then it is used.
+#
+# If you don’t have Brewfile, first, do:
+#
+# $ brew init
+
+################################################################################
+# TAPS
+################################################################################
+tap "dotenvx/brew"
 tap "koekeishiya/formulae"
 tap "olets/tap"
-tap "dotenvx/brew"
-# tap "sachaos/todoist"
 tap "stripe/stripe-cli"
 tap "temporalio/brew"
 tap "typesense/tap"
@@ -11,20 +31,52 @@ tap "waydabber/betterdisplay"
 tap "xo/xo"
 tap "yakitrak/yakitrak"
 
+# https://gist.github.com/ChristopherA/a579274536aab36ea9966f301ff14f3f#minimal-essential-bundle
+# tap "homebrew/core"
+# tap "homebrew/bundle"
+# tap "homebrew/cask"
+# tap "buo/cask-upgrade"
+# tap "homebrew/cask-fonts"
+# brew "github-keygen"
+# brew "gnupg"
+# brew "pinentry-mac"
+# brew "stow"
+# brew "mas"
+# brew "gh"
+# cask "atom"
+# cask "carbon-copy-cloner"cask "atom"
+# cask "typora"
+
+################################################################################
+# CASK ARGS (Optional: Adjust if needed)
+################################################################################
+# Uncomment and adjust the following if you want a custom install directory for casks
+# cask_args appdir: "~/Applications", require_sha: true
+
+################################################################################
+# BREW FORMULAE
+################################################################################
+
+# Mac App Store CLI
+brew "mas"
+
 # Set cask install dir to ~/Applications (user level)
 # cask_args appdir: "~/Applications", require_sha: true
 # cask_args appdir: "/Applications", require_sha: true
-
-brew "mas"                       # Mac App Store command-line interface
 
 ###############################################################################
 # Development Tools & Languages
 ###############################################################################
 
 # Databases
-brew "postgresql@17"
+brew "postgresql@17",
+  postinstall: "${HOMEBREW_PREFIX}/opt/postgresql@16/bin/postgres -D ${HOMEBREW_PREFIX}/var/postgresql@16"
 brew "minio"                     # High Performance, Kubernetes Native Object Storage
 brew "neo4j"                     # Graph database
+brew "node@22"                     # NodeJS
+brew "xcbeautify"                     # xcodebuild beautify
+brew "mint" # swift lint
+brew "poppler" # PDF rendering library (based on the xpdf-3.0 code base)
 
 # JavaScript/TypeScript
 # brew "esbuild"                   # Extremely fast JavaScript bundler and minifier
@@ -42,6 +94,12 @@ brew "pyright"                   # Static type checker for Python
 brew "scrapy"                    # Web crawling & scraping framework
 brew "delta"
 brew "git-delta"
+brew "git-credential-manager"
+
+brew "harfbuzz" # OpenType text shaping engine
+
+brew "glib" # core app lib for C
+brew "xz" # high compression tool
 
 # Lua
 brew "lua"                       # Powerful, lightweight programming language
@@ -52,6 +110,7 @@ brew "luarocks"                  # Package manager for the Lua programming langu
 # brew "rust-analyzer"             # Experimental Rust compiler front-end for IDEs
 
 # Go
+brew "go"
 # brew "gopls"                     # Language server for the Go language
 
 # Ruby
@@ -83,6 +142,7 @@ brew "zsh-history-substring-search" # Zsh port of Fish shell's history search
 brew "zsh-syntax-highlighting"   # Fish shell like syntax highlighting for zsh
 # brew "olets/tap/zsh-abbr"        # Auto-expanding abbreviations manager for zsh, inspired by fish
 # brew "olets/tap/zsh-autosuggestions-abbreviations-strategy" # Plugin for zsh-abbr
+brew "tesseract"
 
 # Terminal Multiplexers & Managers
 # brew "tmux"                      # Terminal multiplexer
@@ -114,12 +174,14 @@ brew "glow"                      # Render markdown on the CLI
 brew "gron"                      # Make JSON greppable
 brew "hexyl"                     # Command-line hex viewer
 brew "jq"                        # Lightweight and flexible command-line JSON processor
-brew "lnav"                      # Curses-based tool for viewing and analyzing log files
+# Curses-based tool for viewing and analyzing log files
+brew "lnav", postinstall: "alias logs='lnav'"
+
 brew "miller"                    # Like sed, awk, cut, join & sort for name-indexed data such as CSV
 brew "pandoc"                    # Swiss-army knife of markup format conversion
 brew "ripgrep"                   # Search tool like grep and The Silver Searcher
 brew "sd"                        # Intuitive find & replace CLI
-brew "sq"                        # Data wrangler with jq-like query language
+# brew "sq"                        # Data wrangler with jq-like query language
 brew "yq"                        # Process YAML, JSON, XML, CSV and properties documents from the CLI
 
 # CLI Apps & Utilities
@@ -156,8 +218,11 @@ brew "k9s"                       # Kubernetes CLI To Manage Your Clusters In Sty
 brew "skaffold"                  # Easy and Repeatable Kubernetes Development
 brew "traefik"                   # Modern reverse proxy
 
+brew "pkgconf" # Package compiler and linker metadata toolkit (https://github.com/pkgconf/pkgconf)
+
 # AWS & Cloud Tools
 brew "awscli-local"              # Thin wrapper around the `aws` command-line interface for use with LocalStack
+brew "git"
 # brew "cloudflare-wrangler"       # CLI tool for Cloudflare Workers
 # brew "gdrive"                    # Google Drive CLI Client
 brew "localstack"                # Fully functional local AWS cloud stack
@@ -211,6 +276,9 @@ brew "fx"                        # Terminal JSON viewer
 # brew "koekeishiya/formulae/skhd" # Simple hotkey-daemon for macOS
 # brew "koekeishiya/formulae/yabai" # Tiling window manager for macOS
 #brew "yakitrak/yakitrak/obsidian-cli" # CLI for Obsidian
+brew "terragrunt"
+brew "terraform"
+brew "pnpm"
 
 ###############################################################################
 # Applications (Casks)
@@ -220,7 +288,10 @@ brew "fx"                        # Terminal JSON viewer
 cask "orbstack"                  # Container and VM manager
 cask "tableplus"                 # Database management
 cask "carbon-copy-cloner"
+cask "ngrok"
+cask "maccy"
 
+cask "mactex"
 # AI & ML Tools
 # cask "boltai"                    # AI assistant
 cask "chatgpt"                   # ChatGPT desktop client
@@ -290,15 +361,15 @@ cask "warp"                      # Terminal
 cask "betterdisplay"             # Display management
 # cask "blackhole-16ch"            # Audio routing
 cask "cleanmymac"                # System cleaner
-# cask "cleaneronepro"             # System cleaner
 # cask "cloudflare-warp"           # Secure DNS
 cask "daisydisk"                 # Disk space analyzer
 cask "keka"                      # File archiver
 cask "kekaexternalhelper"        # Helper for Keka
 # cask "keycastr"                  # Key visualizer
 cask "keymapp"                   # Keyboard mapping
+cask "upscayl"
 # cask "motrix"                    # Download manager
-# cask "osquery"                   # OS instrumentation
+cask "osquery"                   # OS instrumentation
 cask "proton-mail"               # Email client
 cask "protonvpn"                 # VPN client
 cask "qflipper"                  # Flipper Zero utility
