@@ -22,14 +22,12 @@
 # TAPS
 ################################################################################
 tap "dotenvx/brew"
-tap "koekeishiya/formulae"
+# tap "koekeishiya/formulae"
 tap "olets/tap"
-tap "stripe/stripe-cli"
-tap "temporalio/brew"
+# tap "stripe/stripe-cli"
+# tap "temporalio/brew"
 tap "typesense/tap"
 tap "waydabber/betterdisplay"
-tap "xo/xo"
-tap "yakitrak/yakitrak"
 
 # https://gist.github.com/ChristopherA/a579274536aab36ea9966f301ff14f3f#minimal-essential-bundle
 # tap "homebrew/core"
@@ -77,6 +75,7 @@ brew "node@22"                     # NodeJS
 brew "xcbeautify"                     # xcodebuild beautify
 brew "mint" # swift lint
 brew "poppler" # PDF rendering library (based on the xpdf-3.0 code base)
+brew "typesense"
 
 # JavaScript/TypeScript
 # brew "esbuild"                   # Extremely fast JavaScript bundler and minifier
@@ -275,7 +274,6 @@ brew "dotenvx/brew/dotenvx"      # Better dotenv from the creator of `dotenv`
 brew "fx"                        # Terminal JSON viewer
 # brew "koekeishiya/formulae/skhd" # Simple hotkey-daemon for macOS
 # brew "koekeishiya/formulae/yabai" # Tiling window manager for macOS
-#brew "yakitrak/yakitrak/obsidian-cli" # CLI for Obsidian
 brew "terragrunt"
 brew "terraform"
 brew "pnpm"
@@ -289,9 +287,10 @@ cask "orbstack"                  # Container and VM manager
 cask "tableplus"                 # Database management
 cask "carbon-copy-cloner"
 cask "ngrok"
-cask "maccy"
-
+cask "maccy" # clipboard manager
+brew "qlmarkdown" # Markdown quicklook
 cask "mactex"
+
 # AI & ML Tools
 # cask "boltai"                    # AI assistant
 cask "chatgpt"                   # ChatGPT desktop client
@@ -328,7 +327,7 @@ cask "obsidian"                  # Note taking
 cask "pdf-expert"                # PDF editor
 cask "quit-all"                  # Quit all apps
 cask "raycast"                   # App launcher
-# cask "rize"                      # Time tracker
+cask "rize"                      # Time tracker
 cask "soulver"                   # Smart calculator
 cask "swish"                     # Window manager
 cask "timelane"                  # Time tracking
@@ -350,7 +349,7 @@ cask "kaleidoscope"              # Diff tool
 cask "karabiner-elements"        # Keyboard customizer
 cask "proxyman"                  # HTTP debugging proxy
 cask "syntax-highlight"          # Syntax highlighter
-cask "termius"                   # SSH client
+# cask "termius"                   # SSH client
 # cask "tower"                     # Git client
 cask "fork"                     # Git client
 # cask "visual-studio-code"        # Code editor
