@@ -44,9 +44,11 @@ export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 # export XDG_BIN_HOME="${XDG_BIN_HOME:-$HOME/.local/bin}"
 
+export DOTFILES="$HOME/dotfiles"
+
 # Ensure ZSH config directory is set
 # export ZDOTDIR=${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}
-export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
+export ZDOTDIR="$DOTFILES/config/zsh"
 
 export CLOUD="~/Library/CloudStorage"
 export GDRIVE="~/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com"
@@ -54,7 +56,6 @@ export DROPBOX="~/Library/CloudStorage/Dropbox"
 
 # Dotfiles location
 # export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
-export DOTFILES="$HOME/dotfiles"
 
 # Ensure XDG directories exist
 # if [[ ! -d "$XDG_DATA_HOME" ]]; then mkdir -p "$XDG_DATA_HOME"; fi

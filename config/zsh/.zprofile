@@ -36,7 +36,7 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 #   zsh-autosuggestions \
 #   zsh-history-substring-search
 
-# zsh setu
+# zsh setup
 # TODO: fzf-zsh https://github.com/unixorn/fzf-zsh-plugin
 
 # ========================================================================
@@ -53,5 +53,5 @@ export PAGER="bat --pager"
 # typeset -U path PATH
 typeset -U path PATH
 
-# export COLORTERM="truecolor"
+export COLORTERM="truecolor"
 export PATH
