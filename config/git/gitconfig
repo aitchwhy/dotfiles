@@ -3,7 +3,7 @@
 
 # ===== User Information =====
 [user]
-email = hank.lee.qed@gmail.com
+email = hank.lee@anterior.com
 name = Hank Lee
 
 # ===== Core Settings =====
@@ -12,11 +12,7 @@ editor = nvim
 pager = delta
 # Reference the custom gitignore path
 excludesfile = ~/dotfiles/config/git/gitignore
-# Performance optimizations for macOS
-# precomposeunicode = true
-# untrackedCache = true
-# fsync = true
-# preloadIndex = true
+# Performance optimizations for m
 
 # ===== Basic UI Settings =====
 [color]
@@ -32,12 +28,6 @@ defaultBranch = main
 # ===== Diff & Merge Tools =====
 [interactive]
 diffFilter = delta --color-only
-
-[diff]
-# algorithm = zdiff3
-external = /opt/homebrew/bin/ksdiff
-colorMoved = default
-indentHeuristic = true
 
 [delta]
 navigate = true
@@ -86,11 +76,11 @@ tag = false
 helper = osxkeychain
 
 [credential "https://github.com"]
-	helper = 
+	helper =
 	helper = !/opt/homebrew/bin/gh auth git-credential
 
 [credential "https://gist.github.com"]
-	helper = 
+	helper =
 	helper = !/opt/homebrew/bin/gh auth git-credential
 
 [gpg "ssh"]

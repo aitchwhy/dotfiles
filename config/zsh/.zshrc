@@ -111,6 +111,9 @@ fi
 # path+=(~/my_bin)
 # ========================================================================
 
+export VOLTA_HOME="$HOME/.volta"
+export PATH="$VOLTA_HOME/bin:$PATH"
+
 # # Add prioritized paths
 # path=(
 #   # Version managers (need to be before Homebrew)
