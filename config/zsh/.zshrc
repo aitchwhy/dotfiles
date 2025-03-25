@@ -111,9 +111,6 @@ fi
 # path+=(~/my_bin)
 # ========================================================================
 
-export VOLTA_HOME="$HOME/.volta"
-export PATH="$VOLTA_HOME/bin:$PATH"
-
 # # Add prioritized paths
 # path=(
 #   # Version managers (need to be before Homebrew)
@@ -322,41 +319,17 @@ eval "$(atuin init zsh)"
 # atuin import auto
 
 # ========================================================================
-# warp
+# uv
 # ========================================================================
-
-# if ! has_command warp; then
-#   echo "warp not found. Installing warp..."
-#   brew install --quiet warp
-# fi
-#
-# if [[ ! -f "$XDG_CONFIG_HOME/warp/keybindings.yaml" ]]; then
-#   echo "Linking warp keybindings..."
-#   ln -sf "$DOTFILES/config/warp/keybindings.yaml" "$XDG_CONFIG_HOME/warp/keybindings.yaml"
-# fi
+# export PATH="/Users/hank/.local/share/../bin:$PATH"
+path_add "$HOME/.local/share/../bin"
 
 # ========================================================================
-# claude
+# NodeJS (volta + node + bun)
 # ========================================================================
-
-# if ! has_command claude; then
-#   echo "claude not found. Installing claude..."
-#   brew install --quiet claude
-# fi
-#
-# if [[ ! -f "$XDG_CONFIG_HOME/claude/config.json" ]]; then
-#   echo "Linking claude config..."
-#   ln -sf "$DOTFILES/config/claude/config.json" "$XDG_CONFIG_HOME/claude/config.json"
-# fi
-#
-# ========================================================================
-# chatgpt
-# ========================================================================
-
-# if ! has_command chatgpt; then
-#   echo "chatgpt not found. Installing chatgpt..."
-#   brew install --quiet chatgpt
-# fi
+export VOLTA_HOME="$HOME/.volta"
+# export PATH="$VOLTA_HOME/bin:$PATH"
+path_add "$VOLTA_HOME/bin"
 
 # ========================================================================
 # bun (nodejs)
@@ -364,7 +337,8 @@ eval "$(atuin init zsh)"
 
 # add to ~/.zshrc
 export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
+path_add "$BUN_INSTALL/bin"
+# export PATH="$BUN_INSTALL/bin:$PATH"
 
 if ! has_command bun; then
   echo "Bun not found. Installing bun (nodejs)..."
@@ -403,19 +377,101 @@ if ! has_command bat; then
 fi
 
 # ========================================================================
-# rust (rustup)
+# delta
 # ========================================================================
 
+export PAGER="bat --pager always"
+
+if ! has_command bat; then
+  echo "bat not found. Installing bat..."
+  brew install --quiet bat
+fi
+
+# ========================================================================
+# rust (rustup)
+# https://rust-lang.org and https://rustup.rs
+# ========================================================================
+
+# Rust environment variables
+export CARGO_HOME="${CARGO_HOME:-$HOME/.cargo}"
+export RUSTUP_HOME="${RUSTUP_HOME:-$HOME/.rustup}"
+
+# # Installation check and setup
+# if ! has_command rustup; then
+#   log_info "Installing Rust via rustup..."
+#   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+#   # Source the cargo environment if installed
+#   if [[ -f "$CARGO_HOME/env" ]]; then
+#     source "$CARGO_HOME/env"
+#     log_success "Rust installed and environment loaded"
+#   else
+#     log_warn "Rust installation may need manual configuration"
+#   fi
+# fi
+#
+
+# Rust Development Environment Setup
 if ! has_command rustup; then
   echo "rustup not found. Installing rustup..."
-  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -y | sh
-  echo "rustup installed"
-  echo "installing stable toolchain"
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+  # echo "rustup installed"
+  # echo "installing stable toolchain..."
   rustup toolchain install stable
-  echo "installing rustfmt"
+  # echo "installing rustfmt..."
   rustup component add rustfmt
-  echo "rustfmt installed"
+  # echo "rustfmt installed"
 fi
+#
+
+# Add cargo bin to PATH if not already there
+# [[ -d "$CARGO_HOME/bin" ]] && path_add "$CARGO_HOME/bin"
+
+# Optional: Add cargo completions
+# if has_command rustup; then
+#   mkdir -p "$ZDOTDIR/.zfunc"
+#   rustup completions zsh > "$ZDOTDIR/.zfunc/_rustup"
+#   rustup completions zsh cargo > "$ZDOTDIR/.zfunc/_cargo"
+# fi
+
+# Note: For Apple Silicon Macs, the Rust toolchain is installed with native arm64 support
+#
+# ========================================================================
+# warp
+# ========================================================================
+
+# if ! has_command warp; then
+#   echo "warp not found. Installing warp..."
+#   brew install --quiet warp
+# fi
+#
+# if [[ ! -f "$XDG_CONFIG_HOME/warp/keybindings.yaml" ]]; then
+#   echo "Linking warp keybindings..."
+#   ln -sf "$DOTFILES/config/warp/keybindings.yaml" "$XDG_CONFIG_HOME/warp/keybindings.yaml"
+# fi
+
+# ========================================================================
+# claude
+# ========================================================================
+
+# if ! has_command claude; then
+#   echo "claude not found. Installing claude..."
+#   brew install --quiet claude
+# fi
+#
+# if [[ ! -f "$XDG_CONFIG_HOME/claude/config.json" ]]; then
+#   echo "Linking claude config..."
+#   ln -sf "$DOTFILES/config/claude/config.json" "$XDG_CONFIG_HOME/claude/config.json"
+# fi
+#
+# ========================================================================
+# chatgpt
+# ========================================================================
+
+# if ! has_command chatgpt; then
+#   echo "chatgpt not found. Installing chatgpt..."
+#   brew install --quiet chatgpt
+# fi
 
 # ========================================================================
 # postgresql@17
@@ -441,7 +497,7 @@ path_add "/opt/homebrew/opt/postgresql@17/bin"
 export LDFLAGS="-L/opt/homebrew/opt/postgresql@17/lib"
 export CPPFLAGS="-I/opt/homebrew/opt/postgresql@17/include"
 
-brew services start postgresql@17
+brew services restart postgresql@17
 
 # postgresql://[user[:password]@][host][:port][/dbname][?param1=value1&...]
 # Here's an example of how you might set up a connection string:

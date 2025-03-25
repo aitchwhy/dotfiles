@@ -47,7 +47,7 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 export EDITOR="nvim"
 export VISUAL="$EDITOR"
 # export PAGER="less -FRX"
-export PAGER="bat --pager"
+# export PAGER="bat --pager"
 
 # Remove duplicate entries from PATH
 # typeset -U path PATH
