@@ -1,4 +1,5 @@
 tap "oven-sh/bun"
+
 brew "atuin", restart_service: :changed
 brew "awscli"
 brew "bat"
@@ -26,6 +27,7 @@ brew "localstack"
 brew "mas"
 brew "miller"
 brew "neovim"
+brew "oven-sh/bun/bun"
 brew "postgresql@17", restart_service: :changed
 brew "ripgrep"
 brew "ruff"
@@ -41,7 +43,7 @@ brew "zellij"
 brew "zoxide"
 brew "zsh-autosuggestions"
 brew "zsh-syntax-highlighting"
-brew "oven-sh/bun/bun"
+
 cask "1password"
 cask "1password-cli"
 cask "apidog"
@@ -101,9 +103,3 @@ cask "visual-paradigm"
 cask "visual-studio-code"
 cask "warp"
 cask "zen-browser"
-mas "Essentials", id: 1588151344
-mas "GarageBand", id: 682658836
-mas "iMovie", id: 408981434
-mas "Keynote", id: 409183694
-mas "Numbers", id: 409203825
-mas "Pages", id: 409201541
