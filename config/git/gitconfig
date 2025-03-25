@@ -3,8 +3,8 @@
 
 # ===== User Information =====
 [user]
-  email = hank.lee@anterior.com
-  name = Hank Lee
+	email = hank.lee@anterior.com
+	name = Hank Lee
 
 # ===== Core Settings =====
 [core]
