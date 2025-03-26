@@ -44,6 +44,7 @@ brew "zoxide"
 brew "zsh-autosuggestions"
 brew "zsh-syntax-highlighting"
 
+cask "lm-studio"
 cask "1password"
 cask "1password-cli"
 cask "apidog"
