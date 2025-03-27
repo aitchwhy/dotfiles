@@ -325,21 +325,31 @@ eval "$(atuin init zsh)"
 path_add "$HOME/.local/share/../bin"
 
 # ========================================================================
-# NodeJS (volta + node + bun)
+# NodeJS
 # ========================================================================
+# Volta
 export VOLTA_HOME="$HOME/.volta"
 # export PATH="$VOLTA_HOME/bin:$PATH"
 path_add "$VOLTA_HOME/bin"
+if ! has_command volta; then
+  echo "Volta not found. Installing ..."
+  brew install volta
+fi
 
-# ========================================================================
-# bun (nodejs)
-# ========================================================================
+# NVM
+export NVM_DIR="$HOME/.nvm"
+[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
+[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+if ! has_command nvm; then
+  echo "Bun not found. Installing bun (nodejs)..."
+  curl -fsSL https://bun.sh/install | bash # for macOS, Linux, and WSL
+  brew install volta
+fi
 
-# add to ~/.zshrc
+# Bun
 export BUN_INSTALL="$HOME/.bun"
-path_add "$BUN_INSTALL/bin"
 # export PATH="$BUN_INSTALL/bin:$PATH"
-
+path_add "$BUN_INSTALL/bin"
 if ! has_command bun; then
   echo "Bun not found. Installing bun (nodejs)..."
   curl -fsSL https://bun.sh/install | bash # for macOS, Linux, and WSL
@@ -497,7 +507,7 @@ path_add "/opt/homebrew/opt/postgresql@17/bin"
 export LDFLAGS="-L/opt/homebrew/opt/postgresql@17/lib"
 export CPPFLAGS="-I/opt/homebrew/opt/postgresql@17/include"
 
-brew services restart postgresql@17
+# brew services restart postgresql@17
 
 # postgresql://[user[:password]@][host][:port][/dbname][?param1=value1&...]
 # Here's an example of how you might set up a connection string:
@@ -762,3 +772,6 @@ alias lg="lazygit"
 # . "$HOME/.local/bin/env"
 
 # . "$HOME/.local/share/../bin/env"
+
+# bun completions
+[ -s "/Users/hank/.bun/_bun" ] && source "/Users/hank/.bun/_bun"

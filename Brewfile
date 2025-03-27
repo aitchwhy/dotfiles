@@ -67,8 +67,11 @@ brew "mas"
 ###############################################################################
 
 # Databases
-brew "postgresql@17",
-  postinstall: "${HOMEBREW_PREFIX}/opt/postgresql@16/bin/postgres -D ${HOMEBREW_PREFIX}/var/postgresql@16"
+brew "postgresql@17", restart_service: :changed, postinstall: "${HOMEBREW_PREFIX}/opt/postgresql@17/bin/postgres -D ${HOMEBREW_PREFIX}/var/postgresql@17"
+
+# brew "atuin", restart_service: :changed  # Improved shell history for zsh, bash, fish and nushell
+
+# brew "atuin", restart_service: :changed  # Improved shell history for zsh, bash, fish and nushell
 brew "minio"                     # High Performance, Kubernetes Native Object Storage
 brew "neo4j"                     # Graph database
 brew "node@22"                     # NodeJS
@@ -129,9 +132,9 @@ brew "neovim"                    # Ambitious Vim-fork focused on extensibility a
 # CLI Utilities & Shell Tools
 ###############################################################################
 # Shell Enhancements
-# brew "atuin", restart_service: :changed  # Improved shell history for zsh, bash, fish and nushell
+brew "atuin", restart_service: :changed  # Improved shell history for zsh, bash, fish and nushell
 brew "direnv"                    # Load/unload environment variables based on $PWD
-# brew "starship"                  # Cross-shell prompt for astronauts
+brew "starship"                  # Cross-shell prompt for astronauts
 brew "zoxide"                    # Shell extension to navigate your filesystem faster
 brew "zsh-autopair"              # Auto-close and delete matching delimiters in zsh
 brew "zsh-autosuggestions"       # Fish-like fast/unobtrusive autosuggestions for zsh
