@@ -1,6 +1,9 @@
 # Git configuration optimized for macOS Apple Silicon
 # https://git-scm.com/docs/git-config.html
 
+# Git configuration optimized for macOS Apple Silicon
+# https://git-scm.com/docs/git-config.html
+
 # ===== User Information =====
 [user]
 	email = hank.lee@anterior.com
@@ -8,72 +11,72 @@
 
 # ===== Core Settings =====
 [core]
-  editor = nvim
-  pager = delta
-  # Reference the custom gitignore path
-  excludesfile = ~/dotfiles/config/git/gitignore
-  # Performance optimizations for m
+	editor = nvim
+	pager = delta
+	# Reference the custom gitignore path
+	excludesfile = ~/dotfiles/config/git/gitignore
+	# Performance optimizations for Apple Silicon
 
 # ===== Basic UI Settings =====
 [color]
-  ui = true
-  diff = auto
-  status = auto
-  branch = auto
-  interactive = auto
+	ui = true
+	diff = auto
+	status = auto
+	branch = auto
+	interactive = auto
 
 [init]
-  defaultBranch = main
+	defaultBranch = main
 
 # ===== Diff & Merge Tools =====
 [interactive]
-  diffFilter = delta --color-only
+	diffFilter = delta --color-only
 
 [delta]
-  navigate = true
-  light = false
-  line-numbers = true
-  side-by-side = true
+	navigate = true
+	light = false
+	line-numbers = true
+	side-by-side = true
 
 # ===== Pull, Push & Branch Settings =====
 [pull]
-  rebase = false
+	rebase = false
 
 [push]
-  default = current
-  followTags = true
-  recurseSubmodules = check
+	default = current
+	followTags = true
+	recurseSubmodules = check
 
 [branch]
-  autoSetupRebase = always
-  sort = -committerdate
+	autoSetupRebase = always
+	sort = -committerdate
 
 [fetch]
-  prune = true
-  pruneTags = true
-  parallel = 0
+	prune = true
+	pruneTags = true
+	parallel = 0
 
 [rebase]
-  autoStash = true
-  instructionFormat = "[%an @ %ar] %s"
-  stat = true
+	autoStash = true
+	instructionFormat = "[%an @ %ar] %s"
+	stat = true
 
 # ===== Status & Pager Settings =====
 [status]
-  showUntrackedFiles = all
-  submoduleSummary = true
+	showUntrackedFiles = all
+	submoduleSummary = true
 
 [pager]
-  diff = delta
-  log = delta
-  reflog = delta
-  show = delta
-  branch = false
-  tag = false
+	diff = delta
+	log = delta
+	reflog = delta
+	show = delta
+	branch = false
+	tag = false
 
 # ===== Authentication & Signing =====
 [credential]
-  helper = osxkeychain
+	helper = osxkeychain
 
 [credential "https://github.com"]
 	helper =
@@ -84,45 +87,168 @@
 	helper = !/opt/homebrew/bin/gh auth git-credential
 
 [gpg "ssh"]
-  program = ssh-keygen
-  allowedSignersFile = ~/.ssh/allowed_signers
+	program = ssh-keygen
+	allowedSignersFile = ~/.ssh/allowed_signers
 
 [commit]
-  template = ~/dotfiles/config/git/gitmessage
-  verbose = true
+	template = ~/dotfiles/config/git/gitmessage
+	verbose = true
 
 # ===== LFS Settings =====
 [filter "lfs"]
-  clean = git-lfs clean -- %f
-  smudge = git-lfs smudge -- %f
-  process = git-lfs filter-process
-  required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
 
 # ===== URL Handling =====
 [url "git@github.com:"]
-  insteadOf = https://github.com/
+	insteadOf = https://github.com/
 
 # ===== Useful Aliases =====
 [alias]
-# Basic operations
-  a = add
-  aa = add --all
-  c = commit
-  ca = commit --amend
-  co = checkout
-  s = status
-  ss = status -s
-  st = status -sb
-  # Branch operations
-  b = branch
-  # Diff & logs
-  d = diff
-  log = log --oneline
-  # Remote operations
-  p = push
-  ll = pull
-  # Blame for easy code history
-  bl = blame
+	# Basic operations
+	a = add
+	aa = add --all
+	c = commit
+	ca = commit --amend
+	co = checkout
+	s = status
+	ss = status -s
+	st = status -sb
+	# Branch operations
+	b = branch
+	# Diff & logs
+	d = diff
+	log = log --oneline
+	# Remote operations
+	p = push
+	ll = pull
+	# Blame for easy code history
+	bl = blame
+
+# # ===== User Information =====
+# [user]
+# 	email = hank.lee@anterior.com
+# 	name = Hank Lee
+#
+# # ===== Core Settings =====
+# [core]
+#   editor = nvim
+#   pager = delta
+#   # Reference the custom gitignore path
+#   excludesfile = ~/dotfiles/config/git/gitignore
+#   # Performance optimizations for m
+#
+# # ===== Basic UI Settings =====
+# [color]
+#   ui = true
+#   diff = auto
+#   status = auto
+#   branch = auto
+#   interactive = auto
+#
+# [init]
+#   defaultBranch = main
+#
+# # ===== Diff & Merge Tools =====
+# [interactive]
+#   diffFilter = delta --color-only
+#
+# [delta]
+#   navigate = true
+#   light = false
+#   line-numbers = true
+#   side-by-side = true
+#
+# # ===== Pull, Push & Branch Settings =====
+# [pull]
+#   rebase = false
+#
+# [push]
+#   default = current
+#   followTags = true
+#   recurseSubmodules = check
+#
+# [branch]
+#   autoSetupRebase = always
+#   sort = -committerdate
+#
+# [fetch]
+#   prune = true
+#   pruneTags = true
+#   parallel = 0
+#
+# [rebase]
+#   autoStash = true
+#   instructionFormat = "[%an @ %ar] %s"
+#   stat = true
+#
+# # ===== Status & Pager Settings =====
+# [status]
+#   showUntrackedFiles = all
+#   submoduleSummary = true
+#
+# [pager]
+#   diff = delta
+#   log = delta
+#   reflog = delta
+#   show = delta
+#   branch = false
+#   tag = false
+#
+# # ===== Authentication & Signing =====
+# [credential]
+#   helper = osxkeychain
+#
+# [credential "https://github.com"]
+# 	helper =
+# 	helper = !/opt/homebrew/bin/gh auth git-credential
+#
+# [credential "https://gist.github.com"]
+# 	helper =
+# 	helper = !/opt/homebrew/bin/gh auth git-credential
+#
+# [gpg "ssh"]
+#   program = ssh-keygen
+#   allowedSignersFile = ~/.ssh/allowed_signers
+#
+# [commit]
+#   template = ~/dotfiles/config/git/gitmessage
+#   verbose = true
+#
+# # ===== LFS Settings =====
+# [filter "lfs"]
+#   clean = git-lfs clean -- %f
+#   smudge = git-lfs smudge -- %f
+#   process = git-lfs filter-process
+#   required = true
+#
+# # ===== URL Handling =====
+# [url "git@github.com:"]
+#   insteadOf = https://github.com/
+#
+# # ===== Useful Aliases =====
+# [alias]
+# # Basic operations
+#   a = add
+#   aa = add --all
+#   c = commit
+#   ca = commit --amend
+#   co = checkout
+#   s = status
+#   ss = status -s
+#   st = status -sb
+#   # Branch operations
+#   b = branch
+#   # Diff & logs
+#   d = diff
+#   log = log --oneline
+#   # Remote operations
+#   p = push
+#   ll = pull
+#   # Blame for easy code history
+#   bl = blame
 
 ################
 # [user]
