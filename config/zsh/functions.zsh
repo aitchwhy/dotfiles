@@ -1,4 +1,4 @@
-
+#!/usr/bin/env zsh
 # Mac App Store operations command
 function fmas() {
   # In the context of shell scripting, particularly in Unix-like operating systems, [[ $# -gt 0 ]] is a test condition used to check if one or more arguments have been passed to a script or function.
@@ -10,19 +10,34 @@ function fmas() {
   if [[ $# -gt 0 ]]; then
     # Direct execution if args provided
     case "$1" in
-      install|in)      shift; mas_install "$@" ;;
-      uninstall|rm)         shift; mas_uninstall "$@" ;;
-      info|i)          shift; mas_info "$@" ;;
-      cleanup|clean)          shift; mas_clean "$@" ;;
-      edit|e)          shift; mas_edit "$@" ;;
+    install | in)
+      shift
+      mas_install "$@"
+      ;;
+    uninstall | rm)
+      shift
+      mas_uninstall "$@"
+      ;;
+    info | i)
+      shift
+      mas_info "$@"
+      ;;
+    cleanup | clean)
+      shift
+      mas_clean "$@"
+      ;;
+    edit | e)
+      shift
+      mas_edit "$@"
+      ;;
 
-      # Help and default case
-      help|--help|-h)  _show_mas_help ;;
-      *)
-        log_error "Unknown Mac App Store command: $1"
-        _show_mas_help
-        return 1
-        ;;
+    # Help and default case
+    help | --help | -h) _show_mas_help ;;
+    *)
+      log_error "Unknown Mac App Store command: $1"
+      _show_mas_help
+      return 1
+      ;;
     esac
     return $?
   fi
@@ -37,7 +52,10 @@ function fmas() {
 
 # Interactive command selection for Mac App Store operations
 _select_mas_command() {
-  _fzf_check || { _show_mas_help; return 1; }
+  _fzf_check || {
+    _show_mas_help
+    return 1
+  }
 
   local commands=(
     "install:Install app from Mac App Store:mas_install"
@@ -51,8 +69,8 @@ _select_mas_command() {
   selected=$(printf "%s\n" "${commands[@]}" |
     awk -F: '{printf "%-15s %s\n", $1, $2}' |
     fzf --header="Select a Mac App Store command" \
-        --preview="echo; echo Description: {2..}; echo" \
-        --preview-window=bottom:3:wrap)
+      --preview="echo; echo Description: {2..}; echo" \
+      --preview-window=bottom:3:wrap)
 
   if [[ -n "$selected" ]]; then
     local cmd=$(echo "$selected" | awk '{print $1}')
@@ -164,7 +182,7 @@ mas_clean() {
 # Edit Mac App Store apps list (opens a list of installed apps)
 mas_edit() {
   local temp_file=$(mktemp)
-  mas list > "$temp_file"
+  mas list >"$temp_file"
   ${EDITOR:-vi} "$temp_file"
   log_info "Mac App Store apps list saved to $temp_file"
 }
