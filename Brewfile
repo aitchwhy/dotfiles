@@ -117,7 +117,6 @@ cask "visual-studio-code"
 cask "warp"
 cask "windsurf"
 cask "zen-browser"
-mas "Essentials", id: 1588151344
 vscode "42crunch.vscode-openapi"
 vscode "4ops.terraform"
 vscode "aaron-bond.better-comments"

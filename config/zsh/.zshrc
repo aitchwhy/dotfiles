@@ -427,9 +427,9 @@ if ! has_command rustup; then
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
   # echo "rustup installed"
   # echo "installing stable toolchain..."
-  rustup toolchain install stable
+  #rustup toolchain install stable
   # echo "installing rustfmt..."
-  rustup component add rustfmt
+  #rustup component add rustfmt
   # echo "rustfmt installed"
 fi
 #
