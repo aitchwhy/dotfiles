@@ -355,6 +355,12 @@ if ! has_command bun; then
   curl -fsSL https://bun.sh/install | bash # for macOS, Linux, and WSL
 fi
 
+# global packages
+mkdir -p ~/.npm-global
+npm config set prefix ~/.npm-global
+path_add "~/.npm-global/bin"
+npm install -g @anthropic-ai/claude-code
+
 # ========================================================================
 # nvim
 # ========================================================================
