@@ -411,6 +411,7 @@ fi
 # Rust environment variables
 export CARGO_HOME="${CARGO_HOME:-$HOME/.cargo}"
 export RUSTUP_HOME="${RUSTUP_HOME:-$HOME/.rustup}"
+path_add "$HOME/.cargo/bin"
 
 # # Installation check and setup
 # if ! has_command rustup; then
@@ -441,7 +442,7 @@ fi
 #
 
 # Add cargo bin to PATH if not already there
-# [[ -d "$CARGO_HOME/bin" ]] && path_add "$CARGO_HOME/bin"
+[[ -d "$CARGO_HOME/bin" ]] && path_add "$CARGO_HOME/bin"
 
 # Optional: Add cargo completions
 # if has_command rustup; then
