@@ -123,11 +123,11 @@ keybind = cmd+shift+down=adjust_selection:down
 # Tab Management
 # ============================
 
-keybind = ctrl+t>t=toggle_tab_overview
-keybind = ctrl+t>n=new_tab
-keybind = ctrl+t>h=previous_tab
-keybind = ctrl+t>l=next_tab
-keybind = ctrl+t>d=close_tab
+# keybind = ctrl+t>t=toggle_tab_overview
+# keybind = ctrl+t>n=new_tab
+# keybind = ctrl+t>h=previous_tab
+# keybind = ctrl+t>l=next_tab
+# keybind = ctrl+t>d=close_tab
 
 # ============================
 # Split Management

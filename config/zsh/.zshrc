@@ -696,6 +696,8 @@ has_command fzf && source <(fzf --zsh)
 # ZSH aliases - Organized by category
 # ========================================================================
 
+alias claude="/Users/hank/.claude/local/claude"
+
 # Navigation Shortcuts
 alias ..="cd .."
 alias ...="cd ../.."
