@@ -66,13 +66,13 @@
 	showUntrackedFiles = all
 	submoduleSummary = true
 
-[pager]
-	diff = delta
-	log = delta
-	reflog = delta
-	show = delta
-	branch = false
-	tag = false
+# [pager]
+# 	diff = delta
+# 	log = delta
+# 	reflog = delta
+# 	show = delta
+# 	branch = false
+# 	tag = false
 
 # ===== Authentication & Signing =====
 [credential]
