@@ -14,7 +14,7 @@
 	editor = nvim
 	pager = delta
 	# Reference the custom gitignore path
-	excludesfile = ~/dotfiles/config/git/gitignore
+	excludesfile = ~/.gitignore
 	# Performance optimizations for Apple Silicon
 
 # ===== Basic UI Settings =====

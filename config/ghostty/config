@@ -97,7 +97,8 @@ bold-is-bright = true
 link-url = true
 
 # Don't start in fullscreen
-fullscreen = false
+# fullscreen = false
+fullscreen = true
 
 # ============================
 # Custom Key Bindings
@@ -110,14 +111,14 @@ keybind = cmd+opt+i=inspector:toggle
 keybind = cmd+enter=toggle_fullscreen
 
 # Navigation between shell prompts
-keybind = cmd+shift+down=jump_to_prompt:1
-keybind = cmd+shift+up=jump_to_prompt:-1
+keybind = cmd+j=jump_to_prompt:1
+keybind = cmd+k=jump_to_prompt:-1
 
 # Selection handling
-keybind = cmd+shift+right=adjust_selection:right
-keybind = cmd+shift+left=adjust_selection:left
-keybind = cmd+shift+up=adjust_selection:up
-keybind = cmd+shift+down=adjust_selection:down
+# keybind = cmd+shift+right=adjust_selection:right
+# keybind = cmd+shift+left=adjust_selection:left
+# keybind = cmd+shift+up=adjust_selection:up
+# keybind = cmd+shift+down=adjust_selection:down
 
 # ============================
 # Tab Management
@@ -134,24 +135,24 @@ keybind = cmd+shift+down=adjust_selection:down
 # ============================
 
 # Create new splits in different directions
-keybind = ctrl+shift+\=new_split:right
-keybind = ctrl+shift+-=new_split:down
+keybind = cmd+shift+\=new_split:right
+keybind = cmd+shift+-=new_split:down
 
-# Navigate between splits (Vim-style)
-keybind = ctrl+h=goto_split:left
-keybind = ctrl+j=goto_split:down
-keybind = ctrl+k=goto_split:up
-keybind = ctrl+l=goto_split:right
+# # Navigate between splits (Vim-style)
+# keybind = ctrl+h=goto_split:left
+# keybind = ctrl+j=goto_split:down
+# keybind = ctrl+k=goto_split:up
+# keybind = ctrl+l=goto_split:right
 
 # ============================
 # Window Management
 # ============================
 
-# Resize splits with arrow keys when holding Cmd+Shift
-keybind = cmd+shift+left=resize_split:left,10
-keybind = cmd+shift+down=resize_split:down,10
-keybind = cmd+shift+up=resize_split:up,10
-keybind = cmd+shift+right=resize_split:right,10
+# # Resize splits with arrow keys when holding Cmd+Shift
+# keybind = cmd+shift+left=resize_split:left,10
+# keybind = cmd+shift+down=resize_split:down,10
+# keybind = cmd+shift+up=resize_split:up,10
+# keybind = cmd+shift+right=resize_split:right,10
 # ============================
 # End of Configuration
 # ============================
