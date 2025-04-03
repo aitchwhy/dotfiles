@@ -1,0 +1,27 @@
+
+# Configure each pane with a different repo
+local RUN_CMD_ALL="ant build api user s3 prefect-worker prefect-agent prefect-server data-seeder && ant up api user s3 prefect-worker prefect-agent prefect-server data-seeder"
+local RUN_FLONOTES_FE="make deploy-local"
+local RUN_CMD_NOGGIN="ant build noggin && ant run noggin"
+
+layout {
+    pane command="tail" {
+        args "-f" "/path/to/my/logfile"
+    }
+
+    // Hint: include "quoted" shell arguments as a single argument:
+    pane command="bash" {
+        args "-c" "tail -f /path/to/my/logfile"
+    }
+
+}
+
+layout {
+    pane size=1 borderless=true {
+        plugin location="tab-bar"
+    }
+    pane
+    pane size=1 borderless=true {
+        plugin location="status-bar"
+    }
+}
