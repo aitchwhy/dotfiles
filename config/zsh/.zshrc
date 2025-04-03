@@ -1258,6 +1258,8 @@ alias ts="tailscale"
 alias c="clear"
 alias hf="huggingface-cli"
 alias lg="lazygit"
+alias j="just"
+alias zj="zellij"
 
 # ========================================================================
 # Local Environment
