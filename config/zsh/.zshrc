@@ -336,30 +336,34 @@ if ! has_command volta; then
   brew install volta
 fi
 
-# NVM
-export NVM_DIR="$HOME/.nvm"
-[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"                                       # This loads nvm
-[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" # This loads nvm bash_completion
-if ! has_command nvm; then
-  echo "Bun not found. Installing bun (nodejs)..."
-  curl -fsSL https://bun.sh/install | bash # for macOS, Linux, and WSL
-  brew install volta
-fi
+# # NVM
+# export NVM_DIR="$HOME/.nvm"
+# [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"                                       # This loads nvm
+# [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" # This loads nvm bash_completion
+# if ! has_command bun; then
+#   echo "Bun not found. Installing bun (nodejs)..."
+#   curl -fsSL https://bun.sh/install | bash # for macOS, Linux, and WSL
+#   brew install volta
+# fi
 
-# Bun
-export BUN_INSTALL="$HOME/.bun"
-# export PATH="$BUN_INSTALL/bin:$PATH"
-path_add "$BUN_INSTALL/bin"
-if ! has_command bun; then
-  echo "Bun not found. Installing bun (nodejs)..."
-  curl -fsSL https://bun.sh/install | bash # for macOS, Linux, and WSL
-fi
+# # Bun
+# export BUN_INSTALL="$HOME/.bun"
+# # export PATH="$BUN_INSTALL/bin:$PATH"
+# path_add "$BUN_INSTALL/bin"
+# if ! has_command bun; then
+#   echo "Bun not found. Installing bun (nodejs)..."
+#   curl -fsSL https://bun.sh/install | bash # for macOS, Linux, and WSL
+# fi
 
-# global packages
-mkdir -p ~/.npm-global
-npm config set prefix ~/.npm-global
-path_add "~/.npm-global/bin"
-npm install -g @anthropic-ai/claude-code
+# TODO: add github extensions list
+# - gh extension install dlvhdr/gh-dash
+# TODO: add nodejs global packages (bun + etc)
+# TODO: add uv global packages
+
+# mkdir -p ~/.npm-global
+# npm config set prefix ~/.npm-global
+# path_add "~/.npm-global/bin"
+# npm install -g @anthropic-ai/claude-code
 
 # ========================================================================
 # nvim
