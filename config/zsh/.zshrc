@@ -783,7 +783,7 @@ alias ll="ls -la"
 alias cat="bat"
 
 command -v bat >/dev/null && alias cat='bat --paging=never'
-command -v rg >/dev/null && alias grep='rg'
+# command -v rg >/dev/null && alias grep='rg'
 command -v fd >/dev/null && alias find='fd'
 command -v lazygit >/dev/null && alias lg='lazygit'
 
@@ -847,7 +847,7 @@ alias du='dust'
 alias ssh='sshs'
 alias s3='stu'
 # alias http='xh'
-alias http='posting'
+# alias http='posting'
 alias csv='xsv'
 # alias rm='rip'
 alias tmux='zellij'
