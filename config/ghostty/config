@@ -135,8 +135,8 @@ keybind = cmd+k=jump_to_prompt:-1
 # ============================
 
 # Create new splits in different directions
-keybind = cmd+shift+\=new_split:right
-keybind = cmd+shift+-=new_split:down
+keybind = cmd+backslash=new_split:right
+keybind = cmd+minus=new_split:down
 
 # # Navigate between splits (Vim-style)
 # keybind = ctrl+h=goto_split:left
