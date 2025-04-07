@@ -75,5 +75,4 @@ __pycache__/
 venv/
 .env
 config/zsh/.zsh_sessions
-foo.txt
-.trunk
+.trunk/
