@@ -328,13 +328,14 @@ path_add "$HOME/.local/share/../bin"
 # NodeJS
 # ========================================================================
 # Volta
-export VOLTA_HOME="$HOME/.volta"
-# export PATH="$VOLTA_HOME/bin:$PATH"
-path_add "$VOLTA_HOME/bin"
-if ! has_command volta; then
-  echo "Volta not found. Installing ..."
-  brew install volta
-fi
+# export VOLTA_HOME="$HOME/.volta"
+# # export PATH="$VOLTA_HOME/bin:$PATH"
+# path_add "$VOLTA_HOME/bin"
+# if ! has_command volta; then
+#   echo "Volta not found. Installing ..."
+#   brew install volta
+# fi
+
 
 # # NVM
 # export NVM_DIR="$HOME/.nvm"
@@ -364,6 +365,8 @@ fi
 # npm config set prefix ~/.npm-global
 # path_add "~/.npm-global/bin"
 # npm install -g @anthropic-ai/claude-code
+
+path_add "$HOME/.npm-global/bin"
 
 # ========================================================================
 # nvim
@@ -859,10 +862,10 @@ alias jsonviewer='jnv'
 alias k='k9s'
 
 ## Modern CLI alternatives
-alias cat='bat --paging=always'
+# alias cat='bat --paging=always'
 alias miller='mlr'
-alias grep='rg'
-alias find='fd'
+# alias grep='rg'
+# alias find='fd'
 alias md='glow'
 alias ls='eza --icons'
 alias ll='eza -l --icons'
