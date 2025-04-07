@@ -6,56 +6,56 @@ This document provides an organized checklist for managing address changes, with
 
 ### Government & Legal
 
-- ✅ **USCIS Immigration**
+- **USCIS Immigration**
   - Submitted AR-11 form on May 19, 2024
   - Confirmation number: `MCA2459757776`
-- ⬜ **DMV**
-  - ✅ CA DMV address change submitted
-  - ⬜ DC license conversion needed ([DC Gov For New District Residents](https://dmv.dc.gov/service/for-new-district-residents))
-- ⬜ **Vehicle Title & Registration**
-  - ⬜ Transfer car registration to DC
-  - ⬜ Update ownership documents
+- **DMV**
+- CA DMV address change submitted
+- DC license conversion needed ([DC Gov For New District Residents](https://dmv.dc.gov/service/for-new-district-residents))
+- **Vehicle Title & Registration**
+- Transfer car registration to DC
+- Update ownership documents
 
 ### Mail & Shipping
 
-- ✅ **USPS Mail Forwarding**
-  - Confirmation number: `2414-0900-0031-5710`
-- ✅ **Courier Services**
-  - Updated FedEx profile address
-  - Updated UPS profile address
-- ⬜ **Previous Housing**
-  - Notify 399 Fremont leasing office of forwarding address
-  - Secure deposit refund
+- **USPS Mail Forwarding**
+- Confirmation number: `2414-0900-0031-5710`
+- **Courier Services**
+- Updated FedEx profile address
+- Updated UPS profile address
+- **Previous Housing**
+- Notify 399 Fremont leasing office of forwarding address
+- Secure deposit refund
 
 ### Vehicle & Transportation
 
-- ⬜ **Car Insurance**
-  - Cancel old policy (Farmers)
-  - Set up new DC insurance
-- ✅ **Lexus Service**
-  - Found Lindsay Lexus of Alexandria dealership
-  - Scheduled service appointment
-- ⬜ **Toll Systems**
-  - Return FasTrak transponder
-  - Consider E-ZPass for East Coast travel
-- ⬜ **AAA Roadside Assistance**
-  - Cancel Northern California membership
-  - Establish DC area membership
+- **Car Insurance**
+- Cancel old policy (Farmers)
+- Set up new DC insurance
+- **Lexus Service**
+- Found Lindsay Lexus of Alexandria dealership
+- Scheduled service appointment
+- **Toll Systems**
+- Return FasTrak transponder
+- Consider E-ZPass for East Coast travel
+- **AAA Roadside Assistance**
+- Cancel Northern California membership
+- Establish DC area membership
 
 ### Financial Services
 
-- ✅ Bank of America
-- ✅ American Express
-- ⬜ Discover
-- ⬜ Chase
-- ⬜ Robinhood
-- ⬜ Wealthfront ROTH IRA
-- ⬜ Fidelity 401k
-- ⬜ Guideline 401k
+- Bank of America
+- American Express
+- Discover
+- Chase
+- Robinhood
+- Wealthfront ROTH IRA
+- Fidelity 401k
+- Guideline 401k
 
 ### Digital & Online Services
 
-- ✅ **Account Updates**
+- **Account Updates**
   - Bitwarden Password manager
   - Amazon
   - Apple (Find My, Contact card, Wallet billing addresses)
@@ -63,7 +63,7 @@ This document provides an organized checklist for managing address changes, with
   - DoorDash
   - Instacart
   - Xfinity
-- ⬜ **Pending Updates**
+- **Pending Updates**
   - Uber
   - Lyft
   - AT&T
@@ -75,41 +75,40 @@ This document provides an organized checklist for managing address changes, with
 
 ### Employment & Insurance
 
-- ✅ Rippling HR system work address
-- ✅ Cancel renters insurance for 399 Fremont
-- ⬜ Health insurance information
+- Rippling HR system work address
+- Cancel renters insurance for 399 Fremont
+- Health insurance information
   - Save temporary international coverage to Dropbox
   - Add medical cards to Apple Wallet
 
 ### Pets
 
-- ⬜ Pet registration in DC
-- ⬜ Find new veterinarian
-- ⬜ Update pet medication delivery service
+- Pet registration in DC
+- Find new veterinarian
+- Update pet medication delivery service
 
 ### Pending Deliveries
 
-- ⬜ Tennis Warehouse (Wilson bag)
-- ⬜ AI hardware device (Rabbit R1)
+- [ ] ?
 
 ## Previous Address Changes
 
 ### April 2023 Move (to 399 Fremont)
 
-- ✅ **Government**
+- **Government**
   - DMV address change
   - USPS mail forwarding
   - USCIS notification
   - Jury duty address update
-- ✅ **Financial & Services**
-  - All credit cards and banks updated
-  - Renter's insurance
-  - Phone companies (AT&T, Verizon)
-- ✅ **Digital Services**
-  - Apple Contact card and wallet
-  - Google & Apple Maps
-  - Rideshare apps (Uber, Lyft)
-  - Food delivery (DoorDash)
+- **Financial & Services**
+- All credit cards and banks updated
+- Renter's insurance
+- Phone companies (AT&T, Verizon)
+- **Digital Services**
+- Apple Contact card and wallet
+- Google & Apple Maps
+- Rideshare apps (Uber, Lyft)
+- Food delivery (DoorDash)
 
 ### February 2023 and Earlier
 
