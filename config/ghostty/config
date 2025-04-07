@@ -1,17 +1,3 @@
-# Ghostty Terminal Configuration
-# Optimized for macOS Apple Silicon (2025)
-# https://ghostty.org/docs/config
-
-# ============================
-# General Settings
-# ============================
-
-# # Performance optimizations for Apple Silicon
-# gpu-accelerated = true
-# background-opacity = 1.0
-# background-blur-radius = 10.0
-# background-image-opacity = 0.08
-# foreground-text-hsb = [1.0, 1.0, 1.0]
 
 # Enable automatic updates (recommended for macOS)
 auto-update = download
@@ -26,10 +12,6 @@ macos-option-as-alt = true
 # Clipboard handling
 clipboard-read = "allow"
 clipboard-write = "allow"
-
-# ============================
-# Appearance
-# ============================
 
 # Themes optimized for macOS and Apple displays
 # Light/dark variations
@@ -83,8 +65,7 @@ quick-terminal-autohide = true
 # ============================
 
 # Enable shell integration for better terminal experience
-shell-integration = detect
-shell-integration-features = "cursor, title"
+shell-integration = zsh
 
 # ============================
 # Appearance Settings
@@ -111,8 +92,8 @@ keybind = cmd+opt+i=inspector:toggle
 keybind = cmd+enter=toggle_fullscreen
 
 # Navigation between shell prompts
-keybind = cmd+j=jump_to_prompt:1
-keybind = cmd+k=jump_to_prompt:-1
+# keybind = cmd+j=jump_to_prompt:1
+# keybind = cmd+k=jump_to_prompt:-1
 
 # Selection handling
 # keybind = cmd+shift+right=adjust_selection:right
