@@ -9,6 +9,9 @@ hostname := "your-hostname"
 default:
   @just --list
 
+run:
+  @just --choose
+
 ############################################################################
 #
 #  Darwin related commands
