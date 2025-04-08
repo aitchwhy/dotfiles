@@ -50,24 +50,18 @@ export DOTFILES="$HOME/dotfiles"
 # export ZDOTDIR=${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}
 export ZDOTDIR="$DOTFILES/config/zsh"
 
-export CLOUD="~/Library/CloudStorage"
-export GDRIVE="~/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com"
-export DROPBOX="~/Library/CloudStorage/Dropbox"
+export cloud="~/Library/CloudStorage"
+export gdrive="~/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com"
+export dropbox="~/Library/CloudStorage/Dropbox"
 
 # Dotfiles location
 # export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
 
 # Ensure XDG directories exist
-# if [[ ! -d "$XDG_DATA_HOME" ]]; then mkdir -p "$XDG_DATA_HOME"; fi
-# if [[ ! -d "$XDG_CONFIG_HOME" ]]; then mkdir -p "$XDG_CONFIG_HOME"; fi
-# if [[ ! -d "$XDG_STATE_HOME" ]]; then mkdir -p "$XDG_STATE_HOME"; fi
-# if [[ ! -d "$XDG_CACHE_HOME" ]]; then mkdir -p "$XDG_CACHE_HOME"; fi
-# if [[ ! -d "$XDG_BIN_HOME" ]]; then mkdir -p "$XDG_BIN_HOME"; fi
 [[ ! -d "$XDG_CONFIG_HOME" ]] && mkdir -p "$XDG_CONFIG_HOME"
 [[ ! -d "$XDG_CACHE_HOME" ]] && mkdir -p "$XDG_CACHE_HOME"
 [[ ! -d "$XDG_DATA_HOME" ]] && mkdir -p "$XDG_DATA_HOME"
 [[ ! -d "$XDG_STATE_HOME" ]] && mkdir -p "$XDG_STATE_HOME"
-# [[ ! -d "$XDG_BIN_HOME" ]] && mkdir -p "$XDG_BIN_HOME"
 
 # ========================================================================
 # Keyboard & Input Configuration
@@ -111,28 +105,6 @@ fi
 # path+=(~/my_bin)
 # ========================================================================
 
-# # Add prioritized paths
-# path=(
-#   # Version managers (need to be before Homebrew)
-#   $HOME/.volta/bin # Node.js version manager
-
-#   # Other language-specific paths
-#   $HOME/.cargo/bin # Rust
-#   $HOME/go/bin     # Go
-
-#   # # System paths
-#   # "$HOME/.local/bin" # User local binaries
-#   # "$HOME/bin"        # User personal binaries
-# )
-# export PATH
-
-# # user compiled python as default python
-# export PATH=$HOME/python/bin:$PATH
-# export PYTHONPATH=$HOME/python/
-#
-# # user installed node as default node
-# export PATH="$HOME/node/node-v16.0.0-${KERNEL_NAME}-x64"/bin:$PATH
-# export NODE_MIRROR=https://mirrors.ustc.edu.cn/node/
 
 # ========================================================================
 # Dotfiles Symlink Map Configuration
@@ -142,7 +114,7 @@ fi
 # target locations in the user's home directory. It's used by the installation
 # script and other dotfiles management tools.
 
-# declare -gA DOTFILES_TO_SYMLINK_MAP=(
+declare -gA LINKMAP=(
 #   # Git configurations
 #   # ["$DOTFILES/config/git/config"]="$XDG_CONFIG_HOME/.gitconfig"
 #   # ["$DOTFILES/config/git/ignore"]="$XDG_CONFIG_HOME/git/.gitignore"
@@ -175,10 +147,10 @@ fi
 
 #   # ["$DOTFILES/config/ai/claude/claude_desktop_config.json"]="$HOME/Library/Application Support/Claude/claude_desktop_config.json"
 #   # ["$DOTFILES/config/ai/cline/cline_mcp_settings.json"]="$HOME/Library/Application Support/Cursor/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json"
-# )
+)
 
 # # Export the map for use in other scripts
-# export DOTFILES_TO_SYMLINK_MAP
+export LINKMAP
 
 # # Initialize dotfiles - ensure essential symlinks exist
 # # This is a lightweight version of setup_cli_tools from install.zsh
@@ -223,12 +195,12 @@ export GIT_COMMITTER_NAME="Hank"
 export GIT_COMMITTER_EMAIL="hank.lee.qed@gmail.com"
 
 # Backup existing config if needed
-[[ -f ~/.gitconfig ]] && mv ~/.gitconfig ~/.gitconfig.backup
-[[ -f ~/.gitignore ]] && mv ~/.gitignore ~/.gitignore.backup
+# [[ -f ~/.gitconfig ]] || mv ~/.gitconfig ~/.gitconfig.backup
+# [[ -f ~/.gitignore ]] || mv ~/.gitignore ~/.gitignore.backup
 
 # Create symbolic link
-ln -s ~/dotfiles/config/git/gitconfig ~/.gitconfig
-ln -s ~/dotfiles/config/git/gitignore ~/.gitignore
+ln -sf ~/dotfiles/config/git/gitconfig ~/.gitconfig
+ln -sf ~/dotfiles/config/git/gitignore ~/.gitignore
 
 if ! has_command lazygit; then
   echo "lazygit not found. Installing lazygit..."
@@ -356,6 +328,15 @@ path_add "$HOME/.local/share/../bin"
 #   curl -fsSL https://bun.sh/install | bash # for macOS, Linux, and WSL
 # fi
 
+if ! has_command fnm; then
+  echo "FNM not found. Installing ..."
+  brew install --quiet fnm
+fi
+
+# FNM (https://github.com/Schniz/fnm)
+[[ -x fnm ]] && eval "$(fnm env --use-on-cd --shell zsh)"
+
+
 # TODO: add github extensions list
 # - gh extension install dlvhdr/gh-dash
 # TODO: add nodejs global packages (bun + etc)
@@ -364,9 +345,10 @@ path_add "$HOME/.local/share/../bin"
 # mkdir -p ~/.npm-global
 # npm config set prefix ~/.npm-global
 # path_add "~/.npm-global/bin"
-# npm install -g @anthropic-ai/claude-code
+# TODO: npm install -g @anthropic-ai/claude-code
 
 path_add "$HOME/.npm-global/bin"
+path_add "$HOME/.fnm"
 
 # ========================================================================
 # nvim

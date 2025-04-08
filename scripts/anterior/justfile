@@ -1,0 +1,42 @@
+# Flonotes Frontend Justfile
+# Run commands with: just <command>
+
+# List available commands
+default:
+    @just --list
+
+run-noggin: deploy-local
+    cd ~/src/platform && \
+      ant build noggin && \
+      ant up noggin
+
+run-platform:
+    cd ~/src/platform && \
+      ant build api user s3 prefect-worker prefect-agent prefect-server data-seeder && \
+      ant up api user s3 prefect-worker prefect-agent prefect-server data-seeder
+
+##################
+# TODO(hank): clone of existing Makefile targets. Migrate to this if possible after checking with team.
+
+# Run the development server with hot reloading
+run:
+    npm run dev --hot
+
+# Get OTP codes from Docker logs (outputs only the 4-digit code)
+get-otp:
+    docker logs "$(docker container ls | rg 'api' | awk '{print $1}')" | rg "sent an otp code"
+
+# Setup project
+setup:
+    npm install
+    npm run build
+
+# Deploy to local environment
+deploy-local:
+    ./deploy-local.sh http://localhost:59000
+
+# Deploy to AWS
+deploy-aws profile bucket noggin_url:
+    ./deploy-aws.sh {{ profile }} {{ bucket }} {{ noggin_url }}
+
+##################
