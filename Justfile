@@ -9,7 +9,7 @@ hostname := "your-hostname"
 default:
   @just --list
 
-run:
+x:
   @just --choose
 
 ############################################################################
@@ -53,22 +53,36 @@ darwin-debug: darwin-set-proxy
 flonotes_platform := "~/src/platform"
 flonotes_fe := "~/src/flonotes-fe"
 
-[group('flonotes')]
+[group('platform')]
+[working-directory: '~/src/platform']
 run-noggin: deploy-local
     cd {{flonotes_platform}} && \
       ant build noggin && \
       ant up noggin
 
-[group('flonotes')]
+[group('platform')]
+[working-directory: '~/src/platform']
 run-platform:
     cd {{flonotes_platform}} && \
       ant build api user s3 prefect-worker prefect-agent prefect-server data-seeder && \
       ant up api user s3 prefect-worker prefect-agent prefect-server data-seeder
 
 # Run the development server with hot reloading
-[group('flonotes')]
+[group('platform')]
+[working-directory: '~/src/platform']
 run:
-    cd {{flonotes_fe}} && npm run dev --hot
+    npm run dev --hot
+
+[group('platform')]
+test:
+  docker compose \
+      --profile test-e2e \
+      --file compose.integration.yaml \
+      run \
+      --build \
+      --rm \
+      --env ANTHROPIC_API_KEY \
+      noggin-test-e2e
 
 # Get OTP codes from Docker logs (outputs only the 4-digit code)
 [group('flonotes')]
