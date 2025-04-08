@@ -346,6 +346,7 @@ fi
 # npm config set prefix ~/.npm-global
 # path_add "~/.npm-global/bin"
 # TODO: npm install -g @anthropic-ai/claude-code
+# TODO: npm install --save-dev commitizen commitlint husky
 
 path_add "$HOME/.npm-global/bin"
 path_add "$HOME/.fnm"
