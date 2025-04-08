@@ -3,6 +3,8 @@
 # TODO update hostname here!
 hostname := "your-hostname"
 
+# Flonotes Frontend variables and settings
+
 # List all the just commands
 default:
   @just --list
@@ -37,6 +39,55 @@ darwin-debug: darwin-set-proxy
 #  nix related commands
 #
 ############################################################################
+
+############################################################################
+#
+# Flonotes Frontend commands
+#
+############################################################################
+
+# Path variables for Flonotes development
+flonotes_platform := "~/src/platform"
+flonotes_fe := "~/src/flonotes-fe"
+
+[group('flonotes')]
+run-noggin: deploy-local
+    cd {{flonotes_platform}} && \
+      ant build noggin && \
+      ant up noggin
+
+[group('flonotes')]
+run-platform:
+    cd {{flonotes_platform}} && \
+      ant build api user s3 prefect-worker prefect-agent prefect-server data-seeder && \
+      ant up api user s3 prefect-worker prefect-agent prefect-server data-seeder
+
+# Run the development server with hot reloading
+[group('flonotes')]
+run:
+    cd {{flonotes_fe}} && npm run dev --hot
+
+# Get OTP codes from Docker logs (outputs only the 4-digit code)
+[group('flonotes')]
+get-otp:
+    docker logs "$(docker container ls | rg 'api' | awk '{print $1}')" | rg "sent an otp code"
+
+# Setup project
+[group('flonotes')]
+setup:
+    cd {{flonotes_fe}} && npm install && npm run build
+
+# Deploy to local environment
+[group('flonotes')]
+deploy-local:
+    cd {{flonotes_fe}} && \
+    $(pwd)/{{justfile_directory()}}/scripts/anterior/deploy-local.sh http://localhost:59000
+
+# Deploy to AWS
+[group('flonotes')]
+deploy-aws profile bucket noggin_url:
+    cd {{flonotes_fe}} && \
+    $(pwd)/{{justfile_directory()}}/scripts/anterior/deploy-aws.sh {{ profile }} {{ bucket }} {{ noggin_url }}
 
 # Update all the flake inputs
 [group('nix')]

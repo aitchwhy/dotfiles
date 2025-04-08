@@ -47,14 +47,13 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 export EDITOR="nvim"
 export VISUAL="$EDITOR"
 # export PAGER="less -FRX"
-# export PAGER="bat --pager"
+export PAGER="bat --pager always"
 
 # Remove duplicate entries from PATH
 # typeset -U path PATH
 typeset -U path PATH
 
 export COLORTERM="truecolor"
-export PATH
 
 # Added by OrbStack: command-line tools and integration
 # This won't be added again if you remove it.
