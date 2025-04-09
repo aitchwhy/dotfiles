@@ -787,6 +787,7 @@ alias csv='xsv'
 # alias rm='rip'
 alias tmux='zellij'
 
+
 alias jsonfilter='jnv'
 alias jsonviewer='jnv'
 
@@ -855,11 +856,18 @@ alias ts="tailscale"
 # ========================================================================
 # Misc Shortcuts
 # ========================================================================
-alias c="clear"
+
 alias hf="huggingface-cli"
+
 alias lg="lazygit"
+
 alias j="just"
+alias jfmt="just --unstable --fmt"
+
 alias zj="zellij"
+alias zjl="zellij list-sessions"
+alias zja="zellij attach"
+alias zje="zellij attach $(zellij list-sessions | fzf)"
 
 
 # custom functions

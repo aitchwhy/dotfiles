@@ -52,8 +52,8 @@ quick-terminal-autohide = true
 ############################
 
 # keybind = super+alt+shift+j=write_screen_file:open
-keybind = global:cmd+shift+semicolon=toggle_visibility
-keybind = global:cmd+semicolon=toggle_quick_terminal
+# keybind = global:cmd+shift+=toggle_visibility
+# keybind = global:cmd+semicolon=toggle_quick_terminal
 
 # keybind = cmd+=toggle_split_zoom
 # keybind = cmd+equal=equalize_splits
@@ -62,8 +62,8 @@ keybind = super+enter=toggle_fullscreen
 
 
 # Navigation between shell prompts
-keybind = cmd+j=jump_to_prompt:1
-keybind = cmd+k=jump_to_prompt:-1
+# keybind = cmd+j=jump_to_prompt:1
+# keybind = cmd+k=jump_to_prompt:-1
 
 # ============================
 # Tab Management
