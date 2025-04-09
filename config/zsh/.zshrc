@@ -188,7 +188,7 @@ if ! has_command git; then
 fi
 
 export GIT_EDITOR="nvim"
-export GIT_PAGER="bat --pager"
+export GIT_PAGER="bat --pager always"
 export GIT_AUTHOR_NAME="Hank"
 export GIT_AUTHOR_EMAIL="hank.lee.qed@gmail.com"
 export GIT_COMMITTER_NAME="Hank"
@@ -328,13 +328,16 @@ path_add "$HOME/.local/share/../bin"
 #   curl -fsSL https://bun.sh/install | bash # for macOS, Linux, and WSL
 # fi
 
-if ! has_command fnm; then
-  echo "FNM not found. Installing ..."
-  brew install --quiet fnm
-fi
 
 # FNM (https://github.com/Schniz/fnm)
-[[ -x fnm ]] && eval "$(fnm env --use-on-cd --shell zsh)"
+
+if ! has_command fnm; then
+  echo "FNM not found. Installing ..."
+  brew install --quiet nvim
+fi
+
+eval "$(fnm env --use-on-cd --shell zsh)"
+path_add "$HOME/.fnm"
 
 
 # TODO: add github extensions list
@@ -349,7 +352,6 @@ fi
 # TODO: npm install --save-dev commitizen commitlint husky
 
 path_add "$HOME/.npm-global/bin"
-path_add "$HOME/.fnm"
 
 # ========================================================================
 # nvim
@@ -383,15 +385,9 @@ if ! has_command bat; then
 fi
 
 # ========================================================================
-# delta
+# TODO: delta
 # ========================================================================
 
-export PAGER="bat --pager always"
-
-if ! has_command bat; then
-  echo "bat not found. Installing bat..."
-  brew install --quiet bat
-fi
 
 # ========================================================================
 # rust (rustup)
@@ -432,7 +428,9 @@ fi
 #
 
 # Add cargo bin to PATH if not already there
-[[ -d "$CARGO_HOME/bin" ]] && path_add "$CARGO_HOME/bin"
+if [[ -d "$CARGO_HOME/bin" ]]; then
+  path_add "$CARGO_HOME/bin"
+fi
 
 # Optional: Add cargo completions
 # if has_command rustup; then
@@ -523,8 +521,8 @@ export CPPFLAGS="-I/opt/homebrew/opt/postgresql@17/include"
 # ========================================================================
 # Go
 # ========================================================================
-# export GOPATH="$HOME/go"
-# export GOBIN="$GOPATH/bin"
+export GOPATH="$HOME/go"
+export GOBIN="$GOPATH/bin"
 
 # ========================================================================
 #
@@ -562,27 +560,28 @@ export CPPFLAGS="-I/opt/homebrew/opt/postgresql@17/include"
 #   [zoxide]=true
 # )
 #
-# # Install tools in order of importance
-# local tool_names=(
-#   brew
-#   starship
-#   git
-#   atuin
-#   volta
-#   uv
-#   rustup
-#   fzf
-#   eza
-#   go
-#   nvim
-#   # zoxide
-# )
-# for tool_name in "${tool_names[@]}"; do
-#   local install_cmd="${TOOL_INSTALL_COMMANDS[$tool_name]}"
-#   local is_essential="${TOOL_IS_ESSENTIAL[$tool_name]}"
-#   log_info "Ensuring $tool_name is installed"
-#   ensure_tool_installed "$tool_name" "$install_cmd" "$is_essential"
-# done
+# Install tools in order of importance
+local tool_names=(
+  brew
+  starship
+  git
+  atuin
+  volta
+  uv
+  rustup
+  fzf
+  eza
+  go
+  nvim
+  # zoxide
+)
+for tool_name in "${tool_names[@]}"; do
+  local install_cmd="${TOOL_INSTALL_COMMANDS[$tool_name]}"
+  # local is_essential="${TOOL_IS_ESSENTIAL[$tool_name]}"
+  log_info "Ensuring $tool_name is installed"
+  brew install --quiet "$tool"
+  # ensure_tool_installed "$tool_name" "$install_cmd" "$is_essential"
+done
 
 # # Load configuration files in specific order, installing required tools if needed
 # local files=(
@@ -630,12 +629,12 @@ export CPPFLAGS="-I/opt/homebrew/opt/postgresql@17/include"
 # Completions
 # ========================================================================
 
-# Completions setup
-# if type brew &>/dev/null; then
-# 	FPATH=$(brew --prefix)/share/zsh-abbr:$FPATH
-# 	autoload -Uz compinit
-# 	compinit
-# fi
+Completions setup
+if type brew &>/dev/null; then
+	FPATH=$(brew --prefix)/share/zsh-abbr:$FPATH
+	autoload -Uz compinit
+	compinit
+fi
 
 # Initialize the completion system
 # Completions setup
@@ -672,15 +671,17 @@ has_command starship && eval "$(starship init zsh)"
 has_command atuin && eval "$(atuin init zsh)"
 has_command zoxide && eval "$(zoxide init zsh)"
 has_command direnv && eval "$(direnv hook zsh)"
-has_command fnm && eval "$(fnm env --use-on-cd)"
+# has_command fnm && eval "$(fnm env --use-on-cd)"
 # has_command volta && eval "$(volta setup)"
 has_command uv && eval "$(uv generate-shell-completion zsh)"
-has_command uvx && eval "$(uvx --generate-shell-completion zsh)"
+# has_command uvx && eval "$(uvx --generate-shell-completion zsh)"
 # has_command pyenv && eval "$(pyenv init -)"
 # has_command abbr && eval "$(abbr init zsh)"
 
 # Load FZF completions
-has_command fzf && source <(fzf --zsh)
+if has_command fzf; then
+  source <(fzf --zsh)
+fi
 
 # ========================================================================
 # ZSH aliases - Organized by category
@@ -719,11 +720,11 @@ alias flush="dscacheutil -flushcache && killall -HUP mDNSResponder" # Flush DNS
 # ========================================================================
 # Dotfiles Management
 # ========================================================================
-alias cdz='cd $ZDOTDIR'
-alias cdd="cd $DOTFILES"
+# alias zdot='cd $ZDOTDIR'
+alias d="cd $DOTFILES"
 alias zr="exec zsh"
 alias ze="fd --hidden . $ZDOTDIR | xargs nvim"
-alias dot="fd --hidden . $DOTFILES | xargs nvim"
+alias .e="fd --hidden . $DOTFILES | xargs nvim"
 
 # ========================================================================
 # System Information
@@ -745,42 +746,25 @@ alias batman='sys man'
 # ====== Aliases ======
 # Modern replacements
 
-# # Navigation
-# alias ..='cd ..'
-# alias ...='cd ../..'
-# alias ....='cd ../../..'
-# alias -- -='cd -'
-
 # Aliases
-# Modern CLI tool alternatives
-if command -v eza >/dev/null; then
-  alias ls='eza --icons --group-directories-first'
-  alias ll='eza -l --git --icons --group-directories-first'
-  alias la='eza -la --git --icons --group-directories-first'
-  alias lt='eza --tree --icons --group-directories-first'
-fi
-
-# Editor
 alias v='$EDITOR'
 alias vi='$EDITOR'
 alias vim='$EDITOR'
-alias ls="ls --color=auto"
-alias ll="ls -la"
-alias cat="bat"
+# alias cat="bat"
 
-command -v bat >/dev/null && alias cat='bat --paging=never'
-# command -v rg >/dev/null && alias grep='rg'
-command -v fd >/dev/null && alias find='fd'
-command -v lazygit >/dev/null && alias lg='lazygit'
+# command -v bat >/dev/null && alias cat='bat --paging=never'
+# # command -v rg >/dev/null && alias grep='rg'
+# command -v fd >/dev/null && alias find='fd'
+# command -v lazygit >/dev/null && alias lg='lazygit'
 
-# Git shortcuts
-alias g="git"
-alias ga="git add"
-alias gc="git commit"
-alias gp="git push"
-alias gs="git status"
-alias gp='git push'
-alias gl='git pull'
+# # Git shortcuts
+# alias g="git"
+# alias ga="git add"
+# alias gc="git commit"
+# alias gp="git push"
+# alias gs="git status"
+# alias gp='git push'
+# alias gl='git pull'
 
 # Example: flush DNS
 alias flushdns="sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder"
@@ -796,19 +780,6 @@ alias brewup='brew update && brew upgrade && brew cleanup'
 # Source local customizations if they exist
 # [[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
 # [[ -f "$ZDOTDIR/local.zsh" ]] && source "$ZDOTDIR/local.zsh"
-
-#------------------------------------------------------------------------------
-# Useful Aliases
-#------------------------------------------------------------------------------
-alias ll="ls -lahG"
-alias brewup="brew update && brew upgrade && brew cleanup"
-alias vi="nvim"
-
-#############################################
-# vim + neovim
-#############################################
-alias vi=nvim
-alias vim=nvim
 
 # upgrade to modern
 alias ps='procs'
@@ -828,10 +799,10 @@ alias ls='eza -al'
 alias net='trippy'
 alias netviz='netop'
 alias jwt='jet-ui'
-alias sed='sd'
-alias du='dust'
-alias ssh='sshs'
-alias s3='stu'
+# alias sed='sd'
+# alias du='dust'
+# alias ssh='sshs'
+# alias s3='stu'
 # alias http='xh'
 # alias http='posting'
 alias csv='xsv'
@@ -892,14 +863,10 @@ alias bbsave="brew bundle dump --all --verbose --global"
 alias bbcheck="brew bundle check --all --verbose --global"
 
 ## Directory navigation
-alias gdl='cd ~/Downloads'
-alias gcf='cd ~/.config/'
+alias dl='cd ~/Downloads'
+alias .cf='cd ~/.config/'
 #
 #
-# Zsh configuration
-alias ze="nvim ~/.zshrc"
-alias zs="exec zsh"
-alias zr="exec zsh"
 alias zcompreset="rm -f ~/.zcompdump; compinit"
 
 # Tailscale
@@ -927,8 +894,6 @@ alias ts="tailscale"
 #
 # alias d='dirs -v'
 # for index ({1..9}) alias "$index"="cd +${index} > /dev/null"; unset index # directory stack
-#
-# alias kitty='kitty -o allow_remote_control=yes --single-instance --listen-on unix:@mykitty'
 #
 #
 # # +------+
