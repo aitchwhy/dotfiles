@@ -560,28 +560,6 @@ export GOBIN="$GOPATH/bin"
 #   [zoxide]=true
 # )
 #
-# Install tools in order of importance
-local tool_names=(
-  brew
-  starship
-  git
-  atuin
-  volta
-  uv
-  rustup
-  fzf
-  eza
-  go
-  nvim
-  # zoxide
-)
-for tool_name in "${tool_names[@]}"; do
-  local install_cmd="${TOOL_INSTALL_COMMANDS[$tool_name]}"
-  # local is_essential="${TOOL_IS_ESSENTIAL[$tool_name]}"
-  log_info "Ensuring $tool_name is installed"
-  brew install --quiet "$tool"
-  # ensure_tool_installed "$tool_name" "$install_cmd" "$is_essential"
-done
 
 # # Load configuration files in specific order, installing required tools if needed
 # local files=(
@@ -629,9 +607,9 @@ done
 # Completions
 # ========================================================================
 
-Completions setup
+# Completions setup
 if type brew &>/dev/null; then
-	FPATH=$(brew --prefix)/share/zsh-abbr:$FPATH
+	#FPATH=$(brew --prefix)/share/zsh-abbr:$FPATH
 	autoload -Uz compinit
 	compinit
 fi
@@ -643,8 +621,8 @@ fi
 #   autoload -Uz compinit
 #   compinit
 # else
-autoload -Uz compinit
-compinit
+#autoload -Uz compinit
+#compinit
 # fi
 
 # Load ZSH plugins from Homebrew if available
@@ -872,336 +850,7 @@ alias zcompreset="rm -f ~/.zcompdump; compinit"
 # Tailscale
 alias ts="tailscale"
 
-# # +--------+
-# # | System |
-# # +--------+
-#
-# alias shutdown='sudo shutdown now'
-# alias restart='sudo reboot'
-# alias suspend='sudo pm-suspend'
-#
-# alias bigf= 'find / -xdev -type f -size +500M'  # display "big" files > 500M
-#
-# # +-----+
-# # | X11 |
-# # +-----+
-#
-# alias xpropc='xprop | grep WM_CLASS' # display xprop class
-#
-# # +-----+
-# # | Zsh |
-# # +-----+
-#
-# alias d='dirs -v'
-# for index ({1..9}) alias "$index"="cd +${index} > /dev/null"; unset index # directory stack
-#
-#
-# # +------+
-# # | wget |
-# # +------+
-# alias wget='wget --hsts-file="$HOME/wget-hsts'
-#
-# # +----+
-# # | cp |
-# # +----+
-#
-# alias cp='cp -iv'
-# alias mv='mv -iv'
-# alias rm='rm -iv'
-#
-# # +------+
-# # | grep |
-# # +------+
-#
-# alias grep="grep -P -i --color=auto"
-#
-# # +------+
-# # | xlip |
-# # +------+
-#
-# alias cb='xclip -sel clip'
-#
-# # +------+
-# # | dust |
-# # +------+
-#
-# alias dust='du -sh * | sort -hr'
-#
-# # +------+
-# # | ping |
-# # +------+
-#
-# alias pg='ping 8.8.8.8'
-#
-# # +------+
-# # | time |
-# # +------+
-#
-# alias time='/usr/bin/time'
-#
-# # +----+
-# # | bc |
-# # +----+
-#
-# alias calc="noglob calcul"
-#
-# # +-----+
-# # | bat |
-# # +-----+
-#
-# alias batl='bat --paging=never -l log'
-#
-# # +--------+
-# # | pacman |
-# # +--------+
-#
-# alias paci='sudo pacman -S'               # install
-# alias pachi='sudo pacman -Ql'             # Pacman Has Installed - what files where installed in a package
-# alias pacs='sudo pacman -Ss'              # search
-# alias pacu='sudo pacman -Syu'             # update
-# alias pacr='sudo pacman -R'               # remove package but not dependencies
-# alias pacrr='sudo pacman -Rs'             # remove package with unused dependencies by other softwares
-# alias pacrc='sudo pacman -Sc'             # remove pacman's cache
-# alias pacro='pacman -Rns $(pacman -Qtdq)'
-# alias pacrl='rm /var/lib/pacman/db.lck'   # pacman remove locks
-# alias pacls="sudo pacman -Qe"
-# alias pacc='sudo pacman -Sc'
-# alias paccc='sudo pacman -Scc'            # empty the whole cache
-#
-# # +-------+
-# # | fonts |
-# # +-------+
-#
-# alias fonts='fc-cache -f -v'
-#
-# # +-----+
-# # | yay |
-# # +-----+
-#
-# alias yayi='yay -S'     # install
-# alias yayhi='yay -Ql'   # Yay Has Installed - what files where installed in a package
-# alias yays='yay -Ss'    # search
-# alias yayu='yay -Syu'   # update
-# alias yayr='yay -R'     # remove package but not dependencies
-# alias yayrr='yay -Rs'   # remove package with unused dependencies by other softwares
-# alias yayrc='yay -Sc'   # remove yay's cache
-# alias yayls="yay -Qe"
-#
-# # +--------+
-# # | netctl |
-# # +--------+
-#
-# alias wifi='sudo wifi-menu -o'
-#
-# # +--------+
-# # | Golang |
-# # +--------+
-#
-# alias gob="go build"
-# alias gor="go run"
-# alias goc="go clean -i"
-# alias gta="go test ./..."       # go test all
-# alias gia="go install ./..."    # go install all
-#
-# # +------+
-# # | Hugo |
-# # +------+
-#
-# alias hugostart="hugo server -DEF --ignoreCache"
-#
-# # +--------+
-# # | muffet |
-# # +--------+
-#
-# alias deadlink="muffet -t 20"
-#
-# # +---------+
-# # | netstat |
-# # +---------+
-#
-# alias port="netstat -tulpn | grep"
-#
-# # +--------+
-# # | Neovim |
-# # +--------+
-#
-# alias vim='nvim'
-# alias vi='nvim'
-# alias svim='sudoedit'
-# alias dvim="vim -u /usr/share/nvim/archlinux.vim" # nvim with default config
-# alias nvimc='rm -I $VIMCONFIG/swap/*'             # clean nvim swap file
-# alias nvimcu='rm -I $VIMCONFIG/undo/*'            # clean the vim undo
-# alias nviml='nvim -w $VIMCONFIG/vimlog "$@"'      # log the keystrokes
-# alias nvimd='nvim --noplugin -u NONE'             # launch nvim without any plugin or config (nvim debug)
-# alias nvimfr='nvim +e /tmp/scratchpad.md -c "set spelllang=fr"'
-# alias lvim='\vim -c "set nowrap|syntax off"'        # fast vim for big files / big oneliner
-#
-# # +-----+
-# # | Git |
-# # +-----+
-#
-# alias gs='git status'
-# alias gss='git status -s'
-# alias ga='git add'
-# alias gp='git push'
-# alias gpraise='git blame'
-# alias gpo='git push origin'
-# alias gpof='git push origin --force-with-lease'
-# alias gpofn='git push origin --force-with-lease --no-verify'
-# alias gpt='git push --tag'
-# alias gtd='git tag --delete'
-# alias gtdr='git tag --delete origin'
-# alias grb='git branch -r'                                                                           # display remote branch
-# alias gplo='git pull origin'
-# alias gb='git branch '
-# alias gc='git commit'
-# alias gd='git diff'
-# alias gco='git checkout '
-# alias gl='git log --oneline'
-# alias gr='git remote'
-# alias grs='git remote show'
-# alias glol='git log --graph --abbrev-commit --oneline --decorate'
-# alias gclean="git branch --merged | grep  -v '\\*\\|master\\|develop' | xargs -n 1 git branch -d" # Delete local branch merged with master
-# alias gblog="git for-each-ref --sort=committerdate refs/heads/ --format='%(HEAD) %(color:red)%(refname:short)%(color:reset) - %(color:yellow)%(objectname:short)%(color:reset) - %(contents:subject) - %(authorname) (%(color:blue)%(committerdate:relative)%(color:reset))'"                                                             # git log for each branches
-# alias gsub="git submodule update --remote"                                                        # pull submodules
-# alias gj="git-jump"                                                                               # Open in vim quickfix list files of interest (git diff, merged...)
-#
-# alias dif="git diff --no-index"                                                                   # Diff two files even if not in git repo! Can add -w (don't diff whitespaces)
-#
-# # +------+
-# # | tmux |
-# # +------+
-#
-# alias tmuxk='tmux kill-session -t'
-# alias tmuxa='tmux attach -t'
-# alias tmuxl='tmux list-sessions'
-#
-# # +-------+
-# # | tmuxp |
-# # +-------+
-#
-# alias mux='tmuxp load'
-#
-#
-# # +------+
-# # | lynx |
-# # +------+
-#
-# alias lynx='lynx -vikeys -accept_all_cookies'
-#
-# # +----------------+
-# # | udiskie-umount |
-# # +----------------+
-#
-# alias ubackup='udiskie-umount $MEDIA/BACKUP'
-# alias umedia='udiskie-umount $MEDIA/*'
-#
-# # +--------+
-# # | docker |
-# # +--------+
-# alias dockls="docker container ls | awk 'NR > 1 {print \$NF}'"                  # display names of running containers
-# alias dockRr='docker rm $(docker ps -a -q)'                                     # delete every containers / images
-# alias dockRr='docker rm $(docker ps -a -q) && docker rmi $(docker images -q)'   # delete every containers / images
-# alias dockstats='docker stats $(docker ps -q)'                                  # stats on images
-# alias dockimg='docker images'                                                   # list images installed
-# alias dockprune='docker system prune -a'                                        # prune everything
-# alias dockceu='docker-compose run --rm -u $(id -u):$(id -g)'                    # run as the host user
-# alias dockce='docker-compose run --rm'
-#
-# # +----------------+
-# # | docker-compose |
-# # +----------------+
-#
-# alias docker-compose-dev='docker-compose -f docker-compose-dev.yml' # run a different config file than the default one
-#
-# # +----------+
-# # | Personal |
-# # +----------+
-#
-# alias nvidia-settings='nvidia-settings --config="$XDG_CONFIG_HOME"/nvidia/settings'
-#
-# # Folders
-# alias work="$HOME/workspace"
-# alias doc="$HOME/Documents"
-# alias dow="$HOME/Downloads"
-# alias dot="$HOME/.dotfiles"
-#
-# # Mindmaps
-# alias freebrain="freemind $CLOUD/knowledge_base/_BRAINSTORMING/*.mm &> /dev/null &"
-# alias freelists="freemind $CLOUD/knowledge_base/_LISTS/*.mm &> /dev/null &"
-# alias freepain="freemind $CLOUD/knowledge_base/_PROBLEMS/*.mm &> /dev/null &"
-# alias freeproj="freemind $CLOUD/knowledge_base/_PROJECTS/*.mm &> /dev/null &"
-#
-# # Golang
-# alias gosrc="$GOPATH/src/" # golang src
-# alias gobin="$GOPATH/bin/" # golang bin
-#
-# # Clojure
-# alias cljrepl='clojure -Sdeps "{:deps {com.bhauman/rebel-readline {:mvn/version \"0.1.4\"}}}" -m rebel-readline.main'
-#
-# # AWS
-# alias awsa='aws --profile amboss-profile'
-#
-# # OBS
-#
-# alias obsn='prime-run obs&'
-#
-# # +--------+
-# # | Custom |
-# # +--------+
-#
-# alias mke='mkextract'
-# alias ex='extract'
-#
-# # +---------+
-# # | scripts |
-# # +---------+
-#
-# alias ddg="duckduckgo"
-# alias wiki="wikipedia"
-#
-#
-# ## marta file manager symlink
-# ## ln -s /Applications/Marta.app/Contents/Resources/launcher /usr/local/bin/marta
-# #alias marta="/Applications/Marta.app/Contents/Resources/launcher"
-# #
-# ## -----------------------------------------------------
-# ## Custom functions (example)
-# ## -----------------------------------------------------
-# #mkcd () {
-# #  mkdir -p "$1" && cd "$1"
-# #}
-# #
-#
-# # custom functions
-# # symlink
-# slink() {
-#     local src_orig=$1
-#     local dst_link=$2
-#     local dst_dir=$(dirname "$dst_link")
-#
-#     # Create the directory if it does not exist
-#     mkdir -p "$dst_dir"
-#
-#     # Create the symlink
-#     ln -nfs "$src_orig" "$dst_link"
-# }
-#
-# slink_init() {
-#     slink $DOTFILES/.Brewfile $HOME/.Brewfile
-#     slink $DOTFILES/.zshrc $HOME/.zshrc
-#
-#     slink $DOTFILES_EXPORTS $OMZ_CUSTOM/exports.zsh
-#     slink $DOTFILES_ALIASES $OMZ_CUSTOM/aliases.zsh
-#     slink $DOTFILES_FUNCTIONS $OMZ_CUSTOM/functions.zsh
-#
-#     slink $DOTFILES/nvm/default-packages $NVM_DIR/default-packages
-#     slink $DOTFILES/.config/git/.gitignore $HOME/.gitignore
-#
-#
-#     slink $DOTFILES/.config/zellij/main-layout.kdl $HOME/.config/config.kdl
-# }
-#
+
 
 # ========================================================================
 # Misc Shortcuts
@@ -1211,6 +860,37 @@ alias hf="huggingface-cli"
 alias lg="lazygit"
 alias j="just"
 alias zj="zellij"
+
+
+# custom functions
+# symlink
+function slink() {
+    local src_orig=$1
+    local dst_link=$2
+    local dst_dir=$(dirname "$dst_link")
+
+    # Create the directory if it does not exist
+    mkdir -p "$dst_dir"
+
+    # Create the symlink
+    ln -nfs "$src_orig" "$dst_link"
+}
+
+function slink_init() {
+    slink $DOTFILES/.Brewfile $HOME/.Brewfile
+    slink $DOTFILES/.zshrc $HOME/.zshrc
+
+    slink $DOTFILES_EXPORTS $OMZ_CUSTOM/exports.zsh
+    slink $DOTFILES_ALIASES $OMZ_CUSTOM/aliases.zsh
+    slink $DOTFILES_FUNCTIONS $OMZ_CUSTOM/functions.zsh
+
+    slink $DOTFILES/nvm/default-packages $NVM_DIR/default-packages
+    slink $DOTFILES/.config/git/.gitignore $HOME/.gitignore
+
+
+    slink $DOTFILES/.config/zellij/main-layout.kdl $HOME/.config/config.kdl
+}
+
 
 # ========================================================================
 # Local Environment
@@ -1230,12 +910,6 @@ alias zj="zellij"
 #     . "$HOME/.atuin/bin/env"
 #   fi
 # fi
-
-# The actual initialization happens in .zshrc via:
-# has_command atuin && eval "$(atuin init zsh)"
-# . "$HOME/.local/bin/env"
-
-# . "$HOME/.local/share/../bin/env"
 
 # bun completions
 [ -s "/Users/hank/.bun/_bun" ] && source "/Users/hank/.bun/_bun"

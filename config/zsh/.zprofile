@@ -19,22 +19,11 @@ fi
 # setup homebrew shell path
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
-# # install core utils
-# brew install --quiet \
-#   nvim \
-#   bat \
-#   fzf \
-#   gh \
-#   ghostty \
-#   lazygit \
-#   go \
-#   starship \
-#   atuin \
-#   zoxide \
-#   zsh-completions \
-#   zsh-syntax-highlighting \
-#   zsh-autosuggestions \
-#   zsh-history-substring-search
+# install core utils
+export DOTFILES="$HOME/dotfiles"
+local CORE_BREWFILE="$DOTFILES/core.Brewfile"
+cat "$CORE_BREWFILE"
+brew bundle install --quiet --file="$CORE_BREWFILE"
 
 # zsh setup
 # TODO: fzf-zsh https://github.com/unixorn/fzf-zsh-plugin
