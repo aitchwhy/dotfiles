@@ -843,7 +843,7 @@ alias bbcheck="brew bundle check --all --verbose --global"
 
 ## Directory navigation
 alias dl='cd ~/Downloads'
-alias .cf='cd ~/.config/'
+alias cf='cd ~/.config/'
 #
 #
 alias zcompreset="rm -f ~/.zcompdump; compinit"
@@ -867,7 +867,15 @@ alias jfmt="just --unstable --fmt"
 alias zj="zellij"
 alias zjl="zellij list-sessions"
 alias zja="zellij attach"
-alias zje="zellij attach $(zellij list-sessions | fzf)"
+alias zje="zellij attach \$(zellij list-sessions -n | fzf --reverse --border --no-sort | awk '{print \$1}')"
+
+# function zje() {
+#   # Explanation
+#   # - zellij list-sessions: Lists all active Zellij sessions
+#   # - awk '{print $1}': Extracts the session names (first column)
+#   # - fzf --height 40% --reverse --border --no-sort: Presents the session names in a selectable fuzzy finder interface
+#   # - zellij attach "session_name": Attaches to the selected session.
+# }
 
 
 # custom functions
