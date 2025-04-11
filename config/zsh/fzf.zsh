@@ -55,97 +55,97 @@ export FZF_CTRL_R_OPTS="--preview 'echo {}' --preview-window=down:3:wrap --bind 
 # Helper Functions
 # ========================================================================
 
-# Check if a command exists
-_f_has_command() {
-  command -v "$1" &>/dev/null
-}
-
-# Search and display list with fzf then execute command on selection
-_f_search() {
-  local preview_cmd="$1"    # Preview command
-  local header="$2"         # Header text
-  local action_cmd="$3"     # Command to run on selection
-  local initial_query="${4:-}" # Initial search query
-  local fzf_opts="${5:-}"   # Additional fzf options
-
-  if [[ -z "$action_cmd" ]]; then
-    # Simply display selection
-    fzf --preview "$preview_cmd" \
-        --header "$header" \
-        --query "$initial_query" \
-        $fzf_opts
-  else
-    # Run action on selection
-    fzf --preview "$preview_cmd" \
-        --header "$header" \
-        --query "$initial_query" \
-        $fzf_opts | eval "$action_cmd"
-  fi
-}
-
-# Generate and display help from command registry
-_f_help() {
-  echo "FZF Command Framework - Interactive tools powered by fzf"
-  echo ""
-  echo "Usage: f [command] [args]"
-  echo "       f (with no arguments to show interactive menu)"
-  echo ""
-
-  # Extract categories and commands from registry
-  local categories=()
-  local current_category=""
-  
-  for cmd_info in "${_F_COMMANDS[@]}"; do
-    local parts=("${(s/:/)cmd_info}")
-    local cmd_category="${parts[1]}"
-    
-    if [[ ! " ${categories[@]} " =~ " ${cmd_category} " ]]; then
-      categories+=("$cmd_category")
-    fi
-  done
-  
-  # Display commands by category
-  for category in "${categories[@]}"; do
-    echo "${category} Commands:"
-    
-    for cmd_info in "${_F_COMMANDS[@]}"; do
-      local parts=("${(s/:/)cmd_info}")
-      local cmd_category="${parts[1]}"
-      local cmd_name="${parts[2]}"
-      local cmd_aliases="${parts[3]}"
-      local cmd_desc="${parts[4]}"
-      
-      if [[ "$cmd_category" == "$category" ]]; then
-        if [[ -n "$cmd_aliases" ]]; then
-          printf "  %-15s %-10s - %s\n" "$cmd_name" "($cmd_aliases)" "$cmd_desc"
-        else
-          printf "  %-15s %11s %s\n" "$cmd_name" "" "$cmd_desc"
-        fi
-      fi
-    done
-    echo ""
-  done
-}
-
-# Check if dependencies for a command are available
-_f_check_deps() {
-  local deps=($@)
-  local missing=()
-  
-  for dep in $deps; do
-    if ! _f_has_command "$dep"; then
-      missing+=("$dep")
-    fi
-  done
-  
-  if [[ ${#missing[@]} -gt 0 ]]; then
-    echo "Missing required dependencies: ${missing[@]}"
-    echo "Please install them to use this command."
-    return 1
-  fi
-  
-  return 0
-}
+# # Check if a command exists
+# _f_has_command() {
+#   command -v "$1" &>/dev/null
+# }
+# 
+# # Search and display list with fzf then execute command on selection
+# _f_search() {
+#   local preview_cmd="$1"    # Preview command
+#   local header="$2"         # Header text
+#   local action_cmd="$3"     # Command to run on selection
+#   local initial_query="${4:-}" # Initial search query
+#   local fzf_opts="${5:-}"   # Additional fzf options
+# 
+#   if [[ -z "$action_cmd" ]]; then
+#     # Simply display selection
+#     fzf --preview "$preview_cmd" \
+#         --header "$header" \
+#         --query "$initial_query" \
+#         $fzf_opts
+#   else
+#     # Run action on selection
+#     fzf --preview "$preview_cmd" \
+#         --header "$header" \
+#         --query "$initial_query" \
+#         $fzf_opts | eval "$action_cmd"
+#   fi
+# }
+# 
+# # Generate and display help from command registry
+# _f_help() {
+#   echo "FZF Command Framework - Interactive tools powered by fzf"
+#   echo ""
+#   echo "Usage: f [command] [args]"
+#   echo "       f (with no arguments to show interactive menu)"
+#   echo ""
+# 
+#   # Extract categories and commands from registry
+#   local categories=()
+#   local current_category=""
+#   
+#   for cmd_info in "${_F_COMMANDS[@]}"; do
+#     local parts=("${(s/:/)cmd_info}")
+#     local cmd_category="${parts[1]}"
+#     
+#     if [[ ! " ${categories[@]} " =~ " ${cmd_category} " ]]; then
+#       categories+=("$cmd_category")
+#     fi
+#   done
+#   
+#   # Display commands by category
+#   for category in "${categories[@]}"; do
+#     echo "${category} Commands:"
+#     
+#     for cmd_info in "${_F_COMMANDS[@]}"; do
+#       local parts=("${(s/:/)cmd_info}")
+#       local cmd_category="${parts[1]}"
+#       local cmd_name="${parts[2]}"
+#       local cmd_aliases="${parts[3]}"
+#       local cmd_desc="${parts[4]}"
+#       
+#       if [[ "$cmd_category" == "$category" ]]; then
+#         if [[ -n "$cmd_aliases" ]]; then
+#           printf "  %-15s %-10s - %s\n" "$cmd_name" "($cmd_aliases)" "$cmd_desc"
+#         else
+#           printf "  %-15s %11s %s\n" "$cmd_name" "" "$cmd_desc"
+#         fi
+#       fi
+#     done
+#     echo ""
+#   done
+# }
+# 
+# # Check if dependencies for a command are available
+# _f_check_deps() {
+#   local deps=($@)
+#   local missing=()
+#   
+#   for dep in $deps; do
+#     if ! _f_has_command "$dep"; then
+#       missing+=("$dep")
+#     fi
+#   done
+#   
+#   if [[ ${#missing[@]} -gt 0 ]]; then
+#     echo "Missing required dependencies: ${missing[@]}"
+#     echo "Please install them to use this command."
+#     return 1
+#   fi
+#   
+#   return 0
+# }
 
 # ========================================================================
 # Command Registry - Add commands here
@@ -660,143 +660,143 @@ _f_cmd_z() {
 # Main FZF Command Function
 # ========================================================================
 
-# Main entry point for all fzf commands
-f() {
-  # No arguments - show interactive command selector
-  if [[ $# -eq 0 ]]; then
-    local categories=()
-    local all_commands=()
-    
-    # Extract unique categories
-    for cmd_info in "${_F_COMMANDS[@]}"; do
-      local parts=("${(s/:/)cmd_info}")
-      local category="${parts[1]}"
-      
-      if [[ ! " ${categories[@]} " =~ " ${category} " ]]; then
-        categories+=("$category")
-      fi
-    done
-    
-    # Build command list with categories
-    for category in "${categories[@]}"; do
-      all_commands+=("$category:")
-      
-      for cmd_info in "${_F_COMMANDS[@]}"; do
-        local parts=("${(s/:/)cmd_info}")
-        local cmd_category="${parts[1]}"
-        local cmd_name="${parts[2]}"
-        local cmd_desc="${parts[4]}"
-        
-        if [[ "$cmd_category" == "$category" ]]; then
-          all_commands+=("  $cmd_name:$cmd_desc")
-        fi
-      done
-    done
-    
-    # Display interactive menu with fzf
-    local choice
-    choice=$(printf "%s\n" "${all_commands[@]}" |
-      fzf --height 60% --border sharp --cycle --ansi \
-          --preview 'echo Description: {2..}' \
-          --preview-window=down:3:wrap \
-          --bind='ctrl-/:toggle-preview' \
-          --header="Select a command (Categories are labeled)" \
-          --no-multi)
-          
-    # If category header was selected, get first command in that category
-    if [[ "$choice" =~ ^[A-Za-z]+:$ ]]; then
-      local category="${choice%:}"
-      for cmd_info in "${_F_COMMANDS[@]}"; do
-        local parts=("${(s/:/)cmd_info}")
-        if [[ "${parts[1]}" == "$category" ]]; then
-          choice="  ${parts[2]}:${parts[4]}"
-          break
-        fi
-      done
-    fi
-    
-    # Exit if no selection
-    [[ -z "$choice" ]] && return 0
-    
-    # Extract command name (trim leading whitespace if command was under category)
-    local cmd_name=$(echo "$choice" | cut -d: -f1 | sed 's/^ *//')
-    
-    # Run the command
-    f "$cmd_name"
-    return $?
-  fi
-  
-  # Help command
-  if [[ "$1" == "help" ]]; then
-    _f_help
-    return 0
-  fi
-  
-  # Look up command in registry
-  local cmd_func=""
-  local cmd_name=""
-  
-  for cmd_info in "${_F_COMMANDS[@]}"; do
-    local parts=("${(s/:/)cmd_info}")
-    local main_cmd="${parts[2]}"
-    local aliases="${parts[3]}"
-    
-    # Split aliases into array
-    local alias_array=("${(s/,/)aliases}")
-    
-    # Check command and aliases
-    if [[ "$1" == "$main_cmd" ]] || [[ " ${alias_array[@]} " =~ " $1 " ]]; then
-      cmd_name="$main_cmd"
-      cmd_func="_f_cmd_$main_cmd"
-      break
-    fi
-  done
-  
-  # If command found, execute it
-  if [[ -n "$cmd_func" ]]; then
-    shift
-    $cmd_func "$@"
-    return $?
-  fi
-  
-  # Command not found
-  echo "Unknown command: $1"
-  echo "Use 'f help' to see available commands."
-  return 1
-}
+# # Main entry point for all fzf commands
+# f() {
+#   # No arguments - show interactive command selector
+#   if [[ $# -eq 0 ]]; then
+#     local categories=()
+#     local all_commands=()
+#     
+#     # Extract unique categories
+#     for cmd_info in "${_F_COMMANDS[@]}"; do
+#       local parts=("${(s/:/)cmd_info}")
+#       local category="${parts[1]}"
+#       
+#       if [[ ! " ${categories[@]} " =~ " ${category} " ]]; then
+#         categories+=("$category")
+#       fi
+#     done
+#     
+#     # Build command list with categories
+#     for category in "${categories[@]}"; do
+#       all_commands+=("$category:")
+#       
+#       for cmd_info in "${_F_COMMANDS[@]}"; do
+#         local parts=("${(s/:/)cmd_info}")
+#         local cmd_category="${parts[1]}"
+#         local cmd_name="${parts[2]}"
+#         local cmd_desc="${parts[4]}"
+#         
+#         if [[ "$cmd_category" == "$category" ]]; then
+#           all_commands+=("  $cmd_name:$cmd_desc")
+#         fi
+#       done
+#     done
+#     
+#     # Display interactive menu with fzf
+#     local choice
+#     choice=$(printf "%s\n" "${all_commands[@]}" |
+#       fzf --height 60% --border sharp --cycle --ansi \
+#           --preview 'echo Description: {2..}' \
+#           --preview-window=down:3:wrap \
+#           --bind='ctrl-/:toggle-preview' \
+#           --header="Select a command (Categories are labeled)" \
+#           --no-multi)
+#           
+#     # If category header was selected, get first command in that category
+#     if [[ "$choice" =~ ^[A-Za-z]+:$ ]]; then
+#       local category="${choice%:}"
+#       for cmd_info in "${_F_COMMANDS[@]}"; do
+#         local parts=("${(s/:/)cmd_info}")
+#         if [[ "${parts[1]}" == "$category" ]]; then
+#           choice="  ${parts[2]}:${parts[4]}"
+#           break
+#         fi
+#       done
+#     fi
+#     
+#     # Exit if no selection
+#     [[ -z "$choice" ]] && return 0
+#     
+#     # Extract command name (trim leading whitespace if command was under category)
+#     local cmd_name=$(echo "$choice" | cut -d: -f1 | sed 's/^ *//')
+#     
+#     # Run the command
+#     f "$cmd_name"
+#     return $?
+#   fi
+#   
+#   # Help command
+#   if [[ "$1" == "help" ]]; then
+#     _f_help
+#     return 0
+#   fi
+#   
+#   # Look up command in registry
+#   local cmd_func=""
+#   local cmd_name=""
+#   
+#   for cmd_info in "${_F_COMMANDS[@]}"; do
+#     local parts=("${(s/:/)cmd_info}")
+#     local main_cmd="${parts[2]}"
+#     local aliases="${parts[3]}"
+#     
+#     # Split aliases into array
+#     local alias_array=("${(s/,/)aliases}")
+#     
+#     # Check command and aliases
+#     if [[ "$1" == "$main_cmd" ]] || [[ " ${alias_array[@]} " =~ " $1 " ]]; then
+#       cmd_name="$main_cmd"
+#       cmd_func="_f_cmd_$main_cmd"
+#       break
+#     fi
+#   done
+#   
+#   # If command found, execute it
+#   if [[ -n "$cmd_func" ]]; then
+#     shift
+#     $cmd_func "$@"
+#     return $?
+#   fi
+#   
+#   # Command not found
+#   echo "Unknown command: $1"
+#   echo "Use 'f help' to see available commands."
+#   return 1
+# }
 
 # ========================================================================
 # Common Aliases - Shorter forms for frequently used commands
 # ========================================================================
 
-# File navigation
-alias ff='f find'         # Find files
-alias fe='f edit'         # Find and edit files
-alias fd='f dir'          # Find directories
-alias fz='f z'            # Jump with zoxide
-
-# Git operations
-alias fco='f checkout'    # Git checkout
-alias fga='f add'         # Git add files
-alias fgl='f log'         # Git log
-alias fgs='f status'      # Git status
-alias fgd='f diff'        # Git diff
-
-# Search
-alias fgr='f grep'        # Grep with fzf
-alias frg='f rgopen'      # Ripgrep and open
-
-# System
-alias fk='f kill'         # Kill process
-alias fp='f port'         # Kill process on port
-alias fh='f history'      # History search
-alias fm='f man'          # Man pages
-alias fa='f alias'        # Aliases
-
-# Package management
-alias fb='f brew'         # Brew operations
-alias fbi='f brew install' # Brew install
-alias fbu='f brew uninstall' # Brew uninstall
+# # File navigation
+# alias ff='f find'         # Find files
+# alias fe='f edit'         # Find and edit files
+# alias fd='f dir'          # Find directories
+# alias fz='f z'            # Jump with zoxide
+# 
+# # Git operations
+# alias fco='f checkout'    # Git checkout
+# alias fga='f add'         # Git add files
+# alias fgl='f log'         # Git log
+# alias fgs='f status'      # Git status
+# alias fgd='f diff'        # Git diff
+# 
+# # Search
+# alias fgr='f grep'        # Grep with fzf
+# alias frg='f rgopen'      # Ripgrep and open
+# 
+# # System
+# alias fk='f kill'         # Kill process
+# alias fp='f port'         # Kill process on port
+# alias fh='f history'      # History search
+# alias fm='f man'          # Man pages
+# alias fa='f alias'        # Aliases
+# 
+# # Package management
+# alias fb='f brew'         # Brew operations
+# alias fbi='f brew install' # Brew install
+# alias fbu='f brew uninstall' # Brew uninstall
 
 # Load FZF completion and key bindings if available
 if [[ -f ~/.fzf.zsh ]]; then
@@ -820,3 +820,8 @@ if [[ ${#funcstack[@]} -eq 0 ]]; then
   echo "FZF Command Framework loaded successfully"
   echo "Use 'f' or 'f help' to see available commands"
 fi
+
+# Function to preview files with bat in fzf
+_f_preview() {
+  fzf --preview 'bat --style=numbers --color=always --line-range :500 {}'
+}

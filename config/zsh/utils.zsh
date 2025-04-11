@@ -37,40 +37,40 @@ typeset -g WHITE="\033[0;37m"
 # Logging Functions
 # ========================================================================
 
-# Log information message
-function log_info() {
-  printf "${BLUE}[INFO]${RESET} %s\n" "$*"
-}
-
-# Log success message
-function log_success() {
-  printf "${GREEN}[SUCCESS]${RESET} %s\n" "$*"
-}
-
-# Log warning message
-function log_warn() {
-  printf "${YELLOW}[WARNING]${RESET} %s\n" "$*" >&2
-}
-
-# Log error message
-function log_error() {
-  printf "${RED}[ERROR]${RESET} %s\n" "$*" >&2
-}
-
-# Aliases for different naming conventions
-function info() { log_info "$@"; }
-function success() { log_success "$@"; }
-function warn() { log_warn "$@"; }
-function error() { log_error "$@"; }
-
-# List all utility functions exported by this file
-export function list_utils() {
-  local util_funcs=$(functions | grep "^[a-z].*() {" | grep -v "^_" | sort)
-  local count=$(echo "$util_funcs" | wc -l | tr -d ' ')
-
-  log_info "Available utility functions ($count total):"
-  echo "$util_funcs" | sed 's/() {.*//' | column
-}
+# # Log information message
+# function log_info() {
+#   printf "${BLUE}[INFO]${RESET} %s\n" "$*"
+# }
+# 
+# # Log success message
+# function log_success() {
+#   printf "${GREEN}[SUCCESS]${RESET} %s\n" "$*"
+# }
+# 
+# # Log warning message
+# function log_warn() {
+#   printf "${YELLOW}[WARNING]${RESET} %s\n" "$*" >&2
+# }
+# 
+# # Log error message
+# function log_error() {
+#   printf "${RED}[ERROR]${RESET} %s\n" "$*" >&2
+# }
+# 
+# # Aliases for different naming conventions
+# function info() { log_info "$@"; }
+# function success() { log_success "$@"; }
+# function warn() { log_warn "$@"; }
+# function error() { log_error "$@"; }
+# 
+# # List all utility functions exported by this file
+# export function list_utils() {
+#   local util_funcs=$(functions | grep "^[a-z].*() {" | grep -v "^_" | sort)
+#   local count=$(echo "$util_funcs" | wc -l | tr -d ' ')
+# 
+#   log_info "Available utility functions ($count total):"
+#   echo "$util_funcs" | sed 's/() {.*//' | column
+# }
 
 # ========================================================================
 # Shell Detection and Environment
@@ -604,24 +604,24 @@ export function setup_cli_tools() {
   done
 }
 
-# Install essential tools
-export function install_essential_tools() {
-  info "Installing essential tools..."
-
-  # Install Homebrew if needed
-  if ! has_command "brew"; then
-    setup_homebrew
-  fi
-
-  # Order of tool installation (prioritize essential tools)
-  local tool_names=(starship nvim fzf eza zoxide atuin volta uv rustup go)
-
-  # Install each tool if missing
-  for tool_name in "${tool_names[@]}"; do
-    local install_cmd="${TOOL_INSTALL_COMMANDS[$tool_name]}"
-    local is_essential="${TOOL_IS_ESSENTIAL[$tool_name]}"
-    ensure_tool_installed "$tool_name" "$install_cmd" "$is_essential"
-  done
-
-  success "Essential tools installed"
-}
+# # Install essential tools
+# export function install_essential_tools() {
+#   info "Installing essential tools..."
+# 
+#   # Install Homebrew if needed
+#   if ! has_command "brew"; then
+#     setup_homebrew
+#   fi
+# 
+#   # Order of tool installation (prioritize essential tools)
+#   local tool_names=(starship nvim fzf eza zoxide atuin volta uv rustup go)
+# 
+#   # Install each tool if missing
+#   for tool_name in "${tool_names[@]}"; do
+#     local install_cmd="${TOOL_INSTALL_COMMANDS[$tool_name]}"
+#     local is_essential="${TOOL_IS_ESSENTIAL[$tool_name]}"
+#     ensure_tool_installed "$tool_name" "$install_cmd" "$is_essential"
+#   done
+# 
+#   success "Essential tools installed"
+# }
