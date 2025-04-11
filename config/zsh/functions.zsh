@@ -2117,3 +2117,163 @@ _select_brewfile_command() {
 #
 #
 #
+
+
+# Docker functions with fzf integration
+_docker_select_container() {
+  docker ps | fzf --header="Select a container" | awk '{print $1}'
+}
+
+_docker_select_all_container() {
+  docker ps -a | fzf --header="Select a container (including stopped)" | awk '{print $1}'
+}
+
+_docker_select_image() {
+  docker images | fzf --header="Select an image" | awk '{print $3}'
+}
+
+# Docker container management
+dsh() {
+  local container=$(_docker_select_container)
+  [[ -n "$container" ]] && docker exec -it "$container" sh
+}
+
+dbash() {
+  local container=$(_docker_select_container)
+  [[ -n "$container" ]] && docker exec -it "$container" bash
+}
+
+drm() {
+  local container=$(_docker_select_container)
+  [[ -n "$container" ]] && docker rm "$container"
+}
+
+drma() {
+  local container=$(_docker_select_all_container)
+  [[ -n "$container" ]] && docker rm "$container"
+}
+
+# Docker image management
+drmi() {
+  local image=$(_docker_select_image)
+  [[ -n "$image" ]] && docker rmi "$image"
+}
+
+# Docker logs
+dlogs() {
+  local container=$(_docker_select_container)
+  [[ -n "$container" ]] && docker logs -f "$container"
+}
+
+# Docker stats
+dstats() {
+  local container=$(_docker_select_container)
+  [[ -n "$container" ]] && docker stats "$container"
+}
+
+# Docker inspect
+dinspect() {
+  local container=$(_docker_select_container)
+  [[ -n "$container" ]] && docker inspect "$container" | bat -l json
+}
+
+# Docker compose
+dcomp() {
+  local compose_file=$(find . -name "docker-compose*.yml" | fzf --header="Select a compose file")
+  [[ -n "$compose_file" ]] && docker compose -f "$compose_file" "$@"
+}
+
+# Docker volume management
+dvol() {
+  local volume=$(docker volume ls | fzf --header="Select a volume" | awk '{print $2}')
+  [[ -n "$volume" ]] && docker volume inspect "$volume" | bat -l json
+}
+
+# Docker network management
+dnet() {
+  local network=$(docker network ls | fzf --header="Select a network" | awk '{print $2}')
+  [[ -n "$network" ]] && docker network inspect "$network" | bat -l json
+}
+
+# Docker system cleanup
+dclean() {
+  echo "Cleaning up unused containers, networks, images, and volumes..."
+  docker system prune -f
+}
+
+# Docker container restart
+drestart() {
+  local container=$(_docker_select_container)
+  [[ -n "$container" ]] && docker restart "$container"
+}
+
+# Docker container stop
+dstop() {
+  local container=$(_docker_select_container)
+  [[ -n "$container" ]] && docker stop "$container"
+}
+
+# Docker container start
+dstart() {
+  local container=$(_docker_select_all_container)
+  [[ -n "$container" ]] && docker start "$container"
+}
+
+# Docker container port mapping
+dports() {
+  local container=$(_docker_select_container)
+  [[ -n "$container" ]] && docker port "$container"
+}
+
+# Docker container environment variables
+denv() {
+  local container=$(_docker_select_container)
+  [[ -n "$container" ]] && docker exec "$container" env | sort
+}
+
+# Docker container processes
+dps() {
+  local container=$(_docker_select_container)
+  [[ -n "$container" ]] && docker top "$container"
+}
+
+# Docker container resource usage
+dtop() {
+  local container=$(_docker_select_container)
+  [[ -n "$container" ]] && docker stats --no-stream "$container"
+}
+
+# Docker container commit
+dcommit() {
+  local container=$(_docker_select_container)
+  if [[ -n "$container" ]]; then
+    read "repo?Enter repository name: "
+    read "tag?Enter tag: "
+    docker commit "$container" "$repo:$tag"
+  fi
+}
+
+# Docker container diff
+ddiff() {
+  local container=$(_docker_select_container)
+  [[ -n "$container" ]] && docker diff "$container"
+}
+
+# Docker container copy
+dcp() {
+  local container=$(_docker_select_container)
+  if [[ -n "$container" ]]; then
+    read "src?Enter source path: "
+    read "dst?Enter destination path: "
+    docker cp "$container:$src" "$dst"
+  fi
+}
+
+# Docker container exec with custom command
+dexec() {
+  local container=$(_docker_select_container)
+  if [[ -n "$container" ]]; then
+    read "cmd?Enter command to execute: "
+    docker exec -it "$container" $cmd
+  fi
+}
