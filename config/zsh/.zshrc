@@ -792,6 +792,19 @@ alias jsonfilter='jnv'
 alias jsonviewer='jnv'
 
 # k8s kubernetes + docker + containers
+alias d='docker'
+alias dstart='docker start'
+alias dstop='docker stop'
+alias dps='docker ps'
+alias dpsa='docker ps -a'
+alias dimg='docker images'
+alias dx='docker exec -it'
+alias drm='docker rm'
+alias drmi='docker rmi'
+alias dbuild='docker build'
+alias dc='docker-compose'
+
+
 alias k='k9s'
 
 ## Modern CLI alternatives
@@ -799,7 +812,7 @@ alias k='k9s'
 alias miller='mlr'
 # alias grep='rg'
 # alias find='fd'
-alias md='glow'
+# alias md='glow'
 alias ls='eza --icons'
 alias ll='eza -l --icons'
 alias la='eza -al --icons'
