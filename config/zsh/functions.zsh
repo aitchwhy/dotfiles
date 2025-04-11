@@ -1,7 +1,4 @@
 #!/usr/bin/env zsh
-#
-#
-#
 
 ################################
 # IDE (VSCode + Cursor)
@@ -17,98 +14,96 @@ function cursor_ext_import() {
 # Homebrew
 ################################
 # Mac App Store operations command
-function fmas() {
-  # In the context of shell scripting, particularly in Unix-like operating systems, [[ $# -gt 0 ]] is a test condition used to check if one or more arguments have been passed to a script or function.
-  # Here's a breakdown of the components:
-  # > [[ ... ]]: a conditional expression for testing conditions. It is more flexible and safer than the older [ ... ] test command.
-  # > $#: a special variable for number of positional parameters (arguments) passed to the script or function.
-  # > -gt: This is a binary comparison operator that stands for "greater than."
-  # Therefore, [[ $# -gt 0 ]] checks if the number of arguments ($#) is greater than 0, meaning it verifies whether any arguments were provided to the script or function. If true, it indicates that at least one argument has been passed.
-  if [[ $# -gt 0 ]]; then
-    # Direct execution if args provided
-    case "$1" in
-    install | in)
-      shift
-      mas_install "$@"
-      ;;
-    uninstall | rm)
-      shift
-      mas_uninstall "$@"
-      ;;
-    info | i)
-      shift
-      mas_info "$@"
-      ;;
-    cleanup | clean)
-      shift
-      mas_clean "$@"
-      ;;
-    edit | e)
-      shift
-      mas_edit "$@"
-      ;;
-
-    # Help and default case
-    help | --help | -h) _show_mas_help ;;
-    *)
-      log_error "Unknown Mac App Store command: $1"
-      _show_mas_help
-      return 1
-      ;;
-    esac
-    return $?
-  fi
-
-  # Interactive selection with fzf if no args
-  if has_command fzf; then
-    _select_mas_command
-  else
-    _show_mas_help
-  fi
-}
-
-# Interactive command selection for Mac App Store operations
-_select_mas_command() {
-  _fzf_check || {
-    _show_mas_help
-    return 1
-  }
-
-  local commands=(
-    "install:Install app from Mac App Store:mas_install"
-    "uninstall:Uninstall app from Mac App Store:mas_uninstall"
-    "info:Show app information:mas_info"
-    "cleanup:Clean up and remove unused apps:mas_clean"
-    "edit:Edit Mac App Store apps list:mas_edit"
-  )
-
-  local selected
-  selected=$(printf "%s\n" "${commands[@]}" |
-    awk -F: '{printf "%-15s %s\n", $1, $2}' |
-    fzf --header="Select a Mac App Store command" \
-      --preview="echo; echo Description: {2..}; echo" \
-      --preview-window=bottom:3:wrap)
-
-  if [[ -n "$selected" ]]; then
-    local cmd=$(echo "$selected" | awk '{print $1}')
-    local idx=0
-    local function_name=""
-
-    # Find the matching command
-    for c in "${commands[@]}"; do
-      local cmd_name=$(echo "$c" | cut -d: -f1)
-      if [[ "$cmd_name" == "$cmd" ]]; then
-        function_name=$(echo "$c" | cut -d: -f3)
-        break
-      fi
-    done
-
-    if [[ -n "$function_name" ]]; then
-      log_info "Executing: $function_name"
-      $function_name
-    fi
-  fi
-}
+# function fmas() {
+#   # In the context of shell scripting, particularly in Unix-like operating systems, [[ $# -gt 0 ]] is a test condition used to check if one or more arguments have been passed to a script or function.
+#   # Here's a breakdown of the components:
+#   # > [[ ... ]]: a conditional expression for testing conditions. It is more flexible and safer than the older [ ... ] test command.
+#   # > $#: a special variable for number of positional parameters (arguments) passed to the script or function.
+#   # > -gt: This is a binary comparison operator that stands for "greater than."
+#   # Therefore, [[ $# -gt 0 ]] checks if the number of arguments ($#) is greater than 0, meaning it verifies whether any arguments were provided to the script or function. If true, it indicates that at least one argument has been passed.
+#   if [[ $# -gt 0 ]]; then
+#     # Direct execution if args provided
+#     case "$1" in
+#     install | in)
+#       shift
+#       mas_install "$@"
+#       ;;
+#     uninstall | rm)
+#       shift
+#       mas_uninstall "$@"
+#       ;;
+#     info | i)
+#       shift
+#       mas_info "$@"
+#       ;;
+#     cleanup | clean)
+#       shift
+#       mas_clean "$@"
+#       ;;
+#     edit | e)
+#       shift
+#       mas_edit "$@"
+#       ;;
+#
+#     # Help and default case
+#     help | --help | -h) _show_mas_help ;;
+#     *)
+#       log_error "Unknown Mac App Store command: $1"
+#       _show_mas_help
+#       return 1
+#       ;;
+#     esac
+#     return $?
+#   fi
+#
+#   # Interactive selection with fzf if no args
+#   if has_command fzf; then
+#     _select_mas_command
+#   else
+#     _show_mas_help
+#   fi
+# }
+#
+# # Interactive command selection for Mac App Store operations
+# function _select_mas_command() {
+#   _fzf_check || {
+#     _show_mas_help
+#     return 1
+#   }
+#
+#   local commands=(
+#     "install:Install app from Mac App Store:mas_install"
+#     "uninstall:Uninstall app from Mac App Store:mas_uninstall"
+#     "info:Show app information:mas_info"
+#     "cleanup:Clean up and remove unused apps:mas_clean"
+#     "edit:Edit Mac App Store apps list:mas_edit"
+#   )
+#
+#   local selected=$(printf "%s\n" "${commands[@]}" | awk -F: '{printf "%-15s %s\n", $1, $2}' |
+#     fzf --header="Select a Mac App Store command" \
+#       --preview="echo; echo Description: {2..}; echo" \
+#       --preview-window=bottom:3:wrap)
+#
+#   if [[ -n "$selected" ]]; then
+#     local cmd=$(echo "$selected" | awk '{print $1}')
+#     local idx=0
+#     local function_name=""
+#
+#     # Find the matching command
+#     for c in "${commands[@]}"; do
+#       local cmd_name=$(echo "$c" | cut -d: -f1)
+#       if [[ "$cmd_name" == "$cmd" ]]; then
+#         function_name=$(echo "$c" | cut -d: -f3)
+#         break
+#       fi
+#     done
+#
+#     if [[ -n "$function_name" ]]; then
+#       log_info "Executing: $function_name"
+#       $function_name
+#     fi
+#   fi
+# }
 
 # Display Mac App Store commands help
 _show_mas_help() {
@@ -2074,7 +2069,7 @@ _select_brew_command() {
     fi
   fi
 }
-_select_brewfile_command() {
+function _select_brewfile_command() {
   _fzf_check || { _show_brewfile_help; return 1; }
   
   local commands=(
@@ -2120,160 +2115,160 @@ _select_brewfile_command() {
 
 
 # Docker functions with fzf integration
-_docker_select_container() {
+function _docker_select_container() {
   docker ps | fzf --header="Select a container" | awk '{print $1}'
 }
 
-_docker_select_all_container() {
+function _docker_select_all_container() {
   docker ps -a | fzf --header="Select a container (including stopped)" | awk '{print $1}'
 }
 
-_docker_select_image() {
-  docker images | fzf --header="Select an image" | awk '{print $3}'
-}
-
-# Docker container management
-dsh() {
-  local container=$(_docker_select_container)
-  [[ -n "$container" ]] && docker exec -it "$container" sh
-}
-
-dbash() {
-  local container=$(_docker_select_container)
-  [[ -n "$container" ]] && docker exec -it "$container" bash
-}
-
-drm() {
-  local container=$(_docker_select_container)
-  [[ -n "$container" ]] && docker rm "$container"
-}
-
-drma() {
-  local container=$(_docker_select_all_container)
-  [[ -n "$container" ]] && docker rm "$container"
-}
-
-# Docker image management
-drmi() {
-  local image=$(_docker_select_image)
-  [[ -n "$image" ]] && docker rmi "$image"
-}
-
-# Docker logs
-dlogs() {
-  local container=$(_docker_select_container)
-  [[ -n "$container" ]] && docker logs -f "$container"
-}
-
-# Docker stats
-dstats() {
-  local container=$(_docker_select_container)
-  [[ -n "$container" ]] && docker stats "$container"
-}
-
-# Docker inspect
-dinspect() {
-  local container=$(_docker_select_container)
-  [[ -n "$container" ]] && docker inspect "$container" | bat -l json
-}
-
-# Docker compose
-dcomp() {
-  local compose_file=$(find . -name "docker-compose*.yml" | fzf --header="Select a compose file")
-  [[ -n "$compose_file" ]] && docker compose -f "$compose_file" "$@"
-}
-
-# Docker volume management
-dvol() {
-  local volume=$(docker volume ls | fzf --header="Select a volume" | awk '{print $2}')
-  [[ -n "$volume" ]] && docker volume inspect "$volume" | bat -l json
-}
-
-# Docker network management
-dnet() {
-  local network=$(docker network ls | fzf --header="Select a network" | awk '{print $2}')
-  [[ -n "$network" ]] && docker network inspect "$network" | bat -l json
-}
-
-# Docker system cleanup
-dclean() {
-  echo "Cleaning up unused containers, networks, images, and volumes..."
-  docker system prune -f
-}
-
-# Docker container restart
-drestart() {
-  local container=$(_docker_select_container)
-  [[ -n "$container" ]] && docker restart "$container"
-}
-
-# Docker container stop
-dstop() {
-  local container=$(_docker_select_container)
-  [[ -n "$container" ]] && docker stop "$container"
-}
-
-# Docker container start
-dstart() {
-  local container=$(_docker_select_all_container)
-  [[ -n "$container" ]] && docker start "$container"
-}
-
-# Docker container port mapping
-dports() {
-  local container=$(_docker_select_container)
-  [[ -n "$container" ]] && docker port "$container"
-}
-
-# Docker container environment variables
-denv() {
-  local container=$(_docker_select_container)
-  [[ -n "$container" ]] && docker exec "$container" env | sort
-}
-
-# Docker container processes
-dps() {
-  local container=$(_docker_select_container)
-  [[ -n "$container" ]] && docker top "$container"
-}
-
-# Docker container resource usage
-dtop() {
-  local container=$(_docker_select_container)
-  [[ -n "$container" ]] && docker stats --no-stream "$container"
-}
-
-# Docker container commit
-dcommit() {
-  local container=$(_docker_select_container)
-  if [[ -n "$container" ]]; then
-    read "repo?Enter repository name: "
-    read "tag?Enter tag: "
-    docker commit "$container" "$repo:$tag"
-  fi
-}
-
-# Docker container diff
-ddiff() {
-  local container=$(_docker_select_container)
-  [[ -n "$container" ]] && docker diff "$container"
-}
-
-# Docker container copy
-dcp() {
-  local container=$(_docker_select_container)
-  if [[ -n "$container" ]]; then
-    read "src?Enter source path: "
-    read "dst?Enter destination path: "
-    docker cp "$container:$src" "$dst"
-  fi
-}
-
-# Docker container exec with custom command
-dexec() {
-  local container=$(_docker_select_container)
-  if [[ -n "$container" ]]; then
-    read "cmd?Enter command to execute: "
-    docker exec -it "$container" $cmd
-  fi
-}
+# function _docker_select_image() {
+#   docker images | fzf --header="Select an image" | awk '{print $3}'
+# }
+#
+# # Docker container management
+# dsh() {
+#   local container=$(_docker_select_container)
+#   [[ -n "$container" ]] && docker exec -it "$container" sh
+# }
+#
+# dbash() {
+#   local container=$(_docker_select_container)
+#   [[ -n "$container" ]] && docker exec -it "$container" bash
+# }
+#
+# drm() {
+#   local container=$(_docker_select_container)
+#   [[ -n "$container" ]] && docker rm "$container"
+# }
+#
+# drma() {
+#   local container=$(_docker_select_all_container)
+#   [[ -n "$container" ]] && docker rm "$container"
+# }
+#
+# # Docker image management
+# drmi() {
+#   local image=$(_docker_select_image)
+#   [[ -n "$image" ]] && docker rmi "$image"
+# }
+#
+# # Docker logs
+# dlogs() {
+#   local container=$(_docker_select_container)
+#   [[ -n "$container" ]] && docker logs -f "$container"
+# }
+#
+# # Docker stats
+# dstats() {
+#   local container=$(_docker_select_container)
+#   [[ -n "$container" ]] && docker stats "$container"
+# }
+#
+# # Docker inspect
+# dinspect() {
+#   local container=$(_docker_select_container)
+#   [[ -n "$container" ]] && docker inspect "$container" | bat -l json
+# }
+#
+# # Docker compose
+# dcomp() {
+#   local compose_file=$(find . -name "docker-compose*.yml" | fzf --header="Select a compose file")
+#   [[ -n "$compose_file" ]] && docker compose -f "$compose_file" "$@"
+# }
+#
+# # Docker volume management
+# dvol() {
+#   local volume=$(docker volume ls | fzf --header="Select a volume" | awk '{print $2}')
+#   [[ -n "$volume" ]] && docker volume inspect "$volume" | bat -l json
+# }
+#
+# # Docker network management
+# dnet() {
+#   local network=$(docker network ls | fzf --header="Select a network" | awk '{print $2}')
+#   [[ -n "$network" ]] && docker network inspect "$network" | bat -l json
+# }
+#
+# # Docker system cleanup
+# dclean() {
+#   echo "Cleaning up unused containers, networks, images, and volumes..."
+#   docker system prune -f
+# }
+#
+# # Docker container restart
+# drestart() {
+#   local container=$(_docker_select_container)
+#   [[ -n "$container" ]] && docker restart "$container"
+# }
+#
+# # Docker container stop
+# dstop() {
+#   local container=$(_docker_select_container)
+#   [[ -n "$container" ]] && docker stop "$container"
+# }
+#
+# # Docker container start
+# dstart() {
+#   local container=$(_docker_select_all_container)
+#   [[ -n "$container" ]] && docker start "$container"
+# }
+#
+# # Docker container port mapping
+# dports() {
+#   local container=$(_docker_select_container)
+#   [[ -n "$container" ]] && docker port "$container"
+# }
+#
+# # Docker container environment variables
+# denv() {
+#   local container=$(_docker_select_container)
+#   [[ -n "$container" ]] && docker exec "$container" env | sort
+# }
+#
+# # Docker container processes
+# dps() {
+#   local container=$(_docker_select_container)
+#   [[ -n "$container" ]] && docker top "$container"
+# }
+#
+# # Docker container resource usage
+# dtop() {
+#   local container=$(_docker_select_container)
+#   [[ -n "$container" ]] && docker stats --no-stream "$container"
+# }
+#
+# # Docker container commit
+# dcommit() {
+#   local container=$(_docker_select_container)
+#   if [[ -n "$container" ]]; then
+#     read "repo?Enter repository name: "
+#     read "tag?Enter tag: "
+#     docker commit "$container" "$repo:$tag"
+#   fi
+# }
+#
+# # Docker container diff
+# ddiff() {
+#   local container=$(_docker_select_container)
+#   [[ -n "$container" ]] && docker diff "$container"
+# }
+#
+# # Docker container copy
+# dcp() {
+#   local container=$(_docker_select_container)
+#   if [[ -n "$container" ]]; then
+#     read "src?Enter source path: "
+#     read "dst?Enter destination path: "
+#     docker cp "$container:$src" "$dst"
+#   fi
+# }
+#
+# # Docker container exec with custom command
+# dexec() {
+#   local container=$(_docker_select_container)
+#   if [[ -n "$container" ]]; then
+#     read "cmd?Enter command to execute: "
+#     docker exec -it "$container" $cmd
+#   fi
+# }

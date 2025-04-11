@@ -1,8 +1,5 @@
 #!/usr/bin/env zsh
 
-
-echo "hello"
-
 # === Aliases from .zshrc ===
 alias claude="/Users/hank/.claude/local/claude"
 alias ..="cd .."
