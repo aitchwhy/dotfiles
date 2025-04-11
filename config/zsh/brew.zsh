@@ -23,63 +23,63 @@
 # Helper Functions
 # ========================================================================
 
-# Check if Homebrew is available, returning error if not
-_brew_check() {
-  if ! has_command brew; then
-    log_error "Homebrew is not installed or not in PATH"
-    return 1
-  fi
-  return 0
-}
-
-# Check if fzf is available, returning error if not
-_fzf_check() {
-  if ! has_command fzf; then
-    log_error "fzf is required for this operation. Install with: brew install fzf"
-    return 1
-  fi
-  return 0
-}
-
-# Handle Brewfile path parameter, supporting --global flag
-# Usage: local brewfile=$(_brewfile_path "$1")
-_brewfile_path() {
-  local param="${1:-$_BREWFILE}"
-  
-  if [[ "$param" == "--global" ]]; then
-    echo "--global"
-  else
-    echo "${param:-$_BREWFILE}"
-  fi
-}
-
-# Add selected items to Brewfile
-# Usage: _add_to_brewfile "brew" "package1 package2"
-_add_to_brewfile() {
-  local type="$1"  # "brew", "cask", "tap", etc.
-  local items="$2"
-  local brewfile="${3:-$_BREWFILE}"
-  
-  if [[ ! -f "$brewfile" ]]; then
-    touch "$brewfile"
-  fi
-  
-  log_info "Adding to Brewfile: $items"
-  
-  local count=0
-  for item in ${(f)items}; do
-    if ! grep -q "^$type \"$item\"$" "$brewfile"; then
-      echo "$type \"$item\"" >> "$brewfile"
-      ((count++))
-    fi
-  done
-  
-  if [[ $count -gt 0 ]]; then
-    log_success "Added $count packages to Brewfile at $brewfile"
-  else
-    log_info "All packages already in Brewfile"
-  fi
-}
+# # Check if Homebrew is available, returning error if not
+# _brew_check() {
+#   if ! has_command brew; then
+#     log_error "Homebrew is not installed or not in PATH"
+#     return 1
+#   fi
+#   return 0
+# }
+# 
+# # Check if fzf is available, returning error if not
+# _fzf_check() {
+#   if ! has_command fzf; then
+#     log_error "fzf is required for this operation. Install with: brew install fzf"
+#     return 1
+#   fi
+#   return 0
+# }
+# 
+# # Handle Brewfile path parameter, supporting --global flag
+# # Usage: local brewfile=$(_brewfile_path "$1")
+# _brewfile_path() {
+#   local param="${1:-$_BREWFILE}"
+#   
+#   if [[ "$param" == "--global" ]]; then
+#     echo "--global"
+#   else
+#     echo "${param:-$_BREWFILE}"
+#   fi
+# }
+# 
+# # Add selected items to Brewfile
+# # Usage: _add_to_brewfile "brew" "package1 package2"
+# _add_to_brewfile() {
+#   local type="$1"  # "brew", "cask", "tap", etc.
+#   local items="$2"
+#   local brewfile="${3:-$_BREWFILE}"
+#   
+#   if [[ ! -f "$brewfile" ]]; then
+#     touch "$brewfile"
+#   fi
+#   
+#   log_info "Adding to Brewfile: $items"
+#   
+#   local count=0
+#   for item in ${(f)items}; do
+#     if ! grep -q "^$type \"$item\"$" "$brewfile"; then
+#       echo "$type \"$item\"" >> "$brewfile"
+#       ((count++))
+#     fi
+#   done
+#   
+#   if [[ $count -gt 0 ]]; then
+#     log_success "Added $count packages to Brewfile at $brewfile"
+#   else
+#     log_info "All packages already in Brewfile"
+#   fi
+# }
 
 # ========================================================================
 # Basic Brew Commands (b_*)
@@ -754,45 +754,45 @@ _select_brew_command() {
 }
 
 # Interactive command selection for brewfile
-_select_brewfile_command() {
-  _fzf_check || { _show_brewfile_help; return 1; }
-  
-  local commands=(
-    "install:Install packages from Brewfile:bb_install"
-    "check:Check if all packages in Brewfile are installed:bb_check"
-    "dump:Create Brewfile from installed packages:bb_dump"
-    "list-cleanup:List packages not in Brewfile:bb_list_cleanup"
-    "cleanup:Remove packages not in Brewfile:bb_cleanup"
-    "edit:Edit Brewfile:bb_edit"
-  )
-  
-  local selected
-  selected=$(printf "%s\n" "${commands[@]}" | 
-    awk -F: '{printf "%-15s %s\n", $1, $2}' |
-    fzf --header="Select a Brewfile command" \
-        --preview="echo; echo Description: {2..}; echo" \
-        --preview-window=bottom:3:wrap)
-  
-  if [[ -n "$selected" ]]; then
-    local cmd=$(echo "$selected" | awk '{print $1}')
-    local idx=0
-    local function_name=""
-    
-    # Find the matching command
-    for c in "${commands[@]}"; do
-      local cmd_name=$(echo "$c" | cut -d: -f1)
-      if [[ "$cmd_name" == "$cmd" ]]; then
-        function_name=$(echo "$c" | cut -d: -f3)
-        break
-      fi
-    done
-    
-    if [[ -n "$function_name" ]]; then
-      log_info "Executing: $function_name"
-      $function_name
-    fi
-  fi
-}
+# _select_brewfile_command() {
+#   _fzf_check || { _show_brewfile_help; return 1; }
+#   
+#   local commands=(
+#     "install:Install packages from Brewfile:bb_install"
+#     "check:Check if all packages in Brewfile are installed:bb_check"
+#     "dump:Create Brewfile from installed packages:bb_dump"
+#     "list-cleanup:List packages not in Brewfile:bb_list_cleanup"
+#     "cleanup:Remove packages not in Brewfile:bb_cleanup"
+#     "edit:Edit Brewfile:bb_edit"
+#   )
+#   
+#   local selected
+#   selected=$(printf "%s\n" "${commands[@]}" | 
+#     awk -F: '{printf "%-15s %s\n", $1, $2}' |
+#     fzf --header="Select a Brewfile command" \
+#         --preview="echo; echo Description: {2..}; echo" \
+#         --preview-window=bottom:3:wrap)
+#   
+#   if [[ -n "$selected" ]]; then
+#     local cmd=$(echo "$selected" | awk '{print $1}')
+#     local idx=0
+#     local function_name=""
+#     
+#     # Find the matching command
+#     for c in "${commands[@]}"; do
+#       local cmd_name=$(echo "$c" | cut -d: -f1)
+#       if [[ "$cmd_name" == "$cmd" ]]; then
+#         function_name=$(echo "$c" | cut -d: -f3)
+#         break
+#       fi
+#     done
+#     
+#     if [[ -n "$function_name" ]]; then
+#       log_info "Executing: $function_name"
+#       $function_name
+#     fi
+#   fi
+# }
 
 # ========================================================================
 # Initialize on Load

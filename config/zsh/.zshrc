@@ -82,15 +82,15 @@ bindkey '^A' beginning-of-line
 # ========================================================================
 
 # Source our utility functions from utils.zsh
-export UTILS_PATH="$DOTFILES/config/zsh/utils.zsh"
-if [[ -f "$UTILS_PATH" ]]; then
-  source "$UTILS_PATH"
-  log_success "Successfully loaded utils.zsh with $(functions | grep -c "^[a-z].*() {") utility functions"
+export UTILS_PATH="${DOTFILES}/config/zsh/utils.zsh"
+if [[ -f "${UTILS_PATH}" ]]; then
+  source "${UTILS_PATH}"
+  log_success "Successfully loaded utils.zsh with $(functions | grep -c '^[a-z].*() {') utility functions"
 
   # List some key utility functions that should be available
   log_info "Available utility functions include: has_command, is_macos, path_add, sys, etc."
 else
-  echo "Error: $UTILS_PATH not found. Some functionality will be unavailable."
+  echo "Error: ${UTILS_PATH} not found. Some functionality will be unavailable."
 fi
 
 # ========================================================================
@@ -644,6 +644,10 @@ fi
 # Tool Initialization
 # ========================================================================
 
+# Source aliases and functions
+[[ -f "${ZDOTDIR}/aliases.zsh" ]] && source "${ZDOTDIR}/aliases.zsh"
+[[ -f "${ZDOTDIR}/functions.zsh" ]] && source "${ZDOTDIR}/functions.zsh"
+
 # Initialize tools only if they are installed
 has_command starship && eval "$(starship init zsh)"
 has_command atuin && eval "$(atuin init zsh)"
@@ -665,280 +669,261 @@ fi
 # ZSH aliases - Organized by category
 # ========================================================================
 
-alias claude="/Users/hank/.claude/local/claude"
+# alias claude="/Users/hank/.claude/local/claude"
 
-# Navigation Shortcuts
-alias ..="cd .."
-alias ...="cd ../.."
-alias ....="cd ../../.."
-alias home="cd ~"
+# # Navigation Shortcuts
+# alias ..="cd .."
+# alias ...="cd ../.."
+# alias ....="cd ../../.."
+# alias home="cd ~"
 
-# List Files - Prioritize eza/exa with fallback to ls
-if has_command eza; then
-  alias ls="eza --icons --group-directories-first"
-  alias ll="eza --icons --group-directories-first -la"
-  alias la="eza --icons --group-directories-first -a"
-  alias lt="eza --icons --group-directories-first --tree"
-  alias lt2="eza --icons --group-directories-first --tree --level=2"
-else
-  alias ls="ls -G"
-  alias ll="ls -la"
-  alias la="ls -a"
-fi
-
-# ========================================================================
-# Networking Utilities
-# ========================================================================
-alias ip="ipconfig getifaddr en0"
-alias localip="ipconfig getifaddr en0"
-alias publicip="curl -s https://api.ipify.org"
-alias ports="sudo lsof -i -P -n | grep LISTEN"
-alias flush="dscacheutil -flushcache && killall -HUP mDNSResponder" # Flush DNS
-
-# ========================================================================
-# Dotfiles Management
-# ========================================================================
-# alias zdot='cd $ZDOTDIR'
-alias d="cd $DOTFILES"
-alias zr="exec zsh"
-alias ze="fd --hidden . $ZDOTDIR | xargs nvim"
-alias .e="fd --hidden . $DOTFILES | xargs nvim"
-
-# ========================================================================
-# System Information
-# ========================================================================
-alias ppath='echo $PATH | tr ":" "\n"'
-alias pfuncs='print -l ${(k)functions[(I)[^_]*]} | sort'
-alias pfpath='for fp in $fpath; do echo $fp; done; unset fp'
-alias printpath='ppath'
-alias printfuncs='pfuncs'
-alias printfpath='pfpath'
-
-# Keep commonly used aliases for convenience
-alias penv='sys env'
-alias ql='sys ql'
-alias batman='sys man'
-
-#!/usr/bin/env zsh
-
-# ====== Aliases ======
-# Modern replacements
-
-# Aliases
-alias v='$EDITOR'
-alias vi='$EDITOR'
-alias vim='$EDITOR'
-# alias cat="bat"
-
-# command -v bat >/dev/null && alias cat='bat --paging=never'
-# # command -v rg >/dev/null && alias grep='rg'
-# command -v fd >/dev/null && alias find='fd'
-# command -v lazygit >/dev/null && alias lg='lazygit'
-
-# # Git shortcuts
-# alias g="git"
-# alias ga="git add"
-# alias gc="git commit"
-# alias gp="git push"
-# alias gs="git status"
-# alias gp='git push'
-# alias gl='git pull'
-
-# Example: flush DNS
-alias flushdns="sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder"
-alias showhidden="defaults write com.apple.finder AppleShowAllFiles YES; killall Finder"
-
-# Package management
-alias brewup='brew update && brew upgrade && brew cleanup'
-
-# Load Custom Functions
-# [[ -f "${ZDOTDIR}/functions.zsh" ]] && source "${ZDOTDIR}/functions.zsh"
-
-# ====== Local Configuration ======
-# Source local customizations if they exist
-# [[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
-# [[ -f "$ZDOTDIR/local.zsh" ]] && source "$ZDOTDIR/local.zsh"
-
-# upgrade to modern
-alias ps='procs'
-alias ping='gping'
-
-alias diff='delta'
-
-## FZF enhanced commands
-alias flog='fzf --preview "bat --style=numbers --color=always --line-range=:500 {}"'
-alias falias='alias | fzf'
-alias fman='man -k . | fzf --preview "man {}"'
-alias fls='man -k . | fzf --preview "man {}"'
-
-alias ls='eza -al'
-# alias cheat='navi'
-# alias tldr='navi'
-alias net='trippy'
-alias netviz='netop'
-alias jwt='jet-ui'
-# alias sed='sd'
-# alias du='dust'
-# alias ssh='sshs'
-# alias s3='stu'
-# alias http='xh'
-# alias http='posting'
-alias csv='xsv'
-# alias rm='rip'
-alias tmux='zellij'
-
-
-alias jsonfilter='jnv'
-alias jsonviewer='jnv'
-
-# k8s kubernetes + docker + containers
-alias d='docker'
-alias dstart='docker start'
-alias dstop='docker stop'
-alias dps='docker ps'
-alias dpsa='docker ps -a'
-alias dimg='docker images'
-alias dx='docker exec -it'
-alias drm='docker rm'
-alias drmi='docker rmi'
-alias dbuild='docker build'
-alias dc='docker-compose'
-
-
-alias k='k9s'
-
-## Modern CLI alternatives
-# alias cat='bat --paging=always'
-alias miller='mlr'
-# alias grep='rg'
-# alias find='fd'
-# alias md='glow'
-alias ls='eza --icons'
-alias ll='eza -l --icons'
-alias la='eza -al --icons'
-#
-## Git shortcuts
-alias gs='git status'
-alias ga='git add'
-alias gc='git commit'
-alias gp='git push'
-alias gl='git pull'
-alias lg='lazygit'
-
-## Ghostty
-alias g='ghostty'
-
-## Homebrew aliases + shortcuts
-#
-# https://github.com/Homebrew/homebrew-aliases
-
-alias b="brew"
-#alias bdr="brew doctor"
-#alias boc="brew outdated --cask"
-#alias bof="brew outdated --formula"
-alias bupd="brew update"
-alias bupg="brew upgrade"
-alias bclean="brew cleanup --prune=all && brew autoremove"
-alias bcleanall='brew cleanup --prune=all && rm -rf $(brew --cache) && brew autoremove'
-alias bin="brew install"
-alias brein="brew reinstall"
-alias bi="brew info"
-alias bs="brew search"
-alias bl="brew leaves"
-
-## Homebrew Cask/Bundle management
-alias bcl="brew list --cask"
-alias bcin="brew install --cask"
-alias bb="brew bundle"
-alias bbls="brew bundle dump --all --file=- --verbose"
-alias bbsave="brew bundle dump --all --verbose --global"
-alias bbcheck="brew bundle check --all --verbose --global"
-
-## Directory navigation
-alias dl='cd ~/Downloads'
-alias cf='cd ~/.config/'
-#
-#
-alias zcompreset="rm -f ~/.zcompdump; compinit"
-
-# Tailscale
-alias ts="tailscale"
-
-
-
-# ========================================================================
-# Misc Shortcuts
-# ========================================================================
-
-alias hf="huggingface-cli"
-
-alias lg="lazygit"
-
-alias j="just"
-alias jfmt="just --unstable --fmt"
-
-alias zj="zellij"
-alias zjl="zellij list-sessions"
-alias zja="zellij attach"
-alias zje="zellij attach \$(zellij list-sessions -n | fzf --reverse --border --no-sort | awk '{print \$1}')"
-
-# function zje() {
-#   # Explanation
-#   # - zellij list-sessions: Lists all active Zellij sessions
-#   # - awk '{print $1}': Extracts the session names (first column)
-#   # - fzf --height 40% --reverse --border --no-sort: Presents the session names in a selectable fuzzy finder interface
-#   # - zellij attach "session_name": Attaches to the selected session.
-# }
-
-
-# custom functions
-# symlink
-function slink() {
-    local src_orig=$1
-    local dst_link=$2
-    local dst_dir=$(dirname "$dst_link")
-
-    # Create the directory if it does not exist
-    mkdir -p "$dst_dir"
-
-    # Create the symlink
-    ln -nfs "$src_orig" "$dst_link"
-}
-
-function slink_init() {
-    slink $DOTFILES/.Brewfile $HOME/.Brewfile
-    slink $DOTFILES/.zshrc $HOME/.zshrc
-
-    slink $DOTFILES_EXPORTS $OMZ_CUSTOM/exports.zsh
-    slink $DOTFILES_ALIASES $OMZ_CUSTOM/aliases.zsh
-    slink $DOTFILES_FUNCTIONS $OMZ_CUSTOM/functions.zsh
-
-    slink $DOTFILES/nvm/default-packages $NVM_DIR/default-packages
-    slink $DOTFILES/.config/git/.gitignore $HOME/.gitignore
-
-
-    slink $DOTFILES/.config/zellij/main-layout.kdl $HOME/.config/config.kdl
-}
-
-
-# ========================================================================
-# Local Environment
-# ========================================================================
-
-# Load local environment variables if they exist
-# [[ -f "$HOME/.local/state/env" ]] && . "$HOME/.local/state/env"
-
-# # Configure Atuin path if it exists
-# # Note: This should eventually be moved to atuin.zsh
-# if [[ -f "$HOME/.atuin/bin/env" ]]; then
-#   # Define the path variable to be used by other scripts
-#   export ATUIN_BIN_PATH="$HOME/.atuin/bin"
-
-#   # Only source if not already initialized
-#   if ! has_command atuin; then
-#     . "$HOME/.atuin/bin/env"
-#   fi
+# # List Files - Prioritize eza/exa with fallback to ls
+# if has_command eza; then
+#   alias ls="eza --icons --group-directories-first"
+#   alias ll="eza --icons --group-directories-first -la"
+#   alias la="eza --icons --group-directories-first -a"
+#   alias lt="eza --icons --group-directories-first --tree"
+#   alias lt2="eza --icons --group-directories-first --tree --level=2"
+# else
+#   alias ls="ls -G"
+#   alias ll="ls -la"
+#   alias la="ls -a"
 # fi
 
-# bun completions
-[ -s "/Users/hank/.bun/_bun" ] && source "/Users/hank/.bun/_bun"
+# # ========================================================================
+# # Networking Utilities
+# # ========================================================================
+# alias ip="ipconfig getifaddr en0"
+# alias localip="ipconfig getifaddr en0"
+# alias publicip="curl -s https://api.ipify.org"
+# alias ports="sudo lsof -i -P -n | grep LISTEN"
+# alias flush="dscacheutil -flushcache && killall -HUP mDNSResponder" # Flush DNS
+
+# # ========================================================================
+# # Dotfiles Management
+# # ========================================================================
+# # alias zdot='cd $ZDOTDIR'
+# alias d="cd $DOTFILES"
+# alias zr="exec zsh"
+# alias ze="fd --hidden . $ZDOTDIR | xargs nvim"
+# alias .e="fd --hidden . $DOTFILES | xargs nvim"
+
+# # ========================================================================
+# # System Information
+# # ========================================================================
+# alias ppath='echo $PATH | tr ":" "\n"'
+# alias pfuncs='print -l ${(k)functions[(I)[^_]*]} | sort'
+# alias pfpath='for fp in $fpath; do echo $fp; done; unset fp'
+# alias printpath='ppath'
+# alias printfuncs='pfuncs'
+# alias printfpath='pfpath'
+
+# # Keep commonly used aliases for convenience
+# alias penv='sys env'
+# alias ql='sys ql'
+# alias batman='sys man'
+
+# #!/usr/bin/env zsh
+
+# # ====== Aliases ======
+# # Modern replacements
+
+# # Aliases
+# alias v='$EDITOR'
+# alias vi='$EDITOR'
+# alias vim='$EDITOR'
+# # alias cat="bat"
+
+# # command -v bat >/dev/null && alias cat='bat --paging=never'
+# # # command -v rg >/dev/null && alias grep='rg'
+# # command -v fd >/dev/null && alias find='fd'
+# # command -v lazygit >/dev/null && alias lg='lazygit'
+
+# # # Git shortcuts
+# # alias g="git"
+# # alias ga="git add"
+# # alias gc="git commit"
+# # alias gp="git push"
+# # alias gs="git status"
+# # alias gp='git push'
+# # alias gl='git pull'
+
+# # Example: flush DNS
+# alias flushdns="sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder"
+# alias showhidden="defaults write com.apple.finder AppleShowAllFiles YES; killall Finder"
+
+# # Package management
+# alias brewup='brew update && brew upgrade && brew cleanup'
+
+# # Load Custom Functions
+# # [[ -f "${ZDOTDIR}/functions.zsh" ]] && source "${ZDOTDIR}/functions.zsh"
+
+# # ====== Local Configuration ======
+# # Source local customizations if they exist
+# # [[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
+# # [[ -f "$ZDOTDIR/local.zsh" ]] && source "$ZDOTDIR/local.zsh"
+
+# # upgrade to modern
+# alias ps='procs'
+# alias ping='gping'
+
+# alias diff='delta'
+
+# ## FZF enhanced commands
+# alias flog='fzf --preview "bat --style=numbers --color=always --line-range=:500 {}"'
+# alias falias='alias | fzf'
+# alias fman='man -k . | fzf --preview "man {}"'
+# alias fls='man -k . | fzf --preview "man {}"'
+
+# alias ls='eza -al'
+# # alias cheat='navi'
+# # alias tldr='navi'
+# alias net='trippy'
+# alias netviz='netop'
+# alias jwt='jet-ui'
+# # alias sed='sd'
+# # alias du='dust'
+# # alias ssh='sshs'
+# # alias s3='stu'
+# # alias http='xh'
+# # alias http='posting'
+# alias csv='xsv'
+# # alias rm='rip'
+# alias tmux='zellij'
+
+
+# alias jsonfilter='jnv'
+# alias jsonviewer='jnv'
+
+# # k8s kubernetes + docker + containers
+# alias d='docker'
+# alias dstart='docker start'
+# alias dstop='docker stop'
+# alias dps='docker ps'
+# alias dpsa='docker ps -a'
+# alias dimg='docker images'
+# alias dx='docker exec -it'
+# alias drm='docker rm'
+# alias drmi='docker rmi'
+# alias dbuild='docker build'
+# alias dc='docker-compose'
+
+
+# alias k='k9s'
+
+# ## Modern CLI alternatives
+# # alias cat='bat --paging=always'
+# alias miller='mlr'
+# # alias grep='rg'
+# # alias find='fd'
+# # alias md='glow'
+# alias ls='eza --icons'
+# alias ll='eza -l --icons'
+# alias la='eza -al --icons'
+# #
+# ## Git shortcuts
+# alias gs='git status'
+# alias ga='git add'
+# alias gc='git commit'
+# alias gp='git push'
+# alias gl='git pull'
+# alias lg='lazygit'
+
+# ## Ghostty
+# alias g='ghostty'
+
+# ## Homebrew aliases + shortcuts
+# #
+# # https://github.com/Homebrew/homebrew-aliases
+
+# alias b="brew"
+# #alias bdr="brew doctor"
+# #alias boc="brew outdated --cask"
+# #alias bof="brew outdated --formula"
+# alias bupd="brew update"
+# alias bupg="brew upgrade"
+# alias bclean="brew cleanup --prune=all && brew autoremove"
+# alias bcleanall='brew cleanup --prune=all && rm -rf $(brew --cache) && brew autoremove'
+# alias bin="brew install"
+# alias brein="brew reinstall"
+# alias bi="brew info"
+# alias bs="brew search"
+# alias bl="brew leaves"
+
+# ## Homebrew Cask/Bundle management
+# alias bcl="brew list --cask"
+# alias bcin="brew install --cask"
+# alias bb="brew bundle"
+# alias bbls="brew bundle dump --all --file=- --verbose"
+# alias bbsave="brew bundle dump --all --verbose --global"
+# alias bbcheck="brew bundle check --all --verbose --global"
+
+# ## Directory navigation
+# alias dl='cd ~/Downloads'
+# alias cf='cd ~/.config/'
+# #
+# #
+# alias zcompreset="rm -f ~/.zcompdump; compinit"
+
+# # Tailscale
+# alias ts="tailscale"
+
+
+
+# # ========================================================================
+# # Misc Shortcuts
+# # ========================================================================
+
+# alias hf="huggingface-cli"
+
+# alias lg="lazygit"
+
+# alias j="just"
+# alias jfmt="just --unstable --fmt"
+
+# alias zj="zellij"
+# alias zjl="zellij list-sessions"
+# alias zja="zellij attach"
+# # alias zje="zellij attach $(zellij list-sessions -n | fzf --reverse --border --no-sort | awk '{print $1}')"
+
+# # function zje() {
+# #   # Explanation
+# #   # - zellij list-sessions: Lists all active Zellij sessions
+# #   # - awk '{print $1}': Extracts the session names (first column)
+# #   # - fzf --height 40% --reverse --border --no-sort: Presents the session names in a selectable fuzzy finder interface
+# #   # - zellij attach "session_name": Attaches to the selected session.
+# # }
+# 
+# 
+# # custom functions
+# # symlink
+# # function slink() {
+# #     local src_orig=$1
+# #     local dst_link=$2
+# #     local dst_dir=$(dirname "$dst_link")
+# # 
+# #     # Create the directory if it does not exist
+# #     mkdir -p "$dst_dir"
+# # 
+# #     # Create the symlink
+# #     ln -nfs "$src_orig" "$dst_link"
+# # }
+# # 
+# # function slink_init() {
+# #     slink $DOTFILES/.Brewfile $HOME/.Brewfile
+# #     slink $DOTFILES/.zshrc $HOME/.zshrc
+# # 
+# #     slink $DOTFILES_EXPORTS $OMZ_CUSTOM/exports.zsh
+# #     slink $DOTFILES_ALIASES $OMZ_CUSTOM/aliases.zsh
+# #     slink $DOTFILES_FUNCTIONS $OMZ_CUSTOM/functions.zsh
+# # 
+# #     slink $DOTFILES/.config/git/.gitignore $HOME/.gitignore
+# # 
+# # 
+# #     slink $DOTFILES/.config/zellij/main-layout.kdl $HOME/.config/config.kdl
+# # }
+
+
+# ========================================================================
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
