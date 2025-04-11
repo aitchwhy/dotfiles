@@ -295,58 +295,60 @@ eval "$(atuin init zsh)"
 # ========================================================================
 # export PATH="/Users/hank/.local/share/../bin:$PATH"
 path_add "$HOME/.local/share/../bin"
-
 # ========================================================================
 # NodeJS
 # ========================================================================
 
-# NVM setup
-export NVM_DIR="$HOME/.nvm"
-if ! has_command nvm; then
-  echo "NVM not found. Installing NVM..."
-  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-fi
-
-# Load NVM
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-
-# Install and use latest LTS Node.js if not already installed
-if ! nvm ls | grep -q "lts/*"; then
-  echo "Installing latest LTS Node.js..."
-  nvm install --lts
-  nvm use --lts
-fi
-
-# Global npm packages
-NPM_GLOBAL_PACKAGES=(
-  "@anthropic-ai/claude-code"
-  "commitizen"
-  "commitlint"
-  "husky"
-  "npm-check-updates"
-  "prettier"
-  "typescript"
-  "yarn"
-)
-
-# Setup npm global directory
-mkdir -p "$HOME/.npm-global"
-npm config set prefix "$HOME/.npm-global"
-path_add "$HOME/.npm-global/bin"
-
-# Install global packages if not already installed
-for package in "${NPM_GLOBAL_PACKAGES[@]}"; do
-  if ! npm list -g --depth=0 | grep -q "$package@"; then
-    echo "Installing global npm package: $package"
-    npm install -g "$package"
+# Check if Node.js is already installed via nvm
+if ! has_command node; then
+  # NVM setup
+  export NVM_DIR="$HOME/.nvm"
+  if ! has_command nvm; then
+    echo "NVM not found. Installing NVM..."
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
   fi
-done
 
-# Initialize commitizen
-if ! has_command commitizen; then
-  echo "Initializing commitizen..."
-  commitizen init cz-conventional-changelog --save-dev --save-exact
+  # Load NVM
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+  [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+  # Install and use Node.js v23 if not already installed
+  if ! nvm ls | grep -q "v23"; then
+    echo "Installing Node.js v23..."
+    nvm install 23
+    nvm use 23
+  fi
+
+  # Global npm packages
+  NPM_GLOBAL_PACKAGES=(
+    "@anthropic-ai/claude-code"
+    "commitizen"
+    "commitlint"
+    "husky"
+    "npm-check-updates"
+    "prettier"
+    "typescript"
+    "yarn"
+  )
+
+  # Setup npm global directory
+  mkdir -p "$HOME/.npm-global"
+  npm config set prefix "$HOME/.npm-global"
+  path_add "$HOME/.npm-global/bin"
+
+  # Install global packages if not already installed
+  for package in "${NPM_GLOBAL_PACKAGES[@]}"; do
+    if ! npm list -g --depth=0 | grep -q "$package@"; then
+      echo "Installing global npm package: $package"
+      npm install -g "$package"
+    fi
+  done
+
+  # Initialize commitizen
+  if ! has_command commitizen; then
+    echo "Initializing commitizen..."
+    commitizen init cz-conventional-changelog --save-dev --save-exact
+  fi
 fi
 
 # ========================================================================
