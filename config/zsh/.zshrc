@@ -299,59 +299,55 @@ path_add "$HOME/.local/share/../bin"
 # ========================================================================
 # NodeJS
 # ========================================================================
-# Volta
-# export VOLTA_HOME="$HOME/.volta"
-# # export PATH="$VOLTA_HOME/bin:$PATH"
-# path_add "$VOLTA_HOME/bin"
-# if ! has_command volta; then
-#   echo "Volta not found. Installing ..."
-#   brew install volta
-# fi
 
-
-# # NVM
-# export NVM_DIR="$HOME/.nvm"
-# [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"                                       # This loads nvm
-# [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" # This loads nvm bash_completion
-# if ! has_command bun; then
-#   echo "Bun not found. Installing bun (nodejs)..."
-#   curl -fsSL https://bun.sh/install | bash # for macOS, Linux, and WSL
-#   brew install volta
-# fi
-
-# # Bun
-# export BUN_INSTALL="$HOME/.bun"
-# # export PATH="$BUN_INSTALL/bin:$PATH"
-# path_add "$BUN_INSTALL/bin"
-# if ! has_command bun; then
-#   echo "Bun not found. Installing bun (nodejs)..."
-#   curl -fsSL https://bun.sh/install | bash # for macOS, Linux, and WSL
-# fi
-
-
-# FNM (https://github.com/Schniz/fnm)
-
-if ! has_command fnm; then
-  echo "FNM not found. Installing ..."
-  brew install --quiet nvim
+# NVM setup
+export NVM_DIR="$HOME/.nvm"
+if ! has_command nvm; then
+  echo "NVM not found. Installing NVM..."
+  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 fi
 
-eval "$(fnm env --use-on-cd --shell zsh)"
-path_add "$HOME/.fnm"
+# Load NVM
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
+# Install and use latest LTS Node.js if not already installed
+if ! nvm ls | grep -q "lts/*"; then
+  echo "Installing latest LTS Node.js..."
+  nvm install --lts
+  nvm use --lts
+fi
 
-# TODO: add github extensions list
-# - gh extension install dlvhdr/gh-dash
-# TODO: add nodejs global packages (bun + etc)
-# TODO: add uv global packages
+# Global npm packages
+NPM_GLOBAL_PACKAGES=(
+  "@anthropic-ai/claude-code"
+  "commitizen"
+  "commitlint"
+  "husky"
+  "npm-check-updates"
+  "prettier"
+  "typescript"
+  "yarn"
+)
 
-# mkdir -p ~/.npm-global
-# npm config set prefix ~/.npm-global
-# path_add "~/.npm-global/bin"
-# TODO: npm install -g @anthropic-ai/claude-code
-# TODO: npm install --save-dev commitizen commitlint husky
-
+# Setup npm global directory
+mkdir -p "$HOME/.npm-global"
+npm config set prefix "$HOME/.npm-global"
 path_add "$HOME/.npm-global/bin"
+
+# Install global packages if not already installed
+for package in "${NPM_GLOBAL_PACKAGES[@]}"; do
+  if ! npm list -g --depth=0 | grep -q "$package@"; then
+    echo "Installing global npm package: $package"
+    npm install -g "$package"
+  fi
+done
+
+# Initialize commitizen
+if ! has_command commitizen; then
+  echo "Initializing commitizen..."
+  commitizen init cz-conventional-changelog --save-dev --save-exact
+fi
 
 # ========================================================================
 # nvim
