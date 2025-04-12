@@ -1,35 +1,58 @@
-# Flonotes Frontend Justfile
+# Global Justfile for Development Workflows
 # Run commands with: just <command>
 
-# List available commands
+# Configuration
+set dotenv-load := true
+set positional-arguments := true
+set shell := ["zsh", "-c"]
+
+# Default recipe - list all available commands
 default:
     @just --list
 
+# Development Environment Setup
+# ============================
+
+# Format justfile
+fmt:
+    just --fmt --unstable -f ~/dotfiles/Justfile
+
+# Platform Development
+# ===================
+
+# Run noggin service
 run-noggin: deploy-local
     cd ~/src/platform && \
       ant build noggin && \
       ant up noggin
 
+# Run full platform stack
 run-platform:
     cd ~/src/platform && \
       ant build api user s3 prefect-worker prefect-agent prefect-server data-seeder && \
       ant up api user s3 prefect-worker prefect-agent prefect-server data-seeder
 
-##################
-# TODO(hank): clone of existing Makefile targets. Migrate to this if possible after checking with team.
+# Frontend Development
+# ===================
 
-# Run the development server with hot reloading
+# Run development server with hot reloading
 run:
     npm run dev --hot
 
-# Get OTP codes from Docker logs (outputs only the 4-digit code)
+# Get OTP codes from Docker logs
 get-otp:
     docker logs "$(docker container ls | rg 'api' | awk '{print $1}')" | rg "sent an otp code"
 
-# Setup project
+# Project Setup
+# ============
+
+# Install dependencies and build project
 setup:
     npm install
     npm run build
+
+# Deployment
+# =========
 
 # Deploy to local environment
 deploy-local:
@@ -39,4 +62,10 @@ deploy-local:
 deploy-aws profile bucket noggin_url:
     ./deploy-aws.sh {{ profile }} {{ bucket }} {{ noggin_url }}
 
-##################
+# Helper Functions
+# ===============
+
+# Print help message
+help:
+    @echo "Available commands:"
+    @just --list

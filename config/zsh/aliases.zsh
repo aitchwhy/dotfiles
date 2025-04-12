@@ -1,13 +1,19 @@
 #!/usr/bin/env zsh
 
+local DOTFILES="${DOTFILES:-$HOME/dotfiles}"
+local GLOBAL_JUSTFILE=""
+
+
+
+# justfile
+# alias j="just"
+alias j="just -f ~/dotfiles/user.justfile"
+alias j="just -f ~/dotfiles/user.justfile"
+
 # === Aliases from .zshrc ===
 alias claude="/Users/hank/.claude/local/claude"
-alias ..="cd .."
-alias ...="cd ../.."
-alias ....="cd ../../.."
-alias home="cd ~"
 # List Files - Prioritize eza/exa with fallback to ls
-# if has_command eza; then # Conditional logic moved with aliases, might need adjustment
+if has_command eza; then # Conditional logic moved with aliases, might need adjustment
   alias ls="eza --icons --group-directories-first"
   alias ll="eza --icons --group-directories-first -la"
   alias la="eza --icons --group-directories-first -a"
@@ -17,7 +23,8 @@ alias home="cd ~"
 #   alias ls="ls -G"
 #   alias ll="ls -la"
 #   alias la="ls -a"
-# fi
+fi
+
 # Networking Utilities
 alias ip="ipconfig getifaddr en0"
 alias localip="ipconfig getifaddr en0"
@@ -137,7 +144,6 @@ alias ts="tailscale"
 # Misc Shortcuts
 alias hf="huggingface-cli"
 alias lg="lazygit" # Note: Overwrites previous lg alias
-alias j="just"
 alias jfmt="just --unstable --fmt"
 alias zj="zellij"
 alias zjl="zellij list-sessions"
