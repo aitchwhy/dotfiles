@@ -605,10 +605,12 @@ export GOBIN="$GOPATH/bin"
 
 # Completions setup
 if type brew &>/dev/null; then
-  #FPATH=$(brew --prefix)/share/zsh-abbr:$FPATH
-  autoload -Uz compinit
-  compinit
+  FPATH=$(brew --prefix)/share/zsh-abbr:$FPATH
 fi
+
+fpath=($HOMEBREW_PREFIX/share/zsh/site-functions $fpath)
+autoload -Uz compinit
+compinit
 
 # Initialize the completion system
 # Completions setup
