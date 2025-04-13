@@ -1,10 +1,7 @@
-# Brewfile.full - Development Tools, GUI Apps, and Utilities
-
 # Taps (Third-Party Repositories)
 tap "koekeishiya/formulae"
 tap "oven-sh/bun"
 tap "spider-rs/spider-cloud-cli"
-# tap "homebrew/cask-fonts" # Consider uncommenting if you add more fonts
 
 # Formulae (Development & Utility CLIs)
 # Rust toolchain manager (Requires post-install script execution)
@@ -36,7 +33,7 @@ brew "imagemagick"
 brew "jq"
 brew "just"
 brew "kanata"
-brew "koekeishiya/formulae/skhd", restart_service: :changed
+brew "koekeishiya/formulae/skhd", restart_service: :changed, post_install
 brew "lazygit"
 brew "lnav"
 brew "localstack"
@@ -157,33 +154,4 @@ mas "Numbers", id: 409203825
 mas "Obsidian Web Clipper", id: 6720708363
 mas "Raycast Companion", id: 6738274497
 mas "Screens 5", id: 1663047912
-
-
-# ######
-# 
-# tap "koekeishiya/formulae"
-# tap "oven-sh/bun"
-# 
-# 
-# 
-# 
-# # # Install global npm packages
-# # # Use the system's npm to install global packages
-# # # The npm install commands will be executed after the brew installation
-# # postinstall do
-# #   system "npm install -g typescript eslint nodemon"
-# # end
-# 
-# brew tap spider-rs/spider-cloud-cli
-# 
-# 
-# mas "Drafts", id: 1435957248
-# mas "Essentials", id: 1588151344
-# mas "Hidden Bar", id: 1452453066
-# mas "Microsoft Word", id: 462054704
-# mas "Numbers", id: 409203825
-# mas "Obsidian Web Clipper", id: 6720708363
-# mas "Raycast Companion", id: 6738274497
-# mas "Screens 5", id: 1663047912
-# mas "Slack", id: 803453959
 
