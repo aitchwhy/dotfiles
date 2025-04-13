@@ -35,7 +35,7 @@ alias flush="dscacheutil -flushcache && killall -HUP mDNSResponder" # Flush DNS
 # alias zdot='cd $ZDOTDIR'
 alias d="cd $DOTFILES"
 alias zr="exec zsh"
-alias ze="fd --hidden . $ZDOTDIR | xargs nvim"
+alias ze="fd -t file --hidden . "$ZDOTDIR" | xargs nvim"
 alias .e="fd --hidden . $DOTFILES | xargs nvim"
 # System Information
 alias ppath='echo $PATH | tr ":" "\n"'
@@ -156,7 +156,7 @@ alias zje='zellij attach "$(zellij list-sessions -n | fzf --reverse --border --n
 # File navigation
 alias ff='f find'         # Find files
 alias fe='f edit'         # Find and edit files
-alias fd='f dir'          # Find directories
+alias fdir='f dir'          # Find directories
 alias fz='f z'            # Jump with zoxide
 # Git operations
 alias fco='f checkout'    # Git checkout

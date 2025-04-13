@@ -1,0 +1,315 @@
+# Brewfile.full - Development Tools, GUI Apps, and Utilities
+
+# Taps (Third-Party Repositories)
+tap "koekeishiya/formulae"
+tap "oven-sh/bun"
+tap "spider-rs/spider-cloud-cli"
+# tap "homebrew/cask-fonts" # Consider uncommenting if you add more fonts
+
+# Formulae (Development & Utility CLIs)
+brew "atuin", restart_service: :changed  # Shell history sync
+brew "awscli"
+brew "bat"             # Cat clone
+brew "biome"           # Web formatter/linter
+brew "bitwarden-cli"   # Ensure only one password manager CLI is listed (here or core)
+brew "coder"
+brew "datasette"
+brew "direnv"
+brew "dust"            # du alternative
+brew "entr"
+brew "eslint"
+brew "eza"             # ls replacement
+brew "fd"              # find alternative
+brew "fnm"           # Ensure only one Node manager is listed (here or core)
+brew "fx"              # JSON viewer
+brew "fzf"             # Fuzzy finder (Requires post-install script execution)
+brew "git-delta"       # Diff viewer
+brew "glow"            # Markdown renderer
+brew "go"
+brew "httpie"
+brew "imagemagick"
+brew "jq"
+brew "just"            # Command runner
+brew "kanata"          # Keyboard remapper (Manual setup needed)
+brew "koekeishiya/formulae/skhd", restart_service: :changed # Hotkey daemon
+brew "lazygit"
+brew "lnav"            # Log navigator
+brew "localstack"
+brew "mas"             # Ensure mas CLI is installed (can be in core too)
+brew "miller"          # Data processing tool
+brew "neovim"          # Already in core, remove duplicate if necessary
+brew "nvm"             # Ensure only one Node manager is listed (here or core)
+brew "oven-sh/bun/bun"
+brew "postgresql@17", restart_service: :changed # Database (Requires post-install user/db setup)
+brew "posting"         # HTTP benchmarking
+brew "procs"           # ps replacement
+brew "ripgrep"
+brew "ruff"            # Python linter/formatter
+brew "rustscan"
+brew "rustup-init"     # Rust toolchain manager (Requires post-install script execution)
+brew "sd"              # sed alternative
+brew "sops"            # Secrets management
+brew "speedtest-cli"
+brew "starship"        # Cross-shell prompt
+brew "tesseract"       # OCR engine
+brew "tesseract-lang" # Install separately if needed: brew install tesseract-lang
+brew "tldr"            # Simplified man pages
+brew "tlrc"            # Rust tldr client
+brew "typescript"
+brew "typescript-language-server"
+brew "uv"              # Python packager
+brew "yazi"            # Terminal file manager
+brew "zellij"          # Terminal multiplexer
+brew "zoxide"
+brew "zsh-autosuggestions" # Zsh plugin (ensure not duplicated from core)
+brew "zsh-completions"   # Already in core
+brew "zsh-syntax-highlighting" # Already in core
+
+# Casks (GUI Applications & Fonts)
+# cask "1password"         # Ensure only one password manager GUI is listed (here or core)
+# cask "1password-cli"     # Ensure only one password manager CLI is listed (here or core)
+cask "a-better-finder-rename"
+cask "apidog"
+cask "bartender"
+cask "betterdisplay"
+cask "bitwarden"         # Ensure only one password manager GUI is listed (here or core)
+cask "block-goose"
+cask "bruno"
+cask "cardhop"
+cask "chatgpt"
+cask "claude"
+cask "cleanshot"
+cask "cursor"
+cask "dash"
+cask "descript"
+cask "devutils"
+cask "excalidrawz"
+cask "fantastical"
+cask "figma"
+cask "folo"
+cask "font-fira-code-nerd-font"
+cask "font-fira-mono-nerd-font"
+cask "font-symbols-only-nerd-font"
+cask "fork"
+cask "ghostty"           # Alternative terminal (ensure only one main terminal is listed, or remove from core)
+cask "google-chrome"
+cask "google-drive"
+cask "hammerspoon"
+cask "hazel"
+cask "homerow"
+cask "iina"
+cask "imageoptim"
+cask "istat-menus"
+cask "jump"
+cask "jump-desktop-connect"
+cask "kaleidoscope"
+cask "karabiner-elements"
+cask "keka"
+cask "kekaexternalhelper"
+cask "linear-linear"
+cask "lm-studio"
+cask "maccy"
+cask "macwhisper"
+cask "nosql-workbench"
+cask "notion"
+cask "obsidian"
+cask "orbstack"          # Docker alternative
+cask "pdf-expert"
+cask "postman"
+cask "proxyman"
+cask "qlcolorcode"       # QuickLook plugin
+cask "qlmarkdown"        # QuickLook plugin
+cask "qlstephen"         # QuickLook plugin
+cask "quicklook-json"     # QuickLook plugin
+cask "quit-all"
+cask "raycast"           # Already in core
+cask "slack"             # Removed MAS version in favor of cask
+cask "spotify"
+cask "superhuman"
+cask "swish"
+cask "syntax-highlight"  # QuickLook plugin
+cask "tableplus"
+cask "tailscale"
+cask "timelane"
+cask "todoist"           # Removed brew version in favor of cask
+cask "tower"
+cask "virtualbuddy"
+cask "visual-paradigm"
+cask "visual-studio-code"
+# cask "warp"              # Already in core
+cask "zen-browser"
+
+# Mac App Store Applications (Managed via `mas`)
+# Ensure `mas` CLI is installed from Formulae section above or core
+mas "Drafts", id: 1435957248
+mas "Essentials", id: 1588151344
+mas "Hidden Bar", id: 1452453066
+mas "Microsoft Word", id: 462054704
+mas "Numbers", id: 409203825
+mas "Obsidian Web Clipper", id: 6720708363
+mas "Raycast Companion", id: 6738274497
+mas "Screens 5", id: 1663047912
+
+
+# ######
+# 
+# tap "koekeishiya/formulae"
+# tap "oven-sh/bun"
+# 
+# brew "a-better-finder-rename"
+# brew "atuin", restart_service: :changed
+# brew "awscli"
+# brew "bat"
+# brew "biome"
+# brew "bitwarden-cli"
+# brew "coder"
+#  brew "curl"
+# brew "datasette"
+# brew "direnv"
+# brew "dust"
+# brew "entr"
+# brew "eslint"
+# brew "eza"
+# brew "fd"
+# brew "fnm"
+# brew "fx"
+# brew "fzf"
+# brew "gh"
+# brew "git"
+# brew "git-delta"
+# brew "glow"
+# brew "go"
+# brew "htop"
+# brew "httpie"
+# brew "imagemagick"
+# brew "jq"
+# brew "just"
+# brew "kanata"
+# brew "koekeishiya/formulae/skhd"
+# brew "lazygit"
+# brew "lnav"
+# brew "localstack"
+# brew "mas"
+# brew "miller"
+# brew "neovim"
+# brew "nvm"
+# brew "oven-sh/bun/bun"
+# brew "postgresql@17", restart_service: :changed
+# #brew "posting"
+# brew "procs"
+# brew "ripgrep"
+# brew "ruff"
+# brew "rustscan"
+# brew "rustup"
+# brew "sd"
+# brew "sops"
+# brew "speedtest-cli"
+# brew "starship"
+# brew "tesseract"
+# brew "tldr"
+# brew "tlrc"
+# brew "todoist"
+# brew "typescript"
+# brew "typescript-language-server"
+# brew "uv"
+# brew "volta"
+# brew "yazi"
+# brew "zellij"
+# brew "zoxide"
+# brew "zsh-autosuggestions"
+# brew "zsh-completions"
+# brew "zsh-syntax-highlighting"
+# 
+# cask "1password"
+# cask "1password-cli"
+# cask "apidog"
+# cask "bartender"
+# cask "betterdisplay"
+# cask "bitwarden"
+# cask "block-goose"
+# cask "bruno"
+# cask "cardhop"
+# cask "chatgpt"
+# cask "claude"
+# cask "cleanshot"
+# cask "cursor"
+# cask "dash"
+# cask "descript"
+# cask "devutils"
+# cask "excalidrawz"
+# cask "fantastical"
+# cask "figma"
+# cask "folo"
+# cask "font-fira-code-nerd-font"
+# cask "font-fira-mono-nerd-font"
+# cask "font-symbols-only-nerd-font"
+# cask "fork"
+# cask "ghostty"
+# cask "google-chrome"
+# cask "google-drive"
+# cask "hammerspoon"
+# cask "hazel"
+# cask "homerow"
+# cask "iina"
+# cask "imageoptim"
+# cask "istat-menus"
+# cask "jump"
+# cask "jump-desktop-connect"
+# cask "kaleidoscope"
+# cask "karabiner-elements"
+# cask "keka"
+# cask "kekaexternalhelper"
+# cask "linear-linear"
+# cask "lm-studio"
+# cask "maccy"
+# cask "macwhisper"
+# cask "nosql-workbench"
+# cask "notion"
+# cask "obsidian"
+# cask "orbstack"
+# cask "pdf-expert"
+# cask "postman"
+# cask "proxyman"
+# cask "qlcolorcode"
+# cask "qlmarkdown"
+# cask "qlstephen"
+# cask "quicklook-json"
+# cask "quit-all"
+# cask "raycast"
+# cask "slack"
+# cask "spotify"
+# cask "superhuman"
+# cask "swish"
+# cask "syntax-highlight"
+# cask "tableplus"
+# cask "tailscale"
+# cask "timelane"
+# cask "todoist"
+# cask "tower"
+# cask "virtualbuddy"
+# cask "visual-paradigm"
+# cask "visual-studio-code"
+# cask "warp"
+# cask "zen-browser"
+# 
+# 
+# # # Install global npm packages
+# # # Use the system's npm to install global packages
+# # # The npm install commands will be executed after the brew installation
+# # postinstall do
+# #   system "npm install -g typescript eslint nodemon"
+# # end
+# 
+# brew tap spider-rs/spider-cloud-cli
+# 
+# 
+# mas "Drafts", id: 1435957248
+# mas "Essentials", id: 1588151344
+# mas "Hidden Bar", id: 1452453066
+# mas "Microsoft Word", id: 462054704
+# mas "Numbers", id: 409203825
+# mas "Obsidian Web Clipper", id: 6720708363
+# mas "Raycast Companion", id: 6738274497
+# mas "Screens 5", id: 1663047912
+# mas "Slack", id: 803453959
+# 

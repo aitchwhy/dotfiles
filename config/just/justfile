@@ -1,3 +1,242 @@
+# -*- mode: justfile -*-
+
+# ==============================================================================
+# User-Level Justfile
+# ==============================================================================
+# Purpose: Provides common development tasks, system management shortcuts,
+#          and project-specific helpers accessible globally.
+# Invocation: Typically run via an alias like `alias j='just -f ~/.user.justfile'`
+#             or directly `just -f ~/.user.justfile <recipe> [args...]`
+# Docs: https://just.systems/man/en/
+# ==============================================================================
+
+# --- Settings ---
+# (https://just.systems/man/en/settings.html)
+
+# Enable experimental features (required for `fmt`, `group` attribute etc.)
+set unstable := true
+
+# Allow passing arguments directly after recipe name: `just recipe arg1 arg2`
+set positional-arguments := true
+
+# Use zsh for executing recipes. -c: read commands from string, -u: treat unset variables as errors.
+set shell := ["zsh", "-cu"]
+
+# Optional: Load environment variables from a .env file in the justfile's directory
+# set dotenv-load := true
+# set dotenv-filename := ".env"
+
+# Optional: By default, recipes run in the justfile's directory.
+# Set a different default working directory if desired (e.g., home directory).
+# set working-directory := home_directory()
+
+
+# --- Global Variables & Constants ---
+
+# !!! IMPORTANT: Set your actual hostname for Nix Darwin recipes !!!
+hostname            := "your-hostname-here"
+
+# Common Project Paths (using ~ which `shell` setting should expand)
+platform_dir        := "~/src/platform"
+flonotes_fe_dir     := "~/src/flonotes-fe"
+vibes_dir           := "~/src/vibes"             # Uncomment or add other common dirs if needed
+gpt_repo_dir        := "~/src/gpt-repository-loader" # Uncomment or add other common dirs if needed
+
+# --- Default & Utility Recipes ---
+
+# Default action when running `just -f ~/.user.justfile` without arguments
+default: list # Changed from `--choose` to `--list` for quicker overview, personal preference.
+
+# Interactively choose a recipe to run
+choose:
+    @just --choose
+
+# List all available recipes, grouped and sorted
+list: ls
+ls:
+    @# Using --list without --unsorted gives a cleaner, grouped output
+    @just --list
+
+# Format *this* user Justfile
+fmt:
+    @echo "Formatting {{ justfile() }}..."
+    @just --unstable --fmt
+
+# Check formatting of *this* user Justfile
+check-fmt: fmt-check
+fmt-check:
+    @echo "Checking formatting of {{ justfile() }}..."
+    @just --unstable --fmt --check
+
+
+# --- Nix Environment Management ---
+# Recipes related to Nix package manager and Flakes
+
+# Update all Nix flake inputs in the current directory's flake.lock
+[group('Nix'), no-cd] # Run in the directory where `just` was invoked
+nix:update:all:
+    @echo "Updating all Nix flake inputs in $(pwd)..."
+    nix flake update
+
+# Update a specific Nix flake input in the current directory
+# Usage: just nix:update:input nixpkgs
+[group('Nix'), no-cd] # Run in the directory where `just` was invoked
+nix:update:input input:
+    @echo "Updating Nix flake input '{{input}}' in $(pwd)..."
+    nix flake update --update-input {{input}}
+
+# Show Nix system profile history
+[group('Nix')]
+nix:history:
+    @echo "Nix system profile history:"
+    nix profile history --profile /nix/var/nix/profiles/system
+
+# Open a Nix REPL using the flake's nixpkgs input (useful for debugging)
+[group('Nix'), no-cd] # Run in the directory where `just` was invoked
+nix:repl:
+    @echo "Opening Nix REPL for flake in $(pwd) (using nixpkgs input)..."
+    nix repl '.#nixpkgs' # Or just `nix repl` if context is enough
+
+# Clean old Nix system profile generations (older than 7 days)
+[group('Nix')]
+nix:clean:profile:
+    @echo "Cleaning Nix system profile generations older than 7 days (requires sudo)..."
+    sudo nix profile wipe-history --profile /nix/var/nix/profiles/system --older-than 7d
+
+# Garbage collect Nix store (system and user)
+[group('Nix')]
+nix:gc:
+    @echo "Running Nix garbage collection (older than 7 days)..."
+    @echo "System GC (requires sudo)..."
+    sudo nix-collect-garbage --delete-older-than 7d
+    @echo "User GC..."
+    nix-collect-garbage --delete-older-than 7d
+
+# Format Nix files in the current directory
+[group('Nix'), no-cd] # Run in the directory where `just` was invoked
+nix:fmt:
+    @echo "Formatting Nix files in $(pwd)..."
+    nix fmt .
+
+# List Nix garbage collection roots
+[group('Nix')]
+nix:gcroot:
+    @echo "Nix auto GC roots:"
+    ls -al /nix/var/nix/gcroots/auto/
+
+
+# --- Darwin System Management (using Nix) ---
+# Recipes specific to managing a macOS system via nix-darwin
+
+# [private] Helper to set network proxy if needed for builds.
+# Prefixing with `_` makes it hidden from `just --list` by default.
+# You might need to adjust the script path.
+_darwin-set-proxy:
+    @echo "Setting Darwin network proxy (requires sudo)..."
+    sudo python3 {{ justfile_directory() }}/scripts/darwin_set_proxy.py # Assumes script relative to justfile
+
+# Build and switch Darwin configuration using the hostname variable
+[group('Darwin')]
+darwin:build: _darwin-set-proxy # This recipe depends on the proxy helper
+    @echo "Building Darwin configuration for '{{hostname}}'..."
+    nix build ".#darwinConfigurations.{{hostname}}.system" \
+        --extra-experimental-features 'nix-command flakes'
+    @echo "Switching to new Darwin configuration..."
+    ./result/sw/bin/darwin-rebuild switch --flake ".#{{hostname}}"
+
+# Build and switch Darwin configuration with verbose debug output
+[group('Darwin')]
+darwin:build-debug: _darwin-set-proxy
+    @echo "Building Darwin configuration for '{{hostname}}' (DEBUG)..."
+    nix build ".#darwinConfigurations.{{hostname}}.system" --show-trace --verbose \
+        --extra-experimental-features 'nix-command flakes'
+    @echo "Switching to new Darwin configuration (DEBUG)..."
+    ./result/sw/bin/darwin-rebuild switch --flake ".#{{hostname}}" --show-trace --verbose
+
+
+# --- Flonotes / Ant Project Specifics ---
+# Recipes related to the Flonotes/Ant projects.
+# Consider moving these to a project-local Justfile if they become too numerous
+# or are only ever run from within those project directories.
+
+# Setup Flonotes Frontend project (Install deps, build)
+[group('Ant/Flonotes'), working-directory(flonotes_fe_dir)]
+ant:setup:
+    @echo "Setting up Flonotes Frontend in {{flonotes_fe_dir}}..."
+    # If `ant build` is part of setup, add it here:
+    # ant build
+    npm install && npm run build
+
+# Run Noggin service (Platform)
+[group('Ant/Flonotes'), working-directory(platform_dir)]
+ant:run:noggin: # Removed dependency on deploy-local for clarity; run explicitly if needed
+    @echo "Building and starting Noggin service in {{platform_dir}}..."
+    ant build noggin && ant up noggin
+
+# Run core Platform services (Platform)
+[group('Ant/Flonotes'), working-directory(platform_dir)]
+ant:run:platform:
+    @echo "Building and starting Platform services in {{platform_dir}}..."
+    ant build api user s3 prefect-worker prefect-agent prefect-server data-seeder && \
+    ant up api user s3 prefect-worker prefect-agent prefect-server data-seeder
+
+# Run Platform development server with hot reloading (Platform)
+[group('Ant/Flonotes'), working-directory(platform_dir)]
+ant:run:dev:
+    @echo "Starting development server with hot-reload in {{platform_dir}}..."
+    npm run dev --hot
+
+# Get OTP code from 'api' container logs
+[group('Ant/Flonotes')] # Doesnt need a specific working directory
+ant:get-otp:
+    @echo "Fetching OTP code from container named 'api'..."
+    @_container_id=$$(docker ps -qf name=api); \
+    if [ -n "$$_container_id" ]; then \
+        docker logs "$$_container_id" 2>&1 | rg "sent an otp code" | tail -n 1; \
+    else \
+        echo "Error: Container 'api' not found."; exit 1; \
+    fi
+
+# Run e2e tests using Docker Compose (assuming compose file in CWD or specified path)
+[group('Ant/Flonotes')] # Assumes docker compose files are accessible from invocation directory or uses absolute paths
+ant:test:e2e:
+    @echo "Running e2e tests..."
+    docker compose \
+        --profile test-e2e \
+        --file compose.integration.yaml \
+        run \
+        --build \
+        --rm \
+        # Pass API key securely, consider using dotenv or secrets management
+        --env ANTHROPIC_API_KEY \
+        noggin-test-e2e
+
+# Deploy Flonotes Frontend to local environment (using make)
+[group('Ant/Flonotes'), working-directory(flonotes_fe_dir)]
+ant:deploy:local:
+    @echo "Deploying Flonotes Frontend locally using make in {{flonotes_fe_dir}}..."
+    make deploy-local # Assumes Makefile exists and `deploy-local` target is defined
+
+# Deploy Flonotes Frontend to AWS
+# Usage: just ant:deploy:aws my-profile my-bucket https://noggin.example.com
+[group('Ant/Flonotes'), working-directory(flonotes_fe_dir)]
+ant:deploy:aws profile bucket noggin_url:
+    @echo "Deploying Flonotes Frontend to AWS (Profile: {{profile}}, Bucket: {{bucket}})..."
+    # Ensure the script path is correct relative to flonotes_fe_dir or provide absolute path
+    # Using ./scripts assumes it is relative to the working directory (flonotes_fe_dir)
+    ./scripts/anterior/deploy-aws.sh {{profile}} {{bucket}} {{noggin_url}}
+
+
+# ==============================================================================
+# End of User Justfile
+# ==============================================================================
+# Remember to update the `hostname` variable!
+# Consider creating project-local Justfiles for recipes only relevant within
+# a specific project directory (e.g., `~/src/platform/justfile`).
+# ==============================================================================
+
+
+##########3
 # Settings (https://just.systems/man/en/settings.html)
 set unstable := true
 # set cmd used for invoking recipes + eval backticks
@@ -185,164 +424,162 @@ deploy-aws profile bucket noggin_url:
     $(pwd)/{{ justfile_directory() }}/scripts/anterior/deploy-aws.sh {{ profile }} {{ bucket }} {{ noggin_url }}
 
 
-############################################################################
-#
-#  nix related commands
-#
-############################################################################
+# ############################################################################
+# #
+# #  nix related commands
+# #
+# ############################################################################
 
-# Update all the flake inputs
-[group('nix')]
-up:
-    nix flake update
+# # Update all the flake inputs
+# [group('nix')]
+# up:
+#     nix flake update
 
-# Update specific input
+# # Update specific input
 
-# Usage: just upp nixpkgs
-[group('nix')]
-upp input:
-    nix flake update {{ input }}
+# # Usage: just upp nixpkgs
+# [group('nix')]
+# upp input:
+#     nix flake update {{ input }}
 
-# List all generations of the system profile
-[group('nix')]
-history:
-    nix profile history --profile /nix/var/nix/profiles/system
+# # List all generations of the system profile
+# [group('nix')]
+# history:
+#     nix profile history --profile /nix/var/nix/profiles/system
 
-# Open a nix shell with the flake
-[group('nix')]
-repl:
-    nix repl -f flake:nixpkgs
+# # Open a nix shell with the flake
+# [group('nix')]
+# repl:
+#     nix repl -f flake:nixpkgs
 
-# remove all generations older than 7 days
+# # remove all generations older than 7 days
 
-# on darwin, you may need to switch to root user to run this command
-[group('nix')]
-clean:
-    sudo nix profile wipe-history --profile /nix/var/nix/profiles/system  --older-than 7d
+# # on darwin, you may need to switch to root user to run this command
+# [group('nix')]
+# clean:
+#     sudo nix profile wipe-history --profile /nix/var/nix/profiles/system  --older-than 7d
 
-# Garbage collect all unused nix store entries
-[group('nix')]
-gc:
-    # garbage collect all unused nix store entries(system-wide)
-    sudo nix-collect-garbage --delete-older-than 7d
-    # garbage collect all unused nix store entries(for the user - home-manager)
-    # https://github.com/NixOS/nix/issues/8508
-    nix-collect-garbage --delete-older-than 7d
+# # Garbage collect all unused nix store entries
+# [group('nix')]
+# gc:
+#     # garbage collect all unused nix store entries(system-wide)
+#     sudo nix-collect-garbage --delete-older-than 7d
+#     # garbage collect all unused nix store entries(for the user - home-manager)
+#     # https://github.com/NixOS/nix/issues/8508
+#     nix-collect-garbage --delete-older-than 7d
 
-[group('nix')]
-fmt:
-    # format the nix files in this repo
-    nix fmt
+# [group('nix')]
+# fmt:
+#     # format the nix files in this repo
+#     nix fmt
 
-# Show all the auto gc roots in the nix store
-[group('nix')]
-gcroot:
-    ls -al /nix/var/nix/gcroots/auto/
+# # Show all the auto gc roots in the nix store
+# [group('nix')]
+# gcroot:
+#     ls -al /nix/var/nix/gcroots/auto/
 
-
-
-# # TODO: parallel jobs 
-# parallel:
-#   #!/usr/bin/env -S parallel --shebang --ungroup --jobs {{ num_cpus() }}
-#   echo task 1 start; sleep 3; echo task 1 done
-#   echo task 2 start; sleep 3; echo task 2 done
-#   echo task 3 start; sleep 3; echo task 3 done
-#   echo task 4 start; sleep 3; echo task 4 done
+# # # TODO: parallel jobs 
+# # parallel:
+# #   #!/usr/bin/env -S parallel --shebang --ungroup --jobs {{ num_cpus() }}
+# #   echo task 1 start; sleep 3; echo task 1 done
+# #   echo task 2 start; sleep 3; echo task 2 done
+# #   echo task 3 start; sleep 3; echo task 3 done
+# #   echo task 4 start; sleep 3; echo task 4 done
 
 
-# # TODO: now just a soft symlink but .user.justfile should be real life in $HOME/.user.justfile
-#
-#
-# ############################################################
-# # Justfile docs - https://just.systems/man/en/
-# # Justfile tips - https://www.stuartellis.name/articles/just-task-runner/
-# # Justfile cheatsheet https://cheatography.com/linux-china/cheat-sheets/justfile/
-# ############################################################
-#
-# ############################################################
-# # Justfile settings (https://just.systems/man/en/chapter_26.html)
-# # TODO: [no-cd] recipe attribute -> if mod imported use parent cwd instead of child path (https://just.systems/man/en/chapter_32.html#disabling-changing-directory190)
-# ############################################################
-#
-# ############################################################
-# # Justfile exporter (https://just.systems/man/en/chapter_74.html)
-# ############################################################
-# # Justfile compat with NodeJS+package.json
-# export PATH := "./node_modules/.bin:" + env_var('PATH')
-#
-# ############################################################
-# # Justfile imports (other justfiles + modules)
-# # - modules : https://just.systems/man/en/chapter_54.html
-# ############################################################
-# # import 'asdf/justfile'
-# # mod 'modNameFolderName' 'module path'
-#
-# # set dotenv-filename := ".env.local"
-#
-# # use dotfiles/.export.sh to set these env vars (or use default)
-# # user_justfile_name := env_var('USER_JUSTFILE_NAME', ".user.justfile")
-# # user_justfile_path := "{{ home_directory() }}/" + user_justfile_name
-# dotfiles_root_dir := justfile_directory() / "dotfiles"
-# dotfiles_home_root_dir := dotfiles_root_dir / "home"
-# dotenvx_root_dir := dotfiles_root_dir / "dotenvx"
-# nvm_root_dir := dotfiles_root_dir / "nvm"
-#
-# # scripts_root_dir := dotfiles_root_dir / "scripts"
-# # chezmoi_root_dir := dotfiles_root_dir / "chezmoi"
-# # webi_root_dir := dotfiles_root_dir / "webi"
-#
-# # List available recipes
-# # (TODO: update to add 2nd user justfile command to run aliased HOME dir user justfile)
-# help:
-#     @echo "dotfiles root dir: {{dotfiles_root_dir}}"
-#     @echo "dotfiles home root dir: {{dotfiles_home_root_dir}}"
-#     @just --unstable --list --unsorted -f "{{dotfiles_home_root_dir}}/.user.justfile"
-#
-# # Display system information
-# system-info:
-#     @echo "CPU architecture: {{ arch() }}"
-#     @echo "Operating system type: {{ os_family() }}"
-#     @echo "Operating system: {{ os() }}"
-#     @echo "Home directory: {{ home_directory() }}"
-#
-#
-# ##################################
-# # global user recipes (cwd = dotfiles root dir)
-# ##################################
-# [no-cd]
-# run-recipe-user:
-#     @just --choose
-#
-# # formats user.justfile and fixed in place
-# [no-cd]
-# fmt-user-justfile:
-#     @just --unstable --fmt
-#
-# # checks user.justfile for syntax errors (return code 0 if no error)
-# [no-cd]
-# fmt-check-user-justfile:
-#     @just --unstable --fmt --check
-#
-# brew-bundle:
-#     @brew bundle --file={{dotfiles_root_dir}}/Brewfile
-#
-# ##################################
-# # Project specific recipes (cwd = project root dir)
-# ##################################
-# run-recipe-curr:
-#     @just --choose
-#
-# # formats user.justfile and fixed in place
-# fmt-curr-justfile:
-#     @just --unstable --fmt
-#
-# # checks curr project justfile for syntax errors (return code 0 if no error)
-# fmt-check-curr-justfile:
-#     @just --unstable --fmt --check
-#
-# init-justfile-current-dir:
-#     @just --init
-#
-#
-#
-#
+# # # TODO: now just a soft symlink but .user.justfile should be real life in $HOME/.user.justfile
+# #
+# #
+# # ############################################################
+# # # Justfile docs - https://just.systems/man/en/
+# # # Justfile tips - https://www.stuartellis.name/articles/just-task-runner/
+# # # Justfile cheatsheet https://cheatography.com/linux-china/cheat-sheets/justfile/
+# # ############################################################
+# #
+# # ############################################################
+# # # Justfile settings (https://just.systems/man/en/chapter_26.html)
+# # # TODO: [no-cd] recipe attribute -> if mod imported use parent cwd instead of child path (https://just.systems/man/en/chapter_32.html#disabling-changing-directory190)
+# # ############################################################
+# #
+# # ############################################################
+# # # Justfile exporter (https://just.systems/man/en/chapter_74.html)
+# # ############################################################
+# # # Justfile compat with NodeJS+package.json
+# # export PATH := "./node_modules/.bin:" + env_var('PATH')
+# #
+# # ############################################################
+# # # Justfile imports (other justfiles + modules)
+# # # - modules : https://just.systems/man/en/chapter_54.html
+# # ############################################################
+# # # import 'asdf/justfile'
+# # # mod 'modNameFolderName' 'module path'
+# #
+# # # set dotenv-filename := ".env.local"
+# #
+# # # use dotfiles/.export.sh to set these env vars (or use default)
+# # # user_justfile_name := env_var('USER_JUSTFILE_NAME', ".user.justfile")
+# # # user_justfile_path := "{{ home_directory() }}/" + user_justfile_name
+# # dotfiles_root_dir := justfile_directory() / "dotfiles"
+# # dotfiles_home_root_dir := dotfiles_root_dir / "home"
+# # dotenvx_root_dir := dotfiles_root_dir / "dotenvx"
+# # nvm_root_dir := dotfiles_root_dir / "nvm"
+# #
+# # # scripts_root_dir := dotfiles_root_dir / "scripts"
+# # # chezmoi_root_dir := dotfiles_root_dir / "chezmoi"
+# # # webi_root_dir := dotfiles_root_dir / "webi"
+# #
+# # # List available recipes
+# # # (TODO: update to add 2nd user justfile command to run aliased HOME dir user justfile)
+# # help:
+# #     @echo "dotfiles root dir: {{dotfiles_root_dir}}"
+# #     @echo "dotfiles home root dir: {{dotfiles_home_root_dir}}"
+# #     @just --unstable --list --unsorted -f "{{dotfiles_home_root_dir}}/.user.justfile"
+# #
+# # # Display system information
+# # system-info:
+# #     @echo "CPU architecture: {{ arch() }}"
+# #     @echo "Operating system type: {{ os_family() }}"
+# #     @echo "Operating system: {{ os() }}"
+# #     @echo "Home directory: {{ home_directory() }}"
+# #
+# #
+# # ##################################
+# # # global user recipes (cwd = dotfiles root dir)
+# # ##################################
+# # [no-cd]
+# # run-recipe-user:
+# #     @just --choose
+# #
+# # # formats user.justfile and fixed in place
+# # [no-cd]
+# # fmt-user-justfile:
+# #     @just --unstable --fmt
+# #
+# # # checks user.justfile for syntax errors (return code 0 if no error)
+# # [no-cd]
+# # fmt-check-user-justfile:
+# #     @just --unstable --fmt --check
+# #
+# # brew-bundle:
+# #     @brew bundle --file={{dotfiles_root_dir}}/Brewfile
+# #
+# # ##################################
+# # # Project specific recipes (cwd = project root dir)
+# # ##################################
+# # run-recipe-curr:
+# #     @just --choose
+# #
+# # # formats user.justfile and fixed in place
+# # fmt-curr-justfile:
+# #     @just --unstable --fmt
+# #
+# # # checks curr project justfile for syntax errors (return code 0 if no error)
+# # fmt-check-curr-justfile:
+# #     @just --unstable --fmt --check
+# #
+# # init-justfile-current-dir:
+# #     @just --init
+# #
+# #
+# #
+# #
