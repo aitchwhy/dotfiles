@@ -45,16 +45,15 @@ gpt_repo_dir        := "~/src/gpt-repository-loader" # Uncomment or add other co
 # --- Default & Utility Recipes ---
 
 # Default action when running `just -f ~/.user.justfile` without arguments
-default: list # Changed from `--choose` to `--list` for quicker overview, personal preference.
+default: ls # Changed from `--choose` to `--list` for quicker overview, personal preference.
 
 # Interactively choose a recipe to run
 choose:
     @just --choose
 
 # List all available recipes, grouped and sorted
-list: ls
+# Using --list without --unsorted gives a cleaner, grouped output
 ls:
-    @# Using --list without --unsorted gives a cleaner, grouped output
     @just --list
 
 # Format *this* user Justfile
@@ -72,356 +71,356 @@ fmt-check:
 # --- Nix Environment Management ---
 # Recipes related to Nix package manager and Flakes
 
-# Update all Nix flake inputs in the current directory's flake.lock
-[group('Nix'), no-cd] # Run in the directory where `just` was invoked
-nix:update:all:
-    @echo "Updating all Nix flake inputs in $(pwd)..."
-    nix flake update
-
-# Update a specific Nix flake input in the current directory
-# Usage: just nix:update:input nixpkgs
-[group('Nix'), no-cd] # Run in the directory where `just` was invoked
-nix:update:input input:
-    @echo "Updating Nix flake input '{{input}}' in $(pwd)..."
-    nix flake update --update-input {{input}}
-
-# Show Nix system profile history
-[group('Nix')]
-nix:history:
-    @echo "Nix system profile history:"
-    nix profile history --profile /nix/var/nix/profiles/system
-
-# Open a Nix REPL using the flake's nixpkgs input (useful for debugging)
-[group('Nix'), no-cd] # Run in the directory where `just` was invoked
-nix:repl:
-    @echo "Opening Nix REPL for flake in $(pwd) (using nixpkgs input)..."
-    nix repl '.#nixpkgs' # Or just `nix repl` if context is enough
-
-# Clean old Nix system profile generations (older than 7 days)
-[group('Nix')]
-nix:clean:profile:
-    @echo "Cleaning Nix system profile generations older than 7 days (requires sudo)..."
-    sudo nix profile wipe-history --profile /nix/var/nix/profiles/system --older-than 7d
-
-# Garbage collect Nix store (system and user)
-[group('Nix')]
-nix:gc:
-    @echo "Running Nix garbage collection (older than 7 days)..."
-    @echo "System GC (requires sudo)..."
-    sudo nix-collect-garbage --delete-older-than 7d
-    @echo "User GC..."
-    nix-collect-garbage --delete-older-than 7d
-
-# Format Nix files in the current directory
-[group('Nix'), no-cd] # Run in the directory where `just` was invoked
-nix:fmt:
-    @echo "Formatting Nix files in $(pwd)..."
-    nix fmt .
-
-# List Nix garbage collection roots
-[group('Nix')]
-nix:gcroot:
-    @echo "Nix auto GC roots:"
-    ls -al /nix/var/nix/gcroots/auto/
-
-
-# --- Darwin System Management (using Nix) ---
-# Recipes specific to managing a macOS system via nix-darwin
-
-# [private] Helper to set network proxy if needed for builds.
-# Prefixing with `_` makes it hidden from `just --list` by default.
-# You might need to adjust the script path.
-_darwin-set-proxy:
-    @echo "Setting Darwin network proxy (requires sudo)..."
-    sudo python3 {{ justfile_directory() }}/scripts/darwin_set_proxy.py # Assumes script relative to justfile
-
-# Build and switch Darwin configuration using the hostname variable
-[group('Darwin')]
-darwin:build: _darwin-set-proxy # This recipe depends on the proxy helper
-    @echo "Building Darwin configuration for '{{hostname}}'..."
-    nix build ".#darwinConfigurations.{{hostname}}.system" \
-        --extra-experimental-features 'nix-command flakes'
-    @echo "Switching to new Darwin configuration..."
-    ./result/sw/bin/darwin-rebuild switch --flake ".#{{hostname}}"
-
-# Build and switch Darwin configuration with verbose debug output
-[group('Darwin')]
-darwin:build-debug: _darwin-set-proxy
-    @echo "Building Darwin configuration for '{{hostname}}' (DEBUG)..."
-    nix build ".#darwinConfigurations.{{hostname}}.system" --show-trace --verbose \
-        --extra-experimental-features 'nix-command flakes'
-    @echo "Switching to new Darwin configuration (DEBUG)..."
-    ./result/sw/bin/darwin-rebuild switch --flake ".#{{hostname}}" --show-trace --verbose
-
-
-# --- Flonotes / Ant Project Specifics ---
-# Recipes related to the Flonotes/Ant projects.
-# Consider moving these to a project-local Justfile if they become too numerous
-# or are only ever run from within those project directories.
-
-# Setup Flonotes Frontend project (Install deps, build)
-[group('Ant/Flonotes'), working-directory(flonotes_fe_dir)]
-ant:setup:
-    @echo "Setting up Flonotes Frontend in {{flonotes_fe_dir}}..."
-    # If `ant build` is part of setup, add it here:
-    # ant build
-    npm install && npm run build
-
-# Run Noggin service (Platform)
-[group('Ant/Flonotes'), working-directory(platform_dir)]
-ant:run:noggin: # Removed dependency on deploy-local for clarity; run explicitly if needed
-    @echo "Building and starting Noggin service in {{platform_dir}}..."
-    ant build noggin && ant up noggin
-
-# Run core Platform services (Platform)
-[group('Ant/Flonotes'), working-directory(platform_dir)]
-ant:run:platform:
-    @echo "Building and starting Platform services in {{platform_dir}}..."
-    ant build api user s3 prefect-worker prefect-agent prefect-server data-seeder && \
-    ant up api user s3 prefect-worker prefect-agent prefect-server data-seeder
-
-# Run Platform development server with hot reloading (Platform)
-[group('Ant/Flonotes'), working-directory(platform_dir)]
-ant:run:dev:
-    @echo "Starting development server with hot-reload in {{platform_dir}}..."
-    npm run dev --hot
-
-# Get OTP code from 'api' container logs
-[group('Ant/Flonotes')] # Doesnt need a specific working directory
-ant:get-otp:
-    @echo "Fetching OTP code from container named 'api'..."
-    @_container_id=$$(docker ps -qf name=api); \
-    if [ -n "$$_container_id" ]; then \
-        docker logs "$$_container_id" 2>&1 | rg "sent an otp code" | tail -n 1; \
-    else \
-        echo "Error: Container 'api' not found."; exit 1; \
-    fi
-
-# Run e2e tests using Docker Compose (assuming compose file in CWD or specified path)
-[group('Ant/Flonotes')] # Assumes docker compose files are accessible from invocation directory or uses absolute paths
-ant:test:e2e:
-    @echo "Running e2e tests..."
-    docker compose \
-        --profile test-e2e \
-        --file compose.integration.yaml \
-        run \
-        --build \
-        --rm \
-        # Pass API key securely, consider using dotenv or secrets management
-        --env ANTHROPIC_API_KEY \
-        noggin-test-e2e
-
-# Deploy Flonotes Frontend to local environment (using make)
-[group('Ant/Flonotes'), working-directory(flonotes_fe_dir)]
-ant:deploy:local:
-    @echo "Deploying Flonotes Frontend locally using make in {{flonotes_fe_dir}}..."
-    make deploy-local # Assumes Makefile exists and `deploy-local` target is defined
-
-# Deploy Flonotes Frontend to AWS
-# Usage: just ant:deploy:aws my-profile my-bucket https://noggin.example.com
-[group('Ant/Flonotes'), working-directory(flonotes_fe_dir)]
-ant:deploy:aws profile bucket noggin_url:
-    @echo "Deploying Flonotes Frontend to AWS (Profile: {{profile}}, Bucket: {{bucket}})..."
-    # Ensure the script path is correct relative to flonotes_fe_dir or provide absolute path
-    # Using ./scripts assumes it is relative to the working directory (flonotes_fe_dir)
-    ./scripts/anterior/deploy-aws.sh {{profile}} {{bucket}} {{noggin_url}}
-
-
-# ==============================================================================
-# End of User Justfile
-# ==============================================================================
-# Remember to update the `hostname` variable!
-# Consider creating project-local Justfiles for recipes only relevant within
-# a specific project directory (e.g., `~/src/platform/justfile`).
-# ==============================================================================
-
-
-##########3
-# Settings (https://just.systems/man/en/settings.html)
-set unstable := true
-# set cmd used for invoking recipes + eval backticks
-# zsh -c : exec command
-set shell := ["zsh", "-cu"]
-
-# Global Justfile
-# just --global-justfile, or just -g for short, searches the following paths, in-order, for a justfile:
+# # Update all Nix flake inputs in the current directory's flake.lock
+# [group('Nix'), no-cd] # Run in the directory where `just` was invoked
+# nix:update:all:
+#     @echo "Updating all Nix flake inputs in $(pwd)..."
+#     nix flake update
+#
+# # Update a specific Nix flake input in the current directory
+# # Usage: just nix:update:input nixpkgs
+# [group('Nix'), no-cd] # Run in the directory where `just` was invoked
+# nix:update:input input:
+#     @echo "Updating Nix flake input '{{input}}' in $(pwd)..."
+#     nix flake update --update-input {{input}}
+#
+# # Show Nix system profile history
+# [group('Nix')]
+# nix:history:
+#     @echo "Nix system profile history:"
+#     nix profile history --profile /nix/var/nix/profiles/system
+#
+# # Open a Nix REPL using the flake's nixpkgs input (useful for debugging)
+# [group('Nix'), no-cd] # Run in the directory where `just` was invoked
+# nix:repl:
+#     @echo "Opening Nix REPL for flake in $(pwd) (using nixpkgs input)..."
+#     nix repl '.#nixpkgs' # Or just `nix repl` if context is enough
+#
+# # Clean old Nix system profile generations (older than 7 days)
+# [group('Nix')]
+# nix:clean:profile:
+#     @echo "Cleaning Nix system profile generations older than 7 days (requires sudo)..."
+#     sudo nix profile wipe-history --profile /nix/var/nix/profiles/system --older-than 7d
+#
+# # Garbage collect Nix store (system and user)
+# [group('Nix')]
+# nix:gc:
+#     @echo "Running Nix garbage collection (older than 7 days)..."
+#     @echo "System GC (requires sudo)..."
+#     sudo nix-collect-garbage --delete-older-than 7d
+#     @echo "User GC..."
+#     nix-collect-garbage --delete-older-than 7d
+#
+# # Format Nix files in the current directory
+# [group('Nix'), no-cd] # Run in the directory where `just` was invoked
+# nix:fmt:
+#     @echo "Formatting Nix files in $(pwd)..."
+#     nix fmt .
+#
+# # List Nix garbage collection roots
+# [group('Nix')]
+# nix:gcroot:
+#     @echo "Nix auto GC roots:"
+#     ls -al /nix/var/nix/gcroots/auto/
 #
 #
-# $XDG_CONFIG_HOME/just/justfile
-# $HOME/.config/just/justfile
-# $HOME/justfile
-# $HOME/.justfile
-
-
-# By default, recipes run with the working directory set to the directory that contains the justfile.
-# The [no-cd] attribute can be used to make recipes run with the working directory set to directory in which just was invoked.
-
-# https://just.systems/man/en/global-and-user-justfiles.html?highlight=user#global-and-user-justfiles
-# for recipe in `just --justfile ~/.user.justfile --summary`; do
-#   alias $recipe="just --justfile ~/.user.justfile --working-directory . $recipe"
-# done
-
-# alias .j='just --justfile ~/.user.justfile --working-directory .'
+# # --- Darwin System Management (using Nix) ---
+# # Recipes specific to managing a macOS system via nix-darwin
+#
+# # [private] Helper to set network proxy if needed for builds.
+# # Prefixing with `_` makes it hidden from `just --list` by default.
+# # You might need to adjust the script path.
+# _darwin-set-proxy:
+#     @echo "Setting Darwin network proxy (requires sudo)..."
+#     sudo python3 {{ justfile_directory() }}/scripts/darwin_set_proxy.py # Assumes script relative to justfile
+#
+# # Build and switch Darwin configuration using the hostname variable
+# [group('Darwin')]
+# darwin:build: _darwin-set-proxy # This recipe depends on the proxy helper
+#     @echo "Building Darwin configuration for '{{hostname}}'..."
+#     nix build ".#darwinConfigurations.{{hostname}}.system" \
+#         --extra-experimental-features 'nix-command flakes'
+#     @echo "Switching to new Darwin configuration..."
+#     ./result/sw/bin/darwin-rebuild switch --flake ".#{{hostname}}"
+#
+# # Build and switch Darwin configuration with verbose debug output
+# [group('Darwin')]
+# darwin:build-debug: _darwin-set-proxy
+#     @echo "Building Darwin configuration for '{{hostname}}' (DEBUG)..."
+#     nix build ".#darwinConfigurations.{{hostname}}.system" --show-trace --verbose \
+#         --extra-experimental-features 'nix-command flakes'
+#     @echo "Switching to new Darwin configuration (DEBUG)..."
+#     ./result/sw/bin/darwin-rebuild switch --flake ".#{{hostname}}" --show-trace --verbose
 #
 #
-# You can override the working directory for all recipes with set working-directory := '…':
-
-
-# List available commands
-default:
-  @just --choose
-
-
-ls:
-  @just --list --unsorted
-
-fmt:
-  @just --unstable --fmt
-
-fmtcheck:
-  @just --unstable --fmt --check
-
-
-run-noggin:
-  cd ~/src/platform && \
-    ant build noggin && \
-    ant up noggin
-
-run-platform:
-  cd ~/src/platform && \
-    ant build api user s3 prefect-worker prefect-agent prefect-server data-seeder && \
-    ant up api user s3 prefect-worker prefect-agent prefect-server data-seeder
-
-##################
-# TODO(hank): clone of existing Makefile targets. Migrate to this if possible after checking with team.
-
-# Run the development server with hot reloading
-run:
-  npm run dev --hot
-
-# Get OTP codes from Docker logs (outputs only the 4-digit code)
-get-otp:
-  docker logs "$(docker container ls | rg 'api' | awk '{print $1}')" | rg "sent an otp code"
-
-# Setup project
-setup:
-  npm install
-  npm run build
-
-# Deploy to local environment
-deploy-local:
-  ./deploy-local.sh http://localhost:59000
-
-# Deploy to AWS
-deploy-aws profile bucket noggin_url:
-  ./deploy-aws.sh {{ profile }} {{ bucket }} {{ noggin_url }}
-
-##################
-
-
-# just is a command runner, Justfile is very similar to Makefile, but simpler.
-# TODO update hostname here!
-
-hostname := "your-hostname"
-
-# Flonotes Frontend variables and settings
-
-# List all the just commands
-default:
-    @just --list
-
-x:
-    @just --choose
-
-############################################################################
+# # --- Flonotes / Ant Project Specifics ---
+# # Recipes related to the Flonotes/Ant projects.
+# # Consider moving these to a project-local Justfile if they become too numerous
+# # or are only ever run from within those project directories.
 #
-#  Darwin related commands
+# # Setup Flonotes Frontend project (Install deps, build)
+# [group('Ant/Flonotes'), working-directory(flonotes_fe_dir)]
+# ant:setup:
+#     @echo "Setting up Flonotes Frontend in {{flonotes_fe_dir}}..."
+#     # If `ant build` is part of setup, add it here:
+#     # ant build
+#     npm install && npm run build
 #
-############################################################################
-
-# TODO Feel free to remove this target if you don't need a proxy to speed up the build process
-[group('desktop')]
-darwin-set-proxy:
-    sudo python3 scripts/darwin_set_proxy.py
-
-[group('desktop')]
-darwin: darwin-set-proxy
-    nix build .#darwinConfigurations.{{ hostname }}.system \
-      --extra-experimental-features 'nix-command flakes'
-
-    ./result/sw/bin/darwin-rebuild switch --flake .#{{ hostname }}
-
-[group('desktop')]
-darwin-debug: darwin-set-proxy
-    nix build .#darwinConfigurations.{{ hostname }}.system --show-trace --verbose \
-      --extra-experimental-features 'nix-command flakes'
-
-    ./result/sw/bin/darwin-rebuild switch --flake .#{{ hostname }} --show-trace --verbose
-
-
-
-############################################################################
-# Flonotes Frontend commands
-############################################################################
-# Path variables for Flonotes development
-
-ant-platform := "~/src/platform"
-ant-flonotes_fe := "~/src/flonotes-fe"
-ant-vibes := "~/src/vibes"
-gpt-repo := "~/src/gpt-repository-loader"
-
-# Setup project
-[group('ant')]
-[working-directory('~/src/flonotes-fe')]
-setup:
-    ant build
-    npm install && npm run build
-
-[group('ant')]
-[working-directory('~/src/platform')]
-run-noggin: deploy-local
-    ant build noggin && ant up noggin
-
-[group('ant')]
-[working-directory('~/src/platform')]
-run-platform:
-    ant build api user s3 prefect-worker prefect-agent prefect-server data-seeder && \
-    ant up api user s3 prefect-worker prefect-agent prefect-server data-seeder
-
-# Run the development server with hot reloading
-[group('ant')]
-[working-directory('~/src/platform')]
-run:
-    npm run dev --hot
-
-# Test e2e on localhost Docker
-[group('ant')]
-test-e2e:
-    docker compose \
-      --profile test-e2e \
-      --file compose.integration.yaml \
-      run \
-      --build \
-      --rm \
-      --env ANTHROPIC_API_KEY \
-      noggin-test-e2e
-
-# Get OTP codes from Docker logs (outputs only the 4-digit code)
-[group('ant')]
-get-otp:
-    docker logs "$(docker container ls | rg 'api' | awk '{print $1}')" | rg "sent an otp code"
-
-# Deploy to local environment
-[group('ant')]
-[working-directory('~/src/flonotes-fe')]
-deploy-local:
-    make deploy-local
-
-# Deploy to AWS
-[group('ant')]
-deploy-aws profile bucket noggin_url:
-    cd {{ flonotes_fe }} && \
-    $(pwd)/{{ justfile_directory() }}/scripts/anterior/deploy-aws.sh {{ profile }} {{ bucket }} {{ noggin_url }}
+# # Run Noggin service (Platform)
+# [group('Ant/Flonotes'), working-directory(platform_dir)]
+# ant:run:noggin: # Removed dependency on deploy-local for clarity; run explicitly if needed
+#     @echo "Building and starting Noggin service in {{platform_dir}}..."
+#     ant build noggin && ant up noggin
+#
+# # Run core Platform services (Platform)
+# [group('Ant/Flonotes'), working-directory(platform_dir)]
+# ant:run:platform:
+#     @echo "Building and starting Platform services in {{platform_dir}}..."
+#     ant build api user s3 prefect-worker prefect-agent prefect-server data-seeder && \
+#     ant up api user s3 prefect-worker prefect-agent prefect-server data-seeder
+#
+# # Run Platform development server with hot reloading (Platform)
+# [group('Ant/Flonotes'), working-directory(platform_dir)]
+# ant:run:dev:
+#     @echo "Starting development server with hot-reload in {{platform_dir}}..."
+#     npm run dev --hot
+#
+# # Get OTP code from 'api' container logs
+# [group('Ant/Flonotes')] # Doesnt need a specific working directory
+# ant:get-otp:
+#     @echo "Fetching OTP code from container named 'api'..."
+#     @_container_id=$$(docker ps -qf name=api); \
+#     if [ -n "$$_container_id" ]; then \
+#         docker logs "$$_container_id" 2>&1 | rg "sent an otp code" | tail -n 1; \
+#     else \
+#         echo "Error: Container 'api' not found."; exit 1; \
+#     fi
+#
+# # Run e2e tests using Docker Compose (assuming compose file in CWD or specified path)
+# [group('Ant/Flonotes')] # Assumes docker compose files are accessible from invocation directory or uses absolute paths
+# ant:test:e2e:
+#     @echo "Running e2e tests..."
+#     docker compose \
+#         --profile test-e2e \
+#         --file compose.integration.yaml \
+#         run \
+#         --build \
+#         --rm \
+#         # Pass API key securely, consider using dotenv or secrets management
+#         --env ANTHROPIC_API_KEY \
+#         noggin-test-e2e
+#
+# # Deploy Flonotes Frontend to local environment (using make)
+# [group('Ant/Flonotes'), working-directory(flonotes_fe_dir)]
+# ant:deploy:local:
+#     @echo "Deploying Flonotes Frontend locally using make in {{flonotes_fe_dir}}..."
+#     make deploy-local # Assumes Makefile exists and `deploy-local` target is defined
+#
+# # Deploy Flonotes Frontend to AWS
+# # Usage: just ant:deploy:aws my-profile my-bucket https://noggin.example.com
+# [group('Ant/Flonotes'), working-directory(flonotes_fe_dir)]
+# ant:deploy:aws profile bucket noggin_url:
+#     @echo "Deploying Flonotes Frontend to AWS (Profile: {{profile}}, Bucket: {{bucket}})..."
+#     # Ensure the script path is correct relative to flonotes_fe_dir or provide absolute path
+#     # Using ./scripts assumes it is relative to the working directory (flonotes_fe_dir)
+#     ./scripts/anterior/deploy-aws.sh {{profile}} {{bucket}} {{noggin_url}}
+#
+#
+# # ==============================================================================
+# # End of User Justfile
+# # ==============================================================================
+# # Remember to update the `hostname` variable!
+# # Consider creating project-local Justfiles for recipes only relevant within
+# # a specific project directory (e.g., `~/src/platform/justfile`).
+# # ==============================================================================
+#
+#
+# ##########3
+# # Settings (https://just.systems/man/en/settings.html)
+# set unstable := true
+# # set cmd used for invoking recipes + eval backticks
+# # zsh -c : exec command
+# set shell := ["zsh", "-cu"]
+#
+# # Global Justfile
+# # just --global-justfile, or just -g for short, searches the following paths, in-order, for a justfile:
+# #
+# #
+# # $XDG_CONFIG_HOME/just/justfile
+# # $HOME/.config/just/justfile
+# # $HOME/justfile
+# # $HOME/.justfile
+#
+#
+# # By default, recipes run with the working directory set to the directory that contains the justfile.
+# # The [no-cd] attribute can be used to make recipes run with the working directory set to directory in which just was invoked.
+#
+# # https://just.systems/man/en/global-and-user-justfiles.html?highlight=user#global-and-user-justfiles
+# # for recipe in `just --justfile ~/.user.justfile --summary`; do
+# #   alias $recipe="just --justfile ~/.user.justfile --working-directory . $recipe"
+# # done
+#
+# # alias .j='just --justfile ~/.user.justfile --working-directory .'
+# #
+# #
+# # You can override the working directory for all recipes with set working-directory := '…':
+#
+#
+# # List available commands
+# default:
+#   @just --choose
+#
+#
+# ls:
+#   @just --list --unsorted
+#
+# fmt:
+#   @just --unstable --fmt
+#
+# fmtcheck:
+#   @just --unstable --fmt --check
+#
+#
+# run-noggin:
+#   cd ~/src/platform && \
+#     ant build noggin && \
+#     ant up noggin
+#
+# run-platform:
+#   cd ~/src/platform && \
+#     ant build api user s3 prefect-worker prefect-agent prefect-server data-seeder && \
+#     ant up api user s3 prefect-worker prefect-agent prefect-server data-seeder
+#
+# ##################
+# # TODO(hank): clone of existing Makefile targets. Migrate to this if possible after checking with team.
+#
+# # Run the development server with hot reloading
+# run:
+#   npm run dev --hot
+#
+# # Get OTP codes from Docker logs (outputs only the 4-digit code)
+# get-otp:
+#   docker logs "$(docker container ls | rg 'api' | awk '{print $1}')" | rg "sent an otp code"
+#
+# # Setup project
+# setup:
+#   npm install
+#   npm run build
+#
+# # Deploy to local environment
+# deploy-local:
+#   ./deploy-local.sh http://localhost:59000
+#
+# # Deploy to AWS
+# deploy-aws profile bucket noggin_url:
+#   ./deploy-aws.sh {{ profile }} {{ bucket }} {{ noggin_url }}
+#
+# ##################
+#
+#
+# # just is a command runner, Justfile is very similar to Makefile, but simpler.
+# # TODO update hostname here!
+#
+# hostname := "your-hostname"
+#
+# # Flonotes Frontend variables and settings
+#
+# # List all the just commands
+# default:
+#     @just --list
+#
+# x:
+#     @just --choose
+#
+# ############################################################################
+# #
+# #  Darwin related commands
+# #
+# ############################################################################
+#
+# # TODO Feel free to remove this target if you don't need a proxy to speed up the build process
+# [group('desktop')]
+# darwin-set-proxy:
+#     sudo python3 scripts/darwin_set_proxy.py
+#
+# [group('desktop')]
+# darwin: darwin-set-proxy
+#     nix build .#darwinConfigurations.{{ hostname }}.system \
+#       --extra-experimental-features 'nix-command flakes'
+#
+#     ./result/sw/bin/darwin-rebuild switch --flake .#{{ hostname }}
+#
+# [group('desktop')]
+# darwin-debug: darwin-set-proxy
+#     nix build .#darwinConfigurations.{{ hostname }}.system --show-trace --verbose \
+#       --extra-experimental-features 'nix-command flakes'
+#
+#     ./result/sw/bin/darwin-rebuild switch --flake .#{{ hostname }} --show-trace --verbose
+#
+#
+#
+# ############################################################################
+# # Flonotes Frontend commands
+# ############################################################################
+# # Path variables for Flonotes development
+#
+# ant-platform := "~/src/platform"
+# ant-flonotes_fe := "~/src/flonotes-fe"
+# ant-vibes := "~/src/vibes"
+# gpt-repo := "~/src/gpt-repository-loader"
+#
+# # Setup project
+# [group('ant')]
+# [working-directory('~/src/flonotes-fe')]
+# setup:
+#     ant build
+#     npm install && npm run build
+#
+# [group('ant')]
+# [working-directory('~/src/platform')]
+# run-noggin: deploy-local
+#     ant build noggin && ant up noggin
+#
+# [group('ant')]
+# [working-directory('~/src/platform')]
+# run-platform:
+#     ant build api user s3 prefect-worker prefect-agent prefect-server data-seeder && \
+#     ant up api user s3 prefect-worker prefect-agent prefect-server data-seeder
+#
+# # Run the development server with hot reloading
+# [group('ant')]
+# [working-directory('~/src/platform')]
+# run:
+#     npm run dev --hot
+#
+# # Test e2e on localhost Docker
+# [group('ant')]
+# test-e2e:
+#     docker compose \
+#       --profile test-e2e \
+#       --file compose.integration.yaml \
+#       run \
+#       --build \
+#       --rm \
+#       --env ANTHROPIC_API_KEY \
+#       noggin-test-e2e
+#
+# # Get OTP codes from Docker logs (outputs only the 4-digit code)
+# [group('ant')]
+# get-otp:
+#     docker logs "$(docker container ls | rg 'api' | awk '{print $1}')" | rg "sent an otp code"
+#
+# # Deploy to local environment
+# [group('ant')]
+# [working-directory('~/src/flonotes-fe')]
+# deploy-local:
+#     make deploy-local
+#
+# # Deploy to AWS
+# [group('ant')]
+# deploy-aws profile bucket noggin_url:
+#     cd {{ flonotes_fe }} && \
+#     $(pwd)/{{ justfile_directory() }}/scripts/anterior/deploy-aws.sh {{ profile }} {{ bucket }} {{ noggin_url }}
 
 
 # ############################################################################

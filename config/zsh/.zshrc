@@ -329,13 +329,13 @@ path_add "$HOME/.local/share/../bin"
 
 # FNM (https://github.com/Schniz/fnm)
 
-if ! has_command fnm; then
-  echo "FNM not found. Installing ..."
-  brew install --quiet nvim
-fi
-
-eval "$(fnm env --use-on-cd --shell zsh)"
-path_add "$HOME/.fnm"
+# if ! has_command fnm; then
+#   echo "FNM not found. Installing ..."
+#   brew install --quiet nvim
+# fi
+#
+# eval "$(fnm env --use-on-cd --shell zsh)"
+# path_add "$HOME/.fnm"
 
 # TODO: add github extensions list
 # - gh extension install dlvhdr/gh-dash
