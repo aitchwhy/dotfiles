@@ -6,9 +6,11 @@ local GLOBAL_JUSTFILE=""
 
 
 # justfile
-# alias j="just"
-alias j="just -f ~/dotfiles/user.justfile"
-alias j="just -f ~/dotfiles/user.justfile"
+alias j="just"
+alias .j='just --justfile ~/.config/just/justfile --working-directory .'
+# alias .j="just -g"
+# alias j="just -f ~/dotfiles/user.justfile"
+# alias j="just -f ~/dotfiles/user.justfile"
 
 # === Aliases from .zshrc ===
 alias claude="/Users/hank/.claude/local/claude"
