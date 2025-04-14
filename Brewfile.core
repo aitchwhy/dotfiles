@@ -1,9 +1,17 @@
 # Taps (Only if absolutely necessary for a core tool)
 # tap "org/repo"
 
+
+
+# --- Choose ONE Node Manager ---
+# --- Choose ONE Password Manager CLI ---
+# -----------------------------
 # Formulae (Core CLI Tools & Shell Enhancements)
+# brew "fnm"           # Node version manager (Fast)
+# brew "nvm"             # Node version manager (Classic)
 brew "atuin", restart_service: :changed
 brew "bat"
+brew "bitwarden-cli"   # CLI for Bitwarden
 brew "curl"
 brew "direnv"
 brew "eza"
@@ -19,19 +27,11 @@ brew "nvim"
 brew "rustup"
 brew "starship"
 brew "uv"
+brew "volta"           # Node version manager (Project pinning)
 brew "zoxide"
 brew "zsh-autosuggestions"
 brew "zsh-completions"
 brew "zsh-syntax-highlighting"
-
-# --- Choose ONE Node Manager ---
-# brew "fnm"           # Node version manager (Fast)
-# brew "nvm"             # Node version manager (Classic)
-brew "volta"           # Node version manager (Project pinning)
-# -----------------------------
-
-# --- Choose ONE Password Manager CLI ---
-brew "bitwarden-cli"   # CLI for Bitwarden
 # ------------------------------------
 # (1Password CLI is a cask, see below)
 

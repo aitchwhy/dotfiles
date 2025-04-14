@@ -68,7 +68,7 @@ export dropbox="~/Library/CloudStorage/Dropbox"
 # ========================================================================
 
 # Vi Mode
-# bindkey -v
+bindkey -v
 export KEYTIMEOUT=1
 
 # Basic key bindings
@@ -84,15 +84,12 @@ bindkey '^A' beginning-of-line
 # Source our utility functions from utils.zsh
 export UTILS_PATH="${DOTFILES}/config/zsh/utils.zsh"
 
-if [[ -f "${UTILS_PATH}" ]]; then
-  source "${UTILS_PATH}"
-  # log_success "Successfully loaded utils.zsh with $(functions | grep -c '^[a-z].*() {') utility functions"
+[[ ! -f "$UTILS_PATH" ]] || source "$UTILS_PATH"
 
-  # List some key utility functions that should be available
-  # log_info "Available utility functions include: has_command, is_macos, path_add, sys, etc."
-else
-  echo "Error: ${UTILS_PATH} not found. Some functionality will be unavailable."
-fi
+# ========================================================================
+# install core
+# ========================================================================
+# brew install --quiet --file="$DOTFILES/Brewfile.core"
 
 # ========================================================================
 # Path Configuration
@@ -199,8 +196,8 @@ export GIT_COMMITTER_EMAIL="hank.lee.qed@gmail.com"
 # [[ -f ~/.gitignore ]] || mv ~/.gitignore ~/.gitignore.backup
 
 # Create symbolic link
-ln -sf ~/dotfiles/config/git/gitconfig ~/.gitconfig
-ln -sf ~/dotfiles/config/git/gitignore ~/.gitignore
+# ln -sf ~/dotfiles/config/git/gitconfig ~/.gitconfig
+# ln -sf ~/dotfiles/config/git/gitignore ~/.gitignore
 
 if ! has_command lazygit; then
   echo "lazygit not found. Installing lazygit..."
@@ -222,15 +219,9 @@ LG_CONFIG_FILE="$DOTFILES/config/lazygit/config.yml"
 # starship
 # ========================================================================
 
-if ! has_command starship; then
-  echo "starship not found. Installing starship..."
-  curl -sS https://starship.rs/install.sh | sh
-fi
 
-if [[ ! -f "$XDG_CONFIG_HOME/starship.toml" ]]; then
-  echo "Linking starship.toml..."
-  ln -sf "$DOTFILES/config/starship.toml" "$XDG_CONFIG_HOME/starship.toml"
-fi
+echo "Linking starship.toml..."
+ln -sf "$DOTFILES/config/starship.toml" "$XDG_CONFIG_HOME/starship.toml"
 
 # ========================================================================
 # ghostty
@@ -604,6 +595,7 @@ export GOBIN="$GOPATH/bin"
 # ========================================================================
 
 # Completions setup
+#
 if type brew &>/dev/null; then
   FPATH=$(brew --prefix)/share/zsh-abbr:$FPATH
 fi

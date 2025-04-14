@@ -21,9 +21,10 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # install core utils
 export DOTFILES="$HOME/dotfiles"
-local CORE_BREWFILE="$DOTFILES/core.Brewfile"
-cat "$CORE_BREWFILE"
+# local CORE_BREWFILE="$DOTFILES/core.Brewfile"
+# cat "$CORE_BREWFILE"
 # brew bundle install --quiet --file="$CORE_BREWFILE"
+brew bundle install --no-upgrade --quiet --file="$DOTFILES/Brewfile.core"
 
 # zsh setup
 # TODO: fzf-zsh https://github.com/unixorn/fzf-zsh-plugin
