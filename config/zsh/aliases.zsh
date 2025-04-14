@@ -1,16 +1,18 @@
 #!/usr/bin/env zsh
 
 local DOTFILES="${DOTFILES:-$HOME/dotfiles}"
-local GLOBAL_JUSTFILE=""
 
 
 
 # justfile
 alias j="just"
-alias .j='just --justfile ~/.config/just/justfile --working-directory .'
+# alias .j='just -g'
 # alias .j="just -g"
 # alias j="just -f ~/dotfiles/user.justfile"
 # alias j="just -f ~/dotfiles/user.justfile"
+for recipe in `just --justfile $DOTFILES/config/just/user.justfile --summary`; do
+  alias $recipe="just --justfile '$DOTFILES/config/just/user.justfile' --working-directory . $recipe"
+done
 
 # === Aliases from .zshrc ===
 alias claude="/Users/hank/.claude/local/claude"
@@ -146,7 +148,7 @@ alias ts="tailscale"
 # Misc Shortcuts
 alias hf="huggingface-cli"
 alias lg="lazygit" # Note: Overwrites previous lg alias
-alias jfmt="just --unstable --fmt"
+# alias jfmt="just --unstable --fmt"
 alias zj="zellij"
 alias zjl="zellij list-sessions"
 alias zja="zellij attach"

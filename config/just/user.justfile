@@ -22,50 +22,107 @@ set positional-arguments := true
 # Use zsh for executing recipes. -c: read commands from string, -u: treat unset variables as errors.
 set shell := ["zsh", "-cu"]
 
-# Optional: Load environment variables from a .env file in the justfile's directory
-set dotenv-load := true
-set dotenv-filename := ".env"
+# # Optional: Load environment variables from a .env file in the justfile's directory
+# set dotenv-load := true
+# set dotenv-filename := ".env"
 
 # Optional: By default, recipes run in the justfile's directory.
 # Set a different default working directory if desired (e.g., home directory).
-set working-directory := home_directory()
-
+# set working-directory := '~/'
 
 # --- Global Variables & Constants ---
 
 # !!! IMPORTANT: Set your actual hostname for Nix Darwin recipes !!!
-hostname            := "your-hostname-here"
+# hostname            := "your-hostname-here"
 
 # Common Project Paths (using ~ which `shell` setting should expand)
-platform_dir        := "~/src/platform"
-flonotes_fe_dir     := "~/src/flonotes-fe"
-vibes_dir           := "~/src/vibes"             # Uncomment or add other common dirs if needed
-gpt_repo_dir        := "~/src/gpt-repository-loader" # Uncomment or add other common dirs if needed
+# platform_dir        := "~/src/platform"
+# flonotes_fe_dir     := "~/src/flonotes-fe"
+# vibes_dir           := "~/src/vibes"
+# gpt_repo_dir        := "~/src/gpt-repository-loader"
 
 # --- Default & Utility Recipes ---
 
-# Default action when running `just -f ~/.user.justfile` without arguments
-default: ls # Changed from `--choose` to `--list` for quicker overview, personal preference.
+# Default action
+[group('global')]
+[working-directory: '~/dotfiles/config/just']
+default:
+    @just --list --unsorted
 
 # Interactively choose a recipe to run
+[group('global')]
+[working-directory: '~/dotfiles/config/just']
 choose:
     @just --choose
 
-# List all available recipes, grouped and sorted
-# Using --list without --unsorted gives a cleaner, grouped output
-ls:
-    @just --list
 
 # Format *this* user Justfile
+[group('global')]
+[working-directory: '~/dotfiles/config/just']
 fmt:
     @echo "Formatting {{ justfile() }}..."
     @just --unstable --fmt
 
 # Check formatting of *this* user Justfile
 check-fmt: fmt-check
+[group('global')]
+[working-directory: '~/dotfiles/config/just']
 fmt-check:
     @echo "Checking formatting of {{ justfile() }}..."
     @just --unstable --fmt --check
+#
+# --- Flonotes / Ant Project Specifics ---
+# Recipes related to the Flonotes/Ant projects.
+# Consider moving these to a project-local Justfile if they become too numerous
+# or are only ever run from within those project directories.
+
+# Run Noggin service (Platform)
+[group('platform')]
+[working-directory: '~/src/platform']
+noggin-up:
+    @echo "Building and starting Noggin service..."
+    ant build noggin && ant up noggin
+
+# Run core Platform services (Platform)
+[group('platform')]
+[working-directory: '~/src/platform']
+platform-up:
+    @echo "Building and starting Platform services..."
+    ant build api user s3 prefect-worker prefect-agent prefect-server data-seeder && \
+    ant up api user s3 prefect-worker prefect-agent prefect-server data-seeder
+
+# Get OTP code from 'api' container logs
+[group('platform')] # Doesnt need a specific working directory
+[working-directory: '~/src/platform']
+platform-otp:
+    @echo "Fetching OTP code from container named 'api'..."
+    @_container_id=$$(docker ps -qf name=api); \
+    if [ -n "$$_container_id" ]; then \
+        docker logs "$$_container_id" 2>&1 | rg "sent an otp code" | tail -n 1; \
+    else \
+        echo "Error: Container 'api' not found."; exit 1; \
+    fi
+
+# Run Noggin e2e tests using Docker Compose
+[group('platform')] # Assumes docker compose files are accessible from invocation directory or uses absolute paths
+[working-directory: '~/src/platform']
+platform-noggin-test:
+    @echo "Running Noggin e2e tests..."
+    docker compose \
+        --profile test-e2e \
+        --file compose.integration.yaml \
+        run \
+        --build \
+        --rm \
+        --env $ANTHROPIC_API_KEY \
+        noggin-test-e2e
+
+# build Flonotes Frontend to static assets to S3 for Noggin
+[group('flonotes')]
+[working-directory: '~/src/flonotes-fe']
+flonotes-fe-build:
+    @echo "Deploying Flonotes Frontend locally..."
+    make deploy-local # Assumes Makefile exists and `deploy-local` target is defined
 
 
 # --- Nix Environment Management ---
@@ -151,80 +208,6 @@ fmt-check:
 #         --extra-experimental-features 'nix-command flakes'
 #     @echo "Switching to new Darwin configuration (DEBUG)..."
 #     ./result/sw/bin/darwin-rebuild switch --flake ".#{{hostname}}" --show-trace --verbose
-#
-#
-# # --- Flonotes / Ant Project Specifics ---
-# # Recipes related to the Flonotes/Ant projects.
-# # Consider moving these to a project-local Justfile if they become too numerous
-# # or are only ever run from within those project directories.
-#
-# # Setup Flonotes Frontend project (Install deps, build)
-# [group('Ant/Flonotes'), working-directory(flonotes_fe_dir)]
-# ant:setup:
-#     @echo "Setting up Flonotes Frontend in {{flonotes_fe_dir}}..."
-#     # If `ant build` is part of setup, add it here:
-#     # ant build
-#     npm install && npm run build
-#
-# # Run Noggin service (Platform)
-# [group('Ant/Flonotes'), working-directory(platform_dir)]
-# ant:run:noggin: # Removed dependency on deploy-local for clarity; run explicitly if needed
-#     @echo "Building and starting Noggin service in {{platform_dir}}..."
-#     ant build noggin && ant up noggin
-#
-# # Run core Platform services (Platform)
-# [group('Ant/Flonotes'), working-directory(platform_dir)]
-# ant:run:platform:
-#     @echo "Building and starting Platform services in {{platform_dir}}..."
-#     ant build api user s3 prefect-worker prefect-agent prefect-server data-seeder && \
-#     ant up api user s3 prefect-worker prefect-agent prefect-server data-seeder
-#
-# # Run Platform development server with hot reloading (Platform)
-# [group('Ant/Flonotes'), working-directory(platform_dir)]
-# ant:run:dev:
-#     @echo "Starting development server with hot-reload in {{platform_dir}}..."
-#     npm run dev --hot
-#
-# # Get OTP code from 'api' container logs
-# [group('Ant/Flonotes')] # Doesnt need a specific working directory
-# ant:get-otp:
-#     @echo "Fetching OTP code from container named 'api'..."
-#     @_container_id=$$(docker ps -qf name=api); \
-#     if [ -n "$$_container_id" ]; then \
-#         docker logs "$$_container_id" 2>&1 | rg "sent an otp code" | tail -n 1; \
-#     else \
-#         echo "Error: Container 'api' not found."; exit 1; \
-#     fi
-#
-# # Run e2e tests using Docker Compose (assuming compose file in CWD or specified path)
-# [group('Ant/Flonotes')] # Assumes docker compose files are accessible from invocation directory or uses absolute paths
-# ant:test:e2e:
-#     @echo "Running e2e tests..."
-#     docker compose \
-#         --profile test-e2e \
-#         --file compose.integration.yaml \
-#         run \
-#         --build \
-#         --rm \
-#         # Pass API key securely, consider using dotenv or secrets management
-#         --env ANTHROPIC_API_KEY \
-#         noggin-test-e2e
-#
-# # Deploy Flonotes Frontend to local environment (using make)
-# [group('Ant/Flonotes'), working-directory(flonotes_fe_dir)]
-# ant:deploy:local:
-#     @echo "Deploying Flonotes Frontend locally using make in {{flonotes_fe_dir}}..."
-#     make deploy-local # Assumes Makefile exists and `deploy-local` target is defined
-#
-# # Deploy Flonotes Frontend to AWS
-# # Usage: just ant:deploy:aws my-profile my-bucket https://noggin.example.com
-# [group('Ant/Flonotes'), working-directory(flonotes_fe_dir)]
-# ant:deploy:aws profile bucket noggin_url:
-#     @echo "Deploying Flonotes Frontend to AWS (Profile: {{profile}}, Bucket: {{bucket}})..."
-#     # Ensure the script path is correct relative to flonotes_fe_dir or provide absolute path
-#     # Using ./scripts assumes it is relative to the working directory (flonotes_fe_dir)
-#     ./scripts/anterior/deploy-aws.sh {{profile}} {{bucket}} {{noggin_url}}
-#
 #
 # # ==============================================================================
 # # End of User Justfile
