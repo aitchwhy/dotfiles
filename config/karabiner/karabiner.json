@@ -4,163 +4,32 @@
             "complex_modifications": {
                 "rules": [
                     {
-                        "description": "CapsLock to Hyper",
-                        "manipulators": [
-                            {
-                                "description": "capslock = esc(click) | hyper(hold)",
-                                "from": {
-                                    "key_code": "caps_lock",
-                                    "modifiers": { "optional": ["any"] }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "right_shift",
-                                        "modifiers": ["right_command", "right_control", "right_option"]
-                                    }
-                                ],
-                                "to_if_alone": [{ "key_code": "escape" }],
-                                "type": "basic"
-                            },
-                            {
-                                "description": "escape = capslock switch",
-                                "from": {
-                                    "key_code": "escape",
-                                    "modifiers": {
-                                        "mandatory": ["right_command", "right_control", "right_shift", "right_option"],
-                                        "optional": ["caps_lock"]
-                                    }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "caps_lock",
-                                        "modifiers": ["left_control"]
-                                    }
-                                ],
-                                "type": "basic"
-                            },
-                            {
-                                "description": "spacebar = language switch",
-                                "from": {
-                                    "key_code": "spacebar",
-                                    "modifiers": { "mandatory": ["right_command", "right_control", "right_shift", "right_option"] }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "spacebar",
-                                        "modifiers": ["left_control"]
-                                    }
-                                ],
-                                "type": "basic"
-                            },
-                            {
-                                "description": "command + spacebar = emoji",
-                                "from": {
-                                    "key_code": "spacebar",
-                                    "modifiers": { "mandatory": ["left_command", "right_command", "right_control", "right_shift", "right_option"] }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "spacebar",
-                                        "modifiers": ["left_control", "left_command"]
-                                    }
-                                ],
-                                "type": "basic"
-                            }
-                        ]
-                    },
-                    {
-                        "description": "New Rule (change left_shift+caps_lock to page_down, right_shift+caps_lock to left_command+mission_control)",
-                        "manipulators": [
-                            {
-                                "from": {
-                                    "key_code": "caps_lock",
-                                    "modifiers": {
-                                        "mandatory": ["left_shift"],
-                                        "optional": ["any"]
-                                    }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "page_down",
-                                        "modifiers": []
-                                    }
-                                ],
-                                "type": "basic"
-                            },
-                            {
-                                "from": {
-                                    "key_code": "caps_lock",
-                                    "modifiers": {
-                                        "mandatory": ["right_shift"],
-                                        "optional": ["any"]
-                                    }
-                                },
-                                "to": [
-                                    {
-                                        "apple_vendor_keyboard_key_code": "mission_control",
-                                        "modifiers": ["left_command"]
-                                    }
-                                ],
-                                "type": "basic"
-                            }
-                        ]
-                    },
-                    {
-                        "description": "Change cmd+backslach to cmd+f11 if pressed in VSCode or Cursor",
+                        "description": "[GHOSTTY] CapsLock -> ESC (press) | LEFT_CTRL (hold)",
                         "manipulators": [
                             {
                                 "conditions": [
                                     {
                                         "bundle_identifiers": [
-                                            "com\\.microsoft\\.VSCode",
-                                            "com\\.microsoft\\.VSCodeInsiders"
+                                            "^com\\.mitchellh\\.ghostty$",
+                                            "^com\\.todesktop\\.230313mzl4w4u92$"
                                         ],
                                         "type": "frontmost_application_if"
                                     }
                                 ],
                                 "from": {
-                                    "key_code": "backslash",
-                                    "modifiers": {
-                                        "mandatory": ["left_gui"],
-                                        "optional": ["any"]
-                                    }
+                                    "key_code": "caps_lock",
+                                    "modifiers": { "optional": ["any"] }
                                 },
-                                "to": [
-                                    {
-                                        "key_code": "f11",
-                                        "modifiers": ["left_gui"]
-                                    }
-                                ],
-                                "type": "basic"
-                            },
-                            {
-                                "conditions": [
-                                    {
-                                        "file_paths": ["/Cursor.app$", "/Cursor$"],
-                                        "type": "frontmost_application_if"
-                                    }
-                                ],
-                                "from": {
-                                    "key_code": "backslash",
-                                    "modifiers": {
-                                        "mandatory": ["left_gui"],
-                                        "optional": ["any"]
-                                    }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "f11",
-                                        "modifiers": ["left_gui"]
-                                    }
-                                ],
+                                "to": [{ "key_code": "left_control" }],
+                                "to_if_alone": [{ "key_code": "escape" }],
                                 "type": "basic"
                             }
                         ]
                     },
                     {
+                        "description": "CapsLock -> ESC (press) | Hyper (hold)",
                         "manipulators": [
                             {
-                                "description": "Change caps_lock to command+control+option+shift.",
                                 "from": {
                                     "key_code": "caps_lock",
                                     "modifiers": { "optional": ["any"] }
@@ -171,6 +40,25 @@
                                         "modifiers": ["left_command", "left_control", "left_option"]
                                     }
                                 ],
+                                "to_if_alone": [{ "key_code": "escape" }],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "hold ESC -> Bitwarden pw search",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "escape",
+                                    "modifiers": { "optional": ["caps_lock"] }
+                                },
+                                "parameters": {
+                                    "basic.to_if_alone_timeout_milliseconds": 250,
+                                    "basic.to_if_held_down_threshold_milliseconds": 250
+                                },
+                                "to_if_alone": [{ "key_code": "escape" }],
+                                "to_if_held_down": [{ "shell_command": "open 'raycast://extensions/jomifepe/bitwarden/search'" }],
                                 "type": "basic"
                             }
                         ]

@@ -23,12 +23,12 @@ set positional-arguments := true
 set shell := ["zsh", "-cu"]
 
 # Optional: Load environment variables from a .env file in the justfile's directory
-# set dotenv-load := true
-# set dotenv-filename := ".env"
+set dotenv-load := true
+set dotenv-filename := ".env"
 
 # Optional: By default, recipes run in the justfile's directory.
 # Set a different default working directory if desired (e.g., home directory).
-# set working-directory := home_directory()
+set working-directory := home_directory()
 
 
 # --- Global Variables & Constants ---
