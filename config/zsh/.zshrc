@@ -334,12 +334,14 @@ path_add "$HOME/.local/share/../bin"
 # TODO: add uv global packages
 
 # mkdir -p ~/.npm-global
-# npm config set prefix ~/.npm-global
 # path_add "~/.npm-global/bin"
+path_add "$HOME/.npm-global/bin"
+
+# npm config set prefix ~/.npm-global
+
 # TODO: npm install -g @anthropic-ai/claude-code
 # TODO: npm install --save-dev commitizen commitlint husky
 
-path_add "$HOME/.npm-global/bin"
 
 # ========================================================================
 # nvim

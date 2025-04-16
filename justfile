@@ -1,0 +1,659 @@
+# Optimized Justfile for Full-Stack TypeScript Development with HMR
+# Implements Hot Module Replacement for React frontend (Vite) and HonoJS backend
+
+# Default recipe to run when just is called without arguments
+default:
+    @just --list
+
+# Set default shell to bash with error handling
+set shell := ["bash", "-c"]
+
+# Environment variables with defaults
+export NODE_ENV := env_var_or_default("NODE_ENV", "development")
+export FRONTEND_PORT := env_var_or_default("FRONTEND_PORT", "3000")
+export BACKEND_PORT := env_var_or_default("BACKEND_PORT", "3001")
+export DEBUG_PORT := env_var_or_default("DEBUG_PORT", "9229")
+export USE_POLLING := env_var_or_default("USE_POLLING", "false")
+
+# Paths
+frontend_dir := "./frontend"
+backend_dir := "./backend"
+log_dir := "./logs"
+
+# Create necessary directories
+_ensure-dirs:
+    mkdir -p {{log_dir}}
+    mkdir -p {{frontend_dir}}/src
+    mkdir -p {{backend_dir}}/src
+
+# Install dependencies for both frontend and backend
+install: _ensure-dirs
+    cd {{frontend_dir}} && npm install
+    cd {{backend_dir}} && npm install
+    npm install --no-save concurrently
+
+# Start frontend development server with HMR enabled
+frontend: _ensure-dirs
+    #!/usr/bin/env bash
+    echo "Starting frontend development server with HMR on port ${FRONTEND_PORT}..."
+    cd {{frontend_dir}} && npm run dev 2>&1 | tee -a {{log_dir}}/frontend.log
+
+# Start backend development server with hot reload
+backend: _ensure-dirs
+    #!/usr/bin/env bash
+    echo "Starting backend development server with hot reload on port ${BACKEND_PORT}..."
+    cd {{backend_dir}} && npm run dev 2>&1 | tee -a {{log_dir}}/backend.log
+
+# Start both frontend and backend in development mode
+dev: _ensure-dirs
+    #!/usr/bin/env bash
+    echo "Starting full-stack development environment..."
+    npx concurrently -n "FRONTEND,BACKEND" -c "green,blue" \
+      "just frontend" \
+      "just backend"
+
+# Build frontend and backend for production
+build: _ensure-dirs
+    cd {{frontend_dir}} && npm run build
+    cd {{backend_dir}} && npm run build
+
+# Start production servers
+start: _ensure-dirs
+    cd {{backend_dir}} && npm run start
+
+# Clean build artifacts and logs
+clean:
+    rm -rf {{frontend_dir}}/dist
+    rm -rf {{backend_dir}}/dist
+    rm -rf {{log_dir}}/*.log
+
+# Setup frontend HMR configuration
+setup-frontend-hmr: _ensure-dirs
+    #!/usr/bin/env bash
+    echo "Setting up frontend HMR configuration..."
+    # Create or update vite.config.ts with HMR settings
+    cat > {{frontend_dir}}/vite.config.ts << 'EOF'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
+
+export default defineConfig({
+  plugins: [
+    react({
+      // Fast Refresh options
+      fastRefresh: true,
+    }),
+  ],
+  server: {
+    port: Number(process.env.FRONTEND_PORT || 3000),
+    host: true, // Needed for Docker
+    hmr: {
+      // Enable HMR
+      overlay: true,
+    },
+    watch: {
+      // Use polling in Docker environments where inotify doesn't work properly
+      usePolling: process.env.USE_POLLING === 'true',
+      interval: 1000,
+    },
+    proxy: {
+      '/api': {
+        target: process.env.VITE_BACKEND_URL || `http://localhost:${process.env.BACKEND_PORT || 3001}`,
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
+  build: {
+    sourcemap: true, // Enable for production builds
+  },
+  css: {
+    devSourcemap: true // Enable CSS source maps during development
+  },
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
+});
+EOF
+
+    # Create or update package.json with dev script
+    if [ ! -f {{frontend_dir}}/package.json ]; then
+        cat > {{frontend_dir}}/package.json << 'EOF'
+{
+  "name": "frontend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
+    "@vitejs/plugin-react": "^4.0.3",
+    "typescript": "^5.0.2",
+    "vite": "^4.4.5"
+  }
+}
+EOF
+    else
+        echo "Frontend package.json already exists, skipping creation."
+    fi
+
+    # Create a basic index.html if it doesn't exist
+    if [ ! -f {{frontend_dir}}/index.html ]; then
+        cat > {{frontend_dir}}/index.html << 'EOF'
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>React App with HMR</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+EOF
+    fi
+
+    # Create a basic tsconfig.json if it doesn't exist
+    if [ ! -f {{frontend_dir}}/tsconfig.json ]; then
+        cat > {{frontend_dir}}/tsconfig.json << 'EOF'
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["src"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}
+EOF
+    fi
+
+    # Create a basic tsconfig.node.json if it doesn't exist
+    if [ ! -f {{frontend_dir}}/tsconfig.node.json ]; then
+        cat > {{frontend_dir}}/tsconfig.node.json << 'EOF'
+{
+  "compilerOptions": {
+    "composite": true,
+    "skipLibCheck": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true
+  },
+  "include": ["vite.config.ts"]
+}
+EOF
+    fi
+
+    # Create a basic React app entry point
+    mkdir -p {{frontend_dir}}/src
+    if [ ! -f {{frontend_dir}}/src/main.tsx ]; then
+        cat > {{frontend_dir}}/src/main.tsx << 'EOF'
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
+EOF
+    fi
+
+    if [ ! -f {{frontend_dir}}/src/App.tsx ]; then
+        cat > {{frontend_dir}}/src/App.tsx << 'EOF'
+import { useState } from 'react'
+import './App.css'
+
+function App() {
+  const [count, setCount] = useState(0)
+
+  return (
+    <div className="App">
+      <h1>Vite + React with HMR</h1>
+      <div className="card">
+        <button onClick={() => setCount((count) => count + 1)}>
+          count is {count}
+        </button>
+        <p>
+          Edit <code>src/App.tsx</code> and save to test HMR
+        </p>
+      </div>
+    </div>
+  )
+}
+
+export default App
+EOF
+    fi
+
+    if [ ! -f {{frontend_dir}}/src/index.css ]; then
+        cat > {{frontend_dir}}/src/index.css << 'EOF'
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+EOF
+    fi
+
+    if [ ! -f {{frontend_dir}}/src/App.css ]; then
+        cat > {{frontend_dir}}/src/App.css << 'EOF'
+.App {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.card {
+  padding: 2em;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+EOF
+    fi
+
+    echo "Frontend HMR configuration complete."
+
+# Setup backend hot reload configuration
+setup-backend-hmr: _ensure-dirs
+    #!/usr/bin/env bash
+    echo "Setting up backend hot reload configuration..."
+    
+    # Create or update package.json with nodemon
+    if [ ! -f {{backend_dir}}/package.json ]; then
+        cat > {{backend_dir}}/package.json << 'EOF'
+{
+  "name": "backend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "nodemon --watch src --ext ts,json --exec \"ts-node --transpile-only src/index.ts\" --signal SIGTERM",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev:debug": "nodemon --watch src --ext ts,json --exec \"node --inspect=0.0.0.0:9229 -r ts-node/register src/index.ts\" --signal SIGTERM"
+  },
+  "dependencies": {
+    "hono": "^3.2.5",
+    "@hono/node-server": "^1.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^18.15.11",
+    "nodemon": "^3.0.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
+  }
+}
+EOF
+    else
+        echo "Backend package.json already exists, skipping creation."
+    fi
+    
+    # Create or update tsconfig.json with source map settings
+    cat > {{backend_dir}}/tsconfig.json << 'EOF'
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "outDir": "dist",
+    "sourceMap": true,
+    "strict": true,
+    "lib": ["ES2020"],
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+EOF
+
+    # Create nodemon.json for fine-grained control
+    cat > {{backend_dir}}/nodemon.json << 'EOF'
+{
+  "watch": ["src"],
+  "ext": "ts,json",
+  "ignore": ["src/**/*.spec.ts"],
+  "exec": "ts-node --transpile-only src/index.ts",
+  "signal": "SIGTERM",
+  "env": {
+    "NODE_ENV": "development"
+  }
+}
+EOF
+
+    # Create a basic HonoJS server
+    mkdir -p {{backend_dir}}/src
+    if [ ! -f {{backend_dir}}/src/index.ts ]; then
+        cat > {{backend_dir}}/src/index.ts << 'EOF'
+import { Hono } from 'hono';
+import { logger } from 'hono/logger';
+import { cors } from 'hono/cors';
+import { serve } from '@hono/node-server';
+
+const app = new Hono();
+
+// Add middleware
+app.use('*', logger());
+app.use('*', cors({
+  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization'],
+  exposeHeaders: ['Content-Length', 'X-Request-Id'],
+  maxAge: 600,
+  credentials: true,
+}));
+
+// Add routes
+app.get('/', (c) => c.text('Hello, HonoJS!'));
+app.get('/api/health', (c) => c.json({ status: 'ok', timestamp: new Date().toISOString() }));
+
+// Graceful shutdown handling
+const server = serve({
+  fetch: app.fetch,
+  port: Number(process.env.BACKEND_PORT || 3001),
+  hostname: '0.0.0.0', // Important for Docker
+}, (info) => {
+  console.log(`Server is running on http://${info.hostname}:${info.port}`);
+});
+
+// Handle termination signals for clean restarts
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully');
+  server.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT received, shutting down gracefully');
+  server.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
+});
+
+export default app;
+EOF
+    fi
+
+    echo "Backend hot reload configuration complete."
+
+# Setup Docker Compose configuration for development
+setup-docker: _ensure-dirs
+    #!/usr/bin/env bash
+    echo "Setting up Docker Compose configuration..."
+    cat > docker-compose.yml << 'EOF'
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "${FRONTEND_PORT:-3000}:${FRONTEND_PORT:-3000}"
+    environment:
+      - NODE_ENV=development
+      - VITE_BACKEND_URL=http://backend:${BACKEND_PORT:-3001}
+      - USE_POLLING=true
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    ports:
+      - "${BACKEND_PORT:-3001}:${BACKEND_PORT:-3001}"
+      - "${DEBUG_PORT:-9229}:${DEBUG_PORT:-9229}"
+    environment:
+      - NODE_ENV=development
+      - CORS_ORIGIN=http://localhost:${FRONTEND_PORT:-3000}
+
+networks:
+  default:
+    name: fullstack-network
+EOF
+
+    # Create .env file for environment variables
+    cat > .env << 'EOF'
+NODE_ENV=development
+FRONTEND_PORT=3000
+BACKEND_PORT=3001
+DEBUG_PORT=9229
+VITE_BACKEND_URL=http://localhost:3001
+CORS_ORIGIN=http://localhost:3000
+EOF
+
+    echo "Docker Compose configuration complete."
+
+# Create example Dockerfile for frontend
+create-frontend-dockerfile: _ensure-dirs
+    #!/usr/bin/env bash
+    cat > {{frontend_dir}}/Dockerfile.dev << 'EOF'
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+EXPOSE ${FRONTEND_PORT:-3000}
+
+CMD ["npm", "run", "dev"]
+EOF
+
+# Create example Dockerfile for backend
+create-backend-dockerfile: _ensure-dirs
+    #!/usr/bin/env bash
+    cat > {{backend_dir}}/Dockerfile.dev << 'EOF'
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+EXPOSE ${BACKEND_PORT:-3001}
+EXPOSE ${DEBUG_PORT:-9229}
+
+CMD ["npm", "run", "dev"]
+EOF
+
+# Create dockerfiles for both services
+create-dockerfiles: create-frontend-dockerfile create-backend-dockerfile
+    echo "Development Dockerfiles created."
+
+# Setup VS Code configuration for debugging
+setup-vscode: _ensure-dirs
+    #!/usr/bin/env bash
+    echo "Setting up VS Code configuration..."
+    mkdir -p .vscode
+    cat > .vscode/launch.json << 'EOF'
+{
+  "version": "0.2.0",
+  "compounds": [
+    {
+      "name": "Full Stack: Frontend + Backend",
+      "configurations": ["Frontend", "Backend"],
+      "stopAll": true
+    }
+  ],
+  "configurations": [
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Frontend",
+      "url": "http://localhost:${env:FRONTEND_PORT}",
+      "webRoot": "${workspaceFolder}/frontend"
+    },
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Backend",
+      "port": 9229,
+      "restart": true,
+      "localRoot": "${workspaceFolder}/backend",
+      "remoteRoot": "/app"
+    }
+  ]
+}
+EOF
+    echo "VS Code configuration complete."
+
+# Setup everything at once
+setup: setup-frontend-hmr setup-backend-hmr setup-docker create-dockerfiles setup-vscode
+    echo "All configurations complete. Ready for development."
+
+# Start development environment with Docker Compose
+docker-dev: _ensure-dirs
+    docker-compose up
+
+# Stop Docker Compose services
+docker-stop:
+    docker-compose down
+
+# View logs for both services
+logs:
+    #!/usr/bin/env bash
+    if [ -f {{log_dir}}/frontend.log ]; then
+        echo "=== Frontend Logs ==="
+        tail -n 50 {{log_dir}}/frontend.log
+    fi
+    if [ -f {{log_dir}}/backend.log ]; then
+        echo "=== Backend Logs ==="
+        tail -n 50 {{log_dir}}/backend.log
+    fi
+
+# Follow logs in real-time
+logs-follow:
+    #!/usr/bin/env bash
+    npx concurrently -n "FRONTEND,BACKEND" -c "green,blue" \
+      "tail -f {{log_dir}}/frontend.log" \
+      "tail -f {{log_dir}}/backend.log"
+
+# Check status of development environment
+status:
+    #!/usr/bin/env bash
+    echo "Checking frontend status..."
+    curl -s http://localhost:${FRONTEND_PORT} > /dev/null && echo "Frontend is running on port ${FRONTEND_PORT}" || echo "Frontend is not running"
+    
+    echo "Checking backend status..."
+    curl -s http://localhost:${BACKEND_PORT}/api/health && echo "" || echo "Backend is not running"
+    
+    if [ -f docker-compose.yml ]; then
+        echo "Docker Compose status:"
+        docker-compose ps
+    fi
+
+# Run tests for both frontend and backend
+test:
+    #!/usr/bin/env bash
+    echo "Running frontend tests..."
+    cd {{frontend_dir}} && npm test || echo "No tests found or test command not configured"
+    
+    echo "Running backend tests..."
+    cd {{backend_dir}} && npm test || echo "No tests found or test command not configured"
+
+# Help command with detailed information
+help:
+    @echo "Full-Stack TypeScript Development with HMR"
+    @echo ""
+    @echo "Available commands:"
+    @echo "  just install              - Install dependencies for both frontend and backend"
+    @echo "  just frontend             - Start frontend development server with HMR"
+    @echo "  just backend              - Start backend development server with hot reload"
+    @echo "  just dev                  - Start both frontend and backend in development mode"
+    @echo "  just build                - Build frontend and backend for production"
+    @echo "  just start                - Start production servers"
+    @echo "  just clean                - Clean build artifacts and logs"
+    @echo "  just setup                - Setup everything at once"
+    @echo "  just docker-dev           - Start development environment with Docker Compose"
+    @echo "  just docker-stop          - Stop Docker Compose services"
+    @echo "  just logs                 - View logs for both services"
+    @echo "  just logs-follow          - Follow logs in real-time"
+    @echo "  just status               - Check status of development environment"
+    @echo "  just test                 - Run tests for both frontend and backend"
+    @echo ""
+    @echo "Environment variables:"
+    @echo "  NODE_ENV                  - Node environment (default: development)"
+    @echo "  FRONTEND_PORT             - Frontend port (default: 3000)"
+    @echo "  BACKEND_PORT              - Backend port (default: 3001)"
+    @echo "  DEBUG_PORT                - Debug port (default: 9229)"
+    @echo "  USE_POLLING               - Use polling for file watching (default: false)"
