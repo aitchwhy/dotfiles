@@ -33,7 +33,7 @@ brew "imagemagick"
 brew "jq"
 brew "just"
 brew "kanata"
-brew "koekeishiya/formulae/skhd", restart_service: :changed
+brew "koekeishiya/formulae/skhd"
 brew "lazygit"
 brew "lnav"
 brew "localstack"
