@@ -148,6 +148,11 @@ alias ts="tailscale"
 # Misc Shortcuts
 alias hf="huggingface-cli"
 alias lg="lazygit" # Note: Overwrites previous lg alias
+alias ld="lazydocker" # Note: Overwrites previous lg alias
+
+alias rx="repomix" # Note: Overwrites previous lg alias
+
+
 # alias jfmt="just --unstable --fmt"
 alias zj="zellij"
 alias zjl="zellij list-sessions"
