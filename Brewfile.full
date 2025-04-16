@@ -33,7 +33,7 @@ brew "imagemagick"
 brew "jq"
 brew "just"
 brew "kanata"
-brew "koekeishiya/formulae/skhd", restart_service: :changed, post_install
+brew "koekeishiya/formulae/skhd", restart_service: :changed
 brew "lazygit"
 brew "lnav"
 brew "localstack"
@@ -155,3 +155,10 @@ mas "Obsidian Web Clipper", id: 6720708363
 mas "Raycast Companion", id: 6738274497
 mas "Screens 5", id: 1663047912
 
+tap "f1bonacc1/tap"
+brew "f1bonacc1/tap/process-compose"
+brew "httpie"
+cask "httpie"
+cask "repo-prompt"
+brew "gitleaks"
+brew "semgrep"
