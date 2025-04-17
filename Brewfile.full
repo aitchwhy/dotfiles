@@ -2,9 +2,118 @@
 tap "koekeishiya/formulae"
 tap "oven-sh/bun"
 tap "spider-rs/spider-cloud-cli"
+tap "f1bonacc1/tap"
+tap "nikitabobko/tap"
 
 # Formulae (Development & Utility CLIs)
 # Rust toolchain manager (Requires post-install script execution)
+brew "atuin"           # Shell history sync
+brew "starship"        # Customizable prompt
+brew "zoxide"          # Smart directory navigation
+brew "direnv"          # Per-directory environment variables
+brew "just"            # Command runner
+brew "uv"              # Python package installer/resolver
+brew "bat"             # Better cat
+brew "eza"             # Better ls
+brew "fd"              # Better find
+brew "ripgrep"         # Better grep
+brew "sd"              # Better sed
+brew "dust"            # Disk usage statistics
+brew "procs"           # Better ps
+brew "htop"            # Process viewer
+brew "git"             # Version control
+brew "git-delta"       # Better git diffs
+brew "gh"              # GitHub CLI
+brew "lazygit"         # Git TUI
+brew "glow"            # Markdown viewer
+
+# HTTP/REST Tools
+brew "curl"            # HTTP client
+brew "xh"              # Modern HTTP client (HTTPie alternative)
+brew "hurl"            # HTTP request testing
+brew "caddy"           # HTTP server with automatic HTTPS
+brew "bruno-cli"       # Git-friendly API client
+
+# JSON Tools
+brew "jq"              # JSON processor
+brew "fx"              # JSON viewer
+brew "jtbl"            # JSON to tables
+brew "jo"              # JSON generator from shell
+
+# OpenAPI Tools
+brew "prism-cli"       # API mocking and contract testing
+brew "kiota"           # HTTP client generator from OpenAPI
+brew "spectral-cli"    # OpenAPI linter
+brew "openapi-tui"     # Terminal UI for OpenAPI
+
+# Logs and Monitoring
+brew "lnav"            # Log file navigator
+brew "glances"         # System monitoring
+brew "goaccess"        # Web log analyzer
+
+# Docker/Containerization
+brew "lazydocker"      # Docker TUI
+brew "f1bonacc1/tap/process-compose"  # Process orchestration
+brew "nixpacks"        # Container builder
+brew "dive"            # Docker layer explorer
+brew "podman"          # Alternative container runtime
+
+# Security Tools
+brew "gitleaks"        # Secret scanner
+brew "semgrep"         # Static analysis
+brew "trufflehog"      # Credential finder
+brew "trivy"           # Vulnerability scanner
+brew "sops"            # Secrets management
+
+# Development Environment
+brew "neovim"          # Text editor
+brew "zellij"          # Terminal multiplexer
+brew "mise"            # Runtime version manager
+brew "entr"            # File watcher
+brew "lefthook"        # Git hooks manager
+brew "biome"           # JavaScript formatter/linter
+
+# Database Tools
+brew "postgresql@17"   # PostgreSQL database
+brew "datasette"       # SQLite explorer
+brew "pgcli"           # PostgreSQL CLI
+
+# AWS Tools
+brew "awscli"          # AWS CLI
+brew "localstack"      # Local AWS emulator
+
+# Programming Languages
+brew "go"              # Go language
+brew "bun"             # JavaScript runtime
+brew "rustup-init"     # Rust toolchain installer
+
+# Shell Enhancements
+brew "zsh-autosuggestions"
+brew "zsh-completions"
+brew "zsh-syntax-highlighting"
+
+# Media and Data Processing
+brew "imagemagick"     # Image manipulation
+brew "pandoc"          # Document converter
+brew "tesseract"       # OCR engine
+brew "tesseract-lang"  # OCR language data
+brew "miller"          # CSV processor
+
+# Network Tools
+brew "wireshark"       # Network analyzer
+brew "rustscan"        # Fast port scanner
+brew "speedtest-cli"   # Internet speed test
+
+# Misc Utilities
+brew "yazi"            # Terminal file manager
+brew "fastfetch"       # System information
+brew "wiremock-standalone" # API mocking server
+brew "spider-cloud-cli" # Web scraping
+brew "aider"           # AI coding assistant
+brew "mas"             # Mac App Store CLI
+
+# HTTP 
+
 brew "atuin", restart_service: :changed
 brew "awscli"
 brew "bat"
@@ -16,7 +125,6 @@ brew "datasette"
 brew "direnv"
 brew "dust"
 brew "entr"
-brew "eslint"
 brew "eza"
 brew "fd"
 brew "fx"
@@ -45,7 +153,6 @@ brew "postgresql@17", restart_service: :changed
 brew "posting"
 brew "procs"
 brew "ripgrep"
-brew "ruff"
 brew "rustscan"
 brew "rustup"
 brew "rustup-init"     
@@ -57,8 +164,6 @@ brew "starship"
 brew "tesseract"
 brew "tesseract-lang"
 brew "tlrc"
-brew "typescript"
-brew "typescript-language-server"
 brew "uv"
 brew "volta"
 brew "yazi"
@@ -154,7 +259,6 @@ mas "Obsidian Web Clipper", id: 6720708363
 mas "Raycast Companion", id: 6738274497
 mas "Screens 5", id: 1663047912
 
-tap "f1bonacc1/tap"
 brew "f1bonacc1/tap/process-compose"
 brew "httpie"
 cask "httpie"
@@ -167,3 +271,25 @@ brew "trufflehog"
 brew "lazydocker"
 brew "pandoc"
 brew "vite"
+cask "prisma-studio"
+cask "mitmproxy"
+brew "fastfetch"
+brew "wiremock-standalone"
+cask "ngrok"
+cask "ngrok"
+cask "mitmproxy"
+brew "rustscan"
+brew "glances"
+cask "nikitabobko/tap/aerospace"
+brew "volta"
+cask "coq-platform"
+cask "tla+-toolbox"
+brew "glances"
+brew "wireshark"
+cask "prism"
+brew "nixpacks"
+brew "aider"
+cask "dadroit-json-viewer"
+brew "prism-cli"
+brew "caddy"
+cask "windsurf"

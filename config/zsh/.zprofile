@@ -12,21 +12,8 @@
 # Homebrew Setup (install if not installed)
 # ========================================================================
 
-if [[ ! -x /opt/homebrew/bin/brew ]]; then
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-fi
-
 # setup homebrew shell path
 eval "$(/opt/homebrew/bin/brew shellenv)"
-
-# install core utils
-export DOTFILES="$HOME/dotfiles"
-# local CORE_BREWFILE="$DOTFILES/core.Brewfile"
-# cat "$CORE_BREWFILE"
-# 
-# brew bundle install --quiet --file="$CORE_BREWFILE"
-# TODO: cacched install
-# brew bundle install --no-upgrade --quiet --file="$DOTFILES/Brewfile.core"
 
 # zsh setup
 # TODO: fzf-zsh https://github.com/unixorn/fzf-zsh-plugin
