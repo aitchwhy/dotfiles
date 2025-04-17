@@ -7,8 +7,6 @@ local DOTFILES="${DOTFILES:-$HOME/dotfiles}"
 # justfile
 alias j="just"
 # alias .j='just -g'
-# alias .j="just -g"
-# alias j="just -f ~/dotfiles/user.justfile"
 # alias j="just -f ~/dotfiles/user.justfile"
 for recipe in `just --justfile $DOTFILES/config/just/user.justfile --summary`; do
   alias $recipe="just --justfile '$DOTFILES/config/just/user.justfile' --working-directory . $recipe"
@@ -37,7 +35,6 @@ alias ports="sudo lsof -i -P -n | grep LISTEN"
 alias flush="dscacheutil -flushcache && killall -HUP mDNSResponder" # Flush DNS
 # Dotfiles Management
 # alias zdot='cd $ZDOTDIR'
-alias d="cd $DOTFILES"
 alias zr="exec zsh"
 alias ze="fd -t file --hidden . "$ZDOTDIR" | xargs nvim"
 alias .e="fd --hidden . $DOTFILES | xargs nvim"
@@ -163,28 +160,28 @@ alias zje='zellij attach "$(zellij list-sessions -n | fzf --reverse --border --n
 
 # === Aliases from fzf.zsh ===
 # File navigation
-alias ff='f find'         # Find files
-alias fe='f edit'         # Find and edit files
-alias fdir='f dir'          # Find directories
-alias fz='f z'            # Jump with zoxide
-# Git operations
-alias fco='f checkout'    # Git checkout
-alias fga='f add'         # Git add files
-alias fgl='f log'         # Git log
-alias fgs='f status'      # Git status
-alias fgd='f diff'        # Git diff
-# Search
-alias fgr='f grep'        # Grep with fzf
-alias frg='f rgopen'      # Ripgrep and open
-# System
-alias fk='f kill'         # Kill process
-alias fp='f port'         # Kill process on port
-alias fh='f history'      # History search
-alias fm='f man'          # Man pages
-alias fa='f alias'        # Aliases
-# Package management
-alias fb='f brew'         # Brew operations
-alias fbi='f brew install' # Brew install
-alias fbu='f brew uninstall' # Brew uninstall
+# alias ff='f find'         # Find files
+# alias fe='f edit'         # Find and edit files
+# alias fdir='f dir'          # Find directories
+# alias fz='f z'            # Jump with zoxide
+# # Git operations
+# alias fco='f checkout'    # Git checkout
+# alias fga='f add'         # Git add files
+# alias fgl='f log'         # Git log
+# alias fgs='f status'      # Git status
+# alias fgd='f diff'        # Git diff
+# # Search
+# alias fgr='f grep'        # Grep with fzf
+# alias frg='f rgopen'      # Ripgrep and open
+# # System
+# alias fk='f kill'         # Kill process
+# alias fp='f port'         # Kill process on port
+# alias fh='f history'      # History search
+# alias fm='f man'          # Man pages
+# alias fa='f alias'        # Aliases
+# # Package management
+# alias fb='f brew'         # Brew operations
+# alias fbi='f brew install' # Brew install
+# alias fbu='f brew uninstall' # Brew uninstall
 # === End Aliases from fzf.zsh ===
 

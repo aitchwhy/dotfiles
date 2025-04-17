@@ -44,24 +44,19 @@ export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 # export XDG_BIN_HOME="${XDG_BIN_HOME:-$HOME/.local/bin}"
 
-export DOTFILES="$HOME/dotfiles"
-
-# Ensure ZSH config directory is set
-# export ZDOTDIR=${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}
-export ZDOTDIR="$DOTFILES/config/zsh"
-
-export cloud="~/Library/CloudStorage"
-export gdrive="~/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com"
-export dropbox="~/Library/CloudStorage/Dropbox"
-
-# Dotfiles location
-# export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
-
 # Ensure XDG directories exist
 [[ ! -d "$XDG_CONFIG_HOME" ]] && mkdir -p "$XDG_CONFIG_HOME"
 [[ ! -d "$XDG_CACHE_HOME" ]] && mkdir -p "$XDG_CACHE_HOME"
 [[ ! -d "$XDG_DATA_HOME" ]] && mkdir -p "$XDG_DATA_HOME"
 [[ ! -d "$XDG_STATE_HOME" ]] && mkdir -p "$XDG_STATE_HOME"
+
+
+# Ensure ZSH config directory is set
+export ZDOTDIR=${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}
+export dotzsh="$DOTFILES/config/zsh"
+export dotfiles="${DOTFILES:-$HOME/dotfiles}"
+
+# Dotfiles location
 
 # ========================================================================
 # Keyboard & Input Configuration
@@ -71,11 +66,6 @@ export dropbox="~/Library/CloudStorage/Dropbox"
 bindkey -v
 export KEYTIMEOUT=1
 
-# Basic key bindings
-bindkey '^P' up-line-or-history
-bindkey '^N' down-line-or-history
-bindkey '^E' end-of-line
-bindkey '^A' beginning-of-line
 
 # ========================================================================
 # Source Utility Functions
@@ -332,15 +322,37 @@ path_add "$HOME/.local/share/../bin"
 # - gh extension install dlvhdr/gh-dash
 # TODO: add nodejs global packages (bun + etc)
 # TODO: add uv global packages
+# gpt-repository-loader v0.10.0
+#- gpt-repository-loader
+# llm v0.24.2
+# - llm
+# mitmproxy2swagger v0.10.1
+# - mitmproxy2swagger
+# poetry v2.1.1
+# - poetry
+# prefect v3.3.4
+# - prefect
+# strip-tags v0.6
+# - strip-tags
+# ttok v0.3
+# - ttok
+
 
 # mkdir -p ~/.npm-global
 # path_add "~/.npm-global/bin"
-path_add "$HOME/.npm-global/bin"
+# path_add "$HOME/.npm-global/bin"
 
 # npm config set prefix ~/.npm-global
 
 # TODO: npm install -g @anthropic-ai/claude-code
 # TODO: npm install --save-dev commitizen commitlint husky
+# claude
+# liam
+# bru
+# mitmproxy2swagger
+# pino-pretty
+# prettier
+# prisma
 
 
 # ========================================================================
@@ -658,3 +670,5 @@ fi
 # Source aliases and functions
 [[ -f "${ZDOTDIR}/aliases.zsh" ]] && source "${ZDOTDIR}/aliases.zsh"
 [[ -f "${ZDOTDIR}/functions.zsh" ]] && source "${ZDOTDIR}/functions.zsh"
+
+. "$HOME/.atuin/bin/env"
