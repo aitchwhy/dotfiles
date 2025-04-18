@@ -66,7 +66,7 @@ function log_info() {
   printf "${BLUE}[INFO]${RESET} %s\n" "$*"
 }
 
- Log success message
+# Log success message
 function log_success() {
   printf "${GREEN}[SUCCESS]${RESET} %s\n" "$*"
 }
@@ -282,7 +282,7 @@ export ZDOTDIR="$zdotdir_src"
 EOF
 
   chmod 644 "$HOME/.zshenv"
-  success "Created $HOME/.zshenv pointing to $zdotdir_src"
+  log_success "Created $HOME/.zshenv pointing to $zdotdir_src"
 }
 
 # ========================================================================
@@ -352,7 +352,7 @@ export function setup_cli_tools() {
       # Remove existing symlink or file/directory
       if [[ -L "$dst" || -e "$dst" ]]; then
         rm -rf "$dst"
-        success "Removed existing: $dst"
+        log_success "Removed existing: $dst"
       fi
     done
   fi
@@ -371,7 +371,7 @@ export function setup_cli_tools() {
     if [[ ! -e "$dst" ]] || [[ "$(readlink "$dst")" != "$src" ]]; then
       if [[ -e "$src" ]]; then
         ln -sf "$src" "$dst"
-        success "Symlinked $dst -> $src"
+        log_success "Symlinked $dst -> $src"
       else
         warn "Source '$src' does not exist, skipping"
       fi
