@@ -18,6 +18,18 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 # zsh setup
 # TODO: fzf-zsh https://github.com/unixorn/fzf-zsh-plugin
 
+
+# minio / s3 frontend -> http://localhost:51021
+# noggin server -> http://localhost:59000
+# vibes frontend -> http://localhost:3000
+# prefect (job runner) -> http://localhost:52000/runs/flow-run
+
+# MINIO_S3_STORAGE="http://localhost:51021/"
+# NOGGIN_SERVER="http://localhost:59000/"
+# VIBES_FRONTEND="http://localhost:3000/"
+# PREFECT_JOB_RUNNER="http://localhost:52000/runs/flow-run"1
+#
+
 # ========================================================================
 # Editor & Terminal Settings
 # ========================================================================
