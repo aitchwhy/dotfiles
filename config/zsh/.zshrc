@@ -71,10 +71,19 @@ export KEYTIMEOUT=1
 # Source Utility Functions
 # ========================================================================
 
-# Source our utility functions from utils.zsh
-export UTILS_PATH="${DOTFILES}/config/zsh/utils.zsh"
+local DOTFILES="${DOTFILES:-$HOME/dotfiles}"
 
-[[ ! -f "$UTILS_PATH" ]] || source "$UTILS_PATH"
+# Source our utility functions from utils.zsh
+export UTILS_PATH="$DOTFILES/config/zsh/utils.zsh"
+
+source "$UTILS_PATH"
+
+
+# Check if a command exists
+export function has_command() {
+  command -v "$1" &>/dev/null
+}
+
 
 # ========================================================================
 # install core
@@ -244,21 +253,25 @@ fi
 # ========================================================================
 
 # https://docs.atuin.sh/configuration/config/
-export ATUIN_CONFIG_DIR="$DOTFILES/config/atuin/"
+export ATUIN_CONFIG_DIR="$DOTFILES/config/atuin"
 
-path_add "$HOME/.atuin/bin"
+# path_add "$HOME/.atuin/bin"
 
-if ! has_command atuin; then
-  echo "atuin not found. Installing atuin..."
-  curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
-  echo "sourcing $HOME/.atuin/bin/env to add it to PATH"
-  source $HOME/.atuin/bin/env
-fi
+# if ! has_command atuin; then
+#   echo "atuin not found. Installing atuin..."
+#   curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
+#   echo "sourcing $HOME/.atuin/bin/env to add it to PATH"
+#   source $HOME/.atuin/bin/env
+# fi
 
-if [[ ! -f "$XDG_CONFIG_HOME/atuin/config.toml" ]]; then
-  echo "Linking atuin config..."
-  ln -sf "$DOTFILES/config/atuin/config.toml" "$XDG_CONFIG_HOME/atuin/config.toml"
-fi
+# if [[ ! -f "$XDG_CONFIG_HOME/atuin/config.toml" ]]; then
+#   echo "Linking atuin config..."
+#   ln -sf "$DOTFILES/config/atuin/config.toml" "$XDG_CONFIG_HOME/atuin/config.toml"
+# fi
+
+ln -sf "$DOTFILES/config/atuin/config.toml" "$XDG_CONFIG_HOME/atuin/config.toml"
+
+. $HOME/.atuin/bin/env
 
 # atuin zsh shell plugin
 eval "$(atuin init zsh)"
@@ -275,7 +288,7 @@ eval "$(atuin init zsh)"
 # uv
 # ========================================================================
 # export PATH="/Users/hank/.local/share/../bin:$PATH"
-path_add "$HOME/.local/share/../bin"
+# path_add "$HOME/.local/share/../bin"
 
 # ========================================================================
 # NodeJS
@@ -630,19 +643,19 @@ compinit
 # fi
 
 # Load ZSH plugins from Homebrew if available
-if [[ -d "$HOMEBREW_PREFIX/share" ]]; then
-  plugins=(
-    "zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-    "zsh-autosuggestions/zsh-autosuggestions.zsh"
-    "zsh-abbr/zsh-abbr.zsh"
-  )
-  for plugin in $plugins; do
-    plugin_path="$HOMEBREW_PREFIX/share/$plugin"
-    if [[ -f "$plugin_path" ]]; then
-      source "$plugin_path"
-    fi
-  done
-fi
+# if [[ -d "$HOMEBREW_PREFIX/share" ]]; then
+#   plugins=(
+#     "zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+#     "zsh-autosuggestions/zsh-autosuggestions.zsh"
+#     "zsh-abbr/zsh-abbr.zsh"
+#   )
+#   for plugin in $plugins; do
+#     plugin_path="$HOMEBREW_PREFIX/share/$plugin"
+#     if [[ -f "$plugin_path" ]]; then
+#       source "$plugin_path"
+#     fi
+#   done
+# fi
 
 # ========================================================================
 # Tool Initialization

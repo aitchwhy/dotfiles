@@ -2,8 +2,9 @@
 // https://zellij.dev/documentation/
 
 // General configurations
-theme "catppuccin-macchiato" // Modern theme that works well with macOS dark mode
+// theme "catppuccin-macchiato"
 // Alternative light theme: "catppuccin-latte"
+theme "tokyo-night"
 
 // Performance optimizations for Apple Silicon
 pane_frames false        // Disable frames for cleaner look and better performance
@@ -20,7 +21,7 @@ mouse_mode true          // Enable mouse support
 
 // Default editing with Neovim
 default_shell "zsh"
-default_editor "/opt/homebrew/bin/nvim" // Apple Silicon homebrew path
+default_editor "/opt/homebrew/bin/nvim" // Apple Siliconomebrew path
 
 // Apple Silicon optimized UI settings
 ui {
@@ -238,21 +239,8 @@ keybinds clear-defaults=true {
 }
 
 // Default layout for new sessions
-default_layout {
-    pane size=1 borderless=true {
-        plugin location="zellij:tab-bar"
-    }
-    pane split_direction="vertical" {
-        pane size="70%" focus=true
-        pane size="30%" split_direction="horizontal" {
-            pane size="50%"
-            pane size="50%"
-        }
-    }
-    pane size=2 borderless=true {
-        plugin location="zellij:status-bar"
-    }
-}
+default_layout "platform_layout"
+
 
 // Load environment variables and path adjustments for macOS
 env {
