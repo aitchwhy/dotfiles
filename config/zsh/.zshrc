@@ -14,7 +14,7 @@
 # ========================================================================
 
 # Navigation Options
-setopt AUTO_CD           # Change directory without cd
+# setopt AUTO_CD           # Change directory without cd
 setopt AUTO_PUSHD        # Push directory to stack on cd
 setopt PUSHD_IGNORE_DUPS # Don't store duplicates in stack
 setopt PUSHD_SILENT      # Don't print stack after pushd/popd
