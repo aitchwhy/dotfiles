@@ -672,6 +672,9 @@ has_command uv && eval "$(uv generate-shell-completion zsh)"
 # has_command uvx && eval "$(uvx --generate-shell-completion zsh)"
 # has_command pyenv && eval "$(pyenv init -)"
 # has_command abbr && eval "$(abbr init zsh)"
+#
+# Zellij (auto-start on startup)
+eval "$(zellij setup --generate-auto-start zsh)"
 
 # Load FZF completions
 if has_command fzf; then
