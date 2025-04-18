@@ -6,9 +6,11 @@ local DOTFILES="${DOTFILES:-$HOME/dotfiles}"
 alias j="just"
 # alias .j='just -g'
 # alias j="just -f ~/dotfiles/user.justfile"
-for recipe in $(just --justfile $DOTFILES/config/just/user.justfile --summary); do
-  alias $recipe="just --justfile '$DOTFILES/config/just/user.justfile' --working-directory . $recipe"
-done
+alias .j='just --justfile ~/.user.justfile --working-directory .'
+
+# for recipe in $(just --justfile $DOTFILES/config/just/user.justfile --summary); do
+#   alias $recipe="just --justfile '$DOTFILES/config/just/user.justfile' --working-directory . $recipe"
+# done
 
 # === Aliases from .zshrc ===
 alias claude="/Users/hank/.claude/local/claude"
