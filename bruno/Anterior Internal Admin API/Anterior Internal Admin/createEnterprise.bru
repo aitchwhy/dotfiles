@@ -1,0 +1,20 @@
+meta {
+  name: createEnterprise
+  type: http
+  seq: 13
+}
+
+post {
+  url: {{baseUrl}}/enterprises
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "slug": "",
+    "emailDomain": "",
+    "name": "",
+    "imageUrl": ""
+  }
+}

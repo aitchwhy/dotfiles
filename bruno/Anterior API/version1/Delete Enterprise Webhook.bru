@@ -1,0 +1,20 @@
+meta {
+  name: Delete Enterprise Webhook
+  type: http
+  seq: 39
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/webhooks
+  body: none
+  auth: bearer
+}
+
+params:query {
+  webhook_uid: 
+  ~secret: 
+}
+
+auth:bearer {
+  token: {{token}}
+}

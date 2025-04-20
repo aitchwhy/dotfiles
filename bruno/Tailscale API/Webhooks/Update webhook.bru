@@ -1,0 +1,21 @@
+meta {
+  name: Update webhook
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/webhooks/:endpointId
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "subscriptions": []
+  }
+}

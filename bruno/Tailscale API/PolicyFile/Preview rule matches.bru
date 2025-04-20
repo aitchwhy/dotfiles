@@ -1,0 +1,19 @@
+meta {
+  name: Preview rule matches
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/tailnet/:tailnet/acl/preview
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {}
+}

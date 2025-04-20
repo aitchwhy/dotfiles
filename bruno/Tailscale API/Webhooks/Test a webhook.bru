@@ -1,0 +1,15 @@
+meta {
+  name: Test a webhook
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/webhooks/:endpointId/test
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

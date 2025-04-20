@@ -1,0 +1,23 @@
+meta {
+  name: Create a webhook
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/tailnet/:tailnet/webhooks
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "endpointUrl": "",
+    "providerType": "",
+    "subscriptions": []
+  }
+}

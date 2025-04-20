@@ -1,0 +1,19 @@
+meta {
+  name: Determination History
+  type: http
+  seq: 36
+}
+
+get {
+  url: {{baseUrl}}/api/v1/determinations/:determination_uid/history
+  body: none
+  auth: bearer
+}
+
+params:path {
+  determination_uid: 
+}
+
+auth:bearer {
+  token: {{token}}
+}

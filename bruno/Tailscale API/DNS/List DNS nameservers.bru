@@ -1,0 +1,15 @@
+meta {
+  name: List DNS nameservers
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/tailnet/:tailnet/dns/nameservers
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

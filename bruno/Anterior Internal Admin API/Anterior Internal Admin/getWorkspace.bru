@@ -1,0 +1,15 @@
+meta {
+  name: getWorkspace
+  type: http
+  seq: 25
+}
+
+get {
+  url: {{baseUrl}}/workspaces/:workspaceUid
+  body: none
+  auth: none
+}
+
+params:path {
+  workspaceUid: 
+}

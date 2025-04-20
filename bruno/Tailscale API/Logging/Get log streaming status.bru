@@ -1,0 +1,15 @@
+meta {
+  name: Get log streaming status
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/tailnet/:tailnet/logging/:logType/stream/status
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

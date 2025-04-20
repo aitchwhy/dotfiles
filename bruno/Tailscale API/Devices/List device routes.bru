@@ -1,0 +1,15 @@
+meta {
+  name: List device routes
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/device/:deviceId/routes
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

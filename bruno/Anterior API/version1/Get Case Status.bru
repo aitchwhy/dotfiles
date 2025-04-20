@@ -1,0 +1,23 @@
+meta {
+  name: Get Case Status
+  type: http
+  seq: 18
+}
+
+get {
+  url: {{baseUrl}}/api/v1/cases/:case_uid/status
+  body: none
+  auth: bearer
+}
+
+params:query {
+  ~inc_summary: 
+}
+
+params:path {
+  case_uid: 
+}
+
+auth:bearer {
+  token: {{token}}
+}

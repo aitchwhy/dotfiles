@@ -1,0 +1,15 @@
+meta {
+  name: getEnterprise
+  type: http
+  seq: 14
+}
+
+get {
+  url: {{baseUrl}}/enterprises/:enterpriseUid
+  body: none
+  auth: none
+}
+
+params:path {
+  enterpriseUid: 
+}

@@ -1,0 +1,15 @@
+meta {
+  name: Get key
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/tailnet/:tailnet/keys/:keyId
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

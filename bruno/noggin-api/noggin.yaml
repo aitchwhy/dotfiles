@@ -1,0 +1,133 @@
+openapi: 3.0.0
+info:
+  title: noggin-api
+  version: 1.0.0
+servers:
+  - url: http://localhost:59000
+paths:
+  /:
+    get:
+      summary: Get authentication status
+      operationId: getAuthStatus
+      description: ""
+      responses:
+        "200":
+          description: Authentication status response
+  /auth/login:
+    post:
+      summary: Create a one-time password for login
+      operationId: createOtpForLogin
+      description: ""
+      responses:
+        "200":
+          description: OTP creation successful
+      requestBody:
+        $ref: "#/components/requestBodies/create_a_one-time_password_for_login"
+  /auth/refresh:
+    post:
+      summary: Refresh authentication tokens
+      operationId: refreshAuthTokens
+      description: ""
+      responses:
+        "200":
+          description: Token refresh successful
+  /auth/otp/verify:
+    post:
+      summary: Verify OTP and get authentication tokens
+      operationId: verifyOtpAndGetTokens
+      description: ""
+      responses:
+        "200":
+          description: OTP verification successful
+      requestBody:
+        $ref: "#/components/requestBodies/verify_otp_and_get_authentication_tokens"
+  /pdfs/process-pdf:
+    post:
+      summary: Process PDF file
+      description: Extract and process information from a PDF file
+      operationId: processPdf
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: PDF file to process
+                options:
+                  type: object
+                  description: Processing options (optional)
+              required:
+                - file
+      responses:
+        "200":
+          description: PDF processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    description: Extracted data from the PDF
+        "403":
+          description: Forbidden - Insufficient permissions
+        "400":
+          description: Bad request - Invalid input
+        "500":
+          description: Server error during processing
+      security:
+        - BearerAuth: []
+  /flonotes:
+    get:
+      summary: Serves static content for the FloNotes application
+      operationId: serveFloNotes
+      description: ""
+      responses:
+        "200":
+          description: FloNotes content served successfully
+components:
+  schemas:
+    create_a_one-time_password_for_login:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+
+    verify_otp_and_get_authentication_tokens:
+      type: object
+      properties:
+        email:
+          type: string
+        otp:
+          type: string
+
+  requestBodies:
+    create_a_one-time_password_for_login:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/create_a_one-time_password_for_login"
+      description: ""
+      required: true
+
+    verify_otp_and_get_authentication_tokens:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/verify_otp_and_get_authentication_tokens"
+      description: ""
+      required: true
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

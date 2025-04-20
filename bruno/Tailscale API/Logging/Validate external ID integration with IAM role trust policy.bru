@@ -1,0 +1,21 @@
+meta {
+  name: Validate external ID integration with IAM role trust policy
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/tailnet/:tailnet/aws-external-id/:id/validate-aws-trust-policy
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "roleArn": ""
+  }
+}

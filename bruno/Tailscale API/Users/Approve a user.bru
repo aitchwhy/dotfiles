@@ -1,0 +1,15 @@
+meta {
+  name: Approve a user
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/users/:userId/approve
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

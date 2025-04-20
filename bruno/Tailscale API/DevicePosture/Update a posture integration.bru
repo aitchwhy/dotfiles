@@ -1,0 +1,34 @@
+meta {
+  name: Update a posture integration
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/posture/integrations/:id
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "provider": "",
+    "cloudId": "",
+    "clientId": "",
+    "tenantId": "",
+    "clientSecret": "",
+    "id": "",
+    "configUpdated": "",
+    "status": {
+      "lastSync": "",
+      "error": "",
+      "providerHostCount": "",
+      "matchedCount": "",
+      "possibleMatchedCount": ""
+    }
+  }
+}

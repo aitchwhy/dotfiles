@@ -1,0 +1,15 @@
+meta {
+  name: List network flow logs
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/tailnet/:tailnet/logging/network
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

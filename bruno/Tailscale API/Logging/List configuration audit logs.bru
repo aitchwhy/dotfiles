@@ -1,0 +1,15 @@
+meta {
+  name: List configuration audit logs
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/tailnet/:tailnet/logging/configuration
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

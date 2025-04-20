@@ -1,0 +1,24 @@
+meta {
+  name: Create user invites
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/tailnet/:tailnet/user-invites
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  [
+    {
+      "role": "",
+      "email": ""
+    }
+  ]
+}

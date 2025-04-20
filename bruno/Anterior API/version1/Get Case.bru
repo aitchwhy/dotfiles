@@ -1,0 +1,19 @@
+meta {
+  name: Get Case
+  type: http
+  seq: 16
+}
+
+get {
+  url: {{baseUrl}}/api/v1/cases/:case_uid
+  body: none
+  auth: bearer
+}
+
+params:path {
+  case_uid: 
+}
+
+auth:bearer {
+  token: {{token}}
+}

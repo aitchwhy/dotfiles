@@ -1,0 +1,16 @@
+meta {
+  name: removeUserFromWorkspace
+  type: http
+  seq: 28
+}
+
+delete {
+  url: {{baseUrl}}/workspaces/:workspaceUid/users/:userUid
+  body: none
+  auth: none
+}
+
+params:path {
+  workspaceUid: 
+  userUid: 
+}

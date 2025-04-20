@@ -1,0 +1,15 @@
+meta {
+  name: Delete a user invite
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{baseUrl}}/user-invites/:userInviteId
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

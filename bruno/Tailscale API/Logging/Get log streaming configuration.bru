@@ -1,0 +1,15 @@
+meta {
+  name: Get log streaming configuration
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/tailnet/:tailnet/logging/:logType/stream
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

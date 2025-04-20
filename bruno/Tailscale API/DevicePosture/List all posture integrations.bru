@@ -1,0 +1,15 @@
+meta {
+  name: List all posture integrations
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/tailnet/:tailnet/posture/integrations
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

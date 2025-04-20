@@ -1,0 +1,19 @@
+meta {
+  name: Get Enterprise Users
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{baseUrl}}/api/v1/users
+  body: none
+  auth: bearer
+}
+
+params:query {
+  ~secret: 
+}
+
+auth:bearer {
+  token: {{token}}
+}

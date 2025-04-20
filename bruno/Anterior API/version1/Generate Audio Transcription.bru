@@ -1,0 +1,24 @@
+meta {
+  name: Generate Audio Transcription
+  type: http
+  seq: 33
+}
+
+post {
+  url: {{baseUrl}}/api/v1/transcribe-audio
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "ref": "",
+    "file_name": "",
+    "file_type": "",
+    "content": ""
+  }
+}
