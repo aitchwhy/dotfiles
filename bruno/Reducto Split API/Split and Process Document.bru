@@ -1,0 +1,51 @@
+meta {
+  name: Split and Process Document
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/split
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "split_description": {
+      "description": "",
+      "partition_key": ""
+    },
+    "url": "",
+    "options": {
+      "ocr_mode": "",
+      "extraction_mode": "",
+      "chunking": {
+        "chunk_mode": "",
+        "chunk_size": ""
+      },
+      "table_summary": {
+        "enabled": "",
+        "prompt": ""
+      },
+      "figure_summary": {
+        "enabled": "",
+        "prompt": "",
+        "override": ""
+      }
+    },
+    "advanced_options": {
+      "ocr_system": "",
+      "table_output_format": "",
+      "merge_tables": "",
+      "page_range": {
+        "start": "",
+        "end": ""
+      }
+    }
+  }
+}

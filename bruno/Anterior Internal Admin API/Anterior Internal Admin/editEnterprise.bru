@@ -1,0 +1,24 @@
+meta {
+  name: editEnterprise
+  type: http
+  seq: 15
+}
+
+post {
+  url: {{baseUrl}}/enterprises/:enterpriseUid
+  body: json
+  auth: none
+}
+
+params:path {
+  enterpriseUid: 
+}
+
+body:json {
+  {
+    "slug": "",
+    "emailDomain": "",
+    "name": "",
+    "imageUrl": ""
+  }
+}

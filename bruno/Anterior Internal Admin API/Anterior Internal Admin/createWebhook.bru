@@ -1,0 +1,24 @@
+meta {
+  name: createWebhook
+  type: http
+  seq: 18
+}
+
+post {
+  url: {{baseUrl}}/enterprises/:enterpriseUid/webhooks
+  body: json
+  auth: none
+}
+
+params:path {
+  enterpriseUid: 
+}
+
+body:json {
+  {
+    "url": "",
+    "method": "",
+    "productId": "",
+    "workstreamId": ""
+  }
+}

@@ -1,0 +1,16 @@
+meta {
+  name: getWebhook
+  type: http
+  seq: 19
+}
+
+get {
+  url: {{baseUrl}}/enterprises/:enterpriseUid/webhooks/:webhookUid
+  body: none
+  auth: none
+}
+
+params:path {
+  enterpriseUid: 
+  webhookUid: 
+}

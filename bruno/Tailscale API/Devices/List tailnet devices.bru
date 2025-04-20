@@ -1,0 +1,15 @@
+meta {
+  name: List tailnet devices
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/tailnet/:tailnet/devices
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

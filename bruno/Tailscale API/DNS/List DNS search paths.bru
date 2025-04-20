@@ -1,0 +1,15 @@
+meta {
+  name: List DNS search paths
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/tailnet/:tailnet/dns/searchpaths
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

@@ -1,0 +1,19 @@
+meta {
+  name: Get policy file
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/tailnet/:tailnet/acl
+  body: none
+  auth: bearer
+}
+
+params:query {
+  ~details: 
+}
+
+auth:bearer {
+  token: {{token}}
+}

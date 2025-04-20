@@ -1,0 +1,19 @@
+meta {
+  name: Get Ground Truth
+  type: http
+  seq: 42
+}
+
+get {
+  url: {{baseUrl}}/api/v1/ground-truths/:ground_truth_uid
+  body: none
+  auth: bearer
+}
+
+params:path {
+  ground_truth_uid: 
+}
+
+auth:bearer {
+  token: {{token}}
+}

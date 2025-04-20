@@ -1,0 +1,15 @@
+meta {
+  name: Delete a device invite
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{baseUrl}}/device-invites/:deviceInviteId
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

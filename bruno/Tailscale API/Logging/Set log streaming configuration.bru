@@ -1,0 +1,35 @@
+meta {
+  name: Set log streaming configuration
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{baseUrl}}/tailnet/:tailnet/logging/:logType/stream
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "logType": "",
+    "destinationType": "",
+    "url": "",
+    "user": "",
+    "uploadPeriodMinutes": "",
+    "compressionFormat": "",
+    "token": "",
+    "s3Bucket": "",
+    "s3Region": "",
+    "s3KeyPrefix": "",
+    "s3AuthenticationType": "",
+    "s3AccessKeyId": "",
+    "s3SecretAccessKey": "",
+    "s3RoleArn": "",
+    "s3ExternalId": ""
+  }
+}

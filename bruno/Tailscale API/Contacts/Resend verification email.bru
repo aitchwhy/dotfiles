@@ -1,0 +1,15 @@
+meta {
+  name: Resend verification email
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/tailnet/:tailnet/contacts/:contactType/resend-verification-email
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

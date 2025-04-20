@@ -1,0 +1,15 @@
+meta {
+  name: List user invites
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/tailnet/:tailnet/user-invites
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

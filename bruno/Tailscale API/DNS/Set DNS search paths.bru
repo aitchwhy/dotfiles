@@ -1,0 +1,21 @@
+meta {
+  name: Set DNS search paths
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/tailnet/:tailnet/dns/searchpaths
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "searchPaths": []
+  }
+}

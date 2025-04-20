@@ -1,0 +1,29 @@
+meta {
+  name: editUser
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/users/:userUid
+  body: json
+  auth: none
+}
+
+params:path {
+  userUid: 
+}
+
+body:json {
+  {
+    "email": "",
+    "name": "",
+    "enterprises": [
+      {
+        "enterpriseUid": "",
+        "role": "",
+        "workspaceUids": []
+      }
+    ]
+  }
+}

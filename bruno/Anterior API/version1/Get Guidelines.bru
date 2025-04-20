@@ -1,0 +1,19 @@
+meta {
+  name: Get Guidelines
+  type: http
+  seq: 27
+}
+
+get {
+  url: {{baseUrl}}/api/v1/cases/:case_uid/guideline
+  body: none
+  auth: bearer
+}
+
+params:path {
+  case_uid: 
+}
+
+auth:bearer {
+  token: {{token}}
+}

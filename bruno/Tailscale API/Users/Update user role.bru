@@ -1,0 +1,21 @@
+meta {
+  name: Update user role
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/users/:userId/role
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "role": ""
+  }
+}

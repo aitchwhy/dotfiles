@@ -1,0 +1,15 @@
+meta {
+  name: getUserOTP
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/users/:userUid/otp
+  body: none
+  auth: none
+}
+
+params:path {
+  userUid: 
+}

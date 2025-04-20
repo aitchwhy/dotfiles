@@ -1,0 +1,21 @@
+meta {
+  name: Set device routes
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/device/:deviceId/routes
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "routes": []
+  }
+}

@@ -1,0 +1,16 @@
+meta {
+  name: removeUserFromEnterprise
+  type: http
+  seq: 22
+}
+
+delete {
+  url: {{baseUrl}}/enterprises/:enterpriseUid/users/:userUid
+  body: none
+  auth: none
+}
+
+params:path {
+  enterpriseUid: 
+  userUid: 
+}

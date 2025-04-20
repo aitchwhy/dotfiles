@@ -1,0 +1,46 @@
+meta {
+  name: Update Service
+  type: http
+  seq: 24
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/cases/:case_uid/services/:service_uid
+  body: json
+  auth: bearer
+}
+
+params:query {
+  ~process_case: 
+}
+
+params:path {
+  case_uid: 
+  service_uid: 
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "uid": "",
+    "codes": {
+      "cpt": [],
+      "icd10": [],
+      "icd10pcs": [],
+      "icd10cm": [],
+      "hcpcs": [],
+      "dsm5": []
+    },
+    "guideline_uid": "",
+    "guideline_file": {
+      "ref": "",
+      "file_name": "",
+      "file_type": "",
+      "content": ""
+    },
+    "extra": {}
+  }
+}

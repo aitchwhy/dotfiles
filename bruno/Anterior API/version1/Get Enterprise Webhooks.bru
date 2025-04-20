@@ -1,0 +1,15 @@
+meta {
+  name: Get Enterprise Webhooks
+  type: http
+  seq: 37
+}
+
+get {
+  url: {{baseUrl}}/api/v1/webhooks
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

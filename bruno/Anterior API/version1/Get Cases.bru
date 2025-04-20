@@ -1,0 +1,22 @@
+meta {
+  name: Get Cases
+  type: http
+  seq: 13
+}
+
+get {
+  url: {{baseUrl}}/api/v1/cases
+  body: none
+  auth: bearer
+}
+
+params:query {
+  ~limit: 
+  ~page: 
+  ~inc_archived: 
+  ~secret: 
+}
+
+auth:bearer {
+  token: {{token}}
+}

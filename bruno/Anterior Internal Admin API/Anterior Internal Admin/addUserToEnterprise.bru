@@ -1,0 +1,22 @@
+meta {
+  name: addUserToEnterprise
+  type: http
+  seq: 21
+}
+
+put {
+  url: {{baseUrl}}/enterprises/:enterpriseUid/users/:userUid
+  body: json
+  auth: none
+}
+
+params:path {
+  enterpriseUid: 
+  userUid: 
+}
+
+body:json {
+  {
+    "role": ""
+  }
+}

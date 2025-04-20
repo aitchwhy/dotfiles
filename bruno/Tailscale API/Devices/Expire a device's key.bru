@@ -1,0 +1,15 @@
+meta {
+  name: Expire a device's key
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/device/:deviceId/expire
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

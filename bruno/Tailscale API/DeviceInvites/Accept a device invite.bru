@@ -1,0 +1,21 @@
+meta {
+  name: Accept a device invite
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/device-invites/-/accept
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "invite": ""
+  }
+}

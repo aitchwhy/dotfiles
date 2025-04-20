@@ -1,0 +1,15 @@
+meta {
+  name: deleteEnterprise
+  type: http
+  seq: 16
+}
+
+delete {
+  url: {{baseUrl}}/enterprises/:enterpriseUid
+  body: none
+  auth: none
+}
+
+params:path {
+  enterpriseUid: 
+}

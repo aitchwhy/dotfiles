@@ -1,0 +1,15 @@
+meta {
+  name: Get a posture integration
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/posture/integrations/:id
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

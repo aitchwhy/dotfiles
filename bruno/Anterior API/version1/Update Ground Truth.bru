@@ -1,0 +1,65 @@
+meta {
+  name: Update Ground Truth
+  type: http
+  seq: 43
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/ground-truths/:ground_truth_uid
+  body: json
+  auth: bearer
+}
+
+params:path {
+  ground_truth_uid: 
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "name": "",
+    "patient": {
+      "ref": "",
+      "name": "",
+      "gender": "",
+      "dob": "",
+      "age": ""
+    },
+    "codes": {
+      "cpt": [],
+      "icd10": [],
+      "icd10pcs": [],
+      "icd10cm": [],
+      "hcpcs": [],
+      "dsm5": []
+    },
+    "status": "",
+    "is_met": "",
+    "summary": "",
+    "data": {
+      "structure": "",
+      "results": {
+        "uid": "",
+        "text": "",
+        "reasoning": "",
+        "status": "",
+        "reviewed_at": "",
+        "evidence": [
+          {
+            "id": "",
+            "file_id": "",
+            "file_name": "",
+            "page_number": "",
+            "content": "",
+            "page_section": ""
+          }
+        ],
+        "children": []
+      }
+    },
+    "user": ""
+  }
+}

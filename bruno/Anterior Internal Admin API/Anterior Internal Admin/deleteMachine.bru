@@ -1,0 +1,15 @@
+meta {
+  name: deleteMachine
+  type: http
+  seq: 11
+}
+
+delete {
+  url: {{baseUrl}}/machines/:machineUid
+  body: none
+  auth: none
+}
+
+params:path {
+  machineUid: 
+}

@@ -1,0 +1,15 @@
+meta {
+  name: Suspend a user
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/users/:userId/suspend
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

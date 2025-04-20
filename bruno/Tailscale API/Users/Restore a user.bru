@@ -1,0 +1,15 @@
+meta {
+  name: Restore a user
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/users/:userId/restore
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

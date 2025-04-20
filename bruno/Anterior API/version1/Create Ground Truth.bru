@@ -1,0 +1,58 @@
+meta {
+  name: Create Ground Truth
+  type: http
+  seq: 41
+}
+
+post {
+  url: {{baseUrl}}/api/v1/ground-truths
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "name": "",
+    "patient": "",
+    "codes": "",
+    "published_guideline": "",
+    "evidence": [
+      {
+        "ref": "",
+        "file_name": "",
+        "file_type": "",
+        "content": ""
+      }
+    ],
+    "status": "",
+    "is_met": "",
+    "summary": "",
+    "data": {
+      "structure": "",
+      "results": {
+        "uid": "",
+        "text": "",
+        "reasoning": "",
+        "status": "",
+        "reviewed_at": "",
+        "evidence": [
+          {
+            "id": "",
+            "file_id": "",
+            "file_name": "",
+            "page_number": "",
+            "content": "",
+            "page_section": ""
+          }
+        ],
+        "children": []
+      }
+    },
+    "enterprise": "",
+    "user": ""
+  }
+}

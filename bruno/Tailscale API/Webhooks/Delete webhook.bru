@@ -1,0 +1,15 @@
+meta {
+  name: Delete webhook
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/webhooks/:endpointId
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

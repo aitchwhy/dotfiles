@@ -1,0 +1,15 @@
+meta {
+  name: Get tailnet settings
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/tailnet/:tailnet/settings
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

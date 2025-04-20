@@ -1,0 +1,35 @@
+meta {
+  name: Upload Evidence
+  type: http
+  seq: 21
+}
+
+post {
+  url: {{baseUrl}}/api/v1/cases/:case_uid/evidence
+  body: json
+  auth: bearer
+}
+
+params:query {
+  ~set_all: 
+  ~process_case: 
+}
+
+params:path {
+  case_uid: 
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  [
+    {
+      "ref": "",
+      "file_name": "",
+      "file_type": "",
+      "content": ""
+    }
+  ]
+}

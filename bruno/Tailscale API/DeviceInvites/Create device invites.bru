@@ -1,0 +1,25 @@
+meta {
+  name: Create device invites
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/device/:deviceId/device-invites
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  [
+    {
+      "multiUse": "",
+      "allowExitNode": "",
+      "email": ""
+    }
+  ]
+}

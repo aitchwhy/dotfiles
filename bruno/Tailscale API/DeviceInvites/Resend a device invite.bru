@@ -1,0 +1,15 @@
+meta {
+  name: Resend a device invite
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/device-invites/:deviceInviteId/resend
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

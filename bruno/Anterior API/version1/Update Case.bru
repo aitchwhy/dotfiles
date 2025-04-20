@@ -1,0 +1,86 @@
+meta {
+  name: Update Case
+  type: http
+  seq: 15
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/cases/:case_uid
+  body: json
+  auth: bearer
+}
+
+params:path {
+  case_uid: 
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "ref": "",
+    "name": "",
+    "codes": {
+      "cpt": [],
+      "icd10": [],
+      "icd10pcs": [],
+      "icd10cm": [],
+      "hcpcs": [],
+      "dsm5": []
+    },
+    "services": [
+      {
+        "uid": "",
+        "codes": {
+          "cpt": [],
+          "icd10": [],
+          "icd10pcs": [],
+          "icd10cm": [],
+          "hcpcs": [],
+          "dsm5": []
+        },
+        "guideline_uid": "",
+        "guideline_file": {
+          "ref": "",
+          "file_name": "",
+          "file_type": "",
+          "content": ""
+        },
+        "extra": {}
+      }
+    ],
+    "guidelines": [
+      {
+        "ref": "",
+        "file_name": "",
+        "file_type": "",
+        "content": ""
+      }
+    ],
+    "evidence": [
+      {
+        "ref": "",
+        "file_name": "",
+        "file_type": "",
+        "content": ""
+      }
+    ],
+    "assignees": [
+      {
+        "ref": "",
+        "name": ""
+      }
+    ],
+    "patient": {
+      "ref": "",
+      "name": "",
+      "gender": "",
+      "dob": "",
+      "age": ""
+    },
+    "location": "",
+    "extra": {}
+  }
+}

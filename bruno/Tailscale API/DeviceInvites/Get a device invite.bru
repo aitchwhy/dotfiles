@@ -1,0 +1,15 @@
+meta {
+  name: Get a device invite
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/device-invites/:deviceInviteId
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

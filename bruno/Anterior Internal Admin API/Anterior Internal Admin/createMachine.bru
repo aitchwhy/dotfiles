@@ -1,0 +1,21 @@
+meta {
+  name: createMachine
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/machines
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "",
+    "userUid": "",
+    "enterpriseUid": "",
+    "role": "",
+    "workspaceUid": ""
+  }
+}

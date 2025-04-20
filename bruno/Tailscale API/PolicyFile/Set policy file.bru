@@ -1,0 +1,23 @@
+meta {
+  name: Set policy file
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/tailnet/:tailnet/acl
+  body: json
+  auth: bearer
+}
+
+headers {
+  ~If-Match: 
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {}
+}

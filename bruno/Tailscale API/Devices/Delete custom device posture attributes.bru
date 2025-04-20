@@ -1,0 +1,15 @@
+meta {
+  name: Delete custom device posture attributes
+  type: http
+  seq: 14
+}
+
+delete {
+  url: {{baseUrl}}/device/:deviceId/attributes/:attributeKey
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
