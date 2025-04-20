@@ -3,10 +3,11 @@
 local DOTFILES="${DOTFILES:-$HOME/dotfiles}"
 
 # justfile
+# alias jfmt="just --unstable --fmt"
 alias j="just"
 # alias .j='just -g'
 # alias j="just -f ~/dotfiles/user.justfile"
-alias .j='just --justfile ~/.user.justfile --working-directory .'
+alias .j='just -f ~/dotfiles/user.justfile --working-directory .'
 
 # for recipe in $(just --justfile $DOTFILES/config/just/user.justfile --summary); do
 #   alias $recipe="just --justfile '$DOTFILES/config/just/user.justfile' --working-directory . $recipe"
@@ -154,7 +155,6 @@ alias ld="lazydocker" # Note: Overwrites previous lg alias
 
 alias rx="repomix" # Note: Overwrites previous lg alias
 
-# alias jfmt="just --unstable --fmt"
 alias zj="zellij"
 alias zjls="zellij list-sessions"
 alias zja='zellij attach "$(zellij list-sessions -n | fzf --reverse --border --no-sort --height 40% | awk '\''{print $1}'\'')"'

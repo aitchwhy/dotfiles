@@ -12,8 +12,6 @@ set -euo pipefail
 # Source Utility Functions
 # ========================================================================
 
-
-
 # Determine DOTFILES path and utils location
 # export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
 # export UTILS_PATH="$DOTFILES/config/zsh/utils.zsh"

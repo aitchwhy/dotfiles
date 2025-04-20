@@ -1,0 +1,20 @@
+meta {
+  name: Process PDF file
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/pdfs/process-pdf
+  body: multipartForm
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:multipart-form {
+  file: 
+  options: 
+}
