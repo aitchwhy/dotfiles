@@ -7,7 +7,9 @@ tap "nikitabobko/tap"
 
 # Formulae (Development & Utility CLIs)
 # Rust toolchain manager (Requires post-install script execution)
-brew "atuin"           # Shell history sync
+brew "skim"             # grep alternative
+brew "mas"             # Mac App Store CLI
+brew "atuin", restart_service: :changed # Shell history sync
 brew "starship"        # Customizable prompt
 brew "zoxide"          # Smart directory navigation
 brew "direnv"          # Per-directory environment variables
@@ -48,7 +50,6 @@ brew "openapi-tui"     # Terminal UI for OpenAPI
 
 # Logs and Monitoring
 brew "lnav"            # Log file navigator
-brew "glances"         # System monitoring
 brew "goaccess"        # Web log analyzer
 
 # Docker/Containerization
@@ -100,7 +101,6 @@ brew "tesseract-lang"  # OCR language data
 brew "miller"          # CSV processor
 
 # Network Tools
-brew "wireshark"       # Network analyzer
 brew "rustscan"        # Fast port scanner
 brew "speedtest-cli"   # Internet speed test
 
@@ -110,17 +110,11 @@ brew "fastfetch"       # System information
 brew "wiremock-standalone" # API mocking server
 brew "spider-cloud-cli" # Web scraping
 brew "aider"           # AI coding assistant
-brew "mas"             # Mac App Store CLI
+brew "eslint"
+brew "prettier"
 
 # HTTP 
 brew "curl"
-
-
-
-
-# Etc
-
-brew "atuin", restart_service: :changed
 brew "awscli"
 brew "bat"
 brew "biome"
@@ -173,29 +167,29 @@ brew "volta"
 brew "yazi"
 brew "zellij"
 brew "zoxide"
-brew "zsh-autosuggestions"
 brew "zsh-completions"
-brew "zsh-syntax-highlighting"
 brew "aider"
 brew "caddy"
 brew "f1bonacc1/tap/process-compose"
 brew "fastfetch"
 brew "gitleaks"
-brew "glances"
-brew "httpie"
 brew "lazydocker"
 brew "nixpacks"
 brew "pandoc"
 brew "prism-cli"
-brew "rustscan"
 brew "semgrep"
 brew "siderolabs/tap/talosctl"
 brew "spectral-cli"
 brew "trufflehog"
 brew "vite"
-brew "volta"
 brew "wiremock-standalone"
 brew "wireshark"
+
+
+
+
+# Etc
+
 
 # Casks (GUI Applications & Fonts)
 # cask "warp"              # Already in core
