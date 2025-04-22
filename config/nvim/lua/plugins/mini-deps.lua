@@ -1,7 +1,6 @@
 return {
-  {
-    'echasnovski/mini.nvim',
-    version = false,
-  },
-
+    {
+        name = "echasnovski/mini.nvim",
+        version = false,
+    },
 }
