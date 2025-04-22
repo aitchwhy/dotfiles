@@ -19,102 +19,22 @@ sort_dir_first = true
 
 # Make full use of space on Apple Silicon Macs with large displays
 linemode = "size"
-show_preview = true  # File previews - M-series can handle these well
-show_icons = true    # Show file icons for better UX
-show_symlink = true  # Show symlink targets
+show_preview = true # File previews - M-series can handle these well
+show_icons = true   # Show file icons for better UX
+show_symlink = true # Show symlink targets
 
 # Optimized preview size - since macOS typically has larger displays
-preview_ratio = 0.5  # 50% of the window for previews
+preview_ratio = 0.5   # 50% of the window for previews
 folder_preview = true
 
 # Make scrolling smoother on Apple trackpads
 scroll_offset = 5
-case_sensitive = false    # Default macOS behavior
-mouse = true              # Enable mouse support for trackpad gestures
+case_sensitive = false # Default macOS behavior
+mouse = true           # Enable mouse support for trackpad gestures
+
 
 # ==================================================
-# Plugin Configuration for Apple Silicon
-# ==================================================
-
-[plugins]
-# Enable parallel processing for faster performance on M-series chips
-preload = ["maxpreview", "border"]
-prepend_preload = ["icons", "git"]
-
-# ==================================================
-# Search Configuration
-# ==================================================
-
-[search]
-# Fuzzy search works well with M-chip performance
-fuzzy = true
-incsearch = true  # Incremental search
-smart_case = true
-# Wrap-around search (matches macOS UI patterns)
-wrap_around = true
-
-# ==================================================
-# Tasks Configuration
-# ==================================================
-
-[tasks]
-# Apple Silicon can handle more parallel tasks
-micro_workers = 5
-macro_workers = 10
-# Improve responsiveness of the interface
-bizarre_retry = 5
-
-# ==================================================
-# Opener for file types (macOS specific)
-# ==================================================
-
-[opener]
-# Default tools for common file operations
-edit = [
-  { exec = 'nvim "$@"', block = true },
-  { exec = 'code "$@"', orphan = true },
-]
-
-# macOS-specific openers
-open = [
-  { exec = 'open "$@"', desc = "Open with default macOS app" },
-  { exec = 'open -a Safari "$@"', desc = "Open with Safari", for = "url" },
-  { exec = 'qlmanage -p "$@" &>/dev/null', desc = "QuickLook preview", for = "file" },
-  { exec = 'open -a Preview "$@"', desc = "Open with Preview", for = "image" },
-  { exec = 'open -a "Visual Studio Code" "$@"', desc = "Open with VS Code", for = ["text", "code"] },
-  { exec = 'open -a "TextEdit" "$@"', desc = "Open with TextEdit" },
-]
-
-# Archive handling with native macOS utilities where possible
-extract = [
-  { exec = 'unar "$1"', desc = "Extract with unar", for = ["application", "archive"] },
-  { exec = 'tar -xf "$1"', desc = "Extract TAR archive", for = ["application/x-tar"] },
-]
-
-# Archive creation - prefer built-in tools
-archive = [
-  { exec = 'zip -r "$1" "${@:2}"', desc = "Compress to ZIP", for = ["application/zip"] },
-  { exec = 'tar -czvf "$1" "${@:2}"', desc = "Compress to TAR.GZ" },
-]
-
-reveal = [
-  { exec = 'open -R "$@"', desc = "Reveal in Finder" }
-]
-
-# ==================================================
-# Input Configuration (Apple keyboard friendly)
-# ==================================================
-
-[input]
-# OS X style key handling
-cd_shortcuts = true
-# macOS-style history
-dial_as_in_vim = true
-# number of command history entries
-history_dedup = 10000
-
-# ==================================================
-# Preview Configuration (optimized for M-series)
+# Preview Configuration
 # ==================================================
 
 [preview]
@@ -137,88 +57,141 @@ tab_size = 2
 # Direct output of previews
 preload = 5
 
-# ==================================================
-# Command Presets (macOS optimized)
-# ==================================================
 
+[tasks]
+# Apple Silicon can handle more parallel tasks
+micro_workers = 5
+macro_workers = 10
+# Improve responsiveness of the interface
+bizarre_retry = 5
+
+
+#########################
+# opener
+#########################
+
+[opener]
+edit = [
+  { exec = 'nvim "$@"', block = true },
+  { exec = 'windsurf "$@"', orphan = true },
+]
+
+open = [
+  { exec = 'open "$@"', desc = "Open with default macOS app" },
+  { exec = 'open -a Safari "$@"', desc = "Open with Safari", for = "url" },
+  { exec = 'qlmanage -p "$@" &>/dev/null', desc = "QuickLook preview", for = "file" },
+  { exec = 'open -a Preview "$@"', desc = "Open with Preview", for = "image" },
+  { exec = 'open -a "Visual Studio Code" "$@"', desc = "Open with VS Code", for = [
+    "text",
+    "code",
+  ] },
+  { exec = 'open -a "TextEdit" "$@"', desc = "Open with TextEdit" },
+]
+bulk-rename = [{ run = 'nvim "$@"', block = true }]
+# Archive handling with native macOS utilities where possible
+extract = [
+  { exec = 'unar "$1"', desc = "Extract with unar", for = [
+    "application",
+    "archive",
+  ] },
+  { exec = 'tar -xf "$1"', desc = "Extract TAR archive", for = [
+    "application/x-tar",
+  ] },
+]
+
+# Archive creation - prefer built-in tools
+archive = [
+  { exec = 'zip -r "$1" "${@:2}"', desc = "Compress to ZIP", for = [
+    "application/zip",
+  ] },
+  { exec = 'tar -czvf "$1" "${@:2}"', desc = "Compress to TAR.GZ" },
+]
+
+reveal = [{ exec = 'open -R "$@"', desc = "Reveal in Finder" }]
+
+prepend_rules = [{ name = "bulk-rename.txt", use = "bulk-rename" }]
+
+#########################
+# open
+#########################
 [open]
 rules = [
   # Images
   { mime = "image/*", use = "image" },
-  
+
   # Audio
   { mime = "audio/*", use = "audio" },
-  
+
   # Video
   { mime = "video/*", use = "video" },
-  
+
   # PDF
   { mime = "application/pdf", use = "pdf" },
-  
+
   # Archives
   { mime = "application/zip", use = "archive" },
   { mime = "application/gzip", use = "archive" },
   { mime = "application/x-tar", use = "archive" },
-  
+
   # Fallback: Use text for anything else
   { mime = "*", use = "text" },
 ]
 
+#########################
+# plugins
+#########################
+
+[plugin]
+prepend_fetchers = [
+  # mime-type (faster than file binary)
+  { id = "mime", name = "*", run = "mime-ext", prio = "high" },
+  # Mac tag (brew install tag)
+  { id = "mactag", name = "*", run = "mactag" },
+  { id = "mactag", name = "*/", run = "mactag" },
+]
 # ==================================================
-# Colors & Style (optimized for macOS)
+# Plugin Configuration for Apple Silicon
 # ==================================================
 
-[theme]
-# Modern style that matches macOS aesthetic
-
-# Transparency for UI elements
-# Can be enabled on Apple Silicon without performance issues
-opacity = { selected = 1.0, unselected = 0.7 }
-
-# ==================================================
-# Icons (optimized for macOS)
-# ==================================================
-
-[icons]
-prepend_rules = [
-  # macOS-specific files
-  { name = ".DS_Store", text = "" },
-  { name = ".Trash", text = "󰈑" },
-  { name = "Applications", text = "󰇮" },
-  { name = "Desktop", text = "󰟀" },
-  { name = "Developer", text = "󰏓" },
-  { name = "Documents", text = "󰈙" },
-  { name = "Downloads", text = "󰇚" },
-  { name = "Library", text = "󰂺" },
-  { name = "Movies", text = "󰎁" },
-  { name = "Music", text = "󰎄" },
-  { name = "Pictures", text = "󰋩" },
-  { name = "Public", text = "󰄛" },
-  
-  # Development
-  { name = ".git", text = "󰊢" },
-  { name = ".github", text = "" },
-  { name = "node_modules", text = "󰎙" },
-  { name = "package.json", text = "󰎙" },
-  { name = "package-lock.json", text = "󰎙" },
-  { name = "Cargo.toml", text = "󱘗" },
-  { name = "Cargo.lock", text = "󱘗" },
-  { name = "go.mod", text = "󰟓" },
-  { name = "go.sum", text = "󰟓" },
-  { name = "Brewfile", text = "󰜙" },
+# Enable parallel processing for faster performance on M-series chips
+prepend_preloaders = [
+  # HEIC preloader
+  { mime = "image/heic", run = "heic" },
 ]
 
-# ==================================================
-# Syntax-specific Configurations
-# ==================================================
 
-[syntax]
-# Apple Silicon can handle more complex syntax highlighting
-theme = "Catppuccin Macchiato"
+# Previewers
+prepend_previewers = [
+  { mime = "application/*zip", run = "ouch" },
+  { mime = "application/x-tar", run = "ouch" },
+  # Preview tarballs with tar In this example, --format=url tells piper to parse the tar output as file URLs, so you'll be able to get a list of files with icons.
+  { name = "*.tar*", run = 'piper --format=url -- tar tf "$1"' },
+  { mime = "application/x-bzip2", run = "ouch" },
+  { mime = "application/x-7z-compressed", run = "ouch" },
+  { mime = "application/x-rar", run = "ouch" },
+  { mime = "application/x-xz", run = "ouch" },
+  { mime = "application/xz", run = "ouch" },
+  { name = "*.csv", run = "rich-preview" },                       # for csv files
+  # Preview CSV with bat
+  # Note that certain distributions might use a different name for bat, like Debian and Ubuntu uses batcat instead, so please adjust accordingly.
+  { name = "*.csv", run = 'piper -- bat -p --color=always "$1"' },
+  # Preview Markdown with glow - Note that there's a bug in Glow v2.0 that causes slight color differences between tty and non-tty environments.
+  { name = "*.md", run = 'piper -- CLICOLOR_FORCE=1 glow -w=$w -s=dark "$1"' },
+  { name = "*.md", run = "rich-preview" },                                      # for markdown (.md) files
+  { name = "*.rst", run = "rich-preview" },                                     # for restructured text (.rst) files
+  { name = "*.ipynb", run = "rich-preview" },                                   # for jupyter notebooks (.ipynb)
+  { name = "*.json", run = "rich-preview" },                                    # for json (.json) files
+  # Yazi defaults to using file -bL "$1" if there's no matched previewer.
+  #    { name = "*.lang_type", run = "rich-preview"} # for particular language files eg. .py, .go., .lua, etc.
+  # Use hexyl as fallback previewer
+  { name = "*", run = 'piper -- echo "$1"' },
+  { name = "*", run = 'piper -- eza -TL=3 --color=always --icons=always --group-directories-first --no-quotes "$1"' },
+  # This example uses hexyl as a fallback previewer instead of file.
+  { name = "*", run = 'piper -- hexyl --border=none --terminal-width=$w "$1"' },
+]
 
-# Custom theme directory (Catppuccin, Nord, Tokyo Night recommended)
-theme_dir = "~/.config/yazi/syntect/themes"
 
+# Archive previewer
 # ==================================================
 # End of configuration
 # ==================================================

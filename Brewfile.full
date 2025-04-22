@@ -7,7 +7,7 @@ tap "nikitabobko/tap"
 
 # Formulae (Development & Utility CLIs)
 # Rust toolchain manager (Requires post-install script execution)
-brew "skim"             # grep alternative
+# brew "skim"             # grep alternative
 brew "mas"             # Mac App Store CLI
 brew "atuin", restart_service: :changed # Shell history sync
 brew "starship"        # Customizable prompt
@@ -1747,3 +1747,7 @@ mas "Screens 5", id: 1663047912
 # # mcfly                                                                           yakitrak/yakitrak/obsidian-cli
 # # nasm
 # # Run `brew bundle cleanup --force` to make these changes.
+brew "tag"
+brew "ouch"
+brew "hexyl"
+brew "rich"
