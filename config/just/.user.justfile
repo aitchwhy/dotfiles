@@ -7,6 +7,23 @@ hostname := `uname -n`
 default:
   @just --list
 
+# Display system information
+system-info:
+  @echo "CPU architecture: {{ arch() }}"
+  @echo "Operating system type: {{ os_family() }}"
+  @echo "Operating system: {{ os() }}"
+  @echo "Home directory: {{ home_directory() }}"
+
+# --- Default & Utility Recipes ---
+[group('global')]
+choose:
+  @just --choose
+
+[group('global')]
+fmt:
+  @echo "Formatting {{ justfile() }}..."
+  @just --unstable --fmt
+
 ############################################################################
 #
 #  Darwin related commands
@@ -94,30 +111,8 @@ platform_dir := "~/src/platform"
 flonotes_fe_dir := "~/src/flonotes-fe"
 vibes_dir := "~/src/vibes"
 gpt_repo_dir := "~/src/gpt-repository-loader"
-# host := `uname -a`
-
-# List available recipes (default file location as cwd)
-default:
-  just --list 
-
-# Display system information
-system-info:
-  @echo "CPU architecture: {{ arch() }}"
-  @echo "Operating system type: {{ os_family() }}"
-  @echo "Operating system: {{ os() }}"
-  @echo "Home directory: {{ home_directory() }}"
-
-# --- Default & Utility Recipes ---
-# [group('global')]
-# choose:
-#     @just -- --choose
 
 
-# [group('global')]
-# [working-directory: '~/dotfiles/config/just']
-# fmt:
-#     @echo "Formatting {{ justfile() }}..."
-#     @just --unstable --fmt
 
 # # --- Flonotes / Ant Project Recipes ---
 # [group('platform')]
