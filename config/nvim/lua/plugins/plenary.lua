@@ -1,3 +1,3 @@
 return {
-    { "nvim-lua/plenary.nvim", lazy = true },
+    { name = "nvim-lua/plenary.nvim", lazy = true },
 }

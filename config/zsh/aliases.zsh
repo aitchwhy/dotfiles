@@ -6,12 +6,51 @@ local DOTFILES="${DOTFILES:-$HOME/dotfiles}"
 # alias jfmt="just --unstable --fmt"
 # alias .j='just -g'
 # alias j="just -f ~/dotfiles/user.justfile"
-alias .j='just -f ~/dotfiles/config/just/.user.justfile'
+
+alias .j='just -f $XDG_CONFIG_HOME/just/.user.justfile'
 alias j="just"
+
+alias cheat="tldr"
+alias ch="cheat"
 
 # for recipe in $(just --justfile $DOTFILES/config/just/user.justfile --summary); do
 #   alias $recipe="just --justfile '$DOTFILES/config/just/user.justfile' --working-directory . $recipe"
 # done
+
+
+
+# nix
+alias nixh='nix --help'
+# nix package management
+alias nixs="nix search"
+alias nixp="nix profile install"
+alias nixl="nix profile list"
+alias nixr="nix profile remove"
+
+# nix development
+alias nix-shell="nix-shell --run zsh"
+alias ns="nix-shell --run zsh"
+alias nd="nix develop --command zsh"
+alias nf="nix flake"
+
+# nix system
+alias nixu="sudo nixos-rebuild switch"
+alias nixd="darwin-rebuild switch --flake ~/dotfiles"
+alias nixc="cd ~/dotfiles && $EDITOR flake.nix"
+
+# nix garbage collection
+alias nixg="nix-collect-garbage -d"
+
+
+# Aliases
+alias v='$EDITOR'
+alias vi='$EDITOR'
+alias vim='$EDITOR'
+
+# Dotfiles Management
+# alias zdot='cd $ZDOTDIR'
+alias zr="exec zsh"
+alias ze="fd -t file --hidden . "$ZDOTDIR" | xargs nvim"
 
 # === Aliases from .zshrc ===
 alias claude="/Users/hank/.claude/local/claude"
@@ -23,10 +62,10 @@ if has_command eza; then # Conditional logic moved with aliases, might need adju
   alias la="eza --icons --group-directories-first -a"
   alias lt="eza --icons --group-directories-first --tree"
   alias lt2="eza --icons --group-directories-first --tree --level=2"
-# else
-#   alias ls="ls -G"
-#   alias ll="ls -la"
-#   alias la="ls -a"
+else
+  alias ls="ls -G"
+  alias ll="ls -la"
+  alias la="ls -a"
 fi
 
 # Networking Utilities
@@ -35,35 +74,26 @@ alias localip="ipconfig getifaddr en0"
 alias publicip="curl -s https://api.ipify.org"
 alias ports="sudo lsof -i -P -n | grep LISTEN"
 alias flush="dscacheutil -flushcache && killall -HUP mDNSResponder" # Flush DNS
-# Dotfiles Management
-# alias zdot='cd $ZDOTDIR'
-alias zr="exec zsh"
-alias ze="fd -t file --hidden . "$ZDOTDIR" | xargs nvim"
-alias .e="fd --hidden . $DOTFILES | xargs nvim"
+
 # System Information
 alias ppath='echo $PATH | tr ":" "\n"'
-alias pfuncs='print -l ${(k)functions[(I)[^_]*]} | sort'
-alias pfpath='for fp in $fpath; do echo $fp; done; unset fp'
+alias printfuncs='print -l ${(k)functions[(I)[^_]*]} | sort'
+alias printfpath='for fp in $fpath; do echo $fp; done; unset fp'
 alias printpath='ppath'
-alias printfuncs='pfuncs'
-alias printfpath='pfpath'
-# Keep commonly used aliases for convenience
-alias penv='sys env'
-alias ql='sys ql'
-alias batman='sys man'
-# Aliases
-alias v='$EDITOR'
-alias vi='$EDITOR'
-alias vim='$EDITOR'
+
 # Example: flush DNS
 alias flushdns="sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder"
 alias showhidden="defaults write com.apple.finder AppleShowAllFiles YES; killall Finder"
+
 # Package management
-alias brewup='brew update && brew upgrade && brew cleanup'
+alias bup='brew update && brew upgrade && brew cleanup'
+alias brewup='bup'
+
 # upgrade to modern
 alias ps='procs'
 alias ping='gping'
 alias diff='delta'
+
 # FZF enhanced commands
 alias flog='fzf --preview "bat --style=numbers --color=always --line-range=:500 {}"'
 alias falias='alias | fzf'
@@ -75,8 +105,8 @@ alias ls='eza -al' # Note: Overwrites previous ls alias
 alias net='trippy'
 alias netviz='netop'
 alias jwt='jet-ui'
-# alias sed='sd'
-# alias du='dust'
+alias sed='sd'
+alias du='dust'
 # alias ssh='sshs'
 # alias s3='stu'
 # alias http='xh'
@@ -100,11 +130,11 @@ alias dbuild='docker build'
 alias dc='docker-compose'
 alias k='k9s'
 # Modern CLI alternatives
-# alias cat='bat --paging=always'
+alias cat='bat --paging=always'
 alias miller='mlr'
-# alias grep='rg'
-# alias find='fd'
-# alias md='glow'
+alias grep='rg'
+alias find='fd'
+alias md='glow'
 alias ls='eza --icons'     # Note: Overwrites previous ls alias
 alias ll='eza -l --icons'  # Note: Overwrites previous ll alias
 alias la='eza -al --icons' # Note: Overwrites previous la alias

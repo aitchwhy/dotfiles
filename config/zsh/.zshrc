@@ -52,9 +52,17 @@ export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 
 
 # Ensure ZSH config directory is set
-export ZDOTDIR=${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}
-export dotzsh="$DOTFILES/config/zsh"
-export dotfiles="${DOTFILES:-$HOME/dotfiles}"
+export zdot=${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}
+export cf="$DOTFILES/config"
+export cfz="$DOTFILES/config/zsh"
+export dot="${DOTFILES:-$HOME/dotfiles}"
+export bpre="$(brew --prefix)"
+
+
+export function cff() {
+  $(fzf --multi --preview 'cat {}' --preview-window=up:30%:wrap --height 30% --reverse --inline-info --color=dark) | nvim
+  $f
+}
 
 # Dotfiles location
 
@@ -71,12 +79,11 @@ export KEYTIMEOUT=1
 # Source Utility Functions
 # ========================================================================
 
-local DOTFILES="${DOTFILES:-$HOME/dotfiles}"
+export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
 
 # Source our utility functions from utils.zsh
-export UTILS_PATH="$DOTFILES/config/zsh/utils.zsh"
-
-source "$UTILS_PATH"
+export UTILS="$DOTFILES/config/zsh/utils.zsh"
+source "$UTILS"
 
 
 # Check if a command exists
@@ -176,38 +183,28 @@ export LINKMAP
 
 # ========================================================================
 # git
+
+# https://git-scm.com/docs/git-config
 # ========================================================================
 
-if ! has_command git; then
-  echo "git not found. Installing git..."
-  brew install --quiet git
-fi
+! has_command git && brew install --quiet git
+! has_command lazygit && brew install --quiet lazygit
 
-export GIT_EDITOR="nvim"
-export GIT_PAGER="bat --pager always"
-export GIT_AUTHOR_NAME="Hank"
-export GIT_AUTHOR_EMAIL="hank.lee.qed@gmail.com"
-export GIT_COMMITTER_NAME="Hank"
-export GIT_COMMITTER_EMAIL="hank.lee.qed@gmail.com"
+export GIT_CONFIG="$XDG_CONFIG_HOME/git/config"
 
-# Backup existing config if needed
-# [[ -f ~/.gitconfig ]] || mv ~/.gitconfig ~/.gitconfig.backup
-# [[ -f ~/.gitignore ]] || mv ~/.gitignore ~/.gitignore.backup
+# export GIT_EDITOR="nvim"
+# export GIT_PAGER="bat --pager always"
+# export GIT_AUTHOR_NAME="Hank"
+# export GIT_AUTHOR_EMAIL="hank.lee.qed@gmail.com"
+# export GIT_COMMITTER_NAME="Hank"
+# export GIT_COMMITTER_EMAIL="hank.lee.qed@gmail.com"
 
-# Create symbolic link
-# ln -sf ~/dotfiles/config/git/gitconfig ~/.gitconfig
-# ln -sf ~/dotfiles/config/git/gitignore ~/.gitignore
-
-if ! has_command lazygit; then
-  echo "lazygit not found. Installing lazygit..."
-  brew install --quiet lazygit
-fi
 
 # Lazygit custom config file location (https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md#overriding-default-config-file-location)
 # Dir
-CONFIG_DIR="$DOTFILES/config/lazygit"
+CONFIG_DIR="$XDG_CONFIG_HOME/lazygit"
 # file path
-LG_CONFIG_FILE="$DOTFILES/config/lazygit/config.yml"
+LG_CONFIG_FILE="$XDG_CONFIG_HOME/lazygit/config.yml"
 
 # if [[ ! -f "$XDG_CONFIG_HOME/lazygit/config.yml" ]]; then
 #   echo "Linking lazygit config..."
@@ -220,11 +217,17 @@ LG_CONFIG_FILE="$DOTFILES/config/lazygit/config.yml"
 
 
 echo "Linking starship.toml..."
-ln -sf "$DOTFILES/config/starship.toml" "$XDG_CONFIG_HOME/starship.toml"
+# ln -sf "$DOTFILES/config/starship.toml" "$XDG_CONFIG_HOME/starship.toml"
+
+export STARSHIP_CONFIG="$XDG_CONFIG_HOME/starship/starship.toml"
+
+eval "$(starship init zsh)"
 
 # ========================================================================
 # ghostty
 # ========================================================================
+
+
 if ! has_command ghostty; then
   echo "ghostty not found. Installing ghostty..."
   brew install --quiet ghostty
@@ -454,20 +457,6 @@ fi
 # fi
 
 # Note: For Apple Silicon Macs, the Rust toolchain is installed with native arm64 support
-#
-# ========================================================================
-# warp
-# ========================================================================
-
-# if ! has_command warp; then
-#   echo "warp not found. Installing warp..."
-#   brew install --quiet warp
-# fi
-#
-# if [[ ! -f "$XDG_CONFIG_HOME/warp/keybindings.yaml" ]]; then
-#   echo "Linking warp keybindings..."
-#   ln -sf "$DOTFILES/config/warp/keybindings.yaml" "$XDG_CONFIG_HOME/warp/keybindings.yaml"
-# fi
 
 # ========================================================================
 # claude
@@ -539,123 +528,33 @@ export GOPATH="$HOME/go"
 export GOBIN="$GOPATH/bin"
 
 # ========================================================================
-#
-# ========================================================================
-
-# # Define installation commands for tools as an associative array
-# declare -A TOOL_INSTALL_COMMANDS=(
-#   [brew]="/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
-#   [starship]="curl -sS https://starship.rs/install.sh | sh"
-#   [atuin]="curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh"
-#   [volta]="curl https://get.volta.sh | bash"
-#   [uv]="curl -LsSf https://astral.sh/uv/install.sh | sh"
-#   [rustup]="curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
-#   [fzf]="brew install fzf"
-#   [eza]="brew install eza"
-#   [go]="brew install go"
-#   [nvim]="brew install neovim"
-#   [zoxide]="brew install zoxide"
-#   [fd]="brew install fd"
-# )
-#
-# # Define which tools are essential (will always be installed if missing)
-# declare -A TOOL_IS_ESSENTIAL=(
-#   [brew]=true
-#   [starship]=true
-#   [git]=true
-#   [atuin]=true
-#   [volta]=true
-#   [uv]=true
-#   [rustup]=true
-#   [fzf]=true
-#   [eza]=rtrue
-#   [go]=true
-#   [nvim]=true
-#   [zoxide]=true
-# )
-#
-
-# # Load configuration files in specific order, installing required tools if needed
-# local files=(
-#   "$ZDOTDIR/brew.zsh" # Homebrew package management
-#   # "$ZDOTDIR/starship.zsh" # starship prompt
-#   "$ZDOTDIR/fzf.zsh"  # Fuzzy finder configuration
-#   "$ZDOTDIR/nvim.zsh" # Neovim editor configuration
-#   # "$ZDOTDIR/fd.zsh"  # starship prompt
-#   # "$ZDOTDIR/bat.zsh" # starship prompt
-#   # "$ZDOTDIR/git.zsh"      # Git utilities and configurations
-#   # "$ZDOTDIR/python.zsh" # Python development
-#   # "$ZDOTDIR/nodejs.zsh"   # Node.js development
-#   # "$ZDOTDIR/go.zsh"     # Go development
-#   # "$ZDOTDIR/rust.zsh"   # Rust development
-#   # "$ZDOTDIR/atuin.zsh"    # Atuin shell history
-# )
-# # Source individual configuration modules
-# for file in $files; do
-#   [[ -f "$file" ]] && source "$file"
-# done
-
-## Special case for Homebrew PATH
-#if has_command "brew"; then
-#  if is_apple_silicon; then
-#    eval "$(/opt/homebrew/bin/brew shellenv)"
-#  else
-#    eval "$(/usr/local/bin/brew shellenv)"
-#  fi
-#fi
-
-# # Special cases for tools that need post-installation configuration
-# if ! has_command "atuin" && [[ ! -f "$XDG_DATA_HOME/atuin/.initialized" ]]; then
-#   # Only run first-time setup if atuin was just installed
-#   log_info "First-time Atuin setup: importing shell history" atuin import auto
-#   atuin sync -f
-#   touch "$XDG_DATA_HOME/atuin/.initialized"
-# fi
-
-# if has_command "volta" && [[ ! -d "$HOME/.volta/bin/node" ]]; then
-#   log_info "Installing Node.js via Volta"
-#   volta install node
-# fi
-
-# ========================================================================
 # Completions
 # ========================================================================
 
-# Completions setup
-#
-if type brew &>/dev/null; then
-  FPATH=$(brew --prefix)/share/zsh-abbr:$FPATH
+# Load ZSH plugins from Homebrew if available
+if [[ -d "$HOMEBREW_PREFIX/share" ]]; then
+  plugins=(
+    "zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+    "zsh-autosuggestions/zsh-autosuggestions.zsh"
+    "zsh-abbr/zsh-abbr.zsh"
+  )
+  for plugin in $plugins; do
+    plugin_path="$HOMEBREW_PREFIX/share/$plugin"
+    # has_command abbr && FPATH=$brewp/share/zsh-abbr:$FPATH
+    if [[ -f "$plugin_path" ]]; then
+      source "$plugin_path"
+      # Completions setup
+      FPATH=$plugin_path:$FPATH
+    fi
+  done
+
 fi
 
-fpath=($HOMEBREW_PREFIX/share/zsh/site-functions $fpath)
+# Completions setup
+FPATH=$brewp/share/zsh/site-functions:$FPATH
+
 autoload -Uz compinit
 compinit
-
-# Initialize the completion system
-# Completions setup
-# if type brew &>/dev/null; then
-#   FPATH=$(brew --prefix)/share/zsh-abbr:$FPATH
-#   autoload -Uz compinit
-#   compinit
-# else
-#autoload -Uz compinit
-#compinit
-# fi
-
-# Load ZSH plugins from Homebrew if available
-# if [[ -d "$HOMEBREW_PREFIX/share" ]]; then
-#   plugins=(
-#     "zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-#     "zsh-autosuggestions/zsh-autosuggestions.zsh"
-#     "zsh-abbr/zsh-abbr.zsh"
-#   )
-#   for plugin in $plugins; do
-#     plugin_path="$HOMEBREW_PREFIX/share/$plugin"
-#     if [[ -f "$plugin_path" ]]; then
-#       source "$plugin_path"
-#     fi
-#   done
-# fi
 
 # ========================================================================
 # Tool Initialization
@@ -675,12 +574,10 @@ has_command direnv && eval "$(direnv hook zsh)"
 # has_command fnm && eval "$(fnm env --use-on-cd)"
 # has_command volta && eval "$(volta setup)"
 has_command uv && eval "$(uv generate-shell-completion zsh)"
-# has_command uvx && eval "$(uvx --generate-shell-completion zsh)"
 # has_command pyenv && eval "$(pyenv init -)"
 # has_command abbr && eval "$(abbr init zsh)"
-#
 # Zellij (auto-start on startup)
-eval "$(zellij setup --generate-auto-start zsh)"
+has_command zellij && eval "$(zellij setup --generate-auto-start zsh)"
 
 # yazi (https://yazi-rs.github.io/docs/quick-start)
 function y() {
@@ -693,9 +590,7 @@ function y() {
 }
 
 # Load FZF completions
-if has_command fzf; then
-  source <(fzf --zsh)
-fi
+has_command fzf && source <(fzf --zsh)
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 

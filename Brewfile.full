@@ -7,7 +7,7 @@ tap "nikitabobko/tap"
 
 # Formulae (Development & Utility CLIs)
 # Rust toolchain manager (Requires post-install script execution)
-# brew "skim"             # grep alternative
+# brew "sk"             # grep alternative
 brew "mas"             # Mac App Store CLI
 brew "atuin", restart_service: :changed # Shell history sync
 brew "starship"        # Customizable prompt
@@ -21,7 +21,7 @@ brew "fd"              # Better find
 brew "ripgrep"         # Better grep
 brew "sd"              # Better sed
 brew "dust"            # Disk usage statistics
-brew "procs"           # Better ps
+brew "procs"           # Better ps written in Rust
 brew "htop"            # Process viewer
 brew "git"             # Version control
 brew "git-delta"       # Better git diffs
@@ -69,15 +69,14 @@ brew "sops"            # Secrets management
 # Development Environment
 brew "neovim"          # Text editor
 brew "zellij"          # Terminal multiplexer
-brew "mise"            # Runtime version manager
 brew "entr"            # File watcher
 brew "lefthook"        # Git hooks manager
-brew "biome"           # JavaScript formatter/linter
 
 # Database Tools
 brew "postgresql@17"   # PostgreSQL database
 brew "datasette"       # SQLite explorer
 brew "pgcli"           # PostgreSQL CLI
+brew "usql"            # universal sql cli
 
 # AWS Tools
 brew "awscli"          # AWS CLI
@@ -112,12 +111,12 @@ brew "spider-cloud-cli" # Web scraping
 brew "aider"           # AI coding assistant
 brew "eslint"
 brew "prettier"
+brew "tlrc"                      # Official tldr client written in Rust
 
 # HTTP 
 brew "curl"
 brew "awscli"
 brew "bat"
-brew "biome"
 brew "bitwarden-cli"
 brew "coder"
 brew "datasette"
@@ -150,7 +149,6 @@ brew "nvm"
 brew "oven-sh/bun/bun"
 brew "postgresql@17", restart_service: :changed
 brew "posting"
-brew "procs"
 brew "ripgrep"
 brew "rustscan"
 brew "rustup-init"     
@@ -459,7 +457,6 @@ mas "Screens 5", id: 1663047912
 # brew "gping"                     # Ping, but with a graph
 # brew "htop"                      # Improved top (interactive process viewer)
 # brew "hyperfine"                 # Command-line benchmarking tool
-# brew "procs"                     # Modern replacement for ps written in Rust
 # brew "speedtest-cli"             # Command-line interface for speedtest.net bandwidth tests
 # brew "trippy"                    # Network diagnostic tool, inspired by mtr
 #
@@ -483,7 +480,6 @@ mas "Screens 5", id: 1663047912
 # # CLI Apps & Utilities
 # # brew "cheat"                     # Create and view interactive cheat sheets for *nix commands
 # brew "dasht"                     # Search API docs offline, in your terminal or browser
-# brew "tlrc"                      # Official tldr client written in Rust
 # # brew "xxh"                       # Bring your favorite shell wherever you go through the ssh
 #
 # ###############################################################################
@@ -1121,9 +1117,6 @@ mas "Screens 5", id: 1663047912
 #
 # brew "harfbuzz" # OpenType text shaping engine
 #
-# brew "glib" # core app lib for C
-# brew "xz" # high compression tool
-#
 # # Lua
 # brew "lua"                       # Powerful, lightweight programming language
 # brew "luarocks"                  # Package manager for the Lua programming language
@@ -1186,7 +1179,6 @@ mas "Screens 5", id: 1663047912
 # brew "gping"                     # Ping, but with a graph
 # brew "htop"                      # Improved top (interactive process viewer)
 # brew "hyperfine"                 # Command-line benchmarking tool
-# brew "procs"                     # Modern replacement for ps written in Rust
 # brew "speedtest-cli"             # Command-line interface for speedtest.net bandwidth tests
 # brew "trippy"                    # Network diagnostic tool, inspired by mtr
 #
@@ -1210,7 +1202,6 @@ mas "Screens 5", id: 1663047912
 # # CLI Apps & Utilities
 # # brew "cheat"                     # Create and view interactive cheat sheets for *nix commands
 # brew "dasht"                     # Search API docs offline, in your terminal or browser
-# brew "tlrc"                      # Official tldr client written in Rust
 # # brew "xxh"                       # Bring your favorite shell wherever you go through the ssh
 #
 # ###############################################################################
@@ -1635,7 +1626,6 @@ mas "Screens 5", id: 1663047912
 # # ##################
 # # # NPM global install (Bun)
 # # ##################
-# # # brew "biome"                     # bun add --dev --exact @biomejs/biome
 # # # esbuild # npm install --save-exact --save-dev esbuild
 # # # typescript #  npm install -g typescript  # (project-wide) npm install typescript --save-dev
 # #
@@ -1703,7 +1693,7 @@ mas "Screens 5", id: 1663047912
 # # Would uninstall formulae:
 # # shellcheck                                                                      netcat
 # # actionlint                                                                      nspr
-# # angle-grinder                                                                   nss
+# #                                                                    nss
 # # aria2                                                                           raylib
 # # atuin                                                                           odin
 # # autoconf                                                                        onefetch
@@ -1712,8 +1702,8 @@ mas "Screens 5", id: 1663047912
 # # bottom                                                                          poppler
 # # cheat                                                                           portaudio
 # # cloudflare-wrangler                                                             prettier
-# # cmake                                                                           pyenv
-# # curlie                                                                          python@3.11
+# # cmake                                                                           
+# # curlie                                                                          
 # # cutter                                                                          rclone
 # # dotnet@8                                                                        rollup
 # # esbuild                                                                         ruby
@@ -1744,10 +1734,18 @@ mas "Screens 5", id: 1663047912
 # # lsd                                                                             sachaos/todoist/todoist
 # # lua-language-server                                                             stripe/stripe-cli/stripe
 # # marksman                                                                        temporalio/brew/tcld
-# # mcfly                                                                           yakitrak/yakitrak/obsidian-cli
+#                                                                           yakitrak/yakitrak/obsidian-cli
 # # nasm
 # # Run `brew bundle cleanup --force` to make these changes.
+
 brew "tag"
 brew "ouch"
 brew "hexyl"
 brew "rich"
+brew "7zip"
+brew "ffmpeg"
+brew "poppler"
+brew "resvg"
+brew "imagemagick"
+brew "jq"
+brew "luarocks"

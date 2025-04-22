@@ -1,3 +1,0 @@
-return {
-    { "danymat/neogen" },
-}
