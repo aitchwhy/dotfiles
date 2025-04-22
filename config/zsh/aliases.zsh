@@ -4,10 +4,10 @@ local DOTFILES="${DOTFILES:-$HOME/dotfiles}"
 
 # justfile
 # alias jfmt="just --unstable --fmt"
-alias j="just"
 # alias .j='just -g'
 # alias j="just -f ~/dotfiles/user.justfile"
-alias .j='just -f ~/dotfiles/user.justfile --working-directory .'
+alias .j='just -f ~/dotfiles/config/just/.user.justfile'
+alias j="just"
 
 # for recipe in $(just --justfile $DOTFILES/config/just/user.justfile --summary); do
 #   alias $recipe="just --justfile '$DOTFILES/config/just/user.justfile' --working-directory . $recipe"
@@ -15,6 +15,7 @@ alias .j='just -f ~/dotfiles/user.justfile --working-directory .'
 
 # === Aliases from .zshrc ===
 alias claude="/Users/hank/.claude/local/claude"
+
 # List Files - Prioritize eza/exa with fallback to ls
 if has_command eza; then # Conditional logic moved with aliases, might need adjustment
   alias ls="eza --icons --group-directories-first"
@@ -184,7 +185,7 @@ alias zje="zellij edit"
 # alias fm='f man'          # Man pages
 # alias fa='f alias'        # Aliases
 # # Package management
-alias fb='f brew' # Brew operations
+# alias fb='f brew' # Brew operations
 # alias fbi='f brew install' # Brew install
 # alias fbu='f brew uninstall' # Brew uninstall
 # === End Aliases from fzf.zsh ===
