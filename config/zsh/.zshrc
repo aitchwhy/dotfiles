@@ -661,6 +661,12 @@ compinit
 # Tool Initialization
 # ========================================================================
 
+# Yazi
+# env "YAZI_CONFIG_HOME=~/.config/yazi-alt" yazi
+
+# zellij issue with Yazi (image preview) - https://yazi-rs.github.io/docs/image-preview#zellij
+# TERM=xterm-kitty yazi
+
 # Initialize tools only if they are installed
 has_command starship && eval "$(starship init zsh)"
 has_command atuin && eval "$(atuin init zsh)"
@@ -675,6 +681,16 @@ has_command uv && eval "$(uv generate-shell-completion zsh)"
 #
 # Zellij (auto-start on startup)
 eval "$(zellij setup --generate-auto-start zsh)"
+
+# yazi (https://yazi-rs.github.io/docs/quick-start)
+function y() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	yazi "$@" --cwd-file="$tmp"
+	if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+		builtin cd -- "$cwd"
+	fi
+	rm -f -- "$tmp"
+}
 
 # Load FZF completions
 if has_command fzf; then

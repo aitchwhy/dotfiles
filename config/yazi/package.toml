@@ -1,5 +1,139 @@
-[plugin]
-deps = [{ use = "yazi-rs/plugins:full-border", rev = "ad52adf" }, { use = "yazi-rs/plugins:smart-filter", rev = "ad52adf" }, { use = "yazi-rs/plugins:max-preview", rev = "ad52adf" }, { use = "yazi-rs/plugins:git", rev = "ad52adf" }, { use = "dedukun/bookmarks", rev = "600f87c" }, { use = "Rolv-Apneseth/starship", rev = "77a65f5" }]
+[[plugin.deps]]
+use = "yazi-rs/plugins:smart-enter"
+rev = "4b027c7"
+hash = "7918aab6a71caf31b58411f789195677"
 
-[flavor]
-deps = [{ use = "yazi-rs/flavors:catppuccin-macchiato", rev = "d504f70" }]
+[[plugin.deps]]
+use = "yazi-rs/plugins:diff"
+rev = "4b027c7"
+hash = "7a08e303167d5b655c06da6d570f0333"
+
+[[plugin.deps]]
+use = "yazi-rs/plugins:full-border"
+rev = "4b027c7"
+hash = "1f3dad061209081a6b04dd6ff2cb06c7"
+
+[[plugin.deps]]
+use = "yazi-rs/plugins:jump-to-char"
+rev = "4b027c7"
+hash = "a670c03eb3760812e044a24f94cedc55"
+
+[[plugin.deps]]
+use = "yazi-rs/plugins:lsar"
+rev = "4b027c7"
+hash = "d0950c172ce352d31554ad6db8226494"
+
+[[plugin.deps]]
+use = "yazi-rs/plugins:mactag"
+rev = "4b027c7"
+hash = "f4ee8d1a119fc869ffcd7e8a71b1469e"
+
+[[plugin.deps]]
+use = "yazi-rs/plugins:mime-ext"
+rev = "4b027c7"
+hash = "5e24c167e9ae9a203a48f2a438b8c705"
+
+[[plugin.deps]]
+use = "yazi-rs/plugins:mount"
+rev = "4b027c7"
+hash = "dd97eede8e20e59cd2604e8006e470e2"
+
+[[plugin.deps]]
+use = "yazi-rs/plugins:piper"
+rev = "4b027c7"
+hash = "ca862f0008f47952e2bd3e19328aca02"
+
+[[plugin.deps]]
+use = "yazi-rs/plugins:smart-filter"
+rev = "4b027c7"
+hash = "f0c4b41b5d19a3144958383333eff6e7"
+
+[[plugin.deps]]
+use = "yazi-rs/plugins:toggle-pane"
+rev = "4b027c7"
+hash = "f3853bbdd1da2fad09d059ab5464abfd"
+
+[[plugin.deps]]
+use = "yazi-rs/plugins:vcs-files"
+rev = "4b027c7"
+hash = "36405f8781fcaf33ceab24dffd5cea19"
+
+[[plugin.deps]]
+use = "dedukun/bookmarks"
+rev = "a70648a"
+hash = "b836fb264381f35dec79930438a906d5"
+
+[[plugin.deps]]
+use = "dedukun/relative-motions"
+rev = "ce2e890"
+hash = "23915860e59348bf4166778bb0e606f7"
+
+[[plugin.deps]]
+use = "hankertrix/augment-command"
+rev = "adebde0"
+hash = "eef0510c86fa6400f59ad03e0206e817"
+
+[[plugin.deps]]
+use = "stelcodes/bunny"
+rev = "a64f32a"
+hash = "22d9e6f72230be88ab322040626623a"
+
+[[plugin.deps]]
+use = "MasouShizuka/projects"
+rev = "4f11ecc"
+hash = "17fa17295d27864f62875f06a77f72e7"
+
+[[plugin.deps]]
+use = "ndtoan96/ouch"
+rev = "2496cd9"
+hash = "5b9dea47776a30946cfbf83232d18fb1"
+
+[[plugin.deps]]
+use = "Lil-Dank/lazygit"
+rev = "7a08a09"
+hash = "a1fa2b3e1826c3a34804ea8c548e9f80"
+
+[[plugin.deps]]
+use = "pirafrank/what-size"
+rev = "f1c6b69"
+hash = "6e789212eb41d937bab04877ca361099"
+
+[[plugin.deps]]
+use = "AnirudhG07/plugins-yazi:copy-file-contents"
+rev = "524c52c"
+hash = "27c50e6bc15c09096505b805b238ade0"
+
+[[plugin.deps]]
+use = "Ape/open-with-cmd"
+rev = "433cf30"
+hash = "86e0312b01bc5762813c6c1d0517f073"
+
+[[plugin.deps]]
+use = "Rolv-Apneseth/starship"
+rev = "6fde3b2"
+hash = "7ddb7a790746fd91ecdd0350cc5a5d8c"
+
+[[plugin.deps]]
+use = "Reledia/glow"
+rev = "2da96e3"
+hash = "f9ee1436e3b853508d87f7d49dce56e6"
+
+[[plugin.deps]]
+use = "AnirudhG07/rich-preview"
+rev = "2559e5f"
+hash = "c9a3d0731e7d7340e2c6d6126b1f3aa3"
+
+[[flavor.deps]]
+use = "ficcdaf/ashen:ashen"
+rev = "e0d552f"
+hash = "a48aa4d7140c52cdd14552039b632800"
+
+[[flavor.deps]]
+use = "kmlupreti/ayu-dark"
+rev = "5f600aa"
+hash = "a05f94b9a20b64d814c7631074d65c4a"
+
+[[flavor.deps]]
+use = "BennyOe/tokyo-night"
+rev = "695dac6"
+hash = "a8f426ea0d9cb843b081d62ab01364c8"

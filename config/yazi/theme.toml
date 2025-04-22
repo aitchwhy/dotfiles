@@ -1,0 +1,38 @@
+[flavor]
+# dark = "ashen"
+dark = "tokyo-night"
+light = "ashen"
+
+
+# ==================================================
+# Icons (optimized for macOS)
+# ==================================================
+
+[icons]
+prepend_rules = [
+  # macOS-specific files
+  { name = ".DS_Store", text = "" },
+  { name = ".Trash", text = "󰈑" },
+  { name = "Applications", text = "󰇮" },
+  { name = "Desktop", text = "󰟀" },
+  { name = "Developer", text = "󰏓" },
+  { name = "Documents", text = "󰈙" },
+  { name = "Downloads", text = "󰇚" },
+  { name = "Library", text = "󰂺" },
+  { name = "Movies", text = "󰎁" },
+  { name = "Music", text = "󰎄" },
+  { name = "Pictures", text = "󰋩" },
+  { name = "Public", text = "󰄛" },
+
+  # Development
+  { name = ".git", text = "󰊢" },
+  { name = ".github", text = "" },
+  { name = "node_modules", text = "󰎙" },
+  { name = "package.json", text = "󰎙" },
+  { name = "package-lock.json", text = "󰎙" },
+  { name = "Cargo.toml", text = "󱘗" },
+  { name = "Cargo.lock", text = "󱘗" },
+  { name = "go.mod", text = "󰟓" },
+  { name = "go.sum", text = "󰟓" },
+  { name = "Brewfile", text = "󰜙" },
+]
