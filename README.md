@@ -32,6 +32,7 @@ chmod +x install.zsh
 ```
 
 This will:
+
 1. Check system requirements
 2. Set up ZSH configuration
 3. Install Homebrew and packages
@@ -50,6 +51,7 @@ chmod +x update.zsh
 ```
 
 This will:
+
 1. Update dotfiles repository
 2. Update Homebrew packages
 3. Update symlinks
@@ -119,6 +121,7 @@ Regular updates ensure you have the latest configurations and packages:
 ### Backup
 
 The installation script automatically creates backups of existing configurations in:
+
 ```
 $HOME/.dotfiles_backup/YYYYMMDD_HHMMSS/
 ```
@@ -128,17 +131,20 @@ $HOME/.dotfiles_backup/YYYYMMDD_HHMMSS/
 ### Common Issues
 
 1. **Permission Issues**
+
    ```bash
    chmod +x install.zsh update.zsh
    ```
 
 2. **Homebrew Issues**
+
    ```bash
    brew doctor
    brew cleanup
    ```
 
 3. **Shell Issues**
+
    ```bash
    exec zsh
    ```
