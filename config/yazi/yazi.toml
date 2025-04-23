@@ -1,33 +1,33 @@
 [manager]
-show_hidden = true
-layout = [1, 4, 3]
-sort_by = "natural"
-sort_sensitive = false
-sort_reverse = false
-sort_dir_first = true
-linemode = "size"
-show_preview = true
-show_icons = true
-show_symlink = true
-preview_ratio = 0.5
-folder_preview = true
-scroll_offset = 5
-case_sensitive = false
-mouse = true
+  show_hidden = true
+  layout = [1, 4, 3]
+  sort_by = "natural"
+  sort_sensitive = false
+  sort_reverse = false
+  sort_dir_first = true
+  linemode = "size"
+  show_preview = true
+  show_icons = true
+  show_symlink = true
+  preview_ratio = 0.5
+  folder_preview = true
+  scroll_offset = 5
+  case_sensitive = false
+  mouse = true
 
 [preview]
-max_width = 1920
-max_height = 1080
-cache_dir = "~/.cache/yazi"
-keybinding = true
-max_file_size = "10MB"
-tab_size = 2
-preload = 5
+  max_width = 1920
+  max_height = 1080
+  cache_dir = "~/.cache/yazi"
+  keybinding = true
+  max_file_size = "10MB"
+  tab_size = 2
+  preload = 5
 
 [tasks]
-micro_workers = 5
-macro_workers = 10
-bizarre_retry = 5
+  micro_workers = 5
+  macro_workers = 10
+  bizarre_retry = 5
 
 [opener]
 edit = [
