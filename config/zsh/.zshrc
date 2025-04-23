@@ -53,18 +53,12 @@ export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 
 # Ensure ZSH config directory is set
 export zdot=${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}
-export cf="$DOTFILES/config"
-export cfz="$DOTFILES/config/zsh"
 export dot="${DOTFILES:-$HOME/dotfiles}"
+export cf="$dot/config"
+export cfz="$dot/config/zsh"
+export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
 export bpre="$(brew --prefix)"
 
-
-export function cff() {
-  $(fzf --multi --preview 'cat {}' --preview-window=up:30%:wrap --height 30% --reverse --inline-info --color=dark) | nvim
-  $f
-}
-
-# Dotfiles location
 
 # ========================================================================
 # Keyboard & Input Configuration
@@ -79,8 +73,6 @@ export KEYTIMEOUT=1
 # Source Utility Functions
 # ========================================================================
 
-export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
-
 # Source our utility functions from utils.zsh
 export UTILS="$DOTFILES/config/zsh/utils.zsh"
 source "$UTILS"
@@ -91,95 +83,32 @@ export function has_command() {
   command -v "$1" &>/dev/null
 }
 
-
 # ========================================================================
-# install core
-# ========================================================================
-# brew install --quiet --file="$DOTFILES/Brewfile.core"
-
-# ========================================================================
-# Path Configuration
+# create XDG config symlinks for all configs
 #
-# https://stackoverflow.com/questions/11530090/adding-a-new-entry-to-the-path-variable-in-zsh
-# # append
-# path+=('/home/david/pear/bin')
-# # or prepend
-# path=('/home/david/pear/bin' $path)
-# Add a new path, if it's not already there
-# path+=(~/my_bin)
+# Set a variable with a list of strings
+# my_list=("apple" "banana" "cherry" "date")
+
+# # Iterate over the list
+# for item in "${my_list[@]}"; do
+#     echo "Fruit: $item"
+# done
 # ========================================================================
 
-# ========================================================================
-# Dotfiles Symlink Map Configuration
-# ========================================================================
-
-# This defines the mapping between dotfiles source locations and their
-# target locations in the user's home directory. It's used by the installation
-# script and other dotfiles management tools.
-
-declare -gA LINKMAP=(
-  #   # Git configurations
-  #   # ["$DOTFILES/config/git/config"]="$XDG_CONFIG_HOME/.gitconfig"
-  #   # ["$DOTFILES/config/git/ignore"]="$XDG_CONFIG_HOME/git/.gitignore"
-  #   # ["$DOTFILES/config/git/gitattributes"]="$HOME/.gitattributes"
-  #   # ["$DOTFILES/config/git/gitmessage"]="$HOME/.gitmessage"
-
-  #   # ["$DOTFILES/config/starship.toml"]="$XDG_CONFIG_HOME/starship.toml"
-  #   # ["$DOTFILES/config/ghostty/config"]="$XDG_CONFIG_HOME/ghostty"
-  #   # ["$DOTFILES/config/atuin/config.toml"]="$XDG_CONFIG_HOME/atuin/config.toml"
-  #   # ["$DOTFILES/config/lazygit/config.yml"]="$XDG_CONFIG_HOME/lazygit/config.yml"
-  #   ["$DOTFILES/config/karabiner/karabiner.json"]="$XDG_CONFIG_HOME/karabiner/karabiner.json"
-
-  #   # Editor configurations
-  #   ["$DOTFILES/config/vscode/settings.json"]="$HOME/Library/Application Support/Code/User/settings.json"
-  #   ["$DOTFILES/config/vscode/keybindings.json"]="$HOME/Library/Application Support/Code/User/keybindings.json"
-  #   ["$DOTFILES/config/cursor/settings.json"]="$HOME/Library/Application Support/Cursor/User/settings.json"
-  #   ["$DOTFILES/config/cursor/keybindings.json"]="$HOME/Library/Application Support/Cursor/User/keybindings.json"
-
-  #   # ["$DOTFILES/config/yazi"]="$XDG_CONFIG_HOME/yazi"
-  #   # ["$DOTFILES/config/nvim"]="$XDG_CONFIG_HOME/nvim"
-  #   # ["$DOTFILES/config/bat"]="$XDG_CONFIG_HOME/bat"
-  #   # ["$DOTFILES/config/zellij"]="$XDG_CONFIG_HOME/zellij"
-  #   # ["$DOTFILES/config/zed"]="$XDG_CONFIG_HOME/zed"
-  #   # ["$DOTFILES/config/espanso"]="$XDG_CONFIG_HOME/espanso"
-  #   # ["$DOTFILES/config/warp/keybindings.yaml"]="$XDG_CONFIG_HOME/warp/keybindings.yaml"
-
-  #   # ["$DOTFILES/config/hammerspoon"]="$HOME/.hammerspoon"
-
-  #   # AI tools configurations
-
-  #   # ["$DOTFILES/config/ai/claude/claude_desktop_config.json"]="$HOME/Library/Application Support/Claude/claude_desktop_config.json"
-  #   # ["$DOTFILES/config/ai/cline/cline_mcp_settings.json"]="$HOME/Library/Application Support/Cursor/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json"
+# 
+my_list=(
+  "$dot/config/git/config"
+  "$dot/config/lazygit/config.yml"
+  "$dot/config/starship/starship.toml"
+  "$dot/config/ghostty/config"
+  "$dot/config/atuin/config.toml"
 )
 
-# # Export the map for use in other scripts
-export LINKMAP
+# Iterate over the list
+for item in "${my_list[@]}"; do
+    echo "Fruit: $item"
+done
 
-# # Initialize dotfiles - ensure essential symlinks exist
-# # This is a lightweight version of setup_cli_tools from install.zsh
-# # that won't disrupt the user's shell experience
-# dotfiles_init() {
-#   # Only run in interactive shells to avoid slowing down scripts
-#   if [[ -o interactive ]]; then
-#     # Create missing symlinks silently
-#     for key in ${(k)DOTFILES_TO_SYMLINK_MAP}; do
-#       local src="$key"
-#       local dst="${DOTFILES_TO_SYMLINK_MAP[$key]}"
-
-#       # Only create symlink if source exists and destination doesn't
-#       if [[ -e "$src" ]] && [[ ! -e "$dst" ]]; then
-#         local parent_dir=$(dirname "$dst")
-
-#         # Create parent directory if needed
-#         [[ ! -d "$parent_dir" ]] && mkdir -p "$parent_dir"
-
-#         # Create the symlink
-#         echo "Creating symlink: $dst -> $src"
-#         ln -sf "$src" "$dst"
-#       fi
-#     done
-#   fi
-# }
 
 # ========================================================================
 # git
@@ -190,7 +119,11 @@ export LINKMAP
 ! has_command git && brew install --quiet git
 ! has_command lazygit && brew install --quiet lazygit
 
-export GIT_CONFIG="$XDG_CONFIG_HOME/git/config"
+export GIT_CONFIG="$cf/git/config"
+
+# Lazygit custom config file location (https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md#overriding-default-config-file-location)
+CONFIG_DIR="$cf/lazygit"
+# LG_CONFIG_FILE="$dot/config/lazygit/config.yml"
 
 # export GIT_EDITOR="nvim"
 # export GIT_PAGER="bat --pager always"
@@ -200,11 +133,6 @@ export GIT_CONFIG="$XDG_CONFIG_HOME/git/config"
 # export GIT_COMMITTER_EMAIL="hank.lee.qed@gmail.com"
 
 
-# Lazygit custom config file location (https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md#overriding-default-config-file-location)
-# Dir
-CONFIG_DIR="$XDG_CONFIG_HOME/lazygit"
-# file path
-LG_CONFIG_FILE="$XDG_CONFIG_HOME/lazygit/config.yml"
 
 # if [[ ! -f "$XDG_CONFIG_HOME/lazygit/config.yml" ]]; then
 #   echo "Linking lazygit config..."
@@ -219,7 +147,7 @@ LG_CONFIG_FILE="$XDG_CONFIG_HOME/lazygit/config.yml"
 echo "Linking starship.toml..."
 # ln -sf "$DOTFILES/config/starship.toml" "$XDG_CONFIG_HOME/starship.toml"
 
-export STARSHIP_CONFIG="$XDG_CONFIG_HOME/starship/starship.toml"
+export STARSHIP_CONFIG="$cf/starship/starship.toml"
 
 eval "$(starship init zsh)"
 
@@ -233,10 +161,10 @@ if ! has_command ghostty; then
   brew install --quiet ghostty
 fi
 
-if [[ ! -f "$XDG_CONFIG_HOME/ghostty/config" ]]; then
-  echo "Linking ghostty config..."
-  ln -sf "$DOTFILES/config/ghostty/config" "$XDG_CONFIG_HOME/ghostty/config"
-fi
+# if [[ ! -f "$/ghostty/config" ]]; then
+#   echo "Linking ghostty config..."
+#   ln -sf "$dOTFILES/config/ghostty/config" "$XDG_CONFIG_HOME/ghostty/config"
+# fi
 
 # ========================================================================
 # zoxide
@@ -256,7 +184,7 @@ fi
 # ========================================================================
 
 # https://docs.atuin.sh/configuration/config/
-export ATUIN_CONFIG_DIR="$DOTFILES/config/atuin"
+export ATUIN_CONFIG_DIR="$cf/atuin"
 
 # path_add "$HOME/.atuin/bin"
 
@@ -272,7 +200,7 @@ export ATUIN_CONFIG_DIR="$DOTFILES/config/atuin"
 #   ln -sf "$DOTFILES/config/atuin/config.toml" "$XDG_CONFIG_HOME/atuin/config.toml"
 # fi
 
-ln -sf "$DOTFILES/config/atuin/config.toml" "$XDG_CONFIG_HOME/atuin/config.toml"
+# ln -sf "$DOTFILES/config/atuin/config.toml" "$XDG_CONFIG_HOME/atuin/config.toml"
 
 . $HOME/.atuin/bin/env
 
@@ -557,6 +485,11 @@ autoload -Uz compinit
 compinit
 
 # ========================================================================
+# atuin
+# ========================================================================
+! has_command atuin  eval "$(atuin init zsh)"
+
+# ========================================================================
 # Tool Initialization
 # ========================================================================
 
@@ -568,7 +501,6 @@ compinit
 
 # Initialize tools only if they are installed
 has_command starship && eval "$(starship init zsh)"
-has_command atuin && eval "$(atuin init zsh)"
 has_command zoxide && eval "$(zoxide init zsh)"
 has_command direnv && eval "$(direnv hook zsh)"
 # has_command fnm && eval "$(fnm env --use-on-cd)"
@@ -599,3 +531,93 @@ has_command fzf && source <(fzf --zsh)
 [[ -f "${ZDOTDIR}/functions.zsh" ]] && source "${ZDOTDIR}/functions.zsh"
 
 . "$HOME/.atuin/bin/env"
+
+
+# ========================================================================
+# install core
+# ========================================================================
+# brew install --quiet --file="$DOTFILES/Brewfile.core"
+
+# ========================================================================
+# Path Configuration
+#
+# https://stackoverflow.com/questions/11530090/adding-a-new-entry-to-the-path-variable-in-zsh
+# # append
+# path+=('/home/david/pear/bin')
+# # or prepend
+# path=('/home/david/pear/bin' $path)
+# Add a new path, if it's not already there
+# path+=(~/my_bin)
+# ========================================================================
+
+# ========================================================================
+# Dotfiles Symlink Map Configuration
+# ========================================================================
+
+# This defines the mapping between dotfiles source locations and their
+# target locations in the user's home directory. It's used by the installation
+# script and other dotfiles management tools.
+
+declare -gA LINKMAP=(
+  #   # Git configurations
+  #   # ["$DOTFILES/config/git/config"]="$XDG_CONFIG_HOME/.gitconfig"
+  #   # ["$DOTFILES/config/git/ignore"]="$XDG_CONFIG_HOME/git/.gitignore"
+  #   # ["$DOTFILES/config/git/gitattributes"]="$HOME/.gitattributes"
+  #   # ["$DOTFILES/config/git/gitmessage"]="$HOME/.gitmessage"
+
+  #   # ["$DOTFILES/config/starship.toml"]="$XDG_CONFIG_HOME/starship.toml"
+  #   # ["$DOTFILES/config/ghostty/config"]="$XDG_CONFIG_HOME/ghostty"
+  #   # ["$DOTFILES/config/atuin/config.toml"]="$XDG_CONFIG_HOME/atuin/config.toml"
+  #   # ["$DOTFILES/config/lazygit/config.yml"]="$XDG_CONFIG_HOME/lazygit/config.yml"
+  #   ["$DOTFILES/config/karabiner/karabiner.json"]="$XDG_CONFIG_HOME/karabiner/karabiner.json"
+
+  #   # Editor configurations
+  #   ["$DOTFILES/config/vscode/settings.json"]="$HOME/Library/Application Support/Code/User/settings.json"
+  #   ["$DOTFILES/config/vscode/keybindings.json"]="$HOME/Library/Application Support/Code/User/keybindings.json"
+  #   ["$DOTFILES/config/cursor/settings.json"]="$HOME/Library/Application Support/Cursor/User/settings.json"
+  #   ["$DOTFILES/config/cursor/keybindings.json"]="$HOME/Library/Application Support/Cursor/User/keybindings.json"
+
+  #   # ["$DOTFILES/config/yazi"]="$XDG_CONFIG_HOME/yazi"
+  #   # ["$DOTFILES/config/nvim"]="$XDG_CONFIG_HOME/nvim"
+  #   # ["$DOTFILES/config/bat"]="$XDG_CONFIG_HOME/bat"
+  #   # ["$DOTFILES/config/zellij"]="$XDG_CONFIG_HOME/zellij"
+  #   # ["$DOTFILES/config/zed"]="$XDG_CONFIG_HOME/zed"
+  #   # ["$DOTFILES/config/espanso"]="$XDG_CONFIG_HOME/espanso"
+  #   # ["$DOTFILES/config/warp/keybindings.yaml"]="$XDG_CONFIG_HOME/warp/keybindings.yaml"
+
+  #   # ["$DOTFILES/config/hammerspoon"]="$HOME/.hammerspoon"
+
+  #   # AI tools configurations
+
+  #   # ["$DOTFILES/config/ai/claude/claude_desktop_config.json"]="$HOME/Library/Application Support/Claude/claude_desktop_config.json"
+  #   # ["$DOTFILES/config/ai/cline/cline_mcp_settings.json"]="$HOME/Library/Application Support/Cursor/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json"
+)
+
+# # Export the map for use in other scripts
+export LINKMAP
+
+# # Initialize dotfiles - ensure essential symlinks exist
+# # This is a lightweight version of setup_cli_tools from install.zsh
+# # that won't disrupt the user's shell experience
+# dotfiles_init() {
+#   # Only run in interactive shells to avoid slowing down scripts
+#   if [[ -o interactive ]]; then
+#     # Create missing symlinks silently
+#     for key in ${(k)DOTFILES_TO_SYMLINK_MAP}; do
+#       local src="$key"
+#       local dst="${DOTFILES_TO_SYMLINK_MAP[$key]}"
+
+#       # Only create symlink if source exists and destination doesn't
+#       if [[ -e "$src" ]] && [[ ! -e "$dst" ]]; then
+#         local parent_dir=$(dirname "$dst")
+
+#         # Create parent directory if needed
+#         [[ ! -d "$parent_dir" ]] && mkdir -p "$parent_dir"
+
+#         # Create the symlink
+#         echo "Creating symlink: $dst -> $src"
+#         ln -sf "$src" "$dst"
+#       fi
+#     done
+#   fi
+# }

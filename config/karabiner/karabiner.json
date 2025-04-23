@@ -4,6 +4,25 @@
             "complex_modifications": {
                 "rules": [
                     {
+                        "description": "CapsLock -> ESC (press) | ctrl+opt+cmd (hold)",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "caps_lock",
+                                    "modifiers": { "optional": ["any"] }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "left_command",
+                                        "modifiers": ["left_control", "left_option"]
+                                    }
+                                ],
+                                "to_if_alone": [{ "key_code": "escape" }],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
                         "description": "fn (f19) -> (tap) raycast + (hold) HYPER (ctrl+opt+cmd)",
                         "manipulators": [
                             {
@@ -101,27 +120,8 @@
                         ]
                     },
                     {
-                        "description": "CapsLock -> ESC (press) | ctrl+opt+cmd (hold)",
-                        "enabled": false,
-                        "manipulators": [
-                            {
-                                "from": {
-                                    "key_code": "caps_lock",
-                                    "modifiers": { "optional": ["any"] }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "left_command",
-                                        "modifiers": ["left_control", "left_option"]
-                                    }
-                                ],
-                                "to_if_alone": [{ "key_code": "escape" }],
-                                "type": "basic"
-                            }
-                        ]
-                    },
-                    {
                         "description": "[GHOSTTY] CapsLock -> ESC (press) | LEFT_CTRL (hold)",
+                        "enabled": false,
                         "manipulators": [
                             {
                                 "conditions": [
