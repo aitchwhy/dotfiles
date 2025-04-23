@@ -1,9 +1,9 @@
 -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md
 return {
     {
-        name = "nvim-lspconfig",
+        "nvim-lspconfig",
         dependencies = {
-            name = "jose-elias-alvarez/typescript.nvim",
+            "jose-elias-alvarez/typescript.nvim",
             init = function()
                 require("lazyvim.util").lsp.on_attach(function(_, buffer)
                     -- stylua: ignore
@@ -164,7 +164,7 @@ return {
                             })
                         end
 
-                        local fname = vim.uri_to_fname(uri)
+                        local fvim.uri_to_fname(uri)
                         client.request("workspace/executeCommand", {
                             command = "typescript.tsserverRequest",
                             arguments = {

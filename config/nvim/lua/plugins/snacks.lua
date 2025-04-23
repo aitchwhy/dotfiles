@@ -1,6 +1,6 @@
 return {
     {
-        name = "snacks.nvim",
+        "snacks.nvim",
         -- Configuration is moved to separate files for better organization
         --   indent = { enabled = true },
         input = { enabled = true },

@@ -1,12 +1,12 @@
 return {
     -- flash.nvim (Flash enhances the built-in search functionality by showing labels at the end of each match, letting you quickly jump to a specific location.)
     {
-        name = "folke/flash.nvim",
+        "folke/flash.nvim",
         event = "VeryLazy",
         opts = {},
         -- keys = {
         --     {
-        --         name = "s",
+        --         "s",
         --         mode = { "n", "x", "o" },
         --         function()
         --             require("flash").jump()

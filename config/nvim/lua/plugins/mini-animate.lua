@@ -1,6 +1,6 @@
 return {
     {
-        name = "echasnovski/mini.animate",
+        "echasnovski/mini.animate",
         optional = true,
         opts = {
             cursor = { enable = false },

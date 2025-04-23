@@ -1,6 +1,6 @@
 return {
     {
-        name = "mfussenegger/nvim-dap",
+        "mfussenegger/nvim-dap",
         optional = true,
         dependencies = {
             {
@@ -54,14 +54,14 @@ return {
                         {
                             type = "pwa-node",
                             request = "launch",
-                            name = "Launch file",
+                            "Launch file",
                             program = "${file}",
                             cwd = "${workspaceFolder}",
                         },
                         {
                             type = "pwa-node",
                             request = "attach",
-                            name = "Attach",
+                            "Attach",
                             processId = require("dap.utils").pick_process,
                             cwd = "${workspaceFolder}",
                         },

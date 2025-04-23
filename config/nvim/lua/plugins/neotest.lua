@@ -1,7 +1,7 @@
 return {
     { "nvim-neotest/neotest-plenary" },
     {
-        name = "nvim-neotest/neotest",
+        "nvim-neotest/neotest",
         opts = { adapters = { "neotest-plenary" } },
     },
 }

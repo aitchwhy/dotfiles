@@ -1,6 +1,6 @@
 return {
     {
-        name = "L3MON4D3/LuaSnip",
+        "L3MON4D3/LuaSnip",
         opts = function()
             LazyVim.cmp.actions.snippet_forward = function()
                 if require("luasnip").jumpable(1) then

@@ -63,6 +63,6 @@
 -- vim.g.loaded_perl_provider = 0    -- Disable Perl provider
 -- LSP Server to use for Python.
 -- Set to "basedpyright" to use basedpyright instead of pyright.
-vim.g.lazyvim_python_lsp = "pyright"
+-- vim.g.lazyvim_python_lsp = "pyright"
 -- Set to "ruff_lsp" to use the old LSP implementation version.
-vim.g.lazyvim_python_ruff = "ruff"
+-- vim.g.lazyvim_python_ruff = "ruff"

@@ -4,16 +4,16 @@
 
 return {
     {
-        name = "nvim-neo-tree/neo-tree.nvim",
+        "nvim-neo-tree/neo-tree.nvim",
         branch = "v3.x",
         cmd = "Neotree",
         -- Load when these keys are pressed
         keys = {
             { "<leader>e", "<cmd>Neotree toggle<cr>", desc = "Toggle Explorer" },
-            { "<leader>o", "<cmd>Neotree focus<cr>", desc = "Focus Explorer" },
+            { "<leader>o", "<cmd>Neotree focus<cr>",  desc = "Focus Explorer" },
             { "<leader>E", "<cmd>Neotree reveal<cr>", desc = "Reveal File in Explorer" },
             {
-                name = "<leader>ge",
+                "<leader>ge",
                 function()
                     require("neo-tree.command").execute({ source = "git_status", toggle = true })
                 end,
@@ -86,8 +86,8 @@ return {
                     -- Remove space as a mapping
                     ["<space>"] = "none",
                     -- Add useful mappings
-                    ["h"] = "navigate_up", -- Go up one directory with 'h'
-                    ["l"] = "open", -- Open directory or file with 'l'
+                    ["h"] = "navigate_up",   -- Go up one directory with 'h'
+                    ["l"] = "open",          -- Open directory or file with 'l'
                     ["H"] = "toggle_hidden", -- Toggle hidden files with 'H'
                     ["C"] = "close_node",
                     ["z"] = "close_all_nodes",

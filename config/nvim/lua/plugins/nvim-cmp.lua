@@ -3,21 +3,21 @@
 -----------------------------------------------------------------------------------
 
 return {
-    name = "hrsh7th/nvim-cmp",
+    "hrsh7th/nvim-cmp",
     version = false, -- Last release is way too old
     event = "InsertEnter",
     dependencies = {
         -- Sources for completion
-        "hrsh7th/cmp-nvim-lsp", -- LSP source
-        "hrsh7th/cmp-buffer", -- Buffer source
-        "hrsh7th/cmp-path", -- Path source
-        "hrsh7th/cmp-cmdline", -- Command line source
+        "hrsh7th/cmp-nvim-lsp",     -- LSP source
+        "hrsh7th/cmp-buffer",       -- Buffer source
+        "hrsh7th/cmp-path",         -- Path source
+        "hrsh7th/cmp-cmdline",      -- Command line source
         "saadparwaiz1/cmp_luasnip", -- Snippet source
-        "hrsh7th/cmp-nvim-lua", -- Neovim Lua API
-        "hrsh7th/cmp-emoji", -- Emoji source
+        "hrsh7th/cmp-nvim-lua",     -- Neovim Lua API
+        "hrsh7th/cmp-emoji",        -- Emoji source
 
         -- Snippet engine (required for some completion items)
-        "L3MON4D3/LuaSnip", -- Snippet engine
+        "L3MON4D3/LuaSnip",             -- Snippet engine
         "rafamadriz/friendly-snippets", -- Snippet collection
 
         -- Icons
@@ -107,12 +107,12 @@ return {
 
             -- Configure sources for autocompletion
             sources = cmp.config.sources({
-                { name = "nvim_lsp", priority = 1000 },
-                { name = "luasnip", priority = 750 },
-                { name = "buffer", priority = 500 },
-                { name = "path", priority = 250 },
-                { name = "nvim_lua", priority = 700 },
-                { name = "emoji", priority = 300 },
+                { "nvim_lsp", priority = 1000 },
+                { "luasnip",  priority = 750 },
+                { "buffer",   priority = 500 },
+                { "path",     priority = 250 },
+                { "nvim_lua", priority = 700 },
+                { "emoji",    priority = 300 },
             }),
 
             -- Format completion items (VSCode-like pictograms)
@@ -156,8 +156,8 @@ return {
         cmp.setup.cmdline(":", {
             mapping = cmp.mapping.preset.cmdline(),
             sources = cmp.config.sources({
-                { name = "path" },
-                { name = "cmdline" },
+                { "path" },
+                { "cmdline" },
             }),
         })
 
@@ -165,7 +165,7 @@ return {
         cmp.setup.cmdline("/", {
             mapping = cmp.mapping.preset.cmdline(),
             sources = {
-                { name = "buffer" },
+                { "buffer" },
             },
         })
     end,
