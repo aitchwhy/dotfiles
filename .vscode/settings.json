@@ -1,3 +1,10 @@
 {
-    "prettier.configPath": ".prettierrc"
+    "prettier.configPath": ".prettierrc",
+    "vim.enableNeovim": true,
+    "vim.neovimUseConfigFile": true,
+    "vscode-neovim.neovimExecutablePaths.darwin": "/opt/homebrew/bin/nvim",
+    "vscode-neovim.neovimInitVimPaths.darwin": "~/dotfiles/config/nvim/init.lua",
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "vs-code-prettier-eslint.prettierLast": false,
+    "nixEnvSelector.suggestion": false
 }
