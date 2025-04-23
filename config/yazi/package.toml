@@ -69,11 +69,6 @@ rev = "ce2e890"
 hash = "23915860e59348bf4166778bb0e606f7"
 
 [[plugin.deps]]
-use = "hankertrix/augment-command"
-rev = "adebde0"
-hash = "eef0510c86fa6400f59ad03e0206e817"
-
-[[plugin.deps]]
 use = "stelcodes/bunny"
 rev = "a64f32a"
 hash = "22d9e6f72230be88ab322040626623a"
@@ -120,8 +115,8 @@ hash = "f9ee1436e3b853508d87f7d49dce56e6"
 
 [[plugin.deps]]
 use = "AnirudhG07/rich-preview"
-rev = "2559e5f"
-hash = "c9a3d0731e7d7340e2c6d6126b1f3aa3"
+rev = "fdcf373"
+hash = "bd1737dd44b202f412122e6a3b378d4c"
 
 [[flavor.deps]]
 use = "ficcdaf/ashen:ashen"

@@ -4,7 +4,7 @@
 return {
     -- Treesitter core configuration
     {
-        name = "nvim-treesitter/nvim-treesitter",
+        "nvim-treesitter/nvim-treesitter",
         opts = {
             -- Enable highlighting
             highlight = {
@@ -189,13 +189,13 @@ return {
 
             -- Automatically close HTML/JSX tags
             {
-                name = "windwp/nvim-ts-autotag",
+                "windwp/nvim-ts-autotag",
                 opts = {},
             },
 
             -- Show code context at the top of the window
             {
-                name = "nvim-treesitter/nvim-treesitter-context",
+                "nvim-treesitter/nvim-treesitter-context",
                 opts = {
                     enable = true,
                     max_lines = 3,

@@ -1,5 +1,5 @@
 return {
     {
-        name = "b0o/SchemaStore.nvim",
+        "b0o/SchemaStore.nvim",
     },
 }

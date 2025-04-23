@@ -1,8 +1,6 @@
 return {
     {
-        name = "saghen/blink.cmp",
-        version = not vim.g.lazyvim_blink_main and "*",
-        build = vim.g.lazyvim_blink_main and "cargo build --release",
+        "saghen/blink.cmp",
         opts_extend = {
             "sources.completion.enabled_providers",
             "sources.compat",
@@ -12,10 +10,9 @@ return {
             "rafamadriz/friendly-snippets",
             -- add blink.compat to dependencies
             {
-                name = "saghen/blink.compat",
+                "saghen/blink.compat",
                 optional = true, -- make optional so it's only enabled if any extras need it
                 opts = {},
-                version = not vim.g.lazyvim_blink_main and "*",
             },
         },
         event = "InsertEnter",
@@ -84,7 +81,7 @@ return {
             for _, source in ipairs(opts.sources.compat or {}) do
                 opts.sources.providers[source] = vim.tbl_deep_extend(
                     "force",
-                    { name = source, module = "blink.compat.source" },
+                    { source, module = "blink.compat.source" },
                     opts.sources.providers[source] or {}
                 )
                 if type(enabled) == "table" and not vim.tbl_contains(enabled, source) then

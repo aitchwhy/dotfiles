@@ -1,7 +1,7 @@
 return {
     -- Modern code formatter
     {
-        name = "conform-nvim",
+        "conform-nvim",
         opts = function()
             local plugin = require("lazy.core.config").plugins["conform.nvim"]
             if plugin.config ~= M.setup then
@@ -15,8 +15,8 @@ return {
             local opts = {
                 default_format_opts = {
                     timeout_ms = 3000,
-                    async = false, -- not recommended to change
-                    quiet = false, -- not recommended to change
+                    async = false,           -- not recommended to change
+                    quiet = false,           -- not recommended to change
                     lsp_format = "fallback", -- not recommended to change
                 },
                 formatters_by_ft = {
@@ -80,7 +80,7 @@ return {
     },
     -- --
     --   {
-    --       name = "stevearc/conform.nvim",
+    --       "stevearc/conform.nvim",
     --       event = { "BufWritePre" }, -- Load before writing buffer
     --       cmd = { "ConformInfo" }, -- Also load on ConformInfo command
     --       keys = {
@@ -118,7 +118,7 @@ return {
     --       --   -- Define formatting options
     --       --   -- format_on_save = function(bufnr)
     --       --   --   -- Don't format on save for certain files or if file is too large
-    --       --   --   local bufname = vim.api.nvim_buf_get_name(bufnr)
+    --       --   --   local bufvim.api.nvim_buf_get_name(bufnr)
     --       --   --   local file_size = vim.fn.getfsize(bufname)
     --       --
     --       --   --   -- Skip minified files or files larger than 500KB

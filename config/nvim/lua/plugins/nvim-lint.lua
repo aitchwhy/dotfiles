@@ -1,7 +1,7 @@
 return {
     -- Modern linting
     {
-        name = "mfussenegger/nvim-lint",
+        "mfussenegger/nvim-lint",
         opts = {
             -- Event to trigger linters
             -- events = { "BufWritePost", "BufReadPost", "InsertLeave" },

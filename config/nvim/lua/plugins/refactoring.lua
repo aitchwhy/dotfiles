@@ -1,6 +1,6 @@
 return {
     {
-        name = "ThePrimeagen/refactoring.nvim",
+        "ThePrimeagen/refactoring.nvim",
         opts = {
             prompt_func_return_type = {
                 go = false,

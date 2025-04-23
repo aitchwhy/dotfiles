@@ -1,6 +1,6 @@
 return {
     {
-        name = "zbirenbaum/copilot.lua",
+        "zbirenbaum/copilot.lua",
         cmd = "Copilot",
         build = ":Copilot auth",
         event = "BufReadPost",

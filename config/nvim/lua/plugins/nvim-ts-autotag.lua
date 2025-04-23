@@ -1,6 +1,6 @@
 return {
     {
-        name = "nvim-ts-autotag",
+        "nvim-ts-autotag",
         opt = {},
     },
 }
