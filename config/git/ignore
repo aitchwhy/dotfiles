@@ -135,3 +135,13 @@ yarn-error.log
 # Build outputs
 build/
 dist/
+
+
+# cursor
+.cursor/
+example_prd.txt
+.env
+.env.examples
+.roocode
+README-task-master.md
+
