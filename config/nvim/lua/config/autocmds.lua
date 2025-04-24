@@ -7,169 +7,89 @@
 -- Or remove existing autocmds by their group name (which is prefixed with `lazyvim_` for the defaults)
 -- e.g. vim.api.nvim_del_augroup_by_name("lazyvim_wrap_spell")
 
--- -----------------------------------------------------------------------------------
--- -- CUSTOM AUTOCOMMANDS - MODERN LAZYVIM (2025)
--- -----------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
+-- CUSTOM AUTOCOMMANDS - MODERN LAZYVIM (2025)
+-----------------------------------------------------------------------------------
 
--- local function augroup(name)
---   return vim.api.nvim_create_augroup("custom_" .. name, { clear = true })
--- end
+local function augroup(name)
+  return vim.api.nvim_create_augroup("custom_" .. name, { clear = true })
+end
 
--- -- Auto-format on save (if formatter available)
--- vim.api.nvim_create_autocmd("BufWritePre", {
---   group = augroup("auto_format"),
---   callback = function()
---     -- Format with conform.nvim if available
---     if package.loaded["conform"] then
---       require("conform").format({ timeout_ms = 500, lsp_fallback = true })
---     end
---   end,
---   desc = "Auto-format on save",
--- })
+-- Auto-format on save (if formatter available)
+vim.api.nvim_create_autocmd("BufWritePre", {
+  group = augroup("auto_format"),
+  callback = function()
+    -- Format with conform.nvim if available
+    if package.loaded["conform"] then
+      require("conform").format({ timeout_ms = 500, lsp_fallback = true })
+    end
+  end,
+  desc = "Auto-format on save",
+})
 
--- -- Highlight text on yank
--- vim.api.nvim_create_autocmd("TextYankPost", {
---   group = augroup("highlight_yank"),
---   callback = function()
---     vim.highlight.on_yank({ higroup = "IncSearch", timeout = 300 })
---   end,
---   desc = "Highlight yanked text",
--- })
+-- Highlight text on yank
+vim.api.nvim_create_autocmd("TextYankPost", {
+  group = augroup("highlight_yank"),
+  callback = function()
+    vim.highlight.on_yank({ higroup = "IncSearch", timeout = 300 })
+  end,
+  desc = "Highlight yanked text",
+})
 
--- -- Auto-resize splits when window is resized
--- vim.api.nvim_create_autocmd("VimResized", {
---   group = augroup("resize_splits"),
---   callback = function()
---     vim.cmd("tabdo wincmd =")
---   end,
---   desc = "Auto-resize splits on window resize",
--- })
+-- Auto-resize splits when window is resized
+vim.api.nvim_create_autocmd("VimResized", {
+  group = augroup("resize_splits"),
+  callback = function()
+    vim.cmd("tabdo wincmd =")
+  end,
+  desc = "Auto-resize splits on window resize",
+})
 
--- -- Auto-create parent directories when saving a new file
--- vim.api.nvim_create_autocmd("BufWritePre", {
---   group = augroup("auto_create_dir"),
---   callback = function(event)
---     if event.match:match("^%w%w+://") then
---       return
---     end
---     local file = vim.loop.fs_realpath(event.match) or event.match
---     vim.fn.mkdir(vim.fn.fnamemodify(file, ":p:h"), "p")
---   end,
---   desc = "Auto-create directories when saving",
--- })
+-- Auto-create parent directories when saving a new file
+vim.api.nvim_create_autocmd("BufWritePre", {
+  group = augroup("auto_create_dir"),
+  callback = function(event)
+    if event.match:match("^%w%w+://") then
+      return
+    end
+    local file = vim.loop.fs_realpath(event.match) or event.match
+    vim.fn.mkdir(vim.fn.fnamemodify(file, ":p:h"), "p")
+  end,
+  desc = "Auto-create directories when saving",
+})
 
--- -- Restore cursor position when opening a file
--- vim.api.nvim_create_autocmd("BufReadPost", {
---   group = augroup("last_loc"),
---   callback = function()
---     local exclude = { "gitcommit" }
---     local buf = vim.api.nvim_get_current_buf()
---     if vim.tbl_contains(exclude, vim.bo[buf].filetype) then
---       return
---     end
---     local mark = vim.api.nvim_buf_get_mark(buf, '"')
---     local lcount = vim.api.nvim_buf_line_count(buf)
---     if mark[1] > 0 and mark[1] <= lcount then
---       pcall(vim.api.nvim_win_set_cursor, 0, mark)
---     end
---   end,
---   desc = "Restore cursor position when opening a file",
--- })
+-- Set specific indentation for certain file types
+vim.api.nvim_create_autocmd("FileType", {
+  group = augroup("language_indentation"),
+  pattern = {
+    "python",
+    "rust",
+    "go",
+  },
+  callback = function()
+    local indent_map = {
+      python = 4,
+      rust = 4,
+      go = 4,
+    }
 
--- -- Set appropriate file types
--- vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
---   group = augroup("filetype_detection"),
---   pattern = {
---     "*.env", "*.env.*",
---     "Dockerfile*", "*.dockerfile",
---     "*.json5",
---     "*.mdx",
---   },
---   callback = function()
---     local filetype_map = {
---       [".env"] = "sh",
---       [".env."] = "sh",
---       ["Dockerfile"] = "dockerfile",
---       [".dockerfile"] = "dockerfile",
---       [".json5"] = "jsonc",
---       [".mdx"] = "markdown",
---     }
+    local ft = vim.bo.filetype
+    if indent_map[ft] then
+      vim.bo.tabstop = indent_map[ft]
+      vim.bo.shiftwidth = indent_map[ft]
+      vim.bo.softtabstop = indent_map[ft]
+    end
+  end,
+  desc = "Set language-specific indentation",
+})
 
---     local filename = vim.fn.expand("%:t")
---     local extension = vim.fn.expand("%:e")
-
---     for pattern, ft in pairs(filetype_map) do
---       if filename:match(pattern) or extension:match(pattern) then
---         vim.bo.filetype = ft
---         break
---       end
---     end
---   end,
---   desc = "Set appropriate filetypes for special files",
--- })
-
--- -- Auto-close certain buffers with 'q'
--- vim.api.nvim_create_autocmd("FileType", {
---   group = augroup("close_with_q"),
---   pattern = {
---     "help",
---     "man",
---     "qf", -- quickfix
---     "checkhealth",
---     "lspinfo",
---     "oil", -- oil.nvim
---   },
---   callback = function(event)
---     vim.bo[event.buf].buflisted = false
---     vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = event.buf, silent = true })
---   end,
---   desc = "Close certain buffers with 'q'",
--- })
-
--- -- Load .nvim.lua files in project roots for project-specific settings
--- vim.api.nvim_create_autocmd({ "BufEnter" }, {
---   group = augroup("project_config"),
---   callback = function()
---     local project_config = vim.fn.getcwd() .. "/.nvim.lua"
---     if vim.fn.filereadable(project_config) == 1 then
---       vim.cmd("source " .. project_config)
---     end
---   end,
---   desc = "Load project-specific Neovim configuration",
--- })
-
--- -- Set specific indentation for certain file types
--- vim.api.nvim_create_autocmd("FileType", {
---   group = augroup("language_indentation"),
---   pattern = {
---     "python",
---     "rust",
---     "go",
---   },
---   callback = function()
---     local indent_map = {
---       python = 4,
---       rust = 4,
---       go = 4,
---     }
-
---     local ft = vim.bo.filetype
---     if indent_map[ft] then
---       vim.bo.tabstop = indent_map[ft]
---       vim.bo.shiftwidth = indent_map[ft]
---       vim.bo.softtabstop = indent_map[ft]
---     end
---   end,
---   desc = "Set language-specific indentation",
--- })
-
--- -- Wrap and check spelling in text filetypes
--- vim.api.nvim_create_autocmd("FileType", {
---   group = augroup("wrap_spell"),
---   pattern = { "gitcommit", "markdown", "text" },
---   callback = function()
---     vim.opt_local.wrap = true
---     vim.opt_local.spell = true
---   end,
---   desc = "Enable word wrap and spellcheck for text file types",
--- })
+-- Wrap and check spelling in text filetypes
+vim.api.nvim_create_autocmd("FileType", {
+  group = augroup("wrap_spell"),
+  pattern = { "gitcommit", "markdown", "text" },
+  callback = function()
+    vim.opt_local.wrap = true
+    vim.opt_local.spell = true
+  end,
+  desc = "Enable word wrap and spellcheck for text file types",
+})

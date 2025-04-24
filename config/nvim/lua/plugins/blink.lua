@@ -1,82 +1,101 @@
+-----------------------------------------------------------------------------------
+-- BLINK.CMP - MODERN COMPLETION SYSTEM
+-----------------------------------------------------------------------------------
+-- A modern, sleek completion system that replaces nvim-cmp
+-- Benefits over nvim-cmp:
+-- * Better UI with more customization options
+-- * Improved performance and responsiveness
+-- * Better integration with LSP and snippets
+-- * Supports both built-in and compatible sources
 return {
     {
         "saghen/blink.cmp",
-        opts_extend = {
-            "sources.completion.enabled_providers",
-            "sources.compat",
-            "sources.default",
-        },
+        -- Load dependencies required for completion
         dependencies = {
+            -- Snippet collection
             "rafamadriz/friendly-snippets",
-            -- add blink.compat to dependencies
+            -- Compatibility layer for nvim-cmp sources
             {
                 "saghen/blink.compat",
-                optional = true, -- make optional so it's only enabled if any extras need it
+                optional = true, -- Only enabled if extras need it
                 opts = {},
             },
         },
+        -- Only load when entering insert mode
         event = "InsertEnter",
 
-        ---@module 'blink.cmp'
         ---@type blink.cmp.Config
         opts = {
+            -- Configure snippet expansion
             snippets = {
                 expand = function(snippet, _)
-                    return LazyVim.cmp.expand(snippet)
+                    return require("lazyvim.util").cmp.expand(snippet)
                 end,
             },
+            -- UI appearance settings
             appearance = {
-                -- sets the fallback highlight groups to nvim-cmp's highlight groups
-                -- useful for when your theme doesn't support blink.cmp
-                -- will be removed in a future release, assuming themes add support
+                -- Sets fallback highlight groups to nvim-cmp's highlight groups
+                -- Useful when your theme doesn't support blink.cmp yet
                 use_nvim_cmp_as_default = false,
-                -- set to 'mono' for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
-                -- adjusts spacing to ensure icons are aligned
+                -- 'mono' for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
+                -- Adjusts spacing to ensure icons are aligned properly
                 nerd_font_variant = "mono",
             },
+            -- Completion behavior configuration
             completion = {
+                -- Auto-brackets support (experimental)
                 accept = {
-                    -- experimental auto-brackets support
                     auto_brackets = {
                         enabled = true,
                     },
                 },
+                -- Menu drawing configuration
                 menu = {
                     draw = {
                         treesitter = { "lsp" },
                     },
                 },
+                -- Documentation window settings
                 documentation = {
                     auto_show = true,
                     auto_show_delay_ms = 200,
                 },
+                -- Ghost text (inline completion preview)
                 ghost_text = {
-                    enabled = vim.g.ai_cmp,
+                    enabled = vim.g.ai_cmp, -- Enable if AI completion is available
                 },
             },
 
-            -- experimental signature help support
+            -- Experimental signature help support (commented out)
             -- signature = { enabled = true },
 
+            -- Configure completion sources
             sources = {
-                -- adding any nvim-cmp sources here will enable them
-                -- with blink.compat
+                -- Compatible sources via blink.compat
                 compat = {},
+                -- Default sources to always enable
                 default = { "lsp", "path", "snippets", "buffer" },
             },
 
+            -- Command line completion (disabled)
             cmdline = {
                 enabled = false,
             },
 
+            -- Keybinding configuration
             keymap = {
-                preset = "enter",
+                preset = "enter", -- Use enter to confirm completion
                 ["<C-y>"] = { "select_and_accept" },
             },
         },
-        ---@param opts blink.cmp.Config | { sources: { compat: string[] } }
+        -- Setup function runs after plugin loads
         config = function(_, opts)
-            -- setup compat sources
+            local LazyVim = require("lazyvim.util")
+            ------------------
+            -- SETUP SOURCES
+            ------------------
+
+            -- Configure compatibility sources
             local enabled = opts.sources.default
             for _, source in ipairs(opts.sources.compat or {}) do
                 opts.sources.providers[source] = vim.tbl_deep_extend(
@@ -89,9 +108,13 @@ return {
                 end
             end
 
-            -- add ai_accept to <Tab> key
+            ------------------
+            -- SETUP KEYMAPS
+            ------------------
+
+            -- Add ai_accept to Tab key if not already configured
             if not opts.keymap["<Tab>"] then
-                if opts.keymap.preset == "super-tab" then -- super-tab
+                if opts.keymap.preset == "super-tab" then -- super-tab preset
                     opts.keymap["<Tab>"] = {
                         require("blink.cmp.keymap.presets")["super-tab"]["<Tab>"][1],
                         LazyVim.cmp.map({ "snippet_forward", "ai_accept" }),
@@ -105,10 +128,14 @@ return {
                 end
             end
 
-            -- Unset custom prop to pass blink.cmp validation
+            -- Remove compatibility settings to pass validation
             opts.sources.compat = nil
 
-            -- check if we need to override symbol kinds
+            ------------------
+            -- SETUP SYMBOLS
+            ------------------
+
+            -- Override symbol kinds with custom icons if needed
             for _, provider in pairs(opts.sources.providers or {}) do
                 ---@cast provider blink.cmp.SourceProviderConfig|{kind?:string}
                 if provider.kind then
@@ -127,16 +154,18 @@ return {
                         items = transform_items and transform_items(ctx, items) or items
                         for _, item in ipairs(items) do
                             item.kind = kind_idx or item.kind
+                            -- Apply LazyVim icons for consistency
                             item.kind_icon = LazyVim.config.icons.kinds[item.kind_name] or item.kind_icon or nil
                         end
                         return items
                     end
 
-                    -- Unset custom prop to pass blink.cmp validation
+                    -- Remove custom prop to pass validation
                     provider.kind = nil
                 end
             end
 
+            -- Initialize blink.cmp with our options
             require("blink.cmp").setup(opts)
         end,
     },

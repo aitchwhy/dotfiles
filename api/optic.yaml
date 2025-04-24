@@ -1,0 +1,47 @@
+capture:
+  openapi.yml:
+    server:
+      # The command to run your server.
+      # Optional: If omitted, Optic assumes the server is running or started elsewhere.
+      command: your-server-command
+
+      # The url where your server can be reached once running.
+      # Required: Can be overridden with '--server-override'.
+      url: http://localhost:8080
+
+      # A readiness endpoint for Optic to validate before sending requests.
+      # Optional: If omitted, perform no readiness checking.
+      ready_endpoint: /
+
+      # The interval to check 'ready_endpoint', in ms.
+      # Optional: default: 1000
+      ready_interval: 1000
+
+      # The length of time in ms to wait for a successful ready check to occur.
+      # Optional: default: 10_000, 10 seconds
+      ready_timeout: 10_000
+
+    # One of 'requests.run' or 'requests.send' is required.
+    requests:
+      # Run an external command to generate traffic.
+      run:
+        # The command to run to generate traffic (e.g., your test command, etc.).
+        command: your-test-command
+
+        # The name of the environment variable injected into the env of 'command' that contains the address of the Optic proxy.
+        # Optional: default: OPTIC_PROXY
+        proxy_variable: OPTIC_PROXY
+
+      # Use Optic to generate requests.
+      send:
+        - path: /users/create # Required
+          method: POST # Optional: default: GET
+          headers: # Optional
+            content-type: application/json;charset=UTF-8 # If omitted, this is the default
+          data: # Optional: If omitted on a POST request, default: {}
+            name: Hank
+
+    config:
+      # The number of parallel requests to make when using 'requests.send'.
+      # Optional: default: 4
+      request_concurrency: 4
