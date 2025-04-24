@@ -1,172 +1,166 @@
 -----------------------------------------------------------------------------------
 -- NVIM-CMP CONFIGURATION - AUTOCOMPLETION ENGINE
 -----------------------------------------------------------------------------------
+-- This file configures the completion engine for Neovim
+-- The setup includes snippets, sources, keybindings, and UI appearance
+-- References:
+-- * https://github.com/hrsh7th/nvim-cmp
+-- * https://github.com/L3MON4D3/LuaSnip
 
 return {
-    "hrsh7th/nvim-cmp",
-    version = false, -- Last release is way too old
-    event = "InsertEnter",
-    dependencies = {
-        -- Sources for completion
-        "hrsh7th/cmp-nvim-lsp",     -- LSP source
-        "hrsh7th/cmp-buffer",       -- Buffer source
-        "hrsh7th/cmp-path",         -- Path source
-        "hrsh7th/cmp-cmdline",      -- Command line source
-        "saadparwaiz1/cmp_luasnip", -- Snippet source
-        "hrsh7th/cmp-nvim-lua",     -- Neovim Lua API
-        "hrsh7th/cmp-emoji",        -- Emoji source
+    -----------------------------------------------------------------------------------
+    -- MAIN COMPLETION ENGINE CONFIGURATION
+    -----------------------------------------------------------------------------------
+    {
+        "hrsh7th/nvim-cmp",
+        version = false,                -- Last release is too old, so we use the latest commit
+        event = "InsertEnter",          -- Only load when entering insert mode for performance
+        dependencies = {
+            "hrsh7th/cmp-nvim-lsp",     -- LSP completion source
+            "hrsh7th/cmp-buffer",       -- Buffer words completion source
+            "hrsh7th/cmp-path",         -- Path completion source
+            "saadparwaiz1/cmp_luasnip", -- Snippet completion source
+        },
+        opts = function()
+            local cmp = require("cmp")
+            local luasnip = require("luasnip")
+            local defaults = require("cmp.config.default")()
+            local LazyVim = require("lazyvim.util")
 
-        -- Snippet engine (required for some completion items)
-        "L3MON4D3/LuaSnip",             -- Snippet engine
-        "rafamadriz/friendly-snippets", -- Snippet collection
+            -- Helper function to check if there's text before cursor
+            -- Used for smart tab completion behavior
+            local has_words_before = function()
+                unpack = unpack or table.unpack
+                local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+                return col ~= 0 and
+                vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+            end
 
-        -- Icons
-        "onsails/lspkind.nvim", -- VSCode-like pictograms
-    },
-    opts = function()
-        local cmp = require("cmp")
-        local luasnip = require("luasnip")
-        local lspkind = require("lspkind")
-
-        -- Load friendly-snippets
-        require("luasnip.loaders.from_vscode").lazy_load()
-
-        -- Helper function to check if text exists before the cursor
-        local has_text_before_cursor = function()
-            local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-            return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
-        end
-
-        return {
-            -- Configure completion window appearance
-            window = {
+            return {
+                -- Configure completion popup appearance
                 completion = {
-                    winhighlight = "Normal:Pmenu,FloatBorder:Pmenu,CursorLine:PmenuSel,Search:None",
-                    col_offset = -3,
-                    side_padding = 0,
+                    completeopt = "menu,menuone,noinsert", -- Don't insert text until selected
                 },
-                documentation = {
-                    winhighlight = "Normal:Pmenu,FloatBorder:Pmenu,Search:None",
-                    border = "rounded",
-                    max_width = 80,
-                    max_height = 20,
+                -- Configure snippet expansion
+                snippet = {
+                    expand = function(args)
+                        luasnip.lsp_expand(args.body)
+                    end,
                 },
-            },
+                -- Configure key mappings
+                mapping = cmp.mapping.preset.insert({
+                    -- Navigate completion menu
+                    ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
+                    ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
+                    -- Scroll documentation window
+                    ["<C-b>"] = cmp.mapping.scroll_docs(-4), -- Scroll up
+                    ["<C-f>"] = cmp.mapping.scroll_docs(4),  -- Scroll down
 
-            -- Configure completion behavior
-            completion = {
-                completeopt = "menu,menuone,noinsert,noselect",
-                keyword_length = 1, -- Min length to trigger completion
-            },
+                    -- Other controls
+                    ["<C-Space>"] = cmp.mapping.complete(), -- Force completion menu
+                    ["<C-e>"] = cmp.mapping.abort(),        -- Close completion menu
 
-            -- Configure snippet expansion
-            snippet = {
-                expand = function(args)
-                    luasnip.lsp_expand(args.body)
-                end,
-            },
+                    -- Accept completion
+                    ["<CR>"] = cmp.mapping.confirm({ select = true }), -- Accept selected item
 
-            -- Configure key mappings
-            mapping = cmp.mapping.preset.insert({
-                -- Navigate completion menu
-                ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
-                ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
-                ["<Down>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }),
-                ["<Up>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }),
+                    -- Accept with replacement behavior
+                    ["<S-CR>"] = cmp.mapping.confirm({
+                        behavior = cmp.ConfirmBehavior.Replace,
+                        select = true,
+                    }),
 
-                -- Scroll documentation
-                ["<C-b>"] = cmp.mapping.scroll_docs(-4),
-                ["<C-f>"] = cmp.mapping.scroll_docs(4),
-
-                -- Cancel completion
-                ["<C-e>"] = cmp.mapping.abort(),
-
-                -- Accept completion
-                ["<CR>"] = cmp.mapping.confirm({ select = false }),
-                ["<Tab>"] = cmp.mapping(function(fallback)
-                    if cmp.visible() then
-                        cmp.select_next_item()
-                    elseif luasnip.expand_or_jumpable() then
-                        luasnip.expand_or_jump()
-                    elseif has_text_before_cursor() then
-                        cmp.complete()
-                    else
+                    -- Abort completion and execute command
+                    ["<C-CR>"] = function(fallback)
+                        cmp.abort()
                         fallback()
-                    end
-                end, { "i", "s" }),
-                ["<S-Tab>"] = cmp.mapping(function(fallback)
-                    if cmp.visible() then
-                        cmp.select_prev_item()
-                    elseif luasnip.jumpable(-1) then
-                        luasnip.jump(-1)
-                    else
-                        fallback()
-                    end
-                end, { "i", "s" }),
-            }),
+                    end,
+                    -- Tab for navigation and snippet expansion
+                    ["<Tab>"] = cmp.mapping(function(fallback)
+                        if cmp.visible() then
+                            cmp.select_next_item()
+                        elseif luasnip.expand_or_locally_jumpable() then
+                            luasnip.expand_or_jump()
+                        elseif has_words_before() then
+                            cmp.complete()
+                        else
+                            fallback()
+                        end
+                    end, { "i", "s" }),
+                    -- Shift-Tab for backward navigation
+                    ["<S-Tab>"] = cmp.mapping(function(fallback)
+                        if cmp.visible() then
+                            cmp.select_prev_item()
+                        elseif luasnip.jumpable(-1) then
+                            luasnip.jump(-1)
+                        else
+                            fallback()
+                        end
+                    end, { "i", "s" }),
+                }),
+                -- Configure completion sources and their priority
+                sources = cmp.config.sources({
+                    { name = "nvim_lsp" }, -- LSP completions (highest priority)
+                    { name = "luasnip" },  -- Snippets
+                    { name = "path" },     -- Filesystem paths
+                }, {
+                    -- Lower priority source group
+                    { name = "buffer", keyword_length = 3 }, -- Buffer text (needs 3+ chars)
+                }),
+                -- Format completion items
+                formatting = {
+                    format = function(entry, vim_item)
+                        -- Set custom icons based on icons module
+                        local icons = LazyVim.config.icons.kinds
+                        if icons[vim_item.kind] then
+                            vim_item.kind = icons[vim_item.kind] .. vim_item.kind
+                        end
 
-            -- Configure sources for autocompletion
-            sources = cmp.config.sources({
-                { "nvim_lsp", priority = 1000 },
-                { "luasnip",  priority = 750 },
-                { "buffer",   priority = 500 },
-                { "path",     priority = 250 },
-                { "nvim_lua", priority = 700 },
-                { "emoji",    priority = 300 },
-            }),
-
-            -- Format completion items (VSCode-like pictograms)
-            formatting = {
-                format = lspkind.cmp_format({
-                    mode = "symbol_text",
-                    maxwidth = 50,
-                    ellipsis_char = "...",
-                    show_labelDetails = true,
-                    before = function(entry, vim_item)
-                        -- Add source name to entry
+                        -- Set source indication
                         vim_item.menu = ({
                             nvim_lsp = "[LSP]",
-                            luasnip = "[Snippet]",
-                            buffer = "[Buffer]",
+                            luasnip = "[Snip]",
+                            buffer = "[Buf]",
                             path = "[Path]",
-                            nvim_lua = "[Lua]",
-                            emoji = "[Emoji]",
                         })[entry.source.name]
+                        
                         return vim_item
                     end,
-                }),
-            },
-
-            -- Configure experimental features
-            experimental = {
-                ghost_text = {
-                    hl_group = "Comment",
                 },
-            },
-        }
-    end,
+                -- Experimental features
+                experimental = {
+                    ghost_text = {
+                        hl_group = "LspCodeLens", -- Highlight group for ghost text
+                    },
+                },
+                -- Use default sorting (by score)
+                sorting = defaults.sorting,
+            }
+        end,
+    },
 
-    -- Additional setup for Command line completion
-    config = function(_, opts)
-        -- Set up nvim-cmp with provided options
-        local cmp = require("cmp")
-        cmp.setup(opts)
+    -----------------------------------------------------------------------------------
+    -- COMPLETION SOURCES
+    -----------------------------------------------------------------------------------
+    -- Register additional sources with lazy-loading
 
-        -- Set up specific completion sources for command mode
-        cmp.setup.cmdline(":", {
-            mapping = cmp.mapping.preset.cmdline(),
-            sources = cmp.config.sources({
-                { "path" },
-                { "cmdline" },
-            }),
-        })
-
-        -- Set up specific completion sources for search mode
-        cmp.setup.cmdline("/", {
-            mapping = cmp.mapping.preset.cmdline(),
-            sources = {
-                { "buffer" },
-            },
-        })
-    end,
+    -- LSP source
+    {
+        "hrsh7th/cmp-nvim-lsp",
+        event = "InsertEnter"
+    },
+    -- Buffer source
+    {
+        "hrsh7th/cmp-buffer",
+        event = "InsertEnter"
+    },
+    -- Path source
+    {
+        "hrsh7th/cmp-path",
+        event = "InsertEnter"
+    },
+    -- Snippet source
+    {
+        "saadparwaiz1/cmp_luasnip",
+        event = "InsertEnter"
+    },
 }

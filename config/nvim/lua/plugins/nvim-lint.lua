@@ -8,7 +8,6 @@ return {
             linters_by_ft = {
                 fish = { "fish" },
                 -- Use the "*" filetype to run linters on all filetypes.
-                -- ['*'] = { 'global linter' },
                 lua = { "selene" },
                 python = { "ruff" },
                 javascript = { "eslint_d" },
@@ -16,6 +15,7 @@ return {
                 javascriptreact = { "eslint_d" },
                 typescriptreact = { "eslint_d" },
                 markdown = { "markdownlint-cli2" },
+                yml = { "yaml" },
                 yaml = { "yaml" },
                 zsh = { "shfmt" },
                 dockerfile = { "hadolint" },
@@ -24,6 +24,7 @@ return {
                 ["_"] = { "prettier" },
                 -- ['_'] = { 'fallback linter' },
                 ["*"] = { "typos" },
+                -- ['*'] = { 'global linter' },
             },
 
             -- LazyVim extension to easily override linter options
