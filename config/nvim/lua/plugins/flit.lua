@@ -1,0 +1,5 @@
+return {
+    {
+        "ggandor/flit.nvim",
+    }
+}

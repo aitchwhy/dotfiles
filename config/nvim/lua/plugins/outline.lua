@@ -1,0 +1,5 @@
+return {
+    {
+        "hedyhli/outline.nvim",
+    }
+}

@@ -9,29 +9,45 @@
 -- * Integrated with LazyVim keymaps
 return {
     {
-        "kevinhwang91/snacks.nvim",
-        lazy = false, -- Load on startup, as it's core functionality
-        opts = function()
-            local LazyVim = require("lazyvim.util")
-            
-            return {
-                -- Register toggle functionality with LazyVim's keymap helpers
-                -- This ensures proper integration with LazyVim's key handling
-                toggle = {
-                    map = LazyVim.safe_keymap_set
+        "folke/snacks.nvim",
+        lazy = false,
+        opts = {
+            -- your configuration comes here
+            -- or leave it empty to use the default settings
+            -- refer to the configuration section below
+            bigfile = { enabled = true },
+            dashboard = { enabled = true },
+            explorer = { enabled = true },
+            indent = { enabled = true },
+            input = { enabled = true },
+            picker = {
+                win = {
+                    input = {
+                        keys = {
+                            ["<a-c>"] = {
+                                "toggle_cwd",
+                                mode = { "n", "i" },
+                            },
+                        }
+                    }
                 },
-
-                -- Configure file picker appearance and behavior
-                picker = {
-                    prompt_title = "Snack Explorer", -- Custom title for file picker
-                    cwd_only = false,                -- Show files outside of current working dir
+                actions = {
+                    ---@param p snacks.Picker
+                    toggle_cwd = function(p)
+                        local root = LazyVim.root({ buf = p.input.filter.current_buf, normalize = true })
+                        local cwd = vim.fs.normalize((vim.uv or vim.loop).cwd() or ".")
+                        local current = p:cwd()
+                        p:set_cwd(current == root and cwd or root)
+                        p:find()
+                    end,
                 },
-                -- Additional components can be enabled here:
-                -- input = { enabled = true },       -- Enhanced input handling
-                -- notifier = { enabled = true },    -- Notification system
-                -- scope = { enabled = true },       -- Scoped file finder
-                -- scroll = { enabled = true },      -- Smooth scrolling
-            }
-        end,
-    },
+            },
+            notifier = { enabled = true },
+            quickfile = { enabled = true },
+            scope = { enabled = true },
+            scroll = { enabled = true },
+            statuscolumn = { enabled = true },
+            words = { enabled = true },
+        },
+    }
 }

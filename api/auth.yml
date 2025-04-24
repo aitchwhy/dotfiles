@@ -1,0 +1,286 @@
+openapi: 3.0.0
+info:
+  title: noggin-api
+  version: 1.1.0
+servers:
+  - url: http://localhost:59000
+paths:
+  /:
+    get:
+      summary: Get authentication status
+      operationId: getAuthStatus
+      responses:
+        "200":
+          description: Authentication status response
+  /auth/login:
+    post:
+      summary: Create a one-time password for login
+      operationId: createOtpForLogin
+      requestBody:
+        $ref: "#/components/requestBodies/create_a_one-time_password_for_login"
+      responses:
+        "200":
+          description: OTP creation successful
+  /auth/refresh:
+    post:
+      summary: Refresh authentication tokens
+      operationId: refreshAuthTokens
+      responses:
+        "200":
+          description: Token refresh successful
+  /auth/otp/verify:
+    post:
+      summary: Verify OTP and get authentication tokens
+      operationId: verifyOtpAndGetTokens
+      requestBody:
+        $ref: "#/components/requestBodies/verify_otp_and_get_authentication_tokens"
+      responses:
+        "200":
+          description: OTP verification successful
+  /pdfs/stems/process-multi:
+    post:
+      summary: Process multiple PDF files
+      operationId: processMultiplePdfs
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/StemProcessRequest"
+      responses:
+        "200":
+          description: PDFs accepted for processing
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StemProcessResponse"
+        "400":
+          description: Bad request
+        "403":
+          description: Forbidden - Insufficient permissions
+        "500":
+          description: Server error during processing
+      security:
+        - BearerAuth: []
+  /pdfs/stems/{stemUid}/status:
+    get:
+      summary: Get processing status for a stem
+      operationId: getStemStatus
+      parameters:
+        - name: stemUid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Stem status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StemStatusResponse"
+      security:
+        - BearerAuth: []
+  /pdfs/stems/{stemUid}/extracts:
+    get:
+      summary: Get combined extracts for all PDFs in a stem
+      operationId: getStemExtracts
+      parameters:
+        - name: stemUid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Extracts retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StemExtractsResponse"
+        "202":
+          description: Some PDFs are still being processed
+        "404":
+          description: Stem not found
+      security:
+        - BearerAuth: []
+  /pdfs/pdf-extracts/{stemUid}/{pdfUid}:
+    get:
+      summary: Fetch the extracted content for a processed PDF
+      operationId: getPdfExtract
+      parameters:
+        - name: stemUid
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: pdfUid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Extract retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+        "404":
+          description: Extract not found
+      security:
+        - BearerAuth: []
+  /pdfs/process-pdf:
+    post:
+      summary: Legacy single PDF endpoint
+      operationId: processPdf
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: PDF file to process
+              required:
+                - file
+      responses:
+        "200":
+          description: PDF processed successfully
+        "400":
+          description: Bad request
+        "403":
+          description: Forbidden
+        "500":
+          description: Server error
+      security:
+        - BearerAuth: []
+  /flonotes:
+    get:
+      summary: Serves static content for the FloNotes application
+      operationId: serveFloNotes
+      responses:
+        "200":
+          description: FloNotes content served successfully
+components:
+  schemas:
+    create_a_one-time_password_for_login:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    verify_otp_and_get_authentication_tokens:
+      type: object
+      required: [email, otp]
+      properties:
+        email:
+          type: string
+        otp:
+          type: string
+    StemProcessRequest:
+      type: object
+      required:
+        - enterpriseUid
+        - files
+      properties:
+        enterpriseUid:
+          type: string
+          format: uuid
+        stemUid:
+          type: string
+          format: uuid
+        files:
+          type: array
+          items:
+            type: string
+            format: binary
+    StemProcessResponse:
+      type: object
+      required:
+        - stemUid
+        - pdfUids
+      properties:
+        stemUid:
+          type: string
+        pdfUids:
+          type: array
+          items:
+            type: string
+    PdfStatus:
+      type: object
+      required:
+        - pdfUid
+        - status
+      properties:
+        pdfUid:
+          type: string
+        status:
+          type: string
+          enum: [queued, processing, ready, failed]
+        message:
+          type: string
+          nullable: true
+    StemStatusResponse:
+      type: object
+      required:
+        - stemUid
+        - allReady
+        - pdfs
+      properties:
+        stemUid:
+          type: string
+        allReady:
+          type: boolean
+        pdfs:
+          type: array
+          items:
+            $ref: "#/components/schemas/PdfStatus"
+    PdfExtract:
+      type: object
+      required:
+        - pdfUid
+        - result
+      properties:
+        pdfUid:
+          type: string
+        result:
+          type: object
+          additionalProperties: true
+    StemExtractsResponse:
+      type: object
+      required:
+        - stemUid
+        - extracts
+      properties:
+        stemUid:
+          type: string
+        extracts:
+          type: array
+          items:
+            $ref: "#/components/schemas/PdfExtract"
+  requestBodies:
+    create_a_one-time_password_for_login:
+      description: Login request body
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/create_a_one-time_password_for_login"
+    verify_otp_and_get_authentication_tokens:
+      description: Verify OTP request body
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/verify_otp_and_get_authentication_tokens"
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

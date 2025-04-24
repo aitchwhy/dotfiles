@@ -76,3 +76,4 @@ venv/
 .env
 config/zsh/.zsh_sessions
 .trunk/
+config/github-copilot

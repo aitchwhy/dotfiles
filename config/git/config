@@ -1,8 +1,13 @@
-# Git configuration optimized for macOS Apple Silicon
-# https://git-scm.com/docs/git-config.html
+# Global git config (https://git-scm.com/docs/git-config.html)
 
-# Git configuration optimized for macOS Apple Silicon
-# https://git-scm.com/docs/git-config.html
+; core vars
+[core]
+  # Don't trust file modes
+  filemode = false
+  # editor = nvim
+  editor = "cursor --wait"
+  pager = delta
+  excludesfile = "$cf/git/ignore"
 
 # ===== User Information =====
 [user]
@@ -10,14 +15,6 @@
   email = hank.lee.qed@gmail.com
   username = aitchwhy
 
-# ===== Core Settings =====
-[core]
-  ; Don't trust file modes
-  filemode = false
-  ; editor = nvim
-  editor = "windsurf --wait"
-  pager = delta
-  excludesfile = "$XDG_CONFIG_HOME/git/ignore"
 
 # ===== Basic UI Settings =====
 [color]
@@ -66,13 +63,6 @@
 [gpg "ssh"]
   program = ssh-keygen
   allowedSignersFile = $XDG_CONFIG_HOME/ssh/allowed_signers
-
-# ===== LFS Settings =====
-[filter "lfs"]
-  clean = git-lfs clean -- %f
-  smudge = git-lfs smudge -- %f
-  process = git-lfs filter-process
-  required = true
 
 # ===== URL Handling =====
 [url "git@github.com:"]

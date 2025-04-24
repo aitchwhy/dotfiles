@@ -1,9 +1,8 @@
 return {
     {
-        "JoosepAlviste/nvim-ts-context-commentstring",
-        lazy = true,
+        "nvim-treesitter/nvim-treesitter",
         opts = {
-            enable_autocmd = false,
+            ensure_installed = { "ninja", "rst" }
         },
     },
 }
