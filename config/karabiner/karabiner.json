@@ -484,7 +484,7 @@
                     "simple_modifications": [
                         {
                             "from": { "key_code": "delete_forward" },
-                            "to": [{ "consumer_key_code": "al_terminal_lock_or_screensaver" }]
+                            "to": [{ "apple_vendor_top_case_key_code": "keyboard_fn" }]
                         },
                         {
                             "from": { "key_code": "page_up" },
