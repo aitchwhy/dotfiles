@@ -7,10 +7,7 @@ return {
         "nvim-treesitter/nvim-treesitter",
         opts = {
             -- Enable highlighting
-            highlight = {
-                enable = true,
-                additional_vim_regex_highlighting = false,
-            },
+            highlight = { enable = true },
 
             -- Enable indentation support
             indent = { enable = true },
@@ -23,6 +20,7 @@ return {
 
             -- Language parsers to install
             ensure_installed = {
+                "svelte",
                 "dockerfile",
                 "git_config",
                 "gitcommit",

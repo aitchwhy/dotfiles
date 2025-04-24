@@ -18,7 +18,6 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 # zsh setup
 # TODO: fzf-zsh https://github.com/unixorn/fzf-zsh-plugin
 
-
 # minio / s3 frontend -> http://localhost:51021
 # noggin server -> http://localhost:59000
 # vibes frontend -> http://localhost:3000
@@ -45,6 +44,11 @@ export PAGER="bat --pager always"
 typeset -U path PATH
 
 export COLORTERM="truecolor"
+
+. "$HOME/.cargo/env"
+export PATH="$HOME/.npm-global/bin/:$PATH"
+export VOLTA_HOME="$HOME/.volta"
+export PATH="$VOLTA_HOME/bin:$PATH"
 
 # Added by OrbStack: command-line tools and integration
 # This won't be added again if you remove it.

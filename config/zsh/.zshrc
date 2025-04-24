@@ -38,7 +38,8 @@ setopt HIST_IGNORE_SPACE      # Don't record commands starting with space
 # XDG Base Directory Specification
 # ========================================================================
 
-export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+# export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/dotfiles/config}"
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
@@ -50,7 +51,6 @@ export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 [[ ! -d "$XDG_DATA_HOME" ]] && mkdir -p "$XDG_DATA_HOME"
 [[ ! -d "$XDG_STATE_HOME" ]] && mkdir -p "$XDG_STATE_HOME"
 
-
 # Ensure ZSH config directory is set
 export zdot=${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}
 export dot="${DOTFILES:-$HOME/dotfiles}"
@@ -58,7 +58,6 @@ export cf="$dot/config"
 export cfz="$dot/config/zsh"
 export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
 export bpre="$(brew --prefix)"
-
 
 # ========================================================================
 # Keyboard & Input Configuration
@@ -68,7 +67,6 @@ export bpre="$(brew --prefix)"
 bindkey -v
 export KEYTIMEOUT=1
 
-
 # ========================================================================
 # Source Utility Functions
 # ========================================================================
@@ -77,10 +75,9 @@ export KEYTIMEOUT=1
 export UTILS="$DOTFILES/config/zsh/utils.zsh"
 source "$UTILS"
 
-
 # Check if a command exists
-export function has_command() {
-  command -v "$1" &>/dev/null
+function has_command() {
+	command -v "$1" &>/dev/null
 }
 
 # ========================================================================
@@ -95,20 +92,19 @@ export function has_command() {
 # done
 # ========================================================================
 
-# 
-my_list=(
-  "$dot/config/git/config"
-  "$dot/config/lazygit/config.yml"
-  "$dot/config/starship/starship.toml"
-  "$dot/config/ghostty/config"
-  "$dot/config/atuin/config.toml"
-)
+#
+# my_list=(
+# 	"$cf/git/config"
+# 	"$cf/lazygit/config.yml"
+# 	"$cf/starship/starship.toml"
+# 	"$cf/ghostty/config"
+# 	"$cf/atuin/config.toml"
+# )
 
-# Iterate over the list
-for item in "${my_list[@]}"; do
-    echo "Fruit: $item"
-done
-
+# # Iterate over the list
+# for item in "${my_list[@]}"; do
+# 	echo "TODO: $item"
+# done
 
 # ========================================================================
 # git
@@ -116,49 +112,27 @@ done
 # https://git-scm.com/docs/git-config
 # ========================================================================
 
-! has_command git && brew install --quiet git
-! has_command lazygit && brew install --quiet lazygit
-
 export GIT_CONFIG="$cf/git/config"
 
 # Lazygit custom config file location (https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md#overriding-default-config-file-location)
-CONFIG_DIR="$cf/lazygit"
-# LG_CONFIG_FILE="$dot/config/lazygit/config.yml"
-
-# export GIT_EDITOR="nvim"
-# export GIT_PAGER="bat --pager always"
-# export GIT_AUTHOR_NAME="Hank"
-# export GIT_AUTHOR_EMAIL="hank.lee.qed@gmail.com"
-# export GIT_COMMITTER_NAME="Hank"
-# export GIT_COMMITTER_EMAIL="hank.lee.qed@gmail.com"
-
-
-
-# if [[ ! -f "$XDG_CONFIG_HOME/lazygit/config.yml" ]]; then
-#   echo "Linking lazygit config..."
-#   ln -sf "$DOTFILES/config/lazygit/config.yml" "$XDG_CONFIG_HOME/lazygit/config.yml"
-# fi
+# export CONFIG_DIR="$cf/lazygit"
+export LG_CONFIG_FILE="$cf/lazygit/config.yml"
 
 # ========================================================================
 # starship
 # ========================================================================
 
-
-echo "Linking starship.toml..."
 # ln -sf "$DOTFILES/config/starship.toml" "$XDG_CONFIG_HOME/starship.toml"
-
 export STARSHIP_CONFIG="$cf/starship/starship.toml"
-
 eval "$(starship init zsh)"
 
 # ========================================================================
 # ghostty
 # ========================================================================
 
-
 if ! has_command ghostty; then
-  echo "ghostty not found. Installing ghostty..."
-  brew install --quiet ghostty
+	echo "ghostty not found. Installing ghostty..."
+	brew install --quiet ghostty
 fi
 
 # if [[ ! -f "$/ghostty/config" ]]; then
@@ -170,8 +144,8 @@ fi
 # zoxide
 # ========================================================================
 if ! has_command zoxide; then
-  echo "zoxide not found. Installing zoxide..."
-  brew install --quiet zoxide
+	echo "zoxide not found. Installing zoxide..."
+	brew install --quiet zoxide
 fi
 
 # if [[ ! -f "$XDG_CONFIG_HOME/zoxide/config.toml" ]]; then
@@ -226,41 +200,8 @@ eval "$(atuin init zsh)"
 # ========================================================================
 # Volta
 # export VOLTA_HOME="$HOME/.volta"
-# # export PATH="$VOLTA_HOME/bin:$PATH"
-# path_add "$VOLTA_HOME/bin"
-# if ! has_command volta; then
-#   echo "Volta not found. Installing ..."
-#   brew install volta
-# fi
-
-# # NVM
-# export NVM_DIR="$HOME/.nvm"
-# [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"                                       # This loads nvm
-# [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" # This loads nvm bash_completion
-# if ! has_command bun; then
-#   echo "Bun not found. Installing bun (nodejs)..."
-#   curl -fsSL https://bun.sh/install | bash # for macOS, Linux, and WSL
-#   brew install volta
-# fi
-
-# # Bun
-# export BUN_INSTALL="$HOME/.bun"
-# # export PATH="$BUN_INSTALL/bin:$PATH"
-# path_add "$BUN_INSTALL/bin"
-# if ! has_command bun; then
-#   echo "Bun not found. Installing bun (nodejs)..."
-#   curl -fsSL https://bun.sh/install | bash # for macOS, Linux, and WSL
-# fi
-
-# FNM (https://github.com/Schniz/fnm)
-
-# if ! has_command fnm; then
-#   echo "FNM not found. Installing ..."
-#   brew install --quiet nvim
-# fi
-#
-# eval "$(fnm env --use-on-cd --shell zsh)"
-# path_add "$HOME/.fnm"
+# export PATH="$VOLTA_HOME/bin:$PATH"
+has_command volta && path_add "$VOLTA_HOME/bin"
 
 # TODO: add github extensions list
 # - gh extension install dlvhdr/gh-dash
@@ -281,7 +222,6 @@ eval "$(atuin init zsh)"
 # ttok v0.3
 # - ttok
 
-
 # mkdir -p ~/.npm-global
 # path_add "~/.npm-global/bin"
 # path_add "$HOME/.npm-global/bin"
@@ -298,7 +238,6 @@ eval "$(atuin init zsh)"
 # prettier
 # prisma
 
-
 # ========================================================================
 # nvim
 # ========================================================================
@@ -307,27 +246,26 @@ export EDITOR="nvim"
 export VISUAL="$EDITOR"
 
 if ! has_command nvim; then
-  echo "nvim not found. Installing nvim..."
-  brew install --quiet neovim
+	echo "nvim not found. Installing nvim..."
+	brew install --quiet neovim
 fi
 
 # ========================================================================
 # fzf
 # ========================================================================
 if ! has_command fzf; then
-  echo "fzf not found. Installing fzf..."
-  brew install --quiet fzf
+	echo "fzf not found. Installing fzf..."
+	brew install --quiet fzf
 fi
 
 # ========================================================================
 # bat
 # ========================================================================
-
 export PAGER="bat --pager always"
 
 if ! has_command bat; then
-  echo "bat not found. Installing bat..."
-  brew install --quiet bat
+	echo "bat not found. Installing bat..."
+	brew install --quiet bat
 fi
 
 # ========================================================================
@@ -344,56 +282,24 @@ export CARGO_HOME="${CARGO_HOME:-$HOME/.cargo}"
 export RUSTUP_HOME="${RUSTUP_HOME:-$HOME/.rustup}"
 path_add "$HOME/.cargo/bin"
 
-# # Installation check and setup
-# if ! has_command rustup; then
-#   log_info "Installing Rust via rustup..."
-#   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-
-#   # Source the cargo environment if installed
-#   if [[ -f "$CARGO_HOME/env" ]]; then
-#     source "$CARGO_HOME/env"
-#     log_success "Rust installed and environment loaded"
-#   else
-#     log_warn "Rust installation may need manual configuration"
-#   fi
-# fi
-#
-
-# Rust Development Environment Setup
+# Installation check and setup
 if ! has_command rustup; then
-  echo "rustup not found. Installing rustup..."
-  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-  # echo "rustup installed"
-  # echo "installing stable toolchain..."
-  #rustup toolchain install stable
-  # echo "installing rustfmt..."
-  #rustup component add rustfmt
-  # echo "rustfmt installed"
+	log_info "Installing Rust via rustup..."
+	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+	[[ -f "$CARGO_HOME/env" ]] && source "$CARGO_HOME/env"
 fi
+
 #
 
 # Add cargo bin to PATH if not already there
 if [[ -d "$CARGO_HOME/bin" ]]; then
-  path_add "$CARGO_HOME/bin"
+	path_add "$CARGO_HOME/bin"
 fi
-
-# Optional: Add cargo completions
-# if has_command rustup; then
-#   mkdir -p "$ZDOTDIR/.zfunc"
-#   rustup completions zsh > "$ZDOTDIR/.zfunc/_rustup"
-#   rustup completions zsh cargo > "$ZDOTDIR/.zfunc/_cargo"
-# fi
-
-# Note: For Apple Silicon Macs, the Rust toolchain is installed with native arm64 support
 
 # ========================================================================
 # claude
 # ========================================================================
 
-# if ! has_command claude; then
-#   echo "claude not found. Installing claude..."
-#   brew install --quiet claude
-# fi
 #
 # if [[ ! -f "$XDG_CONFIG_HOME/claude/config.json" ]]; then
 #   echo "Linking claude config..."
@@ -408,30 +314,6 @@ fi
 #   echo "chatgpt not found. Installing chatgpt..."
 #   brew install --quiet chatgpt
 # fi
-
-# ========================================================================
-# postgresql@17
-# ========================================================================
-# postgresql@17 is keg-only, which means it was not symlinked into /opt/homebrew,
-# because this is an alternate version of another formula.
-#
-# If you need to have postgresql@17 first in your PATH, run:
-#   echo 'export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"' >> /Users/hank/.config/zsh/.zshrc
-#
-# For compilers to find postgresql@17 you may need to set:
-#   export LDFLAGS="-L/opt/homebrew/opt/postgresql@17/lib"
-#   export CPPFLAGS="-I/opt/homebrew/opt/postgresql@17/include"
-#
-# To start postgresql@17 now and restart at login:
-#   brew services start postgresql@17
-# Or, if you don't want/need a background service you can just run:
-#   LC_ALL="C" /opt/homebrew/opt/postgresql@17/bin/postgres -D /opt/homebrew/var/postgresql@17
-
-# export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"
-path_add "/opt/homebrew/opt/postgresql@17/bin"
-
-export LDFLAGS="-L/opt/homebrew/opt/postgresql@17/lib"
-export CPPFLAGS="-I/opt/homebrew/opt/postgresql@17/include"
 
 # brew services restart postgresql@17
 
@@ -461,20 +343,20 @@ export GOBIN="$GOPATH/bin"
 
 # Load ZSH plugins from Homebrew if available
 if [[ -d "$HOMEBREW_PREFIX/share" ]]; then
-  plugins=(
-    "zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-    "zsh-autosuggestions/zsh-autosuggestions.zsh"
-    "zsh-abbr/zsh-abbr.zsh"
-  )
-  for plugin in $plugins; do
-    plugin_path="$HOMEBREW_PREFIX/share/$plugin"
-    # has_command abbr && FPATH=$brewp/share/zsh-abbr:$FPATH
-    if [[ -f "$plugin_path" ]]; then
-      source "$plugin_path"
-      # Completions setup
-      FPATH=$plugin_path:$FPATH
-    fi
-  done
+	plugins=(
+		"zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+		"zsh-autosuggestions/zsh-autosuggestions.zsh"
+		"zsh-abbr/zsh-abbr.zsh"
+	)
+	for plugin in $plugins; do
+		plugin_path="$HOMEBREW_PREFIX/share/$plugin"
+		# has_command abbr && FPATH=$brewp/share/zsh-abbr:$FPATH
+		if [[ -f "$plugin_path" ]]; then
+			source "$plugin_path"
+			# Completions setup
+			FPATH=$plugin_path:$FPATH
+		fi
+	done
 
 fi
 
@@ -487,17 +369,49 @@ compinit
 # ========================================================================
 # atuin
 # ========================================================================
-! has_command atuin  eval "$(atuin init zsh)"
+export ATUIN_CONFIG_DIR="$cf/atuin"
+
+! has_command atuin && eval "$(atuin init zsh)"
+
+. "$HOME/.atuin/bin/env"
+
+# ========================================================================
+# zellij
+# ========================================================================
+
+export ZELLIJ_CONFIG_DIR="$cf/zellij"
+# Zellij (auto-start on startup)
+has_command zellij && eval "$(zellij setup --generate-auto-start zsh)"
+
+# zellij issue with Yazi (image preview) - https://yazi-rs.github.io/docs/image-preview#zellij
+# TERM=xterm-kitty yazi
+
+# ========================================================================
+# yazi
+# ========================================================================
+
+export YAZI_CONFIG_DIR="$cf/yazi"
+# yazi (https://yazi-rs.github.io/docs/quick-start)
+
+function y() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	yazi "$@" --cwd-file="$tmp"
+	if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+		builtin cd -- "$cwd"
+	fi
+	rm -f -- "$tmp"
+}
+
+# ========================================================================
+# fzf
+# ========================================================================
+has_command fzf && source <(fzf --zsh)
+# Load FZF completions
+# [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # ========================================================================
 # Tool Initialization
 # ========================================================================
-
-# Yazi
-# env "YAZI_CONFIG_HOME=~/.config/yazi-alt" yazi
-
-# zellij issue with Yazi (image preview) - https://yazi-rs.github.io/docs/image-preview#zellij
-# TERM=xterm-kitty yazi
 
 # Initialize tools only if they are installed
 has_command starship && eval "$(starship init zsh)"
@@ -508,30 +422,10 @@ has_command direnv && eval "$(direnv hook zsh)"
 has_command uv && eval "$(uv generate-shell-completion zsh)"
 # has_command pyenv && eval "$(pyenv init -)"
 # has_command abbr && eval "$(abbr init zsh)"
-# Zellij (auto-start on startup)
-has_command zellij && eval "$(zellij setup --generate-auto-start zsh)"
-
-# yazi (https://yazi-rs.github.io/docs/quick-start)
-function y() {
-	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
-	yazi "$@" --cwd-file="$tmp"
-	if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-		builtin cd -- "$cwd"
-	fi
-	rm -f -- "$tmp"
-}
-
-# Load FZF completions
-has_command fzf && source <(fzf --zsh)
-
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # Source aliases and functions
 [[ -f "${ZDOTDIR}/aliases.zsh" ]] && source "${ZDOTDIR}/aliases.zsh"
 [[ -f "${ZDOTDIR}/functions.zsh" ]] && source "${ZDOTDIR}/functions.zsh"
-
-. "$HOME/.atuin/bin/env"
-
 
 # ========================================================================
 # install core
@@ -559,38 +453,38 @@ has_command fzf && source <(fzf --zsh)
 # script and other dotfiles management tools.
 
 declare -gA LINKMAP=(
-  #   # Git configurations
-  #   # ["$DOTFILES/config/git/config"]="$XDG_CONFIG_HOME/.gitconfig"
-  #   # ["$DOTFILES/config/git/ignore"]="$XDG_CONFIG_HOME/git/.gitignore"
-  #   # ["$DOTFILES/config/git/gitattributes"]="$HOME/.gitattributes"
-  #   # ["$DOTFILES/config/git/gitmessage"]="$HOME/.gitmessage"
+	#   # Git configurations
+	#   # ["$DOTFILES/config/git/config"]="$XDG_CONFIG_HOME/.gitconfig"
+	#   # ["$DOTFILES/config/git/ignore"]="$XDG_CONFIG_HOME/git/.gitignore"
+	#   # ["$DOTFILES/config/git/gitattributes"]="$HOME/.gitattributes"
+	#   # ["$DOTFILES/config/git/gitmessage"]="$HOME/.gitmessage"
 
-  #   # ["$DOTFILES/config/starship.toml"]="$XDG_CONFIG_HOME/starship.toml"
-  #   # ["$DOTFILES/config/ghostty/config"]="$XDG_CONFIG_HOME/ghostty"
-  #   # ["$DOTFILES/config/atuin/config.toml"]="$XDG_CONFIG_HOME/atuin/config.toml"
-  #   # ["$DOTFILES/config/lazygit/config.yml"]="$XDG_CONFIG_HOME/lazygit/config.yml"
-  #   ["$DOTFILES/config/karabiner/karabiner.json"]="$XDG_CONFIG_HOME/karabiner/karabiner.json"
+	#   # ["$DOTFILES/config/starship.toml"]="$XDG_CONFIG_HOME/starship.toml"
+	#   # ["$DOTFILES/config/ghostty/config"]="$XDG_CONFIG_HOME/ghostty"
+	#   # ["$DOTFILES/config/atuin/config.toml"]="$XDG_CONFIG_HOME/atuin/config.toml"
+	#   # ["$DOTFILES/config/lazygit/config.yml"]="$XDG_CONFIG_HOME/lazygit/config.yml"
+	#   ["$DOTFILES/config/karabiner/karabiner.json"]="$XDG_CONFIG_HOME/karabiner/karabiner.json"
 
-  #   # Editor configurations
-  #   ["$DOTFILES/config/vscode/settings.json"]="$HOME/Library/Application Support/Code/User/settings.json"
-  #   ["$DOTFILES/config/vscode/keybindings.json"]="$HOME/Library/Application Support/Code/User/keybindings.json"
-  #   ["$DOTFILES/config/cursor/settings.json"]="$HOME/Library/Application Support/Cursor/User/settings.json"
-  #   ["$DOTFILES/config/cursor/keybindings.json"]="$HOME/Library/Application Support/Cursor/User/keybindings.json"
+	#   # Editor configurations
+	#   ["$DOTFILES/config/vscode/settings.json"]="$HOME/Library/Application Support/Code/User/settings.json"
+	#   ["$DOTFILES/config/vscode/keybindings.json"]="$HOME/Library/Application Support/Code/User/keybindings.json"
+	#   ["$DOTFILES/config/cursor/settings.json"]="$HOME/Library/Application Support/Cursor/User/settings.json"
+	#   ["$DOTFILES/config/cursor/keybindings.json"]="$HOME/Library/Application Support/Cursor/User/keybindings.json"
 
-  #   # ["$DOTFILES/config/yazi"]="$XDG_CONFIG_HOME/yazi"
-  #   # ["$DOTFILES/config/nvim"]="$XDG_CONFIG_HOME/nvim"
-  #   # ["$DOTFILES/config/bat"]="$XDG_CONFIG_HOME/bat"
-  #   # ["$DOTFILES/config/zellij"]="$XDG_CONFIG_HOME/zellij"
-  #   # ["$DOTFILES/config/zed"]="$XDG_CONFIG_HOME/zed"
-  #   # ["$DOTFILES/config/espanso"]="$XDG_CONFIG_HOME/espanso"
-  #   # ["$DOTFILES/config/warp/keybindings.yaml"]="$XDG_CONFIG_HOME/warp/keybindings.yaml"
+	#   # ["$DOTFILES/config/yazi"]="$XDG_CONFIG_HOME/yazi"
+	#   # ["$DOTFILES/config/nvim"]="$XDG_CONFIG_HOME/nvim"
+	#   # ["$DOTFILES/config/bat"]="$XDG_CONFIG_HOME/bat"
+	#   # ["$DOTFILES/config/zellij"]="$XDG_CONFIG_HOME/zellij"
+	#   # ["$DOTFILES/config/zed"]="$XDG_CONFIG_HOME/zed"
+	#   # ["$DOTFILES/config/espanso"]="$XDG_CONFIG_HOME/espanso"
+	#   # ["$DOTFILES/config/warp/keybindings.yaml"]="$XDG_CONFIG_HOME/warp/keybindings.yaml"
 
-  #   # ["$DOTFILES/config/hammerspoon"]="$HOME/.hammerspoon"
+	#   # ["$DOTFILES/config/hammerspoon"]="$HOME/.hammerspoon"
 
-  #   # AI tools configurations
+	#   # AI tools configurations
 
-  #   # ["$DOTFILES/config/ai/claude/claude_desktop_config.json"]="$HOME/Library/Application Support/Claude/claude_desktop_config.json"
-  #   # ["$DOTFILES/config/ai/cline/cline_mcp_settings.json"]="$HOME/Library/Application Support/Cursor/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json"
+	#   # ["$DOTFILES/config/ai/claude/claude_desktop_config.json"]="$HOME/Library/Application Support/Claude/claude_desktop_config.json"
+	#   # ["$DOTFILES/config/ai/cline/cline_mcp_settings.json"]="$HOME/Library/Application Support/Cursor/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json"
 )
 
 # # Export the map for use in other scripts
@@ -621,3 +515,27 @@ export LINKMAP
 #     done
 #   fi
 # }
+
+# ========================================================================
+# postgresql@17
+# ========================================================================
+# postgresql@17 is keg-only, which means it was not symlinked into /opt/homebrew,
+# because this is an alternate version of another formula.
+#
+# If you need to have postgresql@17 first in your PATH, run:
+#   echo 'export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"' >> /Users/hank/.config/zsh/.zshrc
+#
+# For compilers to find postgresql@17 you may need to set:
+#   export LDFLAGS="-L/opt/homebrew/opt/postgresql@17/lib"
+#   export CPPFLAGS="-I/opt/homebrew/opt/postgresql@17/include"
+#
+# To start postgresql@17 now and restart at login:
+#   brew services start postgresql@17
+# Or, if you don't want/need a background service you can just run:
+#   LC_ALL="C" /opt/homebrew/opt/postgresql@17/bin/postgres -D /opt/homebrew/var/postgresql@17
+
+# export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"
+path_add "/opt/homebrew/opt/postgresql@17/bin"
+
+export LDFLAGS="-L/opt/homebrew/opt/postgresql@17/lib"
+export CPPFLAGS="-I/opt/homebrew/opt/postgresql@17/include"

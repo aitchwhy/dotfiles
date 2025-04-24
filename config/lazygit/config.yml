@@ -1,5 +1,5 @@
-# # yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
-# # https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
+# https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md
 #
 ##########################
 # Default configs + my tweaks
@@ -10,12 +10,12 @@ gui:
   #   # Format used when displaying time e.g. commit time.
   #   # Uses Go's time format syntax: https://pkg.go.dev/time#Time.Format
   #   timeFormat: 02 Jan 06
-    timeFormat: "Wed Feb 25 11:06:39 PST 2015"
+  timeFormat: "Wed Feb 25 11:06:39 PST 2015"
   #   # Nerd fonts version to use.
   #   # One of: '2' | '3' | empty string (default)
   #   # If empty, do not show icons.
   #   nerdFontsVersion: ""
-    nerdFontsVersion: "3"
+  nerdFontsVersion: "3"
 # # Config relating to git
 git:
   #   # See https://github.com/jesseduffield/lazygit/blob/master/docs/Custom_Pagers.md
@@ -35,71 +35,69 @@ git:
     #     useConfig: false
     #
     #     # e.g. 'difft --color=always'
-    #     externalDiffCommand: ""
+    externalDiffCommand: "ksdiff"
     #
-    #   # Config relating to committing
-    #   commit:
-    #     # If true, pass '--signoff' flag when committing
-    #     signOff: false
-    #
-    #     # Automatic WYSIWYG wrapping of the commit message as you type
-    #     autoWrapCommitMessage: true
-    #
-    #     # If autoWrapCommitMessage is true, the width to wrap to
-    #     autoWrapWidth: 72
-    #
-    #   # Config relating to merging
-    #   merging:
-    #     # If true, run merges in a subprocess so that if a commit message is required, Lazygit will not hang
-    #     # Only applicable to unix users.
-    #     manualCommit: false
-    #
-    #     # Extra args passed to `git merge`, e.g. --no-ff
-    #     args: ""
-    #
-    #     # The commit message to use for a squash merge commit. Can contain "{{selectedRef}}" and "{{currentBranch}}" placeholders.
-    #     squashMergeMessage: Squash merge {{selectedRef}} into {{currentBranch}}
-    #
-    #   # list of branches that are considered 'main' branches, used when displaying commits
-    #   mainBranches:
-    #     - master
-    #     - main:
-    mainBranches:
-      - main
-    #
-    #   # Prefix to use when skipping hooks. E.g. if set to 'WIP', then pre-commit hooks will be skipped when the commit message starts with 'WIP'
-    #   skipHookPrefix: WIP
-    #
-    #   # If true, periodically fetch from remote
-    #   autoFetch: true
-    #
-    #   # If true, periodically refresh files and submodules
-    #   autoRefresh: true
-    #
-    #   # If true, pass the --all arg to git fetch
-    #   fetchAll: true
-    #
-    #   # If true, lazygit will automatically stage files that used to have merge
-    #   # conflicts but no longer do; and it will also ask you if you want to
-    #   # continue a merge or rebase if you've resolved all conflicts. If false, it
-    #   # won't do either of these things.
-    #   autoStageResolvedConflicts: true
-    #
-    #   # Command used when displaying the current branch git log in the main window
-    #   branchLogCmd: git log --graph --color=always --abbrev-commit --decorate --date=relative --pretty=medium {{branchName}} --
-    #
-    #   # Command used to display git log of all branches in the main window.
-    #   # Deprecated: Use `allBranchesLogCmds` instead.
-    #   allBranchesLogCmd: git log --graph --all --color=always --abbrev-commit --decorate --date=relative  --pretty=medium
-    #
-    #   # If true, do not spawn a separate process when using GPG
-    #   overrideGpg: false
-    #
-    #   # If true, do not allow force pushes
-    #   disableForcePushing: false
-    #
-    #   # See https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md#predefined-branch-name-prefix
-    branchPrefix: "hank/"
+  # Config relating to committing
+  commit:
+    # If true, pass '--signoff' flag when committing
+    signOff: false
+
+    # Automatic WYSIWYG wrapping of the commit message as you type
+    autoWrapCommitMessage: true
+
+    # If autoWrapCommitMessage is true, the width to wrap to
+    autoWrapWidth: 72
+
+  # Config relating to merging
+  merging:
+    # If true, run merges in a subprocess so that if a commit message is required, Lazygit will not hang
+    # Only applicable to unix users.
+    manualCommit: false
+
+    # Extra args passed to `git merge`, e.g. --no-ff
+    args: ""
+
+    # The commit message to use for a squash merge commit. Can contain "{{selectedRef}}" and "{{currentBranch}}" placeholders.
+    squashMergeMessage: Squash merge {{selectedRef}} into {{currentBranch}}
+
+  # list of branches that are considered 'main' branches, used when displaying commits
+  mainBranches:
+    - master
+    - main
+  
+  # Prefix to use when skipping hooks. E.g. if set to 'WIP', then pre-commit hooks will be skipped when the commit message starts with 'WIP'
+  skipHookPrefix: WIP
+  
+  # If true, periodically fetch from remote
+  autoFetch: true
+  
+  # If true, periodically refresh files and submodules
+  autoRefresh: true
+  
+  # If true, pass the --all arg to git fetch
+  fetchAll: true
+  
+  # If true, lazygit will automatically stage files that used to have merge
+  # conflicts but no longer do; and it will also ask you if you want to
+  # continue a merge or rebase if you've resolved all conflicts. If false, it
+  # won't do either of these things.
+  autoStageResolvedConflicts: true
+  
+  # Command used when displaying the current branch git log in the main window
+  branchLogCmd: git log --graph --color=always --abbrev-commit --decorate --date=relative --pretty=medium {{branchName}} --
+  
+  # Command used to display git log of all branches in the main window.
+  # Deprecated: Use `allBranchesLogCmds` instead.
+  allBranchesLogCmd: git log --graph --all --color=always --abbrev-commit --decorate --date=relative  --pretty=medium
+  
+  # If true, do not spawn a separate process when using GPG
+  overrideGpg: false
+  
+  # If true, do not allow force pushes
+  disableForcePushing: false
+  
+  # See https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md#predefined-branch-name-prefix
+  branchPrefix: "hank/"
     #
     #   # If true, parse emoji strings in commit messages e.g. render :rocket: as 🚀
     #   # (This should really be under 'gui', not 'git')
@@ -155,7 +153,7 @@ git:
     # os:
     #   # Command for editing a file. Should contain "{{filename}}".
     #   edit: ""
-    edit: "cursor {{filename}}"
+    # edit: "cursor {{filename}}"
     #
     #   # Command for editing a file at a given line number. Should contain
     #   # "{{filename}}", and may optionally contain "{{line}}".

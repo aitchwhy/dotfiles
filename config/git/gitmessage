@@ -1,6 +1,13 @@
 # <type>(<scope>): <subject>
 # |<----  Using a Maximum Of 50 Characters  ---->|
 
+Subject:
+<type>(<scope>): <description> (max 50 characters)
+Body:
+<insert detailed description of changes made in the commit> (wrap at 72 characters)
+Footer:
+<insert any additional information, such as references or issue numbers>
+
 # <body>
 # |<----   Try To Limit Each Line to a Maximum Of 72 Characters   ---->|
 
