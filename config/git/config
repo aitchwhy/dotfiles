@@ -1,11 +1,10 @@
-# Global git config (https://git-scm.com/docs/git-config.html)
+
 
 ; core vars
 [core]
   # Don't trust file modes
   filemode = false
-  # editor = nvim
-  editor = "cursor --wait"
+  editor = nvim
   pager = bat
   excludesfile = "$cf/git/ignore"
 
