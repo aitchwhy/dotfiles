@@ -7,11 +7,13 @@
 # - https://wiki.archlinux.org/title/Zsh#Configuration_files
 # - https://gist.github.com/Linerre/f11ad4a6a934dcf01ee8415c9457e7b2
 # - https://mac.install.guide/terminal/zshrc-zprofile
+echo "Loading .zprofile from $ZDOTDIR"
 
 # ========================================================================
 # Homebrew Setup (install if not installed)
 # ========================================================================
-
+set -x
+echo "Loading Homebrew shell environment..."
 # setup homebrew shell path
 eval "$(/opt/homebrew/bin/brew shellenv)"
 

@@ -76,7 +76,7 @@ brew "lefthook"        # Git hooks manager
 brew "postgresql@17"   # PostgreSQL database
 brew "datasette"       # SQLite explorer
 brew "pgcli"           # PostgreSQL CLI
-brew "usql"            # universal sql cli
+# brew "usql"            # universal sql cli
 
 # AWS Tools
 brew "awscli"          # AWS CLI
@@ -1750,3 +1750,4 @@ brew "imagemagick"
 brew "jq"
 brew "luarocks"
 brew "ghc"
+brew "dprint"

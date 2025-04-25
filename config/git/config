@@ -6,7 +6,7 @@
   filemode = false
   # editor = nvim
   editor = "cursor --wait"
-  pager = delta
+  pager = bat
   excludesfile = "$cf/git/ignore"
 
 # ===== User Information =====
@@ -23,7 +23,6 @@
 [init]
   defaultBranch = main
 
-# commit
 
 [commit]
   template = $XDG_CONFIG_HOME/git/gitmessage
