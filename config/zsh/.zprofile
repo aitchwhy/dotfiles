@@ -12,7 +12,7 @@ echo "Loading .zprofile from $ZDOTDIR"
 # ========================================================================
 # Homebrew Setup (install if not installed)
 # ========================================================================
-set -x
+# set -x
 echo "Loading Homebrew shell environment..."
 # setup homebrew shell path
 eval "$(/opt/homebrew/bin/brew shellenv)"
