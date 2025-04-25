@@ -1,6 +1,6 @@
 return {
-    "ahmedkhalf/project.nvim",
-    opts = {
-        manual_mode = true,
-    },
+  "ahmedkhalf/project.nvim",
+  opts = {
+    -- manual_mode = true,
+  },
 }

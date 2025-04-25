@@ -35,7 +35,7 @@ git:
     #     useConfig: false
     #
     #     # e.g. 'difft --color=always'
-    externalDiffCommand: "ksdiff"
+    # externalDiffCommand: "ksdiff"
     #
   # Config relating to committing
   commit:
