@@ -65,3 +65,5 @@
 # ===== URL Handling =====
 [url "git@github.com:"]
   insteadOf = https://github.com/
+[diff "ignore-timestamp"]
+	textconv = "sed '/#   timestamp:/d'"

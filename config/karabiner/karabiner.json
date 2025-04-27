@@ -478,19 +478,11 @@
                 {
                     "identifiers": {
                         "is_keyboard": true,
+                        "is_pointing_device": true,
                         "product_id": 1760,
                         "vendor_id": 13364
                     },
-                    "simple_modifications": [
-                        {
-                            "from": { "key_code": "delete_forward" },
-                            "to": [{ "apple_vendor_top_case_key_code": "keyboard_fn" }]
-                        },
-                        {
-                            "from": { "key_code": "page_up" },
-                            "to": [{ "apple_vendor_keyboard_key_code": "launchpad" }]
-                        }
-                    ]
+                    "ignore": false
                 }
             ],
             "name": "Default profile",
