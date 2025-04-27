@@ -20,8 +20,9 @@ setopt PUSHD_IGNORE_DUPS # Don't store duplicates in stack
 setopt PUSHD_SILENT      # Don't print stack after pushd/popd
 
 # Globbing and Pattern Matching
-setopt EXTENDED_GLOB # Extended globbing
-setopt NO_CASE_GLOB  # Case insensitive globbing
+unsetopt EXTENDED_GLOB # No Extended globbing (no need for double quotes for nix flakes pkg#target due to hashtag needing escape)
+setopt NO_NOMATCH
+setopt NO_CASE_GLOB # Case insensitive globbing
 
 # Misc Options
 setopt INTERACTIVE_COMMENTS # Allow comments in interactive shells
@@ -33,6 +34,10 @@ setopt HIST_IGNORE_DUPS       # Don't record duplicates
 setopt HIST_VERIFY            # Don't execute immediately upon history expansion
 setopt SHARE_HISTORY          # Share history between sessions
 setopt HIST_IGNORE_SPACE      # Don't record commands starting with space
+# setopt
+
+# Keep your zsh history file (can re-use in Nix shell)
+export HISTFILE="$HOME/.zsh_history"
 
 # ========================================================================
 # XDG Base Directory Specification
@@ -59,10 +64,11 @@ export cfz="$dot/config/zsh"
 export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
 export bpre="$(brew --prefix)"
 
+export NIX_CONFIG_DIR="$cf/nix"
+
 # ========================================================================
 # secrets
 # ========================================================================
-
 
 # ========================================================================
 # Keyboard & Input Configuration
@@ -111,6 +117,205 @@ function has_command() {
 # done
 
 # ========================================================================
+# Completions
+# ========================================================================
+
+# Load ZSH plugins from Homebrew if available
+if [[ -d "$HOMEBREW_PREFIX/share" ]]; then
+	plugins=(
+		"zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+		"zsh-autosuggestions/zsh-autosuggestions.zsh"
+		"zsh-abbr/zsh-abbr.zsh"
+	)
+	for plugin in $plugins; do
+		plugin_path="$HOMEBREW_PREFIX/share/$plugin"
+		# has_command abbr && FPATH=$brewp/share/zsh-abbr:$FPATH
+		if [[ -f "$plugin_path" ]]; then
+			source "$plugin_path"
+			# Completions setup
+			FPATH=$plugin_path:$FPATH
+		fi
+	done
+
+fi
+
+# Completions setup
+FPATH=$brewp/share/zsh/site-functions:$FPATH
+
+autoload -Uz compinit
+compinit
+
+##################################
+# Nix
+##################################
+
+alias nix='nix'
+alias nixh='nix --help'
+alias nixf="$EDITOR $cf/nix/nix.conf"
+alias nixgc="nix-collect-garbage -d"
+alias nixpkgs="nix search"
+alias nixsh="nix-shell --run zsh"
+alias nixdev="nix develop"
+alias nixf="nix flake"
+alias nixup="sudo nixos-rebuild switch"
+alias nixdarwinup="darwin-rebuild switch --flake ~/dotfiles"
+
+##################################
+# Homebrew
+##################################
+alias b="brew"
+alias bupd="brew update"
+alias bupg="brew upgrade"
+alias bclean="brew cleanup --prune=all && brew autoremove"
+alias bcleanall='brew cleanup --prune=all && rm -rf $(brew --cache) && brew autoremove'
+alias bi="brew info"
+alias bin="brew install"
+alias brein="brew reinstall"
+alias bs="brew search"
+alias bsa="brew search --eval-all --desc"
+alias bl="brew leaves"
+alias bcin="brew install --cask"
+alias bb="brew bundle -g"
+alias bbe="brew bundle edit -g"
+alias bba="brew bundle add -g"
+alias bbrm="brew bundle remove -g"
+alias bbls="brew bundle dump -g --all --file=- --verbose"
+alias bbsave="brew bundle dump -g --all --verbose --global"
+alias bbcheck="brew bundle check -g --all --verbose --global"
+alias bup='brew update && brew upgrade && brew cleanup'
+alias brewup='bup'
+
+##################################
+# File System Navigation & Management
+# eza
+# fd
+##################################
+alias ls="eza --icons --group-directories-first"
+alias ll="eza --icons --group-directories-first -la"
+alias la="eza --icons --group-directories-first -a"
+alias lt="eza --icons --group-directories-first --tree"
+alias lt2="eza --icons --group-directories-first --tree --level=2"
+alias dl='cd ~/Downloads'
+alias cf='cd ~/.config/'
+
+##################################
+# Text Editors
+##################################
+alias v='$EDITOR'
+alias vi='$EDITOR'
+alias vim='$EDITOR'
+
+##################################
+# Zsh
+##################################
+alias zr="exec zsh"
+alias ze="nvim '$ZDOTDIR'/{.zshrc,.zprofile,.zshenv}"
+alias zeall="nvim '$ZDOTDIR'/{.zshrc,.zprofile,.zshenv,*.zsh}"
+alias zcompreset="rm -f ~/.zcompdump; compinit"
+
+##################################
+# System Information & Utilities
+##################################
+alias ip="ipconfig getifaddr en0"
+alias localip="ipconfig getifaddr en0"
+alias publicip="curl -s https://api.ipify.org"
+alias ports="sudo lsof -i -P -n | grep LISTEN"
+alias listening="sudo lsof -i -P -n | grep LISTEN"
+alias flush="dscacheutil -flushcache && killall -HUP mDNSResponder"
+alias printpath='echo $PATH | tr ":" "\n"'
+alias printfuncs='print -l ${(k)functions[(I)[^_]*]} | sort'
+alias printfpath='for fp in $fpath; do echo $fp; done; unset fp'
+alias flushdns="sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder"
+alias showhidden="defaults write com.apple.finder AppleShowAllFiles YES; killall Finder"
+
+##################################
+# Git
+##################################
+alias gs='git status'
+alias ga='git add'
+alias gai='git add -i'
+alias gaa='git add --all'
+alias gcm='git commit -m'
+alias gca='git commit --amend --no-edit'
+alias gc='git commit'
+alias gp='git push'
+alias gll='git pull'
+alias lg='lazygit'
+alias lgdot='lazygit --path $DOTFILES'
+
+##################################
+# Modern CLI Alternatives
+##################################
+alias ps='procs'
+alias ping='gping'
+alias diff='delta'
+alias cat='bat --paging=always'
+alias miller='mlr'
+alias grep='rg'
+alias find='fd'
+alias md='glow'
+alias net='trippy'
+alias netviz='netop'
+alias jwt='jet-ui'
+alias sed='sd'
+alias du='dust'
+alias csv='xsv'
+alias jsonfilter='jsonf'
+alias jsonviewer='jsonv'
+
+##################################
+# Docker & Kubernetes
+##################################
+alias d='docker'
+alias dstart='docker start'
+alias dstop='docker stop'
+alias dps='docker ps'
+alias dpsa='docker ps -a'
+alias dimg='docker images'
+alias dx='docker exec -it'
+alias drm='docker rm'
+alias drmi='docker rmi'
+alias dbuild='docker build'
+alias dc='docker-compose'
+alias k='k9s'
+alias ld="lazydocker"
+
+##################################
+# Just Task Runner
+##################################
+alias j="just"
+alias jfmt="just --unstable --fmt"
+alias .j='just --justfile $USER_JUSTFILE --working-directory .'
+alias .jfmt='just --justfile $USER_JUSTFILE --working-directory . --unstable --fmt'
+
+##################################
+# FZF Enhanced Commands
+##################################
+alias flog='fzf --preview "bat --style=numbers --color=always --line-range=:500 {}"'
+alias falias='alias | fzf'
+alias fman='man -k . | fzf --preview "man {}"'
+alias fls='man -k . | fzf --preview "man {}"'
+
+##################################
+# Terminal Multiplexers & Tools
+##################################
+alias g='ghostty'
+alias zj="zellij"
+alias zjls="zellij list-sessions"
+alias zja='zellij attach "$(zellij list-sessions -n | fzf --reverse --border --no-sort --height 40% | awk '\''{print $1}'\'')"'
+alias zje="zellij edit"
+
+##################################
+# Utilities & Other Tools
+##################################
+alias cheat="tldr"
+alias ch="cheat"
+alias claude="/Users/hank/.claude/local/claude"
+alias ts="tailscale"
+alias hf="huggingface-cli"
+alias rx="repomix"
+
+# ========================================================================
 # git
 
 # https://git-scm.com/docs/git-config
@@ -147,10 +352,9 @@ fi
 # ========================================================================
 # zoxide
 # ========================================================================
-if ! has_command zoxide; then
-	echo "zoxide not found. Installing zoxide..."
-	brew install --quiet zoxide
-fi
+
+# completions (AFTER compinit)
+eval "$(zoxide init zsh)"
 
 # if [[ ! -f "$XDG_CONFIG_HOME/zoxide/config.toml" ]]; then
 #   echo "Linking zoxide config..."
@@ -163,6 +367,7 @@ fi
 
 # https://docs.atuin.sh/configuration/config/
 export ATUIN_CONFIG_DIR="$cf/atuin"
+alias at="atuin"
 
 # path_add "$HOME/.atuin/bin"
 
@@ -192,6 +397,44 @@ eval "$(atuin init zsh)"
 # eval "$(atuin init zsh --disable-ctrl-r)"
 
 # atuin import auto
+
+# ========================================================================
+# zellij
+# ========================================================================
+
+export ZELLIJ_CONFIG_DIR="$cf/zellij"
+
+# Zellij (auto-start on startup)
+# has_command zellij && eval "$(zellij setup --generate-auto-start zsh)"
+
+# zellij issue with Yazi (image preview) - https://yazi-rs.github.io/docs/image-preview#zellij
+TERM=xterm-kitty yazi
+
+# ========================================================================
+# yazi
+# ========================================================================
+
+export YAZI_CONFIG_DIR="$cf/yazi"
+# yazi (https://yazi-rs.github.io/docs/quick-start)
+
+function y() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	yazi "$@" --cwd-file="$tmp"
+	if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+		builtin cd -- "$cwd"
+	fi
+	rm -f -- "$tmp"
+}
+
+# ========================================================================
+# fzf
+# ========================================================================
+# Set up fzf key bindings and fuzzy completion
+source <(fzf --zsh)
+# TODO
+# has_command fzf && source <(fzf --zsh)
+# Load FZF completions
+# [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # ========================================================================
 # uv
@@ -286,19 +529,19 @@ export CARGO_HOME="${CARGO_HOME:-$HOME/.cargo}"
 export RUSTUP_HOME="${RUSTUP_HOME:-$HOME/.rustup}"
 path_add "$HOME/.cargo/bin"
 
-# Installation check and setup
-if ! has_command rustup; then
-	log_info "Installing Rust via rustup..."
-	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-	[[ -f "$CARGO_HOME/env" ]] && source "$CARGO_HOME/env"
-fi
+# # Installation check and setup
+# if ! has_command rustup; then
+# 	log_info "Installing Rust via rustup..."
+# 	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+# 	[[ -f "$CARGO_HOME/env" ]] && source "$CARGO_HOME/env"
+# fi
 
 #
 
-# Add cargo bin to PATH if not already there
-if [[ -d "$CARGO_HOME/bin" ]]; then
-	path_add "$CARGO_HOME/bin"
-fi
+# # Add cargo bin to PATH if not already there
+# if [[ -d "$CARGO_HOME/bin" ]]; then
+# 	path_add "$CARGO_HOME/bin"
+# fi
 
 # ========================================================================
 # claude
@@ -310,14 +553,6 @@ fi
 #   ln -sf "$DOTFILES/config/claude/config.json" "$XDG_CONFIG_HOME/claude/config.json"
 # fi
 #
-# ========================================================================
-# chatgpt
-# ========================================================================
-
-# if ! has_command chatgpt; then
-#   echo "chatgpt not found. Installing chatgpt..."
-#   brew install --quiet chatgpt
-# fi
 
 # brew services restart postgresql@17
 
@@ -371,58 +606,14 @@ autoload -Uz compinit
 compinit
 
 # ========================================================================
-# atuin
-# ========================================================================
-export ATUIN_CONFIG_DIR="$cf/atuin"
-
-! has_command atuin && eval "$(atuin init zsh)"
-
-. "$HOME/.atuin/bin/env"
-
-# ========================================================================
-# zellij
-# ========================================================================
-
-export ZELLIJ_CONFIG_DIR="$cf/zellij"
-# Zellij (auto-start on startup)
-has_command zellij && eval "$(zellij setup --generate-auto-start zsh)"
-
-# zellij issue with Yazi (image preview) - https://yazi-rs.github.io/docs/image-preview#zellij
-# TERM=xterm-kitty yazi
-
-# ========================================================================
-# yazi
-# ========================================================================
-
-export YAZI_CONFIG_DIR="$cf/yazi"
-# yazi (https://yazi-rs.github.io/docs/quick-start)
-
-function y() {
-	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
-	yazi "$@" --cwd-file="$tmp"
-	if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-		builtin cd -- "$cwd"
-	fi
-	rm -f -- "$tmp"
-}
-
-# ========================================================================
-# fzf
-# ========================================================================
-has_command fzf && source <(fzf --zsh)
-# Load FZF completions
-# [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-# ========================================================================
 # Tool Initialization
 # ========================================================================
 
 # Initialize tools only if they are installed
 has_command starship && eval "$(starship init zsh)"
-has_command zoxide && eval "$(zoxide init zsh)"
 has_command direnv && eval "$(direnv hook zsh)"
 # has_command fnm && eval "$(fnm env --use-on-cd)"
-# has_command volta && eval "$(volta setup)"
+has_command volta && eval "$(volta setup)"
 has_command uv && eval "$(uv generate-shell-completion zsh)"
 # has_command pyenv && eval "$(pyenv init -)"
 # has_command abbr && eval "$(abbr init zsh)"
@@ -448,100 +639,100 @@ has_command uv && eval "$(uv generate-shell-completion zsh)"
 # path+=(~/my_bin)
 # ========================================================================
 
-# ========================================================================
-# Dotfiles Symlink Map Configuration
-# ========================================================================
-
-# This defines the mapping between dotfiles source locations and their
-# target locations in the user's home directory. It's used by the installation
-# script and other dotfiles management tools.
-
-declare -gA LINKMAP=(
-	#   # Git configurations
-	#   # ["$DOTFILES/config/git/config"]="$XDG_CONFIG_HOME/.gitconfig"
-	#   # ["$DOTFILES/config/git/ignore"]="$XDG_CONFIG_HOME/git/.gitignore"
-	#   # ["$DOTFILES/config/git/gitattributes"]="$HOME/.gitattributes"
-	#   # ["$DOTFILES/config/git/gitmessage"]="$HOME/.gitmessage"
-
-	#   # ["$DOTFILES/config/starship.toml"]="$XDG_CONFIG_HOME/starship.toml"
-	#   # ["$DOTFILES/config/ghostty/config"]="$XDG_CONFIG_HOME/ghostty"
-	#   # ["$DOTFILES/config/atuin/config.toml"]="$XDG_CONFIG_HOME/atuin/config.toml"
-	#   # ["$DOTFILES/config/lazygit/config.yml"]="$XDG_CONFIG_HOME/lazygit/config.yml"
-	#   ["$DOTFILES/config/karabiner/karabiner.json"]="$XDG_CONFIG_HOME/karabiner/karabiner.json"
-
-	#   # Editor configurations
-	#   ["$DOTFILES/config/vscode/settings.json"]="$HOME/Library/Application Support/Code/User/settings.json"
-	#   ["$DOTFILES/config/vscode/keybindings.json"]="$HOME/Library/Application Support/Code/User/keybindings.json"
-	#   ["$DOTFILES/config/cursor/settings.json"]="$HOME/Library/Application Support/Cursor/User/settings.json"
-	#   ["$DOTFILES/config/cursor/keybindings.json"]="$HOME/Library/Application Support/Cursor/User/keybindings.json"
-
-	#   # ["$DOTFILES/config/yazi"]="$XDG_CONFIG_HOME/yazi"
-	#   # ["$DOTFILES/config/nvim"]="$XDG_CONFIG_HOME/nvim"
-	#   # ["$DOTFILES/config/bat"]="$XDG_CONFIG_HOME/bat"
-	#   # ["$DOTFILES/config/zellij"]="$XDG_CONFIG_HOME/zellij"
-	#   # ["$DOTFILES/config/zed"]="$XDG_CONFIG_HOME/zed"
-	#   # ["$DOTFILES/config/espanso"]="$XDG_CONFIG_HOME/espanso"
-	#   # ["$DOTFILES/config/warp/keybindings.yaml"]="$XDG_CONFIG_HOME/warp/keybindings.yaml"
-
-	#   # ["$DOTFILES/config/hammerspoon"]="$HOME/.hammerspoon"
-
-	#   # AI tools configurations
-
-	#   # ["$DOTFILES/config/ai/claude/claude_desktop_config.json"]="$HOME/Library/Application Support/Claude/claude_desktop_config.json"
-	#   # ["$DOTFILES/config/ai/cline/cline_mcp_settings.json"]="$HOME/Library/Application Support/Cursor/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json"
-)
-
-# # Export the map for use in other scripts
-export LINKMAP
-
-# # Initialize dotfiles - ensure essential symlinks exist
-# # This is a lightweight version of setup_cli_tools from install.zsh
-# # that won't disrupt the user's shell experience
-# dotfiles_init() {
-#   # Only run in interactive shells to avoid slowing down scripts
-#   if [[ -o interactive ]]; then
-#     # Create missing symlinks silently
-#     for key in ${(k)DOTFILES_TO_SYMLINK_MAP}; do
-#       local src="$key"
-#       local dst="${DOTFILES_TO_SYMLINK_MAP[$key]}"
-
-#       # Only create symlink if source exists and destination doesn't
-#       if [[ -e "$src" ]] && [[ ! -e "$dst" ]]; then
-#         local parent_dir=$(dirname "$dst")
-
-#         # Create parent directory if needed
-#         [[ ! -d "$parent_dir" ]] && mkdir -p "$parent_dir"
-
-#         # Create the symlink
-#         echo "Creating symlink: $dst -> $src"
-#         ln -sf "$src" "$dst"
-#       fi
-#     done
-#   fi
-# }
-
-# ========================================================================
-# postgresql@17
-# ========================================================================
-# postgresql@17 is keg-only, which means it was not symlinked into /opt/homebrew,
-# because this is an alternate version of another formula.
+# # ========================================================================
+# # Dotfiles Symlink Map Configuration
+# # ========================================================================
 #
-# If you need to have postgresql@17 first in your PATH, run:
-#   echo 'export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"' >> /Users/hank/.config/zsh/.zshrc
+# # This defines the mapping between dotfiles source locations and their
+# # target locations in the user's home directory. It's used by the installation
+# # script and other dotfiles management tools.
 #
-# For compilers to find postgresql@17 you may need to set:
-#   export LDFLAGS="-L/opt/homebrew/opt/postgresql@17/lib"
-#   export CPPFLAGS="-I/opt/homebrew/opt/postgresql@17/include"
+# declare -gA LINKMAP=(
+# 	#   # Git configurations
+# 	#   # ["$DOTFILES/config/git/config"]="$XDG_CONFIG_HOME/.gitconfig"
+# 	#   # ["$DOTFILES/config/git/ignore"]="$XDG_CONFIG_HOME/git/.gitignore"
+# 	#   # ["$DOTFILES/config/git/gitattributes"]="$HOME/.gitattributes"
+# 	#   # ["$DOTFILES/config/git/gitmessage"]="$HOME/.gitmessage"
 #
-# To start postgresql@17 now and restart at login:
-#   brew services start postgresql@17
-# Or, if you don't want/need a background service you can just run:
-#   LC_ALL="C" /opt/homebrew/opt/postgresql@17/bin/postgres -D /opt/homebrew/var/postgresql@17
-
-# export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"
-path_add "/opt/homebrew/opt/postgresql@17/bin"
-
-export LDFLAGS="-L/opt/homebrew/opt/postgresql@17/lib"
-export CPPFLAGS="-I/opt/homebrew/opt/postgresql@17/include"
-
-# [ -f "/Users/hank/.ghcup/env" ] && . "/Users/hank/.ghcup/env" # ghcup-env
+# 	#   # ["$DOTFILES/config/starship.toml"]="$XDG_CONFIG_HOME/starship.toml"
+# 	#   # ["$DOTFILES/config/ghostty/config"]="$XDG_CONFIG_HOME/ghostty"
+# 	#   # ["$DOTFILES/config/atuin/config.toml"]="$XDG_CONFIG_HOME/atuin/config.toml"
+# 	#   # ["$DOTFILES/config/lazygit/config.yml"]="$XDG_CONFIG_HOME/lazygit/config.yml"
+# 	#   ["$DOTFILES/config/karabiner/karabiner.json"]="$XDG_CONFIG_HOME/karabiner/karabiner.json"
+#
+# 	#   # Editor configurations
+# 	#   ["$DOTFILES/config/vscode/settings.json"]="$HOME/Library/Application Support/Code/User/settings.json"
+# 	#   ["$DOTFILES/config/vscode/keybindings.json"]="$HOME/Library/Application Support/Code/User/keybindings.json"
+# 	#   ["$DOTFILES/config/cursor/settings.json"]="$HOME/Library/Application Support/Cursor/User/settings.json"
+# 	#   ["$DOTFILES/config/cursor/keybindings.json"]="$HOME/Library/Application Support/Cursor/User/keybindings.json"
+#
+# 	#   # ["$DOTFILES/config/yazi"]="$XDG_CONFIG_HOME/yazi"
+# 	#   # ["$DOTFILES/config/nvim"]="$XDG_CONFIG_HOME/nvim"
+# 	#   # ["$DOTFILES/config/bat"]="$XDG_CONFIG_HOME/bat"
+# 	#   # ["$DOTFILES/config/zellij"]="$XDG_CONFIG_HOME/zellij"
+# 	#   # ["$DOTFILES/config/zed"]="$XDG_CONFIG_HOME/zed"
+# 	#   # ["$DOTFILES/config/espanso"]="$XDG_CONFIG_HOME/espanso"
+# 	#   # ["$DOTFILES/config/warp/keybindings.yaml"]="$XDG_CONFIG_HOME/warp/keybindings.yaml"
+#
+# 	#   # ["$DOTFILES/config/hammerspoon"]="$HOME/.hammerspoon"
+#
+# 	#   # AI tools configurations
+#
+# 	#   # ["$DOTFILES/config/ai/claude/claude_desktop_config.json"]="$HOME/Library/Application Support/Claude/claude_desktop_config.json"
+# 	#   # ["$DOTFILES/config/ai/cline/cline_mcp_settings.json"]="$HOME/Library/Application Support/Cursor/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json"
+# )
+#
+# # # Export the map for use in other scripts
+# export LINKMAP
+#
+# # # Initialize dotfiles - ensure essential symlinks exist
+# # # This is a lightweight version of setup_cli_tools from install.zsh
+# # # that won't disrupt the user's shell experience
+# # dotfiles_init() {
+# #   # Only run in interactive shells to avoid slowing down scripts
+# #   if [[ -o interactive ]]; then
+# #     # Create missing symlinks silently
+# #     for key in ${(k)DOTFILES_TO_SYMLINK_MAP}; do
+# #       local src="$key"
+# #       local dst="${DOTFILES_TO_SYMLINK_MAP[$key]}"
+#
+# #       # Only create symlink if source exists and destination doesn't
+# #       if [[ -e "$src" ]] && [[ ! -e "$dst" ]]; then
+# #         local parent_dir=$(dirname "$dst")
+#
+# #         # Create parent directory if needed
+# #         [[ ! -d "$parent_dir" ]] && mkdir -p "$parent_dir"
+#
+# #         # Create the symlink
+# #         echo "Creating symlink: $dst -> $src"
+# #         ln -sf "$src" "$dst"
+# #       fi
+# #     done
+# #   fi
+# # }
+#
+# # ========================================================================
+# # postgresql@17
+# # ========================================================================
+# # postgresql@17 is keg-only, which means it was not symlinked into /opt/homebrew,
+# # because this is an alternate version of another formula.
+# #
+# # If you need to have postgresql@17 first in your PATH, run:
+# #   echo 'export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"' >> /Users/hank/.config/zsh/.zshrc
+# #
+# # For compilers to find postgresql@17 you may need to set:
+# #   export LDFLAGS="-L/opt/homebrew/opt/postgresql@17/lib"
+# #   export CPPFLAGS="-I/opt/homebrew/opt/postgresql@17/include"
+# #
+# # To start postgresql@17 now and restart at login:
+# #   brew services start postgresql@17
+# # Or, if you don't want/need a background service you can just run:
+# #   LC_ALL="C" /opt/homebrew/opt/postgresql@17/bin/postgres -D /opt/homebrew/var/postgresql@17
+#
+# # export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"
+# path_add "/opt/homebrew/opt/postgresql@17/bin"
+#
+# export LDFLAGS="-L/opt/homebrew/opt/postgresql@17/lib"
+# export CPPFLAGS="-I/opt/homebrew/opt/postgresql@17/include"
+#
+# # [ -f "/Users/hank/.ghcup/env" ] && . "/Users/hank/.ghcup/env" # ghcup-env

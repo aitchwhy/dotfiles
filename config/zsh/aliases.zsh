@@ -1,45 +1,59 @@
 #!/usr/bin/env zsh
 
 local DOTFILES="${DOTFILES:-$HOME/dotfiles}"
+local cf="${cf:-$DOTFILES/config}"
+local cfz="${cf:-$cf/zsh}"
+local cfnv="${cf:-$cf/nvim}"
+local cf="${cf:-$cf/nvim}"
 
+####################################
 # justfile
-# alias jfmt="just --unstable --fmt"
-# alias .j='just -g'
-# alias j="just -f ~/dotfiles/user.justfile"
+####################################
 
-alias .j='just -f $XDG_CONFIG_HOME/just/.user.justfile'
+export USER_JUSTFILE="$cf/just/.user.justfile"
+
 alias j="just"
+# alias .j='just -g'
+alias jfmt="just --unstable --fmt"
 
-alias cheat="tldr"
-alias ch="cheat"
+# a recipe called foo in ~/.user.justfile --> (.j foo)
+alias .j='just --justfile $USER_JUSTFILE --working-directory .'
+alias .jfmt='just --justfile $USER_JUSTFILE --working-directory . --unstable --fmt'
 
-# for recipe in $(just --justfile $DOTFILES/config/just/user.justfile --summary); do
-#   alias $recipe="just --justfile '$DOTFILES/config/just/user.justfile' --working-directory . $recipe"
+# # run recipe directly without ".j"
+# for recipe in `just --justfile ~/.user.justfile --summary`; do
+#   alias $recipe="just --justfile $USER_JUSTFILE --working-directory . $recipe"
 # done
 
+####################################
+# Nix
+####################################
 
-
-# nix
+alias nix='nix'
 alias nixh='nix --help'
-# nix package management
-alias nixs="nix search"
-alias nixp="nix profile install"
-alias nixl="nix profile list"
-alias nixr="nix profile remove"
 
-# nix development
-alias nix-shell="nix-shell --run zsh"
-alias ns="nix-shell --run zsh"
-alias nd="nix develop --command zsh"
-alias nf="nix flake"
 
-# nix system
-alias nixu="sudo nixos-rebuild switch"
-alias nixd="darwin-rebuild switch --flake ~/dotfiles"
-alias nixc="cd ~/dotfiles && $EDITOR flake.nix"
+alias nixf="$EDITOR $DOTFILE/flake.nix"
+alias nixf="$EDITOR $cf/nix/nix.conf"
 
 # nix garbage collection
-alias nixg="nix-collect-garbage -d"
+alias nixgc="nix-collect-garbage -d"
+
+# nix package management
+alias nixpkgs="nix search"
+# alias nixpin="nix profile install"
+# alias nixpls="nix profile list"
+# alias nixprm="nix profile remove"
+
+# nix development
+alias nixsh="nix-shell --run zsh"
+alias nixdev="nix develop"
+alias nixdevzsh="nix develop --command zsh"
+alias nixf="nix flake"
+
+# nix system
+alias nixup="sudo nixos-rebuild switch"
+alias nixdarwinup="darwin-rebuild switch --flake ~/dotfiles"
 
 
 # Aliases
@@ -50,7 +64,13 @@ alias vim='$EDITOR'
 # Dotfiles Management
 # alias zdot='cd $ZDOTDIR'
 alias zr="exec zsh"
-alias ze="fd -t file --hidden . "$ZDOTDIR" | xargs nvim"
+alias ze="nvim '$ZDOTDIR'/{.zshrc,.zprofile,.zshenv}"
+alias zeall="nvim '$ZDOTDIR'/{.zshrc,.zprofile,.zshenv,*.zsh}"
+####################################
+
+alias cheat="tldr"
+alias ch="cheat"
+
 
 # === Aliases from .zshrc ===
 alias claude="/Users/hank/.claude/local/claude"
@@ -113,8 +133,6 @@ alias du='dust'
 # alias http='posting'
 alias csv='xsv'
 # alias rm='rip'
-alias tmux='zellij'
-alias jsonfilter='jnv'
 alias jsonviewer='jnv'
 # k8s kubernetes + docker + containers
 alias d='docker' # Note: Overwrites previous d alias

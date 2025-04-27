@@ -61,8 +61,8 @@ filter_mode = "global"
 # which filter mode to use when atuin is invoked from a shell up-key binding
 # It can be useful to use a different filter or search mode on the up arrow. For example, you could use ctrl-r for searching globally, but the up arrow for searching history from the current directory only.
 # the accepted values are identical to those of "filter_mode"
-# filter_mode_shell_up_key_binding = "global"
-filter_mode_shell_up_key_binding = "session"
+filter_mode_shell_up_key_binding = "global"
+# filter_mode_shell_up_key_binding = "session"
 # filter_mode_shell_up_key_binding = "directory"
 
 # which search mode to use when atuin is invoked from a shell up-key binding

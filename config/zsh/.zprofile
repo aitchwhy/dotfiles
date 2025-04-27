@@ -8,6 +8,10 @@
 # - https://gist.github.com/Linerre/f11ad4a6a934dcf01ee8415c9457e7b2
 # - https://mac.install.guide/terminal/zshrc-zprofile
 echo "Loading .zprofile from $ZDOTDIR"
+echo "Loading /etc/profile.d/nix.sh from $ZDOTDIR"
+
+# nix.sh - setups up nix environment. Usually created by nix installer
+source /etc/profile.d/nix.sh
 
 # ========================================================================
 # Homebrew Setup (install if not installed)
@@ -30,6 +34,11 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 # VIBES_FRONTEND="http://localhost:3000/"
 # PREFECT_JOB_RUNNER="http://localhost:52000/runs/flow-run"1
 #
+
+# https://nix.dev/manual/nix/2.28/installation/env-variables.html?highlight=ssl#nix_ssl_cert_file
+
+
+
 
 # ========================================================================
 # Editor & Terminal Settings
