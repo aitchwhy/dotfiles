@@ -43,7 +43,8 @@ export HISTFILE="$HOME/.zsh_history"
 # ========================================================================
 
 export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
-export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$DOTFILES/config}"
+# export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$DOTFILES/config}"
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
@@ -134,7 +135,7 @@ compinit
 export NIX_CONFIG_DIR="$cf/nix"
 
 # --- Git ---
-export GIT_CONFIG="$cf/git/config"
+export GIT_CONFIG="$cf/git/gitconfig"
 export LG_CONFIG_FILE="$cf/lazygit/config.yml"
 
 # --- Starship ---
@@ -211,7 +212,6 @@ has_command uv && eval "$(uv generate-shell-completion zsh)"
 # ========================================================================
 
 # --- Nix ---
-alias nix='nix'
 alias nixh='nix --help'
 alias nixf="$EDITOR $cf/nix/nix.conf"
 alias nixgc="nix-collect-garbage -d"
