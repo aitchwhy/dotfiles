@@ -1,0 +1,69 @@
+
+
+; core vars
+[core]
+  # Don't trust file modes
+  filemode = false
+  editor = nvim
+  pager = bat
+  excludesfile = "$cf/git/ignore"
+
+# ===== User Information =====
+[user]
+  name = Hank
+  email = hank.lee.qed@gmail.com
+  username = aitchwhy
+
+
+# ===== Basic UI Settings =====
+[color]
+  ui = true
+
+[init]
+  defaultBranch = main
+
+
+[commit]
+  template = $XDG_CONFIG_HOME/git/gitmessage
+  verbose = true
+
+# ===== Diff & Merge Tools =====
+[interactive]
+  diffFilter = delta --color-only
+
+[delta]
+  navigate = true
+  dark = true
+  line-numbers = true
+  side-by-side = true
+
+[push]
+  default = current
+  followTags = true
+  recurseSubmodules = check
+
+[branch]
+  autoSetupRebase = always
+  sort = -committerdate
+
+# ===== Authentication & Signing =====
+[credential]
+  helper = osxkeychain
+
+[credential "https://github.com"]
+  helper =
+  helper = !/opt/homebrew/bin/gh auth git-credential
+
+[credential "https://gist.github.com"]
+  helper =
+  helper = !/opt/homebrew/bin/gh auth git-credential
+
+[gpg "ssh"]
+  program = ssh-keygen
+  allowedSignersFile = $XDG_CONFIG_HOME/ssh/allowed_signers
+
+# ===== URL Handling =====
+[url "git@github.com:"]
+  insteadOf = https://github.com/
+[diff "ignore-timestamp"]
+	textconv = "sed '/#   timestamp:/d'"

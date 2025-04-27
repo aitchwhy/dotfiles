@@ -9,5 +9,11 @@
     "nixEnvSelector.suggestion": false,
     "[yaml]": {
         "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
+    },
+    "[toml]": {
+        "editor.defaultFormatter": "tamasfe.even-better-toml"
+    },
+    "[ignore]": {
+        "editor.defaultFormatter": "foxundermoon.shell-format"
     }
 }
