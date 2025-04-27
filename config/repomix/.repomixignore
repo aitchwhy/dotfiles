@@ -1,0 +1,69 @@
+# Add patterns to ignore here, one per line
+# Example:
+# *.log
+# tmp/
+
+
+#-------------------------------------------------------------------------------
+# OS generated files
+#-------------------------------------------------------------------------------
+
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.Trash
+Desktop.ini
+ehthumbs.db
+Thumbs.db
+.idea
+.vagrant
+
+
+#-------------------------------------------------------------------------------
+# Shell Env vars (regular + direnv) settings
+#-------------------------------------------------------------------------------
+.env
+*.envrc
+*.env
+.direnv
+
+#-------------------------------------------------------------------------------
+# NodeJS
+#-------------------------------------------------------------------------------
+# .nvmrc # (nodejs)
+node_modules/
+
+#-------------------------------------------------------------------------------
+# Python
+#-------------------------------------------------------------------------------
+.python-version
+__pycache__/
+
+
+# Xcode
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+xcuserdata/
+*.xcscmblueprint
+*.xccheckout
+
+# Node/npm
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Build outputs
+build/
+dist/
+
+# Aider AI coding helper
+.aider*

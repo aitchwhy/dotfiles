@@ -133,6 +133,7 @@ alias du='dust'
 # alias http='posting'
 alias csv='xsv'
 # alias rm='rip'
+alias jsonfilter='jnv'
 alias jsonviewer='jnv'
 # k8s kubernetes + docker + containers
 alias d='docker' # Note: Overwrites previous d alias
@@ -207,7 +208,7 @@ alias rx="repomix" # Note: Overwrites previous lg alias
 alias zj="zellij"
 alias zjls="zellij list-sessions"
 alias zja='zellij attach "$(zellij list-sessions -n | fzf --reverse --border --no-sort --height 40% | awk '\''{print $1}'\'')"'
-alias zje="zellij edit"
+  alias zje="zellij edit"
 
 # === End Aliases from .zshrc ===
 
