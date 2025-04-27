@@ -29,7 +29,6 @@ alias .jfmt='just --justfile $USER_JUSTFILE --working-directory . --unstable --f
 # Nix
 ####################################
 
-alias nix='nix'
 alias nixh='nix --help'
 
 

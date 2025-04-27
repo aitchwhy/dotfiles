@@ -1,12 +1,9 @@
-
-
-; core vars
+# core vars
 [core]
-  # Don't trust file modes
   filemode = false
   editor = nvim
   pager = bat
-  excludesfile = "$cf/git/ignore"
+  excludesfile = "/Users/hank/dotfiles/config/git/gitignore"
 
 # ===== User Information =====
 [user]
