@@ -9,9 +9,9 @@
 -- * Formatter installation via Mason
 -- * LSP integration for fallback
 return {
-	-- Main formatter configuration
-	{
-		"stevearc/conform.nvim",
+  -- Main formatter configuration
+  {
+    "stevearc/conform.nvim",
     opts = {},
-	},
+  },
 }

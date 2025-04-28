@@ -6,12 +6,4 @@ return {
             style = "moon",
         },
     },
-
-    -- Configure LazyVim to load tokyonight
-    {
-        "LazyVim/LazyVim",
-        opts = {
-            colorscheme = "tokyonight",
-        },
-    },
 }
