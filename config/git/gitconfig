@@ -20,11 +20,6 @@
   defaultBranch = main
 
 
-[commit]
-  template = $XDG_CONFIG_HOME/git/gitmessage
-  verbose = true
-
-# ===== Diff & Merge Tools =====
 [interactive]
   diffFilter = delta --color-only
 

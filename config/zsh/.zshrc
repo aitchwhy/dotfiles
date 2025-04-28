@@ -138,7 +138,6 @@ compinit
 export NIX_CONFIG_DIR="$cf/nix"
 
 # --- Git ---
-export GIT_CONFIG="$cf/git/gitconfig"
 export LG_CONFIG_FILE="$cf/lazygit/config.yml"
 
 # --- Starship ---
