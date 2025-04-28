@@ -374,36 +374,6 @@ alias rx="repomix"
 # Atuin
 alias at="atuin"
 
-
-# anterior
-alias aall="ant-all-services"
-alias aprune="ant-system-prune"
-alias = 
-
-# [[general commands]]
-#
-#   ant-check-1password - Check that your 1password CLI integration is set up correctly
-#   menu                - prints this menu
-#
-# [build]
-#
-#   ant-build-docker    - Build and load Docker images for every Nix service
-#   ant-build-host      - Build everything but don't start nor load into Docker
-#   ant-lint            - Lint Go & Python code in your working directory
-#   ant-sync-cache      - Synchronize your local cache with our CI cache.  Requires 1password.
-#
-# [maintenance]
-#
-#   system-prune        - Prune build cache for Docker & Nix
-#
-# [run]
-#
-#   ant-admin           - Anterior admin tool (/admin)
-#   ant-all-services    - Run all services locally (pass --help for more)
-#
-# [anterior]$ ant-build-docker
-# #
-
 # ========================================================================
 # 10. Source Custom Files
 # ========================================================================
@@ -438,5 +408,3 @@ alias =
 
 # --- Dotfiles Symlink Configuration ---
 # Future work: Create a LINKMAP array to manage dotfile symlinks
-
-[ -f "/Users/hank/.ghcup/env" ] && . "/Users/hank/.ghcup/env" # ghcup-env

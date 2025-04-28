@@ -9,7 +9,24 @@
 -- * Customizable keymaps and configurations
 -- * Virtual text support for debugging info
 return {
-    {
-        "mfussenegger/nvim-dap",
+  {
+    "mfussenegger/nvim-dap",
+    dependencies = {
+      "rcarriga/nvim-dap-ui",
+      "theHamsta/nvim-dap-virtual-text",
+      "jay-babu/mason-nvim-dap.nvim",
     },
+    config = function()
+      local dap = require("dap")
+
+      -- Fix the Haskell adapter path
+      dap.adapters.haskell = {
+        type = 'executable',
+        command = vim.fn.expand('~/.local/share/nvim/mason/bin/haskell-debug-adapter'),
+        args = {}
+      }
+
+      -- Your other DAP configurations
+    end,
+  }
 }
