@@ -1,48 +1,3 @@
-# ========================================================================
-# Nix
-# ========================================================================
-alias nix-zsh="nix develop --command zsh"
-source "${cf:-$HOME/dotfiles/config}/zsh/anterior.zsh}" 2>/dev/null
-
-# --- Nix ---
-# export NIX_CONFIG_DIR="$cf/nix"
-
-# ========================================================================
-# Source Nix environment
-# ========================================================================
-if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
-  source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
-fi
-
-# Add Nix to path
-export PATH=$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH
-
-# Nix completions for ZSH
-if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
-  # Add Nix ZSH completion if available
-  if [ -e "${HOME}/.nix-profile/share/zsh/site-functions/_nix" ]; then
-    fpath+=(~/.nix-profile/share/zsh/site-functions)
-  elif [ -e '/nix/var/nix/profiles/default/share/zsh/site-functions/_nix' ]; then
-    fpath+=(/nix/var/nix/profiles/default/share/zsh/site-functions)
-  fi
-  
-  # Initialize ZSH completion system
-  autoload -U compinit && compinit
-fi
-
-# Optional: Setup direnv for automatic environment loading
-if command -v direnv &> /dev/null; then
-  eval "$(direnv hook zsh)"
-fi
-
-alias nixe="$EDITOR ~/.config/nix/nix.conf"
-alias nixd="nix develop"
-alias nixdn="nix develope .#npm"
-alias antall="ant-all-services api user s3 prefect-worker prefect-agent prefect-server data-seeder"
-alias antnoggin="ant-all-services noggin"
-alias antnpm="npm ci --ignore-scripts && ant-npm-build-deptree noggin && npm run --workspace gateways/noggin build"
-
-alias pc="process-compose"
 
 # ========================================================================
 
@@ -109,9 +64,9 @@ export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 
 # Ensure ZSH config directory is set
 export zdot=${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}
+export cf="$HOME/dotfiles/config"
 export dot="$DOTFILES"
-export cf="$dot/config"
-export cfz="$dot/config/zsh"
+export cfz="$HOME/dotfiles/config/zsh"
 
 
 # ========================================================================
@@ -141,6 +96,7 @@ function has_command() {
 # Set up Homebrew
 export HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-$(brew --prefix 2>/dev/null)}"
 export bpre="$HOMEBREW_PREFIX"
+
 
 # ========================================================================
 # 6. Core Tools Setup
@@ -180,6 +136,60 @@ FPATH="$HOMEBREW_PREFIX/share/zsh/site-functions:$FPATH"
 autoload -Uz compinit
 compinit
 
+
+# ========================================================================
+# Nix
+# ========================================================================
+alias nix-zsh="nix develop --command zsh"
+source "${cf:-$HOME/dotfiles/config}/zsh/anterior.zsh}" 2>/dev/null
+
+# --- Nix ---
+# export NIX_CONFIG_DIR="$cf/nix"
+
+# ========================================================================
+# Source Nix environment
+# ========================================================================
+if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+  source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+fi
+
+# Add Nix to path
+export PATH=$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH
+
+# Nix completions for ZSH
+if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+  # Add Nix ZSH completion if available
+  if [ -e "${HOME}/.nix-profile/share/zsh/site-functions/_nix" ]; then
+    fpath+=(~/.nix-profile/share/zsh/site-functions)
+  elif [ -e '/nix/var/nix/profiles/default/share/zsh/site-functions/_nix' ]; then
+    fpath+=(/nix/var/nix/profiles/default/share/zsh/site-functions)
+  fi
+  
+  # Initialize ZSH completion system
+  autoload -U compinit && compinit
+fi
+
+
+alias nixe="$EDITOR ~/.config/nix/nix.conf"
+alias nixd="nix develop"
+alias nixdn="nix develope .#npm"
+alias antall="ant-all-services api user s3 prefect-worker prefect-agent prefect-server data-seeder"
+alias antnoggin="ant-all-services noggin"
+alias antnpm="npm ci --ignore-scripts && ant-npm-build-deptree noggin && npm run --workspace gateways/noggin build"
+
+
+################
+# Direnv
+################
+if command -v direnv &> /dev/null; then
+  eval "$(direnv hook zsh)"
+fi
+
+################
+# Process compose (~ Docker Compose)
+################
+alias pc="process-compose"
+
 # ========================================================================
 # 8. Tool/Package Configurations
 # ========================================================================
@@ -201,9 +211,15 @@ fi
 # --- Zoxide ---
 has_command zoxide && eval "$(zoxide init zsh)"
 
+
+# --- FZF ---
+has_command fzf && source <(fzf --zsh)
+
+
 # --- Atuin ---
 export ATUIN_CONFIG_DIR="$cf/atuin"
-[[ -f "$HOME/.atuin/bin/env" ]] && . $HOME/.atuin/bin/env
+local ATUIN_ENV_CMD="$HOME/.atuin/bin/env"
+[[ -f $ATUIN_ENV_CMD ]] && . $ATUIN_ENV_CMD
 has_command atuin && eval "$(atuin init zsh)"
 
 # --- Zellij ---
@@ -222,19 +238,8 @@ function y() {
 	rm -f -- "$tmp"
 }
 
-# --- FZF ---
-has_command fzf && sourme <(fzf --zsh)
-if ! has_command fzf; then
-	echo "fzf not found. Installing fzf..."
-	brew install --quiet fzf
-fi
-
 # --- Bat ---
-export PAGER="bat --pager always"
-if ! has_command bat; then
-	echo "bat not found. Installing bat..."
-	brew install --quiet bat
-fi
+has_command bat && export PAGER="bat --pager always"
 
 # --- Rust ---
 export CARGO_HOME="${CARGO_HOME:-$HOME/.cargo}"
@@ -256,6 +261,14 @@ has_command direnv && eval "$(direnv hook zsh)"
 
 # --- uv ---
 has_command uv && eval "$(uv generate-shell-completion zsh)"
+
+# --- TODO: aerospace (window tiling manager)
+
+# has_command aerospace && 
+alias aero=aerospace
+
+
+# --- TODO: skhd (keyboard shortcuts hotkey daemon)
 
 # ========================================================================
 # 9. Aliases (grouped by tool)
@@ -321,15 +334,16 @@ alias zeall="nvim '$ZDOTDIR'/{.zshrc,.zprofile,.zshenv,*.zsh}"
 alias zcompreset="rm -f ~/.zcompdump; compinit"
 
 # --- System Information & Utilities ---
-alias ip="ipconfig getifaddr en0"
-alias localip="ipconfig getifaddr en0"
-alias publicip="curl -s https://api.ipify.org"
 alias ports="sudo lsof -i -P -n | grep LISTEN"
-alias listening="sudo lsof -i -P -n | grep LISTEN"
-alias flush="dscacheutil -flushcache && killall -HUP mDNSResponder"
+alias sudoports="sudo lsof -i -P -n | grep LISTEN"
 alias printpath='echo $PATH | tr ":" "\n"'
 alias printfuncs='print -l ${(k)functions[(I)[^_]*]} | sort'
 alias printfpath='for fp in $fpath; do echo $fp; done; unset fp'
+
+alias ip="ipconfig getifaddr en0"
+alias localip="ipconfig getifaddr en0"
+alias publicip="curl -s https://api.ipify.org"
+alias flush="dscacheutil -flushcache && killall -HUP mDNSResponder"
 alias flushdns="sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder"
 alias showhidden="defaults write com.apple.finder AppleShowAllFiles YES; killall Finder"
 

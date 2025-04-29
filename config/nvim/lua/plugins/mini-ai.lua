@@ -9,6 +9,7 @@
 -- * Supports next/previous text object selection
 -- * Buffer text objects and custom text objects
 return {
-
-  { "echasnovski/mini.ai", version = false },
+  {
+    "echasnovski/mini.ai",
+  },
 }
