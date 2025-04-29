@@ -1,281 +1,211 @@
+# Get editor completions based on the config schema
+"$schema" = 'https://starship.rs/config-schema.json'
+
 # Starship Terminal Prompt Configuration
 # Optimized for macOS Apple Silicon (2025)
 # https://starship.rs/config/
 
-# General Prompt Configuration
-# ===========================
+# format='$all'
+#
+# # Add newline before prompt
+# add_newline = true
+#
+# # Set timeout for commands (faster on Apple Silicon)
+# command_timeout = 500  # milliseconds
+#
+# # Set the shell's scan_timeout (Apple Silicon can handle faster scans)
+# scan_timeout = 30  # milliseconds
+#
+# # Disable the terminal's line_break to create a cleaner look
+# [line_break]
+# disabled = false
+#
+
 format = """
-$username\
-$hostname\
+[░▒▓](#a3aed2)\
+[  ](bg:#a3aed2 fg:#090c0c)\
+[](bg:#769ff0 fg:#a3aed2)\
 $directory\
+[](fg:#769ff0 bg:#394260)\
 $git_branch\
-$git_state\
 $git_status\
-$cmd_duration\
-$line_break\
-$jobs\
-$character"""
+[](fg:#394260 bg:#212736)\
+$nix\
+$nodejs\
+[](fg:#212736 bg:#1d2230)\
+$time\
+[ ](fg:#1d2230)\
+\n$character"""
 
-# Add newline before prompt
-add_newline = true
-
-# Set timeout for commands (faster on Apple Silicon)
-command_timeout = 500  # milliseconds
-
-# Set the shell's scan_timeout (Apple Silicon can handle faster scans)
-scan_timeout = 30  # milliseconds
-
-# Disable the terminal's line_break to create a cleaner look
-[line_break]
-disabled = false
-
-# Character configuration - customizable prompt symbol
-[character]
-success_symbol = "[❯](bold green)"  # Unicode symbol for success
-error_symbol = "[✗](bold red)"      # Unicode symbol for error
-vimcmd_symbol = "[V](bold green)"   # Symbol when in Vim normal mode
-
-# Username display - simplify for cleaner prompt
-[username]
-style_user = "yellow bold"
-style_root = "red bold"
-format = "[$user]($style) "
-disabled = false
-show_always = false
-
-# Hostname configuration - show only on SSH connections
-[hostname]
-ssh_only = true
-format = "[@$hostname](bold blue) "
-disabled = false
-trim_at = "."
-
-# Directory configuration - clean and minimal
 [directory]
-truncation_length = 3              # Number of directories to show
-truncate_to_repo = true            # Truncate to the root of git repo
-truncation_symbol = "…/"           # Symbol for truncation
-format = "[$path]($style)[$read_only]($read_only_style) "
-style = "bold cyan"
-read_only = "🔒"                    # Lock symbol for read-only directories
-read_only_style = "red"
-home_symbol = "~"                   # Symbol for home directory
+style = "fg:#e3e5e5 bg:#769ff0"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
 
-# Git branch configuration - clean and informative
+[directory.substitutions]
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = " "
+"Pictures" = " "
+
 [git_branch]
-symbol = " "                       # Git branch symbol (using octicons-like font)
-format = "[$symbol$branch]($style) "
-style = "bold purple"
-truncation_length = 15              # Maximum branch name length
-truncation_symbol = "…"             # Symbol for truncation
+symbol = ""
+style = "bg:#394260"
+truncation_length = 20
+format = '[[ $symbol $branch ](fg:#769ff0 bg:#394260)]($style)'
 
-# Git status configuration - detailed but not overwhelming
 [git_status]
-format = '([\[$all_status$ahead_behind\]]($style) )'
-style = "bold green"
-conflicted = "⚠️ "                   # Conflicts
-ahead = "⇡${count}"                 # Ahead of remote
-behind = "⇣${count}"                # Behind remote
-diverged = "⇕⇡${ahead_count}⇣${behind_count}"
-untracked = "?${count}"             # Untracked files
-stashed = "📦${count}"              # Stashed changes
-modified = "!${count}"              # Modified files
-staged = "+${count}"                # Staged changes
-renamed = "»${count}"               # Renamed files
-deleted = "✘${count}"               # Deleted files
+style = "bg:#394260"
+format = '[[($all_status$ahead_behind)](fg:#769ff0 bg:#394260)]($style)'
 
-# Git state configuration (rebase, merge, etc.)
-[git_state]
-format = '\([$state( $progress_current/$progress_total)]($style)\) '
-style = "bold yellow"
+[nodejs]
+symbol = ""
+style = "bg:#212736"
+format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
 
-# Command duration - show how long commands take
-[cmd_duration]
-min_time = 2000                     # Only show if command took more than 2s
-format = "took [$duration]($style) "
-style = "yellow"
-show_milliseconds = false
-disabled = false
-
-# Performance optimizations for Apple Silicon
-# ==========================================
-
-# Jobs indicator - background tasks
-[jobs]
-symbol = "✦"
-style = "bold blue"
-number_threshold = 1
-format = "[$symbol$number]($style) "
-
-# Module optimizations - disable unused modules
-[aws]
-disabled = true
-
-[gcloud]
-disabled = true
-
-[openstack]
-disabled = true
-
-[crystal]
-disabled = true
-
-[lua]
-disabled = true
-
-[dart]
-disabled = true
-
-[dotnet]
-disabled = true
-
-[elixir]
-disabled = true
-
-[elm]
-disabled = true
-
-[erlang]
-disabled = true
+[rust]
+symbol = ""
+style = "bg:#212736"
+format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
 
 [golang]
-disabled = true
-
-[helm]
-disabled = true
-
-[julia]
-disabled = true
-
-[kotlin]
-disabled = true
-
-[nim]
-disabled = true
-
-[ocaml]
-disabled = true
-
-[perl]
-disabled = true
+symbol = ""
+style = "bg:#212736"
+format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
 
 [php]
-disabled = true
+symbol = ""
+style = "bg:#212736"
+format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
 
-[purescript]
-disabled = true
-
-[rlang]
-disabled = true
-
-[red]
-disabled = true
-
-# These are now configured below with custom symbols
-# [ruby]
-# disabled = true
-
-# [rust]
-# disabled = true
-
-# [nodejs]
-# disabled = true
-
-# [python]
-# disabled = true
-
-[scala]
-disabled = true
-
-[swift]
-disabled = true
-
-[vagrant]
-disabled = true
-
-[vlang]
-disabled = true
-
-[zig]
-disabled = true
-
-# Enable the modules you actually use for development
-# (Enabling commonly used languages for macOS development)
-
-# Node.js configuration with Nerd Font symbol
-[nodejs]
-format = "[$symbol($version )]($style)"
-symbol = "󰎙 "
-style = "bold green"
-disabled = false
-
-# Python configuration with Nerd Font symbol
-[python]
-format = "[$symbol$version ]($style)"
-symbol = "󰌠 "
-style = "bold green"
-disabled = false
-
-# Ruby configuration with Nerd Font symbol
-[ruby]
-format = "[$symbol($version )]($style)"
-symbol = "󰴭 "
-style = "bold green"
-disabled = false
-
-# Rust configuration with Nerd Font symbol
-[rust]
-format = "[$symbol($version )]($style)"
-symbol = "󱘗 "
-style = "bold green"
-disabled = false
-
-# Package version - more clear symbol for Apple users
-[package]
-symbol = "󰏓 "
-format = "[$symbol$version]($style) "
-style = "208 bold"
-disabled = false
-
-# Docker context - useful for developers
-[docker_context]
-format = "[$symbol$context]($style) "
-symbol = "🐳 "
-style = "blue bold"
-disabled = true
-
-# Terraform workspace - disabled by default
-[terraform]
-format = "[$symbol$workspace]($style) "
-symbol = "💠 "
-disabled = true
-
-# Kubernetes context - disabled by default
-[kubernetes]
-format = '[$symbol$context( \($namespace\))]($style) '
-symbol = "☸ "
-disabled = true
-
-# Battery indicator - useful for MacBooks
-[battery]
-full_symbol = "🔋"
-charging_symbol = "⚡️"
-discharging_symbol = "💀"
-disabled = false
-
-[[battery.display]]
-threshold = 10
-style = "bold red"
-
-[[battery.display]]
-threshold = 30
-style = "bold yellow"
-
-# Time module - show current time in prompt
 [time]
 disabled = false
-format = '🕙[$time]($style) '
-style = "bright-white"
-time_format = "%T"
-utc_time_offset = "-5"
-time_range = "10:00:00-14:00:00"
+time_format = "%R" # Hour:Minute Format
+style = "bg:#1d2230"
+format = '[[  $time ](fg:#a0a9cb bg:#1d2230)]($style)'
+
+[os]
+format = "on [($name )]($style)"
+style = "bold blue"
+disabled = false
+
+[os.symbols]
+NixOS = "❄️ "
+Windows = "  "
+Arch = "Arch is the best! "
+
+[shell]
+fish_indicator = '󰈺 '
+powershell_indicator = '_'
+unknown_indicator = 'mystery shell'
+style = 'cyan bold'
+disabled = false
+
+# [nix_shell]
+# disabled = true
+# impure_msg = '[impure shell](bold red)'
+# pure_msg = '[pure shell](bold green)'
+# unknown_msg = '[unknown shell](bold yellow)'
+# format = 'via [☃️ $state( \($name\))](bold blue) '
+
+
+###############
+# default
+###############
+# format = '$all'
+#
+# # Which is equivalent to
+# format = """
+# $username\
+# $hostname\
+# $localip\
+# $shlvl\
+# $singularity\
+# $kubernetes\
+# $directory\
+# $vcsh\
+# $fossil_branch\
+# $fossil_metrics\
+# $git_branch\
+# $git_commit\
+# $git_state\
+# $git_metrics\
+# $git_status\
+# $hg_branch\
+# $pijul_channel\
+# $docker_context\
+# $package\
+# $c\
+# $cmake\
+# $cobol\
+# $daml\
+# $dart\
+# $deno\
+# $dotnet\
+# $elixir\
+# $elm\
+# $erlang\
+# $fennel\
+# $gleam\
+# $golang\
+# $guix_shell\
+# $haskell\
+# $haxe\
+# $helm\
+# $java\
+# $julia\
+# $kotlin\
+# $gradle\
+# $lua\
+# $nim\
+# $nodejs\
+# $ocaml\
+# $opa\
+# $perl\
+# $php\
+# $pulumi\
+# $purescript\
+# $python\
+# $quarto\
+# $raku\
+# $rlang\
+# $red\
+# $ruby\
+# $rust\
+# $scala\
+# $solidity\
+# $swift\
+# $terraform\
+# $typst\
+# $vlang\
+# $vagrant\
+# $zig\
+# $buf\
+# $nix_shell\
+# $conda\
+# $meson\
+# $spack\
+# $memory_usage\
+# $aws\
+# $gcloud\
+# $openstack\
+# $azure\
+# $nats\
+# $direnv\
+# $env_var\
+# $mise\
+# $crystal\
+# $custom\
+# $sudo\
+# $cmd_duration\
+# $line_break\
+# $jobs\
+# $battery\
+# $time\
+# $status\
+# $os\
+# $container\
+# $netns\
+# $shell\
+# $character"""
