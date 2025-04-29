@@ -1,7 +1,6 @@
 return {
   {
     "echasnovski/mini.icons",
-    version = false,
     opts = {
       file = {
         [".eslintrc.js"] = { glyph = "󰱺", hl = "MiniIconsYellow" },

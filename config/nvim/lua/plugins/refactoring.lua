@@ -10,7 +10,6 @@ return {
         h = false,
         hpp = false,
         cxx = false,
-        typescript = true,
       },
       prompt_func_param_type = {
         go = false,
@@ -20,7 +19,6 @@ return {
         h = false,
         hpp = false,
         cxx = false,
-        typescript = true,
       },
       printf_statements = {},
       print_var_statements = {},

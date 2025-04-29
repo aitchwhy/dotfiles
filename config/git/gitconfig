@@ -3,7 +3,7 @@
   filemode = false
   editor = nvim
   pager = bat
-  excludesfile = "/Users/hank/dotfiles/config/git/gitignore"
+	excludesfile = /Users/hank/dotfiles/config/git/gitignore
 
 # ===== User Information =====
 [user]

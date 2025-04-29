@@ -24,4 +24,3 @@
 │       └─ ... (any additional .lua for custom plugin configs)
 
 ```
-

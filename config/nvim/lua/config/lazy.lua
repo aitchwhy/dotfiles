@@ -14,20 +14,21 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- vscode-neovim
-if vim.g.vscode then
-  -- VSCode extension
-  print("[vim.g.vscode = TRUE] VSCODE")
-else
-  -- ordinary Neovim
-  print("[vim.g.vscode = FALSE] NEOVIM")
-end
+-- -- vscode-neovim
+-- if vim.g.vscode then
+--   -- VSCode extension
+--   print("[vim.g.vscode = TRUE] VSCODE")
+-- else
+--   -- ordinary Neovim
+--   print("[vim.g.vscode = FALSE] NEOVIM")
+-- end
 
 require("lazy").setup({
   spec = {
     -- add LazyVim and import its plugins
     { "LazyVim/LazyVim", import = "lazyvim.plugins" },
     -- import/override with your plugins
+
     { import = "plugins" },
   },
   defaults = {

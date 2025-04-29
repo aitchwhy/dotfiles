@@ -1,6 +1,6 @@
 return {
-    {
-        "MagicDuck/grug-far.nvim",
-        opts = { headerMaxWidth = 80 },
-    }
+  {
+    "MagicDuck/grug-far.nvim",
+    opts = { headerMaxWidth = 80 },
+  },
 }
