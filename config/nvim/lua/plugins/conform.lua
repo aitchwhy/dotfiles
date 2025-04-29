@@ -12,6 +12,13 @@ return {
   -- Main formatter configuration
   {
     "stevearc/conform.nvim",
-    opts = {},
+    opts = {
+      lua = { "stylua" },
+      javascript = { "prettier" },
+      markdown = { "mdformat" },
+      -- if you really want to bridge to none-ls:
+    },
+    -- OPTIONAL: disable the real none-ls plugin to avoid double-loading
+    dependencies = {},
   },
 }

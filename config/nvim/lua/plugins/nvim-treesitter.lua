@@ -5,6 +5,7 @@ return {
   -- Treesitter core configuration
   {
     "nvim-treesitter/nvim-treesitter",
+    build = ":TSUpdate",
     opts = {
       -- Enable highlighting
       highlight = { enable = true },

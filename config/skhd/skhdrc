@@ -107,7 +107,7 @@
 # ]
 
 # open terminal, blazingly fast compared to iTerm/Hyper
-cmd - return : /Applications/Ghostty.app/Contents/MacOS/ghostty
+# cmd - return : /Applications/Ghostty.app/Contents/MacOS/ghostty
 
 # # open qutebrowser
 # cmd + shift - return : ~/Scripts/qtb.sh

@@ -284,6 +284,7 @@ load_plugins {
 // Default: default
 // 
 // theme "dracula"
+theme "tokyo-night"
  
 // Choose the base input mode of zellij.
 // Default: normal
@@ -298,6 +299,7 @@ default_shell "zsh"
 // Choose the path to override cwd that zellij will use for opening new panes
 // 
 // default_cwd "/tmp"
+default_cwd "/Users/hank/src"
  
 // The name of the default layout to load on startup
 // Default: "default"
@@ -366,7 +368,7 @@ on_force_close "quit"
 // copy_command "wl-copy"                    // wayland
 // copy_command "pbcopy"                     // osx
 // 
-// copy_command "pbcopy"
+copy_command "pbcopy"
  
 // Choose the destination for copied text
 // Allows using the primary selection buffer (on x11/wayland) instead of the system clipboard.
@@ -385,6 +387,7 @@ on_force_close "quit"
 // Path to the default editor to use to edit pane scrollbuffer
 // Default: $EDITOR or $VISUAL
 // scrollback_editor "/usr/bin/vim"
+scrollback_editor "/opt/homebrew/bin/nvim"
  
 // A fixed name to always give the Zellij session.
 // Consider also setting `attach_to_session true,`
@@ -397,7 +400,7 @@ on_force_close "quit"
 // if it is already running or creates it otherwise.
 // Default: false
 // 
-// attach_to_session true
+attach_to_session true
  
 // Toggle between having Zellij lay out panes according to a predefined set of layouts whenever possible
 // Options:
@@ -411,7 +414,7 @@ on_force_close "quit"
 //   - true (default)
 //   - false
 // 
-// session_serialization false
+session_serialization false
  
 // Whether pane viewports are serialized along with the session, default is false
 // Options:
@@ -424,7 +427,7 @@ on_force_close "quit"
 // defaults to the scrollback size. If this number is higher than the scrollback size, it will
 // also default to the scrollback size. This does nothing if `serialize_pane_viewport` is not true.
 // 
-// scrollback_lines_to_serialize 10000
+scrollback_lines_to_serialize 100000
  
 // Enable or disable the rendering of styled and colored underlines (undercurl).
 // May need to be disabled for certain unsupported terminals

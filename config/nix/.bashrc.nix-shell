@@ -1,0 +1,24 @@
+# This file is loaded by Nix develop shells
+
+# Load ZSH history if available
+if [ -f "$HOME/.zsh_history" ]; then
+  export HISTFILE="$HOME/.zsh_history"
+fi
+
+# Import your ZSH aliases (optional)
+if [ -f "$ZDOTDIR/.zshrc" ]; then
+  source "$ZDOTDIR/.zshrc"
+fi
+
+# Set prompt to indicate we're in a Nix shell
+PS1='\[\033[01;32m\]nix-shell\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+
+# Nix completions for Bash
+if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+  # Add Nix Bash completion if available
+  if [ -e "${HOME}/.nix-profile/share/bash-completion/completions/nix" ]; then
+    source "${HOME}/.nix-profile/share/bash-completion/completions/nix"
+  elif [ -e '/nix/var/nix/profiles/default/share/bash-completion/completions/nix' ]; then
+    source '/nix/var/nix/profiles/default/share/bash-completion/completions/nix'
+  fi
+f

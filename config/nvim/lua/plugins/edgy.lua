@@ -7,10 +7,7 @@ return {
       --   -- Don't override the window navigation keymaps
       keys = {
         -- Disable the defaults to avoid conflicts
-        ["<C-h>"] = false,
-        ["<C-j>"] = false,
-        ["<C-k>"] = false,
-        ["<C-l>"] = false,
+
         --     -- Custom movement keys that don't conflict
         --     ["<M-h>"] = "left", -- Alt+h
         --     ["<M-j>"] = "down",  -- Alt+j

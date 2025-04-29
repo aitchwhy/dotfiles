@@ -13,59 +13,59 @@ smart_case = true
 # Wrap-around search (matches macOS UI patterns)
 wrap_around = true
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = ["c", "m"]
 run = "plugin chmod"
 desc = "Chmod on selected files"
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = "<C-d>"
 run = "plugin diff"
 desc = "Diff the selected with the hovered file"
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = "f"
 run = "plugin jump-to-char"
 desc = "Jump to char"
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = ["b", "a"]
 run = "plugin mactag add"
 desc = "Tag selected files"
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = ["b", "r"]
 run = "plugin mactag remove"
 desc = "Untag selected files"
 
 
 # disk mount/unmount
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = "M"
 run = "plugin mount"
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = ["g", "r"]
 run = 'shell -- ya emit cd "$(git rev-parse --show-toplevel)"'
 
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = "k"
 run = "plugin --sync arrow --args=-1"
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = "j"
 run = "plugin --sync arrow --args=1"
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = "K"
 run = "plugin --sync parent-arrow --args=-1"
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = "J"
 run = "plugin --sync parent-arrow --args=1"
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = "y"
 run = ['''
 	shell 'echo "$@" | xclip -i -selection clipboard -t text/uri-list' --confirm
@@ -73,18 +73,18 @@ run = ['''
 
 
 # cd back to the root of the current Git repository
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = ["g", "r"]
 run = 'shell -- ya emit cd "$(git rev-parse --show-toplevel)"'
 desc = "cd back to git root"
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = "l"
 run = "plugin --sync smart-enter"
 desc = "Enter the child directory, or open the file"
 
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = "p"
 run = "plugin smart-paste"
 desc = "Paste into the hovered directory or CWD"
@@ -93,68 +93,68 @@ desc = "Paste into the hovered directory or CWD"
 # Bookmarks
 #############
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = ["m"]
 run = "plugin bookmarks save"
 desc = "Save current position as a bookmark"
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = ["'"]
 run = "plugin bookmarks jump"
 desc = "Jump to a bookmark"
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = ["b", "d"]
 run = "plugin bookmarks delete"
 desc = "Delete a bookmark"
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = ["b", "D"]
 run = "plugin bookmarks delete_all"
 desc = "Delete all bookmarks"
 
 ###################
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = "l"
 run = "plugin smart-enter"
 desc = "ENTER the child directory, or open the file"
 
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = "F"
 run = "plugin smart-filter"
 desc = "Smart filter"
 
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = ["g", "c"]
 run = "plugin vcs-files"
 desc = "Show Git file changes"
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = "T"
 run = "plugin toggle-pane min-preview"
 desc = "Show or hide the preview pane"
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = "T"
 run = "plugin toggle-pane max-preview"
 desc = "Maximize or restore the preview pane"
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = "p"
 run = "plugin smart-paste"
 desc = "Paste into the hovered directory or CWD"
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = "y"
 run = [
   'shell -- echo "$@" | xclip -i -selection clipboard -t text/uri-list',
   "yank",
 ]
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = ["m"]
 run = "plugin relative-motions"
 desc = "Trigger a new relative motion"
@@ -163,102 +163,102 @@ desc = "Trigger a new relative motion"
 # Projects
 #####################
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = ["P", "s"]
 run = "plugin projects save"
 desc = "Save current project"
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = ["P", "l"]
 run = "plugin projects load"
 desc = "Load project"
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = ["P", "P"]
 run = "plugin projects load_last"
 desc = "Load last project"
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = ["P", "d"]
 run = "plugin projects delete"
 desc = "Delete project"
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = ["P", "D"]
 run = "plugin projects delete_all"
 desc = "Delete all projects"
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = ["P", "m"]
 run = "plugin projects 'merge current'"
 desc = "Merge current tab to other projects"
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = ["P", "M"]
 run = "plugin projects 'merge all'"
 desc = "Merge current project to other projects"
 
 # If you want to save the last project when exiting, map the default quit key to:
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = ["q"]
 run = "plugin projects quit"
 desc = "Save last project and exit the process"
 ################
 
 # Compress
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = ["c", "a"]
 run = "plugin compress"
 desc = "Archive selected files"
 
 
 # rsync (remote server file sync)
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = "R"
 run = "plugin rsync"
 desc = "Copy files using rsync"
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = "R"
 run = "plugin rsync --args='user@server.com'"
 desc = "Copy files using rsync to default location"
 
 
 # lazygit
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = ["g", "i"]
 run = "plugin lazygit"
 desc = "run lazygit"
 
 
 # calculate size of selected files
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = [".", "s"]
 run = "plugin what-size"
 desc = "Calc size of selection or cwd"
 
 # # If you want to copy the result to clipboard, you can add --clipboard or -c as 2nd positional argument:
-# [[manager.prepend_keymap]]
+# [manager.prepend_keymap]
 # on = [".", "s"]
 # run = "plugin what-size -- '--clipboard'"
 # desc = "Calc size of selection or cwd"
 #
-# [[manager.prepend_keymap]]
+# [manager.prepend_keymap]
 # run = "plugin what-size -- '-c'"
 # on = [".", "s"]
 # desc = "Calc size of selection or cwd"
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = "<A-y>"
 run = ["plugin copy-file-contents"]
 desc = "Copy contents of file"
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = "o"
 run = "plugin open-with-cmd --args=block"
 desc = "Open with command in the terminal"
 
-[[manager.prepend_keymap]]
+[manager.prepend_keymap]
 on = "O"
 run = "plugin open-with-cmd"
 desc = "Open with command"
@@ -278,14 +278,14 @@ history_dedup = 10000
 
 
 # Esc cancel input (only 1 press)
-[[input.prepend_keymap]]
+[input.prepend_keymap]
 on = "<Esc>"
 run = "close"
 desc = "Cancel input"
 
 # Esc cancel input (only 1 press)
-[[input.prepend_keymap]]
-#[[manager.prepend_keymap]]
+[input.prepend_keymap]
+[manager.prepend_keymap]
 on = "!"
 run = 'shell "$SHELL" --block --confirm'
 desc = "Open shell here"

@@ -1,4 +1,52 @@
 # ========================================================================
+# Nix
+# ========================================================================
+alias nix-zsh="nix develop --command zsh"
+source "${cf:-$HOME/dotfiles/config}/zsh/anterior.zsh}" 2>/dev/null
+
+# --- Nix ---
+# export NIX_CONFIG_DIR="$cf/nix"
+
+# ========================================================================
+# Source Nix environment
+# ========================================================================
+if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+  source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+fi
+
+# Add Nix to path
+export PATH=$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH
+
+# Nix completions for ZSH
+if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+  # Add Nix ZSH completion if available
+  if [ -e "${HOME}/.nix-profile/share/zsh/site-functions/_nix" ]; then
+    fpath+=(~/.nix-profile/share/zsh/site-functions)
+  elif [ -e '/nix/var/nix/profiles/default/share/zsh/site-functions/_nix' ]; then
+    fpath+=(/nix/var/nix/profiles/default/share/zsh/site-functions)
+  fi
+  
+  # Initialize ZSH completion system
+  autoload -U compinit && compinit
+fi
+
+# Optional: Setup direnv for automatic environment loading
+if command -v direnv &> /dev/null; then
+  eval "$(direnv hook zsh)"
+fi
+
+alias nixe="$EDITOR ~/.config/nix/nix.conf"
+alias nixd="nix develop"
+alias nixdn="nix develope .#npm"
+alias antall="ant-all-services api user s3 prefect-worker prefect-agent prefect-server data-seeder"
+alias antnoggin="ant-all-services noggin"
+alias antnpm="npm ci --ignore-scripts && ant-npm-build-deptree noggin && npm run --workspace gateways/noggin build"
+
+alias pc="process-compose"
+
+# ========================================================================
+
+# ========================================================================
 # ZSH Configuration File (.zshrc)
 # ========================================================================
 # Main configuration file for interactive ZSH shells
@@ -8,6 +56,7 @@
 
 # Performance monitoring (uncomment to debug startup time)
 # zmodload zsh/zprof
+
 
 # ========================================================================
 # 1. Core Shell Options
@@ -63,6 +112,7 @@ export zdot=${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}
 export dot="$DOTFILES"
 export cf="$dot/config"
 export cfz="$dot/config/zsh"
+
 
 # ========================================================================
 # 3. Keyboard & Input Configuration
@@ -134,10 +184,8 @@ compinit
 # 8. Tool/Package Configurations
 # ========================================================================
 
-# --- Nix ---
-export NIX_CONFIG_DIR="$cf/nix"
-
 # --- Git ---
+export GIT_CONFIG_GLOBAL="$cf/git/gitconfig"
 export LG_CONFIG_FILE="$cf/lazygit/config.yml"
 
 # --- Starship ---
@@ -175,7 +223,7 @@ function y() {
 }
 
 # --- FZF ---
-has_command fzf && source <(fzf --zsh)
+has_command fzf && sourme <(fzf --zsh)
 if ! has_command fzf; then
 	echo "fzf not found. Installing fzf..."
 	brew install --quiet fzf
@@ -377,7 +425,13 @@ alias at="atuin"
 # anterior
 alias aall="ant-all-services"
 alias aprune="ant-system-prune"
-alias = 
+
+alias antnpmci="npm ci --ignore-scripts"
+alias antnpmbuild="ant-npm-build-deptree SERVICE_NAME"
+alias antnpmrun="npm run --workspace your/dir build"
+
+
+
 
 # [[general commands]]
 #
