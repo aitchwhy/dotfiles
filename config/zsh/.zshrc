@@ -1,4 +1,3 @@
-
 # ========================================================================
 
 # ========================================================================
@@ -11,7 +10,6 @@
 
 # Performance monitoring (uncomment to debug startup time)
 # zmodload zsh/zprof
-
 
 # ========================================================================
 # 1. Core Shell Options
@@ -68,7 +66,6 @@ export cf="$HOME/dotfiles/config"
 export dot="$DOTFILES"
 export cfz="$HOME/dotfiles/config/zsh"
 
-
 # ========================================================================
 # 3. Keyboard & Input Configuration
 # ========================================================================
@@ -96,7 +93,6 @@ function has_command() {
 # Set up Homebrew
 export HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-$(brew --prefix 2>/dev/null)}"
 export bpre="$HOMEBREW_PREFIX"
-
 
 # ========================================================================
 # 6. Core Tools Setup
@@ -168,8 +164,6 @@ alias tm=task-master
 #         tsc, tsserver (current @ /Users/hank/src/vibes/apps/flopilot/package.json)
 #          (default)
 
-
-
 # ========================================================================
 # Nix
 # ========================================================================
@@ -183,7 +177,7 @@ source "${cf:-$HOME/dotfiles/config}/zsh/anterior.zsh}" 2>/dev/null
 # Source Nix environment
 # ========================================================================
 if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
-  source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+	source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
 fi
 
 # Add Nix to path
@@ -191,17 +185,16 @@ export PATH=$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH
 
 # Nix completions for ZSH
 if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
-  # Add Nix ZSH completion if available
-  if [ -e "${HOME}/.nix-profile/share/zsh/site-functions/_nix" ]; then
-    fpath+=(~/.nix-profile/share/zsh/site-functions)
-  elif [ -e '/nix/var/nix/profiles/default/share/zsh/site-functions/_nix' ]; then
-    fpath+=(/nix/var/nix/profiles/default/share/zsh/site-functions)
-  fi
-  
-  # Initialize ZSH completion system
-  autoload -U compinit && compinit
-fi
+	# Add Nix ZSH completion if available
+	if [ -e "${HOME}/.nix-profile/share/zsh/site-functions/_nix" ]; then
+		fpath+=(~/.nix-profile/share/zsh/site-functions)
+	elif [ -e '/nix/var/nix/profiles/default/share/zsh/site-functions/_nix' ]; then
+		fpath+=(/nix/var/nix/profiles/default/share/zsh/site-functions)
+	fi
 
+	# Initialize ZSH completion system
+	autoload -U compinit && compinit
+fi
 
 alias nixe="$EDITOR ~/.config/nix/nix.conf"
 alias nixd="nix develop"
@@ -210,20 +203,9 @@ alias antall="ant-all-services api user s3 prefect-worker prefect-agent prefect-
 alias antnoggin="ant-all-services noggin"
 alias antnpm="npm ci --ignore-scripts && ant-npm-build-deptree noggin && npm run --workspace gateways/noggin build"
 
-################
-# Direnv
-################
+# Dotenvx
 alias dotx="dotenvx"
 alias dx="dotenvx"
-
-
-
-################
-# Direnv
-################
-if command -v direnv &> /dev/null; then
-  eval "$(direnv hook zsh)"
-fi
 
 ################
 # Process compose (~ Docker Compose)
@@ -240,7 +222,6 @@ export LG_CONFIG_FILE="$cf/lazygit/config.yml"
 
 # --- Starship ---
 export STARSHIP_CONFIG="$cf/starship/starship.toml"
-has_command starship && eval "$(starship init zsh)"
 
 # --- Ghostty ---
 if ! has_command ghostty; then
@@ -248,24 +229,10 @@ if ! has_command ghostty; then
 	brew install --quiet ghostty
 fi
 
-# --- Zoxide ---
-has_command zoxide && eval "$(zoxide init zsh)"
-
-
-# --- FZF ---
-has_command fzf && source <(fzf --zsh)
-
-
 # --- Atuin ---
 export ATUIN_CONFIG_DIR="$cf/atuin"
 local ATUIN_ENV_CMD="$HOME/.atuin/bin/env"
 [[ -f $ATUIN_ENV_CMD ]] && . $ATUIN_ENV_CMD
-has_command atuin && eval "$(atuin init zsh)"
-
-# --- Zellij ---
-export ZELLIJ_CONFIG_DIR="$cf/zellij"
-# Uncomment to auto-start zellij
-# has_command zellij && eval "$(zellij setup --generate-auto-start zsh)"
 
 # --- Yazi ---
 export YAZI_CONFIG_DIR="$cf/yazi"
@@ -289,24 +256,17 @@ path_add "$HOME/.cargo/bin"
 # --- Node/Volta ---
 export VOLTA_HOME="$HOME/.volta"
 has_command volta && path_add "$VOLTA_HOME/bin"
-has_command volta && eval "$(volta setup)"
 
 # --- Go ---
 export GOPATH="$HOME/go"
 export GOBIN="$GOPATH/bin"
 path_add "$GOBIN"
 
-# --- Direnv ---
-has_command direnv && eval "$(direnv hook zsh)"
-
-# --- uv ---
-has_command uv && eval "$(uv generate-shell-completion zsh)"
-
 # --- TODO: aerospace (window tiling manager)
 
-# has_command aerospace && 
+export ZELLIJ_CONFIG_DIR="$cf/zellij"
+# has_command aerospace &&
 alias aero=aerospace
-
 
 # --- TODO: skhd (keyboard shortcuts hotkey daemon)
 
@@ -475,7 +435,6 @@ alias rx="repomix"
 # Atuin
 alias at="atuin"
 
-
 # anterior
 alias aall="ant-all-services"
 alias aprune="ant-system-prune"
@@ -483,9 +442,6 @@ alias aprune="ant-system-prune"
 alias antnpmci="npm ci --ignore-scripts"
 alias antnpmbuild="ant-npm-build-deptree SERVICE_NAME"
 alias antnpmrun="npm run --workspace your/dir build"
-
-
-
 
 # [[general commands]]
 #
@@ -519,7 +475,6 @@ alias antnpmrun="npm run --workspace your/dir build"
 [[ -f "${ZDOTDIR}/aliases.zsh" ]] && source "${ZDOTDIR}/aliases.zsh"
 [[ -f "${ZDOTDIR}/functions.zsh" ]] && source "${ZDOTDIR}/functions.zsh"
 
-
 # ========================================================================
 # COMMENTED SECTIONS (Future Reference)
 # ========================================================================
@@ -547,3 +502,29 @@ alias antnpmrun="npm run --workspace your/dir build"
 # Future work: Create a LINKMAP array to manage dotfile symlinks
 
 [ -f "/Users/hank/.ghcup/env" ] && . "/Users/hank/.ghcup/env" # ghcup-env
+
+################
+# Shell Hooks (at end of file)
+################
+
+# --- Zoxide ---
+has_command zoxide && eval "$(zoxide init zsh)"
+
+# --- FZF ---
+# source <(fzf --zsh)
+has_command fzf && source <(fzf --zsh)
+
+# --- Zellij ---
+# has_command zellij && eval "$(zellij setup --generate-auto-start zsh)"
+
+# --- Direnv ---
+has_command direnv && eval "$(direnv hook zsh)"
+
+# --- uv ---
+has_command uv && eval "$(uv generate-shell-completion zsh)"
+
+# --- Atuin ---
+has_command atuin && eval "$(atuin init zsh)"
+
+# --- Volta ---
+has_command volta && eval "$(volta setup)"
