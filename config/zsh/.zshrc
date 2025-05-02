@@ -136,6 +136,39 @@ FPATH="$HOMEBREW_PREFIX/share/zsh/site-functions:$FPATH"
 autoload -Uz compinit
 compinit
 
+# ========================================================================
+# Claude task master AI
+# ========================================================================
+
+alias tm=task-master
+
+# from volta list
+#     Node: v23.10.0 (default)
+#     npm: v11.3.0 (default)
+#     Tool binaries available:
+#         claude (default)
+#          (default)
+#         liam (default)
+#         codex (default)
+#         redocly, openapi (default)
+#          (default)
+#         bru (default)
+#         optic (default)
+#          (default)
+#          (default)
+#         eslint (default)
+#         eslint-config-prettier (default)
+#         pino-pretty (default)
+#         prettier (default)
+#          (default)
+#         prisma (default)
+#         repo-prompt (default)
+#         repomix (default)
+#         task-master, task-master-mcp, task-master-ai (default)
+#         tsc, tsserver (current @ /Users/hank/src/vibes/apps/flopilot/package.json)
+#          (default)
+
+
 
 # ========================================================================
 # Nix
