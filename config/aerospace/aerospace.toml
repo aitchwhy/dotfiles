@@ -1,27 +1,5 @@
 # Place a copy of this config to ~/.aerospace.toml
-# After that, you can edit ~/.aerospace.toml to your liking
-
-# Start AeroSpace at login
-start-at-login = true
-
-# You can use it to add commands that run after login to macOS user session.
-# 'start-at-login' needs to be 'true' for 'after-login-command' to work
-# Available commands: https://nikitabobko.github.io/AeroSpace/commands
-after-login-command = []
-
-# You can use it to add commands that run after AeroSpace startup.
-# 'after-startup-command' is run after 'after-login-command'
-# Available commands : https://nikitabobko.github.io/AeroSpace/commands
-after-startup-command = [
-    # JankyBorders has a built-in detection of already running process,
-    # so it won't be run twice on AeroSpace restart
-    'exec-and-forget borders active_color=0xffe1e3e4 inactive_color=0xff494d64 width=5.0'
-]
-
-
-# Normalizations. See: https://nikitabobko.github.io/AeroSpace/guide#normalization
-enable-normalization-flatten-containers = true
-enable-normalization-opposite-orientation-for-nested-containers = true
+# After tentation-for-nested-containers = true
 
 # See: https://nikitabobko.github.io/AeroSpace/guide#layouts
 # The 'accordion-padding' specifies the size of accordion padding
@@ -82,7 +60,7 @@ automatically-unhide-macos-hidden-apps = true
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
 # 'main' binding mode must be always presented
 # Fallback value (if you omit the key): mode.main.binding = {}
-[mode.main.binding]
+# [mode.main.binding]
 
     # All possible keys:
     # - Letters.        a, b, c, ..., z
@@ -104,15 +82,16 @@ automatically-unhide-macos-hidden-apps = true
     # See: https://nikitabobko.github.io/AeroSpace/commands#exec-and-forget
     # You can uncomment the following lines to open up terminal with alt + enter shortcut
     # (like in i3)
-# [mode.main.binding]
+[mode.main.binding]
     cmd-h = [] # Disable "hide application"
     cmd-alt-h = [] # Disable "hide others"
-    # alt-enter = '''exec-and-forget osascript -e '
-    # tell application "Ghostty"
-    #     do script
-    #     activate
-    # end tell'
-    # '''
+
+    alt-enter = '''exec-and-forget osascript -e '
+    tell application "Ghostty"
+        do script
+        activate
+    end tell'
+    '''
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#layout
     ctrl-alt-slash = 'layout tiles horizontal vertical'
@@ -155,9 +134,9 @@ automatically-unhide-macos-hidden-apps = true
     # Cycle through available layouts (tiles, accordion, etc.)
     # ctrl-alt-cmd-tab = 'layout next'       
     # Toggle floating for focused window
-    ctrl-alt-f = 'layout floating toggle' 
+    alt-f = 'layout floating' 
     # Toggle maximize for focused window
-    ctrl-alt-enter = 'layout maximize toggle' 
+    # ctrl-alt-enter = 'layout floating toggle' 
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#workspace-back-and-forth
     ctrl-alt-tab = 'workspace-back-and-forth'
