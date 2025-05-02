@@ -280,14 +280,12 @@ cask "zen-browser"
 
 # Mac App Store Applications (Managed via `mas`)
 # Ensure `mas` CLI is installed from Formulae section above or core
-mas "Drafts", id: 1435957248
-mas "Essentials", id: 1588151344
-mas "Hidden Bar", id: 1452453066
-mas "Microsoft Word", id: 462054704
-mas "Numbers", id: 409203825
-mas "Obsidian Web Clipper", id: 6720708363
-mas "Raycast Companion", id: 6738274497
-mas "Screens 5", id: 1663047912
+# mas "Drafts", id: 1435957248
+# mas "Microsoft Word", id: 462054704
+# mas "Numbers", id: 409203825
+# mas "Obsidian Web Clipper", id: 6720708363
+# mas "Raycast Companion", id: 6738274497
+# mas "Screens 5", id: 1663047912
 
 
 ####################################################

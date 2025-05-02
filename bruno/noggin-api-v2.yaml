@@ -1,0 +1,228 @@
+openapi: 3.0.3
+info:
+  title: Noggin PDF API v2
+  version: 1.0.0
+  description: |
+    Endpoints for uploading, tracking and retrieving PDF documents and their
+    AI-extracted content.  
+
+
+    Both modes ultimately materialise the same artefacts:
+    raw PDFs (served at `/pdfs/files/{stemUid}/{pdfUid}`) and
+    JSON extracts (served at `/pdfs/pdf-extracts/{stemUid}/{pdfUid}`).
+
+servers:
+  - url: http://{gateway_host}
+    variables:
+      gateway_host:
+        default: localhost:20701
+
+tags:
+  - name: Noggin
+  - name: Status
+  - name: Document
+  - name: Extracts
+
+components:
+  schemas:
+    IdStem:
+      type: string
+      pattern: ^stm_[A-Fa-f0-9]+$
+      description: Opaque **Stem** identifier issued by an external service
+    IdPdf:
+      type: string
+      pattern: ^pdf_[A-Fa-f0-9]+$
+      description: PDF/document identifier
+    IdSubmission:
+      type: string
+      pattern: ^sub_[A-Fa-f0-9]+$
+      description: Submission (batch) identifier
+
+    FileStatus:
+      type: string
+      enum: [queued, processing, ready, error]
+
+    ## single-upload
+    SingleUploadRequest:
+      type: object
+      required: [file]
+      properties:
+        stemUid:
+          $ref: '#/components/schemas/IdStem'
+          description: Provide to append the PDF to an existing stem
+        file:
+          type: string
+          format: binary
+          description: The PDF file (≤ 32 MiB recommended)
+
+    SingleUploadAccepted:
+      type: object
+      required: [stemUid, pdfUid]
+      properties:
+        stemUid: { $ref: '#/components/schemas/IdStem' }
+        pdfUid:  { $ref: '#/components/schemas/IdPdf' }
+
+    ## submission-upload
+    SubmissionUploadAccepted:
+      type: object
+      required: [submissionId, stemUid, documents]
+      properties:
+        submissionId: { $ref: '#/components/schemas/IdSubmission' }
+        stemUid:      { $ref: '#/components/schemas/IdStem' }
+        documents:
+          type: object
+          additionalProperties:
+            type: object
+            required: [pdfUid, filename, status]
+            properties:
+              pdfUid:   { $ref: '#/components/schemas/IdPdf' }
+              filename: { type: string }
+              status:
+                type: string
+                enum: [queued]   # always queued at accept-time
+
+    SubmissionStatus:
+      type: object
+      required: [submissionId, stemUid, overall, documents]
+      properties:
+        submissionId: { $ref: '#/components/schemas/IdSubmission' }
+        stemUid:      { $ref: '#/components/schemas/IdStem' }
+        overall:
+          type: string
+          enum: [processing, ready, error]
+        documents:
+          type: object
+          additionalProperties:
+            type: object
+            required: [pdfUid, status, percent]
+            properties:
+              pdfUid:  { $ref: '#/components/schemas/IdPdf' }
+              status:  { $ref: '#/components/schemas/FileStatus' }
+              percent:
+                type: integer
+                minimum: 0
+                maximum: 100
+                description: Progress % (0-100) if *processing*
+
+    PdfStatusResponse:
+      type: object
+      required: [status]
+      properties:
+        status: { $ref: '#/components/schemas/FileStatus' }
+
+    PdfExtractsResponse:
+      type: object
+      required: [result]
+      properties:
+        result:
+          type: object
+          required: [extracts]
+          properties:
+            extracts:
+              type: array
+              items:
+                type: object
+                required: [text]
+                properties:
+                  text: { type: string }
+
+  ### ────────────────────────── Responses ───────────────────────────
+  responses:
+    BadRequest:
+      description: Request validation failed
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [message]
+            properties:
+              message: { type: string }
+
+    NotFound:
+      description: The resource does not exist (or submission expired)
+
+paths:
+  ### ───────────────────────── Upload routes ────────────────────────
+  /:
+    get:
+      summary: root
+      operationId: getRoot
+      responses:
+        "200":
+          description: Authentication status response
+        "403":
+          description: Unauthorized
+  /pdfs/process:
+    post:
+      tags: [Upload]
+      summary: Upload one or many PDFs in a *submission*
+      description: |
+        Returns **HTTP 202** with a `Location` header pointing at
+        `/pdfs/submissions/{submissionId}` for polling.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema: { $ref: '#/components/schemas/SubmissionUploadAccepted' }
+      responses:
+        '202':
+          description: Submission accepted
+          headers:
+            Location:
+              description: Polling URL
+              schema: { type: string, format: uri }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SubmissionUploadAccepted' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+
+  ### ───────────────────────── Status routes ────────────────────────
+  /pdfs/submissions/{submissionId}:
+    get:
+      tags: [Status]
+      summary: Poll a submission until `overall=ready`
+      parameters:
+        - name: submissionId
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/IdSubmission' }
+      responses:
+        '200':
+          description: Current per-document progress
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SubmissionStatus' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  ### ─────────────────────── Document / Extract routes ──────────────
+  /pdfs/files/{pdfUid}:
+    get:
+      tags: [Document]
+      summary: Download the raw PDF file
+      parameters:
+        - { name: stemUid, in: path, required: true, schema: { $ref: '#/components/schemas/IdStem' } }
+        - { name: pdfUid,  in: path, required: true, schema: { $ref: '#/components/schemas/IdPdf'  } }
+      responses:
+        '200':
+          description: PDF binary
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /pdfs/pdf-extracts/{stemUid}/{pdfUid}:
+    get:
+      tags: [Extracts]
+      summary: Get JSON text/metadata extracted from a PDF
+      parameters:
+        - { name: stemUid, in: path, required: true, schema: { $ref: '#/components/schemas/IdStem' } }
+        - { name: pdfUid,  in: path, required: true, schema: { $ref: '#/components/schemas/IdPdf'  } }
+      responses:
+        '200':
+          description: Extracted information
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PdfExtractsResponse' }
+        '404': { $ref: '#/components/responses/NotFound' }
