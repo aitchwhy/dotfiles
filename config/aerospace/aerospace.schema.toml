@@ -1,0 +1,38 @@
+# schema.toml
+
+# [schema] is the top‐level namespace for your config definitions
+[schema.general]
+    name    = { type = "string", required = true, description = "Vehicle or project name" }
+    version = { type = "string", required = true, description = "Config version" }
+    date    = { type = "datetime", required = true, description = "Date of configuration" }
+
+[schema.structure]
+    material    = { type = "string", required = true, description = "Primary structure material" }
+    mass_lb     = { type = "float", required = true, description = "Dry mass (lb)" }
+    length_ft   = { type = "float", required = true, description = "Length (ft)" }
+    wingspan_ft = { type = "float", required = false, description = "Wingspan (ft)" }
+
+[schema.propulsion]
+    engine_type = { type = "string", required = true, description = "e.g., turbofan, rocket" }
+    thrust_lbf  = { type = "float", required = true, description = "Sea‐level thrust (lbf)" }
+    fuel_type   = { type = "string", required = true, description = "e.g., Jet A, LH2/LOX" }
+
+[schema.avionics]
+    flight_computer = { type = "string", required = true, description = "On‐board computer model" }
+    sensors         = { type = "array", required = false, description = "List of sensor names" }
+
+[schema.communication]
+    tx_power_w = { type = "float", required = false, description = "Transmit power (W)" }
+    freq_mhz   = { type = "float", required = false, description = "Operating frequency (MHz)" }
+
+[schema.navigation]
+    gps_enabled  = { type = "bool", required = false, description = "GPS enabled?" }
+    inertial_nav = { type = "bool", required = false, description = "INS enabled?" }
+
+[schema.payload]
+    capacity_lb       = { type = "float", required = false, description = "Payload capacity (lb)" }
+    bay_dimensions_ft = { type = "array", required = false, description = "[length, width, height] (ft)" }
+
+[schema.simulation]
+    time_step_s = { type = "float", required = false, description = "Simulation time‐step (s)" }
+    wind_model  = { type = "string", required = false, description = "e.g., ISA, custom" }
