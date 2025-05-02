@@ -87,23 +87,23 @@ function success() { log_success "$@"; }
 function warn() { log_warn "$@"; }
 function error() { log_error "$@"; }
 
-# List all utility functions exported by this file
-export function list_utils() {
-  local util_funcs=$(functions | grep "^[a-z].*() {" | grep -v "^_" | sort)
-  local count=$(echo "$util_funcs" | wc -l | tr -d ' ')
-
-  log_info "Available utility functions ($count total):"
-  echo "$util_funcs" | sed 's/() {.*//' | column
-}
+# # List all utility functions exported by this file
+# function list_utils() {
+#   local util_funcs=$(functions | grep "^[a-z].*() {" | grep -v "^_" | sort)
+#   local count=$(echo "$util_funcs" | wc -l | tr -d ' ')
+#
+#   log_info "Available utility functions ($count total):"
+#   echo "$util_funcs" | sed 's/() {.*//' | column
+# }
 
 # ========================================================================
 # Shell Detection and Environment
 # ========================================================================
 
 # Detect if running interactively
-export function is_interactive() {
-  [[ -o interactive ]]
-}
+# export function is_interactive() {
+#   [[ -o interactive ]]
+# }
 
 # Detect if being sourced
 export function is_sourced() {

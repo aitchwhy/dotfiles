@@ -177,6 +177,13 @@ alias antall="ant-all-services api user s3 prefect-worker prefect-agent prefect-
 alias antnoggin="ant-all-services noggin"
 alias antnpm="npm ci --ignore-scripts && ant-npm-build-deptree noggin && npm run --workspace gateways/noggin build"
 
+################
+# Direnv
+################
+alias dotx="dotenvx"
+alias dx="dotenvx"
+
+
 
 ################
 # Direnv
