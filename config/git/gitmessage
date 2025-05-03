@@ -1,29 +1,38 @@
 # <type>(<scope>): <subject>
 # |<----  Using a Maximum Of 50 Characters  ---->|
 
-Subject:
-<type>(<scope>): <description> (max 50 characters)
-Body:
-<insert detailed description of changes made in the commit> (wrap at 72 characters)
-Footer:
-<insert any additional information, such as references or issue numbers>
-
 # <body>
 # |<----   Try To Limit Each Line to a Maximum Of 72 Characters   ---->|
 
 # <footer>
 
-# --- Commit Message Format ---
-# type: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
-# scope: anything specifying place of the commit change (optional)
-# subject: short summary of the change in present tense, not capitalized, no period
-# body: detailed explanatory text, if necessary
-# footer: reference issues that this commit closes, e.g. Closes #123, #456
-
-# --- Example ---
-# feat(auth): add login button to navbar
+# --- CONVENTIONAL COMMITS FORMAT (2025) ---
+# type(scope): description [max 50 chars]
 #
-# Implement OAuth login flow with GitHub provider.
-# Includes error handling and session persistence.
+# [optional body - explain WHY, not HOW]
 #
-# Closes #42
+# [optional footer - reference issues, breaking changes]
+#
+# Types:
+#   feat:     A new feature
+#   fix:      A bug fix
+#   docs:     Documentation only changes
+#   style:    Changes that don't affect code meaning (formatting, etc)
+#   refactor: Code change that neither fixes a bug nor adds a feature
+#   perf:     Code change that improves performance
+#   test:     Adding missing or correcting existing tests
+#   build:    Changes to build system or dependencies
+#   ci:       Changes to CI configuration files or scripts
+#   chore:    Other changes that don't modify src or test files
+#
+# Breaking Changes:
+#   feat!: or fix!: indicates a BREAKING CHANGE (append with !)
+#   Include "BREAKING CHANGE:" in the footer with description
+#
+# Examples:
+#   feat(auth): add support for OAuth2 authentication
+#   fix(api): prevent crash when empty array is returned
+#   docs(readme): update installation instructions
+#   perf(rendering): improve component rendering speed
+#
+# ⚠️ For AI-assisted commit messages, use: just ai commit-msg

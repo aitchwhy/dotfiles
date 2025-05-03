@@ -1,0 +1,52 @@
+# Aerospace window manager justfile commands
+# Usage: just aero [command]
+
+# Set shell to zsh
+set shell := ["zsh", "-cu"]
+
+# Command prefix for grouping
+alias a := aero
+
+# Edit Aerospace config
+aero edit:
+    nvim ~/.config/aerospace/aerospace.toml
+
+# Reload Aerospace configuration
+aero reload:
+    aerospace reload-config
+
+# Restart Aerospace
+aero restart:
+    aerospace restart
+
+# Check Aerospace status
+aero status:
+    aerospace status
+
+# Focus window by title (fuzzy)
+aero focus title:
+    aerospace focus-window-using-selector "$(aerospace list-windows | grep -v "aerospace" | fzf --reverse --height 40% --border)"
+
+# Focus window by app
+aero focus app:
+    aerospace focus-window-using-selector "$(aerospace list-windows | awk '{print $3}' | sort | uniq | fzf --reverse --height 40% --border)"
+
+# List all windows
+aero windows:
+    aerospace list-windows
+
+# Show window hints
+aero hints:
+    aerospace focus window-hint
+
+# Toggle floating/tiling mode
+aero toggle-float:
+    aerospace layout floating tiling
+
+# Tile all windows
+aero tile:
+    aerospace layout tiles
+
+# Set accordion layout
+aero accordion:
+    aerospace layout accordion

@@ -1,0 +1,231 @@
+# Dotfiles Repository Specifications
+# This file formalizes the requirements and preferences in a machine-readable format
+# for use by automated tools and LLMs
+
+version: "1.0.0"
+last_updated: "2025-05-03"
+
+# Global repository specifications
+repository:
+  name: "dotfiles"
+  description: "Configuration files for macOS (Apple Silicon) development environment"
+  platform: "macOS"
+  architecture: "Apple Silicon"
+  xdg_compliance: true
+  theme: "Tokyo Night"
+  symlink_approach: "directory-first"
+  backup_strategy: "timestamped-directory"
+
+# Core design principles to be applied across all configurations
+design_principles:
+  - name: "minimalism"
+    description: "Keep configurations simple and focused"
+    priority: 1
+  
+  - name: "performance"
+    description: "Optimize for speed and responsiveness"
+    priority: 2
+    
+  - name: "consistency"
+    description: "Maintain consistent style and behaviors across tools"
+    priority: 3
+    
+  - name: "modularity"
+    description: "Enable easy addition/removal of specific configurations"
+    priority: 4
+    
+  - name: "discoverability"
+    description: "Make features and commands easy to discover"
+    priority: 5
+    
+  - name: "documentation"
+    description: "Document everything thoroughly"
+    priority: 6
+    
+  - name: "maintainability"
+    description: "Code should be clean and well-organized"
+    priority: 7
+
+# Visual theme definitions
+theme:
+  name: "Tokyo Night"
+  palette:
+    bg: "#1a1b26"          # Background
+    bg_dark: "#16161e"      # Dark background
+    fg: "#c0caf5"          # Foreground
+    fg_dark: "#a9b1d6"      # Dark foreground
+    black: "#15161e"        # Black
+    red: "#f7768e"          # Red
+    green: "#9ece6a"        # Green
+    yellow: "#e0af68"       # Yellow
+    blue: "#7aa2f7"         # Blue
+    magenta: "#bb9af7"      # Magenta
+    cyan: "#7dcfff"         # Cyan
+    white: "#a9b1d6"        # White
+    comment: "#565f89"      # Comments
+    selection: "#28344a"    # Selection
+
+# Tool-specific requirements and specifications
+tools:
+  - name: "neovim"
+    identifier: "nvim"
+    version: "0.11.1"
+    framework: "LazyVim"
+    config_path: "~/.config/nvim"
+    theme: "tokyonight"
+    leader_key: "space"
+    startup_time_max_ms: 100
+    requirements:
+      - "LSP integration"
+      - "Treesitter syntax highlighting"
+      - "Fuzzy finding with telescope/FZF"
+      - "Git integration"
+      - "Modular organization"
+      - "Consistent keybindings"
+    key_mappings:
+      file_navigation: "<Leader>f"
+      buffer_navigation: "<Leader>b"
+      code_navigation: "g prefix"
+      lsp_features: "<Leader>l"
+      git_operations: "<Leader>g"
+      
+  - name: "zsh"
+    identifier: "zsh"
+    version: "5.2.37"
+    config_path: "~/.config/zsh"
+    startup_time_max_ms: 200
+    requirements:
+      - "Fast startup time"
+      - "Modular configuration"
+      - "Comprehensive aliases"
+      - "Integration with tools"
+      - "Custom functions"
+      - "XDG compliance"
+    integrations:
+      - "starship (prompt)"
+      - "atuin (history)"
+      - "zoxide (navigation)"
+      - "fzf (fuzzy finding)"
+      - "just (task runner)"
+      
+  - name: "yazi"
+    identifier: "yazi"
+    version: "25.4.8"
+    config_path: "~/.config/yazi"
+    preview_size_limit_mb: 5
+    requirements:
+      - "Tokyo Night theme"
+      - "Vim-style navigation"
+      - "Rich file previews"
+      - "Optimized for Apple Silicon"
+      - "Integration with Neovim"
+      - "macOS tag support"
+    optimizations:
+      micro_workers: 12
+      macro_workers: 16
+      delay_chain_threshold: 10
+      
+  - name: "aerospace"
+    identifier: "aero"
+    version: "0.18.4-Beta"
+    config_path: "~/.config/aerospace"
+    primary_modifier: "alt"
+    requirements:
+      - "Tiling window management"
+      - "Multiple workspace support"
+      - "Vim-style navigation"
+      - "Modal system"
+      - "Window hints"
+      - "Tokyo Night-inspired gaps"
+    gap_settings:
+      inner_horizontal: 8
+      inner_vertical: 8
+      outer_left: 10
+      outer_right: 10
+      outer_top: 10
+      outer_bottom: 10
+      
+  - name: "starship"
+    identifier: "star"
+    version: "1.23.0"
+    config_path: "~/.config/starship"
+    scan_timeout_ms: 10
+    requirements:
+      - "Tokyo Night theme"
+      - "Two-line prompt"
+      - "Right-side time and battery"
+      - "Git status information"
+      - "Language version indicators"
+      - "Fast performance"
+
+# Documentation requirements
+documentation:
+  readme:
+    - "Introduction and overview"
+    - "Features list"
+    - "Installation instructions"
+    - "Directory structure"
+    - "Tool configurations"
+    - "Customization options"
+    - "Maintenance procedures"
+    
+  prd:
+    - "Core requirements"
+    - "Feature requirements"
+    - "Configuration categories"
+    - "Key mappings"
+    - "Configuration principles"
+    - "Customization areas"
+    
+  version:
+    - "Version information"
+    - "Dependencies"
+    - "Configuration health"
+    - "Debug information"
+    - "Command line tools"
+    - "Recent changes"
+
+# File formatting requirements
+formatting:
+  lua:
+    indentation: 2
+    line_length: 100
+    string_quotes: "single"
+    
+  shell:
+    indentation: 2
+    line_length: 80
+    string_quotes: "double with variables, single otherwise"
+    
+  toml:
+    indentation: 2
+    arrays: "one item per line"
+    
+  markdown:
+    headers: "ATX style"
+    line_length: 80
+    code_blocks: "fenced with language"
+
+# Installation and setup specifications
+setup:
+  backup: true
+  backup_location: "~/.dotfiles_backup/TIMESTAMP"
+  idempotent: true
+  symlink_directories: true
+  handle_existing_files: "backup and replace"
+  homebrew_integration: true
+  post_install: "exec zsh"
+
+# Task runner specifications
+tasks:
+  system: "just"
+  version: "1.40.0"
+  hierarchical: true
+  tool_prefix: true
+  fuzzy_selection: true
+  shell_integration: true
+  categories:
+    - "system"
+    - "tool-specific"
+    - "documentation"
+    - "maintenance"
