@@ -1,0 +1,35 @@
+{
+  "name": "dotfiles-commitizen",
+  "version": "1.0.0",
+  "description": "Commitizen, Husky, and CommitLint configuration for dotfiles",
+  "private": true,
+  "scripts": {
+    "prepare": "husky",
+    "commit": "git-cz",
+    "postinstall": "node scripts/setup-hooks.js"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-git"
+    }
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^18.4.3",
+    "@commitlint/config-conventional": "^18.4.3",
+    "commitizen": "^4.3.0",
+    "cz-git": "^1.8.0",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.0"
+  },
+  "lint-staged": {
+    "*.{js,ts,jsx,tsx}": [
+      "eslint --fix"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ],
+    "*.{sh,bash,zsh}": [
+      "shfmt -i 2 -ci -w"
+    ]
+  }
+}

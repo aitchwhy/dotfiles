@@ -1,0 +1,44 @@
+# Neovim justfile commands
+# Usage: just nvim [command]
+
+# Set shell to zsh
+set shell := ["zsh", "-cu"]
+
+# Command prefix for grouping
+alias n := nvim
+
+# Edit Neovim config
+nvim edit:
+    nvim ~/.config/nvim/init.lua
+
+# Update Neovim plugins
+nvim update:
+    nvim --headless "+Lazy update" +qa
+
+# Check Neovim health
+nvim health:
+    nvim --headless "+checkhealth" "+write /tmp/nvim-health.txt" +qa && nvim /tmp/nvim-health.txt
+
+# Clean Neovim plugins
+nvim clean:
+    nvim --headless "+Lazy clean" +qa
+
+# Sync Neovim plugins
+nvim sync:
+    nvim --headless "+Lazy sync" +qa
+
+# Format Neovim Lua files
+nvim format:
+    stylua ~/.config/nvim/lua
+
+# List all Neovim installed plugins
+nvim plugins:
+    nvim --headless "+Lazy list" "+write /tmp/nvim-plugins.txt" +qa && cat /tmp/nvim-plugins.txt
+
+# Start Neovim with minimal config
+nvim minimal:
+    NVIM_APPNAME=nvim-minimal nvim
+
+# Start Neovim from scratch (no config)
+nvim scratch:
+    nvim -u NONE
