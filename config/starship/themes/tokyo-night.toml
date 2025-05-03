@@ -1,0 +1,50 @@
+# TokyoNight Color Palette
+[palette]
+# Background colors
+bg = "#1a1b26"
+bg_dark = "#16161e"
+bg_highlight = "#292e42"
+terminal_black = "#414868"
+
+# Foreground colors
+fg = "#c0caf5"
+fg_dark = "#a9b1d6"
+fg_gutter = "#3b4261"
+
+# Normal colors
+black = "#15161e"
+red = "#f7768e"
+green = "#9ece6a"
+yellow = "#e0af68"
+blue = "#7aa2f7"
+magenta = "#bb9af7"
+cyan = "#7dcfff"
+white = "#a9b1d6"
+
+# Bright colors
+bright_black = "#414868"
+bright_red = "#f7768e"
+bright_green = "#9ece6a"
+bright_yellow = "#e0af68"
+bright_blue = "#7aa2f7"
+bright_magenta = "#bb9af7"
+bright_cyan = "#7dcfff"
+bright_white = "#c0caf5"
+
+# Accents
+comment = "#565f89"
+orange = "#ff9e64"
+git = "#b4f9f8"
+git_deleted = "#f7768e"
+git_ignored = "#444b6a"
+git_renamed = "#c0caf5"
+git_modified = "#e0af68"
+git_added = "#9ece6a"
+git_ahead = "#73daca"
+
+# UI Elements
+selection = "#28344a"
+statusline = "#2a2e3f"
+statuslinenc = "#222538"
+pmenu = "#445055"
+error = "#db4b4b"

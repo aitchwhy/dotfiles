@@ -20,7 +20,7 @@
   max_height = 1080
   cache_dir = "~/.cache/yazi"
   keybinding = true
-  max_file_size = "10MB"
+  max_file_size = "5MB"
   tab_size = 2
   preload = 5
 

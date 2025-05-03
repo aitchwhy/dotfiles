@@ -2,7 +2,7 @@
 # The parser is also very primitive, and not human-friendly.
 htop_version=3.4.1
 config_reader_min_version=3
-fields=0 48 49 17 125 38 39 2 46 47 1
+fields=0 1 2 38 39 40 46 47 49
 hide_kernel_threads=1
 hide_userland_threads=0
 hide_running_in_container=0
@@ -44,7 +44,7 @@ sort_direction=1
 tree_sort_direction=1
 tree_view_always_by_pid=0
 all_branches_collapsed=1
-screen:Main=PID USER TIME PRIORITY CWD M_VIRT M_RESIDENT STATE PERCENT_CPU PERCENT_MEM Command
+screen:Main=PID USER PERCENT_CPU PERCENT_MEM IO_READ IO_WRITE TIME STATE PERCENT_CPU PERCENT_MEM Command
 .sort_key=PID
 .tree_sort_key=CWD
 .tree_view_always_by_pid=0

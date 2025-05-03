@@ -1,0 +1,2 @@
+set summary := "on"
+set shell := ["zsh", "-cu"]

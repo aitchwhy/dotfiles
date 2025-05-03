@@ -19,13 +19,13 @@ export EDITOR="nvim"
 export XDG_CACHE_HOME="$PWD/.cache"
 
 # 4. Neovim tweaks that load only inside this repo.
-export NVIM_APPNAME="nv-$(${PWD##*/})"    # keeps configs isolated per-project
+#export NVIM_APPNAME="nv-$(${PWD##*/})"    # keeps configs isolated per-project
 
 # 5. Git metadata you don’t want in global ~/.gitconfig.
-if has git; then
-  export GIT_AUTHOR_NAME="Hank Staff"
-  export GIT_AUTHOR_EMAIL="hank@example.com"
-fi
+# if has git; then
+#   export GIT_AUTHOR_NAME="Hank Lee"
+#   export GIT_AUTHOR_EMAIL="hank.lee.qed@gmail.com"
+# fi
 
 # 6. Zellij helpers — keep panes in the same env even when spawned directly.
 #    nvim launched in a pane will inherit this env if you use `direnv exec`.
@@ -38,6 +38,6 @@ export DIRENV_DIR="$PWD"                  # picked up when Cursor is launched fr
 
 # 8. Safety – refuse to load if a second direnv is shadow-hooking this shell.
 #    Prevents the classic “_direnv_hook(): command not found” race. :contentReference[oaicite:3]{index=3}
-source_env_if_exists ".envrc.local"
+# source_env_if_exists ".envrc.local"
 
 # ───────────────────────────── end ───────────────────────────────────────

@@ -62,12 +62,25 @@ fi
 # Helper Tools (available within the shell):
 #
 # ant-npm-build-deptree YOUR_TS_PROJECT_NAME (Build dependencies for a TS project)
+
+antbuild='ant-npm-build-deptree'
+
+ant-npm-build-deptree YOUR_TS_PROJECT_NAME (Build dependencies for a TS project)
+
+
 #
 #
 # Dev Shell Commands (available in the default dev shell):
 #
 # ant-check-1password (Verify 1Password integration)
+alias ant1p='ant-check-1password'
+
 # ant-lint (Lint code in current directory)
+alias antlint='ant-lint'
+
 # system-prune (Clean up Nix/Docker resources)
+alias antclean='system-prune'
+
 # ant-admin (Run Anterior admin tool)
+antadmin='ant-admin'
 

@@ -1,6 +1,12 @@
 # Get editor completions based on the config schema
 "$schema" = 'https://starship.rs/config-schema.json'
 
+# Configuration enhancements
+right_format = "$time$battery"
+scan_timeout = 10
+add_newline = false
+palette = "tokyo-night"
+
 # Starship Terminal Prompt Configuration
 # Optimized for macOS Apple Silicon (2025)
 # https://starship.rs/config/
@@ -23,18 +29,18 @@
 
 format = """
 [░▒▓](#a3aed2)\
-[  ](bg:#a3aed2 fg:#090c0c)\
-[](bg:#769ff0 fg:#a3aed2)\
+[  ](bg:#a3aed2 fg:#090c0c)\
+[](bg:#769ff0 fg:#a3aed2)\
 $directory\
-[](fg:#769ff0 bg:#394260)\
+[](fg:#769ff0 bg:#394260)\
 $git_branch\
 $git_status\
-[](fg:#394260 bg:#212736)\
+[](fg:#394260 bg:#212736)\
 $nix\
 $nodejs\
-[](fg:#212736 bg:#1d2230)\
+[](fg:#212736 bg:#1d2230)\
 $time\
-[ ](fg:#1d2230)\
+[ ](fg:#1d2230)\
 \n$character"""
 
 [directory]
@@ -45,12 +51,12 @@ truncation_symbol = "…/"
 
 [directory.substitutions]
 "Documents" = "󰈙 "
-"Downloads" = " "
-"Music" = " "
-"Pictures" = " "
+"Downloads" = " "
+"Music" = " "
+"Pictures" = " "
 
 [git_branch]
-symbol = ""
+symbol = ""
 style = "bg:#394260"
 truncation_length = 20
 format = '[[ $symbol $branch ](fg:#769ff0 bg:#394260)]($style)'
@@ -60,22 +66,22 @@ style = "bg:#394260"
 format = '[[($all_status$ahead_behind)](fg:#769ff0 bg:#394260)]($style)'
 
 [nodejs]
-symbol = ""
+symbol = ""
 style = "bg:#212736"
 format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
 
 [rust]
-symbol = ""
+symbol = ""
 style = "bg:#212736"
 format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
 
 [golang]
-symbol = ""
+symbol = ""
 style = "bg:#212736"
 format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
 
 [php]
-symbol = ""
+symbol = ""
 style = "bg:#212736"
 format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
 
@@ -83,7 +89,7 @@ format = '[[ $symbol ($version) ](fg:#769ff0 bg:#212736)]($style)'
 disabled = false
 time_format = "%R" # Hour:Minute Format
 style = "bg:#1d2230"
-format = '[[  $time ](fg:#a0a9cb bg:#1d2230)]($style)'
+format = '[[  $time ](fg:#a0a9cb bg:#1d2230)]($style)'
 
 [os]
 format = "on [($name )]($style)"
@@ -92,15 +98,27 @@ disabled = false
 
 [os.symbols]
 NixOS = "❄️ "
-Windows = "  "
+Windows = "  "
 Arch = "Arch is the best! "
 
 [shell]
 fish_indicator = '󰈺 '
-powershell_indicator = '_'
+powershell_indicator = '_'
+zsh_indicator = 'zsh '
+bash_indicator = 'bash '
 unknown_indicator = 'mystery shell'
 style = 'cyan bold'
 disabled = false
+format = '[$indicator]($style)'
+
+[battery]
+full_symbol = "🔋"
+charging_symbol = "⚡️"
+discharging_symbol = "💀"
+
+[character]
+success_symbol = "[➜](bold green)"
+error_symbol = "[✗](bold red)"
 
 # [nix_shell]
 # disabled = true

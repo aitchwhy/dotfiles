@@ -7,18 +7,17 @@
 
 # General Prompt Configuration
 # ===========================
-format='$all'
+format = '$all'
 
 # Add newline before prompt
 add_newline = true
 
 # Set timeout for commands (faster on Apple Silicon)
-command_timeout = 500  # milliseconds
+command_timeout = 500 # milliseconds
 
 # Set the shell's scan_timeout (Apple Silicon can handle faster scans)
-scan_timeout = 30  # milliseconds
+scan_timeout = 30 # milliseconds
 
 # Disable the terminal's line_break to create a cleaner look
 [line_break]
-disabled = false
-
+    disabled = false
