@@ -14,20 +14,25 @@
   scroll_offset = 5
   case_sensitive = false
   mouse = true
+  # For smoother navigation
+  animation_interval = 0.03
 
 [preview]
   max_width = 1920
   max_height = 1080
   cache_dir = "~/.cache/yazi"
   keybinding = true
-  max_file_size = "5MB"
+  max_file_size = "10MB"
   tab_size = 2
-  preload = 5
+  # Higher preload for faster previews
+  preload = 10
 
 [tasks]
-  micro_workers = 5
-  macro_workers = 10
+  # Optimized workers for better performance on Apple Silicon
+  micro_workers = 12
+  macro_workers = 16
   bizarre_retry = 5
+  delay_chain_threshold = 10 # Improve task chaining performance
 
 [opener]
 edit = [
@@ -41,8 +46,11 @@ open = [
   { exec = 'qlmanage -p "$@" &>/dev/null', desc = "QuickLook preview", for = "file" },
   { exec = 'open -a Preview "$@"', desc = "Open with Preview", for = "image" },
   { exec = 'open -a "Visual Studio Code" "$@"', desc = "Open with VS Code", for = ["text", "code"] },
-  { exec = 'open -a "TextEdit" "$@"', desc = "Open with TextEdit" }
+  { exec = 'open -a "TextEdit" "$@"', desc = "Open with TextEdit" },
+  { exec = 'bat --paging=always "$@"', desc = "Open with bat", for = "text" }
 ]
+
+reveal = [{ exec = 'open -R "$@"', desc = "Reveal in Finder" }]
 
 bulk-rename = [{ run = 'nvim "$@"', block = true }]
 
@@ -56,19 +64,33 @@ archive = [
   { exec = 'tar -czvf "$1" "${@:2}"', desc = "Compress to TAR.GZ" }
 ]
 
-reveal = [{ exec = 'open -R "$@"', desc = "Reveal in Finder" }]
-prepend_rules = [{ name = "bulk-rename.txt", use = "bulk-rename" }]
+code = [
+  { exec = 'nvim "$@"', block = true, desc = "Edit with Neovim" },
+  { exec = 'code "$@"', desc = "Open with VS Code", orphan = true }
+]
+
+prepend_rules = [
+  { name = "bulk-rename.txt", use = "bulk-rename" },
+  { name = "*.py", use = "code" },
+  { name = "*.js", use = "code" },
+  { name = "*.ts", use = "code" },
+  { name = "*.tsx", use = "code" },
+  { name = "*.jsx", use = "code" },
+  { name = "*.lua", use = "code" },
+  { name = "*.sh", use = "code" }
+]
 
 [open]
 rules = [
-  { mime = "image/*", use = "image" },
-  { mime = "audio/*", use = "audio" },
-  { mime = "video/*", use = "video" },
-  { mime = "application/pdf", use = "pdf" },
-  { mime = "application/zip", use = "archive" },
-  { mime = "application/gzip", use = "archive" },
-  { mime = "application/x-tar", use = "archive" },
-  { mime = "*", use = "text" }
+  { mime = "text/*", use = "edit" },
+  { mime = "image/*", use = "open" },
+  { mime = "audio/*", use = "open" },
+  { mime = "video/*", use = "open" },
+  { mime = "application/pdf", use = "open" },
+  { mime = "application/zip", use = "extract" },
+  { mime = "application/gzip", use = "extract" },
+  { mime = "application/x-tar", use = "extract" },
+  { mime = "*", use = "open" }
 ]
 
 [plugin]
@@ -83,6 +105,7 @@ prepend_preloaders = [
 ]
 
 prepend_previewers = [
+  # Archives
   { mime = "application/*zip", run = "ouch" },
   { mime = "application/x-tar", run = "ouch" },
   { name = "*.tar*", run = 'piper --format=url -- tar tf "$1"' },
@@ -91,6 +114,8 @@ prepend_previewers = [
   { mime = "application/x-rar", run = "ouch" },
   { mime = "application/x-xz", run = "ouch" },
   { mime = "application/xz", run = "ouch" },
+  
+  # Code and text files
   { name = "*.csv", run = "rich-preview" },
   { name = "*.csv", run = 'piper -- bat -p --color=always "$1"' },
   { name = "*.md", run = 'piper -- CLICOLOR_FORCE=1 glow -w=$w -s=dark "$1"' },
@@ -98,6 +123,12 @@ prepend_previewers = [
   { name = "*.rst", run = "rich-preview" },
   { name = "*.ipynb", run = "rich-preview" },
   { name = "*.json", run = "rich-preview" },
+  { name = "*.{js,ts,jsx,tsx}", run = 'piper -- bat -p --color=always --language=typescript "$1"' },
+  { name = "*.{rs,toml}", run = 'piper -- bat -p --color=always "$1"' },
+  { name = "*.py", run = 'piper -- bat -p --color=always --language=python "$1"' },
+  { name = "*.lua", run = 'piper -- bat -p --color=always --language=lua "$1"' },
+  
+  # Fallback handlers
   { name = "*", run = 'piper -- echo "$1"' },
   { name = "*", run = 'piper -- eza -TL=3 --color=always --icons=always --group-directories-first --no-quotes "$1"' },
   { name = "*", run = 'piper -- hexyl --border=none --terminal-width=$w "$1"' }
