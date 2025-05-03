@@ -97,9 +97,26 @@ dotfiles/
 - **Shell Enhancements**: Starship, Atuin, Zoxide
 - **Development Tools**: Bat, Lazygit, Zellij
 - **Text Expansion**: Espanso
-- **Window Management**: Hammerspoon
+- **Window Management**: Aerospace
 - **Editors**: VSCode, Cursor
 - **AI Tools**: Claude
+
+## Optimized Configurations
+
+The dotfiles include carefully tuned configurations for each tool:
+
+| Tool      | Optimizations                                    |
+|-----------|--------------------------------------------------|
+| Aerospace | Window hints mode for fast navigation            |
+| Atuin     | Workspace-aware history, hourly syncing          |
+| Bat       | Terminal-matched theme, delta pager integration  |
+| FZF       | Tmux-compatible popup, vim-like key navigation   |
+| Git       | Safe push defaults, delta-powered diffs          |
+| Glow      | Integrated with bat for uniform markdown styling |
+| Htop      | IO visibility layout showing disk activity       |
+| Just      | Shell integration with colorized command summary |
+| Yazi      | Optimized file previews with size limits         |
+| Starship  | Tokyo Night theme with right-side prompt info    |
 
 ## Customization
 

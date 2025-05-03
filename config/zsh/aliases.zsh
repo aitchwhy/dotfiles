@@ -1,10 +1,9 @@
 #!/usr/bin/env zsh
 
-local DOTFILES="${DOTFILES:-$HOME/dotfiles}"
-local cf="${cf:-$DOTFILES/config}"
-local cfz="${cf:-$cf/zsh}"
-local cfnv="${cf:-$cf/nvim}"
-local cf="${cf:-$cf/nvim}"
+DOTFILES="${DOTFILES:-$HOME/dotfiles}"
+cf="${cf:-$DOTFILES/config}"
+cfz="${cfz:-$cf/zsh}"
+cfnv="${cfnv:-$cf/nvim}"
 
 ####################################
 # justfile
@@ -32,8 +31,8 @@ alias .jfmt='just --justfile $USER_JUSTFILE --working-directory . --unstable --f
 alias nixh='nix --help'
 
 
-alias nixf="$EDITOR $DOTFILE/flake.nix"
-alias nixf="$EDITOR $cf/nix/nix.conf"
+alias nixflake="$EDITOR $DOTFILES/flake.nix"
+alias nixconf="$EDITOR $cf/nix/nix.conf"
 
 # nix garbage collection
 alias nixgc="nix-collect-garbage -d"
@@ -48,7 +47,7 @@ alias nixpkgs="nix search"
 alias nixsh="nix-shell --run zsh"
 alias nixdev="nix develop"
 alias nixdevzsh="nix develop --command zsh"
-alias nixf="nix flake"
+alias nixfk="nix flake"
 
 # nix system
 alias nixup="sudo nixos-rebuild switch"
@@ -175,7 +174,6 @@ alias bcleanall='brew cleanup --prune=all && rm -rf $(brew --cache) && brew auto
 alias bi="brew info"
 alias bin="brew install"
 alias brein="brew reinstall"
-alias bi="brew info"
 alias bs="brew search"
 alias bsa="brew search --eval-all --desc"
 alias bl="brew leaves"
@@ -207,7 +205,14 @@ alias rx="repomix" # Note: Overwrites previous lg alias
 alias zj="zellij"
 alias zjls="zellij list-sessions"
 alias zja='zellij attach "$(zellij list-sessions -n | fzf --reverse --border --no-sort --height 40% | awk '\''{print $1}'\'')"'
-  alias zje="zellij edit"
+alias zje="zellij edit"
+
+# Environment variables for tools
+export BAT_THEME="--theme=OneHalfDark"
+export DELTA_PAGER="bat --plain --paging=never"
+export FZF_DEFAULT_OPTS='--height 40% --border --cycle --layout=reverse --marker="✓" --bind=ctrl-j:down,ctrl-k:up'
+export GLOW_PAGER="bat --plain --language=markdown"
+export HOMEBREW_NO_ANALYTICS=1
 
 # === End Aliases from .zshrc ===
 

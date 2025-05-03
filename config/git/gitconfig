@@ -30,9 +30,12 @@
   side-by-side = true
 
 [push]
-  default = current
-  followTags = true
-  recurseSubmodules = check
+	default = current
+	followTags = true
+	recurseSubmodules = check
+
+[safe]
+	directory = *
 
 [branch]
   autoSetupRebase = always

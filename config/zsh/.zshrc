@@ -163,38 +163,37 @@ alias tm=task-master
 #         task-master, task-master-mcp, task-master-ai (default)
 #         tsc, tsserver (current @ /Users/hank/src/vibes/apps/flopilot/package.json)
 #          (default)
-
 # ========================================================================
 # Nix
 # ========================================================================
 alias nix-zsh="nix develop --command zsh"
-source "${cf:-$HOME/dotfiles/config}/zsh/anterior.zsh}" 2>/dev/null
+# source "${cf:-$HOME/dotfiles/config}/zsh/anterior.zsh}" 2>/dev/null
 
 # --- Nix ---
 # export NIX_CONFIG_DIR="$cf/nix"
 
 # ========================================================================
 # Source Nix environment
-# ========================================================================
-if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
-	source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
-fi
-
-# Add Nix to path
-export PATH=$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH
-
-# Nix completions for ZSH
-if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
-	# Add Nix ZSH completion if available
-	if [ -e "${HOME}/.nix-profile/share/zsh/site-functions/_nix" ]; then
-		fpath+=(~/.nix-profile/share/zsh/site-functions)
-	elif [ -e '/nix/var/nix/profiles/default/share/zsh/site-functions/_nix' ]; then
-		fpath+=(/nix/var/nix/profiles/default/share/zsh/site-functions)
-	fi
-
-	# Initialize ZSH completion system
-	autoload -U compinit && compinit
-fi
+# # ========================================================================
+# if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+# 	source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+# fi
+#
+# # Add Nix to path
+# export PATH=$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH
+#
+# # Nix completions for ZSH
+# if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+# 	# Add Nix ZSH completion if available
+# 	if [ -e "${HOME}/.nix-profile/share/zsh/site-functions/_nix" ]; then
+# 		fpath+=(~/.nix-profile/share/zsh/site-functions)
+# 	elif [ -e '/nix/var/nix/profiles/default/share/zsh/site-functions/_nix' ]; then
+# 		fpath+=(/nix/var/nix/profiles/default/share/zsh/site-functions)
+# 	fi
+#
+# 	# Initialize ZSH completion system
+# 	autoload -U compinit && compinit
+# fi
 
 alias nixe="$EDITOR ~/.config/nix/nix.conf"
 alias nixd="nix develop"
@@ -204,8 +203,7 @@ alias antnoggin="ant-all-services noggin"
 alias antnpm="npm ci --ignore-scripts && ant-npm-build-deptree noggin && npm run --workspace gateways/noggin build"
 
 # Dotenvx
-alias dotx="dotenvx"
-alias dx="dotenvx"
+alias envx="dotenvx"
 
 ################
 # Process compose (~ Docker Compose)
@@ -222,6 +220,7 @@ export LG_CONFIG_FILE="$cf/lazygit/config.yml"
 
 # --- Starship ---
 export STARSHIP_CONFIG="$cf/starship/starship.toml"
+eval "$(starship init zsh)"
 
 # --- Ghostty ---
 if ! has_command ghostty; then
@@ -265,6 +264,8 @@ path_add "$GOBIN"
 # --- TODO: aerospace (window tiling manager)
 
 export ZELLIJ_CONFIG_DIR="$cf/zellij"
+
+
 # has_command aerospace &&
 alias aero=aerospace
 
@@ -436,7 +437,7 @@ alias rx="repomix"
 alias at="atuin"
 
 # anterior
-alias aall="ant-all-services"
+alias antall="ant-all-services"
 alias aprune="ant-system-prune"
 
 alias antnpmci="npm ci --ignore-scripts"

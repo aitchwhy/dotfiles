@@ -69,6 +69,7 @@
 # You can uncomment the following lines to open up terminal with alt + enter shortcut
 # (like in i3)
 [mode.main.binding]
+    hyper-; = 'focus window-hint'
     cmd-h = [  ] # Disable "hide application"
     cmd-alt-h = [  ] # Disable "hide others"
     alt-enter = '''exec-and-forget osascript -e '

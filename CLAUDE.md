@@ -2,6 +2,24 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Tool Configuration
+
+These are the optimized settings for various CLI tools in the dotfiles:
+
+| Tool      | Key Configurations                                   |
+|-----------|------------------------------------------------------|
+| Aerospace | `hyper-; = 'focus window-hint'` (window jumping)     |
+| Atuin     | `workspaces=true`, `enter_accept=true`, `sync_frequency="60m"` |
+| Bat       | `BAT_THEME="--theme=OneHalfDark"`, `DELTA_PAGER="bat --plain --paging=never"` |
+| FZF       | 40% height, reverse layout, keybindings (ctrl-j/k navigation) |
+| Git       | Safe pushes (`--force-with-lease = false`), current branch default |
+| Glow      | Uses bat as pager for markdown preview               |
+| Homebrew  | Analytics disabled                                   |
+| htop      | IO Read/Write columns, optimized fields display      |
+| just      | `summary = "on"`, zsh shell mode                     |
+| yazi      | 5MB max file size for previews                       |
+| starship  | Right prompt with time/battery, Tokyo Night theme    |
+
 ## Commands
 
 ### Linting & Formatting
