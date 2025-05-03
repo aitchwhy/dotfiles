@@ -63,23 +63,61 @@ alias vim='$EDITOR'
 # alias zdot='cd $ZDOTDIR'
 alias zr="exec zsh"
 alias ze="nvim '$ZDOTDIR'/{.zshrc,.zprofile,.zshenv}"
-alias zeall="nvim '$ZDOTDIR'/{.zshrc,.zprofile,.zshenv,*.zsh}"
+alias ze="nvim ~/.zshenv '$ZDOTDIR'/{.zshrc,.zprofile,.zshenv,*.zsh}"
+
+alias e="cursor $DOTFILES"
+
+
+# FZF enhanced file selection and navigation
+function f() {
+  local cmd result
+  
+  case "$1" in
+    find|file)
+      # Find files
+      result=$(fd --type f --follow --hidden --exclude .git | fzf --preview="bat --color=always {}")
+      echo "$result"
+      ;;
+    edit)
+      # Find and edit file
+      result=$(fd --type f --follow --hidden --exclude .git | fzf --preview="bat --color=always {}")
+      [[ -n "$result" ]] && "$EDITOR" "$result"
+      ;;
+    dir)
+      # Find directories
+      result=$(fd --type d --follow --hidden --exclude .git | fzf --preview="eza --tree --level=1 --color=always {}")
+      echo "$result"
+      ;;
+    z)
+      # Jump with zoxide
+      result=$(zoxide query -l | fzf --preview="eza --tree --level=1 --color=always {}")
+      [[ -n "$result" ]] && cd "$result"
+      ;;
+    *)
+      echo "Usage: f [find|edit|dir|z]"
+      return 1
+      ;;
+  esac
+}
+
+
 ####################################
 
 alias cheat="tldr"
 alias ch="cheat"
 
 
-# === Aliases from .zshrc ===
+# === Core Tool Aliases ===
 alias claude="/Users/hank/.claude/local/claude"
 
-# List Files - Prioritize eza/exa with fallback to ls
-if has_command eza; then # Conditional logic moved with aliases, might need adjustment
+# List Files - Prioritize eza with fallback to ls
+if (( $+commands[eza] )); then
   alias ls="eza --icons --group-directories-first"
   alias ll="eza --icons --group-directories-first -la"
   alias la="eza --icons --group-directories-first -a"
   alias lt="eza --icons --group-directories-first --tree"
   alias lt2="eza --icons --group-directories-first --tree --level=2"
+  alias lt3="eza --icons --group-directories-first --tree --level=3"
 else
   alias ls="ls -G"
   alias ll="ls -la"
@@ -147,14 +185,13 @@ alias dbuild='docker build'
 alias dc='docker-compose'
 alias k='k9s'
 # Modern CLI alternatives
-alias cat='bat --paging=always'
+alias cat='bat --paging=never'       # Changed to --paging=never for better pipe compatibility
+alias less='bat --paging=always'     # Added less for when paging is desired
 alias miller='mlr'
 alias grep='rg'
 alias find='fd'
 alias md='glow'
-alias ls='eza --icons'     # Note: Overwrites previous ls alias
-alias ll='eza -l --icons'  # Note: Overwrites previous ll alias
-alias la='eza -al --icons' # Note: Overwrites previous la alias
+# Note: ls/ll/la are already defined at the top of the file with proper fallback
 # Git shortcuts
 alias gs='git status'
 alias ga='git add'
@@ -214,31 +251,44 @@ export FZF_DEFAULT_OPTS='--height 40% --border --cycle --layout=reverse --marker
 export GLOW_PAGER="bat --plain --language=markdown"
 export HOMEBREW_NO_ANALYTICS=1
 
-# === End Aliases from .zshrc ===
-
-# === Aliases from fzf.zsh ===
+# FZF enhanced aliases
 # File navigation
-# alias ff='f find'         # Find files
-# alias fe='f edit'         # Find and edit files
-# alias fdir='f dir'          # Find directories
-# alias fz='f z'            # Jump with zoxide
-# # Git operations
-# alias fco='f checkout'    # Git checkout
-# alias fga='f add'         # Git add files
-# alias fgl='f log'         # Git log
-# alias fgs='f status'      # Git status
-# alias fgd='f diff'        # Git diff
-# # Search
-# alias fgr='f grep'        # Grep with fzf
-# alias frg='f rgopen'      # Ripgrep and open
-# # System
-# alias fk='f kill'         # Kill process
-# alias fp='f port'         # Kill process on port
-# alias fh='f history'      # History search
-# alias fm='f man'          # Man pages
-# alias fa='f alias'        # Aliases
-# # Package management
-# alias fb='f brew' # Brew operations
-# alias fbi='f brew install' # Brew install
-# alias fbu='f brew uninstall' # Brew uninstall
-# === End Aliases from fzf.zsh ===
+alias ff='f find'         # Find files
+alias fe='f edit'         # Find and edit files
+alias fdir='f dir'        # Find directories
+alias fz='f z'            # Jump with zoxide
+
+# Define function for git operations with fzf
+fgit() {
+  local cmd="$1"
+  case "$cmd" in
+    checkout|co)
+      local branch=$(git branch --all | grep -v HEAD | fzf --preview="git log -p {}" | sed "s/.* //")
+      [[ -n "$branch" ]] && git checkout "$branch"
+      ;;
+    add)
+      local files=$(git status -s | fzf --multi --preview="git diff {2}" | awk '{print $2}')
+      [[ -n "$files" ]] && git add $files
+      ;;
+    log)
+      git log --oneline | fzf --preview="git show {1}" | cut -d' ' -f1
+      ;;
+    diff)
+      git diff --name-only | fzf --preview="git diff {}"
+      ;;
+    status)
+      git status -s | fzf --preview="git diff {2}"
+      ;;
+    *)
+      echo "Usage: fgit [checkout|add|log|diff|status]"
+      return 1
+      ;;
+  esac
+}
+
+# Git fzf aliases
+alias fco='fgit checkout'  # Git checkout
+alias fga='fgit add'       # Git add files
+alias fgl='fgit log'       # Git log
+alias fgs='fgit status'    # Git status
+alias fgd='fgit diff'      # Git diff
