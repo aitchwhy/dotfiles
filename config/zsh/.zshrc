@@ -543,3 +543,118 @@ has_command atuin && eval "$(atuin init zsh)"
 # --- Volta ---
 has_command volta && eval "$(volta setup)"
 source ${ZDOTDIR}/just.zsh
+
+
+#!/usr/bin/env zsh
+# Quick utilities for viewing and managing the local ports used by the
+# Anterior process-compose stack defined in nix/anterior-services-process-compose.nix.
+#
+#   source scripts/ant-ports.zsh
+#
+# Provides:
+#   ANT_PORTS             – associative array mapping <name> -> <port>
+#   ant_ports_list        – list mapping sorted by port
+#   ant_ports_fzf         – fuzzy finder (needs fzf) – enter to inspect, ^X to kill
+#
+# The array is hand-derived from the same arithmetic used in the nix module so we
+# keep only one source of truth for humans.  Update it when the module changes.
+
+# ---------------------------------------------------------------------------
+# Port map
+# ---------------------------------------------------------------------------
+# NOTE: Only *listener* ports are included; helper processes without their own
+# bound port (prefect-agent, prefect-worker, …) are not listed.
+
+typeset -A ANT_PORTS=(
+  # core services
+  api_http                20101
+  api_admin               20102
+  api_grpc                20103
+  cortex_http             20201
+  user_grpc               20303
+  paop_grpc               20403
+  payment_integrity_grpc  20503
+  noodle_http             20601
+  noggin_http             20701
+  hello_world_http        20901
+  clinical_backend_http   21101
+  clinical_frontend_http  21201
+  # third-party / dependencies
+  gotenberg               3000
+  prefect                 4200
+  localstack              4566
+  redis                   6379
+  postgres                5432
+  dynamodb                8000
+)
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+# List <port> <name>, sorted by port number (ascending)
+function ant_ports_list() {
+  for k v in "${(@kv)ANT_PORTS}"; do
+    print -r -- "$v\t$k"
+  done | sort -n
+}
+
+# Show the processes currently bound to a port.
+function _ant_port_lsof() {
+  local port=$1
+  if (( $+commands[lsof] == 0 )); then
+    echo "lsof not found" >&2
+    return 1
+  fi
+  lsof -Pn -i TCP:${port} -sTCP:LISTEN
+}
+
+# Kill processes bound to a specific port
+function _ant_port_kill() {
+  local port=$1
+  if (( $+commands[lsof] == 0 )); then
+    echo "lsof not found" >&2
+    return 1
+  fi
+  lsof -Pn -ti TCP:${port} | xargs -r kill -9
+  echo "Killed processes on port $port"
+}
+
+# Fuzzy select a port and kill processes bound to it
+function ant_kill() {
+  if (( $+commands[fzf] == 0 )); then
+    echo "fzf not found – install fzf first" >&2
+    return 1
+  fi
+
+  local selected=$(ant_ports_list | fzf --prompt="Select port to kill> " --with-nth=1,2 --header=$'PORT\tNAME')
+  if [[ -n "$selected" ]]; then
+    local port=$(echo "$selected" | awk '{print $1}')
+    _ant_port_kill "$port"
+  fi
+}
+
+# Simple function to list all ports
+function ant_ports() {
+  ant_ports_list
+}
+
+# ---------------------------------------------------------------------------
+# Aliases for faster typing
+# ---------------------------------------------------------------------------
+
+alias antports='ant_ports_list'
+alias antkill='ant_kill'
+
+# For backward compatibility
+alias antpf='ant_kill'
+alias antplsof='ant_ports_lsof_all'
+
+# Convenience: list and immediately show lsof on every port in the map
+function ant_ports_lsof_all() {
+  for p in ${(v)ANT_PORTS}; do
+    echo "=== Port $p ==="
+    _ant_port_lsof $p || true
+    echo
+  done
+}

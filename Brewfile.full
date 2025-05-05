@@ -54,7 +54,7 @@ brew "goaccess"        # Web log analyzer
 
 # Docker/Containerization
 brew "lazydocker"      # Docker TUI
-brew "f1bonacc1/tap/process-compose"  # Process orchestration
+# brew "f1bonacc1/tap/process-compose"  # Process orchestration
 brew "nixpacks"        # Container builder
 brew "dive"            # Docker layer explorer
 brew "podman"          # Alternative container runtime
@@ -168,7 +168,7 @@ brew "zoxide"
 brew "zsh-completions"
 brew "aider"
 brew "caddy"
-brew "f1bonacc1/tap/process-compose"
+# brew "f1bonacc1/tap/process-compose"
 brew "fastfetch"
 brew "gitleaks"
 brew "lazydocker"
