@@ -634,6 +634,15 @@ function ant_kill() {
   fi
 }
 
+# Kill *all* processes bound to known ANT_PORTS (use with caution)
+function ant_kill_all() {
+  echo "Killing all Anterior service ports..."
+  for port in ${(v)ANT_PORTS}; do
+    _ant_port_kill "$port"
+  done
+  echo "✅ All known Anterior ports cleared"
+}
+
 # Simple function to list all ports
 function ant_ports() {
   ant_ports_list
@@ -645,11 +654,7 @@ function ant_ports() {
 
 alias antports='ant_ports_list'
 alias antkill='ant_kill'
-
-# For backward compatibility
-alias antpf='ant_kill'
-alias antplsof='ant_ports_lsof_all'
-
+alias antkillall='ant_kill_all'
 # Convenience: list and immediately show lsof on every port in the map
 function ant_ports_lsof_all() {
   for p in ${(v)ANT_PORTS}; do
