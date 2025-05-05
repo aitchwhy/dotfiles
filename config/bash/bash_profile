@@ -1,0 +1,7 @@
+# Add dotfiles bin to PATH
+export PATH="$HOME/dotfiles/bin:$PATH"
+
+# Source bashrc if it exists
+if [ -f "$HOME/.bashrc" ]; then
+  . "$HOME/.bashrc"
+fi

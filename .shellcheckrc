@@ -1,5 +1,0 @@
-# Allow sourcing of files relative to script
-source-path=$HOME/dotfiles/scripts
-
-# Disable warning about function definition being used before they're defined
-disable=SC2218

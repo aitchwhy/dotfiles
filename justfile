@@ -14,17 +14,174 @@ set fallback
 import? "./*/justfile"
 import? "./config/*/justfile"
 
-# Default recipe - list all available commands with groups
-default:
-    @echo "=== Dotfiles Command Center ==="
-    @echo "Use 'just COMMAND' or 'just TOOL COMMAND' to run commands"
-    @echo "Use 'just choose' for fuzzy command selection"
-    @echo ""
-    @{{just_executable()}} --list --unsorted | tail -n +3 | sort
+# ----------------------------------------------------------
+# CLI Interface Configuration
+# ----------------------------------------------------------
 
-# Fuzzy choose and run a command
+# Tool descriptions for nice display
+TOOL_DESCRIPTIONS := {
+    "ai": "AI-powered tools and Claude Code helpers",
+    "aerospace": "Window manager for MacOS",
+    "atuin": "Shell history management",
+    "brew": "Homebrew package management",
+    "git": "Git version control operations",
+    "nvim": "Neovim text editor",
+    "starship": "Cross-shell prompt",
+    "yazi": "Terminal file manager",
+    "zellij": "Terminal multiplexer",
+    "zsh": "Z shell configuration",
+}
+# ----------------------------------------------------------
+# Default and Core Commands
+# ----------------------------------------------------------
+
+# Default recipe - list all available namespaces with descriptions
+_default:
+    #!/usr/bin/env zsh
+    echo "\033[1;36m=== Dotfiles Command Center ===\033[0m"
+    echo "Use \033[1;33mjust NAMESPACE\033[0m to see available commands for that tool"
+    echo "Use \033[1;33mjust NAMESPACE:COMMAND\033[0m to run a specific command"
+    echo "Use \033[1;33mjust choose\033[0m for fuzzy command selection"
+    echo ""
+    
+    echo "\033[1;36mAvailable Tool Namespaces:\033[0m"
+    
+    # Get all namespaces
+    NAMESPACES=$({{just_executable()}} namespaces)
+    
+    # Display with descriptions
+    for NS in $NAMESPACES; do
+        DESC=$({{just_executable()}} tool-desc $NS)
+        [[ -z "$DESC" ]] && DESC="$NS commands"
+        printf "  \033[1;32m%-15s\033[0m  %s\n" "$NS" "$DESC"
+    done
+    
+    echo ""
+    echo "\033[1;36mCommon Commands:\033[0m"
+    printf "  \033[1;32m%-15s\033[0m  %s\n" "setup" "Run setup script with default options"
+    printf "  \033[1;32m%-15s\033[0m  %s\n" "update" "Update dotfiles repository"
+    printf "  \033[1;32m%-15s\033[0m  %s\n" "status" "Show dotfiles status and info"
+    printf "  \033[1;32m%-15s\033[0m  %s\n" "backup" "Create backup of current config"
+    printf "  \033[1;32m%-15s\033[0m  %s\n" "test" "Run tests for all components"
+
+# Show commands for a specific namespace (implemented as a catch-all recipe)
+@$NAMESPACE:
+    #!/usr/bin/env zsh
+    # Check if namespace exists
+    NAMESPACES=$({{just_executable()}} namespaces)
+    if [[ ! "$NAMESPACES" =~ "{{NAMESPACE}}" ]]; then
+        echo "\033[1;31mError: Namespace '{{NAMESPACE}}' not found\033[0m"
+        echo "Available namespaces:"
+        echo "$NAMESPACES" | sed 's/^/  /'
+        exit 1
+    fi
+    
+    # Format and display commands
+    {{just_executable()}} format-commands {{NAMESPACE}}
+    
+    # Display tool help if available
+    COMMAND_EXISTS=$({{just_executable()}} command-exists {{NAMESPACE}})
+    if [[ "$COMMAND_EXISTS" == "true" ]]; then
+        echo "\n\033[1;36mNative Command Help:\033[0m"
+        {{NAMESPACE}} --help 2>/dev/null | head -n 10 || true
+    fi
+
+# Fuzzy choose and run a command with improved UX
 choose:
-    @{{just_executable()}} $({{just_executable()}} --list --unsorted | tail -n +3 | sort | fzf --height=40% --reverse --border | awk '{print $1}')
+    #!/usr/bin/env zsh
+    CMD=$({{just_executable()}} --list --unsorted | 
+          grep -v "^_" | 
+          sort | 
+          fzf --height=40% \
+              --reverse \
+              --border \
+              --header="Select a command to run" \
+              --preview="echo \"Command: {1}\nDescription: {2}\"" \
+              --preview-window=up:2:wrap)
+    
+    if [[ -n "$CMD" ]]; then
+        CMDNAME=$(echo "$CMD" | awk '{print $1}')
+        echo "\033[1;33mRunning: just $CMDNAME\033[0m"
+        {{just_executable()}} $CMDNAME
+    else
+        echo "No command selected"
+    fi
+
+# Fuzzy choose a namespace and show its commands
+browse:
+    #!/usr/bin/env zsh
+    NS=$({{just_executable()}} namespaces | 
+         fzf --height=40% \
+             --reverse \
+             --border \
+             --header="Select a tool namespace" \
+             --preview="{{just_executable()}} format-commands {1}" \
+             --preview-window=right:70%:wrap)
+    
+    if [[ -n "$NS" ]]; then
+        {{just_executable()}} "$NS"
+    else
+        echo "No namespace selected"
+    fi
+
+
+# Get tool description or default
+tool-desc tool:
+    #!/usr/bin/env zsh
+    TOOL="{{tool}}"
+    DESC="{{TOOL_DESCRIPTIONS}}"
+    echo $DESC | grep -o "\"$TOOL\": \"[^\"]*\"" | sed 's/\"'$TOOL'\": \"//' | sed 's/\"//'
+
+# Get all top-level namespaces
+namespaces:
+    #!/usr/bin/env zsh
+    {{just_executable()}} --list --unsorted | 
+    grep -v "^_" | 
+    awk '{print $1}' | 
+    grep -v ":" | 
+    sort | 
+    uniq
+
+# Get subcommands for a namespace
+subcommands namespace:
+    #!/usr/bin/env zsh
+    {{just_executable()}} --list --unsorted | 
+    grep "^{{namespace}}:" | 
+    awk '{print $1}' | 
+    sed 's/{{namespace}}://g' |
+    sort | 
+    uniq
+
+# Check if a command exists
+command-exists name:
+    #!/usr/bin/env zsh
+    which {{name}} &>/dev/null && echo "true" || echo "false"
+
+# Format commands in a consistent style
+format-commands namespace:
+    #!/usr/bin/env zsh
+    # Get description width
+    DESC_WIDTH=50
+    
+    # Print header for the tool
+    DESC=$({{just_executable()}} tool-desc {{namespace}})
+    [[ -z "$DESC" ]] && DESC="{{namespace}} commands"
+    
+    echo "\033[1;36m=== {{namespace}} - $DESC ===\033[0m"
+    
+    # Get commands
+    {{just_executable()}} --list --unsorted | 
+    grep "^{{namespace}}:" | 
+    sort |
+    while read -r CMD_LINE; do
+        CMD=$(echo "$CMD_LINE" | awk '{print $1}')
+        CMD_DESC=$(echo "$CMD_LINE" | awk '{$1=""; print $0}' | sed 's/^ *//')
+        
+        SUB_CMD=$(echo "$CMD" | sed 's/{{namespace}}://g')
+        
+        # Format in two columns
+        printf "  \033[1;32m%-20s\033[0m  %s\n" "$SUB_CMD" "$CMD_DESC"
+    done
 
 # -----------------------------------------------------------
 # Core system commands
@@ -60,30 +217,32 @@ dry-run:
 # Homebrew management
 # -----------------------------------------------------------
 
+[namespace=brew]
+
 # Install recommended packages from core Brewfile
-brew-install-core:
+install-core:
     @echo "=== Installing Core Packages ==="
     @brew bundle install --file=Brewfile.core
 
 # Install all packages including optional ones
-brew-install-full:
+install-full:
     @echo "=== Installing All Packages ==="
     @brew bundle install --file=Brewfile.full
 
 # Update all Homebrew packages
-brew-update:
+update:
     @echo "=== Updating Homebrew Packages ==="
     @brew update
     @brew upgrade
     @brew cleanup
 
 # Create/update Brewfile from currently installed packages
-brew-dump:
+dump:
     @echo "=== Creating Brewfile from Installed Packages ==="
     @brew bundle dump --force --describe
 
 # Check for outdated packages
-brew-outdated:
+outdated:
     @echo "=== Checking for Outdated Packages ==="
     @brew outdated
 
@@ -177,24 +336,196 @@ docs tool:
 # -----------------------------------------------------------
 # Git operations
 # -----------------------------------------------------------
+[namespace=git]
 
 # Show git status
-git-status:
+status:
     @git status
 
 # Commit all changes
-git-commit message:
+commit message:
     @git add -A
     @git commit -m "{{message}}"
 
 # Push changes to remote
-git-push:
+push:
     @git push
 
 # Pull changes from remote
-git-pull:
+pull:
     @git pull
 
 # Show git log
-git-log:
+log:
     @git log --oneline -n 10
+
+# -----------------------------------------------------------
+# Testing
+# -----------------------------------------------------------
+
+# Run tests for all components
+test *args="":
+    #!/usr/bin/env zsh
+    echo "\033[1;36m=== Running Tests ===\033[0m"
+    
+    # Check if we have vitest
+    if ! command -v vitest &> /dev/null; then
+        echo "\033[1;33mWarning: vitest not found. Installing...\033[0m"
+        npm install -g vitest
+    fi
+    
+    # Set up test directories
+    TEST_DIRS=()
+    
+    # Find all test directories
+    for dir in $(find . -name "tests" -type d | grep -v "node_modules"); do
+        if [[ -n "$(find "$dir" -name "*.test.*" -o -name "*.spec.*" 2>/dev/null)" ]]; then
+            TEST_DIRS+=("$dir")
+        fi
+    done
+    
+    # Run tests for each directory
+    if [[ ${#TEST_DIRS[@]} -eq 0 ]]; then
+        echo "\033[1;33mNo test directories found\033[0m"
+    else
+        for dir in "${TEST_DIRS[@]}"; do
+            COMPONENT=$(echo "$dir" | sed 's|./||' | sed 's|/tests.*||')
+            echo "\033[1;36mTesting: $COMPONENT\033[0m"
+            
+            # Check for specific test runner commands
+            if [[ -f "$dir/../package.json" ]]; then
+                # Use npm test if available
+                CURR_DIR=$(pwd)
+                cd "$dir/.." || continue
+                npm test {{args}} || echo "\033[1;31mTests failed for $COMPONENT\033[0m"
+                cd "$CURR_DIR" || continue
+            elif [[ -n "$(find "$dir" -name "*.test.*" -o -name "*.spec.*" 2>/dev/null)" ]]; then
+                # Use vitest directly
+                vitest run "$dir/**/*.{test,spec}.{js,ts,jsx,tsx}" {{args}} || echo "\033[1;31mTests failed for $COMPONENT\033[0m"
+            else
+                echo "\033[1;33mNo tests found for $COMPONENT\033[0m"
+            fi
+        done
+    fi
+    
+    # Run semgrep validation if available
+    if command -v semgrep &> /dev/null; then
+        echo "\033[1;36mRunning Semgrep Validation\033[0m"
+        semgrep --config=p/r2c-security-audit .
+    else
+        echo "\033[1;33mSemgrep not found, skipping validation\033[0m"
+    fi
+
+# Run tests for a specific component
+test-component component *args="":
+    #!/usr/bin/env zsh
+    echo "\033[1;36m=== Testing: {{component}} ===\033[0m"
+    
+    # Find test directory
+    TEST_DIR=""
+    if [[ -d "./{{component}}/tests" ]]; then
+        TEST_DIR="./{{component}}/tests"
+    elif [[ -d "./config/{{component}}/tests" ]]; then
+        TEST_DIR="./config/{{component}}/tests" 
+    else
+        for dir in $(find . -path "*{{component}}*/tests" -type d); do
+            TEST_DIR="$dir"
+            break
+        done
+    fi
+    
+    if [[ -z "$TEST_DIR" ]]; then
+        echo "\033[1;31mNo test directory found for {{component}}\033[0m"
+        exit 1
+    fi
+    
+    # Check for specific test runner commands
+    if [[ -f "$TEST_DIR/../package.json" ]]; then
+        # Use npm test if available
+        CURR_DIR=$(pwd)
+        cd "$TEST_DIR/.." || exit 1
+        npm test {{args}} || echo "\033[1;31mTests failed for {{component}}\033[0m"
+        cd "$CURR_DIR" || exit 1
+    elif [[ -n "$(find "$TEST_DIR" -name "*.test.*" -o -name "*.spec.*" 2>/dev/null)" ]]; then
+        # Use vitest directly
+        vitest run "$TEST_DIR/**/*.{test,spec}.{js,ts,jsx,tsx}" {{args}} || echo "\033[1;31mTests failed for {{component}}\033[0m"
+    else
+        echo "\033[1;33mNo tests found for {{component}}\033[0m"
+    fi
+
+# Set up git pre-commit hooks for validation
+setup-hooks:
+    #!/usr/bin/env zsh
+    echo "\033[1;36m=== Setting Up Git Hooks ===\033[0m"
+    
+    # Create hooks directory if it doesn't exist
+    mkdir -p .git/hooks
+    
+    # Create pre-commit hook
+    cat > .git/hooks/pre-commit << 'EOL'
+#!/usr/bin/env zsh
+set -e
+
+echo "Running pre-commit hooks..."
+
+# Get changed files
+CHANGED_FILES=$(git diff --cached --name-only --diff-filter=ACM)
+
+# Skip if no files changed
+if [[ -z "$CHANGED_FILES" ]]; then
+    echo "No files to validate"
+    exit 0
+fi
+
+# Run tests for components with changed files
+COMPONENTS=()
+for file in $CHANGED_FILES; do
+    if [[ "$file" == config/* ]]; then
+        COMP=$(echo "$file" | cut -d'/' -f2)
+        COMPONENTS+=("$COMP")
+    fi
+done
+
+# Deduplicate components
+COMPONENTS=($(echo "${COMPONENTS[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '))
+
+# Run tests for changed components
+for comp in "${COMPONENTS[@]}"; do
+    echo "Running tests for component: $comp"
+    just test-component "$comp" || exit 1
+done
+
+# Run semgrep if available
+if command -v semgrep &> /dev/null; then
+    echo "Running semgrep validation..."
+    semgrep --config=p/r2c-security-audit $CHANGED_FILES || exit 1
+fi
+
+# Check if PRD matches implementation for each component
+for comp in "${COMPONENTS[@]}"; do
+    # Only check if PRD exists
+    if [[ -f "config/$comp/PRD.md" ]]; then
+        echo "Validating PRD for component: $comp"
+        
+        # Use claude-cli if available to validate PRD
+        if command -v claude &> /dev/null; then
+            echo "Using Claude to validate PRD implementation..."
+            PRD_CONTENT=$(cat "config/$comp/PRD.md")
+            IMPL_FILES=$(find "config/$comp" -type f -not -path "*/\.*" -not -name "PRD.md" -not -name "README.md" | xargs cat)
+            
+            claude --max-tokens 200 --message "Validate if the implementation matches the PRD requirements. Reply ONLY with 'PASS' or 'FAIL: reason'. PRD: $PRD_CONTENT Implementation: $IMPL_FILES" | grep -q "^PASS" || {
+                echo "PRD validation failed for $comp";
+                exit 1;
+            }
+        fi
+    fi
+done
+
+echo "Pre-commit hooks passed!"
+exit 0
+EOL
+
+    # Make hook executable
+    chmod +x .git/hooks/pre-commit
+    
+    echo "\033[1;32mGit hooks installed successfully\033[0m"

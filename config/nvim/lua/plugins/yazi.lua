@@ -11,7 +11,6 @@ return {
     "mikavilpas/yazi.nvim",
     event = "VeryLazy",
     dependencies = {
-      "folke/snacks.nvim",
       "nvim-lua/plenary.nvim",
       "nvim-tree/nvim-web-devicons",
     },

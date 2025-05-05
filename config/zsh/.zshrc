@@ -61,11 +61,21 @@ export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 [[ ! -d "$XDG_STATE_HOME" ]] && mkdir -p "$XDG_STATE_HOME"
 
 # Ensure ZSH config directory is set
-export zdot=${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}
 export cf="$HOME/dotfiles/config"
-export dot="$DOTFILES"
-export cfz="$HOME/dotfiles/config/zsh"
+export dot="${dot:-$DOTFILES}"
+export cfzsh="${cfz:-$cf/zsh}"
+export zdot=$cfzsh
+# export nvime"$EDITOR $cfnvim"
+# export cfj="${cfz:-$cf/just}"
+# export je="$EDITOR $cfj"
+# export cf="${cfz:-$cf/zsh}"
 
+# edit config files in dir 
+function cfs() {
+  nvim $(fd . -t d --exact-depth 1 --color never ~/dotfiles/config | fzf --prompt='config dirs> ' --preview='ls -s {}')
+}
+
+#
 # ========================================================================
 # 3. Keyboard & Input Configuration
 # ========================================================================
@@ -89,6 +99,9 @@ function has_command() {
 # ========================================================================
 # 5. Homebrew and PATH Setup
 # ========================================================================
+
+# Set up dotfiles bin directory
+export PATH="$HOME/dotfiles/bin:$PATH"
 
 # Set up Homebrew
 export HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-$(brew --prefix 2>/dev/null)}"
@@ -174,26 +187,23 @@ alias nix-zsh="nix develop --command zsh"
 
 # ========================================================================
 # Source Nix environment
-# # ========================================================================
-# if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
-# 	source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
-# fi
-#
-# # Add Nix to path
-# export PATH=$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH
-#
-# # Nix completions for ZSH
-# if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
-# 	# Add Nix ZSH completion if available
-# 	if [ -e "${HOME}/.nix-profile/share/zsh/site-functions/_nix" ]; then
-# 		fpath+=(~/.nix-profile/share/zsh/site-functions)
-# 	elif [ -e '/nix/var/nix/profiles/default/share/zsh/site-functions/_nix' ]; then
-# 		fpath+=(/nix/var/nix/profiles/default/share/zsh/site-functions)
-# 	fi
-#
-# 	# Initialize ZSH completion system
-# 	autoload -U compinit && compinit
-# fi
+# ========================================================================
+if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+	source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+fi
+
+# Add Nix to path
+export PATH=$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH
+
+# Nix completions for ZSH
+if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+	# Add Nix ZSH completion if available
+	if [ -e "${HOME}/.nix-profile/share/zsh/site-functions/_nix" ]; then
+		fpath+=(~/.nix-profile/share/zsh/site-functions)
+	elif [ -e '/nix/var/nix/profiles/default/share/zsh/site-functions/_nix' ]; then
+		fpath+=(/nix/var/nix/profiles/default/share/zsh/site-functions)
+	fi
+fi
 
 alias nixe="$EDITOR ~/.config/nix/nix.conf"
 alias nixd="nix develop"
@@ -394,9 +404,12 @@ alias dc='docker-compose'
 alias k='k9s'         # k9s - Kubernetes CLI
 alias ld="lazydocker" # lazydocker - Docker TUI
 
+
+
 # --- Just Task Runner ---
-alias j="just"
+alias j='$HOME/dotfiles/scripts/j'
 alias jfmt="just --unstable --fmt"
+alias jg='just --justfile $HOME/dotfiles/config/just/global.justfile'
 alias .j='just --justfile $USER_JUSTFILE --working-directory .'
 alias .jfmt='just --justfile $USER_JUSTFILE --working-directory . --unstable --fmt'
 
@@ -529,3 +542,4 @@ has_command atuin && eval "$(atuin init zsh)"
 
 # --- Volta ---
 has_command volta && eval "$(volta setup)"
+source ${ZDOTDIR}/just.zsh
