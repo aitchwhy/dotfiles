@@ -2,10 +2,10 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
 # Configuration enhancements
-right_format = "$time$battery"
+right_format = "$time$battery $os"
 scan_timeout = 10
 add_newline = false
-palette = "tokyo-night"
+# palette = "tokyo-night"
 
 # Starship Terminal Prompt Configuration
 # Optimized for macOS Apple Silicon (2025)
@@ -34,26 +34,27 @@ format = """
 $directory\
 [](fg:#769ff0 bg:#394260)\
 $git_branch\
+$git_state\
 $git_status\
 [](fg:#394260 bg:#212736)\
 $nix\
 $nodejs\
 [](fg:#212736 bg:#1d2230)\
-$time\
+$direnv\
 [ ](fg:#1d2230)\
 \n$character"""
 
 [directory]
 style = "fg:#e3e5e5 bg:#769ff0"
 format = "[ $path ]($style)"
-truncation_length = 3
+truncation_length = 5
 truncation_symbol = "…/"
 
 [directory.substitutions]
 "Documents" = "󰈙 "
-"Downloads" = " "
-"Music" = " "
-"Pictures" = " "
+# "Downloads" = " "
+# "Music" = " "
+# "Pictures" = " "
 
 [git_branch]
 symbol = ""
@@ -96,10 +97,17 @@ format = "on [($name )]($style)"
 style = "bold blue"
 disabled = false
 
+# f8ff #  - Apple Emoji (from https://github.com/ryanoasis/nerd-fonts/issues/492)
 [os.symbols]
 NixOS = "❄️ "
-Windows = "  "
-Arch = "Arch is the best! "
+Macos = " "
+
+[nix_shell]
+disabled = false
+impure_msg = '[impure shell](bold red)'
+pure_msg = '[pure shell](bold green)'
+unknown_msg = '[unknown shell](bold yellow)'
+format = 'via [☃️ $state( \($name\))](bold blue) '
 
 [shell]
 fish_indicator = '󰈺 '

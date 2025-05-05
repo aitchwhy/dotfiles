@@ -1,0 +1,35 @@
+# Project-specific .envrc file for Nix development
+
+# Enable flake support (defaults to using the current directory)
+if [ -f flake.nix ]; then
+  use flake
+  
+  # Uncomment for a specific flake output
+  # use flake .#devShell
+  
+  # Uncomment for a specific profile
+  # use flake --profile path/to/profile
+fi
+
+# Legacy shell.nix support (if no flake.nix exists)
+if [ ! -f flake.nix ] && [ -f shell.nix ]; then
+  use nix
+fi
+
+# Add local scripts and bins to PATH
+PATH_add ./scripts
+PATH_add ./node_modules/.bin
+
+# Project-specific environment variables
+# export DATABASE_URL="postgres://localhost:5432/mydb"
+# export API_KEY="dev_key" # Only for local development
+
+# Log format - make it minimal in terminal multiplexers
+if [[ -n "$ZELLIJ" || -n "$TMUX" ]]; then
+  export DIRENV_LOG_FORMAT=""
+fi
+
+# Load local overrides if present (keep this last)
+if [ -f .envrc.local ]; then
+  source_env .envrc.local
+fi

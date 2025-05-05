@@ -37,7 +37,6 @@
 [opener]
 edit = [
   { exec = 'nvim "$@"', block = true },
-  { exec = 'windsurf "$@"', orphan = true }
 ]
 
 open = [

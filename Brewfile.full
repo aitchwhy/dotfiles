@@ -73,7 +73,7 @@ brew "entr"            # File watcher
 brew "lefthook"        # Git hooks manager
 
 # Database Tools
-brew "postgresql@17"   # PostgreSQL database
+# brew "postgresql@17"   # PostgreSQL database
 brew "datasette"       # SQLite explorer
 brew "pgcli"           # PostgreSQL CLI
 # brew "usql"            # universal sql cli
@@ -147,7 +147,7 @@ brew "miller"
 brew "neovim"
 brew "nvm"
 brew "oven-sh/bun/bun"
-brew "postgresql@17", restart_service: :changed
+# brew "postgresql@17", restart_service: :changed
 brew "posting"
 brew "ripgrep"
 brew "rustscan"

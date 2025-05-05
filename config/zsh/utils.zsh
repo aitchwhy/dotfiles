@@ -106,7 +106,7 @@ function error() { log_error "$@"; }
 # }
 
 # Detect if being sourced
-export function is_sourced() {
+function is_sourced() {
   [[ "${FUNCNAME[1]-main}" != main ]]
 }
 
@@ -115,7 +115,7 @@ export function is_sourced() {
 # ========================================================================
 
 # Check if a command exists
-export function has_command() {
+function has_command() {
   command -v "$1" &>/dev/null
 }
 

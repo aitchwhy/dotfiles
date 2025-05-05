@@ -1,9 +1,9 @@
 #!/usr/bin/env zsh
 
 DOTFILES="${DOTFILES:-$HOME/dotfiles}"
-cf="${cf:-$DOTFILES/config}"
-cfz="${cfz:-$cf/zsh}"
-cfnv="${cfnv:-$cf/nvim}"
+export dot="${dot:-$DOTFILES}"
+export cf="${cf:-$DOTFILES/config}"
+export cfzsh="${cfzsh:-$cf/zsh}"
 
 ####################################
 # justfile
@@ -62,8 +62,9 @@ alias vim='$EDITOR'
 # Dotfiles Management
 # alias zdot='cd $ZDOTDIR'
 alias zr="exec zsh"
-alias ze="nvim '$ZDOTDIR'/{.zshrc,.zprofile,.zshenv}"
-alias ze="nvim ~/.zshenv '$ZDOTDIR'/{.zshrc,.zprofile,.zshenv,*.zsh}"
+alias ce="nvim '$ZDOTDIR'/{.zshrc,.zprofile,.zshenv}"
+alias c="cursor $cf"
+alias ze="nvim '$ZDOTDIR'/{.zshrc,.zprofile,.zshenv,*.zsh} ~/.zshenv "
 
 alias e="cursor $DOTFILES"
 

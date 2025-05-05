@@ -60,7 +60,7 @@ return {
         -- Shell scripting
         "bash",
         "fish",
-        "zsh",
+        -- "zsh",
 
         -- Query and Data
         "graphql",

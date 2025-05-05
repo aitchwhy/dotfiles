@@ -7,6 +7,9 @@ set shell := ["zsh", "-cu"]
 # Command prefix for grouping
 alias y := yazi
 
+default:
+  just --j
+
 # Edit Yazi config
 yazi edit:
     nvim ~/.config/yazi/yazi.toml

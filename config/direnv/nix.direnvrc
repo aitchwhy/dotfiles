@@ -1,0 +1,16 @@
+# Nix direnv integration
+# This file integrates direnv with Nix flakes
+
+# Enhanced version of use_flake that provides better caching
+use_flake() {
+  watch_file flake.nix
+  watch_file flake.lock
+  eval "$(nix print-dev-env --profile "$(direnv_layout_dir)/flake-profile" "$@")"
+}
+
+# Legacy non-flake support
+use_nix() {
+  watch_file shell.nix
+  watch_file default.nix
+  eval "$(nix-shell --run 'direnv dump')"
+}

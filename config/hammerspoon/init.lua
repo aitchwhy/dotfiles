@@ -6,7 +6,89 @@
 -- package.path = package.path ..
 --     ";" ..
 --     os.getenv("HOME") .. "/.hammerspoon/?.lua" .. ";" .. os.getenv("HOME") .. "/.hammerspoon/Spoons/?.spoon/init.lua"
---
+
+--------------------------------------------------------------------
+--  Hammerspoon: Hyper‑centric launcher & Which‑Key‑style overlay  --
+--------------------------------------------------------------------
+
+-- ------------------------------------
+-- -- 0. Mods & Spoon setup
+-- ------------------------------------
+-- local hyper      = { "ctrl", "alt", "cmd" }
+-- local hyperShift = { "ctrl", "alt", "cmd", "shift" }
+
+-- -- Install the AwesomeKeys spoon (place in ~/.hammerspoon/Spoons)
+-- hs.loadSpoon("AwesomeKeys")
+-- spoon.AwesomeKeys:bindHyperKeys(true) -- enable cheat‑sheet on Hyper hold
+
+-- ------------------------------------
+-- -- 1. Helper: context detection
+-- ------------------------------------
+-- local function frontAppName()
+--     return hs.application.frontmostApplication():name() or ""
+-- end
+-- local function isTerminal() return frontAppName() == "Ghostty" end
+
+-- ------------------------------------
+-- -- 2. Navigation (Hyper+H/J/K/L)
+-- ------------------------------------
+-- local function sendAlt(mods, key)
+--     hs.eventtap.keyStroke(mods, key, 0)
+-- end
+-- local function nav(dir)
+--     if isTerminal() then
+--         sendAlt({ "alt" }, dir) -- Zellij pane focus
+--     else
+--         sendAlt({ "alt" }, dir) -- AeroSpace window focus
+--     end
+-- end
+-- for key, dir in pairs { h = "left", j = "down", k = "up", l = "right" } do
+--     hs.hotkey.bind(hyper, key, function() nav(dir) end)
+--     hs.hotkey.bind(hyperShift, key, function()
+--         if isTerminal() then
+--             sendAlt({ "alt", "shift" }, dir) -- swap pane
+--         else
+--             sendAlt({ "alt", "shift" }, dir) -- move window
+--         end
+--     end)
+-- end
+
+-- ------------------------------------
+-- -- 3. Workspaces (Hyper+1..5)
+-- ------------------------------------
+-- for i = 1, 5 do
+--     hs.hotkey.bind(hyper, tostring(i), function()
+--         sendAlt({ "alt" }, tostring(i)) -- focus workspace (AeroSpace)
+--     end)
+--     hs.hotkey.bind(hyperShift, tostring(i), function()
+--         sendAlt({ "alt", "shift" }, tostring(i)) -- move window to workspace
+--     end)
+-- end
+
+-- ------------------------------------
+-- -- 4. App launcher namespace (Hyper + key)
+-- ------------------------------------
+-- hs.hotkey.bind(hyper, "T", function() hs.application.launchOrFocus("Ghostty") end)
+-- hs.hotkey.bind(hyper, "B", function() hs.application.launchOrFocus("Arc") end)
+-- hs.hotkey.bind(hyper, "O", function() hs.application.launchOrFocus("Obsidian") end)
+-- hs.hotkey.bind(hyper, "C", function() hs.application.launchOrFocus("Cursor") end)
+-- hs.hotkey.bind(hyper, "S", function() hs.application.launchOrFocus("Slack") end)
+-- hs.hotkey.bind(hyper, "G", function() hs.application.launchOrFocus("Fork") end)
+
+-- ------------------------------------
+-- -- 5. Misc global actions
+-- ------------------------------------
+-- -- Raycast (Option+Space) behind Hyper+Space
+-- hs.hotkey.bind(hyper, "Space", function()
+--     hs.eventtap.keyStroke({ "alt" }, "Space", 0)
+-- end)
+
+-- -- Example tiling preset on Hyper+Return
+-- hs.hotkey.bind(hyper, "Return", function()
+--     hs.alert.show("⌨️  Quad Layout")
+--     -- TODO: call AeroSpace layout script or chain of window moves
+-- end)
+
 -- -- ===========================
 -- -- Global Configurations
 -- -- ===========================
