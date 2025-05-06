@@ -67,15 +67,12 @@ export cfzsh="${cfz:-$cf/zsh}"
 export zdot=$cfzsh
 # export nvime"$EDITOR $cfnvim"
 # export cfj="${cfz:-$cf/just}"
-# export je="$EDITOR $cfj"
-# export cf="${cfz:-$cf/zsh}"
 
-# edit config files in dir 
+# edit config files in dir
 function cfs() {
-  nvim $(fd . -t d --exact-depth 1 --color never ~/dotfiles/config | fzf --prompt='config dirs> ' --preview='ls -s {}')
+	nvim $(fd . -t d --exact-depth 1 --color never ~/dotfiles/config | fzf --prompt='config dirs> ' --preview='ls -s {}')
 }
 
-#
 # ========================================================================
 # 3. Keyboard & Input Configuration
 # ========================================================================
@@ -88,7 +85,7 @@ export KEYTIMEOUT=1
 # ========================================================================
 
 # Source our utility functions from utils.zsh
-export UTILS="$DOTFILES/config/zsh/utils.zsh"
+export UTILS="$cfzsh/scripts/utils.zsh"
 [[ -f "$UTILS" ]] && source "$UTILS"
 
 # Check if a command exists
@@ -142,6 +139,25 @@ fi
 # Completions setup
 FPATH="$HOMEBREW_PREFIX/share/zsh/site-functions:$FPATH"
 
+
+# Nix completions for ZSH
+if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+# nix.sh - setups up nix environment. Usually created by nix installer
+source /etc/profile.d/nix.sh
+  # Source Nix environment
+  source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+	# Add Nix ZSH completion if available
+	if [ -e "${HOME}/.nix-profile/share/zsh/site-functions/_nix" ]; then
+		fpath+=(~/.nix-profile/share/zsh/site-functions)
+	elif [ -e '/nix/var/nix/profiles/default/share/zsh/site-functions/_nix' ]; then
+		fpath+=(/nix/var/nix/profiles/default/share/zsh/site-functions)
+	fi
+fi
+
+# tell zsh where to find our completions
+fpath=("$DOTFILES/config/zsh/.zfunc" $fpath)
+
+# fpath should be BEFORE compinit
 autoload -Uz compinit
 compinit
 
@@ -180,31 +196,9 @@ alias tm=task-master
 # Nix
 # ========================================================================
 alias nix-zsh="nix develop --command zsh"
-# source "${cf:-$HOME/dotfiles/config}/zsh/anterior.zsh}" 2>/dev/null
 
 # --- Nix ---
 # export NIX_CONFIG_DIR="$cf/nix"
-
-# ========================================================================
-# Source Nix environment
-# ========================================================================
-if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
-	source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
-fi
-
-# Add Nix to path
-export PATH=$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH
-
-# Nix completions for ZSH
-if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
-	# Add Nix ZSH completion if available
-	if [ -e "${HOME}/.nix-profile/share/zsh/site-functions/_nix" ]; then
-		fpath+=(~/.nix-profile/share/zsh/site-functions)
-	elif [ -e '/nix/var/nix/profiles/default/share/zsh/site-functions/_nix' ]; then
-		fpath+=(/nix/var/nix/profiles/default/share/zsh/site-functions)
-	fi
-fi
-
 alias nixe="$EDITOR ~/.config/nix/nix.conf"
 alias nixd="nix develop"
 alias nixdn="nix develope .#npm"
@@ -275,9 +269,8 @@ path_add "$GOBIN"
 
 export ZELLIJ_CONFIG_DIR="$cf/zellij"
 
-
-# has_command aerospace &&
-alias aero=aerospace
+# has_command aerospace
+alias aero='aerospace'
 
 # --- TODO: skhd (keyboard shortcuts hotkey daemon)
 
@@ -300,8 +293,8 @@ alias nixdarwinup="darwin-rebuild switch --flake ~/dotfiles"
 alias b="brew"
 alias bupd="brew update"
 alias bupg="brew upgrade"
-alias bclean="brew cleanup --prune=all && brew autoremove"
-alias bcleanall='brew cleanup --prune=all && rm -rf $(brew --cache) && brew autoremove'
+# alias bclean="brew cleanup --prune=all && brew autoremove"
+alias bclean='brew cleanup --prune=all && rm -rf $(brew --cache) && brew autoremove'
 alias bi="brew info"
 alias bin="brew install"
 alias brein="brew reinstall"
@@ -320,18 +313,18 @@ alias bup='brew update && brew upgrade && brew cleanup'
 alias brewup='bup'
 
 # --- File System (eza, fd) ---
-alias cf='cd ~/.config/'
-alias dl='cd ~/Downloads'
-alias ls='exa --git --icons'                             # system: List filenames on one line
-alias l='exa --git --icons -lF'                          # system: List filenames with long format
-alias ll='exa -lahF --git'                               # system: List all files
-alias lll="exa -1F --git --icons"                        # system: List files with one line per file
+# alias cf='cd ~/.config/'
+# alias dl='cd ~/Downloads'
+alias ls='eza --git --icons'                             # system: List filenames on one line
+alias l='eza --git --icons -lF'                          # system: List filenames with long format
+alias ll='eza -lahF --git'                               # system: List all files
+alias lll="eza -1F --git --icons"                        # system: List files with one line per file
 alias llm='ll --sort=modified'                           # system: List files by last modified date
-alias la='exa -lbhHigUmuSa --color-scale --git --icons'  # system: List files with attributes
-alias lx='exa -lbhHigUmuSa@ --color-scale --git --icons' # system: List files with extended attributes
-alias lt='exa --tree --level=2'                          # system: List files in a tree view
-alias llt='exa -lahF --tree --level=2'                   # system: List files in a tree view with long format
-alias ltt='exa -lahF | grep "$(date +"%d %b")"'          # system: List files modified today
+alias la='eza -lbhHigUmuSa --color-scale --git --icons'  # system: List files with attributes
+alias lx='eza -lbhHigUmuSa@ --color-scale --git --icons' # system: List files with extended attributes
+alias lt='eza --tree --level=2'                          # system: List files in a tree view
+alias llt='eza -lahF --tree --level=2'                   # system: List files in a tree view with long format
+alias ltt='eza -lahF | grep "$(date +"%d %b")"'          # system: List files modified today
 
 # --- Text Editors (nvim) ---
 alias v='$EDITOR'
@@ -345,8 +338,8 @@ alias zeall="nvim '$ZDOTDIR'/{.zshrc,.zprofile,.zshenv,*.zsh}"
 alias zcompreset="rm -f ~/.zcompdump; compinit"
 
 # --- System Information & Utilities ---
-alias ports="sudo lsof -i -P -n | grep LISTEN"
-alias sudoports="sudo lsof -i -P -n | grep LISTEN"
+alias ports="lsof -i -P -n | grep LISTEN"
+alias sudoports="sudo ports"
 alias printpath='echo $PATH | tr ":" "\n"'
 alias printfuncs='print -l ${(k)functions[(I)[^_]*]} | sort'
 alias printfpath='for fp in $fpath; do echo $fp; done; unset fp'
@@ -404,12 +397,10 @@ alias dc='docker-compose'
 alias k='k9s'         # k9s - Kubernetes CLI
 alias ld="lazydocker" # lazydocker - Docker TUI
 
-
-
 # --- Just Task Runner ---
 alias j='$HOME/dotfiles/scripts/j'
 alias jfmt="just --unstable --fmt"
-alias jg='just --justfile $HOME/dotfiles/config/just/global.justfile'
+# alias jg='just --justfile $HOME/dotfiles/config/just/global.justfile'
 alias .j='just --justfile $USER_JUSTFILE --working-directory .'
 alias .jfmt='just --justfile $USER_JUSTFILE --working-directory . --unstable --fmt'
 
@@ -427,7 +418,7 @@ alias g='ghostty'
 alias zj="zellij"
 alias zjls="zellij list-sessions"
 alias zja='zellij attach "$(zellij list-sessions -n | fzf --reverse --border --no-sort --height 40% | awk '\''{print $1}'\'')"'
-alias zje="zellij edit"
+# alias zje="zellij edit"
 
 # --- Other Tools ---
 # TLDR/Cheat sheets
@@ -449,13 +440,26 @@ alias rx="repomix"
 # Atuin
 alias at="atuin"
 
-# anterior
-alias antall="ant-all-services"
-alias aprune="ant-system-prune"
+# load all scripts
+if [ -d "./.scripts" ]; then
+	for f in "./.scripts"/*.sh; do
+		echo "Loading script: $f"
+		source "$f"
+	done
+fi
 
-alias antnpmci="npm ci --ignore-scripts"
-alias antnpmbuild="ant-npm-build-deptree SERVICE_NAME"
-alias antnpmrun="npm run --workspace your/dir build"
+# minio / s3 frontend -> http://localhost:51021
+# noggin server -> http://localhost:59000
+# vibes frontend -> http://localhost:3000
+# prefect (job runner) -> http://localhost:52000/runs/flow-run
+
+# MINIO_S3_STORAGE="http://localhost:51021/"
+# NOGGIN_SERVER="http://localhost:59000/"
+# VIBES_FRONTEND="http://localhost:3000/"
+# PREFECT_JOB_RUNNER="http://localhost:52000/runs/flow-run"1
+#
+
+# https://nix.dev/manual/nix/2.28/installation/env-variables.html?highlight=ssl#nix_ssl_cert_file
 
 # [[general commands]]
 #
@@ -542,124 +546,5 @@ has_command atuin && eval "$(atuin init zsh)"
 
 # --- Volta ---
 has_command volta && eval "$(volta setup)"
-source ${ZDOTDIR}/just.zsh
 
 
-#!/usr/bin/env zsh
-# Quick utilities for viewing and managing the local ports used by the
-# Anterior process-compose stack defined in nix/anterior-services-process-compose.nix.
-#
-#   source scripts/ant-ports.zsh
-#
-# Provides:
-#   ANT_PORTS             – associative array mapping <name> -> <port>
-#   ant_ports_list        – list mapping sorted by port
-#   ant_ports_fzf         – fuzzy finder (needs fzf) – enter to inspect, ^X to kill
-#
-# The array is hand-derived from the same arithmetic used in the nix module so we
-# keep only one source of truth for humans.  Update it when the module changes.
-
-# ---------------------------------------------------------------------------
-# Port map
-# ---------------------------------------------------------------------------
-# NOTE: Only *listener* ports are included; helper processes without their own
-# bound port (prefect-agent, prefect-worker, …) are not listed.
-
-typeset -A ANT_PORTS=(
-  # core services
-  api_http                20101
-  api_admin               20102
-  api_grpc                20103
-  cortex_http             20201
-  user_grpc               20303
-  paop_grpc               20403
-  payment_integrity_grpc  20503
-  noodle_http             20601
-  noggin_http             20701
-  hello_world_http        20901
-  clinical_backend_http   21101
-  clinical_frontend_http  21201
-  # third-party / dependencies
-  gotenberg               3000
-  prefect                 4200
-  localstack              4566
-  redis                   6379
-  postgres                5432
-  dynamodb                8000
-)
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-
-# List <port> <name>, sorted by port number (ascending)
-function ant_ports_list() {
-  for k v in "${(@kv)ANT_PORTS}"; do
-    print -r -- "$v\t$k"
-  done | sort -n
-}
-
-# Show the processes currently bound to a port.
-function _ant_port_lsof() {
-  local port=$1
-  if (( $+commands[lsof] == 0 )); then
-    echo "lsof not found" >&2
-    return 1
-  fi
-  lsof -Pn -i TCP:${port} -sTCP:LISTEN
-}
-
-# Kill processes bound to a specific port
-function _ant_port_kill() {
-  local port=$1
-  if (( $+commands[lsof] == 0 )); then
-    echo "lsof not found" >&2
-    return 1
-  fi
-  lsof -Pn -ti TCP:${port} | xargs -r kill -9
-  echo "Killed processes on port $port"
-}
-
-# Fuzzy select a port and kill processes bound to it
-function ant_kill() {
-  if (( $+commands[fzf] == 0 )); then
-    echo "fzf not found – install fzf first" >&2
-    return 1
-  fi
-
-  local selected=$(ant_ports_list | fzf --prompt="Select port to kill> " --with-nth=1,2 --header=$'PORT\tNAME')
-  if [[ -n "$selected" ]]; then
-    local port=$(echo "$selected" | awk '{print $1}')
-    _ant_port_kill "$port"
-  fi
-}
-
-# Kill *all* processes bound to known ANT_PORTS (use with caution)
-function ant_kill_all() {
-  echo "Killing all Anterior service ports..."
-  for port in ${(v)ANT_PORTS}; do
-    _ant_port_kill "$port"
-  done
-  echo "✅ All known Anterior ports cleared"
-}
-
-# Simple function to list all ports
-function ant_ports() {
-  ant_ports_list
-}
-
-# ---------------------------------------------------------------------------
-# Aliases for faster typing
-# ---------------------------------------------------------------------------
-
-alias antports='ant_ports_list'
-alias antkill='ant_kill'
-alias antkillall='ant_kill_all'
-# Convenience: list and immediately show lsof on every port in the map
-function ant_ports_lsof_all() {
-  for p in ${(v)ANT_PORTS}; do
-    echo "=== Port $p ==="
-    _ant_port_lsof $p || true
-    echo
-  done
-}

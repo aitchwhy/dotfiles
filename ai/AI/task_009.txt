@@ -1,0 +1,76 @@
+# Task ID: 9
+# Title: Add robust selectors and error handling
+# Status: pending
+# Dependencies: 8
+# Priority: medium
+# Description: Refactor the tests to use data-testid attributes and improve error handling and logging.
+# Details:
+1. Check if a central selectors file already exists in the project
+2. Create or extend a central `selectors.ts` file to store all UI selectors used in tests
+3. Refactor existing tests to use the centralized selectors
+4. Update selectors to prioritize data-testid attributes
+5. Add fallback selectors for elements without data-testid
+6. Implement more detailed error messages that provide context about failures
+7. Add screenshots on test failures for visual debugging
+8. Implement custom retry logic for flaky operations
+9. Add network request logging for debugging API interactions
+10. Create helper functions for common wait patterns (network idle, URL changes)
+
+# Test Strategy:
+Run the tests with intentionally broken selectors to verify that the error handling provides useful information. Then fix the selectors and verify that the tests run successfully with the improved selectors. Run the tests using the existing Playwright setup.
+
+# Subtasks:
+## 1. Create centralized selectors file with data-testid attributes [pending]
+### Dependencies: None
+### Description: Create or extend a central selectors.ts file that prioritizes data-testid attributes with fallback selectors
+### Details:
+1. Check if a central selectors file already exists in the project
+2. If it exists, review its structure; if not, create a new selectors.ts file
+3. Define a consistent pattern for selector objects (e.g., { dataTestId: 'x', cssSelector: 'y', xpath: 'z' })
+4. Add selectors for all UI elements used in tests, prioritizing data-testid attributes
+5. Include fallback selectors (CSS, XPath) for elements without data-testid
+6. Document the selector strategy and usage patterns in the file header
+
+## 2. Refactor existing tests to use centralized selectors [pending]
+### Dependencies: 9.1
+### Description: Update all test files to import and use the selectors from the central file instead of hardcoded selectors
+### Details:
+1. Identify all test files that need refactoring
+2. For each file, replace hardcoded selectors with imports from the central selectors file
+3. Update selector usage to follow the new pattern (e.g., using helper functions to try data-testid first, then fallbacks)
+4. Ensure tests still pass after refactoring
+5. Document any edge cases or special handling required for specific tests
+
+## 3. Implement enhanced error handling with context [pending]
+### Dependencies: None
+### Description: Add detailed error messages and screenshot capture on test failures
+### Details:
+1. Create a utility function for enhanced error handling that captures the current state
+2. Implement screenshot capture on test failures
+3. Add context information to error messages (e.g., current URL, element state)
+4. Store screenshots in a designated directory with timestamps and test names
+5. Update error messages to include specific guidance on potential causes of failure
+6. Ensure error details are properly displayed in test reports
+
+## 4. Add network request logging for debugging [pending]
+### Dependencies: None
+### Description: Implement logging of network requests and responses during test execution
+### Details:
+1. Set up network interception in the test framework
+2. Create a logger utility that captures request/response details
+3. Configure filtering to focus on relevant API calls
+4. Format network logs for readability (headers, body, status codes)
+5. Implement conditional logging based on test configuration
+6. Ensure sensitive information is properly masked in logs
+
+## 5. Create wait helpers and retry logic [pending]
+### Dependencies: 9.1, 9.3
+### Description: Implement helper functions for common wait patterns and custom retry logic for flaky operations
+### Details:
+1. Identify common wait patterns in the tests (network idle, URL changes, element state changes)
+2. Create helper functions for each pattern with appropriate timeouts and polling intervals
+3. Implement custom retry logic with exponential backoff for flaky operations
+4. Add detailed logging during wait/retry operations to aid debugging
+5. Update existing tests to use the new helper functions
+6. Document usage patterns and best practices for the new helpers
+

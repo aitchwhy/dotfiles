@@ -12,8 +12,9 @@ export cfzsh="${cfzsh:-$cf/zsh}"
 export USER_JUSTFILE="$cf/just/.user.justfile"
 
 alias j="just"
-# alias .j='just -g'
 alias jfmt="just --unstable --fmt"
+
+alias .j='just --justfile $USER_JUSTFILE --working-directory .'
 
 # a recipe called foo in ~/.user.justfile --> (.j foo)
 alias .j='just --justfile $USER_JUSTFILE --working-directory .'
@@ -29,7 +30,6 @@ alias .jfmt='just --justfile $USER_JUSTFILE --working-directory . --unstable --f
 ####################################
 
 alias nixh='nix --help'
-
 
 alias nixflake="$EDITOR $DOTFILES/flake.nix"
 alias nixconf="$EDITOR $cf/nix/nix.conf"
@@ -53,7 +53,6 @@ alias nixfk="nix flake"
 alias nixup="sudo nixos-rebuild switch"
 alias nixdarwinup="darwin-rebuild switch --flake ~/dotfiles"
 
-
 # Aliases
 alias v='$EDITOR'
 alias vi='$EDITOR'
@@ -68,51 +67,48 @@ alias ze="nvim '$ZDOTDIR'/{.zshrc,.zprofile,.zshenv,*.zsh} ~/.zshenv "
 
 alias e="cursor $DOTFILES"
 
-
 # FZF enhanced file selection and navigation
 function f() {
   local cmd result
-  
+
   case "$1" in
-    find|file)
-      # Find files
-      result=$(fd --type f --follow --hidden --exclude .git | fzf --preview="bat --color=always {}")
-      echo "$result"
-      ;;
-    edit)
-      # Find and edit file
-      result=$(fd --type f --follow --hidden --exclude .git | fzf --preview="bat --color=always {}")
-      [[ -n "$result" ]] && "$EDITOR" "$result"
-      ;;
-    dir)
-      # Find directories
-      result=$(fd --type d --follow --hidden --exclude .git | fzf --preview="eza --tree --level=1 --color=always {}")
-      echo "$result"
-      ;;
-    z)
-      # Jump with zoxide
-      result=$(zoxide query -l | fzf --preview="eza --tree --level=1 --color=always {}")
-      [[ -n "$result" ]] && cd "$result"
-      ;;
-    *)
-      echo "Usage: f [find|edit|dir|z]"
-      return 1
-      ;;
+  find | file)
+    # Find files
+    result=$(fd --type f --follow --hidden --exclude .git | fzf --preview="bat --color=always {}")
+    echo "$result"
+    ;;
+  edit)
+    # Find and edit file
+    result=$(fd --type f --follow --hidden --exclude .git | fzf --preview="bat --color=always {}")
+    [[ -n "$result" ]] && "$EDITOR" "$result"
+    ;;
+  dir)
+    # Find directories
+    result=$(fd --type d --follow --hidden --exclude .git | fzf --preview="eza --tree --level=1 --color=always {}")
+    echo "$result"
+    ;;
+  z)
+    # Jump with zoxide
+    result=$(zoxide query -l | fzf --preview="eza --tree --level=1 --color=always {}")
+    [[ -n "$result" ]] && cd "$result"
+    ;;
+  *)
+    echo "Usage: f [find|edit|dir|z]"
+    return 1
+    ;;
   esac
 }
-
 
 ####################################
 
 alias cheat="tldr"
 alias ch="cheat"
 
-
 # === Core Tool Aliases ===
 alias claude="/Users/hank/.claude/local/claude"
 
 # List Files - Prioritize eza with fallback to ls
-if (( $+commands[eza] )); then
+if (($ + commands[eza])); then
   alias ls="eza --icons --group-directories-first"
   alias ll="eza --icons --group-directories-first -la"
   alias la="eza --icons --group-directories-first -a"
@@ -186,8 +182,8 @@ alias dbuild='docker build'
 alias dc='docker-compose'
 alias k='k9s'
 # Modern CLI alternatives
-alias cat='bat --paging=never'       # Changed to --paging=never for better pipe compatibility
-alias less='bat --paging=always'     # Added less for when paging is desired
+alias cat='bat --paging=never'   # Changed to --paging=never for better pipe compatibility
+alias less='bat --paging=always' # Added less for when paging is desired
 alias miller='mlr'
 alias grep='rg'
 alias find='fd'
@@ -241,7 +237,7 @@ alias ld="lazydocker" # Note: Overwrites previous lg alias
 alias rx="repomix" # Note: Overwrites previous lg alias
 
 alias zj="zellij"
-alias zjls="zellij list-sessions"
+alias zjl="zellij list-sessions"
 alias zja='zellij attach "$(zellij list-sessions -n | fzf --reverse --border --no-sort --height 40% | awk '\''{print $1}'\'')"'
 alias zje="zellij edit"
 
@@ -254,42 +250,42 @@ export HOMEBREW_NO_ANALYTICS=1
 
 # FZF enhanced aliases
 # File navigation
-alias ff='f find'         # Find files
-alias fe='f edit'         # Find and edit files
-alias fdir='f dir'        # Find directories
-alias fz='f z'            # Jump with zoxide
+alias ff='f find'  # Find files
+alias fe='f edit'  # Find and edit files
+alias fdir='f dir' # Find directories
+alias fz='f z'     # Jump with zoxide
 
 # Define function for git operations with fzf
 fgit() {
   local cmd="$1"
   case "$cmd" in
-    checkout|co)
-      local branch=$(git branch --all | grep -v HEAD | fzf --preview="git log -p {}" | sed "s/.* //")
-      [[ -n "$branch" ]] && git checkout "$branch"
-      ;;
-    add)
-      local files=$(git status -s | fzf --multi --preview="git diff {2}" | awk '{print $2}')
-      [[ -n "$files" ]] && git add $files
-      ;;
-    log)
-      git log --oneline | fzf --preview="git show {1}" | cut -d' ' -f1
-      ;;
-    diff)
-      git diff --name-only | fzf --preview="git diff {}"
-      ;;
-    status)
-      git status -s | fzf --preview="git diff {2}"
-      ;;
-    *)
-      echo "Usage: fgit [checkout|add|log|diff|status]"
-      return 1
-      ;;
+  checkout | co)
+    local branch=$(git branch --all | grep -v HEAD | fzf --preview="git log -p {}" | sed "s/.* //")
+    [[ -n "$branch" ]] && git checkout "$branch"
+    ;;
+  add)
+    local files=$(git status -s | fzf --multi --preview="git diff {2}" | awk '{print $2}')
+    [[ -n "$files" ]] && git add $files
+    ;;
+  log)
+    git log --oneline | fzf --preview="git show {1}" | cut -d' ' -f1
+    ;;
+  diff)
+    git diff --name-only | fzf --preview="git diff {}"
+    ;;
+  status)
+    git status -s | fzf --preview="git diff {2}"
+    ;;
+  *)
+    echo "Usage: fgit [checkout|add|log|diff|status]"
+    return 1
+    ;;
   esac
 }
 
 # Git fzf aliases
-alias fco='fgit checkout'  # Git checkout
-alias fga='fgit add'       # Git add files
-alias fgl='fgit log'       # Git log
-alias fgs='fgit status'    # Git status
-alias fgd='fgit diff'      # Git diff
+alias fco='fgit checkout' # Git checkout
+alias fga='fgit add'      # Git add files
+alias fgl='fgit log'      # Git log
+alias fgs='fgit status'   # Git status
+alias fgd='fgit diff'     # Git diff

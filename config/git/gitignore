@@ -116,6 +116,10 @@ dist/
 .windsurfrules
 .env.example
 
+.claude/
+.cursorignore
+^scripts/
+
 
 # Added by Claude Task Master
 *.log
@@ -147,6 +151,8 @@ README-task-master.md
 # Aider AI coding helper
 #-------------------------------------------------------------------------------
 .aider*
+
+
 
 
 

@@ -1,0 +1,423 @@
+# Task ID: 1
+# Title: Leverage existing Playwright setup in gateways/noggin
+# Status: done
+# Dependencies: None
+# Priority: high
+# Description: Utilize the existing Playwright configuration within the gateways/noggin project, understand the current setup, and prepare for extending it with E2E testing for PDF functionality.
+# Details:
+1. Use the existing Playwright setup in gateways/noggin
+2. Understand the current configuration and structure
+3. Verify the environment is accessible via 'nix develop .#noggin' at project root
+4. Confirm tests can be run with 'npm i && dotenvx npm run test:e2e'
+5. Review the existing `.env` file for required variables: ANT_NOGGIN_BASE_URL, ANT_API_ADMIN_BASE_URL, ANT_TEST_USER_EMAIL, ANT_TEST_USER_PASSWORD, ANT_TEST_USER_UID
+6. Check the existing auth setup and storage mechanism
+7. Prepare to extend the test suite with PDF-specific tests
+8. Document the process of setting up dependencies with 'nix develop' and 'dotenvx run -- ant-all-services'
+
+# Test Strategy:
+Verify the existing Playwright setup works by running a simple test, and confirm the environment variables are properly loaded and accessible.
+
+# Subtasks:
+## 1. Explore existing Playwright setup [done]
+### Dependencies: None
+### Description: Examine the existing Playwright configuration in gateways/noggin to understand what's already available
+### Details:
+1. Navigate to the gateways/noggin directory
+2. Run 'nix develop .#noggin' at project root to start the nix devshell
+3. Examine the package.json to understand existing test scripts
+4. Review the existing Playwright configuration in playwright.config.ts
+5. Check for existing test files and utilities
+6. Document the current structure and available functionality
+7. Identify any gaps that need to be addressed for PDF testing
+8. Test the existing setup by running 'npm i && dotenvx npm run test:e2e'
+<info added on 2025-05-06T10:34:36.145Z>
+1. Navigate to the gateways/noggin directory
+2. Run 'nix develop .#noggin' at project root to start the nix devshell
+3. Examine the package.json to understand existing test scripts
+4. Review the existing Playwright configuration in playwright.config.ts
+5. Check for existing test files and utilities
+6. Document the current structure and available functionality
+7. Identify any gaps that need to be addressed for PDF testing
+8. Test the existing setup by running 'npm i && dotenvx npm run test:e2e'
+
+Findings from exploration:
+
+1. Package.json Configuration:
+   - Playwright version: v1.50.1
+   - E2E test command: `npm run test:e2e` runs `playwright test src/*/test-e2e/*.spec.ts`
+   - Unit tests use Vitest, not Playwright
+
+2. Playwright Configuration (playwright.config.ts):
+   - Test pattern: `**/*.spec.ts` in the `src` directory
+   - Test timeout: 60 seconds
+   - Retry configuration: 1 retry locally, 2 retries on CI
+   - Captures screenshots, traces, and videos on failures
+   - Uses HTML and list reporters
+   - Base URL: `ANT_NOGGIN_BASE_URL` with localhost:3000 fallback
+   - Three project configurations:
+     - "setup": Authentication setup
+     - "authenticated": Main test project (Chrome Desktop)
+     - "anonymous": Tests without authentication
+
+3. Authentication Setup:
+   - Implemented in auth.setup.ts
+   - UI-based login automation
+   - Stores auth state in `.auth/user.json`
+   - Uses env vars: `ANT_TEST_USER_EMAIL`, `ANT_TEST_USER_PASSWORD`, `ANT_TEST_OTP`
+   - Verifies login via auth cookies
+
+4. Test Directory Structure:
+   - Tests in `src/[module]/test-e2e/` directories
+   - Existing PDF tests in `src/pdfs/test-e2e/pdf.spec.ts`
+   - Test assets stored alongside test files
+
+5. PDF Testing Capabilities:
+   - Covers PDF upload (FormData/multipart)
+   - Polling for processing completion
+   - Extraction result verification
+   - Uses API calls for PDF processing flow
+   - Includes authenticated and anonymous tests
+   - Uses zod schemas for validation
+
+6. Environment Setup:
+   - Uses `dotenvx` for env var management
+   - Justfile helpers for environment setup
+   - Service startup with `dotenvx run -- ant-all-services`
+
+7. Required Environment Variables:
+   - `ANT_NOGGIN_BASE_URL` (default: http://localhost:3000)
+   - `ANT_TEST_USER_EMAIL`
+   - `ANT_TEST_USER_PASSWORD`
+   - `ANT_TEST_OTP` (default: 123456)
+
+8. PDF Processing API Endpoints:
+   - `/pdfs/process-pdf`: Upload/process PDFs (auth required)
+   - `/pdfs/pdf-status/:stemUid/:pdfUid`: Check status
+   - `/pdfs/pdf-extracts/:stemUid/:pdfUid`: Get extraction results
+
+The existing setup is comprehensive and well-structured for both API and UI testing, with good authentication handling and PDF processing tests. This provides a solid foundation for extending with additional PDF-specific tests.
+</info added on 2025-05-06T10:34:36.145Z>
+
+## 2. Review environment variables and configuration [done]
+### Dependencies: 1.1
+### Description: Examine the existing environment variables setup and ensure all required variables are available
+### Details:
+1. Check the existing .env file or .env.example file
+2. Verify that all required variables are defined: ANT_NOGGIN_BASE_URL, ANT_API_ADMIN_BASE_URL, ANT_TEST_USER_EMAIL, ANT_TEST_USER_PASSWORD, ANT_TEST_USER_UID
+3. Understand how dotenvx is being used in the project
+4. Check how environment variables are loaded and validated in the existing code
+5. Document any additional environment variables needed for PDF testing
+6. Test loading environment variables with dotenvx
+7. Verify the environment variables are accessible in the test environment
+<info added on 2025-05-06T10:54:19.852Z>
+1. Check the existing .env file or .env.example file
+2. Verify that all required variables are defined: ANT_NOGGIN_BASE_URL, ANT_API_ADMIN_BASE_URL, ANT_TEST_USER_EMAIL, ANT_TEST_USER_PASSWORD, ANT_TEST_USER_UID
+3. Understand how dotenvx is being used in the project
+4. Check how environment variables are loaded and validated in the existing code
+5. Document any additional environment variables needed for PDF testing
+6. Test loading environment variables with dotenvx
+7. Verify the environment variables are accessible in the test environment
+
+Environment Variables Review Findings:
+
+1. Environment Variables in .env:
+   - ANT_NOGGIN_BASE_URL is defined (line 35) but all variables are commented out in the first section
+   - Missing required testing variables:
+     - ANT_API_ADMIN_BASE_URL (needed for OTP retrieval)
+     - ANT_TEST_USER_EMAIL
+     - ANT_TEST_USER_PASSWORD
+     - ANT_TEST_USER_UID
+     - ANT_TEST_OTP (optional, defaults to 123456)
+
+2. Environment Variables Usage:
+   - auth.setup.ts uses these variables with fallbacks:
+     - ANT_NOGGIN_BASE_URL fallback: 'http://localhost:3000'
+     - ANT_TEST_USER_EMAIL fallback: 'test.user@anterior.com'
+     - ANT_TEST_USER_PASSWORD fallback: 'password123'
+     - ANT_TEST_OTP fallback: '123456'
+   - playwright.config.ts uses ANT_NOGGIN_BASE_URL with 'http://localhost:3000' fallback
+   - pdf.spec.ts uses ANT_NOGGIN_BASE_URL with 'http://localhost:3000' fallback
+
+3. Environment Variable Loading:
+   - dotenvx is used to load variables (seen in test-e2e.justfile)
+   - Command pattern: dotenvx run -- <command>
+   - Test execution: dotenvx run -- npm run test:e2e
+
+4. Test Execution Environment:
+   - Tests are run via Justfile recipe: nixd .#npm && dotenvx run -- npm run test:e2e
+   - Environment requires service startup: dotenvx run -- ant-all-services
+   - Tests wait for service health: curl -s http://localhost:20701/health
+
+5. Test User Setup Options:
+   - Can use admin CLI to create test users: ant-admin test adduser -e <EMAIL> -p <PASSWORD>
+   - Default password from data-seeder: delight-intense
+   - Internal-admin endpoint for OTP retrieval: /users/{userUid}/otp
+
+6. Additional Variables for PDF Testing:
+   - No additional environment variables are needed specifically for PDF testing
+   - PDF tests use the same base URL and authentication as other tests
+
+7. Next Steps:
+   - Create/update a .env.test file with all required variables
+   - Verify the default values in auth.setup.ts are suitable for testing
+   - Test loading the variables with dotenvx
+   - Confirm the variables are correctly loaded in the test environment
+</info added on 2025-05-06T10:54:19.852Z>
+
+## 3. Understand existing project structure [done]
+### Dependencies: 1.1, 1.2
+### Description: Review the current directory structure and identify where new PDF tests should be placed
+### Details:
+1. Examine the existing directory structure in gateways/noggin
+2. Identify the location of test files, utilities, and fixtures
+3. Check for any existing authentication setup files
+4. Review how test results are stored and reported
+5. Document the appropriate location for new PDF test files
+6. Identify any shared utilities or helpers that can be reused
+7. Check for existing patterns for test organization and follow them
+<info added on 2025-05-06T10:56:14.486Z>
+1. Examine the existing directory structure in gateways/noggin
+2. Identify the location of test files, utilities, and fixtures
+3. Check for any existing authentication setup files
+4. Review how test results are stored and reported
+5. Document the appropriate location for new PDF test files
+6. Identify any shared utilities or helpers that can be reused
+7. Check for existing patterns for test organization and follow them
+
+Project Structure Analysis:
+
+1. Overall Directory Structure:
+   - Module-based structure with separate directories for each feature (auth, pdfs, notes, etc.)
+   - Main source code in `src` directory
+   - Each module has subdirectories for tests, models, and handlers
+   - Compiled code goes to `dist` directory
+   - Authentication state storage in `.auth` directory
+
+2. Test Organization:
+   - Tests organized by module in `src/<module>/test-e2e/` directories
+   - Test files use `.spec.ts` extension
+   - Existing test modules include:
+     - `src/flonotes/test-e2e/flonotes.spec.ts`
+     - `src/hello-world/test-e2e/` (multiple test files)
+     - `src/pdfs/test-e2e/pdf.spec.ts`
+   - PDF test directory contains test fixtures: `test_1.pdf` and `test_2.pdf`
+
+3. Authentication Setup:
+   - Configured in `auth.setup.ts` at project root
+   - Uses UI-based login flow with email/password and OTP verification
+   - Stores auth state in `.auth/user.json` for reuse
+   - Authentication state loaded via Playwright storageState configuration
+
+4. Test Results Storage:
+   - Results stored in `test-results` directory
+   - Includes `.last-run.json` tracking the last test run
+   - Playwright configured to capture screenshots, videos, and traces on failure
+
+5. PDF Implementation:
+   - PDF processing handled in `src/pdfs/`
+   - Models and schemas defined in `src/pdfs/models/`
+   - Key schemas include:
+     - `stemPdfUidResponseSchema` for IDs returned after upload
+     - `stemPdfStatusResponseSchema` for status polling
+     - `pdfFlowResultSchema` for extraction results
+   - Uses zod for validation and type safety
+   - Interfaces with workflow system for PDF processing
+
+6. Test Organization Patterns:
+   - Tests grouped by feature/module
+   - Authentication-dependent tests use `authenticated` project in Playwright config
+   - Anonymous tests use `anonymous` project with `.anon.spec.ts` naming pattern
+   - Tests include fixture files in same directory
+   - Both API and UI tests follow same pattern
+
+7. PDF Test Pattern:
+   - Typical flow:
+     - Upload PDF with multipart/form-data
+     - Get stemUid and pdfUid from response
+     - Poll status until ready
+     - Fetch extractions and validate
+
+8. Location for New PDF Tests:
+   - New PDF tests should be placed in `src/pdfs/test-e2e/`
+   - Reuse existing test fixtures or add new ones in same directory
+   - Follow existing pattern of `*.spec.ts` files
+   - For anonymous tests, use `.anon.spec.ts` suffix
+
+9. Shared Utilities:
+   - No dedicated test utilities directory found
+   - Helper functions typically defined within each test file
+   - Common schemas shared in models directories
+</info added on 2025-05-06T10:56:14.486Z>
+
+## 4. Review existing Playwright configuration [done]
+### Dependencies: 1.1, 1.2, 1.3
+### Description: Examine the existing Playwright configuration to understand timeouts, browser settings, and other options
+### Details:
+1. Review the existing playwright.config.ts file
+2. Understand the configured timeouts, browser settings, and other options
+3. Check how authentication state is handled
+4. Review any custom test fixtures or setup files
+5. Document any configuration changes needed for PDF testing
+6. Verify the configuration works with the existing test runner
+7. Test running existing tests with the configuration
+<info added on 2025-05-06T10:57:39.529Z>
+1. Review the existing playwright.config.ts file
+2. Understand the configured timeouts, browser settings, and other options
+3. Check how authentication state is handled
+4. Review any custom test fixtures or setup files
+5. Document any configuration changes needed for PDF testing
+6. Verify the configuration works with the existing test runner
+7. Test running existing tests with the configuration
+
+Detailed Playwright Configuration Analysis:
+
+1. Playwright Configuration (playwright.config.ts):
+   - Test Directory and Pattern: 
+     - `testDir: './src'` - Tests are located in the src directory
+     - `testMatch: '**/*.spec.ts'` - Files matching this pattern are considered tests
+   
+   - Timeout Configuration:
+     - Default test timeout: 60 seconds (`timeout: 60 * 1000`)
+   
+   - Retry Strategy:
+     - 1 retry in local environments
+     - 2 retries in CI environments (`retries: process.env.CI ? 2 : 1`)
+   
+   - Parallelization:
+     - Serial execution in CI (`workers: process.env.CI ? 1 : undefined`)
+     - Parallel execution in local development (default Playwright behavior)
+   
+   - Reporting:
+     - HTML reporter for visual test results
+     - List reporter for CLI output (`reporter: [['html'], ['list']]`)
+   
+   - Global Test Settings:
+     - Base URL: `process.env.ANT_NOGGIN_BASE_URL || 'http://localhost:3000'`
+     - Trace capture on first retry: `trace: 'on-first-retry'`
+     - Screenshots on failure: `screenshot: 'only-on-failure'`
+     - Video on failure: `video: 'on-first-retry'`
+   
+   - Project Configuration (3 projects):
+     1. `setup` - For authentication setup in auth.setup.ts
+     2. `authenticated` - Main test project using Chrome with stored auth state
+        - Uses Desktop Chrome browser
+        - Loads authentication state from `.auth/user.json`
+        - Depends on the 'setup' project running first
+        - Ignores auth.setup.ts and *.anon.spec.ts files
+     3. `anonymous` - For tests that don't require authentication
+        - Runs tests with .anon.spec.ts naming pattern
+        - Also runs auth.setup.ts (not clear why)
+
+2. Authentication State Handling:
+   - Auth state stored in `.auth/user.json` using `storageState` Playwright feature
+   - State includes cookies and localStorage
+   - Auth depends on cookie verification (`auth_indicator` and `access_token`)
+   - Directory created if it doesn't exist during authentication
+
+3. Test Execution and Environment:
+   - Tests are run via `test-e2e.justfile`
+   - Execution flow:
+     1. Start services with `nixd && dotenvx run -- ant-all-services`
+     2. Wait for Noggin health check to pass
+     3. Stop Noggin service to run tests in isolation
+     4. Run tests with `dotenvx run -- npm run test:e2e`
+   - Clean up command removes test artifacts and auth state
+   - Test Command: `playwright test src/*/test-e2e/*.spec.ts`
+
+4. Custom Test Setup:
+   - Authentication in `auth.setup.ts` at project root
+   - Form-based login with email/password
+   - OTP verification for 2FA
+   - Storage state persistence after successful login
+   - No custom fixtures or test utilities found
+   - Test state is isolated between runs (clean .auth directory)
+
+5. PDF Testing Configuration:
+   - Existing PDF tests use: 
+     - API-based upload test
+     - Status polling with retries
+     - Result validation
+   - Test fixtures: `test_1.pdf` and `test_2.pdf` 
+   - No special configuration needed for PDF tests beyond standard authentication
+
+6. Configuration Evaluation for PDF Testing:
+   - Current configuration is suitable for PDF testing needs
+   - Timeouts (60s) should be sufficient for PDF processing tests
+   - Retry mechanism helps with flaky tests
+   - Screenshot and trace capture helpful for debugging
+   - Authentication setup works as needed
+   - No custom PDF-specific configuration necessary
+</info added on 2025-05-06T10:57:39.529Z>
+
+## 5. Understand existing authentication mechanism [done]
+### Dependencies: 1.1, 1.2, 1.3, 1.4
+### Description: Review how authentication is currently handled in the existing tests
+### Details:
+1. Examine any existing authentication setup files
+2. Understand how login credentials are used
+3. Check how authentication state is stored and reused
+4. Review any OTP handling if it exists
+5. Document the authentication flow for reuse in PDF tests
+6. Test the existing authentication mechanism
+7. Identify any improvements or extensions needed for PDF testing
+<info added on 2025-05-06T10:58:48.686Z>
+1. Examine any existing authentication setup files
+2. Understand how login credentials are used
+3. Check how authentication state is stored and reused
+4. Review any OTP handling if it exists
+5. Document the authentication flow for reuse in PDF tests
+6. Test the existing authentication mechanism
+7. Identify any improvements or extensions needed for PDF testing
+
+Authentication Implementation Analysis:
+- Authentication is implemented in `auth.setup.ts` at project root
+- Uses UI-based login flow with Two-Factor Authentication (2FA) via OTP
+- Authentication state stored in `.auth/user.json` using Playwright's storageState feature
+- Authentication runs during Playwright's setup phase before actual tests
+
+Login Flow Details:
+- Navigation to `/auth/login.html`
+- Credentials input using selectors: `input[name="email"]` and `input[name="password"]`
+- Environment variables used: `ANT_TEST_USER_EMAIL` and `ANT_TEST_USER_PASSWORD`
+- Default fallback credentials: 'test.user@anterior.com' and 'password123'
+- Form submission via `button[type="submit"]`
+- Redirection to OTP verification page (`/otp-verify.html`)
+
+OTP Verification Flow:
+- OTP code input in `input[name="otp"]`
+- Uses environment variable: `ANT_TEST_OTP` with default fallback: '123456'
+- Form submission and waiting for redirection to protected page
+- Accepts `/flonotes` or `/health` as valid destinations
+- Authentication verified via cookie presence
+
+Authentication Verification:
+- Checks for authentication cookies: `auth_indicator` and `access_token`
+- Storage state saved after successful verification
+- JWT tokens used for API authentication
+
+Backend Authentication:
+- Login POST to `/api/v1/login` creates OTP
+- OTP verification POST to `/api/v1/otp/verify` returns JWT tokens
+- Tokens set as cookies with specific expiry times
+- Token payloads include user information and enterprise IDs
+
+Test Authentication Configuration:
+- Playwright projects configured with different authentication needs:
+  - `setup`: Runs authentication setup
+  - `authenticated`: Uses stored authentication state
+  - `anonymous`: Runs without authentication
+- PDF tests run in authenticated project context
+- Authentication verified by checking API response status codes
+
+Error Handling:
+- Login failures handled with console errors
+- Cookie verification provides fallback to confirm authentication
+- Missing access_token results in warning but doesn't stop execution
+
+Improvement Areas for PDF Testing:
+- Add explicit failure for missing authentication
+- Implement token refresh mechanism for long-running tests
+- Add more detailed logging for authentication issues
+- Create retry mechanism for intermittent authentication failures
+</info added on 2025-05-06T10:58:48.686Z>
+
