@@ -142,16 +142,16 @@ FPATH="$HOMEBREW_PREFIX/share/zsh/site-functions:$FPATH"
 
 # Nix completions for ZSH
 if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
-# nix.sh - setups up nix environment. Usually created by nix installer
-source /etc/profile.d/nix.sh
+  # nix.sh - setups up nix environment. Usually created by nix installer
+  source /etc/profile.d/nix.sh
   # Source Nix environment
   source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
-	# Add Nix ZSH completion if available
-	if [ -e "${HOME}/.nix-profile/share/zsh/site-functions/_nix" ]; then
-		fpath+=(~/.nix-profile/share/zsh/site-functions)
-	elif [ -e '/nix/var/nix/profiles/default/share/zsh/site-functions/_nix' ]; then
-		fpath+=(/nix/var/nix/profiles/default/share/zsh/site-functions)
-	fi
+  # Add Nix ZSH completion if available
+  if [ -e "${HOME}/.nix-profile/share/zsh/site-functions/_nix" ]; then
+    fpath+=(~/.nix-profile/share/zsh/site-functions)
+  elif [ -e '/nix/var/nix/profiles/default/share/zsh/site-functions/_nix' ]; then
+    fpath+=(/nix/var/nix/profiles/default/share/zsh/site-functions)
+  fi
 fi
 
 # tell zsh where to find our completions
