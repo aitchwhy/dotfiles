@@ -1,0 +1,51 @@
+# Task ID: 3
+# Title: Create OTP retrieval functionality
+# Status: done
+# Dependencies: 1
+# Priority: high
+# Description: Implement the helper function to retrieve the one-time password for the test user from the Internal-Admin API.
+# Details:
+1. Check if an OTP helper already exists in the project
+2. If needed, create or extend a utility file `otp-helper.ts`
+3. Implement the `getCurrentOtp(uid: string)` function that makes a GET request to `/users/{userUid}/otp`
+4. Add proper error handling and retries for network failures
+5. Parse the response to extract the OTP value from the `{ OTP: string }` format
+6. Add support for the optional ANT_TEST_OTP environment variable to override the API call
+7. Implement logging for OTP retrieval steps
+8. Add validation to ensure the OTP is in the expected format
+9. Export the function for use in the authentication setup
+
+# Test Strategy:
+Create a unit test for the OTP helper function that verifies it can successfully retrieve and parse an OTP from a mock API response, and that it correctly handles the environment variable override. Run the test using the existing Playwright setup.
+
+# Subtasks:
+## 1. Create or identify OTP helper utility file [done]
+### Dependencies: None
+### Description: Check if an OTP helper already exists in the project. If not, create a new utility file named `otp-helper.ts` in the appropriate directory.
+### Details:
+Search the codebase for existing OTP-related functionality. If none exists, create a new file in the utils/helpers directory. Set up the basic file structure with imports, exports, and TypeScript types. Include JSDoc comments for the file purpose.
+
+## 2. Implement the getCurrentOtp function with API integration [done]
+### Dependencies: 3.1
+### Description: Create the core function that retrieves OTP by making a GET request to the Internal-Admin API endpoint.
+### Details:
+Implement `getCurrentOtp(uid: string): Promise<string>` that makes a GET request to `/users/{userUid}/otp`. Use the appropriate HTTP client from the project (axios, fetch, etc.). Handle the response parsing to extract the OTP value from the `{ OTP: string }` format. Return the OTP string.
+
+## 3. Add error handling and retry mechanism [done]
+### Dependencies: 3.2
+### Description: Enhance the getCurrentOtp function with proper error handling and retry logic for network failures.
+### Details:
+Implement try/catch blocks to handle API errors. Add a retry mechanism that attempts the request up to 3 times with exponential backoff. Log appropriate error messages. Return a meaningful error if all retries fail. Consider using existing retry utilities if available in the project.
+
+## 4. Implement environment variable override and validation [done]
+### Dependencies: 3.2
+### Description: Add support for the ANT_TEST_OTP environment variable and implement OTP format validation.
+### Details:
+Check for the ANT_TEST_OTP environment variable at the beginning of the function. If present, use its value instead of making the API call. Add validation to ensure the OTP is in the expected format (typically 6 digits). Throw an error if the OTP format is invalid. Document this override feature in the function's JSDoc.
+
+## 5. Add logging and finalize the helper for export [done]
+### Dependencies: 3.3, 3.4
+### Description: Implement logging for OTP retrieval steps and ensure the function is properly exported for use in authentication setup.
+### Details:
+Add detailed logging at each step of the OTP retrieval process (starting retrieval, API response received, using environment variable, etc.). Use the project's standard logging mechanism. Ensure the function is properly exported from the module. Add comprehensive JSDoc documentation for the function including parameters, return values, exceptions, and usage examples. Test the function to ensure it works as expected.
+

@@ -8,10 +8,7 @@
 # - https://gist.github.com/Linerre/f11ad4a6a934dcf01ee8415c9457e7b2
 # - https://mac.install.guide/terminal/zshrc-zprofile
 echo "Loading .zprofile from $ZDOTDIR"
-echo "Loading /etc/profile.d/nix.sh from $ZDOTDIR"
-
-# nix.sh - setups up nix environment. Usually created by nix installer
-source /etc/profile.d/nix.sh
+# echo "Loading /etc/profile.d/nix.sh from $ZDOTDIR"
 
 # ========================================================================
 # Homebrew Setup (install if not installed)
@@ -23,21 +20,6 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # zsh setup
 # TODO: fzf-zsh https://github.com/unixorn/fzf-zsh-plugin
-
-# minio / s3 frontend -> http://localhost:51021
-# noggin server -> http://localhost:59000
-# vibes frontend -> http://localhost:3000
-# prefect (job runner) -> http://localhost:52000/runs/flow-run
-
-# MINIO_S3_STORAGE="http://localhost:51021/"
-# NOGGIN_SERVER="http://localhost:59000/"
-# VIBES_FRONTEND="http://localhost:3000/"
-# PREFECT_JOB_RUNNER="http://localhost:52000/runs/flow-run"1
-#
-
-# https://nix.dev/manual/nix/2.28/installation/env-variables.html?highlight=ssl#nix_ssl_cert_file
-
-
 
 
 # ========================================================================
@@ -56,10 +38,29 @@ typeset -U path PATH
 
 export COLORTERM="truecolor"
 
-. "$HOME/.cargo/env"
-export PATH="$HOME/.npm-global/bin/:$PATH"
+paths=(
+  # last in PATH
+  "$HOME/.cargo/bin"
+  "$HOME/.npm-global/bin"
+  "$HOME/.volta/bin"
+  "$HOME/.nix-profile/bin"
+  "/nix/var/nix/profiles/default/bin"
+  # first in PATH
+)
+for p in "${paths[@]}"; do 
+  export PATH="$p:$PATH"
+done
+
+export PATH
+
+# export PATH="$HOME/.npm-global/bin/:$PATH"
 export VOLTA_HOME="$HOME/.volta"
-export PATH="$VOLTA_HOME/bin:$PATH"
+# export PATH="$VOLTA_HOME/bin:$PATH"
+
+# Add Nix to path
+# export PATH=$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH
+
+. "$HOME/.cargo/env"
 
 # Added by OrbStack: command-line tools and integration
 # This won't be added again if you remove it.

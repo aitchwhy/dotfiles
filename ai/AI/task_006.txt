@@ -1,0 +1,71 @@
+# Task ID: 6
+# Title: Develop PDF upload test flow
+# Status: pending
+# Dependencies: 5
+# Priority: medium
+# Description: Create a test that loads the authenticated state and implements the PDF upload functionality.
+# Details:
+1. Create `pdf.spec.ts` that loads the storage state from `.auth/user.json` or uses the existing auth mechanism
+2. Add a test fixture that includes a sample PDF file for testing
+3. Implement navigation to the PDF upload page
+4. Create selectors for the PDF upload form elements
+5. Implement the file upload functionality using Playwright's file input handling
+6. Add submission of the upload form and wait for the network request to `/pdfs/process-pdf`
+7. Parse the response to extract `stemUid` and `pdfUid` values
+8. Store these values for use in subsequent steps
+9. Implement error handling for upload failures
+
+# Test Strategy:
+Run the test using the existing Playwright setup with 'npm i && dotenvx npm run test:e2e' to verify it can successfully load the authenticated state, navigate to the PDF upload page, upload a test PDF file, and receive a valid response with the required UIDs.
+
+# Subtasks:
+## 1. Create PDF test file and setup authentication [pending]
+### Dependencies: None
+### Description: Set up the test file structure with authentication and prepare the PDF test fixture
+### Details:
+1. Create a new file `pdf.spec.ts` in the tests directory
+2. Set up the test to use authentication by loading the storage state from `.auth/user.json`
+3. Add a sample PDF file to the test fixtures directory
+4. Create a test fixture that references this PDF file for testing
+5. Implement basic test structure with beforeEach and test cases
+
+## 2. Implement navigation and PDF upload form interaction [pending]
+### Dependencies: 6.1
+### Description: Navigate to the PDF upload page and implement selectors for form elements
+### Details:
+1. Create selectors for the PDF upload page elements (form, input fields, submit button)
+2. Implement navigation to the PDF upload page
+3. Verify the upload form is visible and accessible
+4. Create helper functions to interact with the form elements
+5. Add assertions to verify the page is in the expected state before upload
+
+## 3. Implement PDF file upload functionality [pending]
+### Dependencies: 6.2
+### Description: Add the actual file upload implementation using Playwright's file input handling
+### Details:
+1. Use Playwright's `setInputFiles()` method to upload the PDF fixture to the file input
+2. Implement verification that the file was successfully selected
+3. Add any required form field completions (filename, description, etc.)
+4. Create a function to trigger the form submission
+5. Add appropriate waiting mechanisms for upload processing indicators
+
+## 4. Implement network request monitoring and response handling [pending]
+### Dependencies: 6.3
+### Description: Monitor the network for the PDF processing request and extract response data
+### Details:
+1. Set up a Playwright network request listener for the `/pdfs/process-pdf` endpoint
+2. Submit the upload form and wait for the network request to complete
+3. Parse the response to extract `stemUid` and `pdfUid` values
+4. Store these values in test variables for later use
+5. Add assertions to verify the response contains the expected data structure
+
+## 5. Implement error handling and edge cases [pending]
+### Dependencies: 6.4
+### Description: Add comprehensive error handling for the PDF upload process
+### Details:
+1. Implement tests for various error scenarios (invalid file type, file too large, server errors)
+2. Add appropriate error message verification
+3. Test recovery paths after errors
+4. Implement cleanup of any test artifacts
+5. Add final assertions to verify the complete upload flow works end-to-end
+

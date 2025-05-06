@@ -1,0 +1,51 @@
+# Task ID: 4
+# Title: Build OTP verification flow
+# Status: pending
+# Dependencies: 2, 3
+# Priority: high
+# Description: Implement the functionality to fill in the OTP code on the verification page and submit it to complete the authentication process.
+# Details:
+1. Check if OTP verification is already implemented in the existing auth setup
+2. If needed, extend `auth.setup.ts` to wait for the OTP verification page to load
+3. Call the OTP helper function to retrieve the current OTP for the test user
+4. Create selectors for the OTP input field using data-testid attributes when available
+5. Implement filling the OTP code into the verification form
+6. Add form submission and wait for the network request to `/api/v1/otp/verify`
+7. Implement waiting for successful redirection after OTP verification
+8. Add verification that the user is redirected to a protected page
+9. Implement error handling for OTP verification failures
+
+# Test Strategy:
+Run the test using the existing Playwright setup with 'npm i && dotenvx npm run test:e2e' to verify it can successfully retrieve an OTP, fill it in the verification form, submit it, and be redirected to a protected page, indicating successful authentication.
+
+# Subtasks:
+## 1. Analyze existing auth setup for OTP verification [pending]
+### Dependencies: None
+### Description: Examine the current authentication implementation to determine if OTP verification is already implemented and what modifications are needed.
+### Details:
+Review the existing `auth.setup.ts` file to understand the current authentication flow. Check if there are any OTP-related functions or placeholders. Document what needs to be extended or created to support OTP verification. Identify any existing OTP helper functions that might be available for retrieving test OTPs.
+
+## 2. Extend auth setup to handle OTP verification page [pending]
+### Dependencies: 4.1
+### Description: Modify the authentication setup to wait for and recognize the OTP verification page during the authentication flow.
+### Details:
+Extend `auth.setup.ts` to include logic that waits for the OTP verification page to load after initial login. Add a function to detect when the OTP page is fully loaded and ready for input. Implement timeout handling in case the OTP page doesn't appear as expected. Create and export any necessary page objects or selectors for the OTP verification page.
+
+## 3. Implement OTP code retrieval and form filling [pending]
+### Dependencies: 4.2
+### Description: Create functionality to retrieve the current OTP for the test user and fill it into the verification form.
+### Details:
+Implement or call the OTP helper function to retrieve the current valid OTP for the test user. Create selectors for the OTP input field(s) using data-testid attributes when available, or fallback to other reliable selectors. Develop a function to fill the retrieved OTP code into the verification form, handling different input formats (single field or multiple fields for individual digits).
+
+## 4. Add form submission and request handling [pending]
+### Dependencies: 4.3
+### Description: Implement the submission of the OTP form and handle the verification network request.
+### Details:
+Create functionality to submit the OTP verification form after filling in the code. Implement waiting for the network request to `/api/v1/otp/verify` to complete. Add logic to detect successful verification responses versus error responses. Handle potential rate limiting or throttling during OTP verification attempts. Implement appropriate waiting mechanisms for the verification process to complete.
+
+## 5. Implement post-verification validation and error handling [pending]
+### Dependencies: 4.4
+### Description: Add functionality to verify successful authentication and handle potential OTP verification failures.
+### Details:
+Implement waiting for successful redirection after OTP verification. Add verification that the user is redirected to the expected protected page. Create comprehensive error handling for various OTP verification failure scenarios (invalid code, expired code, too many attempts, etc.). Add appropriate error messages and recovery strategies for test failures. Document the complete OTP verification flow for future reference.
+
