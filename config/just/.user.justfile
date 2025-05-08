@@ -1,18 +1,20 @@
 # just is a command runner, Justfile is very similar to Makefile, but simpler.
 
-# hostname
-hostname := `uname -n`
+# settings
+set hostname := `uname -n`
+set shell := ["zsh", "-cu"]
+
+# 
+
+
+# ========================================================================
+# System & Environment Management
+# ========================================================================
 
 # List all the just commands
 default:
   @just --list
 
-# Display system information
-system-info:
-  @echo "CPU architecture: {{ arch() }}"
-  @echo "Operating system type: {{ os_family() }}"
-  @echo "Operating system: {{ os() }}"
-  @echo "Home directory: {{ home_directory() }}"
 
 # --- Default & Utility Recipes ---
 [group('global')]
@@ -24,8 +26,210 @@ fmt:
   @echo "Formatting {{ justfile() }}..."
   @just --unstable --fmt
 
+# Display system information
+system-info:
+  @echo "CPU architecture: {{ arch() }}"
+  @echo "Operating system type: {{ os_family() }}"
+  @echo "Operating system: {{ os() }}"
+  @echo "Home directory: {{ home_directory() }}"
 
-# Add these recipes to your user justfile
+# Update dotfiles repo
+[working-directory("~/dotfiles")]
+dots-update:
+  @git pull
+
+dots-edit:
+  $EDITOR ~/dotfiles/config/just/.user.justfile
+
+# Global justfile for common tasks
+# Usage: j <recipe>
+
+# Default recipe to show available recipes
+default:
+    @just --list
+
+# Update all package managers and tools
+update:
+    @echo "Updating system packages and tools..."
+    brew update && brew upgrade && brew cleanup
+    command -v volta >/dev/null && volta list || true
+    command -v nix >/dev/null && nix-env -u || true
+    command -v rustup >/dev/null && rustup update || true
+
+# Clean up system disk space
+cleanup: cleanup-brew cleanup-nix cleanup-node
+    @echo "System cleanup completed"
+
+# Clean Homebrew cache and remove old versions
+cleanup-brew:
+    brew cleanup --prune=all
+    brew autoremove
+
+# Clean Nix store
+cleanup-nix:
+    command -v nix-collect-garbage >/dev/null && nix-collect-garbage -d || true
+
+# Clean npm/node caches
+cleanup-node:
+    command -v npm >/dev/null && npm cache clean --force || true
+    rm -rf ~/.npm/_cacache 2>/dev/null || true
+
+# Show system information
+info:
+    @echo "System Information"
+    @echo "=================="
+    @echo "OS: $(uname -s) $(uname -r)"
+    @echo "Architecture: $(uname -m)"
+    command -v sw_vers >/dev/null && sw_vers || true
+    @echo "\nBrew:"
+    command -v brew >/dev/null && brew config | grep HOMEBREW || true
+    @echo "\nShell: $SHELL ($(basename $SHELL))"
+    @echo "\nNode: $(command -v node >/dev/null && node --version || echo 'not installed')"
+    @echo "npm: $(command -v npm >/dev/null && npm --version || echo 'not installed')"
+    @echo "Nix: $(command -v nix >/dev/null && nix --version || echo 'not installed')"
+    @echo "Python: $(command -v python3 >/dev/null && python3 --version || echo 'not installed')"
+    @echo "Ruby: $(command -v ruby >/dev/null && ruby --version || echo 'not installed')"
+
+# # ========================================================================
+# # dotfiles Management
+# # ========================================================================
+
+# # Update dotfiles repo
+# dotfiles-update:
+#     @cd ~/dotfiles && git pull
+
+# # Edit global justfile
+# edit-just:
+#     $EDITOR ~/dotfiles/config/just/justfile
+
+# # Initialize or update Nix tools
+# nix-setup:
+#     @echo "Setting up Nix environment..."
+#     mkdir -p ~/.config/nix
+#     cp ~/dotfiles/config/nix/shell-compat.sh ~/.config/nix/ 2>/dev/null || true
+#     chmod +x ~/.config/nix/shell-compat.sh 2>/dev/null || true
+#     @echo "Nix environment setup complete"
+
+# # Fix zsh configuration
+# zsh-fix:
+#     @echo "Fixing ZSH configuration..."
+#     mkdir -p ~/.config/zsh
+#     cp ~/dotfiles/config/zsh/.zshrc ~/.config/zsh/ 2>/dev/null || true
+#     @echo "ZSH configuration fixed. Please restart your terminal."
+
+# # Fix direnv integration with nix
+# direnv-fix:
+#     @echo "Fixing direnv integration..."
+#     mkdir -p ~/.config/direnv
+#     cp ~/dotfiles/config/direnv/direnvrc ~/.config/direnv/ 2>/dev/null || true
+#     cp ~/dotfiles/config/direnv/nix.direnvrc ~/.config/direnv/ 2>/dev/null || true
+#     cp ~/dotfiles/config/direnv/envrc.template ~/.config/direnv/ 2>/dev/null || true
+#     @echo "Direnv configuration fixed"
+
+# # Fix platform Nix integration
+# nix-fix PATH="~/src/platform":
+#     @echo "Fixing Nix integration for {{PATH}}..."
+#     ~/dotfiles/scripts/fix-platform-nix.sh {{PATH}} 2>/dev/null || echo "Fix script not found or failed"
+
+# # ========================================================================
+# # Git Helpers
+# # ========================================================================
+
+# # Setup conventional commits for current repo
+# git-setup-conv:
+#     echo "Setting up conventional commits for this repository..."
+#     npm init -y >/dev/null 2>&1 || true
+#     npm install --save-dev @commitlint/cli @commitlint/config-conventional commitizen cz-git husky
+#     npx husky init
+#     npx husky add .husky/commit-msg 'npx --no-install commitlint --edit "$1"'
+#     echo 'module.exports = { extends: ["@commitlint/config-conventional"] };' > commitlint.config.js
+#     echo '{ "path": "cz-git" }' > .czrc
+#     echo "Conventional commits setup complete."
+#     echo "Use 'git cz' or 'npx cz' to create commits."
+
+# # Create a new branch for a feature
+# git-feature NAME:
+#     git checkout -b "feature/{{NAME}}"
+#     git push -u origin "feature/{{NAME}}"
+
+# # Create a new branch for a bugfix
+# git-bugfix NAME:
+#     git checkout -b "bugfix/{{NAME}}"
+#     git push -u origin "bugfix/{{NAME}}"
+
+# # Show recent branches
+# git-recent:
+#     git for-each-ref --sort=-committerdate --count=10 --format='%(refname:short)' refs/heads/
+
+# # ========================================================================
+# # Development Helpers
+# # ========================================================================
+
+# # Generate a .envrc file for current directory
+# gen-envrc:
+#     @echo "Generating .envrc file for current directory..."
+#     @if [ -f ~/dotfiles/config/direnv/envrc.template ]; then \
+#         cp ~/dotfiles/config/direnv/envrc.template ./.envrc; \
+#     else \
+#         echo 'use flake' > ./.envrc; \
+#         echo 'PATH_add scripts' >> ./.envrc; \
+#         echo 'PATH_add node_modules/.bin' >> ./.envrc; \
+#     fi
+#     @echo ".envrc file created. Run 'direnv allow' to enable it."
+
+# # Create a new project from template
+# new-project-node NAME:
+#     mkdir -p {{NAME}}
+#     cd {{NAME}} && npm init -y
+#     cd {{NAME}} && echo 'node_modules' > .gitignore
+#     cd {{NAME}} && echo '.env' >> .gitignore
+#     cd {{NAME}} && echo "# {{NAME}}" > README.md
+#     cd {{NAME}} && git init
+#     cd {{NAME}} && git add .
+#     cd {{NAME}} && git commit -m "Initial commit"
+#     @echo "Node project created at {{NAME}}"
+
+# # Create a new Python project
+# new-project-python NAME:
+#     mkdir -p {{NAME}}
+#     cd {{NAME}} && python3 -m venv .venv
+#     cd {{NAME}} && echo '.venv' > .gitignore
+#     cd {{NAME}} && echo '__pycache__' >> .gitignore
+#     cd {{NAME}} && echo '*.pyc' >> .gitignore
+#     cd {{NAME}} && echo "# {{NAME}}" > README.md
+#     cd {{NAME}} && git init
+#     cd {{NAME}} && git add .
+#     cd {{NAME}} && git commit -m "Initial commit"
+#     @echo "Python project created at {{NAME}}"
+
+# # ========================================================================
+# # Utility Commands
+# # ========================================================================
+
+# # Copy current directory path to clipboard
+# copy-path:
+#     pwd | tr -d '\n' | pbcopy
+#     @echo "Current directory path copied to clipboard"
+
+# # Generate a random password
+# password LENGTH="16":
+#     LC_ALL=C tr -dc 'A-Za-z0-9!@#$%^&*()-_=+[]{}|;:,.<>?' < /dev/urandom | head -c {{LENGTH}}; echo
+
+# # Start a simple HTTP server in current directory
+# serve PORT="8000":
+#     @echo "Starting HTTP server on port {{PORT}}..."
+#     python3 -m http.server {{PORT}}
+
+# # Find big files in current directory
+# find-big:
+#     find . -type f -size +10M -exec ls -lh {} \; | sort -k5hr | head -n 10
+
+
+# # Fix Nix integration
+# nix-fix:
+#   @echo "Fixing Nix integration for the platform project..."
+#   @echo "This would run the fix script if this was not a test"
+
 
 # Run Noggin E2E tests with proper setup
 # noggin-e2e:
