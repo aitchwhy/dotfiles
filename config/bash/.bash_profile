@@ -3,11 +3,6 @@ export PATH="$HOME/dotfiles/bin:$PATH"
 
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
-# --- Atuin ---
-export ATUIN_CONFIG_DIR="$dotfiles/config/atuin"
-local ATUIN_ENV_CMD="$HOME/.atuin/bin/env"
-[[ -f $ATUIN_ENV_CMD ]] && . $ATUIN_ENV_CMD
-
 # Source bashrc if it exists
 if [ -f "$HOME/.bashrc" ]; then
   . "$HOME/.bashrc"

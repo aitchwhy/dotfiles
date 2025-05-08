@@ -1,9 +1,11 @@
 # Taps (Third-Party Repositories)
+tap "dotenvx/brew"
+tap "f1bonacc1/tap"
 tap "koekeishiya/formulae"
+tap "localstack/tap"
+tap "nikitabobko/tap"
 tap "oven-sh/bun"
 tap "spider-rs/spider-cloud-cli"
-tap "f1bonacc1/tap"
-tap "nikitabobko/tap"
 
 # Formulae (Development & Utility CLIs)
 # Rust toolchain manager (Requires post-install script execution)
@@ -1755,3 +1757,4 @@ tap "dotenvx/brew"
 brew "dotenvx/brew/dotenvx"
 cask "nikitabobko/tap/aerospace"
 brew "taplo"
+brew "editorconfig"

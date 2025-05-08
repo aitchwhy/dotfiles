@@ -68,13 +68,13 @@ nix-fix:
 
 # Create a new branch for a feature
 git-feature NAME:
-    git checkout -b "feature/{{NAME}}"
-    git push -u origin "feature/{{NAME}}"
+    git checkout -b "feature/{{ NAME }}"
+    git push -u origin "feature/{{ NAME }}"
 
 # Create a new branch for a bugfix
 git-bugfix NAME:
-    git checkout -b "bugfix/{{NAME}}"
-    git push -u origin "bugfix/{{NAME}}"
+    git checkout -b "bugfix/{{ NAME }}"
+    git push -u origin "bugfix/{{ NAME }}"
 
 # Show recent branches
 git-recent:
@@ -84,13 +84,23 @@ git-recent:
 # Platform Specific Commands
 # ========================================================================
 
-# Platform specific commands
-platform-start:
-    cd ~/src/platform && nix develop --command zsh -c "./scripts/ant-all-services"
+# Platform command
+ant-platform:
+    cd ~/src/platform && nix develop -c "ant-all-services"
 
 # Anterior services
-anterior-noggin:
+ant-platform-noggin: ant-platform
     cd ~/src/platform && nix develop --command zsh -c "./scripts/ant-all-services noggin"
 
-anterior-all:
-    cd ~/src/platform && nix develop --command zsh -c "./scripts/ant-all-services api user s3 prefect-worker prefect-agent prefect-server data-seeder"
+ant-vibes-deploy-local app:
+    cd ~/src/vibes/apps/{{ app }} && ./deploy-local.sh
+
+ant-vibes-build:
+    just ant-vibes-deploy-local flonotes
+    just ant-vibes-deploy-local flopilot
+
+# ant-dev:
+#   cd ~/src/platform && nix develop .#npm -c
+
+ant-noggin:
+    cd ~/src/platform && source .env && npm ci --ignore-scripts && ant-npm-build-deptree noggin && cd gateways/noggin && npm install

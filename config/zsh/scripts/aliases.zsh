@@ -5,6 +5,8 @@ export dot="${dot:-$DOTFILES}"
 export cf="${cf:-$DOTFILES/config}"
 export cfzsh="${cfzsh:-$cf/zsh}"
 
+
+
 ####################################
 # justfile
 ####################################

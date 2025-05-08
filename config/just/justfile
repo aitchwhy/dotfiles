@@ -164,24 +164,6 @@ new-project-python NAME:
     @echo "Python project created at {{NAME}}"
 
 # ========================================================================
-# Platform Specific Commands
-# ========================================================================
-
-# Platform command
-platform-start:
-    cd ~/src/platform && nix develop --command zsh -c "./scripts/ant-all-services"
-
-# Anterior services
-anterior-noggin:
-    cd ~/src/platform && nix develop --command zsh -c "./scripts/ant-all-services noggin"
-
-anterior-all:
-    cd ~/src/platform && nix develop --command zsh -c "./scripts/ant-all-services api user s3 prefect-worker prefect-agent prefect-server data-seeder"
-
-anterior-prune:
-    cd ~/src/platform && nix develop --command zsh -c "./scripts/ant-system-prune"
-
-# ========================================================================
 # Utility Commands
 # ========================================================================
 

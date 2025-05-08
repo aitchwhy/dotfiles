@@ -139,19 +139,18 @@ fi
 # Completions setup
 FPATH="$HOMEBREW_PREFIX/share/zsh/site-functions:$FPATH"
 
-
 # Nix completions for ZSH
 if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
-  # nix.sh - setups up nix environment. Usually created by nix installer
-  source /etc/profile.d/nix.sh
-  # Source Nix environment
-  source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
-  # Add Nix ZSH completion if available
-  if [ -e "${HOME}/.nix-profile/share/zsh/site-functions/_nix" ]; then
-    fpath+=(~/.nix-profile/share/zsh/site-functions)
-  elif [ -e '/nix/var/nix/profiles/default/share/zsh/site-functions/_nix' ]; then
-    fpath+=(/nix/var/nix/profiles/default/share/zsh/site-functions)
-  fi
+	# nix.sh - setups up nix environment. Usually created by nix installer
+	source /etc/profile.d/nix.sh
+	# Source Nix environment
+	source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+	# Add Nix ZSH completion if available
+	if [ -e "${HOME}/.nix-profile/share/zsh/site-functions/_nix" ]; then
+		fpath+=(~/.nix-profile/share/zsh/site-functions)
+	elif [ -e '/nix/var/nix/profiles/default/share/zsh/site-functions/_nix' ]; then
+		fpath+=(/nix/var/nix/profiles/default/share/zsh/site-functions)
+	fi
 fi
 
 # tell zsh where to find our completions
@@ -398,11 +397,15 @@ alias k='k9s'         # k9s - Kubernetes CLI
 alias ld="lazydocker" # lazydocker - Docker TUI
 
 # --- Just Task Runner ---
-alias j='$HOME/dotfiles/scripts/j'
-alias jfmt="just --unstable --fmt"
-# alias jg='just --justfile $HOME/dotfiles/config/just/global.justfile'
-alias .j='just --justfile $USER_JUSTFILE --working-directory .'
-alias .jfmt='just --justfile $USER_JUSTFILE --working-directory . --unstable --fmt'
+# alias j='~/dotfiles/scripts/j'
+# alias .j='~/dotfiles/scripts/j'
+alias j="just"
+alias .j='just --justfile ~/dotfiles/config/just/global.justfile'
+# alias .jfmt='just --justfile ~/dotfiles/config/just/global.justfile --working-directory . --unstable --fmt'
+# alias .j='$HOME/dotfiles/scripts/j'
+# alias jfmt="just --unstable --fmt"
+# # alias jg='just --justfile $HOME/dotfiles/config/just/global.justfile'
+# alias .jfmt='just --justfile $USER_JUSTFILE --working-directory . --unstable --fmt'
 
 # --- FZF Enhanced Commands ---
 alias flog='fzf --preview "bat --style=numbers --color=always --line-range=:500 {}"'
@@ -493,6 +496,11 @@ fi
 [[ -f "${ZDOTDIR}/aliases.zsh" ]] && source "${ZDOTDIR}/aliases.zsh"
 [[ -f "${ZDOTDIR}/functions.zsh" ]] && source "${ZDOTDIR}/functions.zsh"
 
+
+alias flopilot="cd ~/src/vibes/apps/flopilot && npm i && dotenvx run ./deploy-local.sh && cd -"
+alias flonotes="cd ~/src/vibes/apps/flonotes && npm i && dotenvx run ./deploy-local.sh && cd -"
+
+
 # ========================================================================
 # COMMENTED SECTIONS (Future Reference)
 # ========================================================================
@@ -546,5 +554,3 @@ has_command atuin && eval "$(atuin init zsh)"
 
 # --- Volta ---
 has_command volta && eval "$(volta setup)"
-
-
