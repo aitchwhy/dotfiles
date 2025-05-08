@@ -38,6 +38,8 @@ typeset -U path PATH
 
 export COLORTERM="truecolor"
 
+# export PATH="$HOME/.npm-global/bin/:$PATH"
+
 paths=(
   # last in PATH
   "$HOME/.cargo/bin"
@@ -51,16 +53,15 @@ for p in "${paths[@]}"; do
   export PATH="$p:$PATH"
 done
 
-export PATH
-
-# export PATH="$HOME/.npm-global/bin/:$PATH"
 export VOLTA_HOME="$HOME/.volta"
-# export PATH="$VOLTA_HOME/bin:$PATH"
+
 
 # Add Nix to path
 # export PATH=$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH
 
 . "$HOME/.cargo/env"
+
+export PATH
 
 # Added by OrbStack: command-line tools and integration
 # This won't be added again if you remove it.
