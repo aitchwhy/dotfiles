@@ -499,6 +499,9 @@ fi
 
 alias flopilot="cd ~/src/vibes/apps/flopilot && npm i && dotenvx run ./deploy-local.sh && cd -"
 alias flonotes="cd ~/src/vibes/apps/flonotes && npm i && dotenvx run ./deploy-local.sh && cd -"
+function kill-ant-ports() {
+  lsof -i TCP:20000-30000 -sTCP:LISTEN | awk 'NR>1 {print $2}' | sort -u | xargs kill -9
+}
 
 # ========================================================================
 # COMMENTED SECTIONS (Future Reference)

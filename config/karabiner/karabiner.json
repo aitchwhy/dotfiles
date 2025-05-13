@@ -4,6 +4,43 @@
             "complex_modifications": {
                 "rules": [
                     {
+                        "description": "Mac OSX: disable cmd + option + h + m to prevent minimising all windows",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "h",
+                                    "modifiers": {
+                                        "mandatory": ["command", "option"],
+                                        "optional": ["any"]
+                                    }
+                                },
+                                "type": "basic"
+                            },
+                            {
+                                "from": {
+                                    "key_code": "m",
+                                    "modifiers": {
+                                        "mandatory": ["command", "option"],
+                                        "optional": ["any"]
+                                    }
+                                },
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Mac OSX: disable cmd + h to prevent minimising an application window",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "h",
+                                    "modifiers": { "mandatory": ["command"] }
+                                },
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
                         "description": "CapsLock -> ESC (press) | ctrl+opt+cmd (hold)",
                         "manipulators": [
                             {
@@ -498,10 +535,6 @@
                 }
             ],
             "fn_function_keys": [
-                {
-                    "from": { "key_code": "f1" },
-                    "to": [{ "consumer_key_code": "display_brightness_increment" }]
-                },
                 {
                     "from": { "key_code": "f6" },
                     "to": [{ "software_function": { "iokit_power_management_sleep_system": {} } }]
