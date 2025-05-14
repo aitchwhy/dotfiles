@@ -194,13 +194,13 @@ alias tm=task-master
 # ========================================================================
 # Nix
 # ========================================================================
-alias nix-zsh="nix develop --command zsh"
+alias nixzsh="nix develop --command zsh"
 
 # --- Nix ---
 # export NIX_CONFIG_DIR="$cf/nix"
-alias nixe="$EDITOR ~/.config/nix/nix.conf"
-alias nixd="nix develop"
-alias nixdn="nix develope .#npm"
+alias nixcf="$EDITOR ~/.config/nix/nix.conf"
+alias nixdev="nix develop"
+alias nixnpm="nix develop .#npm"
 alias antall="ant-all-services api user s3 prefect-worker prefect-agent prefect-server data-seeder"
 alias antnoggin="ant-all-services noggin"
 alias antnpm="npm ci --ignore-scripts && ant-npm-build-deptree noggin && npm run --workspace gateways/noggin build"
