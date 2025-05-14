@@ -15,37 +15,35 @@
 		}
 	],
 	// Shared VS Code settings across all roots
-	"settings": {
-		"nixEnvSelector.useFlake": true,
-		"nixEnvSelector.autoEnter": true,
-		"nixEnvSelector.flakeFilePath": "./flake.nix",
-
-		// // ensure you’re running the correct Node/TS from nix:
-		// "typescript.tsdk": "${env:HOME}/.nix-profile/lib/node_modules/typescript/lib",
-		// "typescript.enablePromptUseWorkspaceTsdk": true
-
-
-		// TypeScript configuration
-		"typescript.enablePromptUseWorkspaceTsdk": true,
-		"typescript.tsdk": "${env:HOME}/.nix-profile/lib/node_modules/typescript/lib",
-		"typescript.updateImportsOnFileMove.enabled": "always",
-		// Formatting and editor settings
-		"editor.codeActionsOnSave": {
-			"source.fixAll.eslint": "explicit"
-		},
-		"[typescript]": {
-			"editor.defaultFormatter": "esbenp.prettier-vscode",
-			"editor.formatOnSave": true,
-			"editor.formatOnSaveMode": "file"
-		},
-		"[typescriptreact]": {
-			"editor.defaultFormatter": "esbenp.prettier-vscode",
-			"editor.formatOnSave": true,
-			"editor.formatOnSaveMode": "file"
-		},
-		"files.trimTrailingWhitespace": true,
-		"liveServer.settings.multiRootWorkspaceName": "platform"
-	},
+	// "settings": {
+	// 	// // ensure you’re running the correct Node/TS from nix:
+	// 	// "typescript.tsdk": "${env:HOME}/.nix-profile/lib/node_modules/typescript/lib",
+	// 	// "typescript.enablePromptUseWorkspaceTsdk": true
+	// 	"nixEnvSelector.useFlake": true,
+	// 	"nixEnvSelector.autoEnter": true,
+	// 	"nixEnvSelector.flakeFilePath": "./flake.nix",
+	// 	// TypeScript configuration
+	// 	"typescript.enablePromptUseWorkspaceTsdk": true,
+	// 	"typescript.tsdk": "${env:HOME}/.nix-profile/lib/node_modules/typescript/lib",
+	// 	"typescript.updateImportsOnFileMove.enabled": "always",
+	// 	// Formatting and editor settings
+	// 	"editor.codeActionsOnSave": {
+	// 		"source.fixAll.eslint": "explicit"
+	// 	},
+	// 	"[typescript]": {
+	// 		"editor.defaultFormatter": "esbenp.prettier-vscode",
+	// 		"editor.formatOnSave": true,
+	// 		"editor.formatOnSaveMode": "file"
+	// 	},
+	// 	"[typescriptreact]": {
+	// 		"editor.defaultFormatter": "esbenp.prettier-vscode",
+	// 		"editor.formatOnSave": true,
+	// 		"editor.formatOnSaveMode": "file"
+	// 	},
+	// 	"files.trimTrailingWhitespace": true,
+	// 	"liveServer.settings.multiRootWorkspaceName": "platform",
+	// 	"nixEnvSelector.nixFile": "${workspaceFolder}/flake.nix"
+	// },
 	"tasks": {
 		"build-noggin": {
 			"label": "Build Noggin",
@@ -136,5 +134,11 @@
 			}
 		],
 		"compounds": []
-	}
+	},
+	"settings": {
+		"typescript.tsdk": "platform/node_modules/typescript/lib"
+	},
+	// "settings": {
+	// 	"nixEnvSelector.nixFile": "${workspaceFolder}/flake.nix"
+	// }
 }

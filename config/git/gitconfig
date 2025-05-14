@@ -15,7 +15,6 @@
   email = hank.lee.qed@gmail.com
   username = aitchwhy
 
-
 # ===== Basic UI Settings =====
 [color]
   ui = true
@@ -94,19 +93,19 @@
   deps = "!f() { git commit -m \"deps${1:+($1)}: $2\"; }; f"
   
   # Fuzzy commit selection with enhanced filtering and preview
-  fzcommit = "!f() { git status --short | fzf --multi --preview 'git diff --color {2}' | cut -c4- | tr '\\n' ' ' | xargs -r git add && npx --no-install commitizen; }; f"
+  fc = "!f() { git status --short | fzf --multi --preview 'git diff --color {2}' | cut -c4- | tr '\\n' ' ' | xargs -r git add && npx --no-install commitizen; }; f"
   
   # Fuzzy add and commit
-  fzadd = "!f() { git status --short | fzf --multi --preview 'git diff --color {2}' | cut -c4- | tr '\\n' ' ' | xargs -r git add; }; f"
+  fa = "!f() { git status --short | fzf --multi --preview 'git diff --color {2}' | cut -c4- | tr '\\n' ' ' | xargs -r git add; }; f"
   
   # AI-assisted commit message generation
   ai-commit = "!f() { just ai commit-msg; }; f"
   
   # Check if commit message follows conventional format using commitlint
-  check-commit-msg = "!f() { npx --no-install commitlint --edit \"$1\"; }; f"
+  check = "!f() { npx --no-install commitlint --edit \"$1\"; }; f"
   
   # Standard workflow shortcuts
-  st = status
+  s = status
   co = checkout
   br = branch
   ci = commit
