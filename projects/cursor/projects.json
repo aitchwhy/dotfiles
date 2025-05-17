@@ -1,34 +1,38 @@
 [
-	{
-		"fullPath": "/Users/hank/dotfiles",
-		"name": "dotfiles"
-	},
-	{
-		"fullPath": "/Users/hank/src/flonotes-fe",
-		"name": "flonotes-fe"
-	},
-	{
-		"fullPath": "/Users/hank/src/obsidian-vimrc-support",
-		"name": "obsidian-vimrc-support"
-	},
-	{
-		"fullPath": "/Users/hank/src/platform",
-		"name": "platform"
-	},
-	{
-		"fullPath": "/Users/hank/src/gpt-repository-loader",
-		"name": "gpt-repository-loader"
-	},
-	{
-		"fullPath": "/Users/hank/src/vibes",
-		"name": "vibes"
-	},
-	{
-		"fullPath": "/Users/hank/src/platform/submodules/docs",
-		"name": "docs"
-	},
-	{
-		"fullPath": "/Users/hank/dotfiles/config/warp/themes",
-		"name": "themes"
-	}
+  {
+    "fullPath": "/Users/hank/src",
+    "name": "src"
+  },
+  {
+    "fullPath": "/Users/hank/dotfiles",
+    "name": "dotfiles"
+  },
+  {
+    "fullPath": "/Users/hank/src/flonotes-fe",
+    "name": "flonotes-fe"
+  },
+  {
+    "fullPath": "/Users/hank/src/obsidian-vimrc-support",
+    "name": "obsidian-vimrc-support"
+  },
+  {
+    "fullPath": "/Users/hank/src/platform",
+    "name": "platform"
+  },
+  {
+    "fullPath": "/Users/hank/src/gpt-repository-loader",
+    "name": "gpt-repository-loader"
+  },
+  {
+    "fullPath": "/Users/hank/src/vibes",
+    "name": "vibes"
+  },
+  {
+    "fullPath": "/Users/hank/src/platform/submodules/docs",
+    "name": "docs"
+  },
+  {
+    "fullPath": "/Users/hank/dotfiles/config/warp/themes",
+    "name": "themes"
+  }
 ]

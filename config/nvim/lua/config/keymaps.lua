@@ -1,8 +1,6 @@
 -- Keymaps are automatically loaded on the VeryLazy event
--- Default keymaps that are always set:
--- https://www.lazyvim.org/configuration/general#keymaps
--- https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
--- Add any additional keymaps here
+-- Default keymaps that are always set -> (https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua)
+-- Add any additional keymaps here -> https://www.lazyvim.org/configuration/general#keymaps
 
 -----------------------------------------------------------------------------------
 -- CUSTOM KEYMAPS - MODERN LAZYVIM KEYBINDINGS (2025)
@@ -10,11 +8,15 @@
 
 -- DO NOT USE `LazyVim.safe_keymap_set` IN YOUR OWN CONFIG!!
 -- use `vim.keymap.set` instead
--- local map = LazyVim.safe_keymap_set
+local map = LazyVim.safe_keymap_set
+
+map()
 
 -- vim.keymap.set
 -- ~/.config/nvim/lua/config/keymaps.lua
 -- local wk = require("which-key")
+
+-- Delete
 
 -- --------------------------------------------------------------------------------
 -- -- Leader-mappings (normal mode)

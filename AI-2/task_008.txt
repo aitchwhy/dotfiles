@@ -1,0 +1,49 @@
+# Task ID: 8
+# Title: Implement PDF extract verification
+# Status: pending
+# Dependencies: 7
+# Priority: medium
+# Description: Create functionality to retrieve and validate the JSON extracts from a processed PDF.
+# Details:
+1. Extend `pdf.spec.ts` to make a GET request to `/pdfs/pdf-extracts/:stemUid/:pdfUid` once the PDF is ready
+2. Parse the JSON response containing the PDF extracts
+3. Implement validation of the extract structure and content
+4. Add assertions to verify that the extracts contain expected data based on the test PDF
+5. Implement error handling for extract retrieval failures
+6. Add logging for the extract validation process
+7. Create utility functions for common extract validation patterns
+
+# Test Strategy:
+Run the test with a known PDF file and verify that the extracts retrieved match the expected content and structure for that specific PDF. Run the test using the existing Playwright setup.
+
+# Subtasks:
+## 1. Extend pdf.spec.ts to retrieve PDF extracts [pending]
+### Dependencies: None
+### Description: Add functionality to make a GET request to the PDF extracts endpoint once a PDF is processed
+### Details:
+Modify the existing test file to include a new test case that: 1) Waits for PDF processing to complete, 2) Makes a GET request to `/pdfs/pdf-extracts/:stemUid/:pdfUid` to retrieve the JSON extracts, 3) Stores the response for further validation. Include proper error handling for API request failures and timeout scenarios.
+
+## 2. Create extract parsing and basic structure validation [pending]
+### Dependencies: 8.1
+### Description: Implement functionality to parse the JSON response and validate its basic structure
+### Details:
+Create utility functions that: 1) Parse the JSON response from the extract endpoint, 2) Validate that the response contains the expected top-level properties and structure, 3) Check for required fields in the extract. Implement type definitions for the extract structure to ensure type safety. This should handle both successful parsing and graceful error handling for malformed responses.
+
+## 3. Implement detailed content validation utilities [pending]
+### Dependencies: 8.2
+### Description: Create reusable utility functions for validating specific aspects of PDF extract content
+### Details:
+Develop a set of utility functions that can be used to validate different aspects of the extract content, such as: 1) Text content validation (checking if specific text exists), 2) Structural validation (checking hierarchical relationships), 3) Metadata validation, 4) Numerical data validation. These utilities should be flexible enough to be reused across different test cases and PDF types.
+
+## 4. Add test assertions for expected PDF content [pending]
+### Dependencies: 8.3
+### Description: Implement specific test assertions to verify that extracts contain expected data based on test PDFs
+### Details:
+Using the validation utilities from subtask 3, implement specific test assertions that: 1) Verify the extract contains expected text content from the test PDF, 2) Check that structural elements are correctly identified, 3) Validate that metadata is correctly extracted, 4) Ensure numerical data is accurately represented. Include both positive tests (expected content exists) and negative tests (content that shouldn't be present).
+
+## 5. Implement logging and comprehensive error handling [pending]
+### Dependencies: 8.4
+### Description: Add detailed logging for the extract validation process and comprehensive error handling
+### Details:
+Enhance the implementation with: 1) Detailed logging at each step of the extract validation process, 2) Comprehensive error handling for different failure scenarios (network errors, malformed responses, validation failures), 3) Meaningful error messages that help diagnose issues, 4) Optional debug logging that can be enabled for troubleshooting. Ensure logs are appropriately categorized and formatted for easy analysis.
+
