@@ -65,6 +65,7 @@
                     },
                     {
                         "description": "Mac OSX: disable cmd + option + h + m to prevent minimising all windows",
+                        "enabled": false,
                         "manipulators": [
                             {
                                 "from": {
@@ -90,6 +91,7 @@
                     },
                     {
                         "description": "Mac OSX: disable cmd + h to prevent minimising an application window",
+                        "enabled": false,
                         "manipulators": [
                             {
                                 "from": {

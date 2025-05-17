@@ -136,7 +136,8 @@
 		"compounds": []
 	},
 	"settings": {
-		"typescript.tsdk": "platform/node_modules/typescript/lib"
+		"typescript.tsdk": "platform/node_modules/typescript/lib",
+		"nixEnvSelector.nixFile": "${workspaceFolder}/flake.nix"
 	},
 	// "settings": {
 	// 	"nixEnvSelector.nixFile": "${workspaceFolder}/flake.nix"

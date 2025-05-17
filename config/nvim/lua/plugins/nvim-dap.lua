@@ -16,17 +16,17 @@ return {
       "theHamsta/nvim-dap-virtual-text",
       "jay-babu/mason-nvim-dap.nvim",
     },
-    config = function()
-      local dap = require("dap")
-
-      -- Fix the Haskell adapter path
-      dap.adapters.haskell = {
-        type = 'executable',
-        command = vim.fn.expand('~/.local/share/nvim/mason/bin/haskell-debug-adapter'),
-        args = {}
-      }
-
-      -- Your other DAP configurations
-    end,
-  }
+    -- config = function()
+    --   local dap = require("dap")
+    --
+    --   -- Fix the Haskell adapter path
+    --   dap.adapters.haskell = {
+    --     type = 'executable',
+    --     command = vim.fn.expand('~/.local/share/nvim/mason/bin/haskell-debug-adapter'),
+    --     args = {}
+    --   }
+    --
+    --   -- Your other DAP configurations
+    -- end,
+  },
 }
