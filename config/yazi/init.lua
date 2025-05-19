@@ -32,6 +32,7 @@ require("mactag"):setup({
 	-- Display tag indicators in status line
 	show_in_status = true,
 })
+
 -- Enhanced Starship integration with Tokyo Night theme
 require("starship"):setup({
 	hide_flags = false,

@@ -21,7 +21,7 @@ enable-normalization-opposite-orientation-for-nested-containers = true
 # See: https://nikitabobko.github.io/AeroSpace/guide#layouts
 # The 'accordion-padding' specifies the size of accordion padding
 # You can set 0 to disable the padding feature
-accordion-padding = 30
+accordion-padding = 10
 
 # Possible values: tiles|accordion
 default-root-container-layout = 'tiles'
@@ -42,6 +42,58 @@ on-focused-monitor-changed = [ 'move-mouse monitor-lazy-center' ]
 # Useful if you don't use this macOS feature, but accidentally hit cmd-h or cmd-alt-h key
 # Also see: https://nikitabobko.github.io/AeroSpace/goodies#disable-hide-app
 automatically-unhide-macos-hidden-apps = true
+####################################
+# You can use workspace-to-monitor-force-assignment syntax to assign workspaces to always appear on particular monitors
+# [workspace-to-monitor-force-assignment]
+#     1 = 1                            # Monitor sequence number from left to right. 1-based indexing
+#     2 = 'main'                       # Main monitor
+#     3 = 'secondary'                  # Non-main monitor in case when there are only two monitors
+#     4 = 'built-in'                   # Case insensitive regex substring
+#     5 = '^built-in retina display$'  # Case insensitive regex match
+#     6 = ['secondary', 'dell']        # You can specify multiple patterns.
+#                                      #   The first matching pattern will be used
+####################################
+[workspace-to-monitor-force-assignment]
+	# Displays
+	1 = 1
+	2 = 2
+	3 = 3
+	# AI chat apps (claude, etc.)
+	I = 3
+	# Code editors (cursor, vscode, etc.)
+	C = 2
+	# Utils (DevUtils)
+	U = 2
+	# Browser (chrome, safari, etc.)
+	L = 1
+	# Vaults (Bitwarden), 1password, etc.
+	V = 2
+	# Email (Superhuman)
+	# Slack
+	S = 2
+	# Calendar (Fantastical)
+
+	# Finder (Files)
+	F = 2
+	# Todoist
+	T = 1
+	# Docker / logs / Orbstack
+	# Dash Docs
+	D = 1
+	# Shell (Terminal, Ghostty, etc.)
+	X = 1
+	# Git (Fork)
+	# Ghostty
+	G = 2
+	# Kaleidoscope
+	K = 1
+	# Obsidian Notes
+	O = 1
+	# Cursor
+	
+	
+	
+	
 
 # Possible values: (qwerty|dvorak|colemak)
 # See https://nikitabobko.github.io/AeroSpace/guide#key-mapping
@@ -97,25 +149,20 @@ automatically-unhide-macos-hidden-apps = true
 	# end tell'
 	# '''
 
+	######### Layout
 	# See: https://nikitabobko.github.io/AeroSpace/commands#layout
-	alt-slash = 'layout tiles horizontal vertical'
-	alt-comma = 'layout accordion horizontal vertical'
-
-	# See: https://nikitabobko.github.io/AeroSpace/commands#focus
-	alt-h = 'focus left'
-	alt-j = 'focus down'
-	alt-k = 'focus up'
-	alt-l = 'focus right'
-
-	# See: https://nikitabobko.github.io/AeroSpace/commands#move
-	alt-shift-h = 'move left'
-	alt-shift-j = 'move down'
-	alt-shift-k = 'move up'
-	alt-shift-l = 'move right'
-
-	# See: https://nikitabobko.github.io/AeroSpace/commands#resize
-	alt-minus = 'resize smart -50'
-	alt-equal = 'resize smart +50'
+	######### Default
+	# alt-slash = 'layout tiles horizontal vertical'
+	# alt-comma = 'layout accordion horizontal vertical'
+	######### Notes
+	# Change layout of the focused window to the given layout
+	# If several arguments are supplied then finds the first argument that doesn’t describe the currently active layout, and applies the layout.
+	# 
+	# Change both tiling layout and orientation in one go: h_tiles|v_tiles|h_accordion|v_accordion
+	# Change tiling layout but preserve orientation: tiles|accordion
+	# Change orientation but preserve layout: horizontal|vertical
+	# Toggle floating/tiling mode: tiling|floating
+	#####################
 
 	# See: https://nikitabobko.github.io/AeroSpace/commands#workspace
 	alt-1 = 'workspace 1'
@@ -135,7 +182,7 @@ automatically-unhide-macos-hidden-apps = true
 	alt-f = 'workspace F'
 	alt-g = 'workspace G'
 	alt-i = 'workspace I'
-	alt-m = 'workspace M'
+	# alt-m = 'workspace M'
 	alt-n = 'workspace N'
 	alt-o = 'workspace O'
 	alt-p = 'workspace P'
@@ -145,7 +192,7 @@ automatically-unhide-macos-hidden-apps = true
 	alt-t = 'workspace T'
 	alt-u = 'workspace U'
 	alt-v = 'workspace V'
-	alt-w = 'workspace W'
+	# alt-w = 'workspace W'
 	alt-x = 'workspace X'
 	alt-y = 'workspace Y'
 	alt-z = 'workspace Z'
@@ -168,7 +215,7 @@ automatically-unhide-macos-hidden-apps = true
 	alt-shift-f = 'move-node-to-workspace F'
 	alt-shift-g = 'move-node-to-workspace G'
 	alt-shift-i = 'move-node-to-workspace I'
-	alt-shift-m = 'move-node-to-workspace M'
+	# alt-shift-m = 'move-node-to-workspace M'
 	alt-shift-n = 'move-node-to-workspace N'
 	alt-shift-o = 'move-node-to-workspace O'
 	alt-shift-p = 'move-node-to-workspace P'
@@ -178,35 +225,88 @@ automatically-unhide-macos-hidden-apps = true
 	alt-shift-t = 'move-node-to-workspace T'
 	alt-shift-u = 'move-node-to-workspace U'
 	alt-shift-v = 'move-node-to-workspace V'
-	alt-shift-w = 'move-node-to-workspace W'
+	# alt-shift-w = 'move-node-to-workspace W'
 	alt-shift-x = 'move-node-to-workspace X'
 	alt-shift-y = 'move-node-to-workspace Y'
 	alt-shift-z = 'move-node-to-workspace Z'
+
+	# Layout
+	# alt-comma = 'layout tiles horizontal'
+	# alt-backslash = 'layout tiles horizontal '
+	alt-slash = 'layout tiles horizontal vertical'
+    alt-comma = 'layout accordion horizontal vertical'
+
+	# See: https://nikitabobko.github.io/AeroSpace/commands#focus
+	alt-h = 'focus left'
+	alt-j = 'focus down'
+	alt-k = 'focus up'
+	alt-l = 'focus right'
+
+
+	# See: https://nikitabobko.github.io/AeroSpace/commands#move
+	alt-shift-h = 'move left'
+	alt-shift-j = 'move down'
+	alt-shift-k = 'move up'
+	alt-shift-l = 'move right'
+
+	# See: https://nikitabobko.github.io/AeroSpace/commands#resize
+	alt-minus = 'resize smart -50'
+	alt-equal = 'resize smart +50'
+	alt-shift-equal = 'balance-sizes'
 
 	# See: https://nikitabobko.github.io/AeroSpace/commands#workspace-back-and-forth
 	alt-tab = 'workspace-back-and-forth'
 	# See: https://nikitabobko.github.io/AeroSpace/commands#move-workspace-to-monitor
 	alt-shift-tab = 'move-workspace-to-monitor --wrap-around next'
 
-	# See: https://nikitabobko.github.io/AeroSpace/commands#mode
+
+	ctrl-alt-shift-h = 'join-with left'
+	ctrl-alt-shift-j = 'join-with down'
+	ctrl-alt-shift-k = 'join-with up'
+	ctrl-alt-shift-l = 'join-with right'
+
+	# modes - See: https://nikitabobko.github.io/AeroSpace/commands#mode
 	alt-shift-semicolon = 'mode service'
+	alt-shift-w = 'mode workspace'
+	alt-shift-m = 'mode monitor'
+
+
+# [mode.monitor.binding]
+# 	# Move node to monitor (arrow keys)
+# 	# Move workspace to monitor (arrow keys)
+# 	h = 'move-workspace-to-monitor --wrap-around left'
+# 	j = 'move-workspace-to-monitor --wrap-around down'
+# 	k = 'move-workspace-to-monitor --wrap-around up'
+# 	l = 'move-workspace-to-monitor --wrap-around right'
 
 # 'service' binding mode declaration.
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
 [mode.service.binding]
-	esc       = [ 'reload-config', 'mode main' ]
-	r         = [ 'flatten-workspace-tree', 'mode main' ]        # reset layout
-	f         = [ 'layout floating tiling', 'mode main' ]        # Toggle between floating and tiling layout
+	esc     = [ 'reload-config', 'mode main' ]
 	backspace = [ 'close-all-windows-but-current', 'mode main' ]
+	r = ['flatten-workspace-tree', 'mode main'] # reset layout
+    f = ['layout floating tiling', 'mode main'] # Toggle between floating and tiling layout
 
+	minus   = [ 'flatten-workspace-tree', 'mode main' ]        # reset layout
 	# sticky is not yet supported https://github.com/nikitabobko/AeroSpace/issues/2
-	#s = ['layout sticky tiling', 'mode main']
-
-	alt-shift-h = [ 'join-with left', 'mode main' ]
-	alt-shift-j = [ 'join-with down', 'mode main' ]
-	alt-shift-k = [ 'join-with up', 'mode main' ]
-	alt-shift-l = [ 'join-with right', 'mode main' ]
-
+	# s = ['layout sticky tiling', 'mode main']
 	down       = 'volume down'
 	up         = 'volume up'
 	shift-down = [ 'volume set 0', 'mode main' ]
+	# sticky is not yet supported https://github.com/nikitabobko/AeroSpace/issues/2
+    #s = ['layout sticky tiling', 'mode main']
+
+    alt-shift-h = ['join-with left', 'mode main']
+    alt-shift-j = ['join-with down', 'mode main']
+    alt-shift-k = ['join-with up', 'mode main']
+    alt-shift-l = ['join-with right', 'mode main']
+
+[mode.monitor.binding]
+	h = ['focus-monitor left', 'mode main']
+	j = ['focus-monitor down', 'mode main']
+	k = ['focus-monitor up', 'mode main']
+	l = ['focus-monitor right', 'mode main']
+	shift-h = ['move-workspace-to-monitor --wrap-around left', 'mode main']
+	shift-j = ['move-workspace-to-monitor --wrap-around down', 'mode main']
+	shift-k = ['move-workspace-to-monitor --wrap-around up', 'mode main']
+	shift-l = ['move-workspace-to-monitor --wrap-around right', 'mode main']
