@@ -52,3 +52,5 @@ git mv AI-2/system-prompts-and-models-of-ai-tools AI/legacy/
 # 9️⃣  Remove now-empty AI-2/ folder (optional, keep history)
 # ------------------------------------------------------------
 git rm -r AI-2 || true
+
+git tag ai-merge-$(date +%Y%m%d)
