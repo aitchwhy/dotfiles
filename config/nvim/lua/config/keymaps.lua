@@ -8,9 +8,10 @@
 
 -- DO NOT USE `LazyVim.safe_keymap_set` IN YOUR OWN CONFIG!!
 -- use `vim.keymap.set` instead
-local map = LazyVim.safe_keymap_set
+local map = vim.keymap.set
 
-map()
+-- Example of proper keymap setup:
+-- map('n', '<leader>ff', '<cmd>Telescope find_files<cr>', { desc = "Find files" })
 
 -- vim.keymap.set
 -- ~/.config/nvim/lua/config/keymaps.lua

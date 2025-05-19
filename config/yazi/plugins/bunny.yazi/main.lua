@@ -94,18 +94,31 @@ local function sort_hops(hops)
   return hops
 end
 
-local create_special_hops = function(desc_strategy)
+local create_special_hops = function(config)
   local hops = {}
-  table.insert(hops, { key = "<Enter>", desc = "Create hop", path = "__MARK__" })
+  local desc_strategy, tabs, ephemeral = config.desc_strategy, config.tabs, config.ephemeral
+  if ephemeral then
+    table.insert(hops, { key = "<Enter>", desc = "Create hop", path = "__MARK__" })
+  end
   table.insert(hops, { key = "<Space>", desc = "Fuzzy search", path = "__FUZZY__" })
   local tabhist = get_state("tabhist")
   local tab = get_current_tab_idx()
   if tabhist[tab] and tabhist[tab][2] then
     local previous_dir = tabhist[tab][2]
-    table.insert(hops, { key = "<Backspace>", path = previous_dir, desc = path_to_desc(previous_dir, desc_strategy) })
+    table.insert(hops, {
+      key = "<Backspace>",
+      path = previous_dir,
+      desc = path_to_desc(previous_dir, desc_strategy)
+    })
   end
-  for idx, tab_path in pairs(get_tabs_as_paths()) do
-    table.insert(hops, { key = tostring(idx), path = tab_path, desc = path_to_desc(tab_path, desc_strategy) })
+  if tabs then
+    for idx, tab_path in pairs(get_tabs_as_paths()) do
+      table.insert(hops, {
+        key = tostring(idx),
+        path = tab_path,
+        desc = path_to_desc(tab_path, desc_strategy)
+      })
+    end
   end
   return hops
 end
@@ -116,16 +129,16 @@ local function validate_options(options)
     if not key then
       return false, "key is missing"
     elseif kt == "string" then
-      if string.len(key) ~= 1 or string.upper(key) == key then
-        return false, "key must be lowercase letter"
+      if utf8.len(key) ~= 1 then
+        return false, "key must be single character"
       end
     elseif kt == "table" then
       if #key == 0 then
         return false, "key cannot be empty table"
       end
       for _, char in pairs(key) do
-        if type(char) ~= "string" or string.len(char) ~= 1 or string.upper(char) == char then
-          return false, "key list must contain lowercase letters"
+        if utf8.len(char) ~= 1 then
+          return false, "key list must contain single characters"
         end
       end
     else
@@ -136,15 +149,17 @@ local function validate_options(options)
   if type(options) ~= "table" then
     return "Invalid config"
   end
-  local hops, desc_strategy, fuzzy_cmd, notify = options.hops, options.desc_strategy, options.fuzzy_cmd, options.notify
+  local hops, desc_strategy, tabs, ephemeral, fuzzy_cmd, notify =
+      options.hops, options.desc_strategy, options.tabs,
+      options.ephemeral, options.fuzzy_cmd, options.notify
   -- Validate hops
   if type(hops) == "table" then
     local used_keys = {}
     for idx, hop in pairs(hops) do
       hop.desc = hop.desc or hop.tag or nil -- used to be tag, allow for backwards compat
-      local key_is_valid, key_err = validate_key(hop.key)
+      local key_is_validated, key_err = validate_key(hop.key)
       local err = 'Invalid "hops" config value: #' .. idx .. " "
-      if not key_is_valid then
+      if not key_is_validated then
         return err .. key_err
       elseif not hop.path then
         return err .. 'path is missing'
@@ -166,6 +181,10 @@ local function validate_options(options)
   -- Validate other options
   if desc_strategy ~= nil and desc_strategy ~= "path" and desc_strategy ~= "filename" then
     return 'Invalid "desc_strategy" config value'
+  elseif tabs ~= nil and type(notify) ~= "boolean" then
+    return 'Invalid "tabs" config value'
+  elseif ephemeral ~= nil and type(notify) ~= "boolean" then
+    return 'Invalid "ephemeral" config value'
   elseif fuzzy_cmd ~= nil and type(fuzzy_cmd) ~= "string" then
     return 'Invalid "fuzzy_cmd" config value'
   elseif notify ~= nil and type(notify) ~= "boolean" then
@@ -175,6 +194,7 @@ end
 
 -- https://github.com/sxyazi/yazi/blob/main/yazi-plugin/preset/plugins/fzf.lua
 -- https://github.com/sxyazi/yazi/blob/main/yazi-plugin/src/process/child.rs
+-- Returns nil if fzf command failed or user exited with escape key
 local select_fuzzy = function(hops, config)
   local permit = ya.hide()
   local child, spawn_err =
@@ -183,16 +203,22 @@ local select_fuzzy = function(hops, config)
     fail("Command `%s` failed with code %s. Do you have it installed?", config.fuzzy_cmd, spawn_err.code)
     return
   end
-  -- Build fzf input string
-  local input_lines = {};
+  local fuzzy_entries = {}
   for _, hop in pairs(hops) do
-    local fuzzy_desc = hop.desc
-    -- Avoid repeating path twice
-    if fuzzy_desc == hop.path then
-      fuzzy_desc = ""
+    local existing_desc = fuzzy_entries[hop.path]
+    if not existing_desc or existing_desc == "" then
+      local fuzzy_desc = hop.desc
+      -- Avoid repeating path in description
+      if fuzzy_desc == hop.path then
+        fuzzy_desc = ""
+      end
+      fuzzy_entries[hop.path] = fuzzy_desc
     end
-    -- right pad the desc so the tabs line up assuming every desc is less than 23 chars
-    local line = fuzzy_desc .. string.rep(" ", 23 - #fuzzy_desc) .. "\t" .. hop.path
+  end
+  -- Build fzf input string
+  local input_lines = {}
+  for entry_path, entry_desc in pairs(fuzzy_entries) do
+    local line = entry_desc .. string.rep(" ", 23 - #entry_desc) .. "\t" .. entry_path
     table.insert(input_lines, line)
   end
   child:write_all(table.concat(input_lines, "\n"))
@@ -217,9 +243,22 @@ local select_fuzzy = function(hops, config)
   return { desc = desc, path = path }
 end
 
+local cd = function(selected_hop, config)
+  local _, dir_list_err = fs.read_dir(Url(selected_hop.path), { limit = 1, resolve = true })
+  if dir_list_err then
+    fail("Invalid directory " .. path_to_desc(selected_hop.path))
+    return
+  end
+  -- Assuming that if I can fs.read_dir, then this will also succeed
+  ya.mgr_emit("cd", { selected_hop.path })
+  if config.notify then
+    info('Hopped to ' .. selected_hop.desc)
+  end
+end
+
 local attempt_hop = function(hops, config)
   local cands = {}
-  for _, hop in pairs(create_special_hops(config.desc_strategy)) do
+  for _, hop in pairs(create_special_hops(config)) do
     table.insert(cands, { desc = hop.desc, on = hop.key, path = hop.path })
   end
   for _, hop in pairs(hops) do
@@ -230,17 +269,21 @@ local attempt_hop = function(hops, config)
   local selected_hop = cands[hops_idx]
   -- Handle special hops
   if selected_hop.path == "__MARK__" then
-    local valid_chars = {
-      'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-      'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-      'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
-    }
     local mark_cands = {};
-    for _, char in pairs(valid_chars) do
+    -- Ideally any unicode character would be supported, but yazi.which
+    -- requies a concrete list of candidates
+    local candidate_chars = {
+      'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p',
+      'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F',
+      'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
+      'W', 'X', 'Y', 'Z', '`', '~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')',
+      '-', '_', '=', '+', '[', '{', ']', '}', '\\', '|', ';', ':', "'", '"', ',', '<',
+      '.', '>', '/', '?', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
+    }
+    for _, char in pairs(candidate_chars) do
       table.insert(mark_cands, { on = char })
     end
-    info("Press a letter to create new hop")
+    info("Press a key to create new hop")
     local char_idx = ya.which { cands = mark_cands, silent = true }
     if char_idx ~= nil then
       local selected_char = string.upper(mark_cands[char_idx].on)
@@ -254,16 +297,7 @@ local attempt_hop = function(hops, config)
     if not fuzzy_hop then return end
     selected_hop = fuzzy_hop
   end
-  local _, dir_list_err = fs.read_dir(Url(selected_hop.path), { limit = 1, resolve = true })
-  if dir_list_err then
-    fail("Invalid directory " .. path_to_desc(selected_hop.path))
-    return
-  end
-  -- Assuming that if I can fs.read_dir, then this will also succeed
-  ya.mgr_emit("cd", { selected_hop.path })
-  if config.notify then
-    info('Hopped to ' .. selected_hop.desc)
-  end
+  cd(selected_hop, config)
 end
 
 local function init()
@@ -318,7 +352,7 @@ return {
       state.tabhist = tabhist
     end)
   end,
-  entry = function()
+  entry = function(self, job)
     if not get_state("init") then
       init()
     end
@@ -328,6 +362,13 @@ return {
       return
     end
     local hops, config = get_state("hops"), get_state("config")
-    attempt_hop(hops, config)
+    if job.args[1] == "fuzzy" then
+      local fuzzy_hop = select_fuzzy(hops, config)
+      if fuzzy_hop then
+        cd(fuzzy_hop, config)
+      end
+    else
+      attempt_hop(hops, config)
+    end
   end,
 }

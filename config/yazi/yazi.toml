@@ -36,38 +36,39 @@
 
 [opener]
 edit = [
-  { exec = 'nvim "$@"', block = true },
+  { run = 'nvim "$@"', block = true },
 ]
 
 open = [
-  { exec = 'open "$@"', desc = "Open with default macOS app" },
-  { exec = 'open -a Safari "$@"', desc = "Open with Safari", for = "url" },
-  { exec = 'qlmanage -p "$@" &>/dev/null', desc = "QuickLook preview", for = "file" },
-  { exec = 'open -a Preview "$@"', desc = "Open with Preview", for = "image" },
-  { exec = 'open -a "Visual Studio Code" "$@"', desc = "Open with VS Code", for = ["text", "code"] },
-  { exec = 'open -a "TextEdit" "$@"', desc = "Open with TextEdit" },
-  { exec = 'bat --paging=always "$@"', desc = "Open with bat", for = "text" }
+  { run = 'open "$@"', desc = "Open with default macOS app" },
+  { run = 'open -a Safari "$@"', desc = "Open with Safari", for = "url" },
+  { run = 'qlmanage -p "$@" &>/dev/null', desc = "QuickLook preview", for = "file" },
+  { run = 'open -a Preview "$@"', desc = "Open with Preview", for = "image" },
+  { run = 'open -a "Visual Studio Code" "$@"', desc = "Open with VS Code", for = "text" },
+  { run = 'open -a "TextEdit" "$@"', desc = "Open with TextEdit" },
+  { run = 'bat --paging=always "$@"', desc = "Open with bat", for = "text" }
 ]
 
-reveal = [{ exec = 'open -R "$@"', desc = "Reveal in Finder" }]
+reveal = [{ run = 'open -R "$@"', desc = "Reveal in Finder" }]
 
 bulk-rename = [{ run = 'nvim "$@"', block = true }]
 
 extract = [
-  { exec = 'unar "$1"', desc = "Extract with unar", for = ["application", "archive"] },
-  { exec = 'tar -xf "$1"', desc = "Extract TAR archive", for = ["application/x-tar"] }
+  { run = 'unar "$1"', desc = "Extract with unar", for = "application" },
+  { run = 'tar -xf "$1"', desc = "Extract TAR archive", for = "application/x-tar" }
 ]
 
 archive = [
-  { exec = 'zip -r "$1" "${@:2}"', desc = "Compress to ZIP", for = ["application/zip"] },
-  { exec = 'tar -czvf "$1" "${@:2}"', desc = "Compress to TAR.GZ" }
+  { run = 'zip -r "$1" "${@:2}"', desc = "Compress to ZIP", for = "application/zip" },
+  { run = 'tar -czvf "$1" "${@:2}"', desc = "Compress to TAR.GZ" }
 ]
 
 code = [
-  { exec = 'nvim "$@"', block = true, desc = "Edit with Neovim" },
-  { exec = 'code "$@"', desc = "Open with VS Code", orphan = true }
+  { run = 'nvim "$@"', block = true, desc = "Edit with Neovim" },
+  { run = 'code "$@"', desc = "Open with VS Code", orphan = true }
 ]
 
+[open]
 prepend_rules = [
   { name = "bulk-rename.txt", use = "bulk-rename" },
   { name = "*.py", use = "code" },
@@ -79,7 +80,6 @@ prepend_rules = [
   { name = "*.sh", use = "code" }
 ]
 
-[open]
 rules = [
   { mime = "text/*", use = "edit" },
   { mime = "image/*", use = "open" },
