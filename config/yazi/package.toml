@@ -1,67 +1,67 @@
 [[plugin.deps]]
 use = "yazi-rs/plugins:smart-enter"
-rev = "864a021"
+rev = "55bf699"
 hash = "7918aab6a71caf31b58411f789195677"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:diff"
-rev = "864a021"
+rev = "55bf699"
 hash = "7a08e303167d5b655c06da6d570f0333"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:full-border"
-rev = "864a021"
+rev = "55bf699"
 hash = "1f3dad061209081a6b04dd6ff2cb06c7"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:jump-to-char"
-rev = "864a021"
+rev = "55bf699"
 hash = "a670c03eb3760812e044a24f94cedc55"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:lsar"
-rev = "864a021"
+rev = "55bf699"
 hash = "d0950c172ce352d31554ad6db8226494"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:mactag"
-rev = "864a021"
+rev = "55bf699"
 hash = "f4ee8d1a119fc869ffcd7e8a71b1469e"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:mime-ext"
-rev = "864a021"
+rev = "55bf699"
 hash = "5e24c167e9ae9a203a48f2a438b8c705"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:mount"
-rev = "864a021"
+rev = "55bf699"
 hash = "dd97eede8e20e59cd2604e8006e470e2"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:piper"
-rev = "864a021"
-hash = "ca862f0008f47952e2bd3e19328aca02"
+rev = "55bf699"
+hash = "5cf6118259765a267f3e2717acc79095"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:smart-filter"
-rev = "864a021"
+rev = "55bf699"
 hash = "f0c4b41b5d19a3144958383333eff6e7"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:toggle-pane"
-rev = "864a021"
+rev = "55bf699"
 hash = "f3853bbdd1da2fad09d059ab5464abfd"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:vcs-files"
-rev = "864a021"
+rev = "55bf699"
 hash = "36405f8781fcaf33ceab24dffd5cea19"
 
 [[plugin.deps]]
 use = "dedukun/bookmarks"
-rev = "a70648a"
-hash = "b836fb264381f35dec79930438a906d5"
+rev = "fbb7c00"
+hash = "1d231a808d3344546380df33daf43e91"
 
 [[plugin.deps]]
 use = "dedukun/relative-motions"
@@ -70,13 +70,13 @@ hash = "23915860e59348bf4166778bb0e606f7"
 
 [[plugin.deps]]
 use = "stelcodes/bunny"
-rev = "a64f32a"
-hash = "22d9e6f72230be88ab322040626623a"
+rev = "ea27f37"
+hash = "7956295208401cdbdf2b673b73437edd"
 
 [[plugin.deps]]
 use = "MasouShizuka/projects"
-rev = "4f11ecc"
-hash = "17fa17295d27864f62875f06a77f72e7"
+rev = "df44165"
+hash = "d5e132ed6e9073a43c155ab753074abb"
 
 [[plugin.deps]]
 use = "ndtoan96/ouch"
@@ -120,7 +120,7 @@ hash = "bd1737dd44b202f412122e6a3b378d4c"
 
 [[flavor.deps]]
 use = "ficcdaf/ashen:ashen"
-rev = "4d5d852"
+rev = "514ed5a"
 hash = "a48aa4d7140c52cdd14552039b632800"
 
 [[flavor.deps]]
@@ -130,5 +130,5 @@ hash = "a05f94b9a20b64d814c7631074d65c4a"
 
 [[flavor.deps]]
 use = "BennyOe/tokyo-night"
-rev = "695dac6"
-hash = "a8f426ea0d9cb843b081d62ab01364c8"
+rev = "b3950bf"
+hash = "319ce574cdb2865baf4323db90456504"

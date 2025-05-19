@@ -45,9 +45,9 @@
 -- vim.opt.timeout = true -- Enable timeout for mappings
 -- vim.opt.timeoutlen = 300 -- Time to wait for a mapped sequence
 --
--- -- Folding with treesitter
+-- -- Folding with treesitter (Neovim 0.11+ compatible)
 -- vim.opt.foldmethod = "expr"
--- vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+-- vim.opt.foldexpr = "vim.treesitter.foldexpr()"
 -- vim.opt.foldenable = true -- Disable folding by default
 -- vim.opt.foldlevel = 99 -- High fold level to open folds by default
 --

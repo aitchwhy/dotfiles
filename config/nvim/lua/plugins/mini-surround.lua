@@ -3,6 +3,7 @@ return {
   --
   {
     "echasnovski/mini.surround",
+    enabled = false, -- Disable mini.surround in favor of nvim-surround
     -- opts = {
     --   mappings = {
     --     add = "gsa",
