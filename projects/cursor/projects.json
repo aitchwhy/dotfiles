@@ -26,5 +26,19 @@
 		"paths": [],
 		"tags": [],
 		"enabled": true
+	},
+	{
+		"name": "pal",
+		"rootPath": "/Users/hank/src/pal",
+		"paths": [],
+		"tags": [],
+		"enabled": true
+	},
+	{
+		"name": "clean-rooms",
+		"rootPath": "/Users/hank/src/clean-rooms",
+		"paths": [],
+		"tags": [],
+		"enabled": true
 	}
 ]
