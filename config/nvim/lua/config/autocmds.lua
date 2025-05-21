@@ -10,22 +10,22 @@
 -----------------------------------------------------------------------------------
 -- CUSTOM AUTOCOMMANDS - MODERN LAZYVIM (2025)
 -----------------------------------------------------------------------------------
-
+--
 -- local function augroup(name)
 --   return vim.api.nvim_create_augroup("custom_" .. name, { clear = true })
 -- end
 
--- -- Auto-format on save (if formatter available)
--- vim.api.nvim_create_autocmd("BufWritePre", {
---   group = augroup("auto_format"),
---   callback = function()
---     -- Format with conform.nvim if available
---     if package.loaded["conform"] then
---       require("conform").format({ timeout_ms = 500, lsp_fallback = true })
---     end
---   end,
---   desc = "Auto-format on save",
--- })
+-- Auto-format on save (if formatter available)
+vim.api.nvim_create_autocmd("BufWritePre", {
+  group = augroup("auto_format"),
+  callback = function()
+    -- Format with conform.nvim if available
+    if package.loaded["conform"] then
+      require("conform").format({ timeout_ms = 500, lsp_fallback = true })
+    end
+  end,
+  desc = "Auto-format on save",
+})
 
 -- -- Highlight text on yank
 -- vim.api.nvim_create_autocmd("TextYankPost", {

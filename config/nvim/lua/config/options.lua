@@ -14,7 +14,7 @@ vim.g.lazyvim_cmp = "blink.cmp" -- Use blink.cmp as the completion engine
 -- vim.g.loaded_ruby_provider = 0
 --
 -- -- Register zsh as a bash-like language for treesitter
--- vim.treesitter.language.register("bash", "zsh")
+vim.treesitter.language.register("bash", "zsh")
 --
 -- -- UI improvements
 -- vim.opt.termguicolors = true -- Enable 24-bit RGB colors
