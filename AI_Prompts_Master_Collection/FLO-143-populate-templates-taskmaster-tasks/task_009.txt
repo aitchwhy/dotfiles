@@ -1,0 +1,89 @@
+# Task ID: 9
+# Title: Implement Error Handling and Validation
+# Status: pending
+# Dependencies: 2, 4
+# Priority: medium
+# Description: Create centralized error handling and request validation for the API endpoints.
+# Details:
+1. Create `errorMiddleware.ts` in `gateways/noggin/src/middleware/`
+2. Implement error handling middleware:
+
+```typescript
+export function errorMiddleware(err: any, req: Request, res: Response, next: NextFunction): void {
+  // Log the error
+  console.error('Error:', err);
+  
+  // Handle validation errors
+  if (err.name === 'ValidationError') {
+    res.status(400).json({
+      error: 'Validation Error',
+      details: err.details || err.message
+    });
+    return;
+  }
+  
+  // Handle not found errors
+  if (err.name === 'NotFoundError') {
+    res.status(404).json({
+      error: 'Not Found',
+      message: err.message
+    });
+    return;
+  }
+  
+  // Handle other known errors
+  if (err.statusCode) {
+    res.status(err.statusCode).json({
+      error: err.name || 'Error',
+      message: err.message
+    });
+    return;
+  }
+  
+  // Handle unknown errors
+  res.status(500).json({
+    error: 'Internal Server Error',
+    message: process.env.NODE_ENV === 'production' 
+      ? 'An unexpected error occurred' 
+      : err.message
+  });
+}
+```
+
+3. Create validation middleware using Zod:
+
+```typescript
+export function validateRequest(schema: z.ZodSchema<any>) {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    try {
+      // Validate request body against schema
+      schema.parse(req.body);
+      next();
+    } catch (error) {
+      // Forward validation errors to error middleware
+      next({
+        name: 'ValidationError',
+        details: error.errors,
+        message: 'Invalid request data'
+      });
+    }
+  };
+}
+```
+
+4. Apply middleware to routes:
+
+```typescript
+// In routes.ts
+import { validateRequest } from '../middleware/validation';
+import { postRunSchema } from '../controllers/postRun';
+
+router.post('/templates/runs', validateRequest(postRunSchema), postRunController);
+```
+
+# Test Strategy:
+1. Unit test error middleware with different error types
+2. Test validation middleware with valid and invalid payloads
+3. Verify correct status codes and response formats
+4. Test integration with controllers
+5. Verify error details are properly sanitized in production environment
