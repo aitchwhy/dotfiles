@@ -1,6 +1,7 @@
 return {
   {
     "echasnovski/mini.icons",
+    version = "*",
     opts = {
       file = {
         [".eslintrc.js"] = { glyph = "󰱺", hl = "MiniIconsYellow" },
@@ -18,6 +19,21 @@ return {
       filetype = {
         dotenv = { glyph = "", hl = "MiniIconsYellow" },
       },
+
+      -- Icon style: 'glyph' or 'ascii'
+      style = "glyph",
+
+      -- Customize per category. See `:h MiniIcons.config` for details.
+      default = {},
+      directory = {},
+      extension = {},
+      lsp = {},
+      os = {},
+
+      -- Control which extensions will be considered during "file" resolution
+      use_file_extension = function(ext, file)
+        return true
+      end,
     },
   },
 }
