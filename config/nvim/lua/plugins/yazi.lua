@@ -1,9 +1,13 @@
 return {
   {
     "mikavilpas/yazi.nvim",
+    event = "VeryLazy",
     dependencies = {
-      "nvim-lua/plenary.nvim",
-      "nvim-tree/nvim-web-devicons",
+      -- "nvim-lua/plenary.nvim",
+      -- "nvim-tree/nvim-web-devicons",
+      -- check the installation instructions at
+      -- https://github.com/folke/snacks.nvim
+      "folke/snacks.nvim",
     },
     -- keys = {
     --   -- Main keybindings

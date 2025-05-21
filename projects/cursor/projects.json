@@ -8,28 +8,21 @@
 	},
 	{
 		"name": "src",
-		"rootPath": "~/dotfiles/projects",
+		"rootPath": "~/src",
 		"paths": [],
 		"tags": [],
 		"enabled": true
 	},
 	{
 		"name": "platform",
-		"rootPath": "~/dotfiles/projects/platform",
+		"rootPath": "~/src/platform",
 		"paths": [],
 		"tags": [],
 		"enabled": true
 	},
 	{
 		"name": "vibes",
-		"rootPath": "~/dotfiles/projects/vibes",
-		"paths": [],
-		"tags": [],
-		"enabled": true
-	},
-	{
-		"name": "docs",
-		"rootPath": "~/dotfiles/projects/docs",
+		"rootPath": "~/src/vibes",
 		"paths": [],
 		"tags": [],
 		"enabled": true

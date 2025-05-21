@@ -7,7 +7,7 @@
 --
 -- -- LazyVim 8.x specific global settings
 -- vim.g.lazyvim_picker = "fzf" -- Use fzf-lua as the picker
--- vim.g.lazyvim_cmp = "blink.cmp" -- Use blink.cmp as the completion engine
+vim.g.lazyvim_cmp = "blink.cmp" -- Use blink.cmp as the completion engine
 --
 -- -- Disable providers you don't need for better startup performance
 -- vim.g.loaded_perl_provider = 0
