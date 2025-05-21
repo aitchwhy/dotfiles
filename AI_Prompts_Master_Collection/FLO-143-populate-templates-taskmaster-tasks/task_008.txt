@@ -1,0 +1,84 @@
+# Task ID: 8
+# Title: Implement Event Handling for Status Updates
+# Status: pending
+# Dependencies: 6, 7
+# Priority: medium
+# Description: Create an event handling system to process status update events from the BRRR worker and update the database accordingly.
+# Details:
+1. Create `EventHandler.ts` in `gateways/noggin/src/chats/services/`
+2. Implement handlers for TEMPLATE_POPULATING_STARTED and TEMPLATE_POPULATING_COMPLETED events:
+
+```typescript
+export class EventHandler {
+  constructor(
+    private runService: RunService,
+    private eventBus: EventBus
+  ) {}
+  
+  async initialize(): Promise<void> {
+    // Subscribe to events
+    this.eventBus.subscribe('TEMPLATE_POPULATING_STARTED', this.handlePopulatingStarted.bind(this));
+    this.eventBus.subscribe('TEMPLATE_POPULATING_COMPLETED', this.handlePopulatingCompleted.bind(this));
+    this.eventBus.subscribe('run.progress', this.handleProgress.bind(this));
+  }
+  
+  private async handlePopulatingStarted(event: any): Promise<void> {
+    const { stem_id } = event;
+    await this.runService.updateStemStatus(stem_id, 'loading');
+    
+    // Forward to WebSocket clients
+    const stem = await this.runService.findStemById(stem_id);
+    if (stem) {
+      this.eventBus.publish(`run.${stem.run_id}.progress`, {
+        stem_id,
+        percentComplete: 0,
+        statusMessage: 'Started template population'
+      });
+    }
+  }
+  
+  private async handlePopulatingCompleted(event: any): Promise<void> {
+    const { stem_id, success, note_id, error } = event;
+    const status = success ? 'complete' : 'error';
+    
+    await this.runService.updateStemStatus(stem_id, status);
+    
+    // Store note reference if successful
+    if (success && note_id) {
+      await this.runService.attachNoteToStem(stem_id, note_id);
+    }
+    
+    // Forward to WebSocket clients
+    const stem = await this.runService.findStemById(stem_id);
+    if (stem) {
+      this.eventBus.publish(`run.${stem.run_id}.complete`, {
+        success,
+        message: success ? 'Template population complete' : `Error: ${error}`
+      });
+    }
+  }
+  
+  private async handleProgress(event: any): Promise<void> {
+    const { stem_id, percentComplete, statusMessage } = event;
+    
+    // Forward to WebSocket clients
+    const stem = await this.runService.findStemById(stem_id);
+    if (stem) {
+      this.eventBus.publish(`run.${stem.run_id}.progress`, {
+        stem_id,
+        percentComplete,
+        statusMessage
+      });
+    }
+  }
+}
+```
+
+3. Initialize the event handler in the application startup
+
+# Test Strategy:
+1. Unit test each event handler with mocked dependencies
+2. Test different event scenarios (success, error)
+3. Verify correct database updates
+4. Test WebSocket event forwarding
+5. Integration test with in-memory event bus and database

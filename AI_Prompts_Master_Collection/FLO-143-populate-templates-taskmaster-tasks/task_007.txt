@@ -1,0 +1,82 @@
+# Task ID: 7
+# Title: Implement RunService for Business Logic
+# Status: pending
+# Dependencies: 1
+# Priority: medium
+# Description: Create a service layer to encapsulate business logic for template runs and stems, following the dependency injection pattern.
+# Details:
+1. Create `RunService.ts` in `gateways/noggin/src/chats/services/`
+2. Implement methods for creating and retrieving runs and stems:
+
+```typescript
+export class RunService {
+  constructor(
+    private db: Database,
+    private broker: MessageBroker
+  ) {}
+  
+  async createRun(templateId: string, params: Record<string, any>): Promise<string> {
+    const runId = uuidv4();
+    
+    await this.db.transaction(async (tx) => {
+      await tx.query(
+        'INSERT INTO runs (id, template_id, status) VALUES ($1, $2, $3)',
+        [runId, templateId, 'pending']
+      );
+    });
+    
+    return runId;
+  }
+  
+  async createStem(runId: string, parentStemId?: string): Promise<string> {
+    const stemId = uuidv4();
+    
+    await this.db.transaction(async (tx) => {
+      await tx.query(
+        'INSERT INTO stems (id, run_id, parent_stem_id, status) VALUES ($1, $2, $3, $4)',
+        [stemId, runId, parentStemId || null, 'pending']
+      );
+    });
+    
+    return stemId;
+  }
+  
+  async findRunById(runId: string): Promise<Run | null> {
+    const result = await this.db.query(
+      'SELECT * FROM runs WHERE id = $1',
+      [runId]
+    );
+    
+    return result.rows[0] || null;
+  }
+  
+  async findStemById(stemId: string): Promise<Stem | null> {
+    const result = await this.db.query(
+      `SELECT s.*, r.template_id 
+       FROM stems s 
+       JOIN runs r ON s.run_id = r.id 
+       WHERE s.id = $1`,
+      [stemId]
+    );
+    
+    return result.rows[0] || null;
+  }
+  
+  async updateStemStatus(stemId: string, status: string): Promise<void> {
+    await this.db.query(
+      'UPDATE stems SET status = $1, updated_at = NOW() WHERE id = $2',
+      [status, stemId]
+    );
+  }
+}
+```
+
+3. Create interfaces for Run and Stem types
+4. Inject this service into controllers
+
+# Test Strategy:
+1. Unit test each method with mocked database
+2. Test transaction handling
+3. Test error cases and edge conditions
+4. Integration test with in-memory database
+5. Verify correct data persistence and retrieval
