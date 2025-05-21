@@ -3,7 +3,7 @@ return {
   {
     "neovim/nvim-lspconfig",
     -- Load when a buffer with a language server–handled file is opened:
-    event = { "BufReadPre", "BufNewFile" },
+    -- event = { "BufReadPre", "BufNewFile" },
 
     -- blink.cmp integration (for capabilities):
     dependencies = {
@@ -11,7 +11,9 @@ return {
     },
 
     -- Pure map of server → config
+    ---@class PluginLspOpts
     opts = {
+      ---@type lspconfig.options
       servers = {
         -- ---------------------------------------------------------------------
         -- ESLINT SERVER (provides diagnostics + code actions)
@@ -165,21 +167,34 @@ return {
         -- ---------------------------------------------------------------------
         marksman = {},
       },
+      -- you can do any additional lsp server setup here
+      -- return true if you don't want this server to be setup with lspconfig
+      ---@type table<string, fun(server:string, opts:_.lspconfig.options):boolean?>
+      setup = {
+        -- example to setup with typescript.nvim
+        tsserver = function(_, opts)
+          require("typescript").setup({ server = opts })
+          return true
+        end,
+        -- Specify * to use this function as a fallback for any server
+        -- ["*"] = function(server, opts) end,
+        --
+      },
     },
 
-    -- Merge blink.cmp capabilities & setup each server
-    config = function(_, opts)
-      local lspconfig = require("lspconfig")
-
-      for server, cfg in pairs(opts.servers) do
-        if cfg.enabled == false then
-          -- skip disabled servers
-        else
-          cfg.capabilities = require("blink.cmp").get_lsp_capabilities(cfg.capabilities)
-          lspconfig[server].setup(cfg)
-        end
-      end
-    end,
+    -- -- Merge blink.cmp capabilities & setup each server
+    -- config = function(_, opts)
+    --   local lspconfig = require("lspconfig")
+    --
+    --   for server, cfg in pairs(opts.servers) do
+    --     if cfg.enabled == false then
+    --       -- skip disabled servers
+    --     else
+    --       cfg.capabilities = require("blink.cmp").get_lsp_capabilities(cfg.capabilities)
+    --       lspconfig[server].setup(cfg)
+    --     end
+    --   end
+    -- end,
   },
 }
 
