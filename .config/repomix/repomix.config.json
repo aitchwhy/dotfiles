@@ -1,0 +1,36 @@
+{
+  "output": {
+    "filePath": "~/obsidian/primary/Resources/anterior/ant.platform.repomix.config.json",
+    "style": "xml",
+    "parsableStyle": true,
+    "compress": true,
+    "instructionFilePath": "~/dotfiles/.config/repomix/ant.platform.repomix.config.json",
+    "fileSummary": true,
+    "directoryStructure": true,
+    "removeComments": true,
+    "removeEmptyLines": true,
+    "topFilesLength": 7,
+    "showLineNumbers": false,
+    "copyToClipboard": false,
+    "includeEmptyDirectories": false,
+    "git": {
+      "sortByChanges": true,
+      "sortByChangesMaxCommits": 100
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "**/package.json"
+  ],
+  "ignore": {
+    "useGitignore": true,
+    "useDefaultPatterns": true,
+    "customPatterns": [
+      "tmp/",
+      "*.log"
+    ]
+  },
+  "security": {
+    "enableSecurityCheck": true
+  }
+}

@@ -1,0 +1,441 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "git-assistant",
+  "title": "Git Assistant",
+  "description": "Streamline your git workflow with AI-powered conventional commits and repository management.",
+  "icon": "extension-icon.png",
+  "author": "validate",
+  "categories": [
+    "Developer Tools"
+  ],
+  "license": "MIT",
+  "commands": [
+    {
+      "name": "search-git-repositories",
+      "icon": "search-git-repositories-icon.png",
+      "title": "Search Git Repositories",
+      "description": "Search for git repositories on your computer by name",
+      "mode": "view"
+    }
+  ],
+  "tools": [
+    {
+      "name": "get-current-directory",
+      "title": "Get Current Directory",
+      "description": "Gets the specified directory and checks if it's a git repository. Must be called first before other git operations.",
+      "instructions": "Gets the current working directory and verifies if it's a git repository\nBy default, tries to get the current Finder path first",
+      "input": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "The directory path to check (optional, defaults to Finder path if available, otherwise current directory)"
+          }
+        },
+        "required": []
+      },
+      "confirmation": false
+    },
+    {
+      "name": "get-git-changes",
+      "title": "Get Git Changes",
+      "description": "Gets all types of changes in a git repository including staged, unstaged, and untracked files.",
+      "instructions": "Gets all types of git changes in a repository:\n- Staged changes\n- Unstaged changes (if stagedOnly is false)\n- Untracked files\n\nFor large changes:\n- Limits diff output to maxDiffLines (default 100)\n- Provides statistics about insertions/deletions\n- Shows total number of files changed",
+      "input": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "The repository path (required)"
+          },
+          "onlyIncludeStagedChanges": {
+            "type": "boolean",
+            "description": "Whether to only include staged changes\n\n@default false - include all changes (staged, unstaged, and untracked)"
+          },
+          "maxDiffLines": {
+            "type": "number",
+            "description": "Maximum number of lines to include in each diff\n\n@default 100 - limits each diff to 100 lines"
+          }
+        },
+        "required": [
+          "path",
+          "onlyIncludeStagedChanges"
+        ]
+      },
+      "confirmation": false
+    },
+    {
+      "name": "commit-changes",
+      "title": "Create Git Commit",
+      "description": "Creates a git commit with the provided message, optionally staging all changes first. Use after reviewing the suggested commit message.",
+      "instructions": "Creates a git commit with the provided message.\nRequires path and isGitRepo to be provided from get-current-directory tool first.",
+      "input": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "The commit message to use"
+          },
+          "path": {
+            "type": "string",
+            "description": "The repository path (required)"
+          },
+          "stageAll": {
+            "type": "boolean",
+            "description": "Whether to stage all changes before committing"
+          }
+        },
+        "required": [
+          "message",
+          "path",
+          "stageAll"
+        ]
+      },
+      "confirmation": true
+    },
+    {
+      "name": "run-git-command",
+      "title": "Run Git Command",
+      "description": "Runs a git command directly without any analysis or commit. Use when user wants to run a git command directly.",
+      "instructions": "Executes a git command in the specified repository.\nRequires path and isGitRepo to be provided from get-current-directory tool first.",
+      "input": {
+        "type": "object",
+        "properties": {
+          "command": {
+            "type": "string",
+            "description": "The git command to execute"
+          },
+          "path": {
+            "type": "string",
+            "description": "The repository path (required)"
+          },
+          "isGitRepo": {
+            "type": "boolean",
+            "description": "Whether the path is a git repository (required)"
+          }
+        },
+        "required": [
+          "command",
+          "path",
+          "isGitRepo"
+        ]
+      },
+      "confirmation": true
+    }
+  ],
+  "preferences": [
+    {
+      "name": "scanDirectories",
+      "title": "Scan Directories",
+      "description": "Enter directories to scan, separated by a colon (:)",
+      "type": "textfield",
+      "required": true
+    },
+    {
+      "name": "maxDepth",
+      "title": "Max Directory Depth",
+      "description": "Maximum depth to search in directory tree for Git repositories",
+      "type": "dropdown",
+      "required": false,
+      "default": "3",
+      "data": [
+        {
+          "title": "1",
+          "value": "1"
+        },
+        {
+          "title": "2",
+          "value": "2"
+        },
+        {
+          "title": "3",
+          "value": "3"
+        },
+        {
+          "title": "4",
+          "value": "4"
+        },
+        {
+          "title": "5",
+          "value": "5"
+        },
+        {
+          "title": "6",
+          "value": "6"
+        },
+        {
+          "title": "7",
+          "value": "7"
+        },
+        {
+          "title": "8",
+          "value": "8"
+        },
+        {
+          "title": "9",
+          "value": "9"
+        },
+        {
+          "title": "10",
+          "value": "10"
+        }
+      ]
+    }
+  ],
+  "ai": {
+    "evals": [
+      {
+        "input": "@git-assistant Analyze my git changes and propose a commit message. Include scope and body",
+        "expected": [
+          {
+            "callsTool": "get-current-directory"
+          },
+          {
+            "callsTool": {
+              "arguments": {
+                "path": "/projects/git-assistant/",
+                "onlyIncludeStagedChanges": false
+              },
+              "name": "get-git-changes"
+            }
+          }
+        ],
+        "mocks": {
+          "get-current-directory": {
+            "path": "/projects/git-assistant/",
+            "gitDir": ".git"
+          },
+          "get-git-changes": {
+            "path": "/projects/git-assistant",
+            "changes": {
+              "status": "M package.json",
+              "stagedChanges": "",
+              "untrackedFiles": [],
+              "untrackedDiff": "",
+              "unstagedChanges": "diff --git a/package.json b/package.json"
+            },
+            "summary": {
+              "hasUnstagedChanges": false,
+              "hasStagedChanges": true,
+              "hasUntrackedFiles": false,
+              "totalFiles": 1,
+              "stats": {
+                "deletions": 0,
+                "filesChanged": 1,
+                "insertions": 0
+              }
+            }
+          }
+        }
+      },
+      {
+        "input": "@git-assistant Run git status",
+        "expected": [
+          {
+            "callsTool": "get-current-directory"
+          },
+          {
+            "callsTool": {
+              "name": "run-git-command",
+              "arguments": {
+                "isGitRepo": true,
+                "command": "git status"
+              }
+            }
+          }
+        ],
+        "mocks": {
+          "get-current-directory": {
+            "path": "/projects/git-assistant/",
+            "gitDir": ".git"
+          },
+          "run-git-command": {
+            "command": "git status",
+            "isGitRepo": true
+          }
+        },
+        "meetsCriteria": "Runs the git status command"
+      },
+      {
+        "input": "@git-assistant Stage and commit only staged changes. Include body.",
+        "expected": [
+          {
+            "callsTool": "get-current-directory"
+          },
+          {
+            "callsTool": {
+              "name": "get-git-changes",
+              "arguments": {
+                "onlyIncludeStagedChanges": true
+              }
+            }
+          },
+          {
+            "callsTool": "commit-changes"
+          }
+        ],
+        "mocks": {
+          "get-current-directory": {
+            "path": "/projects/git-assistant",
+            "gitDir": ".git"
+          },
+          "get-git-changes": {
+            "path": "/projects/git-assistant",
+            "changes": {
+              "status": "M  ai.yaml",
+              "stagedChanges": "diff --git a/ai.yaml b/ai.yaml",
+              "untrackedFiles": [],
+              "untrackedDiff": "",
+              "unstagedChanges": ""
+            },
+            "summary": {
+              "hasUnstagedChanges": true,
+              "hasStagedChanges": true,
+              "hasUntrackedFiles": false,
+              "totalFiles": 1,
+              "stats": {
+                "deletions": 0,
+                "filesChanged": 1,
+                "insertions": 0
+              }
+            }
+          },
+          "commit-changes": {
+            "success": true,
+            "message": "refactor: update instructions"
+          }
+        }
+      },
+      {
+        "input": "@git-assistant Stage and commit all changes. Include body and scope.",
+        "expected": [
+          {
+            "callsTool": "get-current-directory"
+          },
+          {
+            "callsTool": {
+              "name": "get-git-changes",
+              "arguments": {
+                "onlyIncludeStagedChanges": false
+              }
+            }
+          },
+          {
+            "callsTool": "commit-changes"
+          }
+        ],
+        "mocks": {
+          "get-git-changes": {
+            "path": "/projects/git-assistant",
+            "changes": {
+              "status": "M package.json",
+              "stagedChanges": "",
+              "untrackedFiles": [],
+              "untrackedDiff": "",
+              "unstagedChanges": "diff --git a/package.json b/package.json"
+            },
+            "summary": {
+              "hasUnstagedChanges": false,
+              "hasStagedChanges": true,
+              "hasUntrackedFiles": false,
+              "totalFiles": 1,
+              "stats": {
+                "deletions": 0,
+                "filesChanged": 1,
+                "insertions": 0
+              }
+            }
+          },
+          "get-current-directory": {
+            "path": "/projects/git-assistant",
+            "gitDir": ".git"
+          },
+          "commit-changes": {
+            "success": true,
+            "message": "refactor(package): update package.json",
+            "path": "/projects/git-assistant"
+          }
+        }
+      },
+      {
+        "input": "@git-assistant Can you create a new branch named test/call-ducks?",
+        "expected": [
+          {
+            "callsTool": "get-current-directory"
+          },
+          {
+            "callsTool": {
+              "name": "run-git-command",
+              "arguments": {
+                "command": "git checkout -b test/call-ducks",
+                "isGitRepo": true
+              }
+            }
+          }
+        ],
+        "mocks": {
+          "run-git-command": {
+            "command": "git checkout -b test/call-ducks",
+            "path": "/projects/git-assistant",
+            "output": ""
+          },
+          "get-current-directory": {
+            "path": "/projects/git-assistant",
+            "gitDir": ".git"
+          }
+        }
+      },
+      {
+        "input": "@git-assistant Current status of the repo please",
+        "expected": [
+          {
+            "callsTool": {
+              "name": "get-current-directory"
+            }
+          },
+          {
+            "callsTool": {
+              "name": "run-git-command",
+              "arguments": {
+                "path": "/projects/git-assistant",
+                "isGitRepo": true
+              }
+            }
+          }
+        ],
+        "mocks": {
+          "get-current-directory": {
+            "path": "/projects/git-assistant",
+            "gitDir": ".git"
+          },
+          "run-git-command": {
+            "command": "git status",
+            "path": "/projects/git-assistant",
+            "output": "Your branch is up to date"
+          }
+        }
+      }
+    ],
+    "instructions": "IMPORTANT: Always get the repository path first using get-current-directory before performing ANY git operations. This is a mandatory first step.\n\nDefault behavior for changes:\n1. Work with ALL changes (staged, unstaged, and untracked) by default\n2. Only work with staged changes if explicitly requested by user (e.g. \"only staged commits\")\n3. Always include untracked files in the analysis unless explicitly told not to\n\nIf the user wants to run a git command directly:\n1. Get the repository path using get-current-directory\n2. If user wants to run a git command directly, use run-git-command to execute the command\n\nIMPORTANT: If user wants to run a git command directly, without any analysis or commit, use run-git-command to execute the command.\nIf user wants a specific git command which is not already supported by the other tools, use run-git-command to execute the command.\nWhen you compose a git command, make sure to include \"git\" as the first argument.\nFor example, try to run \"git status\" instead of \"status\".\n\nFor analyzing changes (when user only asks to analyze or suggest):\n1. Use get-git-changes to get the changes\n2. Show the suggested message to the user without proceeding to commit\n\nFor creating commits (when user wants to commit directly):\n1. Use get-git-changes to get the changes\n2. After getting the suggested message, use commit-changes to show the commit confirmation UI and create the commit\n\nFor combined analyze and commit (when user asks to analyze AND commit):\n1. Use get-git-changes to get the changes\n2. After getting the suggested message, use commit-changes to show the commit confirmation UI and create the commit\n\nWhen generating commit messages, follow this format:\n\"\"\"\n<type><scope>: <description>\n\n<body>\n\"\"\"\n\nOnly include these optional components if explicitly requested by the user:\n- [scope]: Add scope in brackets after type if user requests it\n- [body]: Add detailed explanation after description if user wants more details\n\n\nSo, the default format if any of the optional components are not requested:\n\"\"\"\n<type>: <description>\n\"\"\"\n\nCommit guidelines:\n- Use appropriate types (feat, fix, docs, style, refactor, test, chore)\n- Generate ONE SINGLE message that encompasses all changes\n- Choose the most significant type that represents the overall changes\n- Keep the description clear and concise\n- Only add scope or body when user specifically asks for them\n"
+  },
+  "dependencies": {
+    "@raycast/api": "^1.87.4",
+    "@raycast/utils": "^1.17.0",
+    "node-spotlight": "^1.0.0"
+  },
+  "devDependencies": {
+    "@raycast/eslint-config": "^1.0.11",
+    "@types/node": "20.8.10",
+    "@types/react": "18.3.3",
+    "eslint": "^8.57.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.4.5"
+  },
+  "scripts": {
+    "build": "ray build",
+    "dev": "ray develop",
+    "fix-lint": "ray lint --fix",
+    "lint": "ray lint",
+    "publish": "npx @raycast/api@latest publish"
+  }
+}

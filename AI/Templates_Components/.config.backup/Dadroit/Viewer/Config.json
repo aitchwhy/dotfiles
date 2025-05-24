@@ -1,0 +1,75 @@
+
+{
+	"Version": "3.1.0.533",
+	"ID": "80e68d16caf8d180a055bdb3510064703f01cd4fd0148b16dc770ca80605065a",
+	"Window": 
+	{
+		"Left": 150,
+		"Top": 801,
+		"Width": 600,
+		"Height": 800,
+		"WindowState": "wsNormal" // "wsNormal","wsMinimized","wsMaximized","wsFullScreen"
+	},
+	"View": 
+	{
+		"StatusBar": true,
+		"NodePathStatusBar": true
+	},
+	"Style": 
+	{
+		"ContentEven": 16448250,
+		"ContentOdd": 16777215,
+		"TreeLines": 14079702,
+		"InformationPanel": 15461355,
+		"SearchResultsFocused": 52479,
+		"SearchResults": 10415359,
+		"String_": 7093511,
+		"Object_": 10254080,
+		"Boolean_": 10695813,
+		"Number_": 25857,
+		"TextLow": 11316396,
+		"TextMedium": 8158332,
+		"TextHigh": 3025705,
+		"FousedLine": 16705479,
+		"Crem": 11358464,
+		"ContentEvenDark": 2498846,
+		"ContentOddDark": 2038295,
+		"TreeLinesDark": 4341051,
+		"InformationPanelDark": 3025449,
+		"SearchResultsFocusedDark": 23967,
+		"SearchResultsDark": 1258314,
+		"StringDark": 16703865,
+		"ObjectDark": 16627243,
+		"BooleanDark": 12871935,
+		"NumberDark": 6414953,
+		"TextLowDark": 7566455,
+		"TextMediumDark": 11579053,
+		"TextHighDark": 16777215,
+		"FousedLineDark": 8930066,
+		"CremDark": 16634926,
+		"BrandPrimary": 12407597,
+		"BrandSecondary": 48127
+	},
+	"AutoRefresh": 
+	{
+		"Active": true,
+		"Silent": true,
+		"Instant": false
+	},
+	"Recent": 
+	{
+		"List": 
+		["/Users/hank/Downloads/reducto-api.json"
+		],
+		"Limit": 10
+	},
+	"Logging": 1,
+	"UpdateInformation": 
+	{
+		"MinVersion": "1.1.0.1756",
+		"Version": "3.0.0.961",
+		"Message": "New Version Available",
+		"URL": "https://dadroit.com/download"
+	},
+	"CheckForUpdate": true
+}

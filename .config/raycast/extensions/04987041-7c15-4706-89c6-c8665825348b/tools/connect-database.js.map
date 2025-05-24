@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../src/tools/connect-database.tsx"],
+  "sourcesContent": ["import { open } from \"@raycast/api\";\n\ntype Input = {\n  /**\n   * The ID of the database to connect to.\n   * Use the `get-databases` tool to get the ID of the database.\n   */\n  id: string;\n};\n\nexport default async function connectToDatabase(input: Input) {\n  await open(`tableplus://?id=${input.id}`);\n}\n"],
+  "mappings": "yaAAA,IAAAA,EAAA,GAAAC,EAAAD,EAAA,aAAAE,IAAA,eAAAC,EAAAH,GAAA,IAAAI,EAAqB,wBAUrB,eAAOF,EAAyCG,EAAc,CAC5D,QAAM,QAAK,mBAAmBA,EAAM,EAAE,EAAE,CAC1C",
+  "names": ["connect_database_exports", "__export", "connectToDatabase", "__toCommonJS", "import_api", "input"]
+}

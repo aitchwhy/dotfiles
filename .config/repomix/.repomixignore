@@ -1,0 +1,10 @@
+# Cache directories
+.cache/
+tmp/
+
+# Build outputs
+dist/
+build/
+
+# Logs
+*.log

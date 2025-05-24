@@ -1,0 +1,58 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run `zed: open default settings` from the
+// command palette (cmd-shift-p / ctrl-shift-p)
+{
+  "agent": {
+    "always_allow_tool_actions": true,
+    "default_model": {
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-thinking-latest"
+    },
+    "model_parameters": [],
+    "inline_assistant_model": {
+      "provider": "zed.dev",
+      "model": "claude-sonnet-4-thinking-latest"
+    },
+    "version": "2"
+  },
+  "context_servers": {
+    "github-activity-summarizer": {
+      "settings": {
+        "author": "aitchwhy"
+      }
+    },
+    "mcp-server-firecrawl": {
+      "settings": {
+        "firecrawl_api_key": "fc-b5f79cc30e77405f9b3e80588dbf87e7"
+      }
+    },
+    "mcp-server-context7": {
+      "settings": {
+        "default_minimum_tokens": "10000"
+      }
+    },
+    "mcp-server-github": {
+      "settings": {
+        "github_personal_access_token": "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"
+      }
+    },
+    "postgres-context-server": {
+      "settings": {
+        "database_url": "postgresql://myuser:mypassword@localhost:5432/mydatabase"
+      }
+    }
+  },
+  "vim_mode": true,
+  "ui_font_size": 16,
+  "buffer_font_size": 16,
+  "theme": {
+    "mode": "system",
+    "light": "One Light",
+    "dark": "Ayu Mirage"
+  }
+}

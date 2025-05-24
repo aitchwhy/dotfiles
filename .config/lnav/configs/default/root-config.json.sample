@@ -1,0 +1,144 @@
+{
+    "$schema": "https://lnav.org/schemas/config-v1.schema.json",
+    "ui": {
+        "clock-format": "%Y-%m-%dT%H:%M:%S %Z",
+        "dim-text": false,
+        "default-colors": true,
+        "keymap": "default",
+        "theme": "default",
+        "mouse": {
+            "mode": "disabled"
+        },
+        "movement": {
+            "mode": "cursor"
+        }
+    },
+    "log": {
+        "date-time": {
+            "convert-zoned-to-local": true
+        },
+        "annotations": {
+            "com.vmware.vmacore.backtrace": {
+                "description": "Convert a vmacore backtrace into human-readable text",
+                "condition": ":log_body LIKE '%[context]%[/context]%'",
+                "handler": "com.vmware.btresolver.py"
+            }
+        },
+        "demux": {
+            "container": {
+                "pattern": "^(?:\\x1b\\[\\d*K)?(?<mux_id>[a-zA-Z0-9][\\@a-zA-Z0-9_\\.\\-]*)\\s+\\| (?<timestamp>\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{9}Z )?(?<body>.*)"
+            },
+            "recv-with-pod": {
+                "control-pattern": "^===== (?:START|END) =====$",
+                "pattern": "^(?<timestamp>\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(?:Z|[+\\-]\\d{2}:\\d{2})) source=[a-zA-Z0-9][a-zA-Z0-9_\\.\\-]* (?<body>.*) kubernetes_host=(?<k8s_host>[a-zA-Z0-9][a-zA-Z0-9_\\.\\-]*) kubernetes_pod_name=(?<mux_id>[a-zA-Z0-9][a-zA-Z0-9_\\.\\-]*)"
+            },
+            "container-with-type": {
+                "enabled": false,
+                "pattern": "^(?<mux_id>[a-zA-Z][\\w\\-]{3,}) (?<container_type>[a-zA-Z][\\w\\-]{3,}) (?<body>.*)"
+            }
+        }
+    },
+    "tuning": {
+        "archive-manager": {
+            "min-free-space": 33554432,
+            "cache-ttl": "2d"
+        },
+        "remote": {
+            "ssh": {
+                "command": "ssh",
+                "config": {
+                    "BatchMode": "yes",
+                    "ConnectTimeout": "10"
+                },
+                "start-command": "bash -c ./{0:}",
+                "transfer-command": "cat > {0:} && chmod ugo+rx ./{0:}"
+            }
+        },
+        "piper": {
+            "max-size": 10485760,
+            "rotations": 4,
+            "ttl": "2d"
+        },
+        "clipboard": {
+            "impls": {
+                "MacOS": {
+                    "test": "command -v pbcopy",
+                    "general": {
+                        "write": "pbcopy",
+                        "read": "pbpaste -Prefer txt"
+                    },
+                    "find": {
+                        "write": "pbcopy -pboard find",
+                        "read": "pbpaste -pboard find -Prefer txt"
+                    }
+                },
+                "Wayland": {
+                    "test": "test -n \"$WAYLAND_DISPLAY\" && command -v wl-copy",
+                    "general": {
+                        "write": "wl-copy --type text/plain",
+                        "read": "wl-paste --no-newline"
+                    }
+                },
+                "X11-xclip": {
+                    "test": "test -n \"$DISPLAY\" && command -v xclip",
+                    "general": {
+                        "write": "xclip -i -selection clipboard",
+                        "read": "xclip -o -selection clipboard"
+                    }
+                },
+                "tmux": {
+                    "test": "test -n \"$TMUX\" -a -z \"$SSH_CLIENT\"",
+                    "general": {
+                        "write": "tmux load-buffer -",
+                        "read": "tmux save-buffer -"
+                    }
+                },
+                "NeoVim": {
+                    "test": "command -v win32yank.exe",
+                    "general": {
+                        "write": "win32yank.exe -i --crlf",
+                        "read": "win32yank.exe -o --lf"
+                    }
+                },
+                "Windows": {
+                    "test": "command -v clip.exe",
+                    "general": {
+                        "write": "clip.exe"
+                    }
+                }
+            }
+        },
+        "external-opener": {
+            "impls": {
+                "MacOS": {
+                    "test": "command -v open",
+                    "command": "open"
+                },
+                "XDG": {
+                    "test": "command -v xdg-open",
+                    "command": "xdg-open"
+                }
+            }
+        },
+        "textfile": {
+            "max-unformatted-line-length": 1024
+        },
+        "url-scheme": {
+            "docker": {
+                "handler": "docker-url-handler"
+            },
+            "docker-compose": {
+                "handler": "docker-compose-url-handler"
+            },
+            "journald": {
+                "handler": "journald-url-handler"
+            },
+            "piper": {
+                "handler": "piper-url-handler"
+            },
+            "podman": {
+                "handler": "docker-url-handler"
+            }
+        }
+    }
+}

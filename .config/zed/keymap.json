@@ -1,0 +1,28 @@
+// Zed keymap
+//
+// For information on binding keys, see the Zed
+// documentation: https://zed.dev/docs/key-bindings
+//
+// To see the default key bindings run `zed: open default keymap`
+// from the command palette.
+[
+  {
+    "context": "Workspace",
+    "bindings": {
+      // "": "file_finder::Toggle",
+      // "shift shift": "file_finder::Toggle"
+      "ctrl-space": "editor::ShowCompletions",
+      "cmd-k": "command_palette::Toggle",
+      "cmd-o": "outline::Toggle",
+      "cmd-shift-o": "project_symbols::Toggle",
+      "cmd-shift-p": "projects::OpenRecent"
+    }
+  },
+  {
+    "context": "Editor",
+    "bindings": {
+      // "j k": ["workspace::SendKeystrokes", "escape"]
+      "cmd-o": "outline::Toggle"
+    }
+  }
+]

@@ -1,0 +1,369 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "google-workspace",
+  "title": "Google Workspace",
+  "description": "Access Google Drive files.",
+  "icon": "google-logo.png",
+  "owner": "raycast",
+  "access": "public",
+  "author": "thomaslombart",
+  "contributors": [
+    "mathieudutour",
+    "marcmagn1",
+    "meganpearson",
+    "jbjanot",
+    "ridemountainpig",
+    "ViGeng"
+  ],
+  "categories": [
+    "Productivity"
+  ],
+  "license": "MIT",
+  "preferences": [
+    {
+      "name": "displayFilePath",
+      "type": "checkbox",
+      "required": false,
+      "default": false,
+      "description": "Display the file path in the search results. ⚠️ This may slow down your search results.",
+      "label": "Display file path in search results"
+    }
+  ],
+  "commands": [
+    {
+      "name": "create-google-document",
+      "title": "Create Google Document",
+      "description": "Create a new Google document.",
+      "icon": "google-docs.png",
+      "mode": "no-view",
+      "arguments": [
+        {
+          "name": "title",
+          "placeholder": "Title",
+          "type": "text",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "create-google-spreadsheet",
+      "title": "Create Google Spreadsheet",
+      "description": "Create a new Google spreadsheet.",
+      "icon": "google-sheets.png",
+      "mode": "no-view"
+    },
+    {
+      "name": "create-google-presentation",
+      "title": "Create Google Presentation",
+      "description": "Create a new Google presentation.",
+      "icon": "google-slides.png",
+      "mode": "no-view",
+      "arguments": [
+        {
+          "name": "title",
+          "placeholder": "Title",
+          "type": "text",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "create-google-form",
+      "title": "Create Google Form",
+      "description": "Create a new Google form.",
+      "icon": "google-forms.png",
+      "mode": "no-view",
+      "arguments": [
+        {
+          "name": "title",
+          "placeholder": "Title",
+          "type": "text",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "open-google-drive-home",
+      "title": "Open Google Drive Home",
+      "description": "Open Google Drive in your default browser.",
+      "icon": "google-drive.png",
+      "mode": "no-view"
+    },
+    {
+      "name": "starred-google-drive-files",
+      "title": "Starred Google Drive Files",
+      "description": "List of your starred Google Drive files.",
+      "icon": "google-drive.png",
+      "mode": "view"
+    },
+    {
+      "name": "search-google-drive-files",
+      "title": "Search Google Drive Files",
+      "description": "Search files in your Google Drive.",
+      "icon": "google-drive.png",
+      "mode": "view"
+    },
+    {
+      "name": "starred-google-drive-files-menubar",
+      "title": "Starred Google Drive Files",
+      "description": "List of your starred Google Drive files in the Menu Bar.",
+      "icon": "google-drive.png",
+      "mode": "menu-bar",
+      "interval": "15m"
+    }
+  ],
+  "tools": [
+    {
+      "name": "search-files",
+      "title": "Search Files",
+      "description": "Search files in your Google Drive",
+      "input": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Search query string to filter files and folders in Google Drive.\n\n# Query Syntax\nEach query consists of one or more search clauses. Clauses can be combined with logical operators:\n- `and` - Match both conditions\n- `or` - Match either condition\n- `not` - Negate a condition\n\nEach clause follows the format: field operator value\n\n# Available Operators\n- `contains` - String contains value (prefix matching for names, full token matching for content)\n- `=` - Exact match (strings, booleans)\n- `!=` - Not equal\n- `<` - Less than (dates)\n- `<=` - Less than or equal (dates)\n- `>` - Greater than (dates)\n- `>=` - Greater than or equal (dates)\n- `in` - Value exists in collection\n- `has` - Collection contains element matching parameters\n\n# Common Search Fields\n\n## Basic Properties\n- `name` - File or folder name\n  Operators: contains, =, !=\n  Example: \"name contains 'budget'\" or \"name = 'Q1 Report.pdf'\"\n\n- `fullText` - Search within file content and metadata\n  Operators: contains\n  Example: \"fullText contains 'quarterly revenue'\"\n  Note: For exact phrases, use double quotes: \"fullText contains '\"quarterly revenue\"'\"\n\n- `mimeType` - File type\n  Operators: contains, =, !=\n  Common values:\n  - 'application/vnd.google-apps.folder' (Folders)\n  - 'application/vnd.google-apps.document' (Docs)\n  - 'application/vnd.google-apps.spreadsheet' (Sheets)\n  - 'application/vnd.google-apps.presentation' (Slides)\n  Example: \"mimeType = 'application/vnd.google-apps.folder'\"\n\n## Dates and Times\n- `modifiedTime` - Last modification date\n- `viewedByMeTime` - Last viewed date\n- `createdTime` - Creation date\n  Operators: <, <=, =, !=, >, >=\n  Format: RFC 3339 (e.g., '2024-01-01T00:00:00')\n  Example: \"modifiedTime > '2024-01-01T00:00:00'\"\n\n## Status Flags\n- `trashed` - In trash or not\n- `starred` - Starred status\n- `sharedWithMe` - In \"Shared with me\" collection\n  Operators: =, !=\n  Values: true, false\n  Example: \"starred = true\"\n\n## Sharing and Permissions\n- `parents` - Parent folder IDs\n  Operators: in\n  Example: \"'folder_id' in parents\"\n\n- `owners` - File owners\n- `writers` - Users with write access\n- `readers` - Users with read access\n  Operators: in\n  Example: \"'user@example.com' in owners\"\n\n- `visibility` - File visibility level\n  Operators: =, !=\n  Values: 'anyoneCanFind', 'anyoneWithLink', 'domainCanFind', 'domainWithLink', 'limited'\n  Example: \"visibility = 'anyoneCanFind'\"\n\n## Custom Properties\n- `properties` - Public custom properties\n- `appProperties` - Private custom properties\n  Operators: has\n  Example: \"properties has { key='category' and value='finance' }\"\n\n# Complex Query Examples\n\nFind recent important documents:\n\"modifiedTime > '2024-01-01T00:00:00' and starred = true and mimeType = 'application/vnd.google-apps.document'\"\n\nFind shared spreadsheets containing \"budget\":\n\"sharedWithMe = true and mimeType = 'application/vnd.google-apps.spreadsheet' and fullText contains 'budget'\"\n\nFind non-trashed images in a specific folder:\n\"'folder_id' in parents and mimeType contains 'image/' and trashed = false\"\n\nFind documents shared with specific domain:\n\"visibility = 'domainCanFind' and mimeType = 'application/vnd.google-apps.document'\"\n\n# Important Notes\n1. String values must be surrounded by single quotes\n2. Escape single quotes in values with \\' (e.g., \"name contains 'Quinn\\'s report'\")\n3. The contains operator only performs prefix matching for names\n4. For fullText searches, contains only matches complete tokens\n5. Date queries default to UTC timezone\n6. Queries are case-insensitive"
+          },
+          "scope": {
+            "type": "string",
+            "description": "Scope of the search.\n\nAvailable options:\n- `user`: Search only in the user's Drive\n- `allDrives`: Search across all accessible shared drives\n\nNote: When using `allDrives`, the search will include files from:\n- User's personal Drive\n- Shared Drives the user has access to\n- Files shared with the user",
+            "enum": [
+              "user",
+              "allDrives"
+            ]
+          }
+        },
+        "required": [
+          "query",
+          "scope"
+        ]
+      },
+      "confirmation": false
+    },
+    {
+      "name": "create-document",
+      "title": "Create Document",
+      "description": "Creates a new Google document (docs, forms, spreadsheets, presentation)",
+      "input": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Type of document to create.\n\nAvailable options:\n- `document`: Create a new Google Doc\n- `spreadsheets`: Create a new Google Sheet\n- `presentation`: Create a new Google Slides\n- `forms`: Create a new Google Form\n\nExamples:\nTo create a new Google Doc titled \"Meeting Notes\":\n{\n  type: \"document\",\n  title: \"Meeting Notes\"\n}\n\nTo create a new untitled spreadsheet:\n{\n  type: \"spreadsheets\"\n}\n\nNote: The document will open in your default browser after creation.\nThe document will be created in your primary Google Drive account.",
+            "enum": [
+              "document",
+              "forms",
+              "spreadsheets",
+              "presentation"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "description": "Optional title for the new document.\nIf not provided, Google will create an \"Untitled\" document."
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "confirmation": false
+    }
+  ],
+  "ai": {
+    "evals": [
+      {
+        "input": "@google-workspace Create new presentation called Q2 2025",
+        "mocks": {
+          "create-document": "Successfully called \"create-document\""
+        },
+        "expected": [
+          {
+            "callsTool": {
+              "arguments": {
+                "title": "Q2 2025",
+                "type": "presentation"
+              },
+              "name": "create-document"
+            }
+          }
+        ]
+      },
+      {
+        "input": "@google-workspace Find me my latest screen recording",
+        "mocks": {
+          "search-files": {
+            "files": [
+              {
+                "originalFilename": "screen-recording.mov",
+                "modifiedTime": "2024-10-21T11:56:28.016Z",
+                "mimeType": "video/quicktime",
+                "quotaBytesUsed": "80702640",
+                "sharedWithMeTime": "2024-10-24T07:54:23.059Z",
+                "explicitlyTrashed": false,
+                "trashed": false,
+                "hasThumbnail": true,
+                "videoMediaMetadata": {
+                  "width": 3344,
+                  "durationMillis": "31499",
+                  "height": 1644
+                },
+                "name": "screen-recording.mov",
+                "version": "14",
+                "size": "80702640",
+                "shared": true,
+                "webViewLink": "https://drive.google.com/file/d/recording-id/view?usp=drivesdk",
+                "id": "recording-id",
+                "createdTime": "2024-10-21T11:56:19.623Z",
+                "starred": false,
+                "spaces": [
+                  "drive"
+                ],
+                "capabilities": {
+                  "canTrash": false
+                },
+                "fileExtension": "mov",
+                "iconLink": "https://drive-thirdparty.googleusercontent.com/16/type/video/quicktime",
+                "viewersCanCopyContent": true,
+                "lastModifyingUser": {
+                  "emailAddress": "hinglematt@gmail.com",
+                  "displayName": "hinglematt"
+                },
+                "fullFileExtension": "mov",
+                "webContentLink": "https://drive.google.com/uc?id=some-id&export=download",
+                "thumbnailLink": "https://lh3.googleusercontent.com/drive-storage/another-id=s220",
+                "viewedByMeTime": "2024-10-24T07:54:23.059Z"
+              }
+            ]
+          }
+        },
+        "expected": [
+          {
+            "callsTool": {
+              "name": "search-files",
+              "arguments": {
+                "query": {
+                  "includes": "recording"
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "input": "@google-workspace Get me the shared documents from last week",
+        "mocks": {
+          "search-files": {
+            "files": [
+              {
+                "name": "Project Planning.docx",
+                "mimeType": "application/vnd.google-apps.document",
+                "createdTime": "2024-03-10T14:30:00.000Z",
+                "shared": true,
+                "webViewLink": "https://docs.google.com/document/d/doc-id/edit",
+                "lastModifyingUser": {
+                  "emailAddress": "colleague@company.com",
+                  "displayName": "Team Member"
+                }
+              }
+            ]
+          }
+        },
+        "expected": [
+          {
+            "callsTool": {
+              "name": "search-files",
+              "arguments": {
+                "query": {
+                  "includes": "shared"
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "input": "@google-workspace New doc \"Weekly Review\"",
+        "mocks": {
+          "create-document": "Successfully called \"create-document\""
+        },
+        "expected": [
+          {
+            "callsTool": {
+              "arguments": {
+                "title": "Weekly Review",
+                "type": "document"
+              },
+              "name": "create-document"
+            }
+          }
+        ]
+      },
+      {
+        "input": "@google-workspace Which presentations were created by Sarah?",
+        "mocks": {
+          "search-files": {
+            "files": [
+              {
+                "name": "Q1 Marketing Strategy.slides",
+                "mimeType": "application/vnd.google-apps.presentation",
+                "modifiedTime": "2024-03-15T09:30:00.000Z",
+                "webViewLink": "https://docs.google.com/presentation/d/pres-id-1/edit",
+                "lastModifyingUser": {
+                  "emailAddress": "sarah@company.com",
+                  "displayName": "Sarah Johnson",
+                  "photoLink": "https://lh3.googleusercontent.com/a/photo-1"
+                }
+              },
+              {
+                "name": "Brand Guidelines 2024.slides",
+                "mimeType": "application/vnd.google-apps.presentation",
+                "modifiedTime": "2024-03-10T14:45:00.000Z",
+                "webViewLink": "https://docs.google.com/presentation/d/pres-id-2/edit",
+                "lastModifyingUser": {
+                  "emailAddress": "sarah@company.com",
+                  "displayName": "Sarah Johnson",
+                  "photoLink": "https://lh3.googleusercontent.com/a/photo-1"
+                }
+              }
+            ]
+          }
+        },
+        "expected": [
+          {
+            "callsTool": {
+              "name": "search-files",
+              "arguments": {
+                "query": {
+                  "includes": "sarah"
+                }
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "dependencies": {
+    "@raycast/api": "^1.62.0",
+    "@raycast/utils": "^1.18.1",
+    "date-fns": "^2.30.0",
+    "jwt-decode": "^3.1.2",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "@raycast/eslint-config": "^1.0.8",
+    "@types/jwt-decode": "^3.1.0",
+    "@types/node": "^20.9.0",
+    "@types/react": "^18.2.37",
+    "eslint": "^8.53.0",
+    "prettier": "^3.1.0",
+    "react": "^18.2.0",
+    "typescript": "^5.2.2"
+  },
+  "scripts": {
+    "build": "ray build -e dist",
+    "dev": "ray develop",
+    "fix-lint": "ray lint --fix",
+    "lint": "ray lint"
+  }
+}
