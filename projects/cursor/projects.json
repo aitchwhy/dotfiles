@@ -40,5 +40,19 @@
 		"paths": [],
 		"tags": [],
 		"enabled": true
+	},
+	{
+		"name": "primary",
+		"rootPath": "/Users/hank/obsidian/primary",
+		"paths": [],
+		"tags": [],
+		"enabled": true
+	},
+	{
+		"name": "platform-posthog",
+		"rootPath": "/Users/hank/src/platform-posthog",
+		"paths": [],
+		"tags": [],
+		"enabled": true
 	}
 ]

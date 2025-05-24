@@ -1,0 +1,5 @@
+theme: Default
+sort:
+    by: RESTARTS
+    isReversed: true
+disable_exit_confirmation: false

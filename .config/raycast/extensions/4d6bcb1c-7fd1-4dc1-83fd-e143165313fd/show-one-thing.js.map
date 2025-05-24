@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../src/show-one-thing.tsx"],
+  "sourcesContent": ["import { MenuBarExtra, Cache, updateCommandMetadata, launchCommand, LaunchType, environment } from \"@raycast/api\";\n\nconst cache = new Cache();\n\nexport default function Command() {\n  const oneThing = cache.get(\"onething\");\n\n  if (!oneThing) {\n    updateCommandMetadata({ subtitle: null });\n    return null;\n  }\n\n  updateCommandMetadata({ subtitle: oneThing });\n\n  return (\n    <MenuBarExtra title={oneThing}>\n      <MenuItem />\n    </MenuBarExtra>\n  );\n}\n\nfunction MenuItem() {\n  if (environment.launchType === LaunchType.UserInitiated) {\n    launchCommand({ name: \"set-one-thing\", type: LaunchType.UserInitiated });\n  }\n\n  return null;\n}\n"],
+  "mappings": "yaAAA,IAAAA,EAAA,GAAAC,EAAAD,EAAA,aAAAE,IAAA,eAAAC,EAAAH,GAAA,IAAAI,EAAmG,wBAgB7FC,EAAA,6BAdAC,EAAQ,IAAI,QAEH,SAARJ,GAA2B,CAChC,IAAMK,EAAWD,EAAM,IAAI,UAAU,EAErC,OAAKC,MAKL,yBAAsB,CAAE,SAAUA,CAAS,CAAC,KAG1C,OAAC,gBAAa,MAAOA,EACnB,mBAACC,EAAA,EAAS,EACZ,OATA,yBAAsB,CAAE,SAAU,IAAK,CAAC,EACjC,KAUX,CAEA,SAASA,GAAW,CAClB,OAAI,cAAY,aAAe,aAAW,kBACxC,iBAAc,CAAE,KAAM,gBAAiB,KAAM,aAAW,aAAc,CAAC,EAGlE,IACT",
+  "names": ["show_one_thing_exports", "__export", "Command", "__toCommonJS", "import_api", "import_jsx_runtime", "cache", "oneThing", "MenuItem"]
+}

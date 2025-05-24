@@ -2,6 +2,10 @@
 	"name": "ant",
 	"folders": [
 		{
+			"name": "platform-gemini",
+			"path": "/Users/hank/src/platform-gemini"
+		},
+		{
 			"name": "platform",
 			"path": "/Users/hank/src/platform"
 		},
@@ -14,93 +18,39 @@
 			"path": "/Users/hank/src/vibes/apps/flonotes"
 		}
 	],
-	// Shared VS Code settings across all roots
-	// "settings": {
-	// 	// // ensure you’re running the correct Node/TS from nix:
-	// 	// "typescript.tsdk": "${env:HOME}/.nix-profile/lib/node_modules/typescript/lib",
-	// 	// "typescript.enablePromptUseWorkspaceTsdk": true
-	// 	"nixEnvSelector.useFlake": true,
-	// 	"nixEnvSelector.autoEnter": true,
-	// 	"nixEnvSelector.flakeFilePath": "./flake.nix",
-	// 	// TypeScript configuration
-	// 	"typescript.enablePromptUseWorkspaceTsdk": true,
-	// 	"typescript.tsdk": "${env:HOME}/.nix-profile/lib/node_modules/typescript/lib",
-	// 	"typescript.updateImportsOnFileMove.enabled": "always",
-	// 	// Formatting and editor settings
-	// 	"editor.codeActionsOnSave": {
-	// 		"source.fixAll.eslint": "explicit"
-	// 	},
-	// 	"[typescript]": {
-	// 		"editor.defaultFormatter": "esbenp.prettier-vscode",
-	// 		"editor.formatOnSave": true,
-	// 		"editor.formatOnSaveMode": "file"
-	// 	},
-	// 	"[typescriptreact]": {
-	// 		"editor.defaultFormatter": "esbenp.prettier-vscode",
-	// 		"editor.formatOnSave": true,
-	// 		"editor.formatOnSaveMode": "file"
-	// 	},
-	// 	"files.trimTrailingWhitespace": true,
-	// 	"liveServer.settings.multiRootWorkspaceName": "platform",
-	// 	"nixEnvSelector.nixFile": "${workspaceFolder}/flake.nix"
-	// },
 	"tasks": {
-		"build-noggin": {
-			"label": "Build Noggin",
-			"type": "shell",
-			"command": "npm run build",
-			"group": "build",
-			"options": {
-				"cwd": "/Users/hank/src/platform/gateways/noggin"
-			}
-		},
-		"run-noggin": {
-			"label": "Run Noggin Chat Service",
-			"type": "shell",
-			"command": "bun run dev",
-			"group": "build",
-			"options": {
-				"cwd": "/Users/hank/src/platform/gateways/noggin"
-			}
-		},
-		"run-flopilot": {
-			"label": "Run Flopilot",
-			"type": "shell",
-			"command": "npm run dev",
-			"group": {
-				"kind": "build",
-				"isDefault": true
+		"version": "2.0.0",
+		"tasks": [
+			{
+				"label": "echo",
+				"type": "shell",
+				"command": "echo Hello"
 			},
-			"options": {
-				"cwd": "/Users/hank/src/vibes/apps/flopilot"
-			}
-		},
-		"run-flonotes": {
-			"label": "Run Flonotes",
-			"type": "shell",
-			"command": "npm run dev",
-			"options": {
-				"cwd": "/Users/hank/src/vibes/apps/flonotes"
-			}
-		},
-		"nix-dev-shell-all": {
-			"label": "Nix Dev Shell (Platform)",
-			"type": "shell",
-			"command": "nix develop",
-			"group": "build",
-			"options": {
-				"cwd": "/Users/hank/src/platform"
-			}
-		},
-		"nix-dev-shell-npm": {
-			"label": "Nix Dev Shell (Vibes)",
-			"type": "shell",
-			"command": "nix develop",
-			"group": "build",
-			"options": {
-				"cwd": "/Users/hank/src/vibes"
-			}
-		}
+			{
+				"label": "build-noggin platform-gemini",
+				"type": "shell",
+				"command": "source .env && npm -w=@anterior/noggin run start | npx start",
+				"options": {
+					"cwd": "${workspaceFolder}"
+				}
+			},
+			{
+				"label": "build-noggin platform",
+				"type": "shell",
+				"command": "source .env && npm -w=@anterior/noggin run start | npx start",
+				"options": {
+					"cwd": "${workspaceFolder}/platform"
+				}
+			},
+			// {
+			// 	"label": "build-noggin",
+			// 	"type": "shell",
+			// 	"command": "nix flake check -L && nix develop && source .env && ant-all-services",
+			// 	"options": {
+			// 		"cwd": "${workspaceFolder}/platform/"
+			// 	}
+			// }
+		]
 	},
 	"launch": {
 		"version": "0.2.0",
@@ -109,7 +59,7 @@
 				"name": "Launch Chrome",
 				"request": "launch",
 				"type": "chrome",
-				"url": "http://localhost:3000",
+				"url": "http://localhost:20701",
 				"webRoot": "${workspaceFolder}/flopilot/src"
 			},
 			{
@@ -126,7 +76,7 @@
 				"skipFiles": [
 					"<node_internals>/**"
 				],
-				"program": "${workspaceFolder}/platform/gateways/noggin/dist/index.js",
+				"program": "${workspaceFolder}/platform/gateways/noggin/dist/index.ts",
 				"outFiles": [
 					"${workspaceFolder}/platform/gateways/noggin/dist/**/*.js"
 				],
@@ -134,10 +84,6 @@
 			}
 		],
 		"compounds": []
-	},
-	"settings": {
-		"typescript.tsdk": "platform/node_modules/typescript/lib",
-		"nixEnvSelector.nixFile": "${workspaceFolder}/flake.nix"
 	},
 	// "settings": {
 	// 	"nixEnvSelector.nixFile": "${workspaceFolder}/flake.nix"

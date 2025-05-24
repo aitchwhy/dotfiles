@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../src/tools/join-meeting.ts"],
+  "sourcesContent": ["import { open } from \"@raycast/api\";\n\ntype Input = {\n  /* The Zoom meeting ID to join */\n  meetingId: string;\n};\n\nexport default async function JoinMeetingTool({ meetingId }: Input) {\n  await open(`https://zoom.us/j/${meetingId}`);\n}\n"],
+  "mappings": "yaAAA,IAAAA,EAAA,GAAAC,EAAAD,EAAA,aAAAE,IAAA,eAAAC,EAAAH,GAAA,IAAAI,EAAqB,wBAOrB,eAAOF,EAAuC,CAAE,UAAAG,CAAU,EAAU,CAClE,QAAM,QAAK,qBAAqBA,CAAS,EAAE,CAC7C",
+  "names": ["join_meeting_exports", "__export", "JoinMeetingTool", "__toCommonJS", "import_api", "meetingId"]
+}

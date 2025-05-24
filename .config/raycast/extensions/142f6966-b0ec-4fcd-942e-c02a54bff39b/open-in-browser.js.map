@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../src/open-in-browser.ts"],
+  "sourcesContent": ["import { LaunchProps, open } from \"@raycast/api\";\n\nexport default async function openInBrowser(props: LaunchProps<{ arguments: Arguments.OpenInBrowser }>) {\n  if (!props.arguments.query) {\n    await open(\"https://exa.ai/search\");\n  } else {\n    await open(`https://exa.ai/search?q=${encodeURIComponent(props.arguments.query)}`);\n  }\n}\n"],
+  "mappings": "yaAAA,IAAAA,EAAA,GAAAC,EAAAD,EAAA,aAAAE,IAAA,eAAAC,EAAAH,GAAA,IAAAI,EAAkC,wBAElC,eAAOF,EAAqCG,EAA4D,CACjGA,EAAM,UAAU,MAGnB,QAAM,QAAK,2BAA2B,mBAAmBA,EAAM,UAAU,KAAK,CAAC,EAAE,EAFjF,QAAM,QAAK,uBAAuB,CAItC",
+  "names": ["open_in_browser_exports", "__export", "openInBrowser", "__toCommonJS", "import_api", "props"]
+}

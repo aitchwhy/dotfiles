@@ -1,0 +1,270 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "exa-search",
+  "title": "Exa Search",
+  "description": "AI-powered search that understands your queries and delivers precise, context-aware results quickly",
+  "icon": "icon.png",
+  "author": "thomas",
+  "owner": "exa_ai",
+  "access": "public",
+  "categories": [
+    "Data"
+  ],
+  "license": "MIT",
+  "commands": [
+    {
+      "name": "open-in-browser",
+      "title": "Open in Browser",
+      "description": "Opens the Exa Search in your browser.",
+      "mode": "no-view",
+      "arguments": [
+        {
+          "name": "query",
+          "placeholder": "Query",
+          "type": "text",
+          "description": "The query to search for."
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "name": "search",
+      "title": "Search",
+      "description": "Perform an Exa search given an input query and retrieve a list of relevant results as links, including a summary of the content.",
+      "instructions": "\n\n@returns The results of the search, including the title, url, and highlights of the content.",
+      "input": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "The input query string."
+          },
+          "numResults": {
+            "type": "number",
+            "description": "Number of search results to return.\n\n@default 10"
+          },
+          "startPublishedDate": {
+            "type": "string",
+            "description": "Results will only include links with a published date after this date.\nMust be specified in ISO 8601 format."
+          },
+          "endPublishedDate": {
+            "type": "string",
+            "description": "Results will only include links with a published date before this date.\nMust be specified in ISO 8601 format."
+          },
+          "category": {
+            "type": "string",
+            "description": "A data category to focus on when searching, with higher comprehensivity and data cleanliness.",
+            "enum": [
+              "company",
+              "research paper",
+              "news",
+              "pdf",
+              "github",
+              "tweet",
+              "personal site",
+              "linkedin profile",
+              "financial report"
+            ]
+          }
+        },
+        "required": [
+          "query"
+        ]
+      },
+      "confirmation": false
+    },
+    {
+      "name": "find-similar",
+      "title": "Find Similar",
+      "description": "Find a list of similar results based on a webpage's URL, including a summary of each result.",
+      "instructions": "\n\n@returns The results of the search, including the title, url, and highlights of the content of the similar results.",
+      "input": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "The URL of the webpage to find similar results for."
+          },
+          "numResults": {
+            "type": "number",
+            "description": "Number of search results to return.\n\n@default 10"
+          },
+          "startPublishedDate": {
+            "type": "string",
+            "description": "Results will only include links with a published date after this date.\nMust be specified in ISO 8601 format."
+          },
+          "endPublishedDate": {
+            "type": "string",
+            "description": "Results will only include links with a published date before this date.\nMust be specified in ISO 8601 format."
+          },
+          "category": {
+            "type": "string",
+            "description": "A data category to focus on when searching, with higher comprehensivity and data cleanliness.",
+            "enum": [
+              "company",
+              "research paper",
+              "news",
+              "pdf",
+              "github",
+              "tweet",
+              "personal site",
+              "linkedin profile",
+              "financial report"
+            ]
+          }
+        },
+        "required": [
+          "url"
+        ]
+      },
+      "confirmation": false
+    },
+    {
+      "name": "get-contents",
+      "title": "Get Contents",
+      "description": "Retrieves the full text of a webpage given its URL.",
+      "instructions": "Retrieves the full contents of the webpages.\n\n@returns The contents of the webpages, including the title, url, and text of the content of the similar results.",
+      "input": {
+        "type": "object",
+        "properties": {
+          "urls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The URLs of the webpages to retrieve the contents of."
+          }
+        },
+        "required": [
+          "urls"
+        ]
+      },
+      "confirmation": false
+    },
+    {
+      "name": "get-answer",
+      "title": "Get Answer",
+      "description": "Get an answer to a question informed by Exa search results.",
+      "input": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "The query to search for."
+          },
+          "model": {
+            "type": "string",
+            "description": "The model to use for the answer.\n\n@default \"exa\"\n@remarks Use \"exa-pro\" for a more accurate answer on complex queries. It performs two additional search queries.",
+            "enum": [
+              "exa",
+              "exa-pro"
+            ]
+          }
+        },
+        "required": [
+          "query"
+        ]
+      },
+      "confirmation": false
+    }
+  ],
+  "preferences": [
+    {
+      "name": "apiKey",
+      "title": "API Key",
+      "type": "password",
+      "required": false,
+      "description": "Your Exa API key."
+    }
+  ],
+  "dependencies": {
+    "@raycast/api": "^1.90.0",
+    "@raycast/utils": "^1.17.0",
+    "exa-js": "^1.4.8"
+  },
+  "devDependencies": {
+    "@raycast/eslint-config": "^1.0.11",
+    "@types/node": "20.8.10",
+    "@types/react": "18.3.3",
+    "eslint": "^8.57.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.4.5"
+  },
+  "scripts": {
+    "build": "ray build",
+    "dev": "ray develop",
+    "fix-lint": "ray lint --fix",
+    "lint": "ray lint",
+    "prepublishOnly": "echo \"\\n\\nIt seems like you are trying to publish the Raycast extension to npm.\\n\\nIf you did intend to publish it to npm, remove the \\`prepublishOnly\\` script and rerun \\`npm publish\\` again.\\nIf you wanted to publish it to the Raycast Store instead, use \\`npm run publish\\` instead.\\n\\n\" && exit 1",
+    "publish": "npx @raycast/api@latest publish"
+  },
+  "ai": {
+    "instructions": "Perform a deep search on the web for information relevant to the query.\n\nFollow these rules when calling tools:\n1. Check if the query is clear. If not, ask for clarification.\n2. Use the `search` tool of the `exa-search` extension to perform a deep search on the web for information relevant to the query. Perform multiple searches in parallel if needed.\n3. Check the search results carefully for relevance to the query.\n  3.1 If you cannot answer the query based on the search results, use the `get-contents` tool to retrieve the full contents of the webpages or do another search. Do this until you find enough relevant results to answer the usery's query.\n  3.2 If you can answer the query based on the relevant search results, write a summary of the results in a way that is easy to understand.\n\nFollow these rules when writing a summary:\n- ALWAYS cite your sources when writing a summary. Each parapgraph and list item must end with the list of sources using this markdown syntax: ([<host of the source, e.g. wikipedia.org>](<full url of the source, e.g. https://en.wikipedia.org/wiki/Thomas_Mann>))\n- If you cannot find any relevant results, return \"No results found\".\n",
+    "evals": [
+      {
+        "input": "@exa-search startups focused on good user experiences in the SF bay area",
+        "mocks": {
+          "search": []
+        },
+        "expected": [
+          {
+            "callsTool": {
+              "name": "search",
+              "arguments": {
+                "query": [
+                  {
+                    "includes": "startups"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "input": "@exa-search recent news about agricultural innovations driven by material advances and robotics",
+        "expected": [
+          {
+            "callsTool": {
+              "name": "search",
+              "arguments": {
+                "query": {
+                  "includes": "agricultural"
+                },
+                "category": "news"
+              }
+            }
+          }
+        ],
+        "mocks": {
+          "search": []
+        }
+      },
+      {
+        "input": "@exa-search linkedin profiles of people who have both eng and design experience",
+        "expected": [
+          {
+            "callsTool": {
+              "name": "search",
+              "arguments": {
+                "category": "linkedin profile",
+                "query": [
+                  {
+                    "includes": "LinkedIn"
+                  },
+                  {
+                    "includes": "design"
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "mocks": {
+          "search": []
+        }
+      }
+    ]
+  }
+}
