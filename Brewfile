@@ -1784,3 +1784,5 @@ cask "zen"
 # biome                kafka                postgresql@17        ruff                 typescript
 # chrome-cli           nushell              ruby                 todoist
 # Run `brew bundle cleanup --force` to make these changes.
+cask "superwhisper"
+cask "macwhisper"
