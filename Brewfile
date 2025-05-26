@@ -1765,3 +1765,8 @@ brew "eslint"
 brew "prettier"
 
 brew "ollama"
+cask "daisydisk"
+cask "another-redis-desktop-manager"
+cask "ghidra"
+cask "osquery"
+cask "zen"
