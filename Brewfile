@@ -1,4 +1,6 @@
 # Taps (Third-Party Repositories)
+#
+#
 tap "dotenvx/brew"
 tap "f1bonacc1/tap"
 tap "koekeishiya/formulae"
@@ -1770,3 +1772,15 @@ cask "another-redis-desktop-manager"
 cask "ghidra"
 cask "osquery"
 cask "zen"
+
+# ➜ bb cleanup -g                                                                          15:19  on Mac OS
+# ==> Downloading https://formulae.brew.sh/api/cask.jws.json
+# Warning: cask.jws.json: update failed, falling back to cached version.
+# ==> Downloading https://formulae.brew.sh/api/formula.jws.json
+# Warning: formula.jws.json: update failed, falling back to cached version.
+# Would uninstall casks:
+# draw-things                                           visual-paradigm
+# Would uninstall formulae:
+# biome                kafka                postgresql@17        ruff                 typescript
+# chrome-cli           nushell              ruby                 todoist
+# Run `brew bundle cleanup --force` to make these changes.
