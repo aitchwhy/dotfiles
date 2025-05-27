@@ -7,20 +7,104 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "debugger": {
+    "log_dap_communications": true,
+    "show_button": true,
+    "save_breakpoints": true,
+    "format_dap_log_messages": true,
+    "show_dap_log_messages": true
+  },
+  "file_types": {
+    "Typescript": ["ts"]
+  },
+  "formatter": {
+    "code_actions": {
+      "source.fixAll.eslint": true,
+      "source.organizeImports": true
+    },
+    "prettier": true
+  },
+  "active_pane_modifiers": {
+    "magnification": 1.0,
+    "border_size": 0.0,
+    "inactive_opacity": 1.0
+  },
+  "auto_install_extensions": {
+    "html": true,
+    "typescript": true,
+    "python": true,
+    "javascript": true
+  },
+  // "load_direnv": "shell_hook",
+  "edit_predictions": {
+    "disabled_globs": [
+      "**/.git",
+      "**/.svn",
+      "**/.hg",
+      "**/CVS",
+      "**/.DS_Store",
+      "**/Thumbs.db",
+      "**/.classpath",
+      "**/.settings",
+      "**/.vscode",
+      "**/.idea",
+      "**/node_modules",
+      "**/.serverless",
+      "**/build",
+      "**/dist",
+      "**/coverage",
+      "**/.venv",
+      "**/__pycache__",
+      "**/.ropeproject",
+      "**/.pytest_cache",
+      "**/.ruff_cache"
+    ],
+    "mode": "eager",
+    "copilot": {
+      "proxy": null,
+      "proxy_no_verify": null
+    },
+    "enabled_in_text_threads": false
+  },
+  "show_edit_predictions": true,
+  /* Duplicated key auto-commented: "agent": {
+    "default_profile": "ask",
+    "default_model": {
+      "provider": "zed.dev",
+      "model": "claude-opus-4-thinking-latest"
+    },
+    "version": "2"
+  }, */
   "agent": {
+    "default_profile": "write",
     "always_allow_tool_actions": true,
     "default_model": {
-      "provider": "anthropic",
-      "model": "claude-sonnet-4-thinking-latest"
+      "provider": "zed.dev",
+      "model": "claude-opus-4-thinking-latest"
     },
     "model_parameters": [],
     "inline_assistant_model": {
       "provider": "zed.dev",
       "model": "claude-sonnet-4-thinking-latest"
     },
-    "version": "2"
+    "version": "2",
+    "single_file_review": false
   },
   "context_servers": {
+    "repomix": {
+      "command": {
+        "path": "repomix",
+        "args": ["--mcp", "--global"],
+        "env": {}
+      }
+    },
+    "taskmaster-ai": {
+      "command": {
+        "path": "taskmaster-ai",
+        "args": ["--model", "claude-sonnet-4-thinking-latest"],
+        "env": {}
+      }
+    },
     "github-activity-summarizer": {
       "settings": {
         "author": "aitchwhy"
@@ -47,12 +131,292 @@
       }
     }
   },
+  "always_treat_brackets_as_autoclosed": true,
+  "diagnostics": {
+    "button": true,
+    "include_warnings": true,
+    "inline": {
+      "enabled": true
+    },
+    "cargo": null
+  },
+  "languages": {
+    "JSON": {},
+    "JSONC": {},
+    "Nix": {
+      "language_servers": ["nixd"],
+      "code_actions_on_format": {
+        "source.organizeImports": true
+      }
+    },
+    "vtsls": {},
+    //     }
+    //   },
+    //   // For TypeScript:
+    //   "typescript": {
+    //     "inlayHints": {
+    //       "parameterNames": {
+    //         "enabled": "all",
+    //         "suppressWhenArgumentMatchesName": false
+    //       },
+    //       "parameterTypes": {
+    //         "enabled": true
+    //       },
+    //       "variableTypes": {
+    //         "enabled": true,
+    //         "suppressWhenTypeMatchesName": true
+    //       },
+    //       "propertyDeclarationTypes": {
+    //         "enabled": true
+    //       },
+    //       "functionLikeReturnTypes": {
+    //         "enabled": true
+    //       },
+    //       "enumMemberValues": {
+    //         "enabled": true
+    //       }
+    //     }
+    //   }
+    // }
+    "TypeScript": {
+      "enable_language_server": true,
+      "language_servers": ["vtsls"]
+    },
+    "TSX": {
+      "enable_language_server": true,
+      "language_servers": ["vtsls"]
+    },
+    "Python": {
+      "language_servers": ["ruff", "basedpyright", "!pyright"],
+      "formatter": [
+        {
+          "code_actions": {
+            "source.organizeImports.ruff": true,
+            "source.fixAll.ruff": true
+          }
+        },
+        {
+          "language_server": {
+            "name": "ruff"
+          }
+        }
+      ]
+    }
+  },
+  "lsp": {
+    "nixd": {
+      "settings": {
+        "diagnostic": {
+          "suppress": ["sema-extra-with"]
+        }
+      }
+    },
+    "disabled_capabilities": {},
+    "code_actions": {
+      "enabled": true,
+      "enable_lsp_tasks": true
+    },
+    "yaml-language-server": {
+      "settings": {
+        "yaml": {
+          "keyOrdering": "false",
+          "schemaStore": {
+            "enable": true,
+            "url": "https://www.schemastore.org/api/json/catalog.json"
+          }
+        }
+      }
+    },
+
+    "vtsls": {
+      "settings": {
+        "javascript": {
+          "inlayHints": {
+            "parameterNames": {
+              "enabled": "all",
+              "suppressWhenArgumentMatchesName": false
+            },
+            "parameterTypes": {
+              "enabled": true
+            },
+            "variableTypes": {
+              "enabled": true,
+              "suppressWhenTypeMatchesName": true
+            },
+            "propertyDeclarationTypes": {
+              "enabled": true
+            },
+            "functionLikeReturnTypes": {
+              "enabled": true
+            },
+            "enumMemberValues": {
+              "enabled": true
+            }
+          }
+        },
+        "typescript": {
+          "tsserver": { "maxTsServerMemory": 16184 },
+          "inlayHints": {
+            "parameterNames": {
+              "enabled": "all",
+              "suppressWhenArgumentMatchesName": false
+            },
+            "parameterTypes": {
+              "enabled": true
+            },
+            "variableTypes": {
+              "enabled": true,
+              "suppressWhenTypeMatchesName": true
+            },
+            "propertyDeclarationTypes": {
+              "enabled": true
+            },
+            "functionLikeReturnTypes": {
+              "enabled": true
+            },
+            "enumMemberValues": {
+              "enabled": true
+            }
+          }
+        }
+      }
+    }
+  },
   "vim_mode": true,
+  // "vim_mode.enabled": true,
   "ui_font_size": 16,
   "buffer_font_size": 16,
   "theme": {
     "mode": "system",
     "light": "One Light",
-    "dark": "Ayu Mirage"
-  }
+    "dark": "Tokyo Night Storm"
+  },
+  "use_smartcase_search": true,
+  // ---------- Look & feel ----------
+  // "theme": "Monokai Extended",
+  // "vim_mode.use_system_clipboard": true,
+  // "format_on_save": true,
+  // "code_actions_on_save": ["eslint.applyAllFixes"]
+
+  // Multi-key sequence settings
+  // "multi_key_binding_delay": 180, // Reduced from default 1000ms to 180ms
+
+  "completions": {
+    "words": "fallback",
+    "lsp": true,
+    "lsp_fetch_timeout_ms": 0,
+    "lsp_insert_mode": "replace_suffix"
+  },
+  // Editor settings for LazyVim users
+  "relative_line_numbers": true,
+  "cursor_blink": false,
+  "show_line_numbers": true,
+  "show_whitespaces": "selection",
+  "indent_guides": {
+    "enabled": true,
+    "line_width": 1,
+    "active_line_width": 1,
+    "coloring": "indent_aware"
+  },
+  "inlay_hints": {
+    "enabled": true,
+    "show_type_hints": true,
+    "show_parameter_hints": true,
+    "show_other_hints": true
+  },
+
+  // Scrolling and navigation
+  "scroll_beyond_last_line": "one_page",
+  "vertical_scroll_margin": 3,
+  "hover_popover_enabled": true,
+  "show_completions_on_input": true,
+  "show_completion_documentation": true,
+
+  // File handling
+  "autosave": "on_focus_change",
+  "format_on_save": "on",
+  "ensure_final_newline_on_save": true,
+  "remove_trailing_whitespace_on_save": true,
+
+  // Search settings
+  "project_search": {
+    "whole_word": false,
+    "case_sensitive": false,
+    "regex": true,
+    "ignore_case": true
+  },
+
+  // Terminal settings
+  "terminal": {
+    "font_size": 14,
+    "font_family": "Zed Plex Mono",
+    "shell": "system",
+    "copy_on_select": true,
+    "cursor_shape": "bar",
+    "blinking": "on",
+    "cursor_blink": false,
+    "toolbar": {
+      "breadcrumbs": true
+    },
+    "working_directory": "current_project_directory"
+  },
+
+  // Git settings
+  "git": {
+    "git_gutter": "tracked_files",
+    "inline_blame": {
+      "enabled": true
+    }
+  },
+
+  // // LSP settings
+  // "lsp": {
+  // },
+
+  // Project panel
+  "project_panel": {
+    "dock": "left",
+    "git_status": true,
+    "indent_size": 20,
+    "auto_fold_dirs": true,
+    "indent_guides": {
+      "show": "always"
+    }
+  },
+  "git_status": true,
+  // Tab settings
+  "tabs": {
+    "activate_on_close": "history",
+    "show_diagnostics": "all",
+    "show_close_button": "hover",
+    "close_position": "right",
+    "file_icons": true,
+    "git_status": true
+  },
+
+  // Outline panel
+  "outline_panel": {
+    "dock": "right"
+  },
+
+  // Collaboration
+  "telemetry": {
+    "diagnostics": false,
+    "metrics": false
+  },
+  // Performance
+  "file_scan_exclusions": [
+    "**/.git",
+    "**/.svn",
+    "**/.hg",
+    "**/CVS",
+    "**/.DS_Store",
+    "**/Thumbs.db",
+    "**/node_modules",
+    "**/dist",
+    "**/build",
+    "**/.next",
+    "**/target",
+    "**/.turbo"
+  ]
 }
