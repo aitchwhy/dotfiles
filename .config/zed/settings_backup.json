@@ -48,6 +48,8 @@
       "**/.settings",
       "**/.vscode",
       "**/.idea",
+      "**/.vscode",
+      "**/.vscode",
       "**/node_modules",
       "**/.serverless",
       "**/build",
@@ -64,17 +66,17 @@
       "proxy": null,
       "proxy_no_verify": null
     },
-    "enabled_in_text_threads": false
+    "enabled_in_assistant": false
   },
   "show_edit_predictions": true,
-  /* Duplicated key auto-commented: "agent": {
+  "assistant": {
     "default_profile": "ask",
     "default_model": {
       "provider": "zed.dev",
       "model": "claude-opus-4-thinking-latest"
     },
     "version": "2"
-  }, */
+  },
   "agent": {
     "default_profile": "write",
     "always_allow_tool_actions": true,
@@ -141,50 +143,38 @@
     "cargo": null
   },
   "languages": {
-    "JSON": {},
-    "JSONC": {},
-    "Nix": {
+    "Nix":  {
       "language_servers": ["nixd"],
       "code_actions_on_format": {
         "source.organizeImports": true
       }
-    },
-    "vtsls": {},
-    //     }
-    //   },
-    //   // For TypeScript:
-    //   "typescript": {
-    //     "inlayHints": {
-    //       "parameterNames": {
-    //         "enabled": "all",
-    //         "suppressWhenArgumentMatchesName": false
-    //       },
-    //       "parameterTypes": {
-    //         "enabled": true
-    //       },
-    //       "variableTypes": {
-    //         "enabled": true,
-    //         "suppressWhenTypeMatchesName": true
-    //       },
-    //       "propertyDeclarationTypes": {
-    //         "enabled": true
-    //       },
-    //       "functionLikeReturnTypes": {
-    //         "enabled": true
-    //       },
-    //       "enumMemberValues": {
-    //         "enabled": true
-    //       }
-    //     }
-    //   }
-    // }
-    "TypeScript": {
-      "enable_language_server": true,
-      "language_servers": ["vtsls"]
-    },
+      // "formatter":
+    }
     "TSX": {
-      "enable_language_server": true,
-      "language_servers": ["vtsls"]
+      "language_servers": ["vtsls"],
+      "code_actions_on_format": {
+        "source.organizeImports": true
+      }
+      // "formatter":
+    },
+    "TypeScript": {
+      "language_servers": ["vtsls"],
+      "code_actions_on_format": {
+        "source.organizeImports": true
+      },
+      "formatter": [
+        {
+          "code_actions": {
+            "source.organizeImports.typescript": true,
+            "source.fixAll.typescript": true
+          }
+        },
+        {
+          "language_server": {
+            "name": "typescript-language-server"
+          }
+        }
+      ]
     },
     "Python": {
       "language_servers": ["ruff", "basedpyright", "!pyright"],
@@ -230,30 +220,6 @@
 
     "vtsls": {
       "settings": {
-        "javascript": {
-          "inlayHints": {
-            "parameterNames": {
-              "enabled": "all",
-              "suppressWhenArgumentMatchesName": false
-            },
-            "parameterTypes": {
-              "enabled": true
-            },
-            "variableTypes": {
-              "enabled": true,
-              "suppressWhenTypeMatchesName": true
-            },
-            "propertyDeclarationTypes": {
-              "enabled": true
-            },
-            "functionLikeReturnTypes": {
-              "enabled": true
-            },
-            "enumMemberValues": {
-              "enabled": true
-            }
-          }
-        },
         "typescript": {
           "tsserver": { "maxTsServerMemory": 16184 },
           "inlayHints": {
@@ -283,7 +249,7 @@
     }
   },
   "vim_mode": true,
-  // "vim_mode.enabled": true,
+  // "vim_mode.enabled": true, // full modal editing :contentReference[oaicite:0]{index=0}
   "ui_font_size": 16,
   "buffer_font_size": 16,
   "theme": {
