@@ -1786,3 +1786,5 @@ cask "zen"
 # Run `brew bundle cleanup --force` to make these changes.
 cask "superwhisper"
 cask "macwhisper"
+cask "anki"
+cask "anki"

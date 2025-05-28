@@ -1,5 +1,36 @@
 [
   {
+    "bindings": {
+      "cmd-o": null,
+      // "cmd-m": "zed::Minimize",
+      "cmd-m": null
+    }
+  },
+  {
+    "context": "Editor",
+    "bindings": {
+      "ctrl-=": "editor::SelectLargerSyntaxNode",
+      "ctrl--": "editor::SelectSmallerSyntaxNode"
+    }
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "cmd-o": "outline::Toggle",
+      "cmd-k": "command_palette::Toggle",
+      "cmd-shift-p": "projects::OpenRecent",
+      "cmd-shift-g": "git_panel::ToggleFocus",
+      "cmd-shift-d": "debug_panel::ToggleFocus",
+      "cmd-shift-o": "outline_panel::ToggleFocus"
+    }
+  },
+  {
+    "context": "Outline",
+    "bindings": {
+      "cmd-o": "outline::Toggle"
+    }
+  },
+  {
     "context": "vim_operator == none && !VimWaiting &&  vim_mode != insert",
     "bindings": {
       "space g": [
