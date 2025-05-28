@@ -8,8 +8,35 @@
 // from the command palette or from `Zed` application menu.
 //
 {
+  // "agent": {
+  //   "version": "2",
+  //   "enabled": true,
+  //   "button": true,
+  //   "dock": "right",
+  //   "default_width": 640,
+  //   "default_height": 320,
+  //   "default_model": {
+  //     "provider": "zed.dev",
+  //     "model": "claude-opus-4-thinking"
+  //   },
+  //   "editor_model": {
+  //     "provider": "zed.dev",
+  //     "model": "claude-opus-4-thinking"
+  //   },
+  //   "single_file_review": true,
+  // }
+  "agent": {
+    "always_allow_tool_actions": true,
+    "default_model": {
+      "provider": "anthropic",
+      "model": "claude-opus-4-thinking-latest"
+    },
+    "model_parameters": [],
+    "default_profile": "write",
+    "version": "2"
+  },
   "telemetry": {
-    "diagnostics": false
+    "diagnostics": true
   },
   "tab_bar": {
     "show": true
@@ -59,29 +86,34 @@
   "languages": {
     "Python": {
       "language_servers": ["pylsp", "ruff"],
-      "format_on_save": "on"
+      "format_on_save": "on",
+      "code_actions_on_format": {
+        "source.organizeImports": true
+      }
     },
-    "typescript": {
-      "language_servers": ["tsserver", "prettier", "!eslint"],
-      "format_on_save": "on"
+    "Typescript": {
+      "language_servers": ["vtsls", "tsserver", "prettier", "!eslint"],
+      "format_on_save": "on",
+      "code_actions_on_format": {
+        "source.organizeImports": true
+      }
     },
-    "typescriptreact": {
-      "language_servers": ["tsserver", "prettier", "!eslint"],
-      "format_on_save": "on"
+    "TSX": {
+      "language_servers": ["vtsls", "tsserver", "prettier", "!eslint"],
+      "format_on_save": "on",
+      "code_actions_on_format": {
+        "source.organizeImports": true
+      }
     },
-    "javascriptreact": {
-      "language_servers": ["tsserver", "prettier", "!eslint"],
-      "format_on_save": "on"
-    },
-    "javascript": {
-      "language_servers": ["tsserver", "prettier", "!eslint"],
-      "format_on_save": "on"
-    },
-    "html": {
-      "language_servers": ["tsserver", "prettier", "!eslint"],
-      "format_on_save": "on"
+    "JavaScript": {
+      "language_servers": ["vtsls", "tsserver", "prettier", "!eslint"],
+      "format_on_save": "on",
+      "code_actions_on_format": {
+        "source.organizeImports": true
+      }
     }
   },
+  "use_smartcase_search": true,
   "lsp": {
     "pylsp": {
       "settings": {
@@ -98,5 +130,28 @@
         "settings": {}
       }
     }
+  },
+  "toolbar": {
+    "breadcrumbs": true,
+    "quick_actions": true,
+    "selections_menu": true,
+    "agent_review": true,
+    "code_actions": true
+  },
+  "indent_guides": {
+    "enabled": true,
+    "coloring": "indent_aware"
+  },
+  "search": {
+    "whole_word": true,
+    "case_sensitive": false,
+    "include_ignored": false,
+    "regex": false
+  },
+  "completions": {
+    "words": "fallback",
+    "lsp": true,
+    "lsp_fetch_timeout_ms": 0,
+    "lsp_insert_mode": "replace_suffix"
   }
 }
