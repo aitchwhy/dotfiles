@@ -557,7 +557,7 @@ has_command fzf && source <(fzf --zsh)
 # has_command zellij && eval "$(zellij setup --generate-auto-start zsh)"
 
 # --- Direnv ---
-has_command direnv && eval "$(direnv hook zsh)"
+# has_command direnv && eval "$(direnv hook zsh)"
 
 # --- uv ---
 has_command uv && eval "$(uv generate-shell-completion zsh)"

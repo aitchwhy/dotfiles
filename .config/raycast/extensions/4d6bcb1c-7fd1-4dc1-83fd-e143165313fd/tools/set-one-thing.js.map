@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../../src/tools/set-one-thing.ts"],
-  "sourcesContent": ["import { Cache, launchCommand, LaunchType } from \"@raycast/api\";\n\ntype Input = {\n  /**\n   * The text to set as the one thing.\n   */\n  text: string;\n};\n\nexport default async function setOneThing(input: Input) {\n  try {\n    await launchCommand({ name: \"show-one-thing\", type: LaunchType.Background });\n  } catch (error) {\n    throw new Error(\"Menu bar is not activated, please run the 'Show One Thing' command first.\");\n  }\n\n  const cache = new Cache();\n  cache.set(\"onething\", input.text);\n\n  return \"One thing set\";\n}\n"],
-  "mappings": "yaAAA,IAAAA,EAAA,GAAAC,EAAAD,EAAA,aAAAE,IAAA,eAAAC,EAAAH,GAAA,IAAAI,EAAiD,wBASjD,eAAOF,EAAmCG,EAAc,CACtD,GAAI,CACF,QAAM,iBAAc,CAAE,KAAM,iBAAkB,KAAM,aAAW,UAAW,CAAC,CAC7E,MAAgB,CACd,MAAM,IAAI,MAAM,2EAA2E,CAC7F,CAGA,OADc,IAAI,QAAM,EAClB,IAAI,WAAYA,EAAM,IAAI,EAEzB,eACT",
-  "names": ["set_one_thing_exports", "__export", "setOneThing", "__toCommonJS", "import_api", "input"]
-}

@@ -1,7 +1,17 @@
 [
+  // {
+  //     "name": "Attach to API",
+  //     "type": "go",
+  //     "request": "attach",
+  //     "mode": "remote",
+  //     "port": 50001,
+  //     "host": "127.0.0.1",
+  //     "cwd": "${workspaceFolder}/services/api",
+  //     "showLog": true
+  // },
   {
-    "label": "Debug active PHP file",
-    "adapter": "php",
+    "label": "Debug golang file",
+    "adapter": "golang",
     "program": "$ZED_FILE",
     "request": "launch",
     "cwd": "$ZED_WORKTREE_ROOT"

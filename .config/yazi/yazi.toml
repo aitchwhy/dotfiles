@@ -1,4 +1,4 @@
-[manager]
+[mgr]
 show_hidden = true
 layout = [1, 4, 3]
 sort_by = "natural"

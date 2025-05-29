@@ -1,0 +1,30 @@
+{
+  "output": {
+    "filePath": "/Users/hank/dotfiles/.config/repomix/lib-infra.repomix.output.xml",
+    "style": "xml",
+    "parsableStyle": true,
+    "instructionFilePath": "/Users/hank/dotfiles/.config/repomix/lib-infra.repomix.instructions.md",
+    "fileSummary": true,
+    "directoryStructure": true,
+    "removeComments": false,
+    "removeEmptyLines": false,
+    "topFilesLength": 7,
+    "copyToClipboard": false,
+    "showLineNumbers": false,
+    "includeEmptyDirectories": false,
+    "git": {
+      "sortByChanges": true,
+      "sortByChangesMaxCommits": 100,
+      "includeDiffs": false
+    }
+  },
+  "ignore": {
+    "useGitignore": true,
+    "useDefaultPatterns": true,
+    "customPatterns": ["data/", "gen/", "**/*.log", "go.sum"]
+  },
+  "include": ["go.mod", "go.sum", "lib/go/**/*.go"],
+  "security": {
+    "enableSecurityCheck": false
+  }
+}

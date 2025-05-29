@@ -1,35 +1,40 @@
 {
   "output": {
-    "filePath": "repomix-output.xml",
+    "filePath": "/Users/hank/dotfiles/.config/repomix/lib-platform.repomix.output.xml",
     "style": "xml",
     "parsableStyle": true,
-    "compress": true,
-    "instructionFilePath": "~/dotfiles/AI/repomix-instruction.md",
+    "instructionFilePath": "/Users/hank/dotfiles/.config/repomix/lib-platform.repomix.instructions.md",
     "fileSummary": true,
     "directoryStructure": true,
     "removeComments": false,
     "removeEmptyLines": false,
-    "topFilesLength": 5,
-    "showLineNumbers": false,
+    "topFilesLength": 7,
     "copyToClipboard": false,
+    "showLineNumbers": false,
     "includeEmptyDirectories": false,
     "git": {
       "sortByChanges": true,
-      "sortByChangesMaxCommits": 100
+      "sortByChangesMaxCommits": 100,
+      "includeDiffs": false
     }
   },
-  "include": [
-    "**/*"
-  ],
   "ignore": {
     "useGitignore": true,
     "useDefaultPatterns": true,
     "customPatterns": [
-      "tmp/",
-      "*.log"
+      "data/",
+      "gen/",
+      "**/*.log",
+      "**@anterior/models/data/**"
     ]
   },
+  "include": [
+    "**package.json",
+    "**tsconfig.json",
+    "**vitest.config.json",
+    "lib/ts/lib-platform/src/**/*.ts"
+  ],
   "security": {
-    "enableSecurityCheck": true
+    "enableSecurityCheck": false
   }
 }

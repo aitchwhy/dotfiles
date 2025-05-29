@@ -39,21 +39,24 @@ typeset -U path PATH
 export COLORTERM="truecolor"
 
 # export PATH="$HOME/.npm-global/bin/:$PATH"
+export VOLTA_HOME="$HOME/.volta"
 
 paths=(
   # last in PATH
   "$HOME/.cargo/bin"
   "$HOME/.npm-global/bin"
   "$HOME/.volta/bin"
-  "$HOME/.nix-profile/bin"
-  "/nix/var/nix/profiles/default/bin"
+  "$HOME/./bin"
+  "$HOME/.local/bin"
+  # "$HOME/.nix-profile/bin"
+  # "/nix/var/nix/profiles/default/bin"
   # first in PATH
 )
 for p in "${paths[@]}"; do 
-  export PATH="$p:$PATH"
+  PATH="$p:$PATH"
 done
 
-export VOLTA_HOME="$HOME/.volta"
+
 
 
 # Add Nix to path

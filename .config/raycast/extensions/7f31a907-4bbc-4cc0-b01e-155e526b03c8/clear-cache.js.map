@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../src/clear-cache.tsx", "../src/helpers/clear-cache.tsx"],
-  "sourcesContent": ["import { clearCache } from \"./helpers/clear-cache\";\n\nexport default async function Command() {\n  await clearCache();\n}\n", "import { LocalStorage, showHUD } from \"@raycast/api\";\n\nexport async function clearCache() {\n  await Promise.all([LocalStorage.removeItem(\"obsidian-files\"), LocalStorage.removeItem(\"obsidian-tags\")]);\n  await showHUD(\"Cache cleared\");\n}\n"],
-  "mappings": "yaAAA,IAAAA,EAAA,GAAAC,EAAAD,EAAA,aAAAE,IAAA,eAAAC,EAAAH,GCAA,IAAAI,EAAsC,wBAEtC,eAAsBC,GAAa,CACjC,MAAM,QAAQ,IAAI,CAAC,eAAa,WAAW,gBAAgB,EAAG,eAAa,WAAW,eAAe,CAAC,CAAC,EACvG,QAAM,WAAQ,eAAe,CAC/B,CDHA,eAAOC,GAAiC,CACtC,MAAMC,EAAW,CACnB",
-  "names": ["clear_cache_exports", "__export", "Command", "__toCommonJS", "import_api", "clearCache", "Command", "clearCache"]
-}
