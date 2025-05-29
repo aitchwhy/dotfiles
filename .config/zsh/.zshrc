@@ -94,6 +94,10 @@ export KEYTIMEOUT=1
 export UTILS="$cfzsh/scripts/utils.zsh"
 [[ -f "$UTILS" ]] && source "$UTILS"
 
+# Source Anterior utility functions
+export ANT_UTILS="$cfzsh/scripts/ant-utils.zsh"
+[[ -f "$ANT_UTILS" ]] && source "$ANT_UTILS"
+
 # Check if a command exists
 function has_command() {
 	command -v "$1" &>/dev/null
@@ -105,6 +109,7 @@ function has_command() {
 
 # Set up dotfiles bin directory
 export PATH="$HOME/dotfiles/bin:$PATH"
+export PATH="$PATH:$HOME/.local/bin"
 
 # Set up Homebrew
 export HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-$(brew --prefix 2>/dev/null)}"
