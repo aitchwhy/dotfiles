@@ -1,92 +1,112 @@
 [
   {
     "bindings": {
-      "cmd-o": null,
       // "cmd-m": "zed::Minimize",
-      "cmd-m": null
+      "cmd-m": null,
+      "cmd-o": null,
+      "cmd-b": null
+    }
+  },
+  {
+    "bindings": {
+      "cmd-shift-k": "assistant::InlineAssist",
+      "cmd-l": "agent::ToggleFocus",
+      "cmd-shift-r": "workspace::Reload",
+      "cmd-o": "outline::Toggle",
+      "cmd-k": "command_palette::Toggle",
+      "cmd-shift-o": "outline_panel::ToggleFocus",
+      "cmd-b": "workspace::ToggleLeftDock"
+    }
+  },
+  {
+    "context": "Outline",
+    "bindings": {
+      "ctrl-o": "outline::Toggle",
+      "cmd-p": "file_finder::Toggle"
+    }
+  },
+  {
+    "context": "(Editor || ProjectPanel || Terminal || OutlinePanel || GitPanel || Dock) && !VimWaiting && !menu && !editing",
+    "bindings": {
+      "ctrl-h": "workspace::ActivatePaneLeft",
+      "ctrl-j": "workspace::ActivatePaneDown",
+      "ctrl-k": "workspace::ActivatePaneUp",
+      "ctrl-l": "workspace::ActivatePaneRight"
+    }
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "cmd-shift-p": "projects::OpenRecent",
+      "cmd-shift-g": "git_panel::ToggleFocus",
+      "cmd-shift-d": "debug_panel::ToggleFocus",
+      "cmd-shift-o": "outline_panel::ToggleFocus",
+      "cmd-shift-,": "zed::OpenKeymap",
+      "cmd-g cmd-g": [
+        "task::Spawn",
+        {
+          "lazygit": "Open lazygit"
+        }
+      ]
     }
   },
   {
     "context": "Editor",
     "bindings": {
       "ctrl-=": "editor::SelectLargerSyntaxNode",
-      "ctrl--": "editor::SelectSmallerSyntaxNode"
+      "ctrl--": "editor::SelectSmallerSyntaxNode",
+      "cmd-m": "workspace::ToggleZoom"
     }
   },
+
   {
-    "context": "Workspace",
+    "context": "vim_operator == none && !VimWaiting &&  vim_mode == normal",
     "bindings": {
-      "cmd-o": "outline::Toggle",
-      "cmd-k": "command_palette::Toggle",
-      "cmd-shift-p": "projects::OpenRecent",
-      "cmd-shift-g": "git_panel::ToggleFocus",
-      "cmd-shift-d": "debug_panel::ToggleFocus",
-      "cmd-shift-o": "outline_panel::ToggleFocus"
-    }
-  },
-  {
-    "context": "Outline",
-    "bindings": {
-      "cmd-o": "outline::Toggle"
-    }
-  },
-  {
-    "context": "vim_operator == none && !VimWaiting &&  vim_mode != insert",
-    "bindings": {
-      "space g": [
-        "task::Spawn",
-        {
-          "lazygit": "Open lazygit"
-        }
-      ],
-      "ctrl-h": "workspace::ActivatePaneLeft",
-      "ctrl-l": "workspace::ActivatePaneRight",
-      "ctrl-k": "workspace::ActivatePaneUp",
-      "ctrl-j": "workspace::ActivatePaneDown",
-      "ctrl-q": "command_palette::Toggle",
-      "shift-f": "editor::UnfoldLines",
-      "shift-h": "pane::ActivatePreviousItem",
-      "shift-l": "pane::ActivateNextItem",
-      "alt-j": "editor::MoveLineDown",
-      "alt-k": "editor::MoveLineUp",
-      "space f": "file_finder::Toggle",
-      "space c": "pane::CloseActiveItem",
-      "space t": "workspace::NewCenterTerminal",
-      "space e": "project_panel::ToggleFocus",
-      "space p e": "workspace::ToggleLeftDock",
-      "space q": "pane::CloseAllItems",
-      "ctrl-space": "workspace::ToggleBottomDock",
-      // LSP
-      "space l s": "project_symbols::Toggle",
-      "space l i": "editor::GoToImplementationSplit",
-      "space l r": "editor::Rename",
-      "space s t": "workspace::NewSearch",
-      //Buffers
-      "space b l": "pane::CloseItemsToTheRight",
-      "space b h": "pane::CloseItemsToTheLeft",
-      "space b a": "pane::ReopenClosedItem",
-      //Folding
-      "space z f": ["workspace::SendKeystrokes", "shift-v shift-f ctrl-c"],
-      "space z a": [
-        "workspace::SendKeystrokes",
-        "g g shift-v shift-g shift-f ctrl-c g g"
-      ], // Fold all
-      "space z u": [
-        "workspace::SendKeystrokes",
-        "g g shift-v shift-g space z z ctrl-c g g"
-      ], // Unfold all
+      // "space p e": "workspace::ToggleLeftDock", // hide/show left dock
+      // "space p r": "workspace::ToggleRightDock", // …right dock
+      // "space p b": "workspace::ToggleBottomDock", // …bottom dock
+      // "shift-h": "pane::ActivatePreviousItem",
+      // "shift-l": "pane::ActivateNextItem",
+      // "alt-j": "editor::MoveLineDown",
+      // "alt-k": "editor::MoveLineUp",
+      // "space c": "pane::CloseActiveItem",
+      // "space t": "workspace::NewCenterTerminal",
+      // "space e": "project_panel::ToggleFocus",
+      // "space p e": "workspace::ToggleLeftDock",
+      // "space q": "pane::CloseAllItems",
+      // // "ctrl-space": "workspace::ToggleBottomDock",
+      // // LSP
+      // "space l s": "project_symbols::Toggle",
+      // "space l i": "editor::GoToImplementationSplit",
+      // "space l r": "editor::Rename",
+      // "space s t": "workspace::NewSearch",
+      // "space s s": "outline::Toggle",
+      // //Buffers
+      // "space b l": "pane::CloseItemsToTheRight",
+      // "space b h": "pane::CloseItemsToTheLeft",
+      // "space b a": "pane::ReopenClosedItem",
+      // //Folding
+      // "space z f": ["workspace::SendKeystrokes", "shift-v shift-f ctrl-c"],
+      // "space z a": [
+      //   "workspace::SendKeystrokes",
+      //   "g g shift-v shift-g shift-f ctrl-c g g"
+      // ], // Fold all
+      // "space z u": [
+      //   "workspace::SendKeystrokes",
+      //   "g g shift-v shift-g space z z ctrl-c g g"
+      // ], // Unfold all
       //Toggle Comments
-      "space /": "editor::ToggleComments",
-      "space r": "command_palette::Toggle",
-      "space w": "workspace::Save",
-      "space 1": ["pane::ActivateItem", 0],
-      "space 2": ["pane::ActivateItem", 1],
-      "space 3": ["pane::ActivateItem", 2],
-      "space 4": ["pane::ActivateItem", 3],
-      "space 5": ["pane::ActivateItem", 4],
-      "space 6": ["pane::ActivateItem", 5],
-      "space 7": ["pane::ActivateItem", 6],
-      "space 8": ["pane::ActivateItem", 7]
+      // "space /": "editor::ToggleComments",
+      // "space r": "command_palette::Toggle",
+      // "space w": "workspace::Save",
+      // "space 1": ["pane::ActivateItem", 0],
+      // "space 2": ["pane::ActivateItem", 1],
+      // "space 3": ["pane::ActivateItem", 2],
+      // "space 4": ["pane::ActivateItem", 3],
+      // "space 5": ["pane::ActivateItem", 4],
+      // "space 6": ["pane::ActivateItem", 5],
+      // "space 7": ["pane::ActivateItem", 6],
+      // "space 8": ["pane::ActivateItem", 7]
     }
   },
   // I dont know why this works!
@@ -120,12 +140,12 @@
       "shift-k": "editor::MoveLineUp",
       "shift-j": "editor::MoveLineDown",
       "shift-f": "editor::Fold",
-      "alt zio": "editor::UnfoldLines",
-      "space z z": [
-        "workspace::SendKeystrokes",
-        "alt zio ctrl-c h % shift-i ctrl-c"
-      ],
-      "space /": "editor::ToggleComments"
+      "alt zio": "editor::UnfoldLines"
+      // "space z z": [
+      //   "workspace::SendKeystrokes",
+      //   "alt zio ctrl-c h % shift-i ctrl-c"
+      // ],
+      // "space /": "editor::ToggleComments"
     }
   },
   {

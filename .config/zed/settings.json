@@ -8,35 +8,30 @@
 // from the command palette or from `Zed` application menu.
 //
 {
-  // "agent": {
-  //   "version": "2",
-  //   "enabled": true,
-  //   "button": true,
-  //   "dock": "right",
-  //   "default_width": 640,
-  //   "default_height": 320,
-  //   "default_model": {
-  //     "provider": "zed.dev",
-  //     "model": "claude-opus-4-thinking"
-  //   },
-  //   "editor_model": {
-  //     "provider": "zed.dev",
-  //     "model": "claude-opus-4-thinking"
-  //   },
-  //   "single_file_review": true,
-  // }
+  "context_servers": {
+    "mcp-server-context7": {
+      "settings": {
+        "default_minimum_tokens": "10000"
+      }
+    },
+    "mcp-server-github": {
+      "settings": {
+        "github_personal_access_token": "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"
+      }
+    }
+  },
   "agent": {
     "always_allow_tool_actions": true,
     "default_model": {
       "provider": "anthropic",
-      "model": "claude-opus-4-thinking-latest"
+      "model": "claude-sonnet-4-thinking-latest"
     },
     "model_parameters": [],
     "default_profile": "write",
     "version": "2"
   },
   "telemetry": {
-    "diagnostics": true
+    "diagnostics": false
   },
   "tab_bar": {
     "show": true
@@ -46,10 +41,10 @@
   "ui_font_size": 16,
   "buffer_font_size": 14,
   "buffer_line_height": { "custom": 1.3 },
-  "current_line_highlight": "line",
+  "current_line_highlight": "all",
   "theme": {
     "mode": "system",
-    "light": "One Light",
+    "light": "Ayu Mirage",
     "dark": "Catppuccin Macchiato"
   },
   "scrollbar": {
@@ -84,6 +79,27 @@
     }
   },
   "languages": {
+    "Markdown": {
+      "format_on_save": "on",
+      "remove_trailing_whitespace_on_save": true
+    },
+    "Shell Script": {
+      "format_on_save": "on",
+      "formatter": {
+        "external": {
+          "command": "shfmt",
+          // Change `--indent 2` to match your preferred tab_size
+          "arguments": ["--filename", "{buffer_path}", "--indent", "2"]
+        }
+      }
+    },
+    "Nix": {
+      "language_servers": ["nixd"],
+      "format_on_save": "on",
+      "code_actions_on_format": {
+        "source.organizeImports": true
+      }
+    },
     "Python": {
       "language_servers": ["pylsp", "ruff"],
       "format_on_save": "on",
@@ -91,7 +107,7 @@
         "source.organizeImports": true
       }
     },
-    "Typescript": {
+    "TypeScript": {
       "language_servers": ["vtsls", "tsserver", "prettier", "!eslint"],
       "format_on_save": "on",
       "code_actions_on_format": {
@@ -113,8 +129,41 @@
       }
     }
   },
-  "use_smartcase_search": true,
+  "multi_key_binding_delay": 200, // ms  – introduced in PR #28576
   "lsp": {
+    "yaml-language-server": {
+      "settings": {
+        "yaml": {
+          "keyOrdering": true,
+          "format": {
+            "singleQuote": true
+          },
+          "schemas": {
+            "url": "https://www.schemastore.org/api/json/catalog.json"
+          }
+        }
+      }
+    },
+    "vtls": {
+      "settings": {
+        "typescript": { "tsserver": { "maxTsServerMemory": 16184 } },
+        "javascript": { "tsserver": { "maxTsServerMemory": 16184 } }
+      }
+    },
+    "gopls": {
+      "settings": {
+        "diagnostics": {
+          "suppress": ["sema-extra-width"]
+        }
+      }
+    },
+    "nixd": {
+      "settings": {
+        "diagnostics": {
+          "suppress": ["sema-extra-width"]
+        }
+      }
+    },
     "pylsp": {
       "settings": {
         "pylsp.plugins.pylsp_django": {
@@ -127,7 +176,7 @@
     },
     "ruff": {
       "initialization_options": {
-        "settings": {}
+        "settings": { "preview": true }
       }
     }
   },
@@ -142,6 +191,8 @@
     "enabled": true,
     "coloring": "indent_aware"
   },
+  "inline_code_actions": true,
+  "use_smartcase_search": false,
   "search": {
     "whole_word": true,
     "case_sensitive": false,
@@ -149,9 +200,14 @@
     "regex": false
   },
   "completions": {
+    // Show buffer words immediately
     "words": "fallback",
+    // merge in LSP once ready
     "lsp": true,
-    "lsp_fetch_timeout_ms": 0,
+    // drop LSP items if they lag
+    "lsp_fetch_timeout_ms": 100,
     "lsp_insert_mode": "replace_suffix"
-  }
+  },
+  "show_completion_documentation": true,
+  "show_completions_on_input": true
 }

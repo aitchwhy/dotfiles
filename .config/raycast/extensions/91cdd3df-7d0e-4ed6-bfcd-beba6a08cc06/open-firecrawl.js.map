@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../src/open-firecrawl.ts"],
-  "sourcesContent": ["import { open } from \"@raycast/api\";\n\nexport default async function openInBrowser() {\n  await open(\"https://firecrawl.dev\");\n}\n"],
-  "mappings": "yaAAA,IAAAA,EAAA,GAAAC,EAAAD,EAAA,aAAAE,IAAA,eAAAC,EAAAH,GAAA,IAAAI,EAAqB,wBAErB,eAAOF,GAAuC,CAC5C,QAAM,QAAK,uBAAuB,CACpC",
-  "names": ["open_firecrawl_exports", "__export", "openInBrowser", "__toCommonJS", "import_api"]
-}

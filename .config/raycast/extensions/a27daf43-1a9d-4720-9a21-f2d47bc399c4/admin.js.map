@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../src/admin.tsx"],
-  "sourcesContent": ["import { getPreferenceValues, open } from \"@raycast/api\";\n\nexport default async function Admin() {\n  const url = getPreferenceValues<Preferences.Admin>().adminConsoleURL;\n  await open(url || \"https://login.tailscale.com/admin/machines\");\n}\n"],
-  "mappings": "yaAAA,IAAAA,EAAA,GAAAC,EAAAD,EAAA,aAAAE,IAAA,eAAAC,EAAAH,GAAA,IAAAI,EAA0C,wBAE1C,eAAOF,GAA+B,CACpC,IAAMG,KAAM,uBAAuC,EAAE,gBACrD,QAAM,QAAKA,GAAO,4CAA4C,CAChE",
-  "names": ["admin_exports", "__export", "Admin", "__toCommonJS", "import_api", "url"]
-}

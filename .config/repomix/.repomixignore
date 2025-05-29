@@ -8,3 +8,17 @@ build/
 
 # Logs
 *.log
+
+gateways/noggin/src/@anterior/models/data/fhir/r5/service_request_r5.ts
+
+data/
+
+tmp/
+
+*.log
+
+gen/**/*.ts
+gen/**/*.py
+gen/**/*.js
+gen/**/*.js
+A
