@@ -707,4 +707,8 @@
     "key": "ctrl+k",
     "when": "inProjectManagerList"
   },
+  {
+    "key": "cmd+i",
+    "command": "composerMode.agent"
+  },
 ]
