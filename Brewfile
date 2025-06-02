@@ -8,6 +8,102 @@ tap "localstack/tap"
 tap "nikitabobko/tap"
 tap "oven-sh/bun"
 tap "spider-rs/spider-cloud-cli"
+# audacity
+# cork
+# keymapp
+# protonvpn
+# royal-tsx
+# upscayl
+# betterzip
+# draw-things
+# mactex
+# qflipper
+# signal
+# zoom
+# cleanmymac
+# git-credential-manager
+# ollama
+# quicklook-csv
+# soulver
+# copilot
+# iconjar
+# proton-mail
+# rize
+# termius
+#
+#
+# act
+# jbig2dec
+# libxmu
+# terragrunt
+# ast-grep
+# libidn
+# minio
+# traefik
+# awscli-local
+# ghostscript
+# mint
+# trippy
+# bdw-gc
+# git-lfs
+# neo4j
+# weasyprint
+# black
+# gping
+# node@22
+# xcbeautify
+# broot
+# grex
+# parallel
+# xclip
+# chrome-cli
+# gron
+# pkgconf
+# xcodes
+# openjdk@21
+# httpx
+# pnpm
+# yt-dlp
+# cypher-shell
+# huggingface-cli
+# postgresql@17
+# zsh-autopair
+# socat
+# hyperfine
+# prometheus
+# zsh-history-substring-search
+# w3m
+# jd
+# pyright
+# rcmdnk/file/brew-file
+# dasht
+# k9s
+# scrapy
+# typesense/tap/typesense-server@28.0
+# diff-so-fancy
+# libice
+# skaffold
+# duf
+# libsm
+# sq
+# exiftool
+# libxt
+# terraform
+#
+#
+# Would untap:
+# waydabber/betterdisplay
+# typesense/tap
+# homebrew/services
+# temporalio/brew
+# stripe/stripe-cli
+# olets/tap
+# homebrew/bundle
+# xo/xo
+# rcmdnk/file
+# yakitrak/yakitrak
+
+
 
 # Formulae (Development & Utility CLIs)
 # Rust toolchain manager (Requires post-install script execution)
