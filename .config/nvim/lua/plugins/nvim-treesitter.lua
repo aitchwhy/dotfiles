@@ -21,86 +21,44 @@ return {
 
       -- Language parsers to install
       ensure_installed = {
-        "svelte",
-        "dockerfile",
-        "git_config",
-        "gitcommit",
-        "git_rebase",
-        "gitignore",
-        "gitattributes",
-
-        "ninja",
-        "rst",
-        -- Web Development
-        "html",
-        "css",
-        "javascript",
-        "typescript",
-        "tsx",
-        "json",
-        "jsonc",
-        "json5",
-        "yaml",
-        "toml",
-        "vue",
-        "svelte",
-
-        -- Programming Languages
-        "python",
-        "lua",
-        "rust",
-        "go",
-        "c",
-        "cpp",
-        "java",
-        "kotlin",
-        "php",
-        "ruby",
-
-        -- Shell scripting
         "bash",
-        "fish",
-        -- "zsh",
-
-        -- Query and Data
-        "graphql",
-        "sql",
-
-        -- Markup and Docs
-        "markdown",
-        "markdown_inline",
-        "regex",
         "comment",
-
-        -- Configuration
         "dockerfile",
-        "terraform",
-        "hcl",
-        "make",
-        "cmake",
-        "nix",
-        "prisma",
-
-        -- Version Control
         "git_config",
         "git_rebase",
         "gitattributes",
         "gitcommit",
         "gitignore",
-
-        -- Build systems
-        "ninja",
-
-        -- Neovim specific
-        "vim",
-        "vimdoc",
-        "query", -- For treesitter query debugging
-
+        "go",
+        "hcl",
+        "html",
+        "javascript",
         "jsdoc",
+        "json",
+        "json5",
+        "jsonc",
+        "lua",
         "luadoc",
         "luap",
+        "markdown",
+        "markdown_inline",
+        "nix",
         "printf",
+        "python",
+        "query", -- For treesitter query debugging
+        "regex",
+        "ruby",
+        "rust",
+        "sql",
+        "svelte",
+        "terraform",
+        "toml",
+        "tsx",
+        "typescript",
+        "vim",
+        "vimdoc",
         "xml",
+        "yaml",
       },
 
       incremental_selection = {
