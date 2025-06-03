@@ -105,7 +105,7 @@ export KEYTIMEOUT=1
 
 # Source our utility functions from utils.zsh
 export UTILS="$SCRIPTS/utils.zsh"
-echo "UTILS : $UTILS"
+# echo "UTILS : $UTILS"
 [[ -f "$UTILS" ]] && source "$UTILS"
 
 # Check if a command exists
@@ -507,13 +507,13 @@ function f() {
   esac
 }
 
-# load all scripts
-if [ -d "$SCRIPTS/" ]; then
-	for f in "./.scripts/*.sh"; do
-		echo "Loading script: $f"
-		source "$f"
-	done
-fi
+# # load all scripts
+# if [ -d "$SCRIPTS/" ]; then
+# 	for f in "./.scripts/"*.sh; do
+# 		echo "Loading script: $f"
+# 		source "$f"
+# 	done
+# fi
 
 # minio / s3 frontend -> http://localhost:51021
 # noggin server -> http://localhost:59000

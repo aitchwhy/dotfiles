@@ -6,7 +6,7 @@
 -- -- Add any additional options here
 --
 -- -- LazyVim 8.x specific global settings
--- vim.g.lazyvim_picker = "fzf" -- Use fzf-lua as the picker
+vim.g.lazyvim_picker = "fzf" -- Use fzf-lua as the picker
 vim.g.lazyvim_cmp = "blink.cmp" -- Use blink.cmp as the completion engine
 --
 -- -- Disable providers you don't need for better startup performance
@@ -15,9 +15,10 @@ vim.g.lazyvim_cmp = "blink.cmp" -- Use blink.cmp as the completion engine
 --
 -- -- Register zsh as a bash-like language for treesitter
 -- vim.treesitter.language.register("bash", "zsh")
+vim.treesitter.language.register("bash", "zsh")
 --
 -- -- UI improvements
--- vim.opt.termguicolors = true -- Enable 24-bit RGB colors
+vim.opt.termguicolors = true -- Enable 24-bit RGB colors
 -- vim.opt.number = true -- Show line numbers
 -- vim.opt.relativenumber = true -- Show relative line numbers
 -- vim.opt.signcolumn = "yes" -- Always show sign column
