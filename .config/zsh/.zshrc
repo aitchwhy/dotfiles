@@ -49,7 +49,7 @@ export SAVEHIST=${HISTSIZE}
 
 export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
 # export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$DOTFILES/config}"
-export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$DOTFILES/.config}"
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
@@ -61,22 +61,29 @@ export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 [[ ! -d "$XDG_STATE_HOME" ]] && mkdir -p "$XDG_STATE_HOME"
 
 # Ensure ZSH config directory is set
-export cf="$HOME/dotfiles/.config"
-export dot="${dot:-$DOTFILES}"
-export cfzsh="${cfz:-$cf/zsh}"
-export zdot=$cfzsh
+export DOT="${dot:-$DOTFILES}"
+export CFS="$HOME/.config"
+export CFSDOT="$dot/.config"
+export SCRPTS="$dot/scripts"
+export OBS="$HOME/obsidian/primary"
+# export cfzsh="${cfz:-$cf/zsh}"
+# export zdot=$cfzsh
 # export nvime"$EDITOR $cfnvim"
 # export cfj="${cfz:-$cf/just}"
 
 
-export CONFIGS_XDG_="$XDG_CONFIG_HOME"
-function cfs-xdg() {
-	nvim $(fd . -t d --exact-depth 1 --color never $CONFIGS_XDG | fzf --prompt="${CONFIGS_XDG} configs>" --preview='ls -s {}')
-}
-export CONFIGS="$HOME/dotfiles/.config"
+# export CONFIGS="$HOME/dotfiles/.config"
 # edit config files in dir
+function fdirs() {
+  local DIRPATH="$1"
+	nvim $(fd . -t d --exact-depth 1 --color never $DIRPATH | fzf --prompt="${DIRPATH} configs>" --preview='ls -s {}')
+}
 function cfs() {
-	nvim $(fd . -t d --exact-depth 1 --color never $CONFIGS | fzf --prompt="${CONFIGS} configs>" --preview='ls -s {}')
+  fdirs $CFS
+}
+# export CONFIGS_XDG_="$XDG_CONFIG_HOME"
+function cfsdot() {
+  fdirs $CFSDOT
 }
 
 # ========================================================================
@@ -91,12 +98,8 @@ export KEYTIMEOUT=1
 # ========================================================================
 
 # Source our utility functions from utils.zsh
-export UTILS="$cfzsh/scripts/utils.zsh"
+export UTILS="$CFSZSH/scripts/utils.zsh"
 [[ -f "$UTILS" ]] && source "$UTILS"
-
-# Source Anterior utility functions
-export ANT_UTILS="$cfzsh/scripts/ant-utils.zsh"
-[[ -f "$ANT_UTILS" ]] && source "$ANT_UTILS"
 
 # Check if a command exists
 function has_command() {
@@ -106,14 +109,6 @@ function has_command() {
 # ========================================================================
 # 5. Homebrew and PATH Setup
 # ========================================================================
-
-# Set up dotfiles bin directory
-export PATH="$HOME/dotfiles/bin:$PATH"
-export PATH="$PATH:$HOME/.local/bin"
-
-# Set up Homebrew
-export HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-$(brew --prefix 2>/dev/null)}"
-export bpre="$HOMEBREW_PREFIX"
 
 # ========================================================================
 # 6. Core Tools Setup
@@ -212,8 +207,10 @@ alias nixzsh="nix develop --command zsh"
 alias nixcf="$EDITOR ~/.config/nix/nix.conf"
 alias nixdev="nix develop"
 alias nixnpm="nix develop .#npm"
-alias antall="ant-all-services api user s3 prefect-worker prefect-agent prefect-server data-seeder"
-alias antnoggin="ant-all-services noggin"
+alias nixgo="nix develop .#go"
+alias nixadmin="nix develop .#admin"
+# alias antall="ant-all-services api user s3 prefect-worker prefect-agent prefect-server data-seeder"
+# alias antnoggin="ant-all-services noggin"
 alias antnpm="npm ci --ignore-scripts && ant-npm-build-deptree noggin && npm run --workspace gateways/noggin build"
 
 # Dotenvx
@@ -229,11 +226,11 @@ alias pc="process-compose"
 # ========================================================================
 
 # --- Git ---
-export GIT_CONFIG_GLOBAL="$cf/git/gitconfig"
-export LG_CONFIG_FILE="$cf/lazygit/config.yml"
+export GIT_CONFIG_GLOBAL="$CFS/git/gitconfig"
+export LG_CONFIG_FILE="$CFS/lazygit/config.yml"
 
 # --- Starship ---
-export STARSHIP_CONFIG="$cf/starship/starship.toml"
+export STARSHIP_CONFIG="$CFS/starship/starship.toml"
 eval "$(starship init zsh)"
 
 # --- Ghostty ---
@@ -243,12 +240,12 @@ if ! has_command ghostty; then
 fi
 
 # --- Atuin ---
-export ATUIN_CONFIG_DIR="$cf/atuin"
+export ATUIN_CONFIG_DIR="$CFS/atuin"
 local ATUIN_ENV_CMD="$HOME/.atuin/bin/env"
 [[ -f $ATUIN_ENV_CMD ]] && . $ATUIN_ENV_CMD
 
 # --- Yazi ---
-export YAZI_CONFIG_DIR="$cf/yazi"
+export YAZI_CONFIG_DIR="$CFS/yazi"
 function y() {
 	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
 	yazi "$@" --cwd-file="$tmp"
@@ -267,8 +264,8 @@ export RUSTUP_HOME="${RUSTUP_HOME:-$HOME/.rustup}"
 path_add "$HOME/.cargo/bin"
 
 # --- Node/Volta ---
-export VOLTA_HOME="$HOME/.volta"
-has_command volta && path_add "$VOLTA_HOME/bin"
+# export VOLTA_HOME="$HOME/.volta"
+# has_command volta && path_add "$VOLTA_HOME/bin"
 
 # --- Go ---
 export GOPATH="$HOME/go"
@@ -277,7 +274,7 @@ path_add "$GOBIN"
 
 # --- TODO: aerospace (window tiling manager)
 
-export ZELLIJ_CONFIG_DIR="$cf/zellij"
+export ZELLIJ_CONFIG_DIR="$CFS/zellij"
 
 # has_command aerospace
 alias aero='aerospace'
@@ -290,14 +287,14 @@ alias aero='aerospace'
 
 # --- Nix ---
 alias nixh='nix --help'
-alias nixf="$EDITOR $cf/nix/nix.conf"
-alias nixgc="nix-collect-garbage -d"
+alias nixcfs="$EDITOR $CFS/nix/nix.conf"
+# alias nixgc="nix-collect-garbage -d"
 alias nixpkgs="nix search"
-alias nixsh="nix-shell --run zsh"
+# alias nixsh="nix-shell --run zsh"
 alias nixdev="nix develop"
 alias nixf="nix flake"
-alias nixup="sudo nixos-rebuild switch"
-alias nixdarwinup="darwin-rebuild switch --flake ~/dotfiles"
+# alias nixup="sudo nixos-rebuild switch"
+# alias nixdarwinup="darwin-rebuild switch --flake ~/dotfiles"
 
 # --- Homebrew ---
 alias b="brew"
@@ -410,7 +407,7 @@ alias ld="lazydocker" # lazydocker - Docker TUI
 # --- Just Task Runner ---
 # alias j='~/dotfiles/scripts/j'
 # alias .j='~/dotfiles/scripts/j'
-export USER_JUSTFILE="$HOME/dotfiles/config/just/.user.justfile"
+export USER_JUSTFILE="$CFS/just/.user.justfile"
 alias j="just"
 alias .j='just --justfile $USER_JUSTFILE'
 # alias .jfmt='just --justfile ~/dotfiles/config/just/global.justfile --working-directory . --unstable --fmt'
@@ -456,8 +453,8 @@ alias rx="repomix"
 alias at="atuin"
 
 # load all scripts
-if [ -d "./.scripts" ]; then
-	for f in "./.scripts"/*.sh; do
+if [ -d "$SCRIPTS/" ]; then
+	for f in "./.scripts/*.sh"; do
 		echo "Loading script: $f"
 		source "$f"
 	done

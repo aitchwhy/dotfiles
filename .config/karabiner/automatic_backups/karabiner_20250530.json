@@ -65,6 +65,7 @@
                     },
                     {
                         "description": "Mac OSX: disable cmd + option + h + m to prevent minimising all windows",
+                        "enabled": false,
                         "manipulators": [
                             {
                                 "from": {
@@ -90,6 +91,7 @@
                     },
                     {
                         "description": "Mac OSX: disable cmd + h to prevent minimising an application window",
+                        "enabled": false,
                         "manipulators": [
                             {
                                 "from": {
@@ -509,8 +511,7 @@
                         "product_id": 1760,
                         "vendor_id": 13364
                     },
-                    "ignore": false,
-                    "manipulate_caps_lock_led": false
+                    "ignore": false
                 },
                 {
                     "identifiers": {
@@ -528,14 +529,6 @@
                         "vendor_id": 1133
                     },
                     "ignore": false
-                },
-                {
-                    "identifiers": {
-                        "is_keyboard": true,
-                        "product_id": 1760,
-                        "vendor_id": 13364
-                    },
-                    "manipulate_caps_lock_led": false
                 }
             ],
             "fn_function_keys": [

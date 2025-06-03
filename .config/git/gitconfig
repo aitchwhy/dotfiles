@@ -3,9 +3,9 @@
   filemode = false
   editor = nvim
   pager = bat
-  excludesfile = /Users/hank/dotfiles/config/git/gitignore
+  excludesfile = /Users/hank/dotfiles/.config/git/gitignore
   # Use custom commit message template
-  committemplate = /Users/hank/dotfiles/config/git/gitmessage
+  committemplate = /Users/hank/dotfiles/.config/git/gitmessage
   # Use husky hooks
   hooksPath = .husky
 
