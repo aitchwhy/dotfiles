@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Load path utilities
+[[ -f "$HOME/.config/shell/path_utils.sh" ]] && source "$HOME/.config/shell/path_utils.sh"
+
 . "$HOME/.atuin/bin/env"
 # [[ -f ~/.bash-preexec.sh ]] && source ~/.bash-preexec.sh
 eval "$(atuin init bash)"
