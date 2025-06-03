@@ -1,32 +1,37 @@
 return {
-  -- {
-  --   "Wansmer/treesj",
-  --   dependencies = { "nvim-treesitter/nvim-treesitter" }, -- if you install parsers with `nvim-treesitter`
-  --   config = function()
-  --     require("treesj").setup({
-  --       -- Treesj configurations go here
-  --       -- Refer to the treesj documentation for all available options
-  --       use_default_keymaps = true, -- Enables default keymaps like <space>m, <space>j, <space>s
-  --       -- Example:
-  --       -- max_join_length = 120,
-  --     })
-  --   end,
-  -- },
-  "Wansmer/treesj",
-  keys = { "<space>m", "<space>j", "<space>s" },
-  dependencies = { "nvim-treesitter/nvim-treesitter" }, -- if you install parsers with `nvim-treesitter`
-  config = function()
-    require("treesj").setup({
-      --[[ your config ]]
-      --return {
-      --incremental_selection = {
-    })
-  end,
-  opts = {
-    enable = true,
-    keymaps = {
-      node_incremental = "v",
-      node_decremental = "V",
+  {
+    --   "Wansmer/treesj",
+    --   dependencies = { "nvim-treesitter/nvim-treesitter" }, -- if you install parsers with `nvim-treesitter`
+    --   config = function()
+    --     require("treesj").setup({
+    --       -- Treesj configurations go here
+    --       -- Refer to the treesj documentation for all available options
+    --       use_default_keymaps = true, -- Enables default keymaps like <space>m, <space>j, <space>s
+    --       -- Example:
+    --       -- max_join_length = 120,
+    --     })
+    --   end,
+    -- },
+    "Wansmer/treesj",
+    keys = {
+      "<space>m",
+      "<space>j",
+      "<space>s",
+    },
+    -- dependencies = { "nvim-treesitter/nvim-treesitter" }, -- if you install parsers with `nvim-treesitter`
+    config = function()
+      require("treesj").setup({
+        --[[ your config ]]
+        --return {
+        --incremental_selection = {
+      })
+    end,
+    opts = {
+      enable = true,
+      keymaps = {
+        node_incremental = "v",
+        node_decremental = "V",
+      },
     },
   },
 }

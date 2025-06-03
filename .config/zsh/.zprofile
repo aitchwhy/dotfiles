@@ -49,6 +49,10 @@ paths=(
   "$HOME/./bin"
   "$HOME/.local/bin"
   "$HOME/dotfiles/bin"
+  # https://mac.install.guide/ruby/13
+  "/opt/homebrew/opt/ruby/bin"
+  "`gem environment gemdir`/bin"
+  $PATH
   # "$HOME/.nix-profile/bin"
   # "/nix/var/nix/profiles/default/bin"
   # first in PATH
