@@ -1,0 +1,57 @@
+# NPM management tasks
+
+# Default task - show available commands
+default:
+    @just --list
+
+# Run the initial setup
+setup:
+    ./setup.sh
+
+# Setup and install global packages
+setup-all:
+    ./setup.sh --install-globals
+
+# Show current npm configuration
+config:
+    npm config list
+
+# List global packages
+list-global:
+    npm list -g --depth=0
+
+# Update all global packages
+update-global:
+    npm update -g
+
+# Check for outdated global packages
+outdated:
+    npm outdated -g
+
+# Clean npm cache
+clean-cache:
+    npm cache clean --force
+
+# Verify npm cache
+verify-cache:
+    npm cache verify
+
+# Install packages from global-packages.txt
+install-globals:
+    cat global-packages.txt | grep -v '^#' | xargs -I {} npm install -g {}
+
+# Backup current global packages list
+backup-globals:
+    npm list -g --depth=0 --json | jq -r '.dependencies | keys[]' > global-packages-backup.txt
+    @echo "Backed up to global-packages-backup.txt"
+
+# Run migration from old setup
+migrate:
+    ./migrate.sh
+
+# Check npm and node versions
+versions:
+    @echo "Node version: $(node --version)"
+    @echo "NPM version: $(npm --version)"
+    @echo "NPM prefix: $(npm config get prefix)"
+    @echo "NPM cache: $(npm config get cache)"

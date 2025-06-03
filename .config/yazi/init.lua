@@ -113,7 +113,8 @@ require("folder-rules"):setup({
 		-- Show git branch/status when in git repository
 		{
 			fn = function()
-				local result = ya.syscall("git", { "rev-parse", "--abbrev-ref", "HEAD" }, { cwd = ya.cwd })
+				local child, err = Command("git"):args({ "rev-parse", "--abbrev-ref", "HEAD" }):cwd(tostring(cx.active.current.cwd)):output()
+				local result = child and { success = child.status.success, stdout = child.stdout or "" } or { success = false }
 				if result.success then
 					return " " .. result.stdout:gsub("%s+$", "")
 				else

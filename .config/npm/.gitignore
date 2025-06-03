@@ -1,0 +1,11 @@
+# Backup files
+*.backup
+*.old
+global-packages-backup.txt
+
+# npm logs
+npm-debug.log*
+
+# Temporary files
+*.tmp
+.DS_Store

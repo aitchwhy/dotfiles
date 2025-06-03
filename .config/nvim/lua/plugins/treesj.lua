@@ -14,9 +14,8 @@ return {
     -- },
     "Wansmer/treesj",
     keys = {
-      "<space>m",
       "<space>j",
-      "<space>s",
+      -- "<space>m",
     },
     -- dependencies = { "nvim-treesitter/nvim-treesitter" }, -- if you install parsers with `nvim-treesitter`
     config = function()
