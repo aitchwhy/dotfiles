@@ -296,6 +296,10 @@ cfs() {
     fdirs $CFS
 }
 
+
+source "$DOTS/scripts/ant.zsh"
+
+
 # ========================================================================
 # Functions - File Operations
 # ========================================================================
@@ -362,6 +366,9 @@ eval "$(atuin init zsh)"
 
 # Load local/private configuration if exists
 [[ -f "$ZDOTDIR/.zshrc.local" ]] && source "$ZDOTDIR/.zshrc.local"
+
+
+eval "$(zoxide init zsh)"
 
 # ========================================================================
 # Cleanup

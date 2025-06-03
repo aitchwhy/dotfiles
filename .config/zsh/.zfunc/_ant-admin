@@ -1,0 +1,20 @@
+Generate the autocompletion script for admin for the specified shell.
+See each sub-command's help for details on how to use the generated script.
+
+Usage:
+  admin completion [command]
+
+Available Commands:
+  bash        Generate the autocompletion script for bash
+  fish        Generate the autocompletion script for fish
+  powershell  Generate the autocompletion script for powershell
+  zsh         Generate the autocompletion script for zsh
+
+Flags:
+  -h, --help   help for completion
+
+Global Flags:
+  -i, --internal-api string   Internal API URL (default "http://localhost:20102")
+  -a, --public-api string     Public API URL (default "http://localhost:20101")
+
+Use "admin completion [command] --help" for more information about a command.

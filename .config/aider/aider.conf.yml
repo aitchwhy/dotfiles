@@ -18,13 +18,13 @@
 # Main model:
 
 ## Specify the model to use for the main chat
-model: o3
+# model: o3
 
 ########################
 # API Keys and settings:
 
 ## Specify the OpenAI API key
-#openai-api-key: xxx
+# openai-api-key:
 
 ## Specify the Anthropic API key
 #anthropic-api-key: xxx
@@ -408,7 +408,8 @@ architect: true
 #config: xxx
 
 ## Specify the .env file to load (default: .env in git root)
-#env-file: .env
+# env-file: .env
+env-file: ~/dotfiles/.env
 
 ## Enable/disable suggesting shell commands (default: True)
 #suggest-shell-commands: true
@@ -430,6 +431,5 @@ architect: true
 
 ## Specify which editor to use for the /editor command
 editor: nvim
-
 ## Print shell completion script for the specified SHELL and exit. Supported shells: bash, tcsh, zsh. Example: aider --shell-completions bash
-shell-completions: zsh
+# shell-completions: zsh

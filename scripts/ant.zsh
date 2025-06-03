@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env zsh
 #
 # Array of commands prefixed with "ant-"
 ant_commands=(
@@ -191,9 +191,9 @@ function ant_ports_lsof_all() {
 #
 # ant-npm-build-deptree YOUR_TS_PROJECT_NAME (Build dependencies for a TS project)
 
-antbuild='ant-npm-build-deptree'
+alias antbuild='ant-npm-build-deptree'
 
-ant-npm-build-deptree YOUR_TS_PROJECT_NAME (Build dependencies for a TS project)
+# ant-npm-build-deptree YOUR_TS_PROJECT_NAME (Build dependencies for a TS project)
 
 
 #
@@ -210,7 +210,7 @@ alias antlint='ant-lint'
 alias antclean='system-prune'
 
 # ant-admin (Run Anterior admin tool)
-antadmin='ant-admin'
+alias antadmin='ant-admin'
 
 
 # ==========================================================================
@@ -225,8 +225,8 @@ ant() {
     # Port management
     ports)
       echo "Listing all ports in use by Anterior services..."
-      lsof -i -P -n | grep LISTEN | grep -E ":(20[0-9]{3}|3000|4[0-9]{3}|6379)" | 
-        awk '{printf "%-6s %-15s %-8s %-20s %s\n", $2, $1, $9, $10, $0}' | 
+      lsof -i -P -n | grep LISTEN | grep -E ":(20[0-9]{3}|3000|4[0-9]{3}|6379)" |
+        awk '{printf "%-6s %-15s %-8s %-20s %s\n", $2, $1, $9, $10, $0}' |
         sort -k3
       ;;
     kill)
@@ -246,8 +246,8 @@ ant() {
         all)
           echo "Killing all Anterior service processes..."
           local pids
-          pids=$(lsof -i -P -n | grep LISTEN | 
-            grep -E ":(20[0-9]{3}|3000|4[0-9]{3}|6379)" | 
+          pids=$(lsof -i -P -n | grep LISTEN |
+            grep -E ":(20[0-9]{3}|3000|4[0-9]{3}|6379)" |
             awk '{print $2}' | sort -u)
           if [[ -n "$pids" ]]; then
             echo "Found processes: $pids"
@@ -285,7 +285,7 @@ ant() {
       echo "Prefect                4200"
       echo "Redis                  6379"
       ;;
-    
+
     # Environment management
     env)
       echo "Anterior Environment Variables:"
@@ -329,7 +329,7 @@ ANT_BRRR_REDIS_URL=redis://localhost:6379
 EOF
       echo "Environment file created at $target_file"
       ;;
-    
+
     # AWS S3 management
     s3)
       local subcommand="$1"
@@ -359,7 +359,7 @@ EOF
           ;;
       esac
       ;;
-    
+
     # DynamoDB management
     dynamo)
       local subcommand="$1"
@@ -384,7 +384,7 @@ EOF
           ;;
       esac
       ;;
-    
+
     # SQS management
     sqs)
       local subcommand="$1"
@@ -420,7 +420,7 @@ EOF
           ;;
       esac
       ;;
-    
+
     # Service management
     svc|service)
       local subcommand="$1"
@@ -446,7 +446,7 @@ EOF
           ;;
       esac
       ;;
-    
+
     # Help
     help|--help|-h|"")
       echo "Anterior Dev Utils"
@@ -476,7 +476,7 @@ EOF
       echo "  ant dynamo scan events - Scan DynamoDB events table"
       echo "  ant service logs       - View data-seeder logs"
       ;;
-    
+
     *)
       echo "Unknown command: $command"
       echo "Run 'ant help' for usage information."
