@@ -1,621 +1,352 @@
 # ========================================================================
-
+# ZSH Configuration (.zshrc)
 # ========================================================================
-# ZSH Configuration File (.zshrc)
-# ========================================================================
-# Main configuration file for interactive ZSH shells
-# References:
-# - https://wiki.archlinux.org/title/Zsh#Configuration_files
-# - https://gist.github.com/Linerre/f11ad4a6a934dcf01ee8415c9457e7b2
+# Main configuration for interactive shells - consolidated and minimal
 
-# Performance monitoring (uncomment to debug startup time)
+# Performance monitoring (uncomment to debug)
 # zmodload zsh/zprof
 
 # ========================================================================
-# 1. Core Shell Options
+# Shell Options
 # ========================================================================
-
-# Navigation Options
-# setopt AUTO_CD           # Change directory without cd
-setopt AUTO_PUSHD        # Push directory to stack on cd
-setopt PUSHD_IGNORE_DUPS # Don't store duplicates in stack
-setopt PUSHD_SILENT      # Don't print stack after pushd/popd
-
-# Globbing and Pattern Matching
-unsetopt EXTENDED_GLOB # No Extended globbing (no need for double quotes for nix flakes pkg#target due to hashtag needing escape)
-setopt NO_NOMATCH      # Don't error on no matches
-setopt NO_CASE_GLOB    # Case insensitive globbing
-
-# Misc Options
+setopt AUTO_PUSHD         # Push directory to stack on cd
+setopt PUSHD_IGNORE_DUPS  # Don't store duplicates in dir stack
+setopt PUSHD_SILENT       # Don't print stack after pushd/popd
+setopt NO_CASE_GLOB       # Case insensitive globbing
 setopt INTERACTIVE_COMMENTS # Allow comments in interactive shells
+setopt NO_NOMATCH         # Don't error on no glob matches
 
-# History Options
-setopt EXTENDED_HISTORY # Record timestamp
+# History Configuration
+setopt SHARE_HISTORY      # Share history between sessions
+setopt HIST_IGNORE_DUPS   # Don't record duplicates
+setopt HIST_IGNORE_SPACE  # Ignore commands starting with space
+setopt HIST_VERIFY        # Don't execute immediately on history expansion
+setopt EXTENDED_HISTORY   # Record timestamp
 
-setopt HIST_EXPIRE_DUPS_FIRST # Delete duplicates first
-setopt HIST_IGNORE_DUPS       # Don't record duplicates
-setopt HIST_VERIFY            # Don't execute immediately upon history expansion
-setopt SHARE_HISTORY          # Share history between sessions
-setopt HIST_IGNORE_SPACE      # Don't record commands starting with space
-
-# Keep your zsh history file (can re-use in Nix shell)
 export HISTFILE="$HOME/.zsh_history"
 export HISTSIZE=100000
-export SAVEHIST=${HISTSIZE}
+export SAVEHIST=$HISTSIZE
 
 # ========================================================================
-# 2. XDG Base Directory Specification
+# Environment Variables
 # ========================================================================
-
-export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
-export DOTS="${DOT:-$HOME/dotfiles}"
-# export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$DOTFILES/config}"
-export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$DOTFILES/.config}"
+# XDG directories
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 
-# Ensure XDG directories exist
-[[ ! -d "$XDG_CONFIG_HOME" ]] && mkdir -p "$XDG_CONFIG_HOME"
-[[ ! -d "$XDG_CACHE_HOME" ]] && mkdir -p "$XDG_CACHE_HOME"
-[[ ! -d "$XDG_DATA_HOME" ]] && mkdir -p "$XDG_DATA_HOME"
-[[ ! -d "$XDG_STATE_HOME" ]] && mkdir -p "$XDG_STATE_HOME"
+# Create XDG directories if they don't exist
+for dir in "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME" "$XDG_STATE_HOME"; do
+    [[ ! -d "$dir" ]] && mkdir -p "$dir"
+done
 
-# Ensure ZSH config directory is set
-export CFSXDG="$HOME/.config"
-export CFS="$DOTS/.config"
+# Shortcuts
+export DOTS="$DOTFILES"
+export CFS="$DOTFILES/.config"
 export CFSZSH="$CFS/zsh"
-export SCRIPTS="$DOTS/scripts"
+export SCRIPTS="$DOTFILES/scripts"
 export OBS="$HOME/obsidian/primary"
-# export zdot=$cfzsh
-# export cfj="${cfz:-$cf/just}"
 
-
-# Environment variables for tools
-export BAT_THEME="--theme=OneHalfDark"
+# Tool configurations
+export BAT_THEME="OneHalfDark"
 export DELTA_PAGER="bat --plain --paging=never"
 export FZF_DEFAULT_OPTS='--height 40% --border --cycle --layout=reverse --marker="✓" --bind=ctrl-j:down,ctrl-k:up'
-export GLOW_PAGER="bat --plain --language=markdown"
+export STARSHIP_CONFIG="$CFS/starship/starship.toml"
+export GIT_CONFIG_GLOBAL="$CFS/git/gitconfig"
+export LG_CONFIG_FILE="$CFS/lazygit/config.yml"
+export CARGO_HOME="${CARGO_HOME:-$HOME/.cargo}"
+export RUSTUP_HOME="${RUSTUP_HOME:-$HOME/.rustup}"
+export GOPATH="$HOME/go"
+export GOBIN="$GOPATH/bin"
+export ATUIN_CONFIG_DIR="$CFS/atuin"
+export YAZI_CONFIG_DIR="$CFS/yazi"
+export ZELLIJ_CONFIG_DIR="$CFS/zellij"
 export HOMEBREW_NO_ANALYTICS=1
-
-# export CONFIGS="$HOME/dotfiles/.config"
-# edit config files in dir
-function fdirs() {
-  local DIRPATH="$1"
-	nvim $(fd . -t d --exact-depth 1 --color never $DIRPATH | fzf --prompt="${DIRPATH} configs>" --preview='ls -s {}')
-}
-function xdg() {
-  fdirs $CFSXDG
-}
-# export CONFIGS_XDG_="$XDG_CONFIG_HOME"
-function cfs() {
-  fdirs $CFS
-}
+export COLORTERM="truecolor"
+export USER_JUSTFILE="$CFS/just/.user.justfile"
 
 # ========================================================================
-# 3. Keyboard & Input Configuration
+# Completions
 # ========================================================================
+# Add Homebrew completions
+if [[ -n "$HOMEBREW_PREFIX" ]]; then
+    FPATH="$HOMEBREW_PREFIX/share/zsh/site-functions:$FPATH"
+fi
 
+# Add Nix completions if available
+if [[ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]]; then
+    fpath+=(/nix/var/nix/profiles/default/share/zsh/site-functions)
+fi
+
+# Add custom completions
+fpath=("$CFS/zsh/.zfunc" $fpath)
+
+# Initialize completion system
+autoload -Uz compinit && compinit
+
+# ========================================================================
+# Key Bindings
+# ========================================================================
 bindkey -v
 export KEYTIMEOUT=1
 
 # ========================================================================
-# 4. Utility Functions
+# Plugins (from Homebrew)
 # ========================================================================
-
-# Source our utility functions from utils.zsh
-export UTILS="$SCRIPTS/utils.zsh"
-# echo "UTILS : $UTILS"
-[[ -f "$UTILS" ]] && source "$UTILS"
-
-# Check if a command exists
-function has_command() {
-	command -v "$1" &>/dev/null
-}
-
-# ========================================================================
-# 5. Homebrew and PATH Setup
-# ========================================================================
-
-# ========================================================================
-# 6. Core Tools Setup
-# ========================================================================
-
-# --- Editor ---
-export EDITOR="nvim"
-export VISUAL="$EDITOR"
-
-if ! has_command nvim; then
-	echo "nvim not found. Installing nvim..."
-	brew install --quiet neovim
-fi
-
-# ========================================================================
-# 7. Completions & Plugin Framework
-# ========================================================================
-
-# Load ZSH plugins from Homebrew if available
 if [[ -d "$HOMEBREW_PREFIX/share" ]]; then
-	plugins=(
-		"zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-		"zsh-autosuggestions/zsh-autosuggestions.zsh"
-		"zsh-abbr/zsh-abbr.zsh"
-	)
-	for plugin in $plugins; do
-		plugin_path="$HOMEBREW_PREFIX/share/$plugin"
-		if [[ -f "$plugin_path" ]]; then
-			source "$plugin_path"
-		fi
-	done
+    # Load plugins if available
+    [[ -f "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]] && \
+        source "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+    
+    [[ -f "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ]] && \
+        source "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+    
+    [[ -f "$HOMEBREW_PREFIX/share/zsh-abbr/zsh-abbr.zsh" ]] && \
+        source "$HOMEBREW_PREFIX/share/zsh-abbr/zsh-abbr.zsh"
 fi
 
-# Completions setup
-FPATH="$HOMEBREW_PREFIX/share/zsh/site-functions:$FPATH"
-
-# Nix completions for ZSH
-if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
-	# nix.sh - setups up nix environment. Usually created by nix installer
-	source /etc/profile.d/nix.sh
-	# Source Nix environment
-	source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
-	# Add Nix ZSH completion if available
-	if [ -e "${HOME}/.nix-profile/share/zsh/site-functions/_nix" ]; then
-		fpath+=(~/.nix-profile/share/zsh/site-functions)
-	elif [ -e '/nix/var/nix/profiles/default/share/zsh/site-functions/_nix' ]; then
-		fpath+=(/nix/var/nix/profiles/default/share/zsh/site-functions)
-	fi
-fi
-
-# tell zsh where to find our completions
-fpath=("$DOTFILES/config/zsh/.zfunc" $fpath)
-
-# fpath should be BEFORE compinit
-autoload -Uz compinit
-compinit
-
 # ========================================================================
-# Claude task master AI
+# Core Functions
 # ========================================================================
 
-alias tm=task-master
-
-# from volta list
-#     Node: v23.10.0 (default)
-#     npm: v11.3.0 (default)
-#     Tool binaries available:
-#         claude (default)
-#          (default)
-#         liam (default)
-#         codex (default)
-#         redocly, openapi (default)
-#          (default)
-#         bru (default)
-#         optic (default)
-#          (default)
-#          (default)
-#         eslint (default)
-#         eslint-config-prettier (default)
-#         pino-pretty (default)
-#         prettier (default)
-#          (default)
-#         prisma (default)
-#         repo-prompt (default)
-#         repomix (default)
-#         task-master, task-master-mcp, task-master-ai (default)
-#         tsc, tsserver (current @ /Users/hank/src/vibes/apps/flopilot/package.json)
-#          (default)
-# ========================================================================
-# Nix
-# ========================================================================
-alias nixzsh="nix develop --command zsh"
-
-# --- Nix ---
-# export NIX_CONFIG_DIR="$cf/nix"
-alias nixcf="$EDITOR ~/.config/nix/nix.conf"
-alias nixdev="nix develop"
-alias nixnpm="nix develop .#npm"
-alias nixgo="nix develop .#go"
-alias nixadmin="nix develop .#admin"
-# alias antall="ant-all-services api user s3 prefect-worker prefect-agent prefect-server data-seeder"
-# alias antnoggin="ant-all-services noggin"
-alias antnpm="npm ci --ignore-scripts && ant-npm-build-deptree noggin && npm run --workspace gateways/noggin build"
-
-# Dotenvx
-alias envx="dotenvx"
-
-################
-# Process compose (~ Docker Compose)
-################
-alias pc="process-compose"
-
-# ========================================================================
-# 8. Tool/Package Configurations
-# ========================================================================
-
-# --- Git ---
-export GIT_CONFIG_GLOBAL="$CFS/git/gitconfig"
-export LG_CONFIG_FILE="$CFS/lazygit/config.yml"
-
-# --- Starship ---
-export STARSHIP_CONFIG="$CFS/starship/starship.toml"
-eval "$(starship init zsh)"
-
-# --- Ghostty ---
-if ! has_command ghostty; then
-	echo "ghostty not found. Installing ghostty..."
-	brew install --quiet ghostty
-fi
-
-# --- Atuin ---
-export ATUIN_CONFIG_DIR="$CFS/atuin"
-local ATUIN_ENV_CMD="$HOME/.atuin/bin/env"
-[[ -f $ATUIN_ENV_CMD ]] && . $ATUIN_ENV_CMD
-
-# --- Yazi ---
-export YAZI_CONFIG_DIR="$CFS/yazi"
-function y() {
-	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
-	yazi "$@" --cwd-file="$tmp"
-	if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-		builtin cd -- "$cwd"
-	fi
-	rm -f -- "$tmp"
+# Check if command exists
+has_command() {
+    command -v "$1" &>/dev/null
 }
 
-# --- Bat ---
-has_command bat && export PAGER="bat --pager always"
-
-# --- Rust ---
-export CARGO_HOME="${CARGO_HOME:-$HOME/.cargo}"
-export RUSTUP_HOME="${RUSTUP_HOME:-$HOME/.rustup}"
-path_add "$HOME/.cargo/bin"
-
-# --- Node/Volta ---
-# export VOLTA_HOME="$HOME/.volta"
-# has_command volta && path_add "$VOLTA_HOME/bin"
-
-# --- Go ---
-export GOPATH="$HOME/go"
-export GOBIN="$GOPATH/bin"
-path_add "$GOBIN"
-
-# --- TODO: aerospace (window tiling manager)
-
-export ZELLIJ_CONFIG_DIR="$CFS/zellij"
-
-# has_command aerospace
-alias aero='aerospace'
-
-# --- TODO: skhd (keyboard shortcuts hotkey daemon)
+# Add to PATH if not already present
+path_add() {
+    [[ -d "$1" && ":$PATH:" != *":$1:"* ]] && export PATH="$PATH:$1"
+}
 
 # ========================================================================
-# 9. Aliases (grouped by tool)
+# Aliases - File System
 # ========================================================================
+alias ls='eza --git --icons'
+alias l='eza --git --icons -lF'
+alias ll='eza -lahF --git'
+alias lll="eza -1F --git --icons"
+alias llm='ll --sort=modified'
+alias la='eza -lbhHigUmuSa --color-scale --git --icons'
+alias lx='eza -lbhHigUmuSa@ --color-scale --git --icons'
+alias lt='eza --tree --level=2'
+alias llt='eza -lahF --tree --level=2'
+alias ltt='eza -lahF | grep "$(date +"%d %b")"'
 
+# ========================================================================
+# Aliases - Navigation
+# ========================================================================
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
 
-alias cheat="tldr"
-alias ch="cheat"
-
-# --- Nix ---
-alias nixh='nix --help'
-alias nixcfs="$EDITOR $CFS/nix/nix.conf"
-# alias nixgc="nix-collect-garbage -d"
-alias nixpkgs="nix search"
-# alias nixsh="nix-shell --run zsh"
-alias nixdev="nix develop"
-alias nixf="nix flake"
-# alias nixup="sudo nixos-rebuild switch"
-# alias nixdarwinup="darwin-rebuild switch --flake ~/dotfiles"
-
-# --- Homebrew ---
-alias b="brew"
-alias bupd="brew update"
-alias bupg="brew upgrade"
-# alias bclean="brew cleanup --prune=all && brew autoremove"
-alias bclean='brew cleanup --prune=all && rm -rf $(brew --cache) && brew autoremove'
-alias bi="brew info"
-alias bin="brew install"
-alias brein="brew reinstall"
-alias bs="brew search"
-alias bsa="brew search --eval-all --desc"
-alias bl="brew leaves"
-alias bcin="brew install --cask"
-alias bb="brew bundle -g"
-alias bbe="brew bundle edit -g"
-alias bba="brew bundle add -g"
-alias bbrm="brew bundle remove -g"
-alias bbls="brew bundle dump -g --all --file=- --verbose"
-alias bbsave="brew bundle dump -g --all --verbose --global"
-alias bbcheck="brew bundle check -g --all --verbose --global"
-alias bup='brew update && brew upgrade && brew cleanup'
-alias brewup='bup'
-
-# --- File System (eza, fd) ---
-# alias cf='cd ~/.config/'
-# alias dl='cd ~/Downloads'
-alias ls='eza --git --icons'                             # system: List filenames on one line
-alias l='eza --git --icons -lF'                          # system: List filenames with long format
-alias ll='eza -lahF --git'                               # system: List all files
-alias lll="eza -1F --git --icons"                        # system: List files with one line per file
-alias llm='ll --sort=modified'                           # system: List files by last modified date
-alias la='eza -lbhHigUmuSa --color-scale --git --icons'  # system: List files with attributes
-alias lx='eza -lbhHigUmuSa@ --color-scale --git --icons' # system: List files with extended attributes
-alias lt='eza --tree --level=2'                          # system: List files in a tree view
-alias llt='eza -lahF --tree --level=2'                   # system: List files in a tree view with long format
-alias ltt='eza -lahF | grep "$(date +"%d %b")"'          # system: List files modified today
-
-# --- Text Editors (nvim) ---
+# ========================================================================
+# Aliases - Editors
+# ========================================================================
 alias v='$EDITOR'
 alias vi='$EDITOR'
 alias vim='$EDITOR'
 
-# --- Zsh ---
+# ========================================================================
+# Aliases - Zsh
+# ========================================================================
 alias zr="exec zsh"
-alias ze="nvim '$ZDOTDIR'/{.zshrc,.zprofile,.zshenv}"
-alias zeall="nvim '$ZDOTDIR'/{.zshrc,.zprofile,.zshenv,*.zsh}"
+alias ze="$EDITOR $ZDOTDIR/.zshrc"
+alias zeall="$EDITOR $ZDOTDIR/{.zshrc,.zprofile,.zshenv}"
 alias zcompreset="rm -f ~/.zcompdump; compinit"
 
-# --- System Information & Utilities ---
-alias ports="lsof -i -P -n | grep LISTEN"
-alias sudoports="sudo ports"
-alias printpath='echo $PATH | tr ":" "\n"'
-alias printfuncs='print -l ${(k)functions[(I)[^_]*]} | sort'
-alias printfpath='for fp in $fpath; do echo $fp; done; unset fp'
-
-alias ip="ipconfig getifaddr en0"
-alias localip="ipconfig getifaddr en0"
-alias publicip="curl -s https://api.ipify.org"
-alias flush="dscacheutil -flushcache && killall -HUP mDNSResponder"
-alias flushdns="sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder"
-alias showhidden="defaults write com.apple.finder AppleShowAllFiles YES; killall Finder"
-
-# --- Git & Lazygit ---
+# ========================================================================
+# Aliases - Git
+# ========================================================================
+alias g='git'
 alias gs='git status'
 alias ga='git add'
 alias gai='git add -i'
 alias gaa='git add --all'
+alias gc='git commit'
 alias gcm='git commit -m'
 alias gca='git commit --amend --no-edit'
-alias gc='git commit'
 alias gp='git push'
 alias gll='git pull'
 alias lg='lazygit'
 alias lgdot='lazygit --path $DOTFILES'
 
-# --- Modern CLI Alternatives ---
-alias ps='procs'                # procs - process viewer
-alias ping='gping'              # gping - ping with graph
-alias diff='delta'              # delta - better diff
-alias cat='bat --paging=always' # bat - better cat
-alias miller='mlr'              # miller - CSV processor
-alias grep='rg'                 # ripgrep - better grep
-alias find='fd'                 # fd - better find
-alias md='glow'                 # glow - markdown viewer
-alias net='trippy'              # trippy - traceroute
-alias netviz='netop'            # netop - network visualization
-alias jwt='jet-ui'              # jet-ui - JWT debugger
-alias sed='sd'                  # sd - better sed
-alias du='dust'                 # dust - better du
-alias csv='xsv'                 # xsv - CSV processor
-alias jsonfilter='jsonf'        # jsonf - JSON filter
-alias jsonviewer='jsonv'        # jsonv - JSON viewer
+# ========================================================================
+# Aliases - Modern CLI Tools
+# ========================================================================
+alias cat='bat --paging=always'
+alias grep='rg'
+alias find='fd'
+alias ps='procs'
+alias diff='delta'
+alias ping='gping'
+alias du='dust'
+alias sed='sd'
+alias md='glow'
+alias cheat='tldr'
+alias ch='cheat'
 
-# --- Docker & Kubernetes ---
+# ========================================================================
+# Aliases - Homebrew
+# ========================================================================
+alias b='brew'
+alias bup='brew update && brew upgrade'
+alias bupd='brew update'
+alias bupg='brew upgrade'
+alias bclean='brew cleanup --prune=all && rm -rf $(brew --cache) && brew autoremove'
+alias bi='brew info'
+alias bin='brew install'
+alias brein='brew reinstall'
+alias bs='brew search'
+alias bl='brew leaves'
+alias bcin='brew install --cask'
+
+# ========================================================================
+# Aliases - Docker
+# ========================================================================
 alias d='docker'
-alias dstart='docker start'
-alias dstop='docker stop'
 alias dps='docker ps'
 alias dpsa='docker ps -a'
 alias dimg='docker images'
 alias dx='docker exec -it'
-alias drm='docker rm'
-alias drmi='docker rmi'
-alias dbuild='docker build'
 alias dc='docker-compose'
-alias k='k9s'         # k9s - Kubernetes CLI
-alias ld="lazydocker" # lazydocker - Docker TUI
+alias ld='lazydocker'
+alias k='k9s'
 
-# --- Just Task Runner ---
-# alias j='~/dotfiles/scripts/j'
-# alias .j='~/dotfiles/scripts/j'
-export USER_JUSTFILE="$CFS/just/.user.justfile"
-alias j="just"
+# ========================================================================
+# Aliases - Just
+# ========================================================================
+alias j='just'
 alias .j='just --justfile $USER_JUSTFILE'
-# alias .jfmt='just --justfile ~/dotfiles/config/just/global.justfile --working-directory . --unstable --fmt'
-# alias .j='$HOME/dotfiles/scripts/j'
-# alias jfmt="just --unstable --fmt"
-# # alias jg='just --justfile $HOME/dotfiles/config/just/global.justfile'
-# alias .jfmt='just --justfile $USER_JUSTFILE --working-directory . --unstable --fmt'
 
-# --- FZF Enhanced Commands ---
-alias flog='fzf --preview "bat --style=numbers --color=always --line-range=:500 {}"'
-alias falias='alias | fzf'
-alias fman='man -k . | fzf --preview "man {}"'
-alias fls='man -k . | fzf --preview "man {}"'
+# ========================================================================
+# Aliases - System
+# ========================================================================
+alias ports='lsof -i -P -n | grep LISTEN'
+alias printpath='echo $PATH | tr ":" "\n"'
+alias ip='ipconfig getifaddr en0'
+alias publicip='curl -s https://api.ipify.org'
+alias flush='dscacheutil -flushcache && killall -HUP mDNSResponder'
 
-# --- Terminal Multiplexers ---
-# Ghostty
-alias g='ghostty'
-
-# Zellij
-alias zj="zellij"
-alias zjls="zellij list-sessions"
+# ========================================================================
+# Aliases - Terminal Multiplexers
+# ========================================================================
+alias zj='zellij'
+alias zjls='zellij list-sessions'
 alias zja='zellij attach "$(zellij list-sessions -n | fzf --reverse --border --no-sort --height 40% | awk '\''{print $1}'\'')"'
-# alias zje="zellij edit"
 
-# --- Other Tools ---
-# TLDR/Cheat sheets
-alias cheat="tldr"
-alias ch="cheat"
+# ========================================================================
+# Aliases - Other Tools
+# ========================================================================
+alias tm='task-master'
+alias claude='/Users/hank/.claude/local/claude'
+alias ts='tailscale'
+alias hf='huggingface-cli'
+alias rx='repomix'
+alias at='atuin'
+alias aero='aerospace'
+alias pc='process-compose'
+alias envx='dotenvx'
 
-# Claude
-alias claude="/Users/hank/.claude/local/claude"
+# ========================================================================
+# Aliases - Nix
+# ========================================================================
+alias nixzsh='nix develop --command zsh'
+alias nixcf='$EDITOR ~/.config/nix/nix.conf'
+alias nixdev='nix develop'
+alias nixpkgs='nix search'
+alias nixf='nix flake'
 
-# Tailscale
-alias ts="tailscale"
+# ========================================================================
+# Functions - Directory Navigation
+# ========================================================================
 
-# Hugging Face
-alias hf="huggingface-cli"
+# Quick directory navigation with fzf
+cdf() {
+    local dir
+    dir=$(fd --type d --hidden --exclude .git | fzf --preview 'eza --tree --level=1 {}') && cd "$dir"
+}
 
-# Repomix
-alias rx="repomix"
+# Edit config directories
+fdirs() {
+    local DIRPATH="$1"
+    nvim $(fd . -t d --exact-depth 1 --color never $DIRPATH | fzf --prompt="${DIRPATH} configs>" --preview='gls -s {}')
+}
 
-# Atuin
-alias at="atuin"
+xdg() {
+    fdirs $XDG_CONFIG_HOME
+}
 
+cfs() {
+    fdirs $CFS
+}
 
+# ========================================================================
+# Functions - File Operations
+# ========================================================================
 
+# Edit files with fzf preview
+vf() {
+    local file
+    file=$(fd --type f --hidden --exclude .git | fzf --preview 'bat --color=always {}') && $EDITOR "$file"
+}
 
-function find_large_files() {
-    git rev-list --all --objects | \                                                                                                           09:05  on Mac OS
-    while read sha1 filename; do
-    if [ -n "$filename" ]; then
-        size=$(git cat-file -s $sha1 2>/dev/null || echo 0)
-        echo "$size $filename"
+# FZF enhanced file operations
+f() {
+    local cmd result
+    case "$1" in
+    find|file)
+        result=$(fd --type f --follow --hidden --exclude .git | fzf --preview="bat --color=always {}")
+        echo "$result"
+        ;;
+    edit)
+        result=$(fd --type f --follow --hidden --exclude .git | fzf --preview="bat --color=always {}")
+        [[ -n "$result" ]] && "$EDITOR" "$result"
+        ;;
+    dir)
+        result=$(fd --type d --follow --hidden --exclude .git | fzf --preview="eza --tree --level=1 --color=always {}")
+        echo "$result"
+        ;;
+    cd)
+        result=$(fd --type d --follow --hidden --exclude .git | fzf --preview="eza --tree --level=1 --color=always {}")
+        [[ -n "$result" ]] && cd "$result"
+        ;;
+    *)
+        echo "Usage: f {find|file|edit|dir|cd}"
+        ;;
+    esac
+}
+
+# ========================================================================
+# Functions - Yazi File Manager
+# ========================================================================
+y() {
+    local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+    yazi "$@" --cwd-file="$tmp"
+    if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+        builtin cd -- "$cwd"
     fi
-    done | sort -nr | head -20
-}
-# FZF enhanced file selection and navigation
-function f() {
-  local cmd result
-
-  case "$1" in
-  find | file)
-    # Find files
-    result=$(fd --type f --follow --hidden --exclude .git | fzf --preview="bat --color=always {}")
-    echo "$result"
-    ;;
-  edit)
-    # Find and edit file
-    result=$(fd --type f --follow --hidden --exclude .git | fzf --preview="bat --color=always {}")
-    [[ -n "$result" ]] && "$EDITOR" "$result"
-    ;;
-  dir)
-    # Find directories
-    result=$(fd --type d --follow --hidden --exclude .git | fzf --preview="eza --tree --level=1 --color=always {}")
-    echo "$result"
-    ;;
-  z)
-    # Jump with zoxide
-    result=$(zoxide query -l | fzf --preview="eza --tree --level=1 --color=always {}")
-    [[ -n "$result" ]] && cd "$result"
-    ;;
-  *)
-    echo "Usage: f [find|edit|dir|z]"
-    return 1
-    ;;
-  esac
-}
-
-# # load all scripts
-# if [ -d "$SCRIPTS/" ]; then
-# 	for f in "./.scripts/"*.sh; do
-# 		echo "Loading script: $f"
-# 		source "$f"
-# 	done
-# fi
-
-# minio / s3 frontend -> http://localhost:51021
-# noggin server -> http://localhost:59000
-# vibes frontend -> http://localhost:3000
-# prefect (job runner) -> http://localhost:52000/runs/flow-run
-
-# MINIO_S3_STORAGE="http://localhost:51021/"
-# NOGGIN_SERVER="http://localhost:59000/"
-# VIBES_FRONTEND="http://localhost:3000/"
-# PREFECT_JOB_RUNNER="http://localhost:52000/runs/flow-run"1
-#
-
-# https://nix.dev/manual/nix/2.28/installation/env-variables.html?highlight=ssl#nix_ssl_cert_file
-
-# [[general commands]]
-#
-#   ant-check-1password - Check that your 1password CLI integration is set up correctly
-#   menu                - prints this menu
-#
-# [build]
-#
-#   ant-build-docker    - Build and load Docker images for every Nix service
-#   ant-build-host      - Build everything but don't start nor load into Docker
-#   ant-lint            - Lint Go & Python code in your working directory
-#   ant-sync-cache      - Synchronize your local cache with our CI cache.  Requires 1password.
-#
-# [maintenance]
-#
-#   system-prune        - Prune build cache for Docker & Nix
-#
-# [run]
-#
-#   ant-admin           - Anterior admin tool (/admin)
-#   ant-all-services    - Run all services locally (pass --help for more)
-#
-# [anterior]$ ant-build-docker
-# #
-
-# ========================================================================
-# 10. Source Custom Files
-# ========================================================================
-
-# Source aliases and functions
-[[ -f "${ZDOTDIR}/aliases.zsh" ]] && source "${ZDOTDIR}/aliases.zsh"
-[[ -f "${ZDOTDIR}/functions.zsh" ]] && source "${ZDOTDIR}/functions.zsh"
-
-alias flopilot="cd ~/src/vibes/apps/flopilot && npm i && dotenvx run ./deploy-local.sh && cd -"
-alias flonotes="cd ~/src/vibes/apps/flonotes && npm i && dotenvx run ./deploy-local.sh && cd -"
-function kill-ant-ports() {
-	lsof -i TCP:20000-30000 -sTCP:LISTEN | awk 'NR>1 {print $2}' | sort -u | xargs kill -9
+    rm -f -- "$tmp"
 }
 
 # ========================================================================
-# COMMENTED SECTIONS (Future Reference)
+# Tool Initialization
 # ========================================================================
 
-# --- PostgreSQL Configuration ---
-# path_add "/opt/homebrew/opt/postgresql@17/bin"
-# export LDFLAGS="-L/opt/homebrew/opt/postgresql@17/lib"
-# export CPPFLAGS="-I/opt/homebrew/opt/postgresql@17/include"
+# Starship prompt
+has_command starship && eval "$(starship init zsh)"
 
-# --- NPM Global Configuration ---
-# mkdir -p ~/.npm-global
-# path_add "$HOME/.npm-global/bin"
-# npm config set prefix ~/.npm-global
-#
+# Atuin (history management)
+[[ -f "$HOME/.atuin/bin/env" ]] && source "$HOME/.atuin/bin/env"
 
-# --- Notes for Global Package Installation ---
-# TODO: add github extensions list
-# - gh extension install dlvhdr/gh-dash
-# TODO: add nodejs global packages (bun + etc)
-# TODO: add uv global packages
-# gpt-repository-loader, llm, mitmproxy2swagger, poetry, prefect, etc.
-# repomix
+# Load utility functions if available
+[[ -f "$SCRIPTS/utils.zsh" ]] && source "$SCRIPTS/utils.zsh"
 
-# --- Dotfiles Symlink Configuration ---
-# Future work: Create a LINKMAP array to manage dotfile symlinks
+# Load local/private configuration if exists
+[[ -f "$ZDOTDIR/.zshrc.local" ]] && source "$ZDOTDIR/.zshrc.local"
 
-[ -f "/Users/hank/.ghcup/env" ] && . "/Users/hank/.ghcup/env" # ghcup-env
-
-################
-# Shell Hooks (at end of file)
-################
-
-# --- Zoxide ---
-has_command zoxide && eval "$(zoxide init zsh)"
-
-# --- FZF ---
-# source <(fzf --zsh)
-has_command fzf && source <(fzf --zsh)
-
-# --- Zellij ---
-# has_command zellij && eval "$(zellij setup --generate-auto-start zsh)"
-
-# --- Direnv ---
-# has_command direnv && eval "$(direnv hook zsh)"
-
-# --- uv ---
-has_command uv && eval "$(uv generate-shell-completion zsh)"
-
-# --- Atuin ---
-has_command atuin && eval "$(atuin init zsh)"
-
-# --- Volta ---
-has_command volta && eval "$(volta setup)"
+# ========================================================================
+# Cleanup
+# ========================================================================
+# Performance monitoring (uncomment to debug)
+# zprof

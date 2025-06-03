@@ -1,79 +1,39 @@
 # ========================================================================
 # ZSH Profile (.zprofile)
 # ========================================================================
-# Executed at login (after .zshenv)
-# Used primarily for setting PATH and environment variables
-# References:
-# - https://wiki.archlinux.org/title/Zsh#Configuration_files
-# - https://gist.github.com/Linerre/f11ad4a6a934dcf01ee8415c9457e7b2
-# - https://mac.install.guide/terminal/zshrc-zprofile
-echo "Loading .zprofile from $ZDOTDIR"
-# echo "Loading /etc/profile.d/nix.sh from $ZDOTDIR"
+# Executed at login (after .zshenv) - for PATH and environment setup
 
-# ========================================================================
-# Homebrew Setup (install if not installed)
-# ========================================================================
-# set -x
-echo "Loading Homebrew shell environment..."
-# setup homebrew shell path
-eval "$(/opt/homebrew/bin/brew shellenv)"
+# Homebrew Setup
+if [[ -x "/opt/homebrew/bin/brew" ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -x "/usr/local/bin/brew" ]]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+fi
 
-# zsh setup
-# TODO: fzf-zsh https://github.com/unixorn/fzf-zsh-plugin
-
-
-# ========================================================================
-# Editor & Terminal Settings
-# ========================================================================
-
-# Default editor
+# Editor and Pager
 export EDITOR="nvim"
 export VISUAL="$EDITOR"
-# export PAGER="less -FRX"
-export PAGER="bat --pager always"
+export PAGER="bat --paging=always"
 
-# Remove duplicate entries from PATH
-# typeset -U path PATH
-typeset -U path PATH
-
-export COLORTERM="truecolor"
-
-# export PATH="$HOME/.npm-global/bin/:$PATH"
-export VOLTA_HOME="$HOME/.volta"
-
-paths=(
-  # last in PATH
-  "$HOME/.cargo/bin"
-  "$HOME/.npm-global/bin"
-  "$HOME/.volta/bin"
-  "$HOME/./bin"
-  "$HOME/.local/bin"
-  "$HOME/dotfiles/bin"
-  # https://mac.install.guide/ruby/13
-  "/opt/homebrew/opt/ruby/bin"
-  "`gem environment gemdir`/bin"
-  $PATH
-  # "$HOME/.nix-profile/bin"
-  # "/nix/var/nix/profiles/default/bin"
-  # first in PATH
+# Clean PATH management using zsh arrays
+typeset -U path  # Ensure unique entries
+path=(
+    # User paths (highest priority)
+    "$HOME/.local/bin"
+    "$HOME/dotfiles/bin"
+    
+    # Language/tool paths
+    "$HOME/.cargo/bin"
+    "$HOME/go/bin"
+    "$VOLTA_HOME/bin"
+    
+    # Homebrew Ruby (if installed)
+    "/opt/homebrew/opt/ruby/bin"
+    
+    # System paths (already added, but included for completeness)
+    $path
 )
-for p in "${paths[@]}"; do 
-  PATH="$p:$PATH"
-done
 
-
-# Set up Homebrew
-export HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-$(brew --prefix 2>/dev/null)}"
-
-
-
-# Add Nix to path
-# export PATH=$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH
-
-. "$HOME/.cargo/env"
-
-export PATH
-
-# Added by OrbStack: command-line tools and integration
-# This won't be added again if you remove it.
-source ~/.orbstack/shell/init.zsh 2>/dev/null || :
+# Additional tool initialization
+[[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
+[[ -f "$HOME/.orbstack/shell/init.zsh" ]] && source "$HOME/.orbstack/shell/init.zsh" 2>/dev/null
