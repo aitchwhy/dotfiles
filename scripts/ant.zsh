@@ -20,17 +20,19 @@ ant_commands=(
 # alias antnpmbuild="ant-npm-build-deptree SERVICE_NAME"
 # alias antnpmrun="npm run --workspace your/dir build"
 
-# Use fzf to select a command and store it in a variable
-selected_command=$(printf "%s\n" "${ant_commands[@]}" | fzf --height 40% --reverse --border --prompt="Select a command: ")
+# Function to run the ant command picker
+ant_picker() {
+  # Use fzf to select a command and store it in a variable
+  selected_command=$(printf "%s\n" "${ant_commands[@]}" | fzf --height 40% --reverse --border --prompt="Select a command: ")
 
-# If a command was selected (fzf wasn't cancelled), run it
-if [[ -n "$selected_command" ]]; then
-  echo "Running: $selected_command"
-  eval "$selected_command"
-else
-  echo "No command selected."
-fi
-
+  # If a command was selected (fzf wasn't cancelled), run it
+  if [[ -n "$selected_command" ]]; then
+    echo "Running: $selected_command"
+    eval "$selected_command"
+  else
+    echo "No command selected."
+  fi
+}
 
 # Quick utilities for viewing and managing the local ports used by the
 # Anterior process-compose stack defined in nix/anterior-services-process-compose.nix.
@@ -80,8 +82,9 @@ typeset -A ANT_PORTS=(
 
 # List <port> <name>, sorted by port number (ascending)
 function ant_ports_list() {
-	for k v in "${(@kv)ANT_PORTS}"; do
-		print -r -- "$v\t$k"
+	local k
+	for k in ${(k)ANT_PORTS}; do
+		print -r -- "${ANT_PORTS[$k]}\t$k"
 	done | sort -n
 }
 
@@ -141,6 +144,7 @@ function ant_ports() {
 alias antports='ant_ports_list'
 alias antkill='ant_kill'
 alias antkillall='ant_kill_all'
+alias antpick='ant_picker'  # Run the ant command picker
 # Convenience: list and immediately show lsof on every port in the map
 function ant_ports_lsof_all() {
 	for p in ${(v)ANT_PORTS}; do
