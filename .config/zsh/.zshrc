@@ -48,6 +48,7 @@ export SAVEHIST=${HISTSIZE}
 # ========================================================================
 
 export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
+export DOTS="${DOT:-$HOME/dotfiles}"
 # export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$DOTFILES/config}"
 export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$DOTFILES/.config}"
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
@@ -61,16 +62,21 @@ export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 [[ ! -d "$XDG_STATE_HOME" ]] && mkdir -p "$XDG_STATE_HOME"
 
 # Ensure ZSH config directory is set
-export DOT="${dot:-$DOTFILES}"
-export CFS="$HOME/.config"
-export CFSDOT="$dot/.config"
-export SCRPTS="$dot/scripts"
+export CFSXDG="$HOME/.config"
+export CFS="$DOTS/.config"
+export CFSZSH="$CFS/zsh"
+export SCRIPTS="$DOTS/scripts"
 export OBS="$HOME/obsidian/primary"
-# export cfzsh="${cfz:-$cf/zsh}"
 # export zdot=$cfzsh
-# export nvime"$EDITOR $cfnvim"
 # export cfj="${cfz:-$cf/just}"
 
+
+# Environment variables for tools
+export BAT_THEME="--theme=OneHalfDark"
+export DELTA_PAGER="bat --plain --paging=never"
+export FZF_DEFAULT_OPTS='--height 40% --border --cycle --layout=reverse --marker="✓" --bind=ctrl-j:down,ctrl-k:up'
+export GLOW_PAGER="bat --plain --language=markdown"
+export HOMEBREW_NO_ANALYTICS=1
 
 # export CONFIGS="$HOME/dotfiles/.config"
 # edit config files in dir
@@ -78,12 +84,12 @@ function fdirs() {
   local DIRPATH="$1"
 	nvim $(fd . -t d --exact-depth 1 --color never $DIRPATH | fzf --prompt="${DIRPATH} configs>" --preview='ls -s {}')
 }
-function cfs() {
-  fdirs $CFS
+function xdg() {
+  fdirs $CFSXDG
 }
 # export CONFIGS_XDG_="$XDG_CONFIG_HOME"
-function cfsdot() {
-  fdirs $CFSDOT
+function cfs() {
+  fdirs $CFS
 }
 
 # ========================================================================
@@ -98,7 +104,8 @@ export KEYTIMEOUT=1
 # ========================================================================
 
 # Source our utility functions from utils.zsh
-export UTILS="$CFSZSH/scripts/utils.zsh"
+export UTILS="$SCRIPTS/utils.zsh"
+echo "UTILS : $UTILS"
 [[ -f "$UTILS" ]] && source "$UTILS"
 
 # Check if a command exists
@@ -285,6 +292,10 @@ alias aero='aerospace'
 # 9. Aliases (grouped by tool)
 # ========================================================================
 
+
+alias cheat="tldr"
+alias ch="cheat"
+
 # --- Nix ---
 alias nixh='nix --help'
 alias nixcfs="$EDITOR $CFS/nix/nix.conf"
@@ -451,6 +462,50 @@ alias rx="repomix"
 
 # Atuin
 alias at="atuin"
+
+
+
+
+function find_large_files() {
+    git rev-list --all --objects | \                                                                                                           09:05  on Mac OS
+    while read sha1 filename; do
+    if [ -n "$filename" ]; then
+        size=$(git cat-file -s $sha1 2>/dev/null || echo 0)
+        echo "$size $filename"
+    fi
+    done | sort -nr | head -20
+}
+# FZF enhanced file selection and navigation
+function f() {
+  local cmd result
+
+  case "$1" in
+  find | file)
+    # Find files
+    result=$(fd --type f --follow --hidden --exclude .git | fzf --preview="bat --color=always {}")
+    echo "$result"
+    ;;
+  edit)
+    # Find and edit file
+    result=$(fd --type f --follow --hidden --exclude .git | fzf --preview="bat --color=always {}")
+    [[ -n "$result" ]] && "$EDITOR" "$result"
+    ;;
+  dir)
+    # Find directories
+    result=$(fd --type d --follow --hidden --exclude .git | fzf --preview="eza --tree --level=1 --color=always {}")
+    echo "$result"
+    ;;
+  z)
+    # Jump with zoxide
+    result=$(zoxide query -l | fzf --preview="eza --tree --level=1 --color=always {}")
+    [[ -n "$result" ]] && cd "$result"
+    ;;
+  *)
+    echo "Usage: f [find|edit|dir|z]"
+    return 1
+    ;;
+  esac
+}
 
 # load all scripts
 if [ -d "$SCRIPTS/" ]; then
