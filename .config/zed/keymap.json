@@ -8,6 +8,7 @@
     }
   },
   {
+    "context": "Workspace",
     "bindings": {
       "cmd-shift-k": "assistant::InlineAssist",
       "cmd-l": "agent::ToggleFocus",
@@ -15,7 +16,8 @@
       "cmd-o": "outline::Toggle",
       "cmd-k": "command_palette::Toggle",
       "cmd-shift-o": "outline_panel::ToggleFocus",
-      "cmd-b": "workspace::ToggleLeftDock"
+      "cmd-b": "workspace::ToggleLeftDock",
+      "cmd-shift-,": "zed::OpenKeymap"
     }
   },
   {
@@ -41,7 +43,6 @@
       "cmd-shift-g": "git_panel::ToggleFocus",
       "cmd-shift-d": "debug_panel::ToggleFocus",
       "cmd-shift-o": "outline_panel::ToggleFocus",
-      "cmd-shift-,": "zed::OpenKeymap",
       "cmd-g cmd-g": [
         "task::Spawn",
         {
@@ -58,7 +59,12 @@
       "cmd-m": "workspace::ToggleZoom"
     }
   },
-
+  {
+    "context": "Terminal",
+    "bindings": {
+      "cmd-p": "file_finder::Toggle"
+    }
+  },
   {
     "context": "vim_operator == none && !VimWaiting &&  vim_mode == normal",
     "bindings": {

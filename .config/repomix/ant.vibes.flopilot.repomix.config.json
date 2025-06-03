@@ -1,0 +1,41 @@
+{
+  "output": {
+    "filePath": "/Users/hank/dotfiles/.config/repomix/ant.platform.noggin.repomix.output.xml",
+    "style": "xml",
+    "parsableStyle": true,
+    "instructionFilePath": "/Users/hank/dotfiles/.config/repomix/ant.platform.noggin.repomix.instructions.md",
+    "fileSummary": true,
+    "directoryStructure": true,
+    "removeComments": false,
+    "removeEmptyLines": false,
+    "topFilesLength": 5,
+    "copyToClipboard": false,
+    "showLineNumbers": false,
+    "includeEmptyDirectories": false,
+    "compress": true,
+    "git": {
+      "sortByChanges": true,
+      "sortByChangesMaxCommits": 100,
+      "includeDiffs": false
+    }
+  },
+  "include": [
+    "**/package.json",
+    "**/tsconfig.json",
+    "**/gateways/noggin/src/**/*.ts",
+    "**/lib-platform/src/**/*.ts"
+  ],
+  "ignore": {
+    "useGitignore": true,
+    "useDefaultPatterns": true,
+    "customPatterns": [
+      "**/data/",
+      "**/gen/",
+      "**/*.log",
+      "**@anterior/models/data/**"
+    ]
+  },
+  "security": {
+    "enableSecurityCheck": false
+  }
+}

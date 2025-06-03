@@ -10,6 +10,12 @@ function cursor_ext_import() {
   done < $DOTFILES/config/vscode/extensions.txt
 }
 
+function volta() {
+  switch
+  volta list --format=plain
+
+}
+
 ################################
 # Homebrew
 ################################

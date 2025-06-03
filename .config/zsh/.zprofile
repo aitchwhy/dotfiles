@@ -48,6 +48,7 @@ paths=(
   "$HOME/.volta/bin"
   "$HOME/./bin"
   "$HOME/.local/bin"
+  "$HOME/dotfiles/bin"
   # "$HOME/.nix-profile/bin"
   # "/nix/var/nix/profiles/default/bin"
   # first in PATH
@@ -56,6 +57,9 @@ for p in "${paths[@]}"; do
   PATH="$p:$PATH"
 done
 
+
+# Set up Homebrew
+export HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-$(brew --prefix 2>/dev/null)}"
 
 
 
