@@ -4,12 +4,12 @@
 # "$schema" = "https://yazi-rs.github.io/schemas/keymap.json"
 ##############################
 
-[search]
-# Fuzzy search works well with M-chip performance
-fuzzy = true
-incsearch = true   # Incremental search
-smart_case = true
-wrap_around = true # Wrap-around search (matches macOS UI patterns)
+# [search]  # These options may be deprecated or moved
+# # Fuzzy search works well with M-chip performance
+# fuzzy = true
+# incsearch = true   # Incremental search
+# smart_case = true
+# wrap_around = true # Wrap-around search (matches macOS UI patterns)
 
 #################################
 #  Manager key mappings
@@ -49,21 +49,21 @@ run = "plugin mount"
 on = ["g", "r"]
 run = 'shell -- ya emit cd "$(git rev-parse --show-toplevel)"'
 
-[[mgr.prepend_keymap]]
-on = "k"
-run = "plugin --sync arrow --args=-1"
-
-[[mgr.prepend_keymap]]
-on = "j"
-run = "plugin --sync arrow --args=1"
-
-[[mgr.prepend_keymap]]
-on = "K"
-run = "plugin --sync parent-arrow --args=-1"
-
-[[mgr.prepend_keymap]]
-on = "J"
-run = "plugin --sync parent-arrow --args=1"
+# [[mgr.prepend_keymap]]
+# on = "k"
+# run = "plugin --sync arrow --args=-1"
+#
+# [[mgr.prepend_keymap]]
+# on = "j"
+# run = "plugin --sync arrow --args=1"
+#
+# [[mgr.prepend_keymap]]
+# on = "K"
+# run = "plugin --sync parent-arrow --args=-1"
+#
+# [[mgr.prepend_keymap]]
+# on = "J"
+# run = "plugin --sync parent-arrow --args=1"
 
 [[mgr.prepend_keymap]]
 on = "y"
@@ -136,7 +136,7 @@ run = "plugin toggle-pane min-preview"
 desc = "Show or hide the preview pane"
 
 [[mgr.prepend_keymap]]
-on = "T"
+on = "M"
 run = "plugin toggle-pane max-preview"
 desc = "Maximize or restore the preview pane"
 
@@ -153,7 +153,7 @@ run = [
 ]
 
 [[mgr.prepend_keymap]]
-on = ["m"]
+on = ["r"]
 run = "plugin relative-motions"
 desc = "Trigger a new relative motion"
 
@@ -269,10 +269,10 @@ desc = "Open shell here"
 # Input Configuration (Apple keyboard friendly)
 # ==================================================
 
-[input]
-cd_shortcuts = true   # OS X-style key handling
-dial_as_in_vim = true # macOS-style history
-history_dedup = 10000 # Number of command-history entries
+# [input]  # These options may be deprecated or moved
+# cd_shortcuts = true   # OS X-style key handling
+# dial_as_in_vim = true # macOS-style history
+# history_dedup = 10000 # Number of command-history entries
 
 # Esc cancels input (only 1 press)
 [[input.prepend_keymap]]

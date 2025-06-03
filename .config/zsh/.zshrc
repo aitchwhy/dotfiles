@@ -65,6 +65,20 @@ export HOMEBREW_NO_ANALYTICS=1
 export COLORTERM="truecolor"
 export USER_JUSTFILE="$CFS/just/.user.justfile"
 
+# NPM configuration - using standard ~/.npmrc (symlinked from dotfiles)
+# export NPM_CONFIG_USERCONFIG="$CFS/npm/.npm-global"  # No longer needed
+
+# Add a directory to PATH if it exists and isn't already in PATH
+export path_add() {
+  local dir="$1"
+  if [[ -d "$dir" ]] && [[ ":$PATH:" != *":$dir:"* ]]; then
+    export PATH="$dir:$PATH"
+    return 0
+  fi
+  return 1
+}
+path_add "$CFS/npm-global/bin"  # Add npm global packages to PATH
+
 # ========================================================================
 # Completions
 # ========================================================================
@@ -108,6 +122,7 @@ fi
 # ========================================================================
 # Core Functions
 # ========================================================================
+
 
 # Check if command exists
 has_command() {
@@ -336,8 +351,11 @@ y() {
 # Starship prompt
 has_command starship && eval "$(starship init zsh)"
 
+
+
 # Atuin (history management)
 [[ -f "$HOME/.atuin/bin/env" ]] && source "$HOME/.atuin/bin/env"
+eval "$(atuin init zsh)"
 
 # Load utility functions if available
 [[ -f "$SCRIPTS/utils.zsh" ]] && source "$SCRIPTS/utils.zsh"

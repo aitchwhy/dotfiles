@@ -9,19 +9,18 @@ linemode = "size"
 show_preview = true
 show_icons = true
 show_symlink = true
-preview_ratio = 0.5
-folder_preview = true
+# preview_ratio = 0.5  # Deprecated - use ratio in layout instead
+# folder_preview = true  # Deprecated option
 scroll_offset = 5
 case_sensitive = false
 mouse = true
-# For smoother navigation
-animation_interval = 0.03
+# animation_interval = 0.03  # Deprecated option
 
 [preview]
 max_width = 1920
 max_height = 1080
 # cache_dir = "~/.cache/yazi"
-keybinding = true
+# keybinding = true  # Deprecated option
 # max_file_size = "10MB"
 tab_size = 2
 # Higher preload for faster previews

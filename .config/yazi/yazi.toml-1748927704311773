@@ -1,0 +1,129 @@
+[manager]
+show_hidden = true
+layout = [1, 4, 3]
+sort_by = "natural"
+sort_sensitive = false
+sort_reverse = false
+sort_dir_first = false
+linemode = "size"
+show_preview = true
+show_icons = true
+show_symlink = true
+# preview_ratio = 0.5  # Deprecated - use ratio in layout instead
+# folder_preview = true  # Deprecated option
+scroll_offset = 5
+case_sensitive = false
+mouse = true
+# animation_interval = 0.03  # Deprecated option
+
+[preview]
+max_width = 1920
+max_height = 1080
+# cache_dir = "~/.cache/yazi"
+# keybinding = true  # Deprecated option
+# max_file_size = "10MB"
+tab_size = 2
+# Higher preload for faster previews
+preload = 10
+
+[tasks]
+# Optimized workers for better performance on Apple Silicon
+micro_workers = 12
+macro_workers = 16
+bizarre_retry = 5
+delay_chain_threshold = 10 # Improve task chaining performance
+
+[opener]
+edit = [{ run = 'nvim "$@"', block = true }]
+
+open = [
+  { run = 'open "$@"', desc = "Open with default macOS app" },
+  { run = 'open -a Safari "$@"', desc = "Open with Safari", for = "url" },
+  { run = 'qlmanage -p "$@" &>/dev/null', desc = "QuickLook preview", for = "file" },
+  { run = 'open -a Preview "$@"', desc = "Open with Preview", for = "image" },
+  { run = 'open -a "Visual Studio Code" "$@"', desc = "Open with VS Code", for = "text" },
+  { run = 'open -a "TextEdit" "$@"', desc = "Open with TextEdit" },
+  { run = 'bat --paging=always "$@"', desc = "Open with bat", for = "text" },
+]
+
+reveal = [{ run = 'open -R "$@"', desc = "Reveal in Finder" }]
+
+bulk-rename = [{ run = 'nvim "$@"', block = true }]
+
+extract = [
+  { run = 'unar "$1"', desc = "Extract with unar", for = "application" },
+  { run = 'tar -xf "$1"', desc = "Extract TAR archive", for = "application/x-tar" },
+]
+
+archive = [
+  { run = 'zip -r "$1" "${@:2}"', desc = "Compress to ZIP", for = "application/zip" },
+  { run = 'tar -czvf "$1" "${@:2}"', desc = "Compress to TAR.GZ" },
+]
+
+code = [
+  { run = 'nvim "$@"', block = true, desc = "Edit with Neovim" },
+  { run = 'code "$@"', desc = "Open with VS Code", orphan = true },
+]
+
+[open]
+prepend_rules = [
+  { name = "bulk-rename.txt", use = "bulk-rename" },
+  { name = "*.py", use = "code" },
+  { name = "*.js", use = "code" },
+  { name = "*.ts", use = "code" },
+  { name = "*.tsx", use = "code" },
+  { name = "*.jsx", use = "code" },
+  { name = "*.lua", use = "code" },
+  { name = "*.sh", use = "code" },
+]
+
+rules = [
+  { mime = "text/*", use = "edit" },
+  { mime = "image/*", use = "open" },
+  { mime = "audio/*", use = "open" },
+  { mime = "video/*", use = "open" },
+  { mime = "application/pdf", use = "open" },
+  { mime = "application/zip", use = "extract" },
+  { mime = "application/gzip", use = "extract" },
+  { mime = "application/x-tar", use = "extract" },
+  { mime = "*", use = "open" },
+]
+
+[plugin]
+prepend_fetchers = [
+  { id = "mime", name = "*", run = "mime-ext", prio = "high" },
+  { id = "mactag", name = "*", run = "mactag" },
+  { id = "mactag", name = "*/", run = "mactag" },
+]
+
+prepend_preloaders = [{ mime = "image/heic", run = "heic" }]
+
+prepend_previewers = [
+  # Archives
+  { mime = "application/*zip", run = "ouch" },
+  { mime = "application/x-tar", run = "ouch" },
+  { name = "*.tar*", run = 'piper --format=url -- tar tf "$1"' },
+  { mime = "application/x-bzip2", run = "ouch" },
+  { mime = "application/x-7z-compressed", run = "ouch" },
+  { mime = "application/x-rar", run = "ouch" },
+  { mime = "application/x-xz", run = "ouch" },
+  { mime = "application/xz", run = "ouch" },
+
+  # Code and text files
+  { name = "*.csv", run = "rich-preview" },
+  { name = "*.csv", run = 'piper -- bat -p --color=always "$1"' },
+  { name = "*.md", run = 'piper -- CLICOLOR_FORCE=1 glow -w=$w -s=dark "$1"' },
+  { name = "*.md", run = "rich-preview" },
+  { name = "*.rst", run = "rich-preview" },
+  { name = "*.ipynb", run = "rich-preview" },
+  { name = "*.json", run = "rich-preview" },
+  { name = "*.{js,ts,jsx,tsx}", run = 'piper -- bat -p --color=always --language=typescript "$1"' },
+  { name = "*.{rs,toml}", run = 'piper -- bat -p --color=always "$1"' },
+  { name = "*.py", run = 'piper -- bat -p --color=always --language=python "$1"' },
+  { name = "*.lua", run = 'piper -- bat -p --color=always --language=lua "$1"' },
+
+  # Fallback handlers
+  { name = "*", run = 'piper -- echo "$1"' },
+  { name = "*", run = 'piper -- eza -TL=3 --color=always --icons=always --group-directories-first --no-quotes "$1"' },
+  { name = "*", run = 'piper -- hexyl --border=none --terminal-width=$w "$1"' },
+]

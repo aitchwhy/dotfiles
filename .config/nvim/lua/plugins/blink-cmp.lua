@@ -3,6 +3,7 @@
 -----------------------------------------------------------------------------------
 return {
   "saghen/blink.cmp",
+  dependencies = { "giuxtaposition/blink-cmp-copilot" },
   opts = {
     snippets = {
       expand = function(snippet, _)
@@ -40,13 +41,13 @@ return {
     },
 
     -- experimental signature help support
-    -- signature = { enabled = true },
+    signature = { enabled = true },
 
     sources = {
       -- adding any nvim-cmp sources here will enable them
       -- with blink.compat
       compat = {},
-      default = { "lsp", "path", "snippets", "buffer", "copilot" },
+      default = { "copiliot", "lsp", "path", "snippets", "buffer" },
       providers = {
         copilot = {
           name = "copilot",
@@ -59,7 +60,7 @@ return {
     },
 
     cmdline = {
-      enabled = false,
+      enabled = true,
     },
 
     keymap = {

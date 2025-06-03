@@ -1,26 +1,41 @@
------------------------------------------------------------------------------------
--- TREESITTER CONFIGURATION - SYNTAX HIGHLIGHTING AND CODE NAVIGATION
------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- TREESITTER CONFIGURATION – SYNTAX HIGHLIGHT & NAVIGATION
+--------------------------------------------------------------------------------
 return {
-  -- Treesitter core configuration
+  ------------------------------------------------------------------------------
+  -- 1. Core Treesitter plugin
+  ------------------------------------------------------------------------------
   {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
-    opts = {
-      -- Enable highlighting
-      highlight = { enable = true },
+    event = { "BufReadPost", "BufNewFile" },
 
-      -- Enable indentation support
-      indent = { enable = true },
+    opts = function(_, opts)
+      --------------------------------------------------------------------------
+      -- Basic features --------------------------------------------------------
+      --------------------------------------------------------------------------
+      opts.highlight = { enable = true }
+      opts.indent = { enable = true }
+      opts.autotag = { enable = true } -- html / jsx auto-close
+      opts.fold = { enable = true }
 
-      -- Enable automatic tag closing and renaming for HTML/JSX/TSX
-      autotag = { enable = true },
+      --------------------------------------------------------------------------
+      -- Incremental selection (no more <C-Space> clashes) ---------------------
+      --------------------------------------------------------------------------
+      opts.incremental_selection = {
+        enable = true,
+        keymaps = {
+          init_selection = "<CR>",
+          node_incremental = "<CR>",
+          scope_incremental = "<S-CR>",
+          node_decremental = "<M-BS>",
+        },
+      }
 
-      -- Enable code folding based on treesitter
-      fold = { enable = true },
-
-      -- Language parsers to install
-      ensure_installed = {
+      --------------------------------------------------------------------------
+      -- Language parsers ------------------------------------------------------
+      --------------------------------------------------------------------------
+      opts.ensure_installed = {
         "bash",
         "comment",
         "dockerfile",
@@ -45,7 +60,7 @@ return {
         "nix",
         "printf",
         "python",
-        "query", -- For treesitter query debugging
+        "query",
         "regex",
         "ruby",
         "rust",
@@ -59,25 +74,18 @@ return {
         "vimdoc",
         "xml",
         "yaml",
-      },
+      }
 
-      incremental_selection = {
-        enabled = true,
-        keymaps = {
-          init_selection = "<C-space>",
-          node_incremental = "<C-space>",
-          scope_incremental = false,
-          node_decremental = "<bs>",
-        },
-      },
+      --------------------------------------------------------------------------
+      -- Text-objects, motions, swaps -----------------------------------------
+      --------------------------------------------------------------------------
+      opts.textobjects = {
 
-      -- Treesitter text objects
-      textobjects = {
+        -- ➊ selection
         select = {
-          enabled = true,
-          lookahead = true, -- Automatically jump forward to textobj
+          enable = true,
+          lookahead = true,
           keymaps = {
-            -- Smart selection of various code objects
             ["af"] = "@function.outer",
             ["if"] = "@function.inner",
             ["ac"] = "@class.outer",
@@ -90,17 +98,17 @@ return {
             ["il"] = "@loop.inner",
             ["ab"] = "@block.outer",
             ["ib"] = "@block.inner",
-            ["is"] = "@statement.inner",
             ["as"] = "@statement.outer",
+            ["is"] = "@statement.inner",
             ["aC"] = "@comment.outer",
             ["iC"] = "@comment.inner",
           },
         },
 
-        -- Move between text objects
+        -- ➋ movement
         move = {
-          enabled = true,
-          set_jumps = true, -- Track in jump list
+          enable = true,
+          set_jumps = true,
           goto_next_start = {
             ["]f"] = "@function.outer",
             ["]c"] = "@class.outer",
@@ -114,14 +122,14 @@ return {
             ["]I"] = "@conditional.outer",
             ["]L"] = "@loop.outer",
           },
-          goto_previous_start = {
+          goto_prev_start = {
             ["[f"] = "@function.outer",
             ["[c"] = "@class.outer",
             ["[i"] = "@conditional.outer",
             ["[l"] = "@loop.outer",
             ["[s"] = "@statement.outer",
           },
-          goto_previous_end = {
+          goto_prev_end = {
             ["[F"] = "@function.outer",
             ["[C"] = "@class.outer",
             ["[I"] = "@conditional.outer",
@@ -129,9 +137,9 @@ return {
           },
         },
 
-        -- Tree-sitter aware code swapping
+        -- ➌ swapping
         swap = {
-          enabled = true,
+          enable = true,
           swap_next = {
             ["<leader>sn"] = "@parameter.inner",
             ["<leader>sf"] = "@function.outer",
@@ -141,23 +149,19 @@ return {
             ["<leader>sF"] = "@function.outer",
           },
         },
-      },
-    },
+      }
+    end,
 
-    -- Configure Treesitter-based code navigation modules
+    --------------------------------------------------------------------------
+    -- Extra modules driven by Treesitter
+    --------------------------------------------------------------------------
     dependencies = {
-      -- Treesitter text objects for smart navigation
-      {
-        "nvim-treesitter/nvim-treesitter-textobjects",
-      },
+      "nvim-treesitter/nvim-treesitter-textobjects",
 
-      -- Automatically close HTML/JSX tags
-      {
-        "windwp/nvim-ts-autotag",
-        opts = {},
-      },
+      -- auto-tagging for html/react
+      { "windwp/nvim-ts-autotag", opts = {} },
 
-      -- Show code context at the top of the window
+      -- sticky context window at top
       {
         "nvim-treesitter/nvim-treesitter-context",
         opts = {
@@ -168,7 +172,7 @@ return {
           multiline_threshold = 5,
           trim_scope = "outer",
           mode = "cursor",
-          separator = "─", -- Nice horizontal line
+          separator = "─",
         },
       },
     },

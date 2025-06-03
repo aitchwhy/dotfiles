@@ -1,62 +1,62 @@
 [[plugin.deps]]
 use = "yazi-rs/plugins:smart-enter"
-rev = "55bf699"
-hash = "7918aab6a71caf31b58411f789195677"
+rev = "63f9650"
+hash = "a7ab702e1ef0c097defbc976ed34c186"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:diff"
-rev = "55bf699"
-hash = "7a08e303167d5b655c06da6d570f0333"
+rev = "63f9650"
+hash = "47865a70cade14a0b9b6bc6a54f16bdb"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:full-border"
-rev = "55bf699"
-hash = "1f3dad061209081a6b04dd6ff2cb06c7"
+rev = "63f9650"
+hash = "3996fc74044bc44144b323686f887e1"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:jump-to-char"
-rev = "55bf699"
-hash = "a670c03eb3760812e044a24f94cedc55"
+rev = "63f9650"
+hash = "30fc0b37f03a597b92d387268319450f"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:lsar"
-rev = "55bf699"
-hash = "d0950c172ce352d31554ad6db8226494"
+rev = "63f9650"
+hash = "24208b1d2144e2f91fd580c3f8e07326"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:mactag"
-rev = "55bf699"
-hash = "f4ee8d1a119fc869ffcd7e8a71b1469e"
+rev = "63f9650"
+hash = "6e0cbddb97038ea95f04f9de0944c175"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:mime-ext"
-rev = "55bf699"
-hash = "5e24c167e9ae9a203a48f2a438b8c705"
+rev = "63f9650"
+hash = "6094c7e7def6d131323e53d641f1bddd"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:mount"
-rev = "55bf699"
-hash = "dd97eede8e20e59cd2604e8006e470e2"
+rev = "63f9650"
+hash = "c0b6cd7dc830b96e77e5c8a71eec7926"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:piper"
-rev = "55bf699"
-hash = "5cf6118259765a267f3e2717acc79095"
+rev = "63f9650"
+hash = "2bdc137505b8d9a0cc867a57d0e99b01"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:smart-filter"
-rev = "55bf699"
-hash = "f0c4b41b5d19a3144958383333eff6e7"
+rev = "63f9650"
+hash = "4d82cd9e7534d976f000edf9c0f68d8f"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:toggle-pane"
-rev = "55bf699"
-hash = "f3853bbdd1da2fad09d059ab5464abfd"
+rev = "63f9650"
+hash = "d5d4f3527592da5fbe77fd6f51815f80"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:vcs-files"
-rev = "55bf699"
-hash = "36405f8781fcaf33ceab24dffd5cea19"
+rev = "63f9650"
+hash = "70898957e9e4c1ca291ff26e8fdc434"
 
 [[plugin.deps]]
 use = "dedukun/bookmarks"
@@ -70,18 +70,18 @@ hash = "23915860e59348bf4166778bb0e606f7"
 
 [[plugin.deps]]
 use = "stelcodes/bunny"
-rev = "ea27f37"
-hash = "7956295208401cdbdf2b673b73437edd"
+rev = "059fe22"
+hash = "3983af0cc7d944cce0eb9654831bdbf9"
 
 [[plugin.deps]]
 use = "MasouShizuka/projects"
-rev = "df44165"
-hash = "d5e132ed6e9073a43c155ab753074abb"
+rev = "7037dd5"
+hash = "9a4524dc938af1d30f2d115be7b64900"
 
 [[plugin.deps]]
 use = "ndtoan96/ouch"
-rev = "2496cd9"
-hash = "5b9dea47776a30946cfbf83232d18fb1"
+rev = "10b4627"
+hash = "3ec6a973d506665f1570a9fe08343fd8"
 
 [[plugin.deps]]
 use = "Lil-Dank/lazygit"
@@ -90,13 +90,13 @@ hash = "a1fa2b3e1826c3a34804ea8c548e9f80"
 
 [[plugin.deps]]
 use = "pirafrank/what-size"
-rev = "f1c6b69"
-hash = "6e789212eb41d937bab04877ca361099"
+rev = "0a4904c"
+hash = "fca231a128488a554823374f8f6d5241"
 
 [[plugin.deps]]
 use = "AnirudhG07/plugins-yazi:copy-file-contents"
-rev = "524c52c"
-hash = "27c50e6bc15c09096505b805b238ade0"
+rev = "907e292"
+hash = "a61930b827d8f1ef8fa016409de458ed"
 
 [[plugin.deps]]
 use = "Ape/open-with-cmd"
@@ -105,8 +105,8 @@ hash = "86e0312b01bc5762813c6c1d0517f073"
 
 [[plugin.deps]]
 use = "Rolv-Apneseth/starship"
-rev = "6fde3b2"
-hash = "7ddb7a790746fd91ecdd0350cc5a5d8c"
+rev = "6a0f3f7"
+hash = "d5a74d95c2e8194ac352c5e10e81e64f"
 
 [[plugin.deps]]
 use = "Reledia/glow"
@@ -115,8 +115,8 @@ hash = "f9ee1436e3b853508d87f7d49dce56e6"
 
 [[plugin.deps]]
 use = "AnirudhG07/rich-preview"
-rev = "fdcf373"
-hash = "bd1737dd44b202f412122e6a3b378d4c"
+rev = "843c3fa"
+hash = "b4040931f0d2f9670ddb4923e55cd881"
 
 [[flavor.deps]]
 use = "ficcdaf/ashen:ashen"
