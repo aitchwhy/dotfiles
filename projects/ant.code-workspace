@@ -1,13 +1,13 @@
 {
 	"name": "ant",
 	"folders": [
-		{
-			"name": "platform-gemini",
-			"path": "/Users/hank/src/platform-gemini"
-		},
+		// {
+		// 	"name": "platform-gemini",
+		// 	"path": "/Users/hank/src/platform-gemini"
+		// },
 		{
 			"name": "platform",
-			"path": "/Users/hank/src/platform"
+			"path": "/Users/hank/src/platform/"
 		},
 		{
 			"name": "flopilot",
@@ -27,50 +27,71 @@
 				"command": "echo Hello"
 			},
 			{
-				"label": "build-noggin platform-gemini",
+				"label": "vibes-deploy-flonotes",
 				"type": "shell",
-				"command": "source .env && npm -w=@anterior/noggin run start | npx start",
+				"command": "./deploy-local.sh",
 				"options": {
-					"cwd": "${workspaceFolder}"
+					"cwd": "${workspaceFolder}/vibes/apps/flonotes",
+					"envFile": "${workspaceFolder}/vibes/apps/flonotes/.env"
 				}
 			},
 			{
-				"label": "build-noggin platform",
+				"label": "vibes-deploy-flopilot",
 				"type": "shell",
-				"command": "source .env && npm -w=@anterior/noggin run start | npx start",
+				"command": "./deploy-local.sh",
 				"options": {
-					"cwd": "${workspaceFolder}/platform"
+					"cwd": "${workspaceFolder}/vibes/apps/flopilot",
+					"envFile": "${workspaceFolder}/vibes/apps/flopilot/.env"
 				}
 			},
-			// {
-			// 	"label": "build-noggin",
-			// 	"type": "shell",
-			// 	"command": "nix flake check -L && nix develop && source .env && ant-all-services",
-			// 	"options": {
-			// 		"cwd": "${workspaceFolder}/platform/"
-			// 	}
-			// }
+			{
+				"label": "platform-build-lib-platform",
+				"type": "shell",
+				"command": "npm -w=@anterior/platform run build",
+				"options": {
+					"cwd": "${workspaceFolder}/platform",
+					"envFile": "${workspaceFolder}/platform/.env"
+				}
+			},
+			{
+				"label": "platform-build-noggin",
+				"type": "shell",
+				"command": "npm -w=@anterior/noggin run build",
+				"options": {
+					"cwd": "${workspaceFolder}/platform",
+					"envFile": "${workspaceFolder}/platform/.env"
+				}
+			},
+			{
+				"label": "nix-build-admin",
+				"type": "shell",
+				"command": "nix build .#admin",
+				"options": {
+					"cwd": "${workspaceFolder:platform-gemini}"
+				},
+				"problemMatcher": []
+			}
 		]
 	},
 	"launch": {
 		"version": "0.2.0",
 		"configurations": [
 			{
-				"name": "Launch Chrome",
+				"name": "(TSX) Launch Chrome",
 				"request": "launch",
 				"type": "chrome",
 				"url": "http://localhost:20701",
 				"webRoot": "${workspaceFolder}/flopilot/src"
 			},
 			{
-				"name": "Launch Flonotes",
+				"name": "(TSX) Launch Flonotes",
 				"request": "launch",
 				"type": "chrome",
 				"url": "http://localhost:3001",
 				"webRoot": "${workspaceFolder}/flonotes/src"
 			},
 			{
-				"name": "Debug Noggin",
+				"name": "(TS) Debug Noggin",
 				"type": "node",
 				"request": "launch",
 				"skipFiles": [
@@ -81,10 +102,54 @@
 					"${workspaceFolder}/platform/gateways/noggin/dist/**/*.js"
 				],
 				"preLaunchTask": "build-noggin"
+			},
+			{
+				"name": "(Go) Debug admin cli",
+				"type": "go",
+				"request": "launch",
+				"program": "${workspaceFolder}/platform/admin/cmd/main.go",
+				"preLaunchTask": "build-noggin"
+			},
+			{
+				"name": "Debug Nix Admin CLI",
+				"type": "go",
+				"request": "launch",
+				"mode": "exec",
+				"program": "${workspaceFolder:platform-gemini}/result/bin/admin",
+				"args": [],
+				"env": {
+					"CGO_ENABLED": "1"
+				},
+				"cwd": "${workspaceFolder:platform-gemini}",
+				"preLaunchTask": "nix-build-admin",
+				"showLog": true
+			},
+			{
+				"name": "Debug Nix Admin CLI - Custom Args",
+				"type": "go",
+				"request": "launch",
+				"mode": "exec",
+				"program": "${workspaceFolder:platform-gemini}/result/bin/admin",
+				"args": "${input:adminArgs}",
+				"env": {
+					"CGO_ENABLED": "1"
+				},
+				"cwd": "${workspaceFolder:platform-gemini}",
+				"preLaunchTask": "nix-build-admin",
+				"showLog": true
 			}
 		],
-		"compounds": []
+		"compounds": [],
+		"inputs": [
+			{
+				"id": "adminArgs",
+				"type": "promptString",
+				"description": "Enter admin CLI arguments (e.g., 'users list')",
+				"default": ""
+			}
+		]
 	},
+	"settings": {},
 	// "settings": {
 	// 	"nixEnvSelector.nixFile": "${workspaceFolder}/flake.nix"
 	// }

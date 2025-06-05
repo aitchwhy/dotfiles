@@ -88,9 +88,9 @@ if [[ -n "$HOMEBREW_PREFIX" ]]; then
 fi
 
 # Add Nix completions if available
-if [[ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]]; then
-    fpath+=(/nix/var/nix/profiles/default/share/zsh/site-functions)
-fi
+# if [[ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]]; then
+#     fpath+=(/nix/var/nix/profiles/default/share/zsh/site-functions)
+# fi
 
 # Add custom completions
 fpath=("$CFS/zsh/.zfunc" $fpath)
@@ -354,7 +354,7 @@ y() {
 
 # Starship prompt
 has_command starship && eval "$(starship init zsh)"
-
+has_command zoxide && eval "$(zoxide init zsh)"
 
 
 # Atuin (history management)
@@ -367,8 +367,24 @@ eval "$(atuin init zsh)"
 # Load local/private configuration if exists
 [[ -f "$ZDOTDIR/.zshrc.local" ]] && source "$ZDOTDIR/.zshrc.local"
 
+# all zsh files in z dir
+# [[ -f "$SCRIPTS/utils.zsh" ]] && source "$SCRIPTS/utils.zsh"
 
-eval "$(zoxide init zsh)"
+function lsz() {
+  echo $(fd --hidden -t f . $ZDOTDIR)
+}
+
+# Load local/private configuration if exists
+[[ -f "$DOTS/scripts/functions.zsh" ]] && source "$DOTS/scripts/functions.zsh"
+
+
+
+# for f in $(lsz); do
+#   echo $(fd --hidden -t f . $ZDOTDIR)
+#
+#     [ -f "$f" ] && cp "$src/$f" "$dest/"
+# done
+
 
 # ========================================================================
 # Cleanup
