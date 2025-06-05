@@ -16,7 +16,80 @@ function volta() {
 
 }
 
-################################
+# examples
+# From home directory
+# cpgit /path/to/source /path/to/dest
+#
+# # With relative paths
+# cpgit ../project1 ./project2
+#
+# # From any directory
+# cpgit ~/repos/myproject /tmp/backup  
+cp-repo() {
+  git -C "$1" ls-files -z | (cd "$1" && rsync -0av --files-from=- . "$(realpath "$2")/")
+    rsync -av --include=".*" --exclude="*" "$1/" "$2/" 2>/dev/null
+}
+
+
+# copy_git_project() {
+#
+#     mkdir -p "$dest"
+#
+#     # Copy git tracked files
+#     (cd "$src" && git ls-files -z | tar --null -cf - -T -) | tar -xf - -C "$dest"
+#
+#     # Copy config files
+#     for f in .env .env.* .envrc .tool-versions .nvmrc .ruby-version .gitignore; do
+#         [ -f "$src/$f" ] && cp "$src/$f" "$dest/"
+#     done
+#
+# }
+
+# # uses rsync
+# function cp_rsync() {
+#     if [ $# -lt 2 ]; then
+#         echo "Usage: copy_git_project_rsync <source_dir> <destination_dir>" >&2
+#         return 1
+#     fi
+#
+#     # Check if rsync is available
+#     if ! command -v rsync >/dev/null 2>&1; then
+#         echo "Error: rsync not found. Using tar method instead..." >&2
+#         copy_git_project "$@"
+#         return $?
+#     fi
+#
+#     src="$1"
+#     dest="$2"
+#
+#     [ -d "$src/.git" ] || {
+#         echo "Error: Source is not a git repository" >&2
+#         return 1
+#     }
+#
+#     mkdir -p "$dest" || return 1
+#
+#     src=$(cd "$src" && pwd) || return 1
+#     dest=$(cd "$dest" && pwd) || return 1
+#
+#     echo "Copying with rsync..."
+#
+#     # Copy git tracked files
+#     (
+#         cd "$src" && \
+#         git ls-files -z | rsync -av --files-from=- --from0 . "$dest/"
+#     ) || return 1
+#
+#     # Copy additional files
+#     rsync -av --include=".env*" --include=".tool-versions" \
+#               --include=".nvmrc" --include=".ruby-version" \
+#               --include=".gitignore" --include=".gitattributes" \
+#               --exclude="*" "$src/" "$dest/" 2>/dev/null
+#
+#     echo "✓ Successfully copied with rsync"
+# }
+#
+# ################################
 # Homebrew
 ################################
 # Mac App Store operations command
