@@ -1,0 +1,4 @@
+export DOTFILES="$HOME/dotfiles"
+export XDG_CONFIG_HOME="$DOTFILES/.config"
+export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
+source "$ZDOTDIR/.zshrc"

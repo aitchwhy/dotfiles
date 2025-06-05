@@ -1,0 +1,5 @@
+export EDITOR="nvim"
+export YAZI_CONFIG_DIR="$XDG_CONFIG_HOME/yazi"
+export ZELLIJ_CONFIG_DIR="$XDG_CONFIG_HOME/zellij"
+
+path=("$HOME/.local/bin" $path)
