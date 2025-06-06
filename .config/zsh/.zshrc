@@ -15,6 +15,7 @@ setopt PUSHD_SILENT       # Don't print stack after pushd/popd
 setopt NO_CASE_GLOB       # Case insensitive globbing
 setopt INTERACTIVE_COMMENTS # Allow comments in interactive shells
 setopt NO_NOMATCH         # Don't error on no glob matches
+setopt EXTENDEDGLOB # extended glob (e.g. '*')
 
 # History Configuration
 setopt SHARE_HISTORY      # Share history between sessions
@@ -23,22 +24,14 @@ setopt HIST_IGNORE_SPACE  # Ignore commands starting with space
 setopt HIST_VERIFY        # Don't execute immediately on history expansion
 setopt EXTENDED_HISTORY   # Record timestamp
 
-export HISTFILE="$HOME/.zsh_history"
-export HISTSIZE=100000
-export SAVEHIST=$HISTSIZE
-
 # ========================================================================
 # Environment Variables
 # ========================================================================
 # XDG directories
-export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
-export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
-export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 
-# Create XDG directories if they don't exist
-for dir in "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME" "$XDG_STATE_HOME"; do
-    [[ ! -d "$dir" ]] && mkdir -p "$dir"
-done
+export HISTFILE="$HOME/.zsh_history"
+export HISTSIZE=100000
+export SAVEHIST=$HISTSIZE
 
 # Shortcuts
 export DOTS="$DOTFILES"
@@ -174,17 +167,17 @@ alias zcompreset="rm -f ~/.zcompdump; compinit"
 # Aliases - Git
 # ========================================================================
 alias g='git'
-alias gs='git status'
 alias ga='git add'
-alias gai='git add -i'
 alias gaa='git add --all'
+alias gai='git add -i'
 alias gc='git commit'
-alias gcm='git commit -m'
 alias gca='git commit --amend --no-edit'
-alias gp='git push'
+alias gcm='git commit -m'
 alias gll='git pull'
+alias gp='git push'
+alias gs='git status'
+alias lg.='lazygit --path $DOTFILES'
 alias lg='lazygit'
-alias lgdot='lazygit --path $DOTFILES'
 
 # ========================================================================
 # Aliases - Modern CLI Tools
@@ -198,7 +191,6 @@ alias ping='gping'
 alias du='dust'
 alias sed='sd'
 alias md='glow'
-alias cheat='tldr'
 alias ch='cheat'
 
 # ========================================================================
@@ -206,15 +198,11 @@ alias ch='cheat'
 # ========================================================================
 alias b='brew'
 alias bup='brew update && brew upgrade'
-alias bupd='brew update'
-alias bupg='brew upgrade'
 alias bclean='brew cleanup --prune=all && rm -rf $(brew --cache) && brew autoremove'
 alias bi='brew info'
 alias bin='brew install'
 alias brein='brew reinstall'
 alias bs='brew search'
-alias bl='brew leaves'
-alias bcin='brew install --cask'
 
 # ========================================================================
 # Aliases - Docker
@@ -266,11 +254,16 @@ alias envx='dotenvx'
 # ========================================================================
 # Aliases - Nix
 # ========================================================================
-alias nixzsh='nix develop --command zsh'
-alias nixcf='$EDITOR ~/.config/nix/nix.conf'
-alias nixdev='nix develop'
-alias nixpkgs='nix search'
-alias nixf='nix flake'
+alias nz='nix develop --command zsh'
+alias ncf='$EDITOR ~/.config/nix/nix.conf'
+alias nd='nix develop'
+alias ns='nix search'
+alias nf='nix flake'
+# alias nixzsh='nix develop --command zsh'
+# alias nixcf='$EDITOR ~/.config/nix/nix.conf'
+# alias nixdev='nix develop'
+# alias nixpkgs='nix search'
+# alias nixf='nix flake'
 
 # ========================================================================
 # Functions - Directory Navigation
