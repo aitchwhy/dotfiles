@@ -254,16 +254,23 @@ alias envx='dotenvx'
 # ========================================================================
 # Aliases - Nix
 # ========================================================================
-alias nz='nix develop --command zsh'
-alias ncf='$EDITOR ~/.config/nix/nix.conf'
 alias nd='nix develop'
+
+# alias nz='nix develop --command zsh'
+function nz() {
+  nix develop ".#$1" --command zsh
+}
+
+
 alias ns='nix search'
 alias nf='nix flake'
+alias nb='nix build'
+# alias ncf='$EDITOR ~/.config/nix/nix.conf'
+alias ncf='nix config'
+alias nr='nix run'
 # alias nixzsh='nix develop --command zsh'
 # alias nixcf='$EDITOR ~/.config/nix/nix.conf'
 # alias nixdev='nix develop'
-# alias nixpkgs='nix search'
-# alias nixf='nix flake'
 
 # ========================================================================
 # Functions - Directory Navigation
