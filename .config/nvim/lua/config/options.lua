@@ -77,6 +77,17 @@ vim.g.snacks_animate = false
 -- -- use that instead of inline suggestions
 -- vim.g.ai_cmp = true
 vim.g.ai_cmp = true
+vim.g.loaded_perl_provider = 0
+
+-- TODO: fix path
+-- vim.g.ruby_host_prog = vim.fn.expand("$HOME/.gem/ruby/3.4.0/bin/neovim-ruby-host")
+
+-- 1 — Python 3 provider (pynvim)<D-s>
+-- init.lua  or  lua/config/options.lua
+-- TODO: find uv path for python
+-- vim.g.python3_host_prog = "/opt/homebrew/bin/python3"
+vim.g.python3_host_prog = "/Users/hank/.local/share/uv/python"
+
 --
 -- -- LazyVim root dir detection
 -- -- Each entry can be:
