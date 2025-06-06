@@ -4,7 +4,7 @@
 tap "dotenvx/brew"
 tap "f1bonacc1/tap"
 tap "koekeishiya/formulae"
-tap "localstack/tap"
+# tap "localstack/tap"
 tap "nikitabobko/tap"
 tap "oven-sh/bun"
 tap "spider-rs/spider-cloud-cli"
@@ -180,7 +180,7 @@ brew "pgcli"           # PostgreSQL CLI
 
 # AWS Tools
 brew "awscli"          # AWS CLI
-brew "localstack"      # Local AWS emulator
+# brew "localstack"      # Local AWS emulator
 
 # Programming Languages
 brew "go"              # Go language
@@ -241,7 +241,7 @@ brew "kanata"
 brew "koekeishiya/formulae/skhd"
 brew "lazygit"
 brew "lnav"
-brew "localstack"
+# brew "localstack"
 brew "mas"
 brew "miller"
 brew "neovim"
@@ -1834,6 +1834,12 @@ cask "zen-browser"
 #                                                                           yakitrak/yakitrak/obsidian-cli
 # # nasm
 # # Run `brew bundle cleanup --force` to make these changes.
+
+brew "fish"
+brew "terraform"
+brew "tectonic"
+brew "mermaid-cli"
+brew "coreutils"
 
 brew "tag"
 brew "ouch"

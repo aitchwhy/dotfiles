@@ -53,6 +53,9 @@ return {
       -- Replace netrw with Yazi for directory browsing
       open_for_directories = true,
 
+      -- Disabled by default in LazyVim because neo-tree is used for that
+      use_as_default_explorer = false,
+
       -- Appearance settings
       appearance = {
         -- Match Neovim color scheme (Tokyo Night)
@@ -98,16 +101,16 @@ return {
       },
 
       -- Better performance on Apple Silicon
-      -- performance = {
-      --   -- Optimized values for faster rendering
-      --   preview_debounce_ms = 30, -- Reduced for more responsive previews
-      --   max_preview_size_mb = 15, -- Increased for larger files
-      --   -- Enable file watching for auto-refresh with throttling
-      --   watch_files = true,
-      --   watch_throttle_ms = 100, -- Added throttling to prevent excessive updates
-      --   -- Use nvim's native LSP when available
-      --   use_nvim_lsp = true, -- Leverage LSP for syntax highlighting
-      -- },
+      performance = {
+        -- Optimized values for faster rendering
+        preview_debounce_ms = 30, -- Reduced for more responsive previews
+        max_preview_size_mb = 15, -- Increased for larger files
+        -- Enable file watching for auto-refresh with throttling
+        watch_files = true,
+        --   watch_throttle_ms = 100, -- Added throttling to prevent excessive updates
+        -- Use nvim's native LSP when available
+        use_nvim_lsp = true, -- Leverage LSP for syntax highlighting
+      },
     },
 
     -- init = function()

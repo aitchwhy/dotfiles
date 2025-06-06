@@ -9,20 +9,26 @@
 # ========================================================================
 # Shell Options
 # ========================================================================
-setopt AUTO_PUSHD         # Push directory to stack on cd
-setopt PUSHD_IGNORE_DUPS  # Don't store duplicates in dir stack
-setopt PUSHD_SILENT       # Don't print stack after pushd/popd
-setopt NO_CASE_GLOB       # Case insensitive globbing
+setopt AUTO_PUSHD        # Push directory to stack on cd
+setopt PUSHD_IGNORE_DUPS # Don't store duplicates in dir stack
+setopt PUSHD_SILENT      # Don't print stack after pushd/popd
+setopt NO_CASE_GLOB      # Case insensitive globbing
+
+# ┌─────────┬──────────────────────────────────────────────────────────────────────────────┐
+# │  bash   │ Comments always active. .#foo is not a comment (since # is inside token).    │
+# │  zsh    │ Comments off unless setopt interactive_comments is set.                      │
+# │         │ If on, first # starts a comment; e.g., nix run . # rest is ignored.          │
+# └─────────┴──────────────────────────────────────────────────────────────────────────────┘
 setopt INTERACTIVE_COMMENTS # Allow comments in interactive shells
-setopt NO_NOMATCH         # Don't error on no glob matches
-setopt EXTENDEDGLOB # extended glob (e.g. '*')
+setopt NO_NOMATCH           # Don't error on no glob matches
+setopt EXTENDEDGLOB         # extended glob (e.g. '*')
 
 # History Configuration
-setopt SHARE_HISTORY      # Share history between sessions
-setopt HIST_IGNORE_DUPS   # Don't record duplicates
-setopt HIST_IGNORE_SPACE  # Ignore commands starting with space
-setopt HIST_VERIFY        # Don't execute immediately on history expansion
-setopt EXTENDED_HISTORY   # Record timestamp
+setopt SHARE_HISTORY     # Share history between sessions
+setopt HIST_IGNORE_DUPS  # Don't record duplicates
+setopt HIST_IGNORE_SPACE # Ignore commands starting with space
+setopt HIST_VERIFY       # Don't execute immediately on history expansion
+setopt EXTENDED_HISTORY  # Record timestamp
 
 # ========================================================================
 # Environment Variables
@@ -62,15 +68,15 @@ export USER_JUSTFILE="$CFS/just/.user.justfile"
 # export NPM_CONFIG_USERCONFIG="$CFS/npm/.npm-global"  # No longer needed
 
 # Add a directory to PATH if it exists and isn't already in PATH
-export path_add() {
-  local dir="$1"
-  if [[ -d "$dir" ]] && [[ ":$PATH:" != *":$dir:"* ]]; then
-    export PATH="$dir:$PATH"
-    return 0
-  fi
-  return 1
+function path_add() {
+    local dir=$1
+    if [[ -d "$dir" ]] && [[ ":$PATH:" != *":$dir:"* ]]; then
+        export PATH="$dir:$PATH"
+        return 0
+    fi
+    return 1
 }
-path_add "$CFS/npm-global/bin"  # Add npm global packages to PATH
+path_add "$CFS/npm-global/bin" # Add npm global packages to PATH
 
 # ========================================================================
 # Completions
@@ -81,9 +87,9 @@ if [[ -n "$HOMEBREW_PREFIX" ]]; then
 fi
 
 # Add Nix completions if available
-# if [[ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]]; then
-#     fpath+=(/nix/var/nix/profiles/default/share/zsh/site-functions)
-# fi
+if [[ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]]; then
+    fpath+=(/nix/var/nix/profiles/default/share/zsh/site-functions)
+fi
 
 # Add custom completions
 fpath=("$CFS/zsh/.zfunc" $fpath)
@@ -102,20 +108,19 @@ export KEYTIMEOUT=1
 # ========================================================================
 if [[ -d "$HOMEBREW_PREFIX/share" ]]; then
     # Load plugins if available
-    [[ -f "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]] && \
+    [[ -f "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]] &&
         source "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-    
-    [[ -f "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ]] && \
+
+    [[ -f "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ]] &&
         source "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
-    
-    [[ -f "$HOMEBREW_PREFIX/share/zsh-abbr/zsh-abbr.zsh" ]] && \
+
+    [[ -f "$HOMEBREW_PREFIX/share/zsh-abbr/zsh-abbr.zsh" ]] &&
         source "$HOMEBREW_PREFIX/share/zsh-abbr/zsh-abbr.zsh"
 fi
 
 # ========================================================================
 # Core Functions
 # ========================================================================
-
 
 # Check if command exists
 has_command() {
@@ -220,7 +225,7 @@ alias k='k9s'
 # Aliases - Just
 # ========================================================================
 alias j='just'
-alias .j='just --justfile $USER_JUSTFILE'
+# alias .j='just --justfile $USER_JUSTFILE'
 
 # ========================================================================
 # Aliases - System
@@ -254,35 +259,32 @@ alias envx='dotenvx'
 # ========================================================================
 # Aliases - Nix
 # ========================================================================
-alias nd='nix develop'
 
 # alias nz='nix develop --command zsh'
 function nz() {
-  nix develop ".#$1" --command zsh
+    nix develop ".#$1" --command zsh
 }
-
-
+alias ndev='nix develop'
 alias ns='nix search'
+alias nst='nix store'
 alias nf='nix flake'
 alias nb='nix build'
-# alias ncf='$EDITOR ~/.config/nix/nix.conf'
 alias ncf='nix config'
 alias nr='nix run'
-# alias nixzsh='nix develop --command zsh'
-# alias nixcf='$EDITOR ~/.config/nix/nix.conf'
-# alias nixdev='nix develop'
+alias nfmt='nix fmt --list-files'
+alias nfc='nix flake check -L'
 
 # ========================================================================
 # Functions - Directory Navigation
 # ========================================================================
 
-# Quick directory navigation with fzf
-cdf() {
-    local dir
-    dir=$(fd --type d --hidden --exclude .git | fzf --preview 'eza --tree --level=1 {}') && cd "$dir"
-}
+# # Quick directory navigation with fzf
+# cdf() {
+#     local dir
+#     dir=$(fd --type d --hidden --exclude .git | fzf --preview 'eza --tree --level=1 {}') && cd "$dir"
+# }
 
-# Edit config directories
+# Edit directories
 fdirs() {
     local DIRPATH="$1"
     nvim $(fd . -t d --exact-depth 1 --color never $DIRPATH | fzf --prompt="${DIRPATH} configs>" --preview='gls -s {}')
@@ -296,9 +298,7 @@ cfs() {
     fdirs $CFS
 }
 
-
 source "$DOTS/scripts/ant.zsh"
-
 
 # ========================================================================
 # Functions - File Operations
@@ -314,7 +314,7 @@ vf() {
 f() {
     local cmd result
     case "$1" in
-    find|file)
+    find | file)
         result=$(fd --type f --follow --hidden --exclude .git | fzf --preview="bat --color=always {}")
         echo "$result"
         ;;
@@ -356,7 +356,6 @@ y() {
 has_command starship && eval "$(starship init zsh)"
 has_command zoxide && eval "$(zoxide init zsh)"
 
-
 # Atuin (history management)
 [[ -f "$HOME/.atuin/bin/env" ]] && source "$HOME/.atuin/bin/env"
 eval "$(atuin init zsh)"
@@ -371,13 +370,11 @@ eval "$(atuin init zsh)"
 # [[ -f "$SCRIPTS/utils.zsh" ]] && source "$SCRIPTS/utils.zsh"
 
 function lsz() {
-  echo $(fd --hidden -t f . $ZDOTDIR)
+    echo $(fd --hidden -t f . $ZDOTDIR)
 }
 
 # Load local/private configuration if exists
 [[ -f "$DOTS/scripts/functions.zsh" ]] && source "$DOTS/scripts/functions.zsh"
-
-
 
 # for f in $(lsz); do
 #   echo $(fd --hidden -t f . $ZDOTDIR)
@@ -385,9 +382,12 @@ function lsz() {
 #     [ -f "$f" ] && cp "$src/$f" "$dest/"
 # done
 
-
 # ========================================================================
 # Cleanup
 # ========================================================================
 # Performance monitoring (uncomment to debug)
 # zprof
+
+export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
+export LDFLAGS="-L/opt/homebrew/opt/ruby/lib"
+export CPPFLAGS="-I/opt/homebrew/opt/ruby/include"

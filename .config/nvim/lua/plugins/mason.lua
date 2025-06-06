@@ -1,6 +1,9 @@
 return {
   {
-    "williamboman/mason.nvim",
+    -- Mason itself
+    "williamboman/mason.nvim", -- still the canonical repo in v2
+    version = "2.*",
+    build = ":MasonUpdate",
     opts = {
       ui = {
         icons = {
