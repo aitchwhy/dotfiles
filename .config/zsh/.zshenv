@@ -1,23 +1,29 @@
-# ========================================================================
-# ZSH Environment (.zshenv)
-# ========================================================================
-# Executed for all zsh invocations - keep minimal for performance
-# Only essential PATH and environment setup that ALL shells need
+export DOTFILES="$HOME/dotfiles"
+export XDG_CONFIG_HOME="$DOTFILES/.config"
+export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
+source "$ZDOTDIR/.zshrc"
 
-# Core PATH setup - ensure GNU tools are available
-export PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH"
-export PATH="$PATH:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
-
-# Essential environment variables
-export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
-export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
-export ZDOTDIR="${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}"
-
-# Volta (Node.js version manager)
-export VOLTA_HOME="$HOME/.volta"
-export PATH="$VOLTA_HOME/bin:$PATH"
-
-# Nix environment (if installed)
-if [[ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]]; then
-    source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
-fi
+# --- Optional configuration from the full .zshenv ---
+# # ========================================================================
+# # ZSH Environment (.zshenv)
+# # ========================================================================
+# # Executed for all zsh invocations - keep minimal for performance
+# # Only essential PATH and environment setup that ALL shells need
+# 
+# # Core PATH setup - ensure GNU tools are available
+# export PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH"
+# export PATH="$PATH:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+# 
+# # Essential environment variables
+# export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
+# export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+# export ZDOTDIR="${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}"
+# 
+# # Volta (Node.js version manager)
+# export VOLTA_HOME="$HOME/.volta"
+# export PATH="$VOLTA_HOME/bin:$PATH"
+# 
+# # Nix environment (if installed)
+# if [[ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]]; then
+#     source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+# fi
