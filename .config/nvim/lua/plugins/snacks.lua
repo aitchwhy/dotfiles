@@ -6,17 +6,17 @@ return {
       bigfile = { enabled = false },
       dashboard = { enabled = false },
       explorer = { enabled = false },
-      indent = { enabled = false },
+      indent = { enabled = true },
       input = { enabled = false },
       notifier = {
-        enabled = false,
+        enabled = true,
         timeout = 3000,
       },
-      picker = { enabled = false },
-      quickfile = { enabled = false },
-      scope = { enabled = false },
+      picker = { enabled = true },
+      quickfile = { enabled = true },
+      scope = { enabled = true },
       scroll = { enabled = false },
-      statuscolumn = { enabled = false },
+      statuscolumn = { enabled = true },
       words = { enabled = false },
       styles = {
         notification = {

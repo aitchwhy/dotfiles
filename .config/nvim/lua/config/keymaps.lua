@@ -15,6 +15,31 @@ local map = vim.keymap.set
 map("n", "<leader>-", "<cmd>Oil<cr>", { desc = "Oil file manager" })
 map("n", "<leader>fy", "<cmd>Yazi<cr>", { desc = "Yazi file manager" })
 
+-----------------------------------
+-- prevent opening weird mystery pane by accident
+-----------------------------------
+-- What you probably hit
+-- How it looks One-key way to close
+-- Command way Disable the shortcut (optional)
+-- Command-line window(opened by q:, q/, or q?)
+-- Blank split at the bottom; statusline shows [Command Line] when you move into it
+-- q (while the cursor is inside it)
+-- :quit  or  <C-w>c
+-- nnoremap q: :<CR>nnoremap q/ /nnoremap q? ?
+-- Quickfix / Location list(opened by a plugin or :make, :grep, etc.)
+-- Statusline shows quickfix or location
+-- N/A
+-- :cclose (quickfix):lclose (location)
+-----------------------------------
+--
+-- vim.keymap.set("n", "q:", ":", { noremap = true, silent = true })
+-- vim.keymap.set("n", "q/", "/", { noremap = true, silent = true })
+-- vim.keymap.set("n", "q?", "?", { noremap = true, silent = true })
+
+map("n", "q:", ":", { noremap = true, silent = true })
+map("n", "q/", "/", { noremap = true, silent = true })
+map("n", "q?", "?", { noremap = true, silent = true })
+
 -- vim.keymap.set
 -- ~/.config/nvim/lua/config/keymaps.lua
 local wk = require("which-key")
