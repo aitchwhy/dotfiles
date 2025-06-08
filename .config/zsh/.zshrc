@@ -40,6 +40,7 @@ export HISTSIZE=100000
 export SAVEHIST=$HISTSIZE
 
 # Shortcuts
+export DOTFILES="$HOME/dotfiles"
 export DOTS="$DOTFILES"
 export CFS="$DOTFILES/.config"
 export CFSZSH="$CFS/zsh"
@@ -181,7 +182,7 @@ alias gcm='git commit -m'
 alias gll='git pull'
 alias gp='git push'
 alias gs='git status'
-alias lg.='lazygit --path $DOTFILES'
+alias lgdot='lazygit --path $DOTFILES'
 alias lg='lazygit'
 
 # ========================================================================
