@@ -5,7 +5,6 @@
 tap "dotenvx/brew"
 tap "f1bonacc1/tap"
 tap "koekeishiya/formulae"
-tap "localstack/tap"
 tap "nikitabobko/tap"
 tap "oven-sh/bun"
 tap "spider-rs/spider-cloud-cli"
@@ -14,6 +13,7 @@ tap "spider-rs/spider-cloud-cli"
 # FORMULAE  – CLI tools & libraries
 ###############################################################################
 
+brew "ruby"
 brew "7zip"
 brew "aider"                       # AI coding assistant
 brew "atuin", restart_service: :changed
@@ -70,21 +70,16 @@ brew "lazydocker"
 brew "lazygit"
 brew "lefthook"                    # Git hooks
 brew "lnav"
-brew "localstack"
-brew "localstack/tap/localstack-cli"
 brew "luarocks"
 brew "mas"                         # Mac App Store CLI
-brew "mermaid-cli"
 brew "miller"                      # CSV swiss-army-knife
 brew "neovim"
 brew "nixpacks"
 brew "nvm"
-brew "ollama"
 brew "openapi-tui"                 # OpenAPI TUI
 brew "ouch"
 brew "oven-sh/bun/bun"             # same as `bun` tap
 brew "p7zip"
-brew "packer"
 brew "pandoc"
 brew "pgcli"
 brew "podman"
