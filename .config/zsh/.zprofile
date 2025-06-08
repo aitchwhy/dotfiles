@@ -3,17 +3,16 @@
 # ========================================================================
 # Executed at login (after .zshenv) - for PATH and environment setup
 
-# Homebrew Setup
-if [[ -x "/opt/homebrew/bin/brew" ]]; then
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-elif [[ -x "/usr/local/bin/brew" ]]; then
-    eval "$(/usr/local/bin/brew shellenv)"
-fi
-
 # Editor and Pager
 export EDITOR="nvim"
 export VISUAL="$EDITOR"
 export PAGER="bat --paging=always"
+export MANPAGER="bat --paging=always"
+
+local GEM_BIN_DIR="`gem environment gemdir`/bin"
+
+# Homebrew Setup
+eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # Clean PATH management using zsh arrays
 typeset -U path  # Ensure unique entries
@@ -21,15 +20,16 @@ path=(
     # User paths (highest priority)
     "$HOME/.local/bin"
     "$HOME/dotfiles/bin"
-    
+
     # Language/tool paths
     "$HOME/.cargo/bin"
     "$HOME/go/bin"
     "$VOLTA_HOME/bin"
-    
+
     # Homebrew Ruby (if installed)
     "/opt/homebrew/opt/ruby/bin"
-    
+    $GEM_BIN_DIR
+
     # System paths (already added, but included for completeness)
     $path
 )
