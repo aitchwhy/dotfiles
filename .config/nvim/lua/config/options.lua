@@ -55,7 +55,7 @@ vim.g.snacks_animate = false
 -- vim.g.maplocalleader = "\\"
 --
 -- -- LazyVim auto format
--- vim.g.autoformat = true
+vim.g.autoformat = true
 --
 -- -- Snacks animations
 -- -- Set to `false` to globally disable all snacks animations
@@ -86,7 +86,11 @@ vim.g.loaded_perl_provider = 0
 -- init.lua  or  lua/config/options.lua
 -- TODO: find uv path for python
 -- vim.g.python3_host_prog = "/opt/homebrew/bin/python3"
-vim.g.python3_host_prog = "/Users/hank/.local/share/uv/python"
+-- vim.g.python3_host_prog = "/Users/hank/.local/share/uv/python"
+
+-- vim.g.python3_host_prog =
+
+vim.ui.select = "Snacks.picker.select"
 
 --
 -- -- LazyVim root dir detection

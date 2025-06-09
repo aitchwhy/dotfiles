@@ -54,5 +54,12 @@
 		"paths": [],
 		"tags": [],
 		"enabled": true
+	},
+	{
+		"name": "ant",
+		"rootPath": "/Users/hank/src/ant",
+		"paths": [],
+		"tags": [],
+		"enabled": true
 	}
 ]

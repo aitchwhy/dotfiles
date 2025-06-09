@@ -1,9 +1,9 @@
 return {
+  -- Mason core (UI and package management)
   {
-    -- Mason itself
-    "williamboman/mason.nvim", -- still the canonical repo in v2
+    "williamboman/mason.nvim",
     version = "2.*",
-    build = ":MasonUpdate",
+    -- build = ":MasonUpdate",
     opts = {
       ui = {
         icons = {
@@ -12,69 +12,41 @@ return {
           package_uninstalled = "✗",
         },
       },
+      -- Mason itself doesn't have ensure_installed
+    },
+  },
+
+  -- Bridge for LSP servers only
+  {
+    "williamboman/mason-lspconfig.nvim",
+    version = "2.*",
+    dependencies = {
+      "williamboman/mason.nvim",
+      "neovim/nvim-lspconfig",
+    },
+    opts = {
       ensure_installed = {
-        "markdownlint-cli2",
-        "markdown-toc",
-        -- LSP (Language Servers)
-        -----------------------------
-        -- Web Development
-        "typescript-language-server", -- TypeScript/JavaScript
-        "eslint-lsp", -- ESLint with LSP capabilities
-        "tailwindcss-language-server", -- Tailwind CSS
-        "css-lsp", -- CSS
-        "html-lsp", -- HTML
-        "json-lsp", -- JSON
-        "emmet-ls", -- Emmet
-        "hadolint", -- Dockerfile
-
-        -- Backend/Systems Programming
-        "pyright", -- Python type checking
-        "ruff-lsp", -- Fast Python linting
+        -- LSP servers only
+        "ts_ls", -- TypeScript/JavaScript (formerly tsserver)
+        "eslint", -- ESLint LSP
+        "tailwindcss", -- Tailwind CSS
+        "cssls", -- CSS
+        "html", -- HTML
+        "jsonls", -- JSON
+        "emmet_ls", -- Emmet
+        "pyright", -- Python
+        "ruff_lsp", -- Ruff LSP
         "gopls", -- Go
-        "rust-analyzer", -- Rust
-        "lua-language-server", -- Lua
+        "rust_analyzer", -- Rust
+        "lua_ls", -- Lua
         "clangd", -- C/C++
-        "tflint",
-
-        -- DevOps/Configuration
-        "yaml-language-server", -- YAML
-        "dockerfile-language-server", -- Dockerfile
-        "terraform-ls", -- Terraform
+        "yamlls", -- YAML
+        "dockerls", -- Dockerfile
+        "terraformls", -- Terraform
         "marksman", -- Markdown
         "taplo", -- TOML
-
-        -- Formatters
-        -----------------------------
-        "prettier", -- Web technologies
-        "black", -- Python
-        "stylua", -- Lua
-        "shfmt", -- Shell
-        "gofumpt", -- Go
-        "rustfmt", -- Rust
-        "markdownlint-cli2", -- Markdown
-        "markdown-toc", -- Markdown
-
-        -- Linters
-        -----------------------------
-        "eslint_d", -- JavaScript/TypeScript (fast daemon)
-        "ruff", -- Python (ultra-fast)
-        "selene", -- Lua
-        "hadolint", -- Dockerfile
-        "actionlint", -- GitHub Actions
-        "shellcheck", -- Shell
-        "flake8", -- Python (traditional)
-        "vale", -- Prose/documentation linter
-
-        -- DAP (Debug Adapters)
-        "debugpy", -- Python
-        "js-debug-adapter", -- JavaScript/TypeScript
-        "delve", -- Go
-        "codelldb", -- Rust/C/C++
-
-        -- Tools
-        -----------------------------
-        "ast-grep", -- Universal AST tool for code search
       },
+      automatic_installation = true,
     },
   },
 }
