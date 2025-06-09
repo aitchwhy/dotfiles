@@ -254,3 +254,8 @@ cask "zoom"
 # 4. To prune things later:   brew bundle cleanup --force --file <path>
 #
 # Happy brewing! 🍺
+brew "nx"
+tap "pulumi/tap"
+brew "pulumi/tap/pulumi"
+brew "gdrive"
+brew "gdrive"

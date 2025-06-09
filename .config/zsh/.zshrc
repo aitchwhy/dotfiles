@@ -368,6 +368,7 @@ eval "$(atuin init zsh)"
 [[ -f "$ZDOTDIR/.zshrc.local" ]] && source "$ZDOTDIR/.zshrc.local"
 
 # all zsh files in z dir
+# uv
 # [[ -f "$SCRIPTS/utils.zsh" ]] && source "$SCRIPTS/utils.zsh"
 
 function lsz() {
@@ -388,7 +389,3 @@ function lsz() {
 # ========================================================================
 # Performance monitoring (uncomment to debug)
 # zprof
-
-export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
-export LDFLAGS="-L/opt/homebrew/opt/ruby/lib"
-export CPPFLAGS="-I/opt/homebrew/opt/ruby/include"
