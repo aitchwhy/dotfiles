@@ -61,5 +61,12 @@
 		"paths": [],
 		"tags": [],
 		"enabled": true
+	},
+	{
+		"name": "dots",
+		"rootPath": "/Users/hank/dots",
+		"paths": [],
+		"tags": [],
+		"enabled": true
 	}
 ]
