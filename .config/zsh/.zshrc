@@ -248,7 +248,9 @@ alias zja='zellij attach "$(zellij list-sessions -n | fzf --reverse --border --n
 # Aliases - Other Tools
 # ========================================================================
 alias tm='task-master'
-alias claude='/Users/hank/.claude/local/claude'
+# alias claude='/Users/hank/.claude/local/claude'
+
+alias sp='supabase'
 alias ts='tailscale'
 alias hf='huggingface-cli'
 alias rx='repomix'
@@ -256,6 +258,8 @@ alias at='atuin'
 alias aero='aerospace'
 alias pc='process-compose'
 alias envx='dotenvx'
+
+alias ycwd='yazi --cwd-file'
 
 # ========================================================================
 # Aliases - Nix
@@ -265,31 +269,26 @@ alias envx='dotenvx'
 function nz() {
     nix develop ".#$1" --command zsh
 }
-alias ndev='nix develop'
-alias ns='nix search'
+alias nd='nix develop'
+alias npkgs='nix search'
 alias nst='nix store'
 alias nf='nix flake'
+alias nfc='nix flake check -L'
 alias nb='nix build'
 alias ncf='nix config'
 alias nr='nix run'
-alias nfmt='nix fmt --list-files'
-alias nfc='nix flake check -L'
+alias nfmt='nix fmt'
+alias np='nix profile'
 
 # ========================================================================
 # Functions - Directory Navigation
 # ========================================================================
 
-# # Quick directory navigation with fzf
-# cdf() {
-#     local dir
-#     dir=$(fd --type d --hidden --exclude .git | fzf --preview 'eza --tree --level=1 {}') && cd "$dir"
+# # Edit directories
+# () {
+#     local DIRPATH="$1"
+#     nvim $(fd . -t d --exact-depth 1 --color never $DIRPATH | fzf --prompt="${DIRPATH} configs>" --preview='gls -s {}')
 # }
-
-# Edit directories
-fdirs() {
-    local DIRPATH="$1"
-    nvim $(fd . -t d --exact-depth 1 --color never $DIRPATH | fzf --prompt="${DIRPATH} configs>" --preview='gls -s {}')
-}
 
 xdg() {
     fdirs $XDG_CONFIG_HOME
@@ -297,44 +296,6 @@ xdg() {
 
 cfs() {
     fdirs $CFS
-}
-
-source "$DOTS/scripts/ant.zsh"
-
-# ========================================================================
-# Functions - File Operations
-# ========================================================================
-
-# Edit files with fzf preview
-vf() {
-    local file
-    file=$(fd --type f --hidden --exclude .git | fzf --preview 'bat --color=always {}') && $EDITOR "$file"
-}
-
-# FZF enhanced file operations
-f() {
-    local cmd result
-    case "$1" in
-    find | file)
-        result=$(fd --type f --follow --hidden --exclude .git | fzf --preview="bat --color=always {}")
-        echo "$result"
-        ;;
-    edit)
-        result=$(fd --type f --follow --hidden --exclude .git | fzf --preview="bat --color=always {}")
-        [[ -n "$result" ]] && "$EDITOR" "$result"
-        ;;
-    dir)
-        result=$(fd --type d --follow --hidden --exclude .git | fzf --preview="eza --tree --level=1 --color=always {}")
-        echo "$result"
-        ;;
-    cd)
-        result=$(fd --type d --follow --hidden --exclude .git | fzf --preview="eza --tree --level=1 --color=always {}")
-        [[ -n "$result" ]] && cd "$result"
-        ;;
-    *)
-        echo "Usage: f {find|file|edit|dir|cd}"
-        ;;
-    esac
 }
 
 # ========================================================================
@@ -347,6 +308,39 @@ y() {
         builtin cd -- "$cwd"
     fi
     rm -f -- "$tmp"
+}
+
+source "$DOTS/scripts/ant.zsh"
+
+# ========================================================================
+# Functions - File Operations
+# ========================================================================
+ff() {
+    local cmd result
+    local fd_options="--type f --follow --hidden --exclude .git"
+    case "$1" in
+    find | file)
+        result=$(fd $fd_options | fzf --preview="bat --color=always {}")
+        echo "$result"
+        ;;
+    edit)
+        result=$(fd $fd_options | fzf --preview="bat --color=always {}")
+        [[ -n "$result" ]] && "$EDITOR" "$result"
+        ;;
+    dir)
+        yazi --cwd $(fd $fd_options | fzf --preview="eza --tree --level=1 --color=always {}")
+        ;;
+    cd)
+        result=$(fd $fd_options | fzf --preview="eza --tree --level=1 --color=always {}")
+        [[ -n "$result" ]] && cd "$result"
+        ;;
+    cd)
+        echo $(fd --hidden -t f . $ZDOTDIR)
+        ;;
+    *)
+        echo "Usage: f {find|file|edit|dir|cd}"
+        ;;
+    esac
 }
 
 # ========================================================================
@@ -367,14 +361,6 @@ eval "$(atuin init zsh)"
 # Load local/private configuration if exists
 [[ -f "$ZDOTDIR/.zshrc.local" ]] && source "$ZDOTDIR/.zshrc.local"
 
-# all zsh files in z dir
-# uv
-# [[ -f "$SCRIPTS/utils.zsh" ]] && source "$SCRIPTS/utils.zsh"
-
-function lsz() {
-    echo $(fd --hidden -t f . $ZDOTDIR)
-}
-
 # Load local/private configuration if exists
 [[ -f "$DOTS/scripts/functions.zsh" ]] && source "$DOTS/scripts/functions.zsh"
 
@@ -383,6 +369,50 @@ function lsz() {
 #
 #     [ -f "$f" ] && cp "$src/$f" "$dest/"
 # done
+
+alias flopilot="cd ~/src/vibes/apps/flopilot && npm i && ./deploy-local.sh && cd -"
+alias flonotes="cd ~/src/vibes/apps/flonotes && npm i && ./deploy-local.sh && cd -"
+
+function cp_repo() {
+  local FROM_DIR="$1"
+  [[ ! -d ~/src/ant ]] && mkdir -p ~/src/ant
+  rsync -av \
+    --recursive \
+    --exclude=".git*" \
+    --exclude="node_modules" \
+    --exclude=".venv" \
+    --progress \
+    "$FROM_DIR" ~/src/ant/"$(basename "$FROM_DIR")"
+}
+
+function cp_repos() {
+  local selected_dirs
+
+  # Let fzf handle terminal directly
+  selected_dirs=$(fd . ~/src --max-depth 1 --min-depth 1 --type d | \
+    fzf --multi \
+        --prompt="Select directories to copy: " \
+        --height=80% \
+        --layout=reverse \
+        --preview 'ls -la {}' \
+        --preview-window=right:50%)
+
+  [[ -z "$selected_dirs" ]] && echo "No directories selected." && return 1
+
+  # Process each line
+  while IFS= read -r dir; do
+    echo "Copying $(basename "$dir")..."
+    cp_repo "$dir"
+  done <<< "$selected_dirs"
+
+  echo "✓ Done copying."
+}
+
+function ant-npm-strict-install() {
+    npm install --strict-peer-deps true --prefer-dedupe true
+}
+
+# has_command direnv && eval "$(direnv hook zsh)"
 
 # ========================================================================
 # Cleanup

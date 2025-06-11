@@ -131,7 +131,7 @@ alias antkillall='ant_kill_all'
 # Main dispatcher – recognised sub-commands come first; otherwise treat the
 # first arg as an ant-* binary name and attempt to run it.
 # -----------------------------------------------------------------------------
-ant() {
+hant() {
   local cmd="$1"; shift
 
   case "$cmd" in
