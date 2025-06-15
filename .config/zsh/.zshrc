@@ -374,42 +374,50 @@ alias flopilot="cd ~/src/vibes/apps/flopilot && npm i && ./deploy-local.sh && cd
 alias flonotes="cd ~/src/vibes/apps/flonotes && npm i && ./deploy-local.sh && cd -"
 
 function cp_repo() {
-  local FROM_DIR="$1"
-  [[ ! -d ~/src/ant ]] && mkdir -p ~/src/ant
-  rsync -av \
-    --recursive \
-    --exclude=".git*" \
-    --exclude="node_modules" \
-    --exclude=".venv" \
-    --progress \
-    "$FROM_DIR" ~/src/ant/"$(basename "$FROM_DIR")"
+    local FROM_DIR="$1"
+    [[ ! -d ~/src/ant ]] && mkdir -p ~/src/ant
+    rsync -av \
+        --recursive \
+        --exclude=".git*" \
+        --exclude="node_modules" \
+        --exclude=".venv" \
+        --progress \
+        "$FROM_DIR" ~/src/ant/"$(basename "$FROM_DIR")"
 }
 
 function cp_repos() {
-  local selected_dirs
+    local selected_dirs
 
-  # Let fzf handle terminal directly
-  selected_dirs=$(fd . ~/src --max-depth 1 --min-depth 1 --type d | \
-    fzf --multi \
-        --prompt="Select directories to copy: " \
-        --height=80% \
-        --layout=reverse \
-        --preview 'ls -la {}' \
-        --preview-window=right:50%)
+    # Let fzf handle terminal directly
+    selected_dirs=$(fd . ~/src --max-depth 1 --min-depth 1 --type d |
+        fzf --multi \
+            --prompt="Select directories to copy: " \
+            --height=80% \
+            --layout=reverse \
+            --preview 'ls -la {}' \
+            --preview-window=right:50%)
 
-  [[ -z "$selected_dirs" ]] && echo "No directories selected." && return 1
+    [[ -z "$selected_dirs" ]] && echo "No directories selected." && return 1
 
-  # Process each line
-  while IFS= read -r dir; do
-    echo "Copying $(basename "$dir")..."
-    cp_repo "$dir"
-  done <<< "$selected_dirs"
+    # Process each line
+    while IFS= read -r dir; do
+        echo "Copying $(basename "$dir")..."
+        cp_repo "$dir"
+    done <<<"$selected_dirs"
 
-  echo "✓ Done copying."
+    echo "✓ Done copying."
 }
 
 function ant-npm-strict-install() {
     npm install --strict-peer-deps true --prefer-dedupe true
+}
+
+function change-mac-name() {
+    local name="$1"
+    # Change all three names (replace NEWNAME with your desired name)
+    sudo scutil --set ComputerName "$1"
+    sudo scutil --set HostName "$1"
+    sudo scutil --set LocalHostName "$1"
 }
 
 # has_command direnv && eval "$(direnv hook zsh)"
