@@ -6,15 +6,15 @@ tap "dotenvx/brew"
 tap "f1bonacc1/tap"
 tap "koekeishiya/formulae"
 tap "nikitabobko/tap"
-tap "oven-sh/bun"
-tap "spider-rs/spider-cloud-cli"
+tap "pulumi/tap"
 
 ###############################################################################
 # FORMULAE  – CLI tools & libraries
 ###############################################################################
 
-brew "commitizen"
-brew "ruby"
+# brew "posting"
+# brew "volta"
+# brew "wireshark"
 brew "7zip"
 brew "aider"                       # AI coding assistant
 brew "atuin", restart_service: :changed
@@ -25,6 +25,7 @@ brew "bruno-cli"                   # Git-friendly API client
 brew "bun"                         # JS runtime
 brew "caddy"                       # HTTP server w/ HTTPS
 brew "coder"
+brew "commitizen"
 brew "coreutils"
 brew "curl"                        # HTTP client
 brew "datasette"                   # SQLite explorer
@@ -42,14 +43,16 @@ brew "f2"
 brew "fastfetch"                   # System info
 brew "fd"                          # Better find
 brew "ffmpeg"
-brew "fish"
 brew "flyctl"
 brew "fx"                          # JSON viewer
 brew "fzf"
+brew "gdrive"
 brew "gh"                          # GitHub CLI
 brew "ghc"
 brew "git"
 brew "git-delta"                   # Better git diffs
+brew "git-extras"		   # small git utils (git-ignore, git-standup, git-sync)
+brew "git-lfs"
 brew "git-filter-repo"
 brew "gitleaks"                    # Secret scanner
 brew "glow"                        # Markdown viewer
@@ -77,21 +80,23 @@ brew "miller"                      # CSV swiss-army-knife
 brew "neovim"
 brew "nixpacks"
 brew "nvm"
+brew "nx"
 brew "openapi-tui"                 # OpenAPI TUI
 brew "ouch"
-brew "oven-sh/bun/bun"             # same as `bun` tap
 brew "p7zip"
 brew "pandoc"
 brew "pgcli"
 brew "podman"
 brew "poppler"
-# brew "posting"
+brew "postgresql@17"
 brew "prettier"
 brew "prism-cli"                   # API mocking / contract
 brew "procs"                       # Better ps
+brew "pulumi/tap/pulumi"
 brew "resvg"
 brew "rich"
 brew "ripgrep"
+brew "ruby"
 brew "rustscan"
 brew "rustup-init"
 brew "sd"                          # Better sed
@@ -99,11 +104,13 @@ brew "semgrep"                     # Static analysis
 brew "shellcheck"
 brew "shfmt"
 brew "siderolabs/tap/talosctl"
+brew "skopeo"
 brew "sops"
 brew "spectral-cli"                # OpenAPI linter
 brew "speedtest-cli"
-brew "spider-cloud-cli"
+# brew "spider-cloud-cli"
 brew "starship"                    # Prompt
+brew "supabase/tap/supabase"
 brew "tag"
 brew "taplo"
 brew "tectonic"
@@ -115,10 +122,9 @@ brew "trivy"
 brew "trufflehog"
 brew "uv"
 brew "vite"
-# brew "volta"
 brew "wget"
-brew "wireshark"
 brew "xh"                          # Modern HTTP client
+brew "xo/xo/usql"
 brew "yazi"
 brew "yq"
 brew "zellij"
@@ -131,18 +137,21 @@ brew "zsh-syntax-highlighting"
 # CASKS – GUI apps & fonts
 # ##############################################################################
 
+# cask "blackhole-16ch"
+# cask "dropbox"
+# cask "mactex"
+# cask "quit-all"
 cask "1password"
 cask "1password-cli"
 cask "a-better-finder-rename"
 cask "airtable"
-cask "another-redis-desktop-manager"
 cask "anki"
+cask "another-redis-desktop-manager"
 cask "asana"
 cask "audacity"
 cask "bartender"
 cask "betterdisplay"
 cask "bitwarden"
-cask "blackhole-16ch"
 cask "bruno"
 cask "bunch"
 cask "canva"
@@ -160,25 +169,22 @@ cask "dash"
 cask "descript"
 cask "devutils"
 cask "draw-things"
-# cask "dropbox"
 cask "espanso"
 cask "excalidrawz"
 cask "fantastical"
 cask "figma"
-cask "folo"
+cask "folo" # follow RSS feed reader app
 cask "font-fira-code-nerd-font"
 cask "font-fira-mono-nerd-font"
 cask "font-symbols-only-nerd-font"
 cask "fork"
 cask "ghidra"
 cask "ghostty"
-cask "github"
 cask "google-chrome"
 cask "google-drive"
 cask "hammerspoon"
 cask "hazel"
 cask "homerow"
-cask "httpie"
 cask "iina"
 cask "imageoptim"
 cask "istat-menus"
@@ -192,7 +198,6 @@ cask "linear-linear"
 cask "lm-studio"
 cask "maccy"
 cask "macwhisper"
-# cask "mactex"
 cask "mitmproxy"
 cask "ngrok"
 cask "nikitabobko/tap/aerospace"
@@ -200,6 +205,7 @@ cask "nosql-workbench"
 cask "notion"
 cask "obsidian"
 cask "ollama"
+cask "onlook"
 cask "orbstack"
 cask "osquery"
 cask "pdf-expert"
@@ -211,11 +217,10 @@ cask "qlcolorcode"
 cask "qlmarkdown"
 cask "qlstephen"
 cask "quicklook-json"
-# cask "quit-all"
 cask "raycast"
 cask "repo-prompt"
-cask "royal-tsx"
 cask "rize"
+cask "royal-tsx"
 cask "signal"
 cask "slack"
 cask "spotify"
@@ -230,29 +235,10 @@ cask "timelane"
 cask "tla+-toolbox"
 cask "todoist"
 cask "virtualbuddy"
-cask "visual-studio-code"
+# cask "visual-studio-code"
 cask "warp"
-cask "wireshark"
-cask "zed"
+# cask "wireshark"
+# cask "zed"
 cask "zen"
 cask "zoom"
 
-###############################################################################
-# QUICK HOW-TO
-###############################################################################
-# 1. Save this file as   ~/.config/brewfile/Brewfile   (or any path you like).
-# 2. Uncomment the taps/formulae/casks you actually want installed.
-# 3. Run:     brew bundle --file <path>   (or   brew bundle --global   if you
-#    keep it in the default global location).
-# 4. To prune things later:   brew bundle cleanup --force --file <path>
-#
-# Happy brewing! 🍺
-brew "nx"
-tap "pulumi/tap"
-brew "pulumi/tap/pulumi"
-brew "gdrive"
-brew "postgresql@17"
-brew "xo/xo/usql"
-brew "supabase/tap/supabase"
-cask "onlook"
-brew "skopeo"
