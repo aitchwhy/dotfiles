@@ -29,3 +29,4 @@ export PATH="$VOLTA_HOME/bin:$PATH"
 if [[ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]]; then
     source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
 fi
+. "$HOME/.cargo/env"

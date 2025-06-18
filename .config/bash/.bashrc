@@ -447,3 +447,4 @@ PS1='\[\e[0;32m\]\u@\h\[\e[0m\]:\[\e[0;34m\]\w\[\e[0;33m\]$(parse_git_branch)\[\
 
 # Source local bashrc if it exists
 [[ -f "$HOME/.bashrc.local" ]] && source "$HOME/.bashrc.local"
+. "$HOME/.cargo/env"

@@ -77,7 +77,7 @@ function path_add() {
     fi
     return 1
 }
-path_add "$CFS/npm-global/bin" # Add npm global packages to PATH
+# path_add "$CFS/npm-global/bin" # Add npm global packages to PATH
 
 # ========================================================================
 # Completions
@@ -371,7 +371,6 @@ eval "$(atuin init zsh)"
 # done
 
 alias flopilot="cd ~/src/vibes/apps/flopilot && npm i && ./deploy-local.sh && cd -"
-alias flonotes="cd ~/src/vibes/apps/flonotes && npm i && ./deploy-local.sh && cd -"
 
 function cp_repo() {
   local FROM_DIR="$1"
@@ -379,7 +378,13 @@ function cp_repo() {
   rsync -av \
     --recursive \
     --exclude=".git*" \
+    --exclude=".github" \
     --exclude="node_modules" \
+    --exclude=".venv" \
+    --exclude=".gitignore" \
+    --exclude=".pytest_cache" \
+    --exclude=".obsidian" \
+    --exclude=".ruff_cache" \
     --exclude=".venv" \
     --progress \
     "$FROM_DIR" ~/src/ant/"$(basename "$FROM_DIR")"
@@ -404,6 +409,11 @@ function cp_repos() {
     echo "Copying $(basename "$dir")..."
     cp_repo "$dir"
   done <<< "$selected_dirs"
+
+  for d in $selected_dirs; do
+    echo "--- cp_repo $d"
+    cp_repo $d
+  done
 
   echo "✓ Done copying."
 }
