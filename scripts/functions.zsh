@@ -345,71 +345,71 @@ sys() { _cli_framework SYS sys "$@"; }
 ################################################################################
 # MACOS DEFAULTS
 ################################################################################
-
-_defaults_all() {
-  info "Applying all macOS preferences..."
-  _defaults_keyboard
-  _defaults_finder
-  _defaults_dock
-  _defaults_trackpad
-  success "All macOS preferences applied"
-}
-
-_defaults_keyboard() {
-  defaults write NSGlobalDomain KeyRepeat -int 2
-  defaults write NSGlobalDomain InitialKeyRepeat -int 15
-  defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
-  success "Keyboard preferences applied"
-}
-
-_defaults_finder() {
-  defaults write NSGlobalDomain AppleShowAllExtensions -bool true
-  defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
-  defaults write com.apple.finder AppleShowAllFiles -bool true
-  defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
-  defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
-  defaults write com.apple.finder ShowPathbar -bool true
-  defaults write com.apple.finder ShowStatusBar -bool true
-  defaults write com.apple.finder _FXSortFoldersFirst -bool true
-  killall Finder &>/dev/null || true
-  success "Finder preferences applied"
-}
-
-_defaults_dock() {
-  defaults write com.apple.dock autohide -bool true
-  defaults write com.apple.dock autohide-delay -float 0
-  defaults write com.apple.dock show-recents -bool false
-  killall Dock &>/dev/null || true
-  success "Dock preferences applied"
-}
-
-_defaults_trackpad() {
-  defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
-  success "Trackpad preferences applied"
-}
-
-DEFAULTS_COMMANDS=(
-  "apply:all:Apply all macOS preferences:_defaults_all"
-  "keyboard:kb:Apply keyboard settings:_defaults_keyboard"
-  "finder::Apply Finder settings:_defaults_finder"
-  "dock::Apply Dock settings:_defaults_dock"
-  "trackpad::Apply trackpad settings:_defaults_trackpad"
-)
-
-DEFAULTS_HELP=$(_cli_generate_help "defaults" "macOS defaults management" "${DEFAULTS_COMMANDS[@]}")
-
-defaults() {
-  # Pass through to system defaults for read/write
-  if [[ "$1" == "write" ]] || [[ "$1" == "read" ]]; then
-    command defaults "$@"
-    return $?
-  fi
-  _cli_framework DEFAULTS defaults "$@"
-}
-
-# Compatibility aliases
-setup_macos_preferences() { _defaults_all; }
-defaults_apply() { _defaults_all; }
+#
+# _defaults_all() {
+#   info "Applying all macOS preferences..."
+#   _defaults_keyboard
+#   _defaults_finder
+#   _defaults_dock
+#   _defaults_trackpad
+#   success "All macOS preferences applied"
+# }
+#
+# _defaults_keyboard() {
+#   defaults write NSGlobalDomain KeyRepeat -int 2
+#   defaults write NSGlobalDomain InitialKeyRepeat -int 15
+#   defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
+#   success "Keyboard preferences applied"
+# }
+#
+# _defaults_finder() {
+#   defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+#   defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+#   defaults write com.apple.finder AppleShowAllFiles -bool true
+#   defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
+#   defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
+#   defaults write com.apple.finder ShowPathbar -bool true
+#   defaults write com.apple.finder ShowStatusBar -bool true
+#   defaults write com.apple.finder _FXSortFoldersFirst -bool true
+#   killall Finder &>/dev/null || true
+#   success "Finder preferences applied"
+# }
+#
+# _defaults_dock() {
+#   defaults write com.apple.dock autohide -bool true
+#   defaults write com.apple.dock autohide-delay -float 0
+#   defaults write com.apple.dock show-recents -bool false
+#   killall Dock &>/dev/null || true
+#   success "Dock preferences applied"
+# }
+#
+# _defaults_trackpad() {
+#   defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
+#   success "Trackpad preferences applied"
+# }
+#
+# DEFAULTS_COMMANDS=(
+#   "apply:all:Apply all macOS preferences:_defaults_all"
+#   "keyboard:kb:Apply keyboard settings:_defaults_keyboard"
+#   "finder::Apply Finder settings:_defaults_finder"
+#   "dock::Apply Dock settings:_defaults_dock"
+#   "trackpad::Apply trackpad settings:_defaults_trackpad"
+# )
+#
+# DEFAULTS_HELP=$(_cli_generate_help "defaults" "macOS defaults management" "${DEFAULTS_COMMANDS[@]}")
+#
+# defaults() {
+#   # Pass through to system defaults for read/write
+#   if [[ "$1" == "write" ]] || [[ "$1" == "read" ]]; then
+#     command defaults "$@"
+#     return $?
+#   fi
+#   _cli_framework DEFAULTS defaults "$@"
+# }
+#
+# # Compatibility aliases
+# setup_macos_preferences() { _defaults_all; }
+# defaults_apply() { _defaults_all; }
 
 ################################################################################
 # MAC APP STORE
