@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"path": "../../../src/platform"
+		},
+		{
+			"path": "../../../src/vibes"
+		}
+	],
+	"settings": {
+		"yaml.validate": false,
+		"go.useLanguageServer": true,
+		"typescript.tsdk": "node_modules/typescript/lib"
+	}
+}

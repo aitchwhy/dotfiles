@@ -1,26 +1,35 @@
 {
-	"name": "ant",
+	"extensions": {
+		"recommendations": []
+	},
 	"folders": [
-		// {
-		// 	"name": "platform-gemini",
-		// 	"path": "/Users/hank/src/platform-gemini"
-		// },
 		{
 			"name": "platform",
-			"path": "/Users/hank/src/platform/"
+			"path": "/Users/hank/src/platform"
 		},
 		{
-			"name": "flopilot",
-			"path": "/Users/hank/src/vibes/apps/flopilot"
+			"name": "vibes",
+			"path": "/Users/hank/src/vibes"
 		},
 		{
-			"name": "flonotes",
-			"path": "/Users/hank/src/vibes/apps/flonotes"
+			"name": "brrr",
+			"path": "/Users/hank/src/brrr"
 		}
 	],
 	"tasks": {
 		"version": "2.0.0",
 		"tasks": [
+			{
+				"label": "platform-llm-test",
+				"type": "shell",
+				"command": "nix develop '.#workflows' --command zsh -c 'cd workflows && uv venv && source .venv/bin/activate && source .envrc && uv sync && python -m pytest'",
+				"options": {
+					"cwd": "${workspaceFolder:platform}/workflows/ported/services/llm"
+				},
+				"problemMatcher": [
+					"$pytest"
+				]
+			},
 			{
 				"label": "echo",
 				"type": "shell",
@@ -61,21 +70,20 @@
 					"cwd": "${workspaceFolder}/platform",
 					"envFile": "${workspaceFolder}/platform/.env"
 				}
-			},
-			{
-				"label": "nix-build-admin",
-				"type": "shell",
-				"command": "nix build .#admin",
-				"options": {
-					"cwd": "${workspaceFolder:platform-gemini}"
-				},
-				"problemMatcher": []
 			}
 		]
 	},
 	"launch": {
 		"version": "0.2.0",
 		"configurations": [
+			{
+				"name": "Run LLM Tests",
+				"type": "debugpy",
+				"request": "launch",
+				"program": "${workspaceFolder}/platform/workflows/ported/services/llm/tests/integration.py",
+				"preLaunchTask": "platform-llm-test",
+				"console": "integratedTerminal"
+			},
 			{
 				"name": "(TSX) Launch Chrome",
 				"request": "launch",
@@ -149,7 +157,6 @@
 			}
 		]
 	},
-	"settings": {},
 	// "settings": {
 	// 	"nixEnvSelector.nixFile": "${workspaceFolder}/flake.nix"
 	// }
