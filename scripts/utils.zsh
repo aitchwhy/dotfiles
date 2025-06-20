@@ -80,7 +80,7 @@ function log_warn() {
 function log_error() {
   printf "${RED}[ERROR]${RESET} %s\n" "$*" >&2
 }
- 
+
 # Aliases for different naming conventions
 function info() { log_info "$@"; }
 function success() { log_success "$@"; }
@@ -120,19 +120,19 @@ function has_command() {
 }
 
 # System detection functions
-export function is_macos() {
+function is_macos() {
   [[ "$(uname -s)" == "Darwin" ]]
 }
 
-export function is_linux() {
+function is_linux() {
   [[ "$(uname -s)" == "Linux" ]]
 }
 
-export function is_apple_silicon() {
+function is_apple_silicon() {
   [[ "$(uname -m)" == "arm64" ]] && is_macos
 }
 
-export function is_rosetta() {
+function is_rosetta() {
   # Check if a process is running under Rosetta translation
   if is_apple_silicon; then
     local arch_output
@@ -143,7 +143,7 @@ export function is_rosetta() {
   fi
 }
 
-export function get_macos_version() {
+function get_macos_version() {
   if is_macos; then
     sw_vers -productVersion
   else
@@ -157,7 +157,7 @@ export function get_macos_version() {
 # ========================================================================
 
 # Create a directory if it doesn't exist
-export function ensure_dir() {
+function ensure_dir() {
   local dir="$1"
   if [[ ! -d "$dir" ]]; then
     mkdir -p "$dir"
@@ -170,12 +170,12 @@ export function ensure_dir() {
 # ========================================================================
 
 # install brew if not exists
-export function install_brew() {
+function install_brew() {
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 }
 
 # uninstall brew
-export function uninstall_brew() {
+function uninstall_brew() {
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"
 }
 
@@ -186,7 +186,7 @@ export function uninstall_brew() {
 # ========================================================================
 
 # Add a directory to PATH if it exists and isn't already in PATH
-export function path_add() {
+function path_add() {
   local dir="$1"
   if [[ -d "$dir" ]] && [[ ":$PATH:" != *":$dir:"* ]]; then
     export PATH="$dir:$PATH"
@@ -196,7 +196,7 @@ export function path_add() {
 }
 
 # Remove a directory from PATH
-export function path_remove() {
+function path_remove() {
   local dir="$1"
   if [[ ":$PATH:" == *":$dir:"* ]]; then
     export PATH=${PATH//:$dir:/:}  # Remove middle
@@ -212,7 +212,7 @@ export function path_remove() {
 # ========================================================================
 
 # Apply common macOS system preferences
-export function defaults_apply() {
+function defaults_apply() {
   if ! is_macos; then
     log_error "Not running on macOS"
     return 1
@@ -259,7 +259,7 @@ export function defaults_apply() {
 
 
 # Setup Homebrew and install packages
-export function init_brew() {
+function init_brew() {
   info "Setting up Homebrew..."
   has_command brew || install_brew
   brew bundle install --verbose --file="$DOTFILES/Brewfile.core" --all --force

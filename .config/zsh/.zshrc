@@ -77,7 +77,11 @@ function path_add() {
     fi
     return 1
 }
+
 # path_add "$CFS/npm-global/bin" # Add npm global packages to PATH
+# path_add "$HOME/.volta/bin" # Add npm global packages to PATH
+alias cs="claude-squad"
+alias pc="process-compose"
 
 # ========================================================================
 # Completions
@@ -140,7 +144,7 @@ alias ls='eza --git --icons'
 alias l='eza --git --icons -lF'
 alias ll='eza -lahF --git'
 alias lll="eza -1F --git --icons"
-alias llm='ll --sort=modified'
+# alias llm='ll --sort=modified'
 alias la='eza -lbhHigUmuSa --color-scale --git --icons'
 alias lx='eza -lbhHigUmuSa@ --color-scale --git --icons'
 alias lt='eza --tree --level=2'
@@ -150,9 +154,9 @@ alias ltt='eza -lahF | grep "$(date +"%d %b")"'
 # ========================================================================
 # Aliases - Navigation
 # ========================================================================
-alias ..='cd ..'
-alias ...='cd ../..'
-alias ....='cd ../../..'
+# alias ..='cd ..'
+# alias ...='cd ../..'
+# alias ....='cd ../../..'
 
 # ========================================================================
 # Aliases - Editors
@@ -184,6 +188,7 @@ alias gp='git push'
 alias gs='git status'
 alias lgdot='lazygit --path $DOTFILES'
 alias lg='lazygit'
+alias gw='git worktree'
 
 # ========================================================================
 # Aliases - Modern CLI Tools
@@ -352,17 +357,17 @@ has_command starship && eval "$(starship init zsh)"
 has_command zoxide && eval "$(zoxide init zsh)"
 
 # Atuin (history management)
-[[ -f "$HOME/.atuin/bin/env" ]] && source "$HOME/.atuin/bin/env"
+# [[ -f "$HOME/.atuin/bin/env" ]] && source "$HOME/.atuin/bin/env"
 eval "$(atuin init zsh)"
 
 # Load utility functions if available
 [[ -f "$SCRIPTS/utils.zsh" ]] && source "$SCRIPTS/utils.zsh"
 
 # Load local/private configuration if exists
-[[ -f "$ZDOTDIR/.zshrc.local" ]] && source "$ZDOTDIR/.zshrc.local"
+# [[ -f "$ZDOTDIR/.zshrc.local" ]] && source "$ZDOTDIR/.zshrc.local"
 
 # Load local/private configuration if exists
-[[ -f "$DOTS/scripts/functions.zsh" ]] && source "$DOTS/scripts/functions.zsh"
+# [[ -f "$DOTS/scripts/functions.zsh" ]] && source "$DOTS/scripts/functions.zsh"
 
 # for f in $(lsz); do
 #   echo $(fd --hidden -t f . $ZDOTDIR)
@@ -394,13 +399,7 @@ function cp_repos() {
   local selected_dirs
 
   # Let fzf handle terminal directly
-  selected_dirs=$(fd . ~/src --max-depth 1 --min-depth 1 --type d | \
-    fzf --multi \
-        --prompt="Select directories to copy: " \
-        --height=80% \
-        --layout=reverse \
-        --preview 'ls -la {}' \
-        --preview-window=right:50%)
+  selected_dirs=$(fd . ~/src --max-depth 1 --min-depth 1 --type d | fzf --multi --prompt="Select directories to copy: " --height=80% --layout=reverse --preview 'ls -la {}' --preview-window=right:50%)
 
   [[ -z "$selected_dirs" ]] && echo "No directories selected." && return 1
 
@@ -429,3 +428,5 @@ function ant-npm-strict-install() {
 # ========================================================================
 # Performance monitoring (uncomment to debug)
 # zprof
+#
+#

@@ -1,7 +1,7 @@
 {
 	"folders": [
 		{
-			"path": "../../../src/platform"
+			"path": "../../../src/platform-posthog"
 		},
 		{
 			"path": "../../../src/vibes"
@@ -10,6 +10,7 @@
 	"settings": {
 		"yaml.validate": false,
 		"go.useLanguageServer": true,
-		"typescript.tsdk": "node_modules/typescript/lib"
+		"typescript.tsdk": "vibes/node_modules/typescript/lib",
+		"nixEnvSelector.nixFile": "${workspaceFolder}/flake.nix"
 	}
 }
