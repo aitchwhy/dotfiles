@@ -6,9 +6,11 @@
 set shell := ["zsh", "-cu"]
 
 # Enable colorful output
-set dotenv-load
-set positional-arguments
-set fallback
+# set dotenv-load
+# set positional-arguments
+# set fallback
+
+
 
 # ----------------------------------------------------------
 # CLI Interface Configuration
@@ -164,6 +166,18 @@ readme:
 # View PRD (Product Requirements Document)
 prd:
     @glow PRD.md
+
+# Setup config symlinks
+symlinks:
+    ./scripts/setup-config-symlinks.sh setup
+
+# Check symlink status
+symlinks-status:
+    ./scripts/setup-config-symlinks.sh status
+
+# Remove all symlinks
+symlinks-unlink:
+    ./scripts/setup-config-symlinks.sh unlink
 
 # # View specific tool documentation
 # docs tool:

@@ -63,7 +63,7 @@ export YAZI_CONFIG_DIR="$CFS/yazi"
 export ZELLIJ_CONFIG_DIR="$CFS/zellij"
 export HOMEBREW_NO_ANALYTICS=1
 export COLORTERM="truecolor"
-export USER_JUSTFILE="$CFS/just/.user.justfile"
+export GLOBAL_JUSTFILE="~/justfile"
 
 # NPM configuration - using standard ~/.npmrc (symlinked from dotfiles)
 # export NPM_CONFIG_USERCONFIG="$CFS/npm/.npm-global"  # No longer needed
@@ -231,7 +231,7 @@ alias k='k9s'
 # Aliases - Just
 # ========================================================================
 alias j='just'
-# alias .j='just --justfile $USER_JUSTFILE'
+alias .j="just --justfile $GLOBAL_JUSTFILE"
 
 # ========================================================================
 # Aliases - System
