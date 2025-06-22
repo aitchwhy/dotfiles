@@ -314,7 +314,7 @@ _sys_killport() {
 
 _sys_man() {
   [[ -z "$1" ]] && { echo "Usage: sys man <command>"; return 1; }
-  MANPAGER="sh -c 'col -bx | bat -l man -p'" man "$@"
+  # MANPAGER="sh -c 'col -bx | bat -l man -p'" man "$@"
 }
 
 _sys_ports() { sudo lsof -iTCP -sTCP:LISTEN -n -P; }

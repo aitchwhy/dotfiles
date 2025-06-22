@@ -193,7 +193,7 @@ alias gw='git worktree'
 # ========================================================================
 # Aliases - Modern CLI Tools
 # ========================================================================
-alias cat='bat --paging=always'
+alias cat='bat --paging=never'
 alias grep='rg'
 alias find='fd'
 alias ps='procs'
