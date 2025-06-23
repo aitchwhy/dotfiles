@@ -1,35 +1,166 @@
-**/.claude/settings.local.json
+# -------------------------------------------------------------------------------
+# Per-machine configuration
+# -------------------------------------------------------------------------------
+*.extra
+prd.txt
 
-**/.claude/settings.local.json
+# -------------------------------------------------------------------------------
+# Compiled sources
+# -------------------------------------------------------------------------------
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
 
-**/.claude/settings.local.json
+#-------------------------------------------------------------------------------
+# Archives / packages
+#-------------------------------------------------------------------------------
+*.7z
+*.dmg
+*.iso
+*.rar
+*.zip
 
-**/.claude/settings.local.json
+#-------------------------------------------------------------------------------
+# Logs & databases
+#-------------------------------------------------------------------------------
+*.log
+*.sqlite
 
-**/.claude/settings.local.json
+data/
+!schemas/data/
 
-**/.claude/settings.local.json
+#-------------------------------------------------------------------------------
+# OS-generated files
+#-------------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.Trash
+Desktop.ini
+ehthumbs.db
+Thumbs.db
+.AppleDouble
+.LSOverride
+Icon
 
-**/.claude/settings.local.json
+#-------------------------------------------------------------------------------
+# Development environment metadata
+#-------------------------------------------------------------------------------
+.idea/
+.vscode/
+.vagrant/
+*.swp
+*.swo
+*~
 
-**/.claude/settings.local.json
+#-------------------------------------------------------------------------------
+# Environment variable files
+#-------------------------------------------------------------------------------
+.env
+*.env
+*.envrc
+.direnv
 
-**/.claude/settings.local.json
+#-------------------------------------------------------------------------------
+# Node / npm
+#-------------------------------------------------------------------------------
+# .nvmrc
+node_modules/
+npm-debug.log
+yarn-error.log
 
-**/.claude/settings.local.json
+#-------------------------------------------------------------------------------
+# Python
+#-------------------------------------------------------------------------------
+.python-version
+__pycache__/
 
-**/.claude/settings.local.json
+#-------------------------------------------------------------------------------
+# Tags (ctags/etags/gtags/cscope)
+#-------------------------------------------------------------------------------
+TAGS
+.TAGS
+!TAGS/
+tags
+.tags
+!tags/
+gtags.files
+GTAGS
+GRTAGS
+GPATH
+GSYMS
+cscope.*
 
-**/.claude/settings.local.json
+#-------------------------------------------------------------------------------
+# Xcode
+#-------------------------------------------------------------------------------
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+.cursor/
 
-**/.claude/settings.local.json
+*.xcscmblueprint
+*.xccheckout
+*.app
+# **/Linear.app/Contents/
 
-**/.claude/settings.local.json
+#-------------------------------------------------------------------------------
+# Build outputs
+#-------------------------------------------------------------------------------
+build/
+dist/
 
-**/.claude/settings.local.json
+#-------------------------------------------------------------------------------
+# Cursor
+#-------------------------------------------------------------------------------
+.cursor/
+.windsurfrules
+.env.example
 
-**/.claude/settings.local.json
+.claude/
+.cursorignore
+^scripts/
 
-**/.claude/settings.local.json
 
-**/.claude/settings.local.json
+# Added by Claude Task Master
+*.log
+npm-debug.log*
+dev-debug.log
+# Environment variables
+# Editor directories and files
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+# OS specific
+# Task files
+tasks.json
+tasks/
+
+
+#-------------------------------------------------------------------------------
+# Project-specific files
+#-------------------------------------------------------------------------------
+example_prd.txt
+.env.examples
+.roocode
+README-task-master.md
+
+#-------------------------------------------------------------------------------
+# Aider AI coding helper
+#-------------------------------------------------------------------------------
+.aider*
+
+
+.roo
+.roomodes
+.taskmasterconfig
+tasks/
+
+

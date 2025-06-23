@@ -430,3 +430,5 @@ function ant-npm-strict-install() {
 # zprof
 #
 #
+
+alias claude="/Users/hank/dotfiles/.config/claude/local/claude"
