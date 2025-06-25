@@ -111,3 +111,10 @@ extensions
 
 # Sensitive environment files
 user.env
+
+# Large files to ignore
+.config/repomix/*.xml
+*.patch
+docs/repomix-output.xml
+.config/raycast/extensions/**/*.js.map
+.config/raycast/extensions/**/*.js
