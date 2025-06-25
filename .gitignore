@@ -108,3 +108,6 @@ extensions
 .config/zed/prompts/prompts-library-db.0.mdb
 .config/raycast/extensions
 .config/claude
+
+# Sensitive environment files
+user.env
