@@ -8,13 +8,12 @@ tap "koekeishiya/formulae"
 tap "nikitabobko/tap"
 tap "oven-sh/bun"
 tap "spider-rs/spider-cloud-cli"
+tap "pulumi/tap"
 
 ###############################################################################
 # FORMULAE  – CLI tools & libraries
 ###############################################################################
 
-brew "commitizen"
-brew "ruby"
 brew "7zip"
 brew "aider"                       # AI coding assistant
 brew "atuin", restart_service: :changed
@@ -24,7 +23,11 @@ brew "bitwarden-cli"
 brew "bruno-cli"                   # Git-friendly API client
 brew "bun"                         # JS runtime
 brew "caddy"                       # HTTP server w/ HTTPS
+brew "claude-squad"
 brew "coder"
+brew "gurk" # signal CLI client
+brew "codex"
+brew "commitizen"
 brew "coreutils"
 brew "curl"                        # HTTP client
 brew "datasette"                   # SQLite explorer
@@ -46,6 +49,7 @@ brew "fish"
 brew "flyctl"
 brew "fx"                          # JSON viewer
 brew "fzf"
+brew "gdrive"
 brew "gh"                          # GitHub CLI
 brew "ghc"
 brew "git"
@@ -77,21 +81,24 @@ brew "miller"                      # CSV swiss-army-knife
 brew "neovim"
 brew "nixpacks"
 brew "nvm"
+brew "nx"
 brew "openapi-tui"                 # OpenAPI TUI
 brew "ouch"
-brew "oven-sh/bun/bun"             # same as `bun` tap
 brew "p7zip"
 brew "pandoc"
 brew "pgcli"
 brew "podman"
 brew "poppler"
-# brew "posting"
+brew "postgresql@17"
+brew "posting"
 brew "prettier"
 brew "prism-cli"                   # API mocking / contract
 brew "procs"                       # Better ps
+brew "pulumi/tap/pulumi"
 brew "resvg"
 brew "rich"
 brew "ripgrep"
+brew "ruby"
 brew "rustscan"
 brew "rustup-init"
 brew "sd"                          # Better sed
@@ -99,11 +106,13 @@ brew "semgrep"                     # Static analysis
 brew "shellcheck"
 brew "shfmt"
 brew "siderolabs/tap/talosctl"
+brew "skopeo"
 brew "sops"
 brew "spectral-cli"                # OpenAPI linter
 brew "speedtest-cli"
 brew "spider-cloud-cli"
 brew "starship"                    # Prompt
+brew "supabase/tap/supabase"
 brew "tag"
 brew "taplo"
 brew "tectonic"
@@ -115,10 +124,11 @@ brew "trivy"
 brew "trufflehog"
 brew "uv"
 brew "vite"
-# brew "volta"
+brew "volta"
 brew "wget"
 brew "wireshark"
 brew "xh"                          # Modern HTTP client
+brew "xo/xo/usql"
 brew "yazi"
 brew "yq"
 brew "zellij"
@@ -236,6 +246,8 @@ cask "wireshark"
 cask "zed"
 cask "zen"
 cask "zoom"
+cask "keymapp"
+cask "onlook"
 
 ###############################################################################
 # QUICK HOW-TO
@@ -247,14 +259,3 @@ cask "zoom"
 # 4. To prune things later:   brew bundle cleanup --force --file <path>
 #
 # Happy brewing! 🍺
-brew "nx"
-tap "pulumi/tap"
-brew "pulumi/tap/pulumi"
-brew "gdrive"
-brew "postgresql@17"
-brew "xo/xo/usql"
-brew "supabase/tap/supabase"
-cask "onlook"
-brew "skopeo"
-cask "keymapp"
-brew "claude-squad"

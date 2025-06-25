@@ -63,7 +63,8 @@ export YAZI_CONFIG_DIR="$CFS/yazi"
 export ZELLIJ_CONFIG_DIR="$CFS/zellij"
 export HOMEBREW_NO_ANALYTICS=1
 export COLORTERM="truecolor"
-export GLOBAL_JUSTFILE="~/justfile"
+export GLOBAL_JUSTFILE="$HOME/dotfiles/justfile"
+export DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib:$DYLD_FALLBACK_LIBRARY_PATH
 
 # NPM configuration - using standard ~/.npmrc (symlinked from dotfiles)
 # export NPM_CONFIG_USERCONFIG="$CFS/npm/.npm-global"  # No longer needed
@@ -172,6 +173,11 @@ alias zr="exec zsh"
 alias ze="$EDITOR $ZDOTDIR/.zshrc"
 alias zeall="$EDITOR $ZDOTDIR/{.zshrc,.zprofile,.zshenv}"
 alias zcompreset="rm -f ~/.zcompdump; compinit"
+
+alias br="exec bash"
+alias be="$EDITOR ~/.bashrc ~/.bash_profeil"
+alias beall="$EDITOR $ZDOTDIR/{.bashrc,.bash_profile,.profile}"
+
 
 # ========================================================================
 # Aliases - Git
@@ -421,7 +427,7 @@ function ant-npm-strict-install() {
     npm install --strict-peer-deps true --prefer-dedupe true
 }
 
-# has_command direnv && eval "$(direnv hook zsh)"
+has_command direnv && eval "$(direnv hook zsh)"
 
 # ========================================================================
 # Cleanup

@@ -3,40 +3,71 @@
 # Version: 1.40.0
 
 # Set shell to zsh for all recipes
-set shell := ["zsh", "-cu"]
+# set shell := ["zsh", "-cu"]
 
 # Enable colorful output
-# set dotenv-load
-# set positional-arguments
-# set fallback
+set dotenv-load
+set positional-arguments
+set fallback
+
+# Enterprise UID constants
+ENTERPRISE_ANTERIOR := "ent_mVq8yFqJiH4PqLZ88FPuq"
+ENTERPRISE_HEALTHHELP := "ent_FlksH-cwodheUuFTTcoJU"
+ENTERPRISE_MEDWATCH := "ent_4KPq47Ht8IXiRpDY-sBEt"
+ENTERPRISE_MRIOA := "ent_FR0qo7gbvcqsjPYDMz6ho"
+ENTERPRISE_TEST := "ent_l68cu7hn4SH4Gnvq5HbFx"
+ENTERPRISE_DEMO := "ent_QYYEW-88xLPA5qr5uvrFy"
 
 
-
-# ----------------------------------------------------------
-# CLI Interface Configuration
-# ----------------------------------------------------------
-
-# Tool descriptions for nice display
-# TOOL_DESCRIPTIONS := {
-#     "ai": "AI-powered tools and Claude Code helpers",
-#     "aerospace": "Window manager for MacOS",
-#     "atuin": "Shell history management",
-#     "brew": "Homebrew package management",
-#     "git": "Git version control operations",
-#     "nvim": "Neovim text editor",
-#     "starship": "Cross-shell prompt",
-#     "yazi": "Terminal file manager",
-#     "zellij": "Terminal multiplexer",
-#     "zsh": "Z shell configuration",
-# }
-# ----------------------------------------------------------
-# Default and Core Commands
-# ----------------------------------------------------------
-
+# Default recipe - show available commands
+# Default recipe - show available commands
 default:
-  just --list
+    @just --list
 
-# Fuzzy choose and run a command with improved UX
+# List all enterprises
+enterprises:
+    @ant-admin enterprises list
+
+# List all users
+users:
+    @ant-admin users list
+
+# Interactive selection pipeline: enterprise -> user -> workspace
+ant-admin-fzf:
+    #!/usr/bin/env zsh
+    set -e
+
+    # Select enterprise
+    ENTERPRISE=$(ant-admin enterprises list | fzf --prompt="Enterprise: " | awk '{print $1}')
+    [[ -z "$ENTERPRISE" ]] && { echo "No enterprise selected"; exit 1; }
+
+    # Select user
+    USER=$(ant-admin users list | fzf --prompt="User: " | awk '{print $1}')
+    [[ -z "$USER" ]] && { echo "No user selected"; exit 1; }
+
+    # Select workspace
+    WORKSPACE=$(ant-admin workspaces list --enterprise=$ENTERPRISE | fzf --prompt="Workspace: " | awk '{print $1}')
+    [[ -z "$WORKSPACE" ]] && { echo "No workspace selected"; exit 1; }
+
+    echo "Selected: $ENTERPRISE | $USER | $WORKSPACE"
+    echo "Usage: just create-key $USER $ENTERPRISE $WORKSPACE [name] [role]"
+
+# Create API key with selected values
+create-key user enterprise workspace name role="ADMIN":
+    ant-admin user addmachine -u {{user}} -e {{enterprise}} -w {{workspace}} -r {{role}} -n "{{name}}"
+
+# Fuzzy search entities
+find entity="users":
+    ant-admin {{entity}} list | fzf --prompt="{{entity}}: "
+
+# Search with pattern
+find-by entity pattern:
+    ant-admin {{entity}} list | rg {{pattern}} | fzf --prompt="{{entity}}/{{pattern}}: "
+
+# List workspaces for enterprise
+workspaces enterprise:
+    ant-admin workspaces list --enterprise={{enterprise}}
+# // End of Selection
 # choose:
 #     #!/usr/bin/env zsh
 #     CMD=$({{just_executable()}} --list --unsorted |
@@ -178,6 +209,42 @@ symlinks-status:
 # Remove all symlinks
 symlinks-unlink:
     ./scripts/setup-config-symlinks.sh unlink
+
+# -----------------------------------------------------------
+# ant
+# -----------------------------------------------------------
+
+[group('ant')]
+[no-cd]
+ant-sdk-clean:
+    dotnet clean
+
+[group('ant')]
+[no-cd]
+ant-sdk-restore:
+    dotnet restore
+
+[group('ant')]
+[no-cd]
+ant-sdk-build:
+    dotnet build
+
+[group('ant')]
+[no-cd]
+ant-sdk-test:
+    dotnet test --logger "console;verbosity=detailed"
+
+[group('ant')]
+[no-cd]
+ant-sdk-all: ant-sdk-clean ant-sdk-restore ant-sdk-build ant-sdk-test
+    @echo "ant-sdk-all"
+
+
+# -----------------------------------------------------------
+# utils
+# -----------------------------------------------------------
+
+# Follow @README.md instructions
 
 # # View specific tool documentation
 # docs tool:

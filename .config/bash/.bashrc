@@ -11,37 +11,37 @@
 # Homebrew
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
-# Volta (Node.js)
-export VOLTA_HOME="$HOME/.volta"
-export PATH="$VOLTA_HOME/bin:$PATH"
-
-# NPM Global
-export PATH="$HOME/.npm-global/bin:$PATH"
-
-# Cargo (Rust)
-[[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
-
-# GHCup (Haskell)
-[[ -f "$HOME/.ghcup/env" ]] && source "$HOME/.ghcup/env"
-
-# LM Studio
-export PATH="$PATH:$HOME/.lmstudio/bin"
-
-# Atuin (Shell History)
-[[ -f "$HOME/.atuin/bin/env" ]] && source "$HOME/.atuin/bin/env"
-
-# FZF
-if [[ ! "$PATH" == */opt/homebrew/opt/fzf/bin* ]]; then
-	PATH="${PATH:+${PATH}:}/opt/homebrew/opt/fzf/bin"
-fi
+# # Volta (Node.js)
+# export VOLTA_HOME="$HOME/.volta"
+# export PATH="$VOLTA_HOME/bin:$PATH"
+#
+# # NPM Global
+# export PATH="$HOME/.npm-global/bin:$PATH"
+#
+# # Cargo (Rust)
+# [[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
+#
+# # GHCup (Haskell)
+# [[ -f "$HOME/.ghcup/env" ]] && source "$HOME/.ghcup/env"
+#
+# # LM Studio
+# export PATH="$PATH:$HOME/.lmstudio/bin"
+#
+# # Atuin (Shell History)
+# [[ -f "$HOME/.atuin/bin/env" ]] && source "$HOME/.atuin/bin/env"
+#
+# # FZF
+# if [[ ! "$PATH" == */opt/homebrew/opt/fzf/bin* ]]; then
+# 	PATH="${PATH:+${PATH}:}/opt/homebrew/opt/fzf/bin"
+# fi
 eval "$(fzf --bash)"
-
-# Direnv
+#
+# # Direnv
 eval "$(direnv hook bash)"
-
-# Custom path utilities
-[[ -f "$HOME/.config/shell/path_utils.sh" ]] && source "$HOME/.config/shell/path_utils.sh"
-
+#
+# # Custom path utilities
+# [[ -f "$HOME/.config/shell/path_utils.sh" ]] && source "$HOME/.config/shell/path_utils.sh"
+#
 # ============================================================================
 # COLORS AND LOGGING
 # ============================================================================
@@ -72,6 +72,8 @@ is_linux() { [[ "$(uname -s)" == "Linux" ]]; }
 # Task Master
 alias tm='task-master'
 alias taskmaster='task-master'
+alias j="just"
+alias .j='just --justfile ~/dotfiles/justfile --working-directory .'
 
 # Docker shortcuts
 alias dps='docker ps'
