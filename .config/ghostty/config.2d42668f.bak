@@ -95,4 +95,3 @@ keybind = super+enter=toggle_fullscreen
 # keybind = ctrl+t>h=previous_tab
 # keybind = ctrl+t>l=next_tab
 # keybind = ctrl+t>d=close_tab
-keybind = shift+enter=text:\n

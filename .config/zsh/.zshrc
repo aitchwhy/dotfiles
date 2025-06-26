@@ -401,6 +401,18 @@ function cp_repo() {
     "$FROM_DIR" ~/src/ant/"$(basename "$FROM_DIR")"
 }
 
+function generate_ssh() {
+    echo "Generating new SSH key..."
+    ssh-keygen -t ed25519 -C "$1" -f ~/.ssh/id_ed25519_new
+
+    echo -e "\n=== Copy these to Bitwarden ===\n"
+    echo "PRIVATE KEY:"
+    cat ~/.ssh/id_ed25519_new
+    echo -e "\nPUBLIC KEY:"
+    cat ~/.ssh/id_ed25519_new.pub
+}
+
+
 function cp_repos() {
   local selected_dirs
 

@@ -29,8 +29,8 @@ prd.txt
 *.log
 *.sqlite
 
-data/
-!schemas/data/
+# data/
+# !schemas/data/
 
 #-------------------------------------------------------------------------------
 # OS-generated files
@@ -167,14 +167,5 @@ tasks/
 
 **/.claude/settings.local.json
 
-**/.claude/settings.local.json
-
-**/.claude/settings.local.json
-
-**/.claude/settings.local.json
-
-**/.claude/settings.local.json
-
-**/.claude/settings.local.json
 
 **/.claude/settings.local.json
