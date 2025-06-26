@@ -1,5 +1,5 @@
 theme: Cobalt
 sort:
     by: RESTARTS
-    isReversed: true
+    isReversed: false
 disable_exit_confirmation: false

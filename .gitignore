@@ -118,3 +118,4 @@ user.env
 docs/repomix-output.xml
 .config/raycast/extensions/**/*.js.map
 .config/raycast/extensions/**/*.js
+.config/configstore/update-notifier-@google/gemini-cli.json
