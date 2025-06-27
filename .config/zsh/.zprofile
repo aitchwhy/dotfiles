@@ -50,6 +50,7 @@ export VISUAL="$EDITOR"
 # export PAGER="less -FRX"
 export PAGER="bat --paging=always"
 
+
 # Remove duplicate entries from PATH
 # typeset -U path PATH
 typeset -U path PATH

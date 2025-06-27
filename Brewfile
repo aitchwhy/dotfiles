@@ -260,3 +260,10 @@ cask "onlook"
 # 4. To prune things later:   brew bundle cleanup --force --file <path>
 #
 # Happy brewing! 🍺
+brew "libmagic"
+brew "act"
+cask "setapp"
+
+# mas "1355679052"
+
+brew "bat-extras"

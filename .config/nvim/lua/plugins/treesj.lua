@@ -15,16 +15,16 @@ return {
     "Wansmer/treesj",
     keys = {
       "<space>j",
-      -- "<space>m",
+      "<space>m",
+      "<space>s",
     },
-    -- dependencies = { "nvim-treesitter/nvim-treesitter" }, -- if you install parsers with `nvim-treesitter`
+    dependencies = { "nvim-treesitter/nvim-treesitter" }, -- if you install parsers with `nvim-treesitter`
     config = function()
       require("treesj").setup({
         --[[ your config ]]
-        --return {
-        --incremental_selection = {
       })
     end,
+
     opts = {
       enable = true,
       keymaps = {

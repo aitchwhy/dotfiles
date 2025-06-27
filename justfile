@@ -10,27 +10,47 @@ set dotenv-load
 set positional-arguments
 set fallback
 
-# Enterprise UID constants
-ENTERPRISE_ANTERIOR := "ent_mVq8yFqJiH4PqLZ88FPuq"
-ENTERPRISE_HEALTHHELP := "ent_FlksH-cwodheUuFTTcoJU"
-ENTERPRISE_MEDWATCH := "ent_4KPq47Ht8IXiRpDY-sBEt"
-ENTERPRISE_MRIOA := "ent_FR0qo7gbvcqsjPYDMz6ho"
-ENTERPRISE_TEST := "ent_l68cu7hn4SH4Gnvq5HbFx"
-ENTERPRISE_DEMO := "ent_QYYEW-88xLPA5qr5uvrFy"
-
-
-# Default recipe - show available commands
 # Default recipe - show available commands
 default:
     @just --list
 
-# List all enterprises
-enterprises:
-    @ant-admin enterprises list
+choose:
+    @just --choose
 
-# List all users
-users:
-    @ant-admin users list
+# -----------------------------------------------------------
+# System management
+# -----------------------------------------------------------
+
+# Check for missing dependencies
+check-deps:
+    @echo "=== Checking Dependencies ==="
+    @which git >/dev/null || echo "Missing: git"
+    @which zsh >/dev/null || echo "Missing: zsh"
+    @which brew >/dev/null || echo "Missing: brew"
+    @which nvim >/dev/null || echo "Missing: nvim"
+    @which starship >/dev/null || echo "Missing: starship"
+    @which yazi >/dev/null || echo "Missing: yazi"
+    @which just >/dev/null || echo "Missing: just"
+
+# List all changed files since last commit
+changed:
+    @git status -s
+
+# Reload shell configuration
+reload:
+    @exec zsh
+
+# Show system information
+sysinfo:
+    @echo "=== System Information ==="
+    @echo "OS: $(uname -s) $(uname -r)"
+    @echo "Architecture: $(uname -m)"
+    @echo "Hostname: $(hostname)"
+    @echo "User: $(whoami)"
+    @echo "Shell: $SHELL"
+    @echo "Terminal: $TERM"
+    @echo "Directory: $(pwd)"
+    @echo "Date: $(date)"
 
 # Interactive selection pipeline: enterprise -> user -> workspace
 ant-admin-fzf:
@@ -52,74 +72,56 @@ ant-admin-fzf:
     echo "Selected: $ENTERPRISE | $USER | $WORKSPACE"
     echo "Usage: just create-key $USER $ENTERPRISE $WORKSPACE [name] [role]"
 
-# Create API key with selected values
-create-key user enterprise workspace name role="ADMIN":
-    ant-admin user addmachine -u {{user}} -e {{enterprise}} -w {{workspace}} -r {{role}} -n "{{name}}"
+# -----------------------------------------------------------
+# Documentation
+# -----------------------------------------------------------
 
-# Fuzzy search entities
-find entity="users":
-    ant-admin {{entity}} list | fzf --prompt="{{entity}}: "
+# View main README
+readme:
+    @glow README.md
 
-# Search with pattern
-find-by entity pattern:
-    ant-admin {{entity}} list | rg {{pattern}} | fzf --prompt="{{entity}}/{{pattern}}: "
-
-# List workspaces for enterprise
-workspaces enterprise:
-    ant-admin workspaces list --enterprise={{enterprise}}
-# // End of Selection
-# choose:
-#     #!/usr/bin/env zsh
-#     CMD=$({{just_executable()}} --list --unsorted |
-#           grep -v "^_" |
-#           sort |
-#           fzf --height=40% \
-#               --reverse \
-#               --border \
-#               --header="Select a command to run" \
-#               --preview="echo \"Command: {1}\nDescription: {2}\"" \
-#               --preview-window=up:2:wrap)
-#
-#     if [[ -n "$CMD" ]]; then
-#         CMDNAME=$(echo "$CMD" | awk '{print $1}')
-#         echo "\033[1;33mRunning: just $CMDNAME\033[0m"
-#         {{just_executable()}} $CMDNAME
-#     else
-#         echo "No command selected"
-#     fi
-
-
+# View PRD (Product Requirements Document)
+prd:
+    @glow PRD.md
 
 # -----------------------------------------------------------
-# # Core system commands
-# # -----------------------------------------------------------
-#
-# # Show dotfiles status and info
-# status:
-#     @echo "=== Dotfiles Status ==="
-#     @echo "Repository: $(pwd)"
-#     @echo "Configuration: $HOME/.config"
-#     @echo "Last update: $(stat -f '%Sm' VERSION.md)"
-#     @git -C "$(pwd)" status -s
-#
-# # Update dotfiles repository
-# update:
-#     @echo "=== Updating Dotfiles ==="
-#     @git pull
-#     @./scripts/setup.sh --update
-#     @echo "Updating VERSION.md with current timestamp..."
-#     @sed -i '' "s/Date: .*/Date: $(date +'%Y-%m-%d')/" VERSION.md
-#
-# # Run setup script with default options
-# setup:
-#     @echo "=== Setting Up Dotfiles ==="
-#     @./scripts/setup.sh
-#
-# # Run setup script in dry-run mode
-# dry-run:
-#     @echo "=== Dry Run Setup ==="
-#     @./scripts/setup.sh --dry-run
-#
+# ant
+# -----------------------------------------------------------
+
+[group('ant sdk')]
+[no-cd]
+ant-sdk-clean:
+    dotnet clean
+
+[group('ant sdk')]
+[no-cd]
+ant-sdk-restore:
+    dotnet restore
+
+[group('ant sdk')]
+[no-cd]
+ant-sdk-build:
+    dotnet build
+
+[group('ant sdk')]
+[no-cd]
+ant-sdk-test:
+    dotnet test --logger "console;verbosity=detailed"
+
+[group('ant sdk')]
+[no-cd]
+ant-sdk-sample-app appDir="SampleApp":
+    dotnet run --project {{appDir}} -- --sample-cases=should-error-corrupted-clinical
+    dotnet test --logger "console;verbosity=detailed"
+
+[group('ant sdk')]
+[no-cd]
+ant-sdk-all: ant-sdk-clean ant-sdk-restore ant-sdk-build ant-sdk-test
+    @echo "ant-sdk-all"
+
+
+
+
 # -----------------------------------------------------------
 # Homebrew management
 # -----------------------------------------------------------
@@ -140,7 +142,7 @@ workspaces enterprise:
 #     @brew update
 #     @brew upgrade
 #     @brew cleanup
-#
+
 # # Create/update Brewfile from currently installed packages
 # dump:
 #     @echo "=== Creating Brewfile from Installed Packages ==="
@@ -150,95 +152,6 @@ workspaces enterprise:
 # outdated:
 #     @echo "=== Checking for Outdated Packages ==="
 #     @brew outdated
-
-# -----------------------------------------------------------
-# System management
-# -----------------------------------------------------------
-
-# Check for missing dependencies
-# check-deps:
-#     @echo "=== Checking Dependencies ==="
-#     @which git >/dev/null || echo "Missing: git"
-#     @which zsh >/dev/null || echo "Missing: zsh"
-#     @which brew >/dev/null || echo "Missing: brew"
-#     @which nvim >/dev/null || echo "Missing: nvim"
-#     @which starship >/dev/null || echo "Missing: starship"
-#     @which yazi >/dev/null || echo "Missing: yazi"
-#     @which just >/dev/null || echo "Missing: just"
-#
-# # List all changed files since last commit
-# changed:
-#     @git status -s
-#
-# # Reload shell configuration
-# reload:
-#     @exec zsh
-#
-# # Show system information
-# sysinfo:
-#     @echo "=== System Information ==="
-#     @echo "OS: $(uname -s) $(uname -r)"
-#     @echo "Architecture: $(uname -m)"
-#     @echo "Hostname: $(hostname)"
-#     @echo "User: $(whoami)"
-#     @echo "Shell: $SHELL"
-#     @echo "Terminal: $TERM"
-#     @echo "Directory: $(pwd)"
-#     @echo "Date: $(date)"
-#
-# -----------------------------------------------------------
-# Documentation
-# -----------------------------------------------------------
-
-# View main README
-readme:
-    @glow README.md
-
-# View PRD (Product Requirements Document)
-prd:
-    @glow PRD.md
-
-# Setup config symlinks
-symlinks:
-    ./scripts/setup-config-symlinks.sh setup
-
-# Check symlink status
-symlinks-status:
-    ./scripts/setup-config-symlinks.sh status
-
-# Remove all symlinks
-symlinks-unlink:
-    ./scripts/setup-config-symlinks.sh unlink
-
-# -----------------------------------------------------------
-# ant
-# -----------------------------------------------------------
-
-[group('ant')]
-[no-cd]
-ant-sdk-clean:
-    dotnet clean
-
-[group('ant')]
-[no-cd]
-ant-sdk-restore:
-    dotnet restore
-
-[group('ant')]
-[no-cd]
-ant-sdk-build:
-    dotnet build
-
-[group('ant')]
-[no-cd]
-ant-sdk-test:
-    dotnet test --logger "console;verbosity=detailed"
-
-[group('ant')]
-[no-cd]
-ant-sdk-all: ant-sdk-clean ant-sdk-restore ant-sdk-build ant-sdk-test
-    @echo "ant-sdk-all"
-
 
 # -----------------------------------------------------------
 # utils

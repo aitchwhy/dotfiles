@@ -6,7 +6,7 @@
 -- -- Add any additional options here
 --
 -- -- LazyVim 8.x specific global settings
-vim.g.lazyvim_picker = "fzf" -- Use fzf-lua as the picker
+-- vim.g.lazyvim_picker = "fzf" -- Use fzf-lua as the picker
 vim.g.lazyvim_cmp = "blink.cmp" -- Use blink.cmp as the completion engine
 --
 -- -- Disable providers you don't need for better startup performance
@@ -40,7 +40,7 @@ vim.opt.termguicolors = true -- Enable 24-bit RGB colors
 -- vim.opt.inccommand = "split" -- Preview substitutions
 --
 -- -- System integration
--- vim.opt.clipboard = "unnamedplus" -- Use system clipboard
+vim.opt.clipboard = "unnamedplus" -- Use system clipboard
 -- vim.opt.mouse = "a" -- Enable mouse in all modes
 -- vim.opt.updatetime = 100 -- Faster completion
 -- vim.opt.timeout = true -- Enable timeout for mappings
@@ -59,25 +59,25 @@ vim.g.autoformat = true
 --
 -- -- Snacks animations
 -- -- Set to `false` to globally disable all snacks animations
--- vim.g.snacks_animate = true
+vim.g.snacks_animate = false
 --
 -- -- LazyVim picker to use.
 -- -- Can be one of: telescope, fzf
 -- -- Leave it to "auto" to automatically use the picker
 -- -- enabled with `:LazyExtras`
--- vim.g.lazyvim_picker = "auto"
+vim.g.lazyvim_picker = "fzf"
 --
 -- -- LazyVim completion engine to use.
 -- -- Can be one of: nvim-cmp, blink.cmp
 -- -- Leave it to "auto" to automatically use the completion engine
 -- -- enabled with `:LazyExtras`
--- vim.g.lazyvim_cmp = "auto"
+vim.g.lazyvim_cmp = "blink.cmp"
 --
 -- -- if the completion engine supports the AI source,
 -- -- use that instead of inline suggestions
 -- vim.g.ai_cmp = true
-vim.g.ai_cmp = true
-vim.g.loaded_perl_provider = 0
+-- vim.g.ai_cmp = true
+-- vim.g.loaded_perl_provider = 0
 
 -- TODO: fix path
 -- vim.g.ruby_host_prog = vim.fn.expand("$HOME/.gem/ruby/3.4.0/bin/neovim-ruby-host")
@@ -90,7 +90,7 @@ vim.g.loaded_perl_provider = 0
 
 -- vim.g.python3_host_prog =
 
-vim.ui.select = "Snacks.picker.select"
+-- vim.ui.select = "Snacks.picker.select"
 
 --
 -- -- LazyVim root dir detection
@@ -104,7 +104,7 @@ vim.ui.select = "Snacks.picker.select"
 -- -- This sets `vim.o.shell` and does some additional configuration for:
 -- -- * pwsh
 -- -- * powershell
--- -- LazyVim.terminal.setup("pwsh")
+-- LazyVim.terminal.setup("pwsh")
 --
 -- -- Set LSP servers to be ignored when used with `util.root.detectors.lsp`
 -- -- for detecting the LSP root
@@ -117,7 +117,7 @@ vim.ui.select = "Snacks.picker.select"
 -- -- You can disable this for a buffer by setting `vim.b.trouble_lualine = false`
 -- vim.g.trouble_lualine = true
 --
--- local opt = vim.opt
+local opt = vim.opt
 --
 -- opt.autowrite = true -- Enable auto write
 -- -- only set clipboard if not in ssh, to make sure the OSC 52
@@ -140,14 +140,14 @@ vim.ui.select = "Snacks.picker.select"
 -- opt.formatexpr = "v:lua.require'lazyvim.util'.format.formatexpr()"
 -- opt.formatoptions = "jcroqlnt" -- tcqj
 -- opt.grepformat = "%f:%l:%c:%m"
--- opt.grepprg = "rg --vimgrep"
+opt.grepprg = "rg --vimgrep"
 -- opt.ignorecase = true -- Ignore case
 -- opt.inccommand = "nosplit" -- preview incremental substitute
 -- opt.jumpoptions = "view"
 -- opt.laststatus = 3 -- global statusline
 -- opt.linebreak = true -- Wrap lines at convenient points
 -- opt.list = true -- Show some invisible characters (tabs...
--- opt.mouse = "a" -- Enable mouse mode
+vim.opt.mouse = "a" -- Enable mouse mode
 -- opt.number = true -- Print line number
 -- opt.pumblend = 10 -- Popup blend
 -- opt.pumheight = 10 -- Maximum number of entries in a popup
@@ -169,7 +169,6 @@ vim.ui.select = "Snacks.picker.select"
 -- opt.splitright = true -- Put new windows right of current
 -- opt.statuscolumn = [[%!v:lua.require'snacks.statuscolumn'.get()]]
 -- opt.tabstop = 2 -- Number of spaces tabs count for
--- opt.termguicolors = true -- True color support
 -- opt.timeoutlen = vim.g.vscode and 1000 or 300 -- Lower than default (1000) to quickly trigger which-key
 -- opt.undofile = true
 -- opt.undolevels = 10000

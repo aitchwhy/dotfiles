@@ -6,6 +6,8 @@ return {
     ---@type neotree.Config?
     opts = {
       -- fill any relevant options here
+      bind_to_cwd = true,
+      follow_current_file = { enabled = true },
     },
   },
 }

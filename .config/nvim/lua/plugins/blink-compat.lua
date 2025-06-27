@@ -1,5 +1,0 @@
-return {
-  {
-    "saghen/blink.compat",
-  },
-}

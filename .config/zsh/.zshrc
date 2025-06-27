@@ -79,6 +79,11 @@ function path_add() {
     return 1
 }
 
+path_add /opt/homebrew/opt/ruby/bin
+export LDFLAGS="-L/opt/homebrew/opt/ruby/lib"
+export CPPFLAGS="-I/opt/homebrew/opt/ruby/include"
+
+
 # path_add "$CFS/npm-global/bin" # Add npm global packages to PATH
 # path_add "$HOME/.volta/bin" # Add npm global packages to PATH
 alias cs="claude-squad"
@@ -362,9 +367,15 @@ ff() {
 has_command starship && eval "$(starship init zsh)"
 has_command zoxide && eval "$(zoxide init zsh)"
 
+has_command luarocks && eval "$(luarocks path --bin)"
+has_command direnv && eval "$(direnv hook zsh)"
+
 # Atuin (history management)
 # [[ -f "$HOME/.atuin/bin/env" ]] && source "$HOME/.atuin/bin/env"
-eval "$(atuin init zsh)"
+has_command atuin && eval "$(atuin init zsh)"
+
+
+
 
 # Load utility functions if available
 [[ -f "$SCRIPTS/utils.zsh" ]] && source "$SCRIPTS/utils.zsh"
@@ -397,6 +408,7 @@ function cp_repo() {
     --exclude=".obsidian" \
     --exclude=".ruff_cache" \
     --exclude=".venv" \
+    --exclude=".DS*" \
     --progress \
     "$FROM_DIR" ~/src/ant/"$(basename "$FROM_DIR")"
 }
@@ -411,7 +423,6 @@ function generate_ssh() {
     echo -e "\nPUBLIC KEY:"
     cat ~/.ssh/id_ed25519_new.pub
 }
-
 
 function cp_repos() {
   local selected_dirs
@@ -439,7 +450,6 @@ function ant-npm-strict-install() {
     npm install --strict-peer-deps true --prefer-dedupe true
 }
 
-has_command direnv && eval "$(direnv hook zsh)"
 
 # ========================================================================
 # Cleanup

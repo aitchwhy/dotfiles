@@ -1,18 +1,28 @@
 #!/usr/bin/env zsh
+################################################################################
+# Combined ZSH Utilities - Unified CLI Framework & Utilities
+################################################################################
+# This file combines utility functions, CLI frameworks, and the Anterior
+# monorepo helper into a single comprehensive utilities file.
+#
+# USAGE: Source this file in your .zprofile or other zsh configuration
+# Recommended: source "${ZDOTDIR:-$HOME/dotfiles}/scripts/combined-utils.zsh"
 
 ################################################################################
-# ZSH Functions Collection - Unified CLI Framework
+# ANSI COLOR CODES
 ################################################################################
-
-# Color definitions
-readonly BLUE='\033[0;34m'
-readonly GREEN='\033[0;32m'
-readonly YELLOW='\033[1;33m'
-readonly RED='\033[0;31m'
-readonly RESET='\033[0m'
+typeset -g RESET="\033[0m"
+typeset -g BLACK="\033[0;30m"
+typeset -g RED="\033[0;31m"
+typeset -g GREEN="\033[0;32m"
+typeset -g YELLOW="\033[0;33m"
+typeset -g BLUE="\033[0;34m"
+typeset -g MAGENTA="\033[0;35m"
+typeset -g CYAN="\033[0;36m"
+typeset -g WHITE="\033[0;37m"
 
 ################################################################################
-# CORE LOGGING
+# CORE LOGGING FUNCTIONS
 ################################################################################
 
 log_info() { printf "${BLUE}[INFO]${RESET} %s\n" "$*"; }
@@ -20,14 +30,14 @@ log_success() { printf "${GREEN}[SUCCESS]${RESET} %s\n" "$*"; }
 log_warn() { printf "${YELLOW}[WARNING]${RESET} %s\n" "$*" >&2; }
 log_error() { printf "${RED}[ERROR]${RESET} %s\n" "$*" >&2; }
 
-# Aliases
+# Aliases for different naming conventions
 info() { log_info "$@"; }
 success() { log_success "$@"; }
 warn() { log_warn "$@"; }
 error() { log_error "$@"; }
 
 ################################################################################
-# SYSTEM DETECTION
+# SYSTEM DETECTION & ENVIRONMENT
 ################################################################################
 
 has_command() { command -v "$1" &>/dev/null; }
@@ -51,7 +61,6 @@ get_macos_version() {
 _cli_framework() {
   local namespace="$1"
   local cmd_name="$2"
-  echo "namespace : ${namespace} and ${cmd_name}"
   shift 2
 
   # Get command registry
@@ -179,36 +188,17 @@ _fzf_select() {
 }
 
 ################################################################################
-# IDE/EDITOR COMMANDS
+# FILE & DIRECTORY OPERATIONS
 ################################################################################
 
-cursor_ext_import() {
-  local ext_file="${DOTFILES}/config/vscode/extensions.txt"
-  [[ ! -f "$ext_file" ]] && { error "Extensions file not found: $ext_file"; return 1; }
-
-  while read extension; do
-    cursor --install-extension "$extension"
-  done < "$ext_file"
+# Create a directory if it doesn't exist
+ensure_dir() {
+  local dir="$1"
+  if [[ ! -d "$dir" ]]; then
+    mkdir -p "$dir"
+    log_success "Created directory: $dir"
+  fi
 }
-
-_ide_volta_list() {
-  has_command volta || { error "Volta not installed"; return 1; }
-  volta list --format=plain
-}
-
-# IDE command registry
-IDE_COMMANDS=(
-  "cursor-ext::Import Cursor/VSCode extensions:cursor_ext_import"
-  "volta-list:volta,v:List Volta managed tools:_ide_volta_list"
-)
-
-IDE_HELP=$(_cli_generate_help "ide" "IDE and editor management" "${IDE_COMMANDS[@]}")
-
-ide() { _cli_framework IDE ide "$@"; }
-
-################################################################################
-# FILE OPERATIONS
-################################################################################
 
 # Git repository copy - multiple implementations unified
 cp_repo() {
@@ -274,203 +264,84 @@ FILE_HELP=$(_cli_generate_help "file" "File operations" "${FILE_COMMANDS[@]}")
 file() { _cli_framework FILE file "$@"; }
 
 ################################################################################
-# SYSTEM UTILITIES
+# PATH MANAGEMENT FUNCTIONS
 ################################################################################
 
-_sys_env() {
-  local pattern="$1"
-  echo "======== env vars =========="
-  if [[ -z "$pattern" ]]; then
-    printenv | sort | awk -F= '{ printf "%-30s %s\n", $1, $2 }'
+# Add a directory to PATH if it exists and isn't already in PATH
+path_add() {
+  local dir="$1"
+  if [[ -d "$dir" ]] && [[ ":$PATH:" != *":$dir:"* ]]; then
+    export PATH="$dir:$PATH"
+    return 0
+  fi
+  return 1
+}
+
+# Remove a directory from PATH
+path_remove() {
+  local dir="$1"
+  if [[ ":$PATH:" == *":$dir:"* ]]; then
+    export PATH=${PATH//:$dir:/:}  # Remove middle
+    export PATH=${PATH/#$dir:/}    # Remove beginning
+    export PATH=${PATH/%:$dir/}    # Remove end
+    return 0
+  fi
+  return 1
+}
+
+_path_add() {
+  [[ -z "$1" ]] && { echo "Usage: path add <dir>"; return 1; }
+  local dir="$1"
+
+  if [[ -d "$dir" ]] && [[ ":$PATH:" != *":$dir:"* ]]; then
+    export PATH="$dir:$PATH"
+    success "Added to PATH: $dir"
   else
-    printenv | sort | grep -i "$pattern" | awk -F= '{ printf "%-30s %s\n", $1, $2 }'
+    warn "Directory not added (doesn't exist or already in PATH)"
   fi
-  echo "============================"
 }
 
-_sys_hidden() {
-  local current=$(defaults read com.apple.finder AppleShowAllFiles)
-  defaults write com.apple.finder AppleShowAllFiles $((!current))
-  killall Finder
-  echo "Finder hidden files: $((!current))"
+_path_remove() {
+  [[ -z "$1" ]] && { echo "Usage: path remove <dir>"; return 1; }
+  local dir="$1"
+
+  if [[ ":$PATH:" == *":$dir:"* ]]; then
+    export PATH=${PATH//:$dir:/:}
+    export PATH=${PATH/#$dir:/}
+    export PATH=${PATH/%:$dir/}
+    success "Removed from PATH: $dir"
+  else
+    warn "Directory not in PATH"
+  fi
 }
 
-_sys_ql() {
-  [[ -z "$1" ]] && { echo "Usage: sys ql <file>"; return 1; }
-  qlmanage -p "$@" &>/dev/null
+_path_list() {
+  echo $PATH | tr ':' '\n' | nl | awk '{printf "  %2d: %s\n", $1, $2}'
 }
 
-_sys_killport() {
-  local port="$1"
-  [[ -z "$port" ]] && { echo "Usage: sys killport <port>"; return 1; }
-
-  local pid=$(lsof -i ":$port" | awk 'NR!=1 {print $2}')
-  [[ -z "$pid" ]] && { echo "No process found on port $port"; return 1; }
-
-  echo "Killing process(es) on port $port: $pid"
-  echo "$pid" | xargs kill -9
-  success "Process(es) killed"
-}
-
-_sys_man() {
-  [[ -z "$1" ]] && { echo "Usage: sys man <command>"; return 1; }
-  # MANPAGER="sh -c 'col -bx | bat -l man -p'" man "$@"
-}
-
-_sys_ports() { sudo lsof -iTCP -sTCP:LISTEN -n -P; }
-_sys_disk() { df -h; }
-_sys_cpu() { top -l 1 | grep -E "^CPU"; }
-_sys_mem() { vm_stat | perl -ne '/page size of (\d+)/ and $size=$1; /Pages\s+([^:]+)[^\d]+(\d+)/ and printf("%-16s % 16.2f MB\n", "$1:", $2 * $size / 1048576);'; }
-_sys_path() { echo "PATH components:"; echo $PATH | tr ':' '\n' | nl | awk '{printf "  %2d: %s\n", $1, $2}'; }
-_sys_ip() { echo "Public IP: $(curl -s https://ipinfo.io/ip)"; echo "Local IP: $(ipconfig getifaddr en0)"; }
-
-SYS_COMMANDS=(
-  "env:env-grep:Display environment variables:_sys_env"
-  "hidden:toggle-hidden:Toggle hidden files in Finder:_sys_hidden"
-  "ql:quick-look:Quick Look a file:_sys_ql"
-  "killport:kill-port,kp:Kill process on port:_sys_killport"
-  "man:batman:Man pages with syntax highlighting:_sys_man"
-  "ports:listening:Show all listening ports:_sys_ports"
-  "disk:space,df:Check disk space usage:_sys_disk"
-  "cpu::Show CPU usage:_sys_cpu"
-  "mem:memory:Show memory usage:_sys_mem"
-  "path::List PATH entries:_sys_path"
-  "ip:myip:Show IP addresses:_sys_ip"
+PATH_COMMANDS=(
+  "add:a:Add directory to PATH:_path_add"
+  "remove:rm:Remove directory from PATH:_path_remove"
+  "list:ls,l:List PATH entries:_path_list"
 )
 
-SYS_HELP=$(_cli_generate_help "sys" "System utilities" "${SYS_COMMANDS[@]}")
+PATH_HELP=$(_cli_generate_help "path" "PATH management" "${PATH_COMMANDS[@]}")
 
-sys() { _cli_framework SYS sys "$@"; }
-
-################################################################################
-# MACOS DEFAULTS
-################################################################################
-#
-# _defaults_all() {
-#   info "Applying all macOS preferences..."
-#   _defaults_keyboard
-#   _defaults_finder
-#   _defaults_dock
-#   _defaults_trackpad
-#   success "All macOS preferences applied"
-# }
-#
-# _defaults_keyboard() {
-#   defaults write NSGlobalDomain KeyRepeat -int 2
-#   defaults write NSGlobalDomain InitialKeyRepeat -int 15
-#   defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
-#   success "Keyboard preferences applied"
-# }
-#
-# _defaults_finder() {
-#   defaults write NSGlobalDomain AppleShowAllExtensions -bool true
-#   defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
-#   defaults write com.apple.finder AppleShowAllFiles -bool true
-#   defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
-#   defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
-#   defaults write com.apple.finder ShowPathbar -bool true
-#   defaults write com.apple.finder ShowStatusBar -bool true
-#   defaults write com.apple.finder _FXSortFoldersFirst -bool true
-#   killall Finder &>/dev/null || true
-#   success "Finder preferences applied"
-# }
-#
-# _defaults_dock() {
-#   defaults write com.apple.dock autohide -bool true
-#   defaults write com.apple.dock autohide-delay -float 0
-#   defaults write com.apple.dock show-recents -bool false
-#   killall Dock &>/dev/null || true
-#   success "Dock preferences applied"
-# }
-#
-# _defaults_trackpad() {
-#   defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
-#   success "Trackpad preferences applied"
-# }
-#
-# DEFAULTS_COMMANDS=(
-#   "apply:all:Apply all macOS preferences:_defaults_all"
-#   "keyboard:kb:Apply keyboard settings:_defaults_keyboard"
-#   "finder::Apply Finder settings:_defaults_finder"
-#   "dock::Apply Dock settings:_defaults_dock"
-#   "trackpad::Apply trackpad settings:_defaults_trackpad"
-# )
-#
-# DEFAULTS_HELP=$(_cli_generate_help "defaults" "macOS defaults management" "${DEFAULTS_COMMANDS[@]}")
-#
-# defaults() {
-#   # Pass through to system defaults for read/write
-#   if [[ "$1" == "write" ]] || [[ "$1" == "read" ]]; then
-#     command defaults "$@"
-#     return $?
-#   fi
-#   _cli_framework DEFAULTS defaults "$@"
-# }
-#
-# # Compatibility aliases
-# setup_macos_preferences() { _defaults_all; }
-# defaults_apply() { _defaults_all; }
+path() { _cli_framework PATH path "$@"; }
 
 ################################################################################
-# MAC APP STORE
+# HOMEBREW INSTALLATION & MANAGEMENT
 ################################################################################
 
-_mas_select() {
-  mas list | fzf --header="$1" | awk '{print $1}'
+# install brew if not exists
+install_brew() {
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 }
 
-_mas_install() {
-  local id="${1:-$(_mas_select "Select app to install")}"
-  [[ -z "$id" ]] && return 1
-  info "Installing Mac App Store app: $id"
-  mas install "$id"
+# uninstall brew
+uninstall_brew() {
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"
 }
-
-_mas_uninstall() {
-  local id="${1:-$(_mas_select "Select app to uninstall")}"
-  [[ -z "$id" ]] && return 1
-  local app_name=$(mas list | grep "^$id" | awk '{$1=""; print $0}' | xargs)
-  info "Uninstalling: $app_name"
-  osascript -e "tell application \"Finder\" to move application \"$app_name\" to trash"
-}
-
-_mas_info() {
-  local id="${1:-$(_mas_select "Select app for info")}"
-  [[ -z "$id" ]] && return 1
-  mas info "$id"
-}
-
-_mas_outdated() {
-  info "Outdated Mac App Store apps:"
-  mas outdated
-}
-
-_mas_upgrade() {
-  info "Upgrading all Mac App Store apps..."
-  mas upgrade
-}
-
-MAS_COMMANDS=(
-  "install:in,i:Install app from Mac App Store:_mas_install"
-  "uninstall:rm:Uninstall app:_mas_uninstall"
-  "info::Show app information:_mas_info"
-  "outdated::Show outdated apps:_mas_outdated"
-  "upgrade:up:Upgrade all apps:_mas_upgrade"
-)
-
-MAS_HELP=$(_cli_generate_help "mas" "Mac App Store management" "${MAS_COMMANDS[@]}")
-
-mas() {
-  if ! has_command mas; then
-    command mas "$@"
-    return $?
-  fi
-  _cli_framework MAS mas "$@"
-}
-
-################################################################################
-# HOMEBREW
-################################################################################
 
 brew_init() {
   has_command brew && return 0
@@ -666,7 +537,7 @@ BB_COMMANDS=(
 B_HELP=$(_cli_generate_help "b" "Homebrew management" "${B_COMMANDS[@]}")
 BB_HELP=$(_cli_generate_help "bb" "Brewfile management" "${BB_COMMANDS[@]}")
 
-unalias b
+unalias b 2>/dev/null
 function b() {
   if [[ $# -gt 0 ]] && ! [[ "$1" =~ ^(update|install|cask|remove|info|list|cleanup|fin|fcask|frm|help|up|in|i|rm|un|ls|clean|--help|-h)$ ]]; then
     command brew "$@"
@@ -677,11 +548,383 @@ function b() {
 
 bb() { _cli_framework BB bb "$@"; }
 
-# Compatibility function
-uninstall_brew() {
-  has_command brew || { warn "Homebrew is not installed"; return 1; }
-  info "Uninstalling Homebrew..."
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"
+# Setup Homebrew and install packages
+init_brew() {
+  info "Setting up Homebrew..."
+  has_command brew || install_brew
+  brew bundle install --verbose --file="$DOTFILES/Brewfile.core" --all --force
+}
+
+################################################################################
+# MACOS SYSTEM PREFERENCES
+################################################################################
+
+# Apply common macOS system preferences
+defaults_apply() {
+  if ! is_macos; then
+    log_error "Not running on macOS"
+    return 1
+  fi
+
+  log_info "Applying macOS preferences..."
+
+  # Keyboard settings
+  defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
+  defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+  defaults write NSGlobalDomain InitialKeyRepeat -int 15
+  defaults write NSGlobalDomain KeyRepeat -int 2
+
+  # File system behavior
+  defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+
+  # Dock settings
+  defaults write com.apple.dock autohide -bool true
+  defaults write com.apple.dock autohide-delay -float 0
+  defaults write com.apple.dock show-recents -bool false
+
+  # Trackpad settings
+  defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
+
+  # Finder settings
+  defaults write com.apple.finder AppleShowAllFiles -bool true
+  defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
+  defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
+  defaults write com.apple.finder ShowPathbar -bool true
+  defaults write com.apple.finder ShowStatusBar -bool true
+  defaults write com.apple.finder _FXSortFoldersFirst -bool true
+
+  # Restart affected applications
+  for app in "Finder" "Dock"; do
+    killall "$app" >/dev/null 2>&1 || true
+  done
+
+  log_success "macOS preferences applied"
+}
+
+################################################################################
+# CORE INSTALLATION FUNCTIONS
+################################################################################
+
+# Setup ZSH configuration
+init_zsh() {
+  info "Setting up ZSH configuration..."
+
+  # Use environment vars if set, fall back to internal vars if not
+  local zdotdir_src="${ZDOTDIR:-$DOTFILES/config/zsh}"
+
+  # Create .zshenv in home directory pointing to dotfiles
+  info "Creating .zshenv to point to dotfiles ZSH configuration"
+  cat >"$HOME/.zshenv" <<EOF
+# ZSH configuration bootstrapper
+# Auto-generated by dotfiles setup
+export ZDOTDIR="$zdotdir_src"
+[[ -f "$zdotdir_src/.zshenv" ]] && source "$zdotdir_src/.zshenv"
+EOF
+
+  chmod 644 "$HOME/.zshenv"
+  log_success "Created $HOME/.zshenv pointing to $zdotdir_src"
+}
+
+################################################################################
+# ANTERIOR MONOREPO CLI HELPER
+################################################################################
+# Works in three situations out-of-the-box:
+#   1. Inside `nix develop` – every `ant-*` binary is already on $PATH.
+#   2. Outside a dev-shell but **inside** the repo – falls back to
+#      `nix run .#<binary>` (so no global install needed).
+#   3. Any other directory – warns politely instead of exploding.
+
+# Config – customise if your repo layout is unusual
+readonly _ANT_FLAKE_ROOT=${ANT_FLAKE:-$(git -C "${0:a:h}" rev-parse --show-toplevel 2>/dev/null)}
+
+# All first-class binaries exposed by the flake that start with "ant-"
+local -a _ANT_BINARIES=(
+  ant-all-services
+  ant-system-prune
+  ant-check-1password
+  ant-build-docker
+  ant-build-host
+  ant-lint
+  ant-sync-cache
+  ant-admin
+  ant-npm-build-deptree
+)
+
+# Portable wrapper: run binary if on $PATH, else `nix run` from the repo root
+_ant_exec() {
+  local bin="$1"; shift
+  if command -v "$bin" &>/dev/null; then
+    "$bin" "$@"
+  elif [[ -d $_ANT_FLAKE_ROOT ]]; then
+    # Outside dev-shell – fallback to nix run (makes heavy use of the binary cache)
+    nix run "$_ANT_FLAKE_ROOT#$bin" -- "$@"
+  else
+    print -u2 "✖︎ ant: cannot find $bin and not inside the repo (set \$ANT_FLAKE)"
+    return 127
+  fi
+}
+
+# fzf picker
+ant_pick() {
+  if (( $+commands[fzf] == 0 )); then
+    print -u2 "fzf not installed – run \`brew install fzf\` or \`nix profile install nixpkgs#fzf\`"
+    return 1
+  fi
+  local selected=$(
+    printf '%s\n' "${_ANT_BINARIES[@]}" |
+    fzf --height 40% --reverse --border --prompt='ant ▸ '
+  )
+  [[ -n $selected ]] && _ant_exec "$selected" "$@"
+}
+
+# user-friendly alias that works in every shell
+alias antpick='ant_pick'
+
+# Port helper maps
+typeset -A ANT_PORTS=(
+  api_http                20101
+  api_admin               20102
+  api_grpc                20103
+  cortex_http             20201
+  user_grpc               20303
+  paop_grpc               20403
+  payment_integrity_grpc  20503
+  noodle_http             20601
+  noggin_http             20701
+  hello_world_http        20901
+  clinical_backend_http   21101
+  clinical_frontend_http  21201
+  gotenberg               3000
+  prefect                 4200
+  localstack              4566
+  redis                   6379
+  postgres                5432
+  dynamodb                8000
+)
+
+ant_ports_list() {
+  for k in ${(k)ANT_PORTS}; do
+    print -r -- "${ANT_PORTS[$k]}\t$k"
+  done | sort -n
+}
+alias antports='ant_ports_list'
+
+# Killer helpers
+_ant_lsof() {
+  command -v lsof &>/dev/null || { print -u2 "lsof missing"; return 1 }
+  lsof -Pn -i TCP:$1 -sTCP:LISTEN
+}
+_ant_kill_port() {
+  command -v lsof &>/dev/null || { print -u2 "lsof missing"; return 1 }
+  lsof -Pn -ti TCP:$1 | xargs -r kill -9
+}
+
+ant_kill() {
+  command -v fzf &>/dev/null || { print -u2 "fzf missing"; return 1 }
+  local sel=$(ant_ports_list | fzf --prompt='kill ▸ ' --with-nth=1,2)
+  [[ -z $sel ]] && return
+  _ant_kill_port "${sel%%	*}"
+}
+alias antkill='ant_kill'
+
+ant_kill_all() {
+  print "Killing all processes bound to known Anterior ports…"
+  for p in ${(v)ANT_PORTS}; do
+    _ant_kill_port $p
+  done
+}
+alias antkillall='ant_kill_all'
+
+# Main dispatcher
+ant() {
+  local cmd="$1"; shift
+
+  case "$cmd" in
+    ""|-h|--help|help)
+      cat <<'EOF'
+ant – Anterior monorepo helper
+
+Usage: ant <command> [args...]
+
+Built-in commands:
+  pick              Interactive picker for common ant-* binaries
+  ports             List canonical service ports
+  kill              Interactive killer (uses fzf)
+  killall           Kill all processes bound to any ANT_PORTS
+  ref               Print reference port table
+  env|genenv|s3|dynamo|sqs|service
+                    – see project README for details
+
+If <command> matches an ant-* binary name it is executed transparently.
+EOF
+      ;;
+
+    pick)      ant_pick "$@" ;;
+    ports)     ant_ports_list ;;
+    kill)      ant_kill ;;
+    killall)   ant_kill_all ;;
+    ref)       print "API 20101/2/3 …";;
+    # fallback: treat <cmd> as a binary (strip optional "ant-" prefix)
+    *)
+      local bin=$cmd
+      [[ $bin == ant-* ]] || bin="ant-$bin"
+      _ant_exec "$bin" "$@"
+      ;;
+  esac
+}
+
+################################################################################
+# IDE/EDITOR COMMANDS
+################################################################################
+
+cursor_ext_import() {
+  local ext_file="${DOTFILES}/config/vscode/extensions.txt"
+  [[ ! -f "$ext_file" ]] && { error "Extensions file not found: $ext_file"; return 1; }
+
+  while read extension; do
+    cursor --install-extension "$extension"
+  done < "$ext_file"
+}
+
+_ide_volta_list() {
+  has_command volta || { error "Volta not installed"; return 1; }
+  volta list --format=plain
+}
+
+# IDE command registry
+IDE_COMMANDS=(
+  "cursor-ext::Import Cursor/VSCode extensions:cursor_ext_import"
+  "volta-list:volta,v:List Volta managed tools:_ide_volta_list"
+)
+
+IDE_HELP=$(_cli_generate_help "ide" "IDE and editor management" "${IDE_COMMANDS[@]}")
+
+ide() { _cli_framework IDE ide "$@"; }
+
+################################################################################
+# SYSTEM UTILITIES
+################################################################################
+
+_sys_env() {
+  local pattern="$1"
+  echo "======== env vars =========="
+  if [[ -z "$pattern" ]]; then
+    printenv | sort | awk -F= '{ printf "%-30s %s\n", $1, $2 }'
+  else
+    printenv | sort | grep -i "$pattern" | awk -F= '{ printf "%-30s %s\n", $1, $2 }'
+  fi
+  echo "============================"
+}
+
+_sys_hidden() {
+  local current=$(defaults read com.apple.finder AppleShowAllFiles)
+  defaults write com.apple.finder AppleShowAllFiles $((!current))
+  killall Finder
+  echo "Finder hidden files: $((!current))"
+}
+
+_sys_ql() {
+  [[ -z "$1" ]] && { echo "Usage: sys ql <file>"; return 1; }
+  qlmanage -p "$@" &>/dev/null
+}
+
+_sys_killport() {
+  local port="$1"
+  [[ -z "$port" ]] && { echo "Usage: sys killport <port>"; return 1; }
+
+  local pid=$(lsof -i ":$port" | awk 'NR!=1 {print $2}')
+  [[ -z "$pid" ]] && { echo "No process found on port $port"; return 1; }
+
+  echo "Killing process(es) on port $port: $pid"
+  echo "$pid" | xargs kill -9
+  success "Process(es) killed"
+}
+
+_sys_man() {
+  [[ -z "$1" ]] && { echo "Usage: sys man <command>"; return 1; }
+  # MANPAGER="sh -c 'col -bx | bat -l man -p'" man "$@"
+}
+
+_sys_ports() { sudo lsof -iTCP -sTCP:LISTEN -n -P; }
+_sys_disk() { df -h; }
+_sys_cpu() { top -l 1 | grep -E "^CPU"; }
+_sys_mem() { vm_stat | perl -ne '/page size of (\d+)/ and $size=$1; /Pages\s+([^:]+)[^\d]+(\d+)/ and printf("%-16s % 16.2f MB\n", "$1:", $2 * $size / 1048576);'; }
+_sys_path() { echo "PATH components:"; echo $PATH | tr ':' '\n' | nl | awk '{printf "  %2d: %s\n", $1, $2}'; }
+_sys_ip() { echo "Public IP: $(curl -s https://ipinfo.io/ip)"; echo "Local IP: $(ipconfig getifaddr en0)"; }
+
+SYS_COMMANDS=(
+  "env:env-grep:Display environment variables:_sys_env"
+  "hidden:toggle-hidden:Toggle hidden files in Finder:_sys_hidden"
+  "ql:quick-look:Quick Look a file:_sys_ql"
+  "killport:kill-port,kp:Kill process on port:_sys_killport"
+  "man:batman:Man pages with syntax highlighting:_sys_man"
+  "ports:listening:Show all listening ports:_sys_ports"
+  "disk:space,df:Check disk space usage:_sys_disk"
+  "cpu::Show CPU usage:_sys_cpu"
+  "mem:memory:Show memory usage:_sys_mem"
+  "path::List PATH entries:_sys_path"
+  "ip:myip:Show IP addresses:_sys_ip"
+)
+
+SYS_HELP=$(_cli_generate_help "sys" "System utilities" "${SYS_COMMANDS[@]}")
+
+sys() { _cli_framework SYS sys "$@"; }
+
+################################################################################
+# MAC APP STORE
+################################################################################
+
+_mas_select() {
+  mas list | fzf --header="$1" | awk '{print $1}'
+}
+
+_mas_install() {
+  local id="${1:-$(_mas_select "Select app to install")}"
+  [[ -z "$id" ]] && return 1
+  info "Installing Mac App Store app: $id"
+  mas install "$id"
+}
+
+_mas_uninstall() {
+  local id="${1:-$(_mas_select "Select app to uninstall")}"
+  [[ -z "$id" ]] && return 1
+  local app_name=$(mas list | grep "^$id" | awk '{$1=""; print $0}' | xargs)
+  info "Uninstalling: $app_name"
+  osascript -e "tell application \"Finder\" to move application \"$app_name\" to trash"
+}
+
+_mas_info() {
+  local id="${1:-$(_mas_select "Select app for info")}"
+  [[ -z "$id" ]] && return 1
+  mas info "$id"
+}
+
+_mas_outdated() {
+  info "Outdated Mac App Store apps:"
+  mas outdated
+}
+
+_mas_upgrade() {
+  info "Upgrading all Mac App Store apps..."
+  mas upgrade
+}
+
+MAS_COMMANDS=(
+  "install:in,i:Install app from Mac App Store:_mas_install"
+  "uninstall:rm:Uninstall app:_mas_uninstall"
+  "info::Show app information:_mas_info"
+  "outdated::Show outdated apps:_mas_outdated"
+  "upgrade:up:Upgrade all apps:_mas_upgrade"
+)
+
+MAS_HELP=$(_cli_generate_help "mas" "Mac App Store management" "${MAS_COMMANDS[@]}")
+
+mas() {
+  if ! has_command mas; then
+    command mas "$@"
+    return $?
+  fi
+  _cli_framework MAS mas "$@"
 }
 
 ################################################################################
@@ -847,7 +1090,7 @@ D_COMMANDS=(
 
 D_HELP=$(_cli_generate_help "d" "Docker management" "${D_COMMANDS[@]}")
 
-unalias d
+unalias d 2>/dev/null
 function d() {
   if ! has_command docker; then
     command docker "$@"
@@ -885,56 +1128,6 @@ alias dcomp='d compose'
 alias dclean='d clean'
 alias dtop='d ps'
 alias drma='d rm'
-
-################################################################################
-# PATH MANAGEMENT
-################################################################################
-
-_path_add() {
-  [[ -z "$1" ]] && { echo "Usage: path add <dir>"; return 1; }
-  local dir="$1"
-
-  if [[ -d "$dir" ]] && [[ ":$PATH:" != *":$dir:"* ]]; then
-    export PATH="$dir:$PATH"
-    success "Added to PATH: $dir"
-  else
-    warn "Directory not added (doesn't exist or already in PATH)"
-  fi
-}
-
-_path_remove() {
-  [[ -z "$1" ]] && { echo "Usage: path remove <dir>"; return 1; }
-  local dir="$1"
-
-  if [[ ":$PATH:" == *":$dir:"* ]]; then
-    export PATH=${PATH//:$dir:/:}
-    export PATH=${PATH/#$dir:/}
-    export PATH=${PATH/%:$dir/}
-    success "Removed from PATH: $dir"
-  else
-    warn "Directory not in PATH"
-  fi
-}
-
-_path_list() {
-  echo $PATH | tr ':' '\n' | nl | awk '{printf "  %2d: %s\n", $1, $2}'
-}
-
-PATH_COMMANDS=(
-  "add:a:Add directory to PATH:_path_add"
-  "remove:rm:Remove directory from PATH:_path_remove"
-  "list:ls,l:List PATH entries:_path_list"
-)
-
-PATH_HELP=$(_cli_generate_help "path" "PATH management" "${PATH_COMMANDS[@]}")
-
-path() { _cli_framework PATH path "$@"; }
-
-# Compatibility
-path_add() { _path_add "$@"; }
-path_remove() { _path_remove "$@"; }
-path_list() { _path_list; }
-path_print() { _path_list; }
 
 ################################################################################
 # FZF COMMANDS FRAMEWORK
@@ -1101,13 +1294,8 @@ F_HELP=$(_cli_generate_help "f" "FZF-powered commands" "${F_COMMANDS[@]}")
 f() { _cli_framework F f "$@"; }
 
 ################################################################################
-# UTILITIES
+# GENERAL UTILITIES
 ################################################################################
-
-ensure_dir() {
-  [[ -z "$1" ]] && { echo "Usage: ensure_dir <dir>"; return 1; }
-  [[ ! -d "$1" ]] && mkdir -p "$1" && success "Created directory: $1"
-}
 
 safe_source() {
   [[ -z "$1" ]] && { echo "Usage: safe_source <file>"; return 1; }
@@ -1247,3 +1435,16 @@ UTILS_COMMANDS=(
 UTILS_HELP=$(_cli_generate_help "utils" "Utility functions" "${UTILS_COMMANDS[@]}")
 
 utils() { _cli_framework UTILS utils "$@"; }
+
+################################################################################
+# EXPORT STATEMENTS
+################################################################################
+
+# Export commonly used functions
+export -f log_info log_success log_warn log_error
+export -f has_command is_macos is_linux is_apple_silicon is_rosetta
+export -f path_add path_remove ensure_dir
+export -f brew_init init_brew init_zsh defaults_apply
+export -f ant
+
+# End of combined utilities file
