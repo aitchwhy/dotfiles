@@ -1,0 +1,79 @@
+[
+	{
+		"name": "dotfiles",
+		"rootPath": "~/dotfiles",
+		"paths": [],
+		"tags": [],
+		"enabled": true
+	},
+	{
+		"name": "src",
+		"rootPath": "~/src",
+		"paths": [],
+		"tags": [],
+		"enabled": true
+	},
+	{
+		"name": "platform",
+		"rootPath": "~/src/platform",
+		"paths": [],
+		"tags": [],
+		"enabled": true
+	},
+	{
+		"name": "vibes",
+		"rootPath": "~/src/vibes",
+		"paths": [],
+		"tags": [],
+		"enabled": true
+	},
+	{
+		"name": "pal",
+		"rootPath": "/Users/hank/src/pal",
+		"paths": [],
+		"tags": [],
+		"enabled": true
+	},
+	{
+		"name": "clean-rooms",
+		"rootPath": "/Users/hank/src/clean-rooms",
+		"paths": [],
+		"tags": [],
+		"enabled": true
+	},
+	{
+		"name": "primary",
+		"rootPath": "/Users/hank/obsidian/primary",
+		"paths": [],
+		"tags": [],
+		"enabled": true
+	},
+	{
+		"name": "platform-posthog",
+		"rootPath": "/Users/hank/src/platform-posthog",
+		"paths": [],
+		"tags": [],
+		"enabled": true
+	},
+	{
+		"name": "ant",
+		"rootPath": "/Users/hank/src/ant",
+		"paths": [],
+		"tags": [],
+		"enabled": true
+	},
+	{
+		"name": "dots",
+		"rootPath": "/Users/hank/dots",
+		"paths": [],
+		"tags": [],
+		"enabled": true
+	},
+	{
+		"name": "Obsidian",
+		"rootPath": "/Users/hank/Obsidian",
+		"paths": [],
+		"tags": [],
+		"enabled": true
+	}
+]
