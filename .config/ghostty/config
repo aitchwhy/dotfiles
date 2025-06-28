@@ -83,8 +83,8 @@ keybind = super+enter=toggle_fullscreen
 
 
 # Navigation between shell prompts
-# keybind = cmd+j=jump_to_prompt:1
-# keybind = cmd+k=jump_to_prompt:-1
+keybind = cmd+j=jump_to_prompt:1
+keybind = cmd+k=jump_to_prompt:-1
 
 # ============================
 # Tab Management

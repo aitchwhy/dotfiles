@@ -1,1 +1,0 @@
-{"apps":{"http":{"servers":{"srv0":{"listen":[":30101"],"routes":[{"handle":[{"handler":"subroute","routes":[{"handle":[{"handler":"reverse_proxy","upstreams":[{"dial":"localhost:20101"}]}]}]}],"match":[{"host":["localhost"]}],"terminal":true}]}}}}}

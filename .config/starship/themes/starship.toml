@@ -247,5 +247,3 @@ error_symbol = "[✗](bold red)"
 # $netns\
 # $shell\
 # $character"""
-
-# aerospace, aider, atuin, bat, caddy, direnv, cursor, coq, ghostty, git, hammerspoon, hazel, htop, just, lazydocker, nix, npm, nvim, repomix, starship, tree-sitter, yazi, zellij

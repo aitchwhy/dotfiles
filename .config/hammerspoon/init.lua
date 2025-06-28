@@ -11,9 +11,9 @@
 --  Hammerspoon: Hyper‑centric launcher & Which‑Key‑style overlay  --
 --------------------------------------------------------------------
 
--- ------------------------------------
--- -- 0. Mods & Spoon setup
--- ------------------------------------
+------------------------------------
+-- 0. Mods & Spoon setup
+------------------------------------
 -- local hyper      = { "ctrl", "alt", "cmd" }
 -- local hyperShift = { "ctrl", "alt", "cmd", "shift" }
 

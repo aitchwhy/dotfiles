@@ -35,6 +35,9 @@ setopt EXTENDED_HISTORY  # Record timestamp
 # ========================================================================
 # XDG directories
 
+export COLORTERM="truecolor"
+export HOMEBREW_NO_ANALYTICS=1
+
 export HISTFILE="$HOME/.zsh_history"
 export HISTSIZE=100000
 export SAVEHIST=$HISTSIZE
@@ -44,8 +47,32 @@ export DOTFILES="$HOME/dotfiles"
 export DOTS="$DOTFILES"
 export CFS="$DOTFILES/.config"
 export CFSZSH="$CFS/zsh"
-export SCRIPTS="$DOTFILES/scripts"
+export CMD="$DOTFILES/scripts"
 export OBS="$HOME/obsidian/primary"
+
+
+# Essential environment variables
+export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
+# export XDG_CONFIG_HOME="$DOTFILES/.config"
+export ZDOTDIR="$DOTFILES/zsh"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+
+# Create XDG directories if they don't exist
+for dir in "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME" "$XDG_STATE_HOME"; do
+    [[ ! -d "$dir" ]] && mkdir -p "$dir"
+done
+
+# Volta (Node.js version manager)
+export VOLTA_HOME="$HOME/.volta"
+export PATH="$VOLTA_HOME/bin:$PATH"
+
+# Nix environment (if installed)
+if [[ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]]; then
+    source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+fi
+. "$HOME/.cargo/env"
 
 # Tool configurations
 export BAT_THEME="OneHalfDark"
@@ -54,16 +81,11 @@ export FZF_DEFAULT_OPTS='--height 40% --border --cycle --layout=reverse --marker
 export STARSHIP_CONFIG="$CFS/starship/starship.toml"
 # export GIT_CONFIG_GLOBAL="$CFS/git/.config"
 export LG_CONFIG_FILE="$CFS/git/lazygit.yml"
-export CARGO_HOME="${CARGO_HOME:-$HOME/.cargo}"
-export RUSTUP_HOME="${RUSTUP_HOME:-$HOME/.rustup}"
-export GOPATH="$HOME/go"
-export GOBIN="$GOPATH/bin"
+
 export ATUIN_CONFIG_DIR="$CFS/atuin"
 export YAZI_CONFIG_DIR="$CFS/yazi"
 export ZELLIJ_CONFIG_DIR="$CFS/zellij"
-export HOMEBREW_NO_ANALYTICS=1
-export COLORTERM="truecolor"
-export GLOBAL_JUSTFILE="$HOME/dotfiles/justfile"
+
 export DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib:$DYLD_FALLBACK_LIBRARY_PATH
 
 # NPM configuration - using standard ~/.npmrc (symlinked from dotfiles)
@@ -79,10 +101,11 @@ function path_add() {
     return 1
 }
 
-path_add /opt/homebrew/opt/ruby/bin
+export GLOBAL_JUSTFILE="$HOME/dotfiles/justfile"
 export LDFLAGS="-L/opt/homebrew/opt/ruby/lib"
 export CPPFLAGS="-I/opt/homebrew/opt/ruby/include"
 
+path_add /opt/homebrew/opt/ruby/bin
 
 # path_add "$CFS/npm-global/bin" # Add npm global packages to PATH
 # path_add "$HOME/.volta/bin" # Add npm global packages to PATH
@@ -104,6 +127,11 @@ fi
 
 # Add custom completions
 fpath=("$CFS/zsh/.zfunc" $fpath)
+
+for x in ; do
+    [[ ! -d "$dir" ]] && mkdir -p "$dir"
+done
+
 
 # Initialize completion system
 autoload -Uz compinit && compinit

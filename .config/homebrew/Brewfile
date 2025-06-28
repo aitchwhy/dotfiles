@@ -1,1 +1,86 @@
+# Brewfile with conditional installation sets
+# Usage:
+#   BREW_MINIMAL=1 brew bundle  # Install minimal set only
+#   brew bundle                  # Install everything (default)
 
+# Define installation mode
+minimal_mode = ENV['BREW_MINIMAL'] == '1'
+
+# -----------------------------
+# CORE SET (Always installed)
+# -----------------------------
+
+# Essential CLI Tools
+brew "bat"
+brew "curl"
+brew "fd"
+brew "fzf"
+brew "git"
+brew "nvim"
+brew "zsh-autosuggestions"
+brew "zsh-completions"
+brew "zsh-syntax-highlighting"
+
+# Essential Casks
+cask "ghostty"    # Primary terminal
+cask "raycast"    # Launcher
+
+# -----------------------------
+# EXTENDED SET (Full install only)
+# -----------------------------
+
+unless minimal_mode
+  # Extended CLI Tools & Shell Enhancements
+  brew "atuin", restart_service: :changed
+  brew "direnv"
+  brew "eza"
+  brew "gh"
+  brew "go"
+  brew "htop"
+  brew "lazygit"
+  brew "mas"
+  brew "rustup"
+  brew "starship"
+  brew "uv"
+  brew "volta"           # Node version manager (Project pinning)
+  brew "zoxide"
+
+  # Password Manager CLI (Choose one)
+  brew "bitwarden-cli"   # CLI for Bitwarden
+  # cask "1password-cli"  # Alternative: 1Password CLI
+
+  # Additional Terminal (optional)
+  cask "warp"
+
+  # Development Tools
+  # brew "fnm"           # Node version manager (Fast alternative)
+  # brew "nvm"           # Node version manager (Classic alternative)
+end
+
+# -----------------------------
+# OPTIONAL SETS (Conditional)
+# -----------------------------
+
+# Mac App Store apps (requires `mas`)
+if !minimal_mode && ENV['BREW_WITH_MAS'] == '1'
+  # mas "Xcode", id: 497799835  # Large download, enable if needed
+end
+
+# Development environment specific
+if ENV['BREW_DEV_FULL'] == '1'
+  # Additional development tools
+  # brew "docker"
+  # brew "kubectl"
+  # brew "terraform"
+  # cask "visual-studio-code"
+end
+
+# -----------------------------
+# NOTES
+# -----------------------------
+# Installation examples:
+#   brew bundle                              # Install everything
+#   BREW_MINIMAL=1 brew bundle              # Minimal set only
+#   BREW_WITH_MAS=1 brew bundle            # Include Mac App Store apps
+#   BREW_DEV_FULL=1 brew bundle            # Include full dev tools
+#   BREW_MINIMAL=1 BREW_DEV_FULL=1 brew bundle  # Combine flags

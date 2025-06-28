@@ -1,5 +1,0 @@
-theme: Cobalt
-sort:
-    by: RESTARTS
-    isReversed: false
-disable_exit_confirmation: false
