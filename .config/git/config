@@ -1,11 +1,12 @@
+
 # core vars
 [core]
   filemode = false
   editor = nvim
-  pager = bat
-  excludesfile = /Users/hank/dotfiles/.config/git/gitignore
+  pager = "bat --paging=never"
+  excludesfile = ./ignore
   # Use custom commit message template
-  committemplate = /Users/hank/dotfiles/.config/git/gitmessage
+  committemplate = ./message
   # Use husky hooks
   hooksPath = .husky
 
@@ -49,11 +50,11 @@
   helper = osxkeychain
 
 [credential "https://github.com"]
-	helper = 
+	helper =
 	helper = !/opt/homebrew/bin/gh auth git-credential
 
 [credential "https://gist.github.com"]
-	helper = 
+	helper =
 	helper = !/opt/homebrew/bin/gh auth git-credential
 
 [gpg "ssh"]
@@ -65,11 +66,17 @@
   insteadOf = https://github.com/
 [diff "ignore-timestamp"]
 	textconv = "sed '/#   timestamp:/d'"
+[diff]
+  tool = Kaleidoscope
+[difftool]
+	cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\"
+	prompt = false
+	trustExitCode = true
 
 # ===== Commit Message & Workflow Settings =====
 [commit]
   # Use the template
-  template = /Users/hank/dotfiles/config/git/gitmessage
+  template = ~/.config/git/message
   # Show diff when editing commit message
   verbose = true
   # Sign all commits by default
@@ -79,7 +86,7 @@
   # Commitizen for interactive conventional commits
   cz = "!f() { npx --no-install commitizen; }; f"
   czf = "!f() { npx --no-install -- commitizen; }; f"
-  
+
   # Conventional Commits helpers (legacy)
   feat = "!f() { git commit -m \"feat${1:+($1)}: $2\"; }; f"
   fix = "!f() { git commit -m \"fix${1:+($1)}: $2\"; }; f"
@@ -91,19 +98,19 @@
   chore = "!f() { git commit -m \"chore${1:+($1)}: $2\"; }; f"
   wip = "!f() { git commit -m \"wip${1:+($1)}: $2\"; }; f"
   deps = "!f() { git commit -m \"deps${1:+($1)}: $2\"; }; f"
-  
+
   # Fuzzy commit selection with enhanced filtering and preview
   fc = "!f() { git status --short | fzf --multi --preview 'git diff --color {2}' | cut -c4- | tr '\\n' ' ' | xargs -r git add && npx --no-install commitizen; }; f"
-  
+
   # Fuzzy add and commit
   fa = "!f() { git status --short | fzf --multi --preview 'git diff --color {2}' | cut -c4- | tr '\\n' ' ' | xargs -r git add; }; f"
-  
+
   # AI-assisted commit message generation
   ai-commit = "!f() { just ai commit-msg; }; f"
-  
+
   # Check if commit message follows conventional format using commitlint
   check = "!f() { npx --no-install commitlint --edit \"$1\"; }; f"
-  
+
   # Standard workflow shortcuts
   s = status
   co = checkout
@@ -122,9 +129,8 @@
   rebase = true
 
 [merge]
-  conflictstyle = diff3
-  ff = only
-  
+	tool = Kaleidoscope
+
 [rebase]
   autosquash = true
   autostash = true
@@ -133,12 +139,18 @@
 [diff]
   colorMoved = default
   algorithm = histogram
-  
+
 [difftool]
   prompt = false
-  
+
+[difftool "Kaleidoscope"]
+	cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\"
+
 [mergetool]
   prompt = false
+[mergetool "Kaleidoscope"]
+	cmd = ksdiff --merge --output \"$MERGED\" --base \"$BASE\" -- \"$LOCAL\" --snapshot \"$REMOTE\" --snapshot
+	trustExitCode = true
 
 # ===== AI Assistant Integration =====
 [ai]

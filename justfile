@@ -1,14 +1,16 @@
 # Root justfile for dotfiles
 # Usage: just [command]
 # Version: 1.40.0
+mod ant '~/dotfiles/.config/just/ant.just'
 
 # Set shell to zsh for all recipes
 # set shell := ["zsh", "-cu"]
 
-# Enable colorful output
 set dotenv-load
 set positional-arguments
-set fallback
+# set fallback
+# export recipe args as env vars in recipe
+
 
 # Default recipe - show available commands
 default:
@@ -16,6 +18,8 @@ default:
 
 choose:
     @just --choose
+
+
 
 # -----------------------------------------------------------
 # System management
@@ -52,26 +56,6 @@ sysinfo:
     @echo "Directory: $(pwd)"
     @echo "Date: $(date)"
 
-# Interactive selection pipeline: enterprise -> user -> workspace
-ant-admin-fzf:
-    #!/usr/bin/env zsh
-    set -e
-
-    # Select enterprise
-    ENTERPRISE=$(ant-admin enterprises list | fzf --prompt="Enterprise: " | awk '{print $1}')
-    [[ -z "$ENTERPRISE" ]] && { echo "No enterprise selected"; exit 1; }
-
-    # Select user
-    USER=$(ant-admin users list | fzf --prompt="User: " | awk '{print $1}')
-    [[ -z "$USER" ]] && { echo "No user selected"; exit 1; }
-
-    # Select workspace
-    WORKSPACE=$(ant-admin workspaces list --enterprise=$ENTERPRISE | fzf --prompt="Workspace: " | awk '{print $1}')
-    [[ -z "$WORKSPACE" ]] && { echo "No workspace selected"; exit 1; }
-
-    echo "Selected: $ENTERPRISE | $USER | $WORKSPACE"
-    echo "Usage: just create-key $USER $ENTERPRISE $WORKSPACE [name] [role]"
-
 # -----------------------------------------------------------
 # Documentation
 # -----------------------------------------------------------
@@ -87,6 +71,10 @@ prd:
 # -----------------------------------------------------------
 # ant
 # -----------------------------------------------------------
+[no-cd]
+[group('ant node')]
+npm-clean:
+    trash ~/.npm **/node_modules
 
 [group('ant sdk')]
 [no-cd]

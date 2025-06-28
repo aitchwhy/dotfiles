@@ -32,7 +32,7 @@ git:
     pager: "delta --dark --paging=never"
     #
     #     # If true, Lazygit will use whatever pager is specified in `$GIT_PAGER`, `$PAGER`, or your *git config*. If the pager ends with something like ` | less` we will strip that part out, because less doesn't play nice with our rendering approach. If the custom pager uses less under the hood, that will also break rendering (hence the `--paging=never` flag for the `delta` pager).
-    #     useConfig: false
+    # useConfig: false
     #
     #     # e.g. 'difft --color=always'
     # externalDiffCommand: "ksdiff"
@@ -62,36 +62,35 @@ git:
 
   # list of branches that are considered 'main' branches, used when displaying commits
   mainBranches:
-    - master
     - main
-  
+
   # Prefix to use when skipping hooks. E.g. if set to 'WIP', then pre-commit hooks will be skipped when the commit message starts with 'WIP'
   skipHookPrefix: WIP
-  
+
   # If true, periodically fetch from remote
   autoFetch: true
-  
+
   # If true, periodically refresh files and submodules
   autoRefresh: true
-  
+
   # If true, pass the --all arg to git fetch
   fetchAll: true
-  
+
   # If true, lazygit will automatically stage files that used to have merge
   # conflicts but no longer do; and it will also ask you if you want to
   # continue a merge or rebase if you've resolved all conflicts. If false, it
   # won't do either of these things.
   autoStageResolvedConflicts: true
-  
+
   # Command used when displaying the current branch git log in the main window
   branchLogCmd: "git log --graph --color=always --abbrev-commit --decorate --date=relative --pretty=medium {{branchName}} --"
-  
+
   # If true, do not spawn a separate process when using GPG
   overrideGpg: false
-  
+
   # If true, do not allow force pushes
   disableForcePushing: false
-  
+
   # See https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md#predefined-branch-name-prefix
   branchPrefix: "hank/"
 
@@ -103,8 +102,6 @@ os:
   edit: "nvim {{filename}}"
   editAtLine: "nvim +{{line}} {{filename}}"
   open: "open {{filename}}"
-
-
 ##########################
 # Default config
 # https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md

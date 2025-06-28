@@ -52,8 +52,8 @@ export BAT_THEME="OneHalfDark"
 export DELTA_PAGER="bat --plain --paging=never"
 export FZF_DEFAULT_OPTS='--height 40% --border --cycle --layout=reverse --marker="✓" --bind=ctrl-j:down,ctrl-k:up'
 export STARSHIP_CONFIG="$CFS/starship/starship.toml"
-export GIT_CONFIG_GLOBAL="$CFS/git/gitconfig"
-export LG_CONFIG_FILE="$CFS/lazygit/config.yml"
+# export GIT_CONFIG_GLOBAL="$CFS/git/.config"
+export LG_CONFIG_FILE="$CFS/git/lazygit.yml"
 export CARGO_HOME="${CARGO_HOME:-$HOME/.cargo}"
 export RUSTUP_HOME="${RUSTUP_HOME:-$HOME/.rustup}"
 export GOPATH="$HOME/go"
@@ -82,6 +82,7 @@ function path_add() {
 path_add /opt/homebrew/opt/ruby/bin
 export LDFLAGS="-L/opt/homebrew/opt/ruby/lib"
 export CPPFLAGS="-I/opt/homebrew/opt/ruby/include"
+
 
 # path_add "$CFS/npm-global/bin" # Add npm global packages to PATH
 # path_add "$HOME/.volta/bin" # Add npm global packages to PATH
@@ -181,6 +182,7 @@ alias zcompreset="rm -f ~/.zcompdump; compinit"
 alias br="exec bash"
 alias be="$EDITOR ~/.bashrc ~/.bash_profeil"
 alias beall="$EDITOR $ZDOTDIR/{.bashrc,.bash_profile,.profile}"
+
 
 # ========================================================================
 # Aliases - Git
@@ -324,7 +326,7 @@ y() {
     rm -f -- "$tmp"
 }
 
-source "$DOTS/scripts/ant.zsh"
+# source "$DOTS/scripts/ant.zsh"
 
 # ========================================================================
 # Functions - File Operations
@@ -372,8 +374,11 @@ has_command direnv && eval "$(direnv hook zsh)"
 # [[ -f "$HOME/.atuin/bin/env" ]] && source "$HOME/.atuin/bin/env"
 has_command atuin && eval "$(atuin init zsh)"
 
+
+
+
 # Load utility functions if available
-[[ -f "$SCRIPTS/utils.zsh" ]] && source "$SCRIPTS/utils.zsh"
+[[ -f "$ZDOTDIR/utils.zsh" ]] && source "$ZDOTDIR/utils.zsh"
 
 # Load local/private configuration if exists
 # [[ -f "$ZDOTDIR/.zshrc.local" ]] && source "$ZDOTDIR/.zshrc.local"
@@ -390,22 +395,22 @@ has_command atuin && eval "$(atuin init zsh)"
 alias flopilot="cd ~/src/vibes/apps/flopilot && npm i && ./deploy-local.sh && cd -"
 
 function cp_repo() {
-    local FROM_DIR="$1"
-    [[ ! -d ~/src/ant ]] && mkdir -p ~/src/ant
-    rsync -av \
-        --recursive \
-        --exclude=".git*" \
-        --exclude=".github" \
-        --exclude="node_modules" \
-        --exclude=".venv" \
-        --exclude=".gitignore" \
-        --exclude=".pytest_cache" \
-        --exclude=".obsidian" \
-        --exclude=".ruff_cache" \
-        --exclude=".venv" \
-        --exclude=".DS*" \
-        --progress \
-        "$FROM_DIR" ~/src/ant/"$(basename "$FROM_DIR")"
+  local FROM_DIR="$1"
+  [[ ! -d ~/src/ant ]] && mkdir -p ~/src/ant
+  rsync -av \
+    --recursive \
+    --exclude=".git*" \
+    --exclude=".github" \
+    --exclude="node_modules" \
+    --exclude=".venv" \
+    --exclude=".gitignore" \
+    --exclude=".pytest_cache" \
+    --exclude=".obsidian" \
+    --exclude=".ruff_cache" \
+    --exclude=".venv" \
+    --exclude=".DS*" \
+    --progress \
+    "$FROM_DIR" ~/src/ant/"$(basename "$FROM_DIR")"
 }
 
 function generate_ssh() {
@@ -420,34 +425,31 @@ function generate_ssh() {
 }
 
 function cp_repos() {
-    local selected_dirs
+  local selected_dirs
 
-    # Let fzf handle terminal directly
-    selected_dirs=$(fd . ~/src --max-depth 1 --min-depth 1 --type d | fzf --multi --prompt="Select directories to copy: " --height=80% --layout=reverse --preview 'ls -la {}' --preview-window=right:50%)
+  # Let fzf handle terminal directly
+  selected_dirs=$(fd . ~/src --max-depth 1 --min-depth 1 --type d | fzf --multi --prompt="Select directories to copy: " --height=80% --layout=reverse --preview 'ls -la {}' --preview-window=right:50%)
 
-    [[ -z "$selected_dirs" ]] && echo "No directories selected." && return 1
+  [[ -z "$selected_dirs" ]] && echo "No directories selected." && return 1
 
-    # Process each line
-    while IFS= read -r dir; do
-        echo "Copying $(basename "$dir")..."
-        cp_repo "$dir"
-    done <<<"$selected_dirs"
+  # Process each line
+  while IFS= read -r dir; do
+    echo "Copying $(basename "$dir")..."
+    cp_repo "$dir"
+  done <<< "$selected_dirs"
 
-    for d in $selected_dirs; do
-        echo "--- cp_repo $d"
-        cp_repo $d
-    done
+  for d in $selected_dirs; do
+    echo "--- cp_repo $d"
+    cp_repo $d
+  done
 
-    echo "✓ Done copying."
+  echo "✓ Done copying."
 }
 
 function ant-npm-strict-install() {
     npm install --strict-peer-deps true --prefer-dedupe true
 }
 
-function git-ls-size() {
-    git ls-files -z | xargs -0 du -h --apparent-size | sort -h
-}
 
 # ========================================================================
 # Cleanup
