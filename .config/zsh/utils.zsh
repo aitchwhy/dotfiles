@@ -1616,3 +1616,81 @@ EOF
 #         printf "%2d. %s\n" $((i++)) "$dir"
 #     done
 # }
+
+################################################################################
+
+# Below is the current state-of-the-art for cutting down (or at least hiding) .DS_Store files on macOS.
+
+# | Situation | Can you **fully stop** .DS_Store? | Best available workaround | Risk / trade-off |
+# |---|---|---|---|
+# | Local internal volumes (the built-in SSD/HDD) | ❌ No. Finder always needs a place to cache icon positions, view options, tags, etc. | Periodically delete them with a script or hide them with .gitignore/.dockerignore, etc. | Finder may recreate them instantly; constant deletion slightly increases I/O. |
+# | External USB / Thunderbolt drives | ⚠️ macOS ≥ 10.15 lets you disable creation | defaults write com.apple.desktopservices DSDontWriteUSBStores -bool TRUE | Some view settings (icon positions, custom folder backgrounds) will be lost on those drives. |
+# | Network shares (SMB, AFP, WebDAV, NFS, etc.) | ✅ Can be disabled | defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool TRUE | Folder customizations won’t stick; can increase network traffic if Finder constantly asks to write and is denied. |
+
+---
+
+# ## Step-by-step: Disable .DS_Store on USB & Network volumes
+
+# 1. Open Terminal (Applications ➜ Utilities ➜ Terminal).
+# 2. Paste the following 2 commands, pressing Return after each:
+
+#    ```bash
+#    # Block .DS_Store on network shares
+#    defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool TRUE
+
+#    # Block .DS_Store on external/removable drives
+#    defaults write com.apple.desktopservices DSDontWriteUSBStores -bool TRUE
+#    ```
+# 3. Restart Finder so it reads the new preference:
+
+#    ```bash
+#    killall Finder
+#    ```
+#    (All open Finder windows will close and reopen automatically.)
+
+# ### How to undo
+
+# ```bash
+# # Re-enable .DS_Store on network volumes
+# defaults delete com.apple.desktopservices DSDontWriteNetworkStores
+
+# # Re-enable .DS_Store on external/removable drives
+# defaults delete com.apple.desktopservices DSDontWriteUSBStores
+
+# # Relaunch Finder again
+# killall Finder
+# ```
+
+# ---
+
+# ## What if you really need “zero” .DS_Store everywhere?
+
+# Because macOS writes them on internal disks no matter what, your only practical options are:
+
+# 1. **Automated cleanup**
+#    Create a small LaunchAgent or cron job that runs something like:
+
+#    ```bash
+#    find $HOME -name ".DS_Store" -delete
+#    ```
+
+# 2. **Hide them from version control / packaging tools**
+#    • `.gitignore` ➜ `*.DS_Store`
+#    • Docker context ➜ `.dockerignore`
+#    • zip/tar ➜ `zip -x '*.DS_Store' …`
+
+# 3. **Use another file manager** (rarely worth it)
+#    Finder replacements that do not generate .DS_Store will lose macOS-specific niceties such as Quick Look integration.
+
+# ---
+
+# ### Why Apple still uses .DS_Store
+
+# -  Stores per-directory icon positions, list/column view settings, sort order, spotlight comments, labels, etc.
+# -  Avoids populating global preference files that would grow without bound.
+# -  Historically small and benign; deleting them is safe but Finder regenerates them immediately.
+
+# In short, you can tame .DS_Store on removable and network volumes, but Finder considers them essential on internal disks. The commands above are the cleanest supported solution today (macOS Sonoma 14 and earlier).
+
+
+################################################################################
