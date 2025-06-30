@@ -25,6 +25,7 @@ brew "bitwarden-cli"
 brew "bun"                         # JS runtime
 brew "caddy"                       # HTTP server w/ HTTPS
 brew "claude-squad"
+brew "sops"
 brew "gurk" # signal CLI client
 brew "codex"
 brew "commitizen"

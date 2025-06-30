@@ -84,7 +84,7 @@ export BAT_THEME="OneHalfDark"
 export DELTA_PAGER="bat --plain --paging=never"
 export FZF_DEFAULT_OPTS='--height 40% --border --cycle --layout=reverse --marker="✓" --bind=ctrl-j:down,ctrl-k:up'
 export STARSHIP_CONFIG="$CFS/starship/starship.toml"
-# export GIT_CONFIG_GLOBAL="$CFS/git/.config"
+export GIT_CONFIG_GLOBAL="$CFS/git/config"
 export LG_CONFIG_FILE="$CFS/git/lazygit.yml"
 
 export ATUIN_CONFIG_DIR="$CFS/atuin"
