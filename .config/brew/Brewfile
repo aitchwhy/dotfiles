@@ -12,18 +12,43 @@ minimal_mode = ENV['BREW_MINIMAL'] == '1'
 
 # Essential CLI Tools
 brew "bat"
+brew "bat-extras"
 brew "curl"
 brew "fd"
 brew "fzf"
 brew "git"
 brew "nvim"
+brew "delta"
+brew "just"
+brew "neovim"
+brew "tlrc"
+brew "hexyl"
+brew "htop"
+brew "httpie"
+brew "glow"
+brew "ripgrep"
+brew "tag"
+brew "lazygit"
+brew "procs"
+brew "starship"
+brew "zoxide"
+brew "zellij"
 brew "zsh-autosuggestions"
 brew "zsh-completions"
 brew "zsh-syntax-highlighting"
+brew "bitwarden-cli"
+brew "direnv"
+brew "gh"
+brew "go"
 
 # Essential Casks
-cask "ghostty"    # Primary terminal
 cask "raycast"    # Launcher
+cask "warp"
+cask "raycast"
+cask "ghostty"
+cask "cursor"
+cask "atuin"
+cask ""
 
 # -----------------------------
 # EXTENDED SET (Full install only)
@@ -32,18 +57,22 @@ cask "raycast"    # Launcher
 unless minimal_mode
   # Extended CLI Tools & Shell Enhancements
   brew "atuin", restart_service: :changed
+  brew "bat-extras"
   brew "direnv"
   brew "eza"
+  brew "git-delta"
+  brew "git-filter-repo"
+  brew "git-lfs"
+  brew "git-sizer"
   brew "gh"
   brew "go"
   brew "htop"
   brew "lazygit"
   brew "mas"
-  brew "rustup"
   brew "starship"
-  brew "uv"
-  brew "volta"           # Node version manager (Project pinning)
-  brew "zoxide"
+  # brew "uv"
+  # brew "volta"           # Node version manager (Project pinning)
+  # brew "zoxide"
 
   # Password Manager CLI (Choose one)
   brew "bitwarden-cli"   # CLI for Bitwarden

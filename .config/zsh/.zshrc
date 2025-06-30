@@ -77,7 +77,7 @@ export HOMEBREW_NO_ANALYTICS=1
 # export VOLTA_HOME="$HOME/.volta"
 # export PATH="$VOLTA_HOME/bin:$PATH"
 
-. "$HOME/.cargo/env"
+# . "$HOME/.cargo/env"
 
 # Tool configurations
 export BAT_THEME="OneHalfDark"
