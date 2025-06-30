@@ -30,21 +30,21 @@ setopt HIST_IGNORE_SPACE # Ignore commands starting with space
 setopt HIST_VERIFY       # Don't execute immediately on history expansion
 setopt EXTENDED_HISTORY  # Record timestamp
 
+# Nix environment (if installed)
+if [[ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]]; then
+    source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+fi
+
 # ========================================================================
 # Environment Variables
 # ========================================================================
-# XDG directories
-
 export COLORTERM="truecolor"
-export HOMEBREW_NO_ANALYTICS=1
 
 export HISTFILE="$HOME/.zsh_history"
 export HISTSIZE=100000
 export SAVEHIST=$HISTSIZE
 
 # Shortcuts
-export DOTFILES="$HOME/dotfiles"
-export DOTS="$DOTFILES"
 export CFS="$DOTFILES/.config"
 export CFSZSH="$CFS/zsh"
 export CMD="$DOTFILES/scripts"
@@ -52,26 +52,31 @@ export OBS="$HOME/obsidian/primary"
 
 
 # Essential environment variables
-export DOTFILES="${DOTFILES:-$HOME/dotfiles}"
-# export XDG_CONFIG_HOME="$DOTFILES/.config"
+export DOTFILES="$HOME/dotfiles"
+export CFS="$DOTFILES/.config"
 export ZDOTDIR="$DOTFILES/zsh"
-export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
-export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
-export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+# export XDG_CONFIG_HOME="$DOTFILES/.config"
+# export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+# export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+# export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+# XDG directories
+# # Create XDG directories if they don't exist
+# for dir in "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME" "$XDG_STATE_HOME"; do
+#     [[ ! -d "$dir" ]] && mkdir -p "$dir"
+# done
 
-# Create XDG directories if they don't exist
-for dir in "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME" "$XDG_STATE_HOME"; do
-    [[ ! -d "$dir" ]] && mkdir -p "$dir"
-done
+
+# Set Homebrew bundle file to custom location in dotfiles repo dir
+export HOMEBREW_BUNDLE_FILE="$CFS/brew/Brewfile"
+export HOMEBREW_NO_ANALYTICS=1
+
+
+
 
 # Volta (Node.js version manager)
-export VOLTA_HOME="$HOME/.volta"
-export PATH="$VOLTA_HOME/bin:$PATH"
+# export VOLTA_HOME="$HOME/.volta"
+# export PATH="$VOLTA_HOME/bin:$PATH"
 
-# Nix environment (if installed)
-if [[ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]]; then
-    source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
-fi
 . "$HOME/.cargo/env"
 
 # Tool configurations
@@ -101,7 +106,7 @@ function path_add() {
     return 1
 }
 
-export GLOBAL_JUSTFILE="$HOME/dotfiles/justfile"
+export GLOBAL_JUSTFILE="$DOTFILES/justfile"
 export LDFLAGS="-L/opt/homebrew/opt/ruby/lib"
 export CPPFLAGS="-I/opt/homebrew/opt/ruby/include"
 
@@ -146,17 +151,15 @@ export KEYTIMEOUT=1
 # Plugins (from Homebrew)
 # ========================================================================
 if [[ -d "$HOMEBREW_PREFIX/share" ]]; then
-    # Load plugins if available
-    [[ -f "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]] &&
-        source "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-
-    [[ -f "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ]] &&
-        source "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
-
-    [[ -f "$HOMEBREW_PREFIX/share/zsh-abbr/zsh-abbr.zsh" ]] &&
-        source "$HOMEBREW_PREFIX/share/zsh-abbr/zsh-abbr.zsh"
+    # Load all available zsh plugins from Homebrew
+    for plugin_dir in "$HOMEBREW_PREFIX/share"/zsh-*; do
+        if [[ -d "$plugin_dir" ]]; then
+            plugin_name=$(basename "$plugin_dir")
+            plugin_script="$plugin_dir/$plugin_name.zsh"
+            [[ -f "$plugin_script" ]] && source "$plugin_script"
+        fi
+    done
 fi
-
 # ========================================================================
 # Core Functions
 # ========================================================================
@@ -473,10 +476,26 @@ function cp_repos() {
 
   echo "✓ Done copying."
 }
+#############################
 
 function ant-npm-strict-install() {
     npm install --strict-peer-deps true --prefer-dedupe true
 }
+
+function clean-node() {
+    fd --hidden --no-ignore .venv | xargs -I _ rm -rf _
+}
+
+function clean-python() {
+    fd --hidden --no-ignore .venv | xargs -I _ rm -rf _
+    fd --hidden --no-ignore .pytest_cache | xargs -I _ rm -rf _
+    fd --hidden --no-ignore .ruff_cache | xargs -I _ rm -rf _
+}
+
+
+
+#############################
+
 
 
 # ========================================================================
