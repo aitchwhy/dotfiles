@@ -166,3 +166,10 @@ eval "$(fzf --bash)"
 #
 # # uv
 # export PATH="/Users/hank/.local/share/../bin:$PATH"
+
+alias 
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/hank/.lmstudio/bin"
+# End of LM Studio CLI section
+
