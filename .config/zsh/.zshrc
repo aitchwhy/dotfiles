@@ -54,7 +54,7 @@ export OBS="$HOME/obsidian/primary"
 # Essential environment variables
 export DOTFILES="$HOME/dotfiles"
 export CFS="$DOTFILES/.config"
-export ZDOTDIR="$DOTFILES/.zsh"
+export ZDOTDIR="$DOTFILES/.config/zsh"
 # export XDG_CONFIG_HOME="$DOTFILES/.config"
 # export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 # export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
@@ -206,6 +206,7 @@ alias vim='$EDITOR'
 # Aliases - Zsh
 # ========================================================================
 alias zr="exec zsh"
+# alias ze="$EDITOR $ZDOTDIR/.zshrc"
 alias ze="$EDITOR $ZDOTDIR/.zshrc"
 alias zeall="$EDITOR $ZDOTDIR/{.zshrc,.zprofile,.zshenv}"
 alias zcompreset="rm -f ~/.zcompdump; compinit"
@@ -506,4 +507,6 @@ function clean-python() {
 #
 #
 
-alias claude="/Users/hank/dotfiles/.config/claude/local/claude"
+# alias claude="$HOME/.claude/local/claude"
+alias claude="~/.claude/local/claude"
+alias cl="claude"
