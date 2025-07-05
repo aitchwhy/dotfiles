@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+.venv-*/
+venv/
+ENV/
+env/
+
+# uv
+.venv
+uv.lock
+
+# Credentials - NEVER commit these!
+credentials.json
+*.json
+.envrc.local
+
+# Output
+downloaded_docs/
+
+# Nix
+result
+result-*
+
+# direnv
+.direnv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
