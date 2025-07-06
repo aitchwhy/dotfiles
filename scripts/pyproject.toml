@@ -1,9 +1,18 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
 [project]
-name = "scripts"
-version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
+name = "stopwatch-ocr"
+version = "1.0.0"
 requires-python = ">=3.9"
 dependencies = [
-    "google>=3.0.0",
+    "pillow>=10.0.0",
+    "pytesseract>=0.3.10",
+    "opencv-python>=4.8.0",
+    "numpy>=1.24.0",
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "browser-cookie3>=0.20.1",
+    "requests>=2.32.4",
 ]
