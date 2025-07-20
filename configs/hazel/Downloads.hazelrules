@@ -1,0 +1,239 @@
+{
+  "meta": {
+    "version": 1,
+    "hazelVersion": "6.0.4",
+    "generated": "2025-06-10T17:54:21.708036"
+  },
+  "folders": [
+    {
+      "path": "~/Downloads",
+      "enabled": true,
+      "rules": [
+        {
+          "name": "Downloads \u2192 Inbox (2 days)",
+          "enabled": true,
+          "predicate": {
+            "all": [
+              {
+                "attribute": "date_added",
+                "operator": "older_than",
+                "value": "2d"
+              },
+              {
+                "attribute": "kind",
+                "operator": "is_not",
+                "value": "Installer"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "move",
+              "destination": "~/Inbox"
+            }
+          ]
+        },
+        {
+          "name": "Purge stale installers (7 days)",
+          "enabled": true,
+          "predicate": {
+            "all": [
+              {
+                "attribute": "extension",
+                "operator": "is_in",
+                "value": [
+                  "dmg",
+                  "pkg",
+                  "pkgx"
+                ]
+              },
+              {
+                "attribute": "date_added",
+                "operator": "older_than",
+                "value": "7d"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "trash"
+            }
+          ]
+        },
+        {
+          "name": "Pay-stubs \u2192 Finance/Paystubs",
+          "enabled": true,
+          "predicate": {
+            "all": [
+              {
+                "attribute": "name",
+                "operator": "contains",
+                "value": "paystub",
+                "case_sensitive": false
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "rename",
+              "pattern": "{date_created:%Y-%m-%d}-paystub-{counter}"
+            },
+            {
+              "type": "move",
+              "destination": "~/Documents/Finance/Paystubs/{date_created:%Y}"
+            },
+            {
+              "type": "set_contents_ocr",
+              "value": "always"
+            }
+          ]
+        },
+        {
+          "name": "Bank eStatements \u2192 Finance/Statements",
+          "enabled": true,
+          "predicate": {
+            "all": [
+              {
+                "attribute": "name",
+                "operator": "starts_with",
+                "value": "eStmt_"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "rename",
+              "pattern": "{name}"
+            },
+            {
+              "type": "move",
+              "destination": "~/Documents/Finance/Statements/{date_created:%Y}"
+            },
+            {
+              "type": "set_contents_ocr",
+              "value": "always"
+            }
+          ]
+        },
+        {
+          "name": "Receipts & Invoices \u2192 Finance/Receipts",
+          "enabled": true,
+          "predicate": {
+            "any": [
+              {
+                "attribute": "name",
+                "operator": "contains",
+                "value": "receipt",
+                "case_sensitive": false
+              },
+              {
+                "attribute": "name",
+                "operator": "contains",
+                "value": "invoice",
+                "case_sensitive": false
+              },
+              {
+                "attribute": "contents",
+                "operator": "matches",
+                "value": "(Receipt|Invoice)"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "rename",
+              "pattern": "{date_created:%Y-%m-%d}-{match:1?invoice:receipt}-{counter}"
+            },
+            {
+              "type": "move",
+              "destination": "~/Documents/Finance/Receipts/{date_created:%Y}"
+            },
+            {
+              "type": "set_contents_ocr",
+              "value": "always"
+            }
+          ]
+        },
+        {
+          "name": "Git patches \u2192 Projects/Patches",
+          "enabled": true,
+          "predicate": {
+            "all": [
+              {
+                "attribute": "extension",
+                "operator": "is",
+                "value": "patch"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "move",
+              "destination": "~/Projects/Patches"
+            },
+            {
+              "type": "add_tag",
+              "value": "Needs-Review"
+            }
+          ]
+        },
+        {
+          "name": "Auto-unarchive drive-download zips",
+          "enabled": true,
+          "predicate": {
+            "all": [
+              {
+                "attribute": "name",
+                "operator": "starts_with",
+                "value": "drive-download"
+              },
+              {
+                "attribute": "extension",
+                "operator": "is_in",
+                "value": [
+                  "zip",
+                  "zip.zip"
+                ]
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "unarchive"
+            },
+            {
+              "type": "move",
+              "destination": "~/Inbox/drive-unpacked"
+            },
+            {
+              "type": "trash"
+            }
+          ]
+        },
+        {
+          "name": "Big files (>1 GB) \u2192 Archive volume",
+          "enabled": true,
+          "predicate": {
+            "all": [
+              {
+                "attribute": "size",
+                "operator": "greater_than",
+                "value": "1GB"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "pause",
+              "value": "10s"
+            },
+            {
+              "type": "move",
+              "destination": "/Volumes/External/Archive"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

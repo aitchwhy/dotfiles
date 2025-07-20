@@ -1,0 +1,632 @@
+{
+  "meta": {
+    "version": 1,
+    "hazelVersion": "6.0.4",
+    "generated": "2025-06-10T17:47:12.605212"
+  },
+  "folders": [
+    {
+      "path": "~/Desktop",
+      "enabled": true,
+      "rules": [
+        {
+          "name": "Screenshot filing (ss- prefix)",
+          "enabled": true,
+          "predicate": {
+            "all": [
+              {
+                "attribute": "name",
+                "operator": "starts_with",
+                "value": "ss-"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "move",
+              "destination": "~/Pictures/Screenshots/{date_created:%Y}/{date_created:%m}"
+            },
+            {
+              "type": "rename",
+              "pattern": "{name}"
+            }
+          ]
+        },
+        {
+          "name": "Desktop junk older than 14 days",
+          "enabled": true,
+          "predicate": {
+            "all": [
+              {
+                "attribute": "date_added",
+                "operator": "older_than",
+                "value": "14d"
+              },
+              {
+                "attribute": "kind",
+                "operator": "is_not",
+                "value": "Folder"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "trash"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "~/Downloads",
+      "enabled": true,
+      "rules": [
+        {
+          "name": "Downloads \u2192 Inbox (2 days)",
+          "enabled": true,
+          "predicate": {
+            "all": [
+              {
+                "attribute": "date_added",
+                "operator": "older_than",
+                "value": "2d"
+              },
+              {
+                "attribute": "kind",
+                "operator": "is_not",
+                "value": "Installer"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "move",
+              "destination": "~/Inbox"
+            }
+          ]
+        },
+        {
+          "name": "Purge stale installers (7 days)",
+          "enabled": true,
+          "predicate": {
+            "all": [
+              {
+                "attribute": "extension",
+                "operator": "is_in",
+                "value": [
+                  "dmg",
+                  "pkg",
+                  "pkgx"
+                ]
+              },
+              {
+                "attribute": "date_added",
+                "operator": "older_than",
+                "value": "7d"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "trash"
+            }
+          ]
+        },
+        {
+          "name": "Pay-stubs \u2192 Finance/Paystubs",
+          "enabled": true,
+          "predicate": {
+            "all": [
+              {
+                "attribute": "name",
+                "operator": "contains",
+                "value": "paystub",
+                "case_sensitive": false
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "rename",
+              "pattern": "{date_created:%Y-%m-%d}-paystub-{counter}"
+            },
+            {
+              "type": "move",
+              "destination": "~/Documents/Finance/Paystubs/{date_created:%Y}"
+            },
+            {
+              "type": "set_contents_ocr",
+              "value": "always"
+            }
+          ]
+        },
+        {
+          "name": "Bank eStatements \u2192 Finance/Statements",
+          "enabled": true,
+          "predicate": {
+            "all": [
+              {
+                "attribute": "name",
+                "operator": "starts_with",
+                "value": "eStmt_"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "rename",
+              "pattern": "{name}"
+            },
+            {
+              "type": "move",
+              "destination": "~/Documents/Finance/Statements/{date_created:%Y}"
+            },
+            {
+              "type": "set_contents_ocr",
+              "value": "always"
+            }
+          ]
+        },
+        {
+          "name": "Receipts & Invoices \u2192 Finance/Receipts",
+          "enabled": true,
+          "predicate": {
+            "any": [
+              {
+                "attribute": "name",
+                "operator": "contains",
+                "value": "receipt",
+                "case_sensitive": false
+              },
+              {
+                "attribute": "name",
+                "operator": "contains",
+                "value": "invoice",
+                "case_sensitive": false
+              },
+              {
+                "attribute": "contents",
+                "operator": "matches",
+                "value": "(Receipt|Invoice)"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "rename",
+              "pattern": "{date_created:%Y-%m-%d}-{match:1?invoice:receipt}-{counter}"
+            },
+            {
+              "type": "move",
+              "destination": "~/Documents/Finance/Receipts/{date_created:%Y}"
+            },
+            {
+              "type": "set_contents_ocr",
+              "value": "always"
+            }
+          ]
+        },
+        {
+          "name": "Git patches \u2192 Projects/Patches",
+          "enabled": true,
+          "predicate": {
+            "all": [
+              {
+                "attribute": "extension",
+                "operator": "is",
+                "value": "patch"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "move",
+              "destination": "~/Projects/Patches"
+            },
+            {
+              "type": "add_tag",
+              "value": "Needs-Review"
+            }
+          ]
+        },
+        {
+          "name": "Auto-unarchive drive-download zips",
+          "enabled": true,
+          "predicate": {
+            "all": [
+              {
+                "attribute": "name",
+                "operator": "starts_with",
+                "value": "drive-download"
+              },
+              {
+                "attribute": "extension",
+                "operator": "is_in",
+                "value": [
+                  "zip",
+                  "zip.zip"
+                ]
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "unarchive"
+            },
+            {
+              "type": "move",
+              "destination": "~/Inbox/drive-unpacked"
+            },
+            {
+              "type": "trash"
+            }
+          ]
+        },
+        {
+          "name": "Big files (>1 GB) \u2192 Archive volume",
+          "enabled": true,
+          "predicate": {
+            "all": [
+              {
+                "attribute": "size",
+                "operator": "greater_than",
+                "value": "1GB"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "pause",
+              "value": "10s"
+            },
+            {
+              "type": "move",
+              "destination": "/Volumes/External/Archive"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "~/Inbox",
+      "enabled": true,
+      "rules": [
+        {
+          "name": "Auto-OCR \u2192 Finance",
+          "enabled": true,
+          "predicate": {
+            "all": [
+              {
+                "attribute": "contents",
+                "operator": "matches",
+                "value": "(Invoice|Receipt|Statement)"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "rename",
+              "pattern": "{date_created:%Y-%m-%d}-{match:1}-{counter}"
+            },
+            {
+              "type": "move",
+              "destination": "~/Documents/Finance/{date_created:%Y}"
+            },
+            {
+              "type": "set_contents_ocr",
+              "value": "always"
+            }
+          ]
+        },
+        {
+          "name": "Decrypt \u2192 OCR \u2192 File",
+          "enabled": true,
+          "predicate": {
+            "all": [
+              {
+                "attribute": "kind",
+                "operator": "is",
+                "value": "PDF"
+              },
+              {
+                "attribute": "encrypted",
+                "operator": "is",
+                "value": true
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "rename",
+              "pattern": "{date_created:%Y-%m-%d}-encrypted-{counter}"
+            },
+            {
+              "type": "move",
+              "destination": "~/Documents/Finance/{date_created:%Y}"
+            },
+            {
+              "type": "set_pdf_password",
+              "value": "CHANGEME"
+            },
+            {
+              "type": "set_contents_ocr",
+              "value": "always"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/Applications",
+      "enabled": true,
+      "rules": [
+        {
+          "name": "Flag inactive apps (>180 days)",
+          "enabled": true,
+          "predicate": {
+            "all": [
+              {
+                "attribute": "date_last_opened",
+                "operator": "older_than",
+                "value": "180d"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "add_tag",
+              "value": "Stale"
+            },
+            {
+              "type": "set_color_label",
+              "value": "yellow"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "~/Archive",
+      "enabled": true,
+      "rules": [
+        {
+          "name": "Off-load big cold files",
+          "enabled": true,
+          "predicate": {
+            "all": [
+              {
+                "attribute": "size",
+                "operator": "greater_than",
+                "value": "500MB"
+              },
+              {
+                "attribute": "date_added",
+                "operator": "older_than",
+                "value": "30d"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "pause",
+              "value": "10s"
+            },
+            {
+              "type": "move",
+              "destination": "/Volumes/External/Archive"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "~/Library/CloudStorage/GoogleDrive/My Drive",
+      "enabled": true,
+      "rules": [
+        {
+          "name": "Drive-download zip auto-unarchive",
+          "enabled": true,
+          "predicate": {
+            "all": [
+              {
+                "attribute": "name",
+                "operator": "starts_with",
+                "value": "drive-download"
+              },
+              {
+                "attribute": "extension",
+                "operator": "is_in",
+                "value": [
+                  "zip",
+                  "zip.zip"
+                ]
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "unarchive"
+            },
+            {
+              "type": "move",
+              "destination": "~/Inbox/drive-unpacked"
+            },
+            {
+              "type": "trash"
+            }
+          ]
+        },
+        {
+          "name": "Google Takeout zip auto-unarchive",
+          "enabled": true,
+          "predicate": {
+            "all": [
+              {
+                "attribute": "extension",
+                "operator": "is",
+                "value": "zip"
+              },
+              {
+                "attribute": "name",
+                "operator": "contains",
+                "value": "Takeout",
+                "case_sensitive": false
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "unarchive"
+            },
+            {
+              "type": "move",
+              "destination": "~/Inbox/takeout-unpacked"
+            },
+            {
+              "type": "trash"
+            }
+          ]
+        },
+        {
+          "name": "Selective Sync Conflict tag",
+          "enabled": true,
+          "predicate": {
+            "all": [
+              {
+                "attribute": "name",
+                "operator": "contains",
+                "value": "(Selective Sync Conflict)"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "add_tag",
+              "value": "Conflict"
+            },
+            {
+              "type": "set_color_label",
+              "value": "orange"
+            }
+          ]
+        },
+        {
+          "name": "Security backup & recovery codes",
+          "enabled": true,
+          "predicate": {
+            "any": [
+              {
+                "attribute": "name",
+                "operator": "contains",
+                "value": "backup code",
+                "case_sensitive": false
+              },
+              {
+                "attribute": "name",
+                "operator": "contains",
+                "value": "recovery code",
+                "case_sensitive": false
+              },
+              {
+                "attribute": "name",
+                "operator": "contains",
+                "value": "recovery key",
+                "case_sensitive": false
+              },
+              {
+                "attribute": "name",
+                "operator": "contains",
+                "value": "backup-codes",
+                "case_sensitive": false
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "rename",
+              "pattern": "{date_created:%Y-%m-%d}-{name}"
+            },
+            {
+              "type": "move",
+              "destination": "~/Security/Backup Codes/{date_created:%Y}"
+            }
+          ]
+        },
+        {
+          "name": "Finance docs classification",
+          "enabled": true,
+          "predicate": {
+            "any": [
+              {
+                "attribute": "name",
+                "operator": "contains",
+                "value": "receipt",
+                "case_sensitive": false
+              },
+              {
+                "attribute": "name",
+                "operator": "contains",
+                "value": "invoice",
+                "case_sensitive": false
+              },
+              {
+                "attribute": "name",
+                "operator": "contains",
+                "value": "statement",
+                "case_sensitive": false
+              },
+              {
+                "attribute": "name",
+                "operator": "contains",
+                "value": "paystub",
+                "case_sensitive": false
+              },
+              {
+                "attribute": "contents",
+                "operator": "matches",
+                "value": "(Receipt|Invoice|Statement|Pay Stub)"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "rename",
+              "pattern": "{date_created:%Y-%m-%d}-{match:1?invoice:receipt}-{counter}"
+            },
+            {
+              "type": "move",
+              "destination": "~/Documents/Finance/{date_created:%Y}"
+            },
+            {
+              "type": "set_contents_ocr",
+              "value": "always"
+            }
+          ]
+        },
+        {
+          "name": "Large files (>1 GB) to External Archive",
+          "enabled": true,
+          "predicate": {
+            "all": [
+              {
+                "attribute": "size",
+                "operator": "greater_than",
+                "value": "1GB"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "pause",
+              "value": "10s"
+            },
+            {
+              "type": "move",
+              "destination": "/Volumes/External/Archive"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

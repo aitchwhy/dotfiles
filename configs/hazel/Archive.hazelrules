@@ -1,0 +1,43 @@
+{
+  "meta": {
+    "version": 1,
+    "hazelVersion": "6.0.4",
+    "generated": "2025-06-10T17:54:21.710121"
+  },
+  "folders": [
+    {
+      "path": "~/Archive",
+      "enabled": true,
+      "rules": [
+        {
+          "name": "Off-load big cold files",
+          "enabled": true,
+          "predicate": {
+            "all": [
+              {
+                "attribute": "size",
+                "operator": "greater_than",
+                "value": "500MB"
+              },
+              {
+                "attribute": "date_added",
+                "operator": "older_than",
+                "value": "30d"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "pause",
+              "value": "10s"
+            },
+            {
+              "type": "move",
+              "destination": "/Volumes/External/Archive"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

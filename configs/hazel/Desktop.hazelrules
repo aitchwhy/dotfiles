@@ -1,0 +1,61 @@
+{
+  "meta": {
+    "version": 1,
+    "hazelVersion": "6.0.4",
+    "generated": "2025-06-10T17:54:21.707417"
+  },
+  "folders": [
+    {
+      "path": "~/Desktop",
+      "enabled": true,
+      "rules": [
+        {
+          "name": "Screenshot filing (ss- prefix)",
+          "enabled": true,
+          "predicate": {
+            "all": [
+              {
+                "attribute": "name",
+                "operator": "starts_with",
+                "value": "ss-"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "move",
+              "destination": "~/Pictures/Screenshots/{date_created:%Y}/{date_created:%m}"
+            },
+            {
+              "type": "rename",
+              "pattern": "{name}"
+            }
+          ]
+        },
+        {
+          "name": "Desktop junk older than 14 days",
+          "enabled": true,
+          "predicate": {
+            "all": [
+              {
+                "attribute": "date_added",
+                "operator": "older_than",
+                "value": "14d"
+              },
+              {
+                "attribute": "kind",
+                "operator": "is_not",
+                "value": "Folder"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "trash"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

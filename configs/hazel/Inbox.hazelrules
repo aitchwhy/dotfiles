@@ -1,0 +1,78 @@
+{
+  "meta": {
+    "version": 1,
+    "hazelVersion": "6.0.4",
+    "generated": "2025-06-10T17:54:21.708916"
+  },
+  "folders": [
+    {
+      "path": "~/Inbox",
+      "enabled": true,
+      "rules": [
+        {
+          "name": "Auto-OCR \u2192 Finance",
+          "enabled": true,
+          "predicate": {
+            "all": [
+              {
+                "attribute": "contents",
+                "operator": "matches",
+                "value": "(Invoice|Receipt|Statement)"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "rename",
+              "pattern": "{date_created:%Y-%m-%d}-{match:1}-{counter}"
+            },
+            {
+              "type": "move",
+              "destination": "~/Documents/Finance/{date_created:%Y}"
+            },
+            {
+              "type": "set_contents_ocr",
+              "value": "always"
+            }
+          ]
+        },
+        {
+          "name": "Decrypt \u2192 OCR \u2192 File",
+          "enabled": true,
+          "predicate": {
+            "all": [
+              {
+                "attribute": "kind",
+                "operator": "is",
+                "value": "PDF"
+              },
+              {
+                "attribute": "encrypted",
+                "operator": "is",
+                "value": true
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "rename",
+              "pattern": "{date_created:%Y-%m-%d}-encrypted-{counter}"
+            },
+            {
+              "type": "move",
+              "destination": "~/Documents/Finance/{date_created:%Y}"
+            },
+            {
+              "type": "set_pdf_password",
+              "value": "CHANGEME"
+            },
+            {
+              "type": "set_contents_ocr",
+              "value": "always"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

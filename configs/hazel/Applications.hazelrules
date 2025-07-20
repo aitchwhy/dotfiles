@@ -1,0 +1,38 @@
+{
+  "meta": {
+    "version": 1,
+    "hazelVersion": "6.0.4",
+    "generated": "2025-06-10T17:54:21.709686"
+  },
+  "folders": [
+    {
+      "path": "/Applications",
+      "enabled": true,
+      "rules": [
+        {
+          "name": "Flag inactive apps (>180 days)",
+          "enabled": true,
+          "predicate": {
+            "all": [
+              {
+                "attribute": "date_last_opened",
+                "operator": "older_than",
+                "value": "180d"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "add_tag",
+              "value": "Stale"
+            },
+            {
+              "type": "set_color_label",
+              "value": "yellow"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
