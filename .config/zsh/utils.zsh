@@ -1358,7 +1358,7 @@ EOF
 # | External USB / Thunderbolt drives | ⚠️ macOS ≥ 10.15 lets you disable creation | defaults write com.apple.desktopservices DSDontWriteUSBStores -bool TRUE | Some view settings (icon positions, custom folder backgrounds) will be lost on those drives. |
 # | Network shares (SMB, AFP, WebDAV, NFS, etc.) | ✅ Can be disabled | defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool TRUE | Folder customizations won’t stick; can increase network traffic if Finder constantly asks to write and is denied. |
 
----
+# ---
 
 # ## Step-by-step: Disable .DS_Store on USB & Network volumes
 
