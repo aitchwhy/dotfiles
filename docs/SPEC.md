@@ -1,8 +1,8 @@
 # HEALTH ANALYSIS SPECIFICATION
 
-**Version**: 2.0.0  
-**Created**: 2025-11-26  
-**Status**: Active  
+**Version**: 2.1.0
+**Created**: 2025-11-26
+**Status**: Active
 **Repository**: github.com/aitchwhy/health-analysis
 
 ---
@@ -170,35 +170,35 @@ A deterministic, reproducible health data analysis pipeline that processes weara
 
 | Component | Technology | Version | Purpose |
 |-----------|------------|---------|---------|
-| Language | Python | 3.11+ | Analysis pipeline |
+| Language | Python | 3.14+ | Analysis pipeline |
 | Code VCS | Git | 2.43+ | Source code version control |
-| Data VCS | DVC | 3.58+ | Large file version control |
+| Data VCS | DVC | 3.61+ | Large file version control |
 | Remote Storage | Cloudflare R2 | - | S3-compatible object storage |
 | Code Hosting | GitHub | - | Repository hosting, CI/CD |
-| Package Manager | uv | 0.9+ | Fast Python dependency management |
-| Linting | Ruff | latest | Linting and formatting |
-| Type Checking | mypy | latest | Static type analysis |
-| Testing | pytest | latest | Test framework |
+| Package Manager | uv | 0.5+ | Fast Python dependency management |
+| Linting | Ruff | 0.14+ | Linting and formatting |
+| Type Checking | mypy | 1.18+ | Static type analysis |
+| Testing | pytest | 9.0+ | Test framework |
 
 ### 3.2 Python Dependencies
 
 **Production** (requirements.txt):
 ```
-pandas>=2.0
-numpy>=1.24
-pyyaml>=6.0
-pyarrow>=14.0
-matplotlib>=3.8
-seaborn>=0.13
+pandas>=2.3.0
+numpy>=2.3.0
+pyyaml>=6.0.0
+pyarrow>=22.0.0
+matplotlib>=3.10.0
+seaborn>=0.13.0
 ```
 
 **Development** (requirements-dev.txt):
 ```
-pytest>=7.4
-pytest-cov>=4.1
-ruff>=0.1
-mypy>=1.7
-dvc[s3]>=3.58
+pytest>=9.0.0
+pytest-cov>=7.0.0
+ruff>=0.14.0
+mypy>=1.18.0
+dvc[s3]>=3.61.0
 ```
 
 ### 3.3 DVC Remote Configuration
@@ -243,6 +243,9 @@ health-analysis/
 │   │   └── {person-folder}/
 │   │       ├── *.zip                  # Large exports (DVC-tracked)
 │   │       └── extracted/             # Parsed XML (gitignored)
+│   │
+│   ├── medical-records/               # Medical records (future v3.0)
+│   │   └── {person-folder}/           # PDFs, FHIR exports
 │   │
 │   └── apple-health.dvc               # DVC pointer file (git-tracked)
 │
@@ -731,7 +734,8 @@ on:
   workflow_dispatch:
 
 env:
-  PYTHON_VERSION: "3.11"
+  PYTHON_VERSION: "3.14"
+  UV_VERSION: "0.5.0"
 
 jobs:
   lint:
@@ -741,7 +745,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v4
         with:
-          version: "0.9.11"
+          version: ${{ env.UV_VERSION }}
       - run: uv python install ${{ env.PYTHON_VERSION }}
       - run: uv sync --dev
       - run: uv run ruff check .
@@ -753,6 +757,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v4
+        with:
+          version: ${{ env.UV_VERSION }}
       - run: uv python install ${{ env.PYTHON_VERSION }}
       - run: uv sync --dev
       - run: uv run mypy pipeline/ --ignore-missing-imports
@@ -764,6 +770,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v4
+        with:
+          version: ${{ env.UV_VERSION }}
       - run: uv python install ${{ env.PYTHON_VERSION }}
       - run: uv sync --dev
       - run: uv run pytest tests/unit/ -v -m "unit" --junitxml=junit-unit.xml
@@ -777,9 +785,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v4
+        with:
+          version: ${{ env.UV_VERSION }}
       - run: uv python install ${{ env.PYTHON_VERSION }}
       - run: uv sync --dev
-      - run: uv pip install "dvc[s3]>=3.58"
       - name: Configure DVC
         run: |
           dvc remote modify --local r2 access_key_id $DVC_REMOTE_R2_ACCESS_KEY_ID
@@ -796,9 +805,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v4
+        with:
+          version: ${{ env.UV_VERSION }}
       - run: uv python install ${{ env.PYTHON_VERSION }}
       - run: uv sync --dev
-      - run: uv pip install "dvc[s3]>=3.58"
       - name: Configure DVC
         run: |
           dvc remote modify --local r2 access_key_id $DVC_REMOTE_R2_ACCESS_KEY_ID
@@ -1053,6 +1063,7 @@ export DVC_REMOTE_R2_SECRET_ACCESS_KEY=xxx
 |---------|------|---------|
 | 1.0.0 | 2025-11-25 | Initial pipeline specification |
 | 2.0.0 | 2025-11-26 | Added data management with DVC + R2, comprehensive rewrite |
+| 2.1.0 | 2025-11-26 | Upgraded to Python 3.14, latest dependencies (Nov 2025) |
 
 ---
 
