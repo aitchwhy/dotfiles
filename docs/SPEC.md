@@ -1,7 +1,8 @@
 # HEALTH ANALYSIS SPECIFICATION
 
-**Version**: 2.1.0
+**Version**: 2.2.0
 **Created**: 2025-11-26
+**Updated**: 2025-11-28
 **Status**: Active
 **Repository**: github.com/aitchwhy/health-analysis
 
@@ -172,11 +173,13 @@ A deterministic, reproducible health data analysis pipeline that processes weara
 |-----------|------------|---------|---------|
 | Language | Python | 3.14+ | Analysis pipeline |
 | Code VCS | Git | 2.43+ | Source code version control |
-| Data VCS | DVC | 3.61+ | Large file version control |
+| Data VCS | DVC | 3.64+ | Large file version control |
 | Remote Storage | Cloudflare R2 | - | S3-compatible object storage |
 | Code Hosting | GitHub | - | Repository hosting, CI/CD |
-| Package Manager | uv | 0.5+ | Fast Python dependency management |
-| Linting | Ruff | 0.14+ | Linting and formatting |
+| Package Manager | uv | 0.9+ | Fast Python dependency management |
+| Task Runner | just | 1.43+ | Command runner (replaces Make) |
+| File Linting | ls-lint | 2.3+ | File/directory naming conventions |
+| Code Linting | Ruff | 0.14+ | Python linting and formatting |
 | Type Checking | mypy | 1.18+ | Static type analysis |
 | Testing | pytest | 9.0+ | Test framework |
 
@@ -258,13 +261,10 @@ health-analysis/
 │   ├── extract.py                     # Data extraction from ZIPs
 │   ├── consolidate.py                 # Deduplication and unification
 │   ├── analyze.py                     # Health analysis engine
-│   ├── visualize.py                   # Chart generation
-│   ├── report.py                      # Report generation
-│   ├── comprehensive_report.py        # Extended reporting
+│   ├── comprehensive_report.py        # Report generation with visualizations
 │   ├── context.py                     # Historical context loader
 │   ├── config.py                      # Configuration loader
 │   ├── schema.py                      # Data schemas and validation
-│   ├── models.py                      # Data models
 │   └── logging_config.py              # Logging setup
 │
 ├── snapshots/                         # Analysis outputs (git-tracked)
@@ -282,14 +282,20 @@ health-analysis/
 │   ├── unit/
 │   │   ├── __init__.py
 │   │   ├── test_analyze.py
-│   │   ├── test_config.py
-│   │   └── test_models.py
+│   │   └── test_config.py
 │   ├── __init__.py
 │   └── conftest.py                    # Pytest fixtures
 │
+├── .githooks/                         # Git hooks for DVC integration
+│   ├── pre-commit                     # Auto-stage DVC files, check naming
+│   ├── post-checkout                  # Sync DVC data on checkout
+│   └── post-merge                     # Sync DVC data on merge
+│
 ├── analysis/                          # Symlink → latest snapshot
 ├── .gitignore
-├── .python-version                    # Python version (3.11)
+├── .ls-lint.yml                       # File naming convention rules
+├── .python-version                    # Python version (3.14)
+├── justfile                           # Task runner commands
 ├── pyproject.toml                     # Project metadata
 ├── requirements.txt
 ├── requirements-dev.txt
@@ -1000,30 +1006,35 @@ data/
 ### 14.1 Quick Reference Commands
 
 ```bash
-# === DVC Commands ===
-dvc add data/path/           # Track data
-dvc push                     # Upload to R2
-dvc pull                     # Download from R2
-dvc status                   # Check sync status
-dvc gc --workspace           # Clean old cache
+# === just Commands (unified interface) ===
+just                    # Show all available commands
+just push               # Push code (git) and data (dvc) together
+just pull               # Pull code (git) and data (dvc) together
+just sync               # Full sync (pull then push)
+just data-add           # Add data changes to DVC
+just status             # Show git and dvc status
+just setup              # Configure git hooks
 
-# === Git + DVC Workflow ===
+# === Development Commands ===
+just run                # Run the analysis pipeline
+just run --force        # Force regenerate
+just test               # Run unit tests
+just test-all           # Run all tests
+just lint               # Check code style
+just fmt                # Format code
+just check              # Run all checks (lint + format + file naming)
+just lint-files         # Check file naming conventions
+
+# === Direct DVC Commands (if needed) ===
+dvc add data/path/      # Track data
+dvc status              # Check sync status
+dvc gc --workspace      # Clean old cache
+
+# === Git + DVC Manual Workflow ===
 dvc add data/apple-health/
 git add data/apple-health.dvc .gitignore
 git commit -m "data: add export"
-dvc push && git push
-
-# === Pipeline Commands ===
-python -m pipeline.main                    # Full run
-python -m pipeline.main --force            # Force regenerate
-python -m pipeline.main --stage analyze    # Single stage
-python -m pipeline.main --dry-run          # Preview
-
-# === Testing Commands ===
-uv run pytest                              # All tests
-uv run pytest tests/unit/ -v               # Unit only
-uv run ruff check .                        # Lint
-uv run mypy pipeline/                      # Type check
+just push               # Unified push
 ```
 
 ### 14.2 Environment Variables
@@ -1064,6 +1075,7 @@ export DVC_REMOTE_R2_SECRET_ACCESS_KEY=xxx
 | 1.0.0 | 2025-11-25 | Initial pipeline specification |
 | 2.0.0 | 2025-11-26 | Added data management with DVC + R2, comprehensive rewrite |
 | 2.1.0 | 2025-11-26 | Upgraded to Python 3.14, latest dependencies (Nov 2025) |
+| 2.2.0 | 2025-11-28 | Added just task runner, ls-lint file naming, git hooks, cleaned dead code |
 
 ---
 
@@ -1073,3 +1085,5 @@ export DVC_REMOTE_R2_SECRET_ACCESS_KEY=xxx
 - [Cloudflare R2 Documentation](https://developers.cloudflare.com/r2/)
 - [uv Documentation](https://docs.astral.sh/uv/)
 - [Ruff Documentation](https://docs.astral.sh/ruff/)
+- [just Documentation](https://just.systems/man/en/)
+- [ls-lint Documentation](https://ls-lint.org/)
