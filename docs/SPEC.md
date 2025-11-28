@@ -515,6 +515,114 @@ python -m pipeline.main --context snapshots/20251120_b8c4d3e2/context_for_next.j
 python -m pipeline.main --force
 ```
 
+### 6.6 Weekly Analysis Workflow
+
+The weekly analysis is the **primary review cadence** for actionable health insights. It focuses on recent changes with high priority on the most recent week.
+
+#### 6.6.1 Time-Weighted Analysis Model
+
+| Time Period | Weight | Focus | Purpose |
+|-------------|--------|-------|---------|
+| Current week vs Previous week | 1.0 | High detail, alerts | Immediate action items |
+| 2-4 weeks ago | 0.7 | Trend detection | Short-term patterns |
+| 1-3 months ago | 0.4 | Baseline comparison | Monthly trends |
+| 3+ months ago | 0.2 | Context only | Long-term reference |
+
+#### 6.6.2 Weekly Report Structure
+
+```
+weekly_review_{person}_{YYYYMMDD}.json
+{
+  "person_key": "hank",
+  "review_date": "2025-11-28",
+  "data_period": {
+    "current_week": {"start": "2025-11-22", "end": "2025-11-28"},
+    "previous_week": {"start": "2025-11-15", "end": "2025-11-21"}
+  },
+
+  "week_over_week_changes": {
+    "cardiovascular": {
+      "rhr_change": -2.3,
+      "rhr_current": 54.2,
+      "rhr_previous": 56.5,
+      "trend": "improving",
+      "grade": "A",
+      "alert_level": "none"
+    },
+    "sleep": {
+      "duration_change_min": +18,
+      "duration_current_min": 432,
+      "duration_previous_min": 414,
+      "trend": "improving",
+      "grade": "B+",
+      "alert_level": "watch"
+    }
+  },
+
+  "alerts": [
+    {
+      "id": "weekly_001",
+      "severity": "WARNING",
+      "category": "Recovery",
+      "metric": "recovery_score",
+      "message": "Recovery trending down 12% week-over-week",
+      "action": "Consider reducing training intensity"
+    }
+  ],
+
+  "recommendations_for_next_week": [
+    {
+      "priority": 1,
+      "category": "Sleep",
+      "action": "Target 7.5+ hours per night",
+      "rationale": "Current 7.2h is below age-optimal 7.5-8h"
+    }
+  ],
+
+  "long_term_context": {
+    "30_day_trend": "stable",
+    "90_day_trend": "improving",
+    "vs_age_benchmark": "above_average"
+  }
+}
+```
+
+#### 6.6.3 Grading Criteria
+
+| Grade | Description | Week-over-Week Change |
+|-------|-------------|----------------------|
+| A+ | Exceptional improvement | >15% improvement or optimal range |
+| A | Strong improvement | 10-15% improvement |
+| B | Moderate improvement | 5-10% improvement |
+| C | Stable | ±5% change |
+| D | Declining | 5-10% decline |
+| F | Significant concern | >10% decline |
+
+#### 6.6.4 Alert Levels
+
+| Level | Trigger | Action |
+|-------|---------|--------|
+| **CRITICAL** | >20% decline OR medical threshold breach | Immediate review required |
+| **WARNING** | 10-20% decline OR approaching threshold | Monitor closely next week |
+| **WATCH** | 5-10% decline OR slight concern | Track in next review |
+| **NONE** | Stable or improving | Continue current approach |
+
+#### 6.6.5 CLI for Weekly Analysis
+
+```bash
+# Run weekly analysis for all individuals
+python -m pipeline.weekly
+
+# Run for specific person
+python -m pipeline.weekly --person hank
+
+# Specify date range (defaults to last 7 days)
+python -m pipeline.weekly --end-date 2025-11-28
+
+# Generate comparison report
+python -m pipeline.weekly --compare-weeks 4
+```
+
 ---
 
 ## 7. Configuration
