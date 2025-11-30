@@ -1,0 +1,54 @@
+# Finance Domain Pipeline
+
+set dotenv-load
+
+default:
+    @just --list
+
+# Run the finance analysis pipeline
+run:
+    uv run python -c "
+from pathlib import Path
+from pipeline.ingest import load_monarch_transactions
+from pipeline.analyze import compute_monthly_summary, compute_category_breakdown, generate_insights
+from pipeline.report import generate_markdown_report, generate_manifest
+import json
+from datetime import datetime
+
+data_dir = Path('data/monarch')
+output_dir = Path('snapshots') / datetime.now().strftime('%Y%m%d')
+output_dir.mkdir(parents=True, exist_ok=True)
+
+print('Loading transactions...')
+df = load_monarch_transactions(data_dir)
+print(f'Loaded {len(df)} transactions')
+
+print('Computing summaries...')
+monthly = compute_monthly_summary(df)
+categories = compute_category_breakdown(df)
+
+print('Generating insights...')
+insights = generate_insights(monthly, categories)
+
+print('Writing reports...')
+generate_markdown_report(insights, output_dir / 'report.md')
+
+with open(output_dir / 'insights.json', 'w') as f:
+    json.dump(insights, f, indent=2, default=str)
+
+manifest = generate_manifest({'monarch': 'latest'}, [{'file': 'report.md', 'hash': 'computed'}])
+with open(output_dir / 'manifest.json', 'w') as f:
+    json.dump(manifest, f, indent=2)
+
+print(f'✓ Analysis complete. Output: {output_dir}')
+"
+
+# Run tests
+test:
+    uv run pytest tests/ -v
+
+# Validate config
+validate:
+    @echo "Validating finance config..."
+    python -c "import yaml; yaml.safe_load(open('config/pipeline.yaml'))"
+    @echo "✓ Config valid"
