@@ -1,0 +1,64 @@
+# ls-lint configuration - File and directory naming conventions
+# https://ls-lint.org/
+
+ls:
+  # Pipeline code - snake_case for Python files
+  pipeline:
+    .py: snake_case
+
+  # Tests - snake_case for Python files
+  tests:
+    .py: snake_case
+  tests/*:
+    .py: snake_case
+
+  # Configuration files - lowercase with hyphens or underscores
+  config:
+    .yaml: kebab-case | snake_case
+    .yml: kebab-case | snake_case
+
+  # Documentation - UPPERCASE or kebab-case for markdown
+  docs:
+    .md: SCREAMING_SNAKE_CASE | PascalCase
+
+  # GitHub workflows - kebab-case
+  .github/workflows:
+    .yml: kebab-case
+    .yaml: kebab-case
+
+  # Data directories - kebab-case for person folders
+  # Note: WHOOP is an acronym/brand name, kept uppercase
+  data/WHOOP/*:
+    .csv: snake_case | kebab-case
+  data/WHOOP/consolidated/*:
+    .parquet: snake_case | kebab-case
+  data/apple-health:
+    .dvc: kebab-case
+  data/medical-records:
+    .pdf: regex:.*
+
+  # Snapshots - date_hash format
+  snapshots:
+    .json: snake_case | kebab-case
+    .md: snake_case | kebab-case
+
+  # Root files
+  .:
+    .py: snake_case
+    .toml: lowercase
+    .txt: kebab-case
+    .md: SCREAMING_SNAKE_CASE | PascalCase
+    .lock: lowercase
+
+ignore:
+  - .git
+  - .dvc
+  - .venv
+  - __pycache__
+  - node_modules
+  - .pytest_cache
+  - .ruff_cache
+  - "*.egg-info"
+  - .DS_Store
+  - extracted
+  - consolidated

@@ -1,0 +1,139 @@
+# Health Analysis Pipeline - Unified Workflow
+# https://just.systems/man/en/
+
+# Default recipe shows help
+default:
+    @just --list
+
+# Load .env file for environment variables
+set dotenv-load := true
+
+# Use bash for shell commands
+set shell := ["bash", "-c"]
+
+# Path to uv binary (auto-detect or fallback)
+uv := `command -v uv 2>/dev/null || echo "$HOME/.local/bin/uv"`
+
+# Path to ls-lint binary (auto-detect or fallback)
+ls_lint := `command -v ls-lint 2>/dev/null || echo "/opt/homebrew/bin/ls-lint"`
+
+# === Git + DVC Unified Workflow ===
+
+# Push code (git) and data (dvc) together
+push:
+    @echo "Pushing code and data..."
+    git push
+    {{uv}} run dvc push
+    @echo "Done. Code and data pushed."
+
+# Pull code (git) and data (dvc) together
+pull:
+    @echo "Pulling code and data..."
+    git pull
+    {{uv}} run dvc pull
+    @echo "Done. Code and data synced."
+
+# Full sync: pull then push
+sync: pull push
+
+# Add data changes to DVC and stage pointer files
+data-add:
+    @echo "Adding data changes..."
+    {{uv}} run dvc add data/apple-health
+    git add data/apple-health.dvc data/.gitignore
+    @echo "Data staged. Ready for git commit."
+
+# Show status of both git and dvc
+status:
+    @echo "=== Git Status ==="
+    @git status --short
+    @echo ""
+    @echo "=== DVC Status ==="
+    @{{uv}} run dvc status
+
+# Configure git hooks for automatic DVC sync
+setup:
+    git config core.hooksPath .githooks
+    @echo "Git hooks configured. DVC will auto-sync on checkout/merge."
+
+# === Pipeline Commands ===
+
+# Run the full analysis pipeline
+run *ARGS:
+    {{uv}} run python -m pipeline.main {{ARGS}}
+
+# Run pipeline with force flag (regenerate even if hash matches)
+run-force:
+    {{uv}} run python -m pipeline.main --force
+
+# Run weekly analysis for all individuals
+weekly *ARGS:
+    {{uv}} run python -m pipeline.weekly {{ARGS}}
+
+# Run weekly analysis for specific person
+weekly-person person:
+    {{uv}} run python -m pipeline.weekly --person {{person}}
+
+# === Development Commands ===
+
+# Install dependencies
+install:
+    {{uv}} sync --dev
+
+# Run unit tests
+test:
+    {{uv}} run pytest tests/unit/ -v -m "unit"
+
+# Run all tests
+test-all:
+    {{uv}} run pytest -v
+
+# Run e2e tests (requires data)
+test-e2e:
+    {{uv}} run pytest tests/e2e/ -v -m "e2e"
+
+# === Code Quality ===
+
+# Lint code with ruff
+lint:
+    {{uv}} run ruff check .
+
+# Format code with ruff
+fmt:
+    {{uv}} run ruff format .
+
+# Check formatting without modifying files
+fmt-check:
+    {{uv}} run ruff format --check .
+
+# Run all linting and format checks
+check: lint fmt-check lint-files
+
+# Type check with mypy
+typecheck:
+    {{uv}} run mypy pipeline/ --ignore-missing-imports
+
+# === File Structure Enforcement ===
+
+# Check file and directory naming conventions
+lint-files:
+    @echo "Checking file naming conventions..."
+    {{ls_lint}}
+
+# === Cleanup ===
+
+# Clean generated files
+clean:
+    rm -rf data/**/extracted/
+    rm -rf data/**/consolidated/
+    rm -rf .pytest_cache/
+    rm -rf **/__pycache__/
+    rm -rf .coverage
+    rm -rf htmlcov/
+    rm -rf .ruff_cache/
+    @echo "Cleaned generated files."
+
+# Deep clean (includes DVC cache)
+clean-all: clean
+    {{uv}} run dvc gc --workspace
+    @echo "Cleaned DVC cache."

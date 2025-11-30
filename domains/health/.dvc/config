@@ -1,0 +1,6 @@
+[core]
+    remote = r2
+    autostage = true
+['remote "r2"']
+    url = s3://health-analysis-data
+    endpointurl = https://ACCOUNT_ID.r2.cloudflarestorage.com
