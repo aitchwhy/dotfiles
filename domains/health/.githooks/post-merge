@@ -1,0 +1,8 @@
+#!/bin/bash
+# Post-merge hook: Sync DVC data after merge
+
+# Add tools to PATH
+export PATH="$HOME/.local/bin:/opt/homebrew/bin:$PATH"
+
+echo "Syncing DVC data after merge..."
+uv run dvc checkout 2>/dev/null || echo "Note: Run 'just pull' if data is not cached locally"

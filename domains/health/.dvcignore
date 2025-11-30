@@ -1,0 +1,10 @@
+# Don't track extracted/generated data with DVC
+**/extracted/**
+**/consolidated/**
+
+# Small files handled by git
+*.csv
+*.json
+*.yaml
+*.yml
+*.md
