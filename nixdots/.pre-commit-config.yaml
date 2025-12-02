@@ -1,0 +1,30 @@
+repos:
+  - repo: local
+    hooks:
+      - id: nix-fmt
+        name: Nix Format Check
+        entry: nix fmt -- --check
+        language: system
+        files: '\.nix$'
+        pass_filenames: false
+      
+      - id: test-modules
+        name: Test Module Evaluation
+        entry: ./tests/unit/test-modules.sh
+        language: system
+        files: 'modules/.*\.nix$'
+        pass_filenames: false
+        
+      - id: validate-structure
+        name: Validate Directory Structure
+        entry: ./tests/lib/validate-structure.sh
+        language: system
+        files: '\.nix$'
+        pass_filenames: false
+        
+      - id: flake-check
+        name: Nix Flake Check
+        entry: nix flake check --no-build
+        language: system
+        files: 'flake\.nix$|flake\.lock$'
+        pass_filenames: false
