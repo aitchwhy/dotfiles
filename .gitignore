@@ -1,0 +1,24 @@
+# Generated files
+repomix-output.xml
+state.yml
+.zcompdump
+.zcompdump-*
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Package manager cache
+.config/configstore/
+
+# Auto-backups
+.config/karabiner/automatic_backups/
+*.old.json
+*-backup.txt
+
+# GitHub Copilot state
+.config/github-copilot/versions.json
+.config/github-copilot/apps.json
+
+# API specs (fetch dynamically)
+lib/clients/api/specs/
