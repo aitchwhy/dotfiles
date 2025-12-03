@@ -16,7 +16,7 @@
 
     # Essential taps only
     taps = [
-      "nikitabobko/tap" # AeroSpace window manager
+      # "nikitabobko/tap" # AeroSpace - retired, using Hammerspoon
     ];
 
     # CLI tools
@@ -77,7 +77,7 @@
       "chatgpt" # ChatGPT app
 
       # System Utilities
-      "nikitabobko/tap/aerospace" # Window manager (from custom tap)
+      # "nikitabobko/tap/aerospace" # Retired - using Hammerspoon
       "karabiner-elements" # Keyboard customization
       "hammerspoon" # macOS automation
 
