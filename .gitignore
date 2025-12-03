@@ -22,3 +22,6 @@ state.yml
 
 # API specs (fetch dynamically)
 lib/clients/api/specs/
+
+# Claude Code local settings (user-specific, not config)
+.claude/settings.local.json

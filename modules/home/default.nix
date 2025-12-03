@@ -33,6 +33,7 @@ with lib;
     ./apps/hammerspoon.nix
     ./apps/swish.nix
     ./apps/raycast.nix
+    ./apps/claude.nix
     ./apps/misc.nix
   ];
 
@@ -73,6 +74,7 @@ with lib;
         hammerspoon.enable = mkDefault true;
         swish.enable = mkDefault true;
         raycast.enable = mkDefault true;
+        claude.enable = mkDefault true;
         misc.enable = mkDefault true;
       };
     };
