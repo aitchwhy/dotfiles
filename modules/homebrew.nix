@@ -78,7 +78,7 @@
 
       # Window/Gesture Management
       "swish" # Trackpad window gestures
-      "dropover" # Drag-and-drop shelf
+      # "dropover" # Removed - cask no longer available
 
       # QuickLook Plugins (preview files in Finder)
       "qlmarkdown" # Markdown preview
