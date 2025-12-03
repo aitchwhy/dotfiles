@@ -101,7 +101,6 @@ with lib;
 
       # Tool config paths
       LG_CONFIG_FILE = "$HOME/dotfiles/config/git/lazygit.yml";
-      STARSHIP_CONFIG = "$HOME/dotfiles/config/starship/starship.toml";
       ATUIN_CONFIG_DIR = "$HOME/dotfiles/config/atuin";
       YAZI_CONFIG_DIR = "$HOME/dotfiles/config/yazi";
       ZELLIJ_CONFIG_DIR = "$HOME/dotfiles/config/zellij";

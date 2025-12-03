@@ -31,20 +31,6 @@ with lib;
   config = mkIf config.modules.home.tools.git.enable {
     programs.git = {
       enable = true;
-
-      userName = config.modules.home.tools.git.userName;
-      userEmail = config.modules.home.tools.git.userEmail;
-
-      delta = {
-        enable = true;
-        options = {
-          navigate = true;
-          light = false;
-          line-numbers = true;
-          side-by-side = true;
-        };
-      };
-
       lfs.enable = true;
 
       signing = mkIf config.modules.home.tools.git.signing.enable {
@@ -67,42 +53,53 @@ with lib;
         "*.log"
       ];
 
-      aliases = {
-        # Essential shortcuts only
-        co = "checkout";
-        br = "branch";
-        ci = "commit";
-        st = "status";
-        unstage = "reset HEAD --";
-        last = "log -1 HEAD";
-        l = "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit";
-      };
+      settings = {
+        user = {
+          name = config.modules.home.tools.git.userName;
+          email = config.modules.home.tools.git.userEmail;
+        };
 
-      extraConfig = {
+        alias = {
+          co = "checkout";
+          br = "branch";
+          ci = "commit";
+          st = "status";
+          unstage = "reset HEAD --";
+          last = "log -1 HEAD";
+          l = "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit";
+        };
+
         init.defaultBranch = "main";
         pull.rebase = true;
         push.autoSetupRemote = true;
         merge.conflictStyle = "zdiff3";
         rerere.enabled = true;
-
         branch.sort = "-committerdate";
+        credential.helper = "osxkeychain";
 
-        # Performance
         core = {
           preloadindex = true;
           fscache = true;
           untrackedcache = true;
         };
 
-        # Better diffs
         diff = {
           algorithm = "histogram";
           colorMoved = "default";
           colorMovedWS = "ignore-all-space";
         };
+      };
+    };
 
-        # Credentials
-        credential.helper = "osxkeychain";
+    # Delta is now a separate program in home-manager
+    programs.delta = {
+      enable = true;
+      enableGitIntegration = true;
+      options = {
+        navigate = true;
+        light = false;
+        line-numbers = true;
+        side-by-side = true;
       };
     };
 
