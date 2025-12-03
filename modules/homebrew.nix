@@ -16,7 +16,6 @@
 
     # Essential taps only
     taps = [
-      # "nikitabobko/tap" # AeroSpace - retired, using Hammerspoon
     ];
 
     # CLI tools
@@ -77,12 +76,8 @@
       "chatgpt" # ChatGPT app
 
       # System Utilities
-      # "nikitabobko/tap/aerospace" # Retired - using Hammerspoon
-      "karabiner-elements" # Keyboard customization
+      "karabiner-elements" # DriverKit driver for Kanata
       "hammerspoon" # macOS automation
-
-      # Window/Gesture Management
-      "swish" # Trackpad window gestures
 
       # QuickLook Plugins (preview files in Finder)
       "qlmarkdown" # Markdown preview
