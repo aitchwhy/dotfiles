@@ -21,5 +21,9 @@ with lib;
       "hazel".source = ../../../config/hazel;
       "cursor".source = ../../../config/cursor;
     };
+
+    # Wispr Flow config (stored in ~/Library/Application Support/)
+    home.file."Library/Application Support/Wispr Flow/config.json".source =
+      ../../../config/wispr-flow/config.json;
   };
 }

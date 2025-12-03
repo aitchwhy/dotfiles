@@ -1,0 +1,838 @@
+{
+	"notifications": {
+		"HelperLoadingError": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"HelperNotReady": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"HelperPersistentFailure": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"TranscriptionError": {
+			"lastShownTime": 1764171640720,
+			"numTimesShown": 54
+		},
+		"NoMicrophonePerms": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"NoAccessibilityPerms": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"UpdateError": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"NoInternet": {
+			"lastShownTime": 1760630669004,
+			"numTimesShown": 8
+		},
+		"FailedSignIn": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"TranscriptCurrentlyProcessing": {
+			"lastShownTime": 1764388092207,
+			"numTimesShown": 13
+		},
+		"MicDisconnected": {
+			"lastShownTime": 1761310426458,
+			"numTimesShown": 35
+		},
+		"NoAudio": {
+			"lastShownTime": 1764039990657,
+			"numTimesShown": 5
+		},
+		"NoAudioDuringDictation": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"TranscriptionEmpty": {
+			"lastShownTime": 1764037201964,
+			"numTimesShown": 10
+		},
+		"MicAccessTimeout": {
+			"lastShownTime": 1764616652297,
+			"numTimesShown": 4
+		},
+		"NoClamshellBuiltInMic": {
+			"lastShownTime": 1764626547525,
+			"numTimesShown": 2
+		},
+		"WeeklyWordsLimitReached": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"StripeCheckoutError": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"FailedEnterpriseInvite": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"DatabaseGenericError": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"DatabaseCorruptionError": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"DatabaseStorageFull": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"RampOrphanBlocked": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"AudioQualityIssue": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"WrongLanguageSetting": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"AudioWorkletLoadError": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"EnterpriseInviteSent": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"PolishDisabledDuringDictation": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"SignedOut": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"BarHidden": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"MicSwitched": {
+			"lastShownTime": 1761100799031,
+			"numTimesShown": 9
+		},
+		"TranscriptCancelledDetailed": {
+			"lastShownTime": 1760300167085,
+			"numTimesShown": 3
+		},
+		"TranscriptCancelled": {
+			"lastShownTime": 1764687988913,
+			"numTimesShown": 190
+		},
+		"LearnedDictionaryWords": {
+			"lastShownTime": 1764272925277,
+			"numTimesShown": 26
+		},
+		"EmailSignature": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"FirstTimeUsingCommandMode": {
+			"lastShownTime": 1761760474693,
+			"numTimesShown": 1
+		},
+		"UsingCommandMode": {
+			"lastShownTime": 1763655134460,
+			"numTimesShown": 24
+		},
+		"DictatingWithWisprFlow": {
+			"lastShownTime": 1764708695307,
+			"numTimesShown": 2026
+		},
+		"PolishTextSuccess": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"PolishTextFailed": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"PolishTextNoInstruction": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"PolishTextLessWords": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"PolishMaxWords": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"PolishTextNotEditable": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"PolishTextNoChanges": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"SuggestSelectTextboxDetailed": {
+			"lastShownTime": 1763681088430,
+			"numTimesShown": 1
+		},
+		"SuggestSelectTextbox": {
+			"lastShownTime": 1763681094321,
+			"numTimesShown": 1
+		},
+		"Debounce": {
+			"lastShownTime": 1760327533385,
+			"numTimesShown": 3
+		},
+		"SuggestPOPO": {
+			"lastShownTime": 1762266075729,
+			"numTimesShown": 3
+		},
+		"SuggestWiredMic": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"SuggestPasteLastText": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"LanguageNotification": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"DisableMuteMusic": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"UseHeyFlowForCommandMode": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"FlowLensSuggestion": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"CursorIntegrationSuggestion": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"CursorIntegrationCelebration": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"FirstFileTaggingCelebration": {
+			"lastShownTime": 1761693465770,
+			"numTimesShown": 1
+		},
+		"FirstDefaultSnippetUseCelebration": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"OnboardingContinueNudge": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"PostOnboardingCompleted": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"AirPodsWarning": {
+			"lastShownTime": 1764613123732,
+			"numTimesShown": 1
+		},
+		"DictationDurationWarning": {
+			"lastShownTime": 1764633181109,
+			"numTimesShown": 31
+		},
+		"DictationMaxDurationReached": {
+			"lastShownTime": 1760569249693,
+			"numTimesShown": 2
+		},
+		"WeeklyWordsLimitAlert": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"CommandModeUpgradeToPro": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"CommandModeServersAreBusy": {
+			"lastShownTime": 1762266037431,
+			"numTimesShown": 1
+		},
+		"PostOnboardingInAppDictation": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"PostOnboardingFailedPaste": {
+			"lastShownTime": 1764635243029,
+			"numTimesShown": 27
+		},
+		"PolishRunningWarning": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"TodosCompletedConfetti": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"DictionaryInfo": {
+			"lastShownTime": 1760035941154,
+			"numTimesShown": 1
+		},
+		"iOSCTA": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"TeamCTA": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"EmailSignatureCTA": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"TeamInviteCTA": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"TeamTrialCTA": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"TeamTrialNoBillingInfoCTA": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"ProTrialUpgradeCTA": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"BasicUpgradeCTA": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"OrphanDomainJoinCTA": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"AdminJoinRequestCTA": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"VocabularyCTA": {
+			"lastShownTime": 1764617096770,
+			"numTimesShown": 1
+		},
+		"SnippetsCTA": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"SugarDaddyCTA": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"MicrophonePermissionRevoked": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"AccessibilityPermissionRevoked": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"PasteFailed": {
+			"lastShownTime": 1760074818274,
+			"numTimesShown": 1
+		},
+		"PasteBlocked": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"RampSSO": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"FlowLensEnabledConfetti": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"UnstableConnection": {
+			"lastShownTime": 1760394823421,
+			"numTimesShown": 1
+		},
+		"UnstableConnectionMini": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"UnstableConnectionProcessing": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"ProcessingDelayNotification": {
+			"lastShownTime": 1764704876668,
+			"numTimesShown": 73
+		},
+		"PersonalizationFirstTimePersonal": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"PersonalizationFirstTimeWork": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"PersonalizationFirstTimeEmail": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"PersonalizationFirstTimeOther": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"SmartFormattingPunctuation": {
+			"lastShownTime": 1763850364129,
+			"numTimesShown": 1
+		},
+		"SmartFormattingList": {
+			"lastShownTime": 1764633403577,
+			"numTimesShown": 1
+		},
+		"SmartFormattingEmails": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"SmartFormatting": {
+			"lastShownTime": 1764132288987,
+			"numTimesShown": 1
+		},
+		"SmartFormattingBacktrack": {
+			"lastShownTime": 1763580936545,
+			"numTimesShown": 1
+		},
+		"StatsUnlocked": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"StatsUnlockMilestones": {
+			"lastShownTime": 0,
+			"numTimesShown": 0,
+			"milestones": {}
+		},
+		"HistoryPrivacy": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"TrialEndingCTA": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		},
+		"PersonalizationFirstTime": {
+			"lastShownTime": 1760394456893,
+			"numTimesShown": 1
+		}
+	},
+	"nudge": {
+		"PersonalizationOnboarding": {
+			"lastShownTime": 1760394843444,
+			"numTimesShown": 1
+		},
+		"DeveloperCard": {
+			"lastShownTime": 1761760310316,
+			"numTimesShown": 1
+		},
+		"PostOnboardingDialog": {
+			"lastShownTime": 0,
+			"numTimesShown": 0
+		}
+	},
+	"prefs": {
+		"sessionId": "5a2bfcf4-20f3-419b-a9b3-8cc5d6d3cedf",
+		"appLastClosedTime": 1764694589693,
+		"version": "1.4.57",
+		"isUpdating": false,
+		"cache": {
+			"statistics": {
+				"weekStreak": 12,
+				"dayStreak": 78,
+				"totalWords": 400268,
+				"totalDuration": 243617.44773509956,
+				"totalNonEmptyDuration": 241453.1220325706,
+				"averageWPM": 101,
+				"wordsThisWeek": 14297,
+				"lastTranscriptTimestamp": "2025-12-02T20:51:35.321Z",
+				"totalApps": [
+					"com.droplocker.TotalLockers",
+					"com.ubercab.UberEats",
+					"com.superhuman.electron",
+					"com.raycast.macos",
+					"papillon.com",
+					"com.todoist.ios.TodoistShare",
+					"inc.tana.desktop",
+					"robinhood.com",
+					"suno.com",
+					"instagram.com",
+					"secure.chase.com",
+					"com.apple.UserNotificationCenter",
+					"amazon.com",
+					"com.sunsama.mobile",
+					"com.whoop.iphone",
+					"sora.chatgpt.com",
+					"com.flexibits.fantastical2.iphone",
+					"com.facebook.Messenger",
+					"com.relayrides.ios.RelayRides",
+					"org.whispersystems.signal",
+					"google.com",
+					"85C27NK92C.com.flexibits.fantastical2.mac.helper",
+					"com.raycast.ios.release",
+					"play.cartesia.ai",
+					"com.icandiapps.nightsky",
+					"com.tana.TanaApp",
+					"claude.ai",
+					"com.todesktop.230313mzl4w4u92",
+					"com.flexibits.cardhop.mac",
+					"gemini.google.com",
+					"sunsama.com",
+					"com.instacart",
+					"chatgpt.com",
+					"com.openai.atlas",
+					"com.mitchellh.ghostty",
+					"com.apple.ScreenContinuity",
+					"net.mullvad.mullvadbrowser",
+					"ai.polycam.polycam",
+					"com.zhiliaoapp.musically",
+					"doordash.DoorDashConsumer",
+					"freepik.com",
+					"uscis.gov",
+					"com.electron.wispr-flow",
+					"drive.google.com",
+					"com.suofang.jcbqdy",
+					"com.zimride.instant",
+					"com.google.Drive",
+					"com.apple.VoiceMemos",
+					"com.google.chrome.ios",
+					"org.pqrs.Karabiner-EventViewer",
+					"com.todoist.ios",
+					"imdb.com",
+					"4GU63N96WE.com.p5sys.jumpdesktop",
+					"firecrawl.dev",
+					"com.apple.systempreferences",
+					"com.facebook.Facebook",
+					"com.apple.mobilesms.compose",
+					"q.surveyfeedbackresponse.com",
+					"securecafenet.com",
+					"com.superhuman.Superhuman",
+					"com.kakao.KakaoTalkMac",
+					"com.superduper.superwhisper",
+					"com.openai.chat",
+					"com.google.Chrome",
+					"reservations.wynnlasvegas.com",
+					"com.apple.Spotlight",
+					"com.sillens.iShape",
+					"docs.google.com",
+					"com.anthropic.claude",
+					"com.openai.noface",
+					"com.nitinbansal85.zenquery",
+					"com.apple.finder",
+					"airi.moeru.ai",
+					"com.apple.FaceTime",
+					"com.iwilab.KakaoTalk",
+					"com.goodsnooze.MacWhisper",
+					"com.vzw.hss.myverizon",
+					"com.anthropic.claudefordesktop",
+					"com.apple.ContactsUI.ContactViewViewService",
+					"corsair.com",
+					"us.zoom.xos",
+					"opentable.com",
+					"co.hinge.mobile.ios",
+					"icloud.com",
+					"com.iwilab.KakaoTalk.Share",
+					"com.apple.siri",
+					"com.wispr.flowapp",
+					"com.DigiDNA.iMazing3Mac",
+					"com.sunsama.native-app",
+					"com.todoist.mac.Todoist",
+					"tiktok.com",
+					"com.google.Maps",
+					"com.readdle.PDFExpert5",
+					"org.pqrs.Karabiner-Elements.Settings",
+					"com.burbn.instagram",
+					"facebook.com",
+					"myaccount.google.com",
+					"io.readwise.read.RActionExtension",
+					"com.burbn.instagram.shareextension",
+					"com.granola.app",
+					"com.linguee.DeepLMobileTranslator",
+					"notion.id",
+					"com.apple.calendar.EventKitUIRemoteUIExtension",
+					"org.whispersystems.signal-desktop",
+					"dice.fm",
+					"fathom.video",
+					"app.tripsy.ios",
+					"com.apple.MobileSMS",
+					"youtube.com",
+					"com.mr-brightside.myParcel",
+					"com.apple.Photos",
+					"arxiv.org",
+					"data.go.kr",
+					"amanatsea.com",
+					"gamma.app",
+					"com.readdle.PDFExpert-Mac",
+					"com.google.antigravity",
+					"artists.spotify.com",
+					"supabase.com",
+					"com.apple.Passwords",
+					"betterstack.com",
+					"distrokid.com",
+					"railway.com",
+					"app.monarch.com"
+				]
+			},
+			"hipaaBaaSigned": true,
+			"refererName": null,
+			"referralCode": "HANK14",
+			"referrals": [
+				{
+					"email": "phillip.jm.lee@gmail.com",
+					"status": "INACTIVE",
+					"credits": 2,
+					"avatar_url": null
+				}
+			],
+			"splitKeybinds": [
+				{
+					"shortcut": [
+						53
+					],
+					"value": "dismiss"
+				},
+				{
+					"shortcut": [
+						63
+					],
+					"value": "ptt"
+				},
+				{
+					"shortcut": [
+						49,
+						63
+					],
+					"value": "popo"
+				},
+				{
+					"shortcut": [
+						59,
+						63
+					],
+					"value": "lens"
+				},
+				{
+					"shortcut": [
+						55,
+						59,
+						9
+					],
+					"value": "paste_last_text"
+				}
+			],
+			"lastTeamDictionarySyncTime": null,
+			"avatarUrls": {},
+			"defaultDictionaryItemsLoaded": false
+		},
+		"platform": "darwin",
+		"architecture": "arm64",
+		"user": {
+			"uuid": "29e09f46-f065-467c-b210-d314137d9fa0",
+			"firstName": "Hank",
+			"lastName": "Lee",
+			"email": "hank.lee.qed@gmail.com",
+			"avatarUrl": "/Users/hank/Library/Application Support/Wispr Flow/avatars/avatar_1760033813526.png",
+			"pagesCompleted": [
+				{
+					"page": "welcome-basic",
+					"completed": true
+				},
+				{
+					"page": "about-yourself",
+					"completed": true
+				},
+				{
+					"page": "spend-time-typing",
+					"completed": true
+				},
+				{
+					"page": "privacy",
+					"completed": true
+				},
+				{
+					"page": "permissions",
+					"completed": true
+				},
+				{
+					"page": "microphone-test",
+					"completed": true
+				},
+				{
+					"page": "shortcut",
+					"completed": true
+				},
+				{
+					"page": "language",
+					"completed": true
+				},
+				{
+					"page": "try-it-yourself",
+					"completed": true
+				},
+				{
+					"page": "flow-pro",
+					"completed": true
+				},
+				{
+					"page": "referral",
+					"completed": true
+				}
+			],
+			"lensOnboardingPagesCompleted": [
+				false,
+				false,
+				false,
+				false
+			],
+			"lensOnboardingStatus": "not_started",
+			"shouldMuteAudio": false,
+			"streamAudio": false,
+			"shouldAutoLearnWords": true,
+			"shouldOCRScreenCapture": false,
+			"enableSounds": true,
+			"selectedSoundFolder": null,
+			"hideAppInDock": false,
+			"openAtLogin": true,
+			"shareUsageData": false,
+			"onboardingCompleted": true,
+			"initialSubscriptionSynced": true,
+			"clickableBubbleSnoozeUntil": 1760035889541,
+			"hideFlowBarPermanently": false,
+			"useAxContext": true,
+			"cursorIdeIntegration": true,
+			"ideFileTagging": true,
+			"emailAutoSignature": false,
+			"emailSignatureOption": "written_with_flow",
+			"usedLanguages": [
+				"en"
+			],
+			"selectedLanguages": [
+				"en",
+				"ko"
+			],
+			"shortcuts": {
+				"63": "ptt",
+				"49+63": "popo",
+				"59+63": "lens",
+				"55+59+9": "paste_last_text"
+			},
+			"modifierShortcut": "48",
+			"overrideAudioDeviceId": "default",
+			"defaultTranscriptionFormat": "Apply AI formatting",
+			"appTranscriptionFormats": [],
+			"aiFormatting": true,
+			"renderOptions": {
+				"width": 1440,
+				"height": 1264,
+				"sidebarOpen": false
+			},
+			"internal": {
+				"isExperimentalModelEnabled": false,
+				"isToneMatchEnabled": false,
+				"isHapticsEnabled": false,
+				"shouldSaveAxText": false
+			},
+			"polishInstructions": [],
+			"polishAutoOpenDiff": false,
+			"polishUseCount": 0,
+			"creatorMode": true,
+			"tutorials": {
+				"sentMessages": false,
+				"sentEmails": false,
+				"sentMessagesAI": false,
+				"usedHandsfree": false,
+				"usedWhisperMode": false
+			},
+			"subscription": {
+				"status": "active",
+				"daysLeft": null,
+				"plan": "FLOW_PRO_MONTHLY",
+				"credits": 0,
+				"isSubscribed": true,
+				"renewalTimestamp": 1766683712000,
+				"teamDomainStatus": "forbidden",
+				"isStudent": false,
+				"totalTrialDays": 14,
+				"sourceOfSubscription": "stripe",
+				"teamTrialGiven": false
+			},
+			"enterprise": null,
+			"lastNotificationReadTime": 1762790550990,
+			"lastLogsSentTime": 0,
+			"lastNoteSyncTime": 1764709063932,
+			"registeredDevices": [
+				"ios",
+				"darwin_arm64"
+			],
+			"flowLensEnabled": false,
+			"lensWaitingForReopen": false,
+			"theme": "light",
+			"notificationSettings": {
+				"achievementsMuted": false,
+				"referralsMuted": false,
+				"announcementsMuted": false
+			},
+			"commandModeEnabled": true,
+			"dictionarySort": "Newest",
+			"emailWordCount": 0,
+			"personalizationStyles": {
+				"work": "formal",
+				"email": "formal",
+				"other": "formal",
+				"unset": "default",
+				"personal": "formal"
+			},
+			"personalizationOnboardingCompleted": true,
+			"notesViewType": "grid",
+			"showTIY": false,
+			"postOnboardingCompleted": false,
+			"userInformation": null,
+			"postOnboardingSelectedUseCase": null,
+			"typingLocations": [],
+			"postOnboardingStep": "set_app",
+			"onboardingCompletedTime": null
+		},
+		"permissions": [
+			{
+				"name": "accessibility",
+				"clicked": true,
+				"granted": true
+			},
+			{
+				"name": "microphone",
+				"clicked": true,
+				"granted": true
+			}
+		],
+		"deviceId": "60c043e88707ca1cbffcbf65c5a5c80954c57d23c6b09060cb8a025ee17a7f8d",
+		"timezone": "America/New_York"
+	},
+	"activationCron": {
+		"FirstDictation": {
+			"initialActivationTimestamp": null,
+			"shouldRestart": false,
+			"isActive": false
+		}
+	}
+}
