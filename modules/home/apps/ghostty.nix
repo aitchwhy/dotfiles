@@ -32,7 +32,7 @@ with lib;
         fullscreen = false;
 
         # Appearance
-        theme = "tokyonight-storm";
+        theme = "TokyoNight Storm";
         window-theme = "system";
         window-padding-balance = true;
         font-family = "Fira Code Nerd Font";
@@ -61,8 +61,10 @@ with lib;
         quick-terminal-autohide = true;
 
         # Shell integration
-        shell-integration = "zsh";
-        shell-integration-features = "cursor,title";
+        # Using "detect" to let terminal multiplexers (Zellij) handle their own integration
+        # Disabling cursor,title features that conflict with Zellij's terminal management
+        shell-integration = "detect";
+        shell-integration-features = "no-cursor,no-title";
 
         # Keybinds
         keybind = [
