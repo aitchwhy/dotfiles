@@ -1,9 +1,0 @@
-{
-  "version": "1",
-  "name": "Noggin API 1.0.1",
-  "type": "collection",
-  "ignore": [
-    "node_modules",
-    ".git"
-  ]
-}
