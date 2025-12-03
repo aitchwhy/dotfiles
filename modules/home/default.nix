@@ -34,6 +34,7 @@ with lib;
     ./apps/swish.nix
     ./apps/raycast.nix
     ./apps/claude.nix
+    ./apps/cursor.nix
     ./apps/misc.nix
   ];
 
@@ -75,6 +76,7 @@ with lib;
         swish.enable = mkDefault true;
         raycast.enable = mkDefault true;
         claude.enable = mkDefault true;
+        cursor.enable = mkDefault true;
         misc.enable = mkDefault true;
       };
     };
