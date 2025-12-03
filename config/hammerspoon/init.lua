@@ -4,7 +4,8 @@
 --
 -- Key bindings:
 --   Hyper + Arrows       = Snap to half/thirds (cycles through sizes)
---   Hyper + Enter        = Toggle maximize / restore
+--   Hyper + Enter        = Fullscreen (fills screen)
+--   Hyper + Shift + Enter = Toggle maximize / restore
 --   Hyper + W            = Fuzzy window switcher
 --   Hyper + Escape       = Toggle auto-tiling mode
 --
@@ -18,6 +19,7 @@ hs.window.animationDuration = 0
 hs.logger.defaultLogLevel = "warning"
 
 local hyper = { "ctrl", "alt", "cmd" }
+local hyperShift = { "ctrl", "alt", "cmd", "shift" }
 
 -- Store original window frames for restore
 local savedFrames = {}
@@ -172,10 +174,22 @@ hs.hotkey.bind(hyper, "Down", function()
 end)
 
 --------------------------------------------------------------------------------
--- Toggle Maximize (Hyper + Enter)
+-- Fullscreen (Hyper + Enter) - just fills the screen
 --------------------------------------------------------------------------------
 
 hs.hotkey.bind(hyper, "Return", function()
+  local win = hs.window.focusedWindow()
+  if win then
+    autoTileEnabled = false
+    win:moveToUnit(positions.maximize)
+  end
+end)
+
+--------------------------------------------------------------------------------
+-- Toggle Maximize/Restore (Hyper + Shift + Enter)
+--------------------------------------------------------------------------------
+
+hs.hotkey.bind(hyperShift, "Return", function()
   local win = hs.window.focusedWindow()
   if not win then
     return
@@ -190,7 +204,7 @@ hs.hotkey.bind(hyper, "Return", function()
     and math.abs(currentFrame.w - screenFrame.w) < 10
     and math.abs(currentFrame.h - screenFrame.h) < 10
 
-  autoTileEnabled = false -- Disable auto-tiling when manually maximizing
+  autoTileEnabled = false
 
   if isMaximized and savedFrames[id] then
     win:setFrame(savedFrames[id])
