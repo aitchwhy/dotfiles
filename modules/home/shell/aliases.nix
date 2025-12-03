@@ -86,7 +86,6 @@ with lib;
       hf = "huggingface-cli";
       rx = "repomix";
       at = "atuin";
-      aero = "aerospace";
 
       # Nix management
       rebuild = "darwin-rebuild switch --flake ~/dotfiles#hank-mbp-m4";
