@@ -31,6 +31,7 @@ with lib;
 
       # Behavior
       FXEnableExtensionChangeWarning = false;
+      FXRemoveOldTrashItems = true; # Auto-empty trash after 30 days
       QuitMenuItem = true;
       FXDefaultSearchScope = "SCcf"; # Search current folder
 
@@ -54,6 +55,8 @@ with lib;
       ShowMountedServersOnDesktop = true;
       ShowRemovableMediaOnDesktop = true;
       _FXSortFoldersFirst = true;
+      _FXSortFoldersFirstOnDesktop = true;
+      WarnOnEmptyTrash = false;
     };
 
     # Prevent .DS_Store files on network and USB volumes
