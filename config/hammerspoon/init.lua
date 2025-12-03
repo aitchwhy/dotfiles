@@ -1,709 +1,242 @@
--- Hammerspoon Configuration for macOS on Apple Silicon
--- Optimized for 2025 and Apple Silicon Macs
--- For documentation, see: https://www.hammerspoon.org/docs/
+-- Hammerspoon Configuration
+-- AeroSpace-style auto-tiling window management
+-- Kanata handles: CapsLock -> Esc (tap) | Hyper (hold)
+--
+-- Key bindings:
+--   Hyper + Arrows       = Snap to half/thirds (cycles through sizes)
+--   Hyper + Enter        = Toggle maximize / restore
+--   Hyper + W            = Fuzzy window switcher
+--   Hyper + Escape       = Toggle auto-tiling mode
+--
+-- Auto-tiling: When enabled, windows auto-arrange in columns
 
--- Set up Lua path to find our modules (for standard setup and potential plugins)
--- package.path = package.path ..
---     ";" ..
---     os.getenv("HOME") .. "/.hammerspoon/?.lua" .. ";" .. os.getenv("HOME") .. "/.hammerspoon/Spoons/?.spoon/init.lua"
+--------------------------------------------------------------------------------
+-- Configuration
+--------------------------------------------------------------------------------
 
---------------------------------------------------------------------
---  Hammerspoon: Hyper‑centric launcher & Which‑Key‑style overlay  --
---------------------------------------------------------------------
+hs.window.animationDuration = 0
+hs.logger.defaultLogLevel = "warning"
 
-------------------------------------
--- 0. Mods & Spoon setup
-------------------------------------
--- local hyper      = { "ctrl", "alt", "cmd" }
--- local hyperShift = { "ctrl", "alt", "cmd", "shift" }
+local hyper = { "ctrl", "alt", "cmd" }
 
--- -- Install the AwesomeKeys spoon (place in ~/.hammerspoon/Spoons)
--- hs.loadSpoon("AwesomeKeys")
--- spoon.AwesomeKeys:bindHyperKeys(true) -- enable cheat‑sheet on Hyper hold
+-- Store original window frames for restore
+local savedFrames = {}
+local autoTileEnabled = true
 
--- ------------------------------------
--- -- 1. Helper: context detection
--- ------------------------------------
--- local function frontAppName()
---     return hs.application.frontmostApplication():name() or ""
--- end
--- local function isTerminal() return frontAppName() == "Ghostty" end
+--------------------------------------------------------------------------------
+-- Auto-reload on config changes
+--------------------------------------------------------------------------------
 
--- ------------------------------------
--- -- 2. Navigation (Hyper+H/J/K/L)
--- ------------------------------------
--- local function sendAlt(mods, key)
---     hs.eventtap.keyStroke(mods, key, 0)
--- end
--- local function nav(dir)
---     if isTerminal() then
---         sendAlt({ "alt" }, dir) -- Zellij pane focus
---     else
---         sendAlt({ "alt" }, dir) -- AeroSpace window focus
---     end
--- end
--- for key, dir in pairs { h = "left", j = "down", k = "up", l = "right" } do
---     hs.hotkey.bind(hyper, key, function() nav(dir) end)
---     hs.hotkey.bind(hyperShift, key, function()
---         if isTerminal() then
---             sendAlt({ "alt", "shift" }, dir) -- swap pane
---         else
---             sendAlt({ "alt", "shift" }, dir) -- move window
---         end
---     end)
--- end
+local function reloadConfig(files)
+  for _, file in pairs(files) do
+    if file:sub(-4) == ".lua" then
+      hs.reload()
+      return
+    end
+  end
+end
 
--- ------------------------------------
--- -- 3. Workspaces (Hyper+1..5)
--- ------------------------------------
--- for i = 1, 5 do
---     hs.hotkey.bind(hyper, tostring(i), function()
---         sendAlt({ "alt" }, tostring(i)) -- focus workspace (AeroSpace)
---     end)
---     hs.hotkey.bind(hyperShift, tostring(i), function()
---         sendAlt({ "alt", "shift" }, tostring(i)) -- move window to workspace
---     end)
--- end
+hs.pathwatcher.new(os.getenv("HOME") .. "/.hammerspoon/", reloadConfig):start()
 
--- ------------------------------------
--- -- 4. App launcher namespace (Hyper + key)
--- ------------------------------------
--- hs.hotkey.bind(hyper, "T", function() hs.application.launchOrFocus("Ghostty") end)
--- hs.hotkey.bind(hyper, "B", function() hs.application.launchOrFocus("Arc") end)
--- hs.hotkey.bind(hyper, "O", function() hs.application.launchOrFocus("Obsidian") end)
--- hs.hotkey.bind(hyper, "C", function() hs.application.launchOrFocus("Cursor") end)
--- hs.hotkey.bind(hyper, "S", function() hs.application.launchOrFocus("Slack") end)
--- hs.hotkey.bind(hyper, "G", function() hs.application.launchOrFocus("Fork") end)
+--------------------------------------------------------------------------------
+-- Auto-Tiling (AeroSpace-style)
+--------------------------------------------------------------------------------
 
--- ------------------------------------
--- -- 5. Misc global actions
--- ------------------------------------
--- -- Raycast (Option+Space) behind Hyper+Space
--- hs.hotkey.bind(hyper, "Space", function()
---     hs.eventtap.keyStroke({ "alt" }, "Space", 0)
--- end)
+local function tileWindows()
+  if not autoTileEnabled then
+    return
+  end
 
--- -- Example tiling preset on Hyper+Return
--- hs.hotkey.bind(hyper, "Return", function()
---     hs.alert.show("⌨️  Quad Layout")
---     -- TODO: call AeroSpace layout script or chain of window moves
--- end)
+  local screen = hs.screen.mainScreen()
+  local frame = screen:frame()
+  local windows = hs.window.filter
+    .new()
+    :setCurrentSpace(true)
+    :setScreens({ screen:id() })
+    :getWindows(hs.window.filter.sortByFocusedLast)
 
--- -- ===========================
--- -- Global Configurations
--- -- ===========================
---
--- -- One important detail to call out here is that hs.reload() destroys the current Lua interpreter and creates a new one. If we had any code after hs.reload() in this function, it would not be called.
---
--- hs.hotkey.bind({ "cmd", "alt", "ctrl" }, "W", function()
---     hs.alert.show("Hello World!")
--- end)
---
--- hs.hotkey.bind({ "cmd", "opt", "ctrl" }, "R", function()
---     hs.reload()
--- end)
--- hs.alert.show("Config loaded")
---
---
--- -- ~/.hammerspoon/init.lua - Ergonomic Examples
---
--- hs.logger.setLogLevel('warning')
---
--- -- Define Hyper Modifier (ensure this matches your Karabiner setup)
--- local hyper = {'cmd', 'ctrl', 'opt', 'shift'}
--- local hyperShift = {'cmd', 'ctrl', 'opt', 'shift', 'shift'}
---
--- -- --- Application Switching (Hyper + Home Row / Easy Reach Keys) ---
--- -- Group common apps on easily reachable keys (e.g., A,S,D,F or mnemonic)
--- hs.hotkey.bind(hyper, 'T', function() hs.application.launchOrFocus('Ghostty') end) -- T = Terminal
--- hs.hotkey.bind(hyper, 'B', function() hs.application.launchOrFocus('Arc') end) -- B = Browser
--- hs.hotkey.bind(hyper, 'N', function() hs.application.launchOrFocus('Obsidian') end) -- N = Notes
--- hs.hotkey.bind(hyper, 'C', function() hs.application.launchOrFocus('Cursor') end) -- C = Code
--- hs.hotkey.bind(hyper, 'S', function() hs.application.launchOrFocus('Slack') end) -- S = Slack/Comms (Example)
--- hs.hotkey.bind(hyper, 'G', function() hs.application.launchOrFocus('Fork') end) -- G = Git
---
--- -- --- Triggering Aerospace Workspaces ---
--- -- Use Hammerspoon to potentially add logic, but keys mirror Aerospace direct binds
--- function switchToWorkspace(workspaceNum)
---     hs.execute("aerospace workspace " .. workspaceNum)
--- end
--- function moveWinToWorkspace(workspaceNum)
---     -- Ensure window focus first if needed
---     local win = hs.window.focusedWindow()
---     if not win then return end
---     hs.execute("aerospace move-node-to-workspace " .. workspaceNum)
--- end
--- function moveWinAndSwitch(workspaceNum)
---     local win = hs.window.focusedWindow()
---     if not win then return end
---     -- Use Aerospace sequence directly if possible, or execute commands
---     hs.execute("aerospace move-node-to-workspace " .. workspaceNum .. " && aerospace workspace " .. workspaceNum)
--- end
---
--- -- Bind Hyper + Number (Matches Aerospace for consistency)
--- for i = 1, 5 do -- Only binding 1-5 for ergonomics
---     hs.hotkey.bind(hyper, tostring(i), function() switchToWorkspace(tostring(i)) end)
---     hs.hotkey.bind(hyperShift, tostring(i), function() moveWinToWorkspace(tostring(i)) end)
---     -- Optional: Add another modifier combo for move+switch if needed
--- end
---
--- -- --- Custom Layout Trigger ---
--- -- Hyper + L (Layout) or Hyper + Return are good options
--- hs.hotkey.bind(hyper, 'Return', function()
---     -- Place your custom layout function here (like the side-by-side example previously)
---     hs.alert.show('Layout Triggered')
--- end)
---
--- -- --- Trigger Raycast ---
--- -- Use Hyper + Space if Raycast isn't already bound there
--- hs.hotkey.bind(hyper, 'Space', function()
---     -- Option 1: Simulate Raycast's assigned hotkey (e.g., Opt+Space)
---     -- hs.eventtap.keyStroke({'opt'}, 'space')
---     -- Option 2: Use Raycast URL scheme if available/needed
---     -- hs.urlevent.openURL("raycast://...")
---     hs.alert.show('Raycast Triggered') -- Placeholder
--- end)
---
---
--- -- --- Hammerspoon Reload --- (Keep as is)
--- function reloadConfig(files) -- ... (same as before) ... end
--- hs.pathwatcher.new(os.getenv('HOME') .. '/.hammerspoon/', reloadConfig):start()
--- hs.alert.show('Hammerspoon Config Reloaded')
---
--- print('Hammerspoon ergonomic config loaded')
---
--- --
--- -- -- Suppress animations for better performance on Apple Silicon
--- -- hs.window.animationDuration = 0
--- --
--- -- -- Set logger level (can be 'verbose', 'debug', 'info', 'warning', 'error', 'nothing')
--- -- hs.logger.defaultLogLevel = 'warning'
--- --
--- -- -- Auto-reload config on changes (great for development)
--- -- local function reloadConfig(files)
--- --     local doReload = false
--- --     for _, file in pairs(files) do
--- --         if file:sub(-4) == ".lua" then
--- --             doReload = true
--- --             break
--- --         end
--- --     end
--- --     if doReload then
--- --         hs.reload()
--- --     end
--- -- end
--- --
--- -- -- Watch for config changes to auto-reload
--- -- configWatcher = hs.pathwatcher.new(hs.configdir, reloadConfig):start()
--- --
--- -- -- Notify when config is loaded
--- -- hs.notify.new({title="Hammerspoon", informativeText="Config loaded"}):send()
--- --
--- -- -- ===========================
--- -- -- Window Management
--- -- -- ===========================
--- --
--- -- -- Window grid for precise window placement (adjust grid size as needed)
--- -- hs.grid.setGrid('6x4')
--- -- hs.grid.setMargins({w = 10, h = 10})
--- --
--- -- -- Key hyper for window operations - Right Option and Shift
--- -- -- Works well with Apple keyboards including MacBooks
--- -- hyper = {"alt", "shift"}
--- --
--- -- -- Window manipulation functions
--- -- local windowActions = {
--- --     -- Basic window positions
--- --     fullScreen = function()
--- --         local win = hs.window.focusedWindow()
--- --         if win then win:maximize() end
--- --     end,
--- --
--- --     leftHalf = function()
--- --         local win = hs.window.focusedWindow()
--- --         if win then
--- --             local f = win:frame()
--- --             local screen = win:screen()
--- --             local max = screen:frame()
--- --
--- --             f.x = max.x
--- --             f.y = max.y
--- --             f.w = max.w / 2
--- --             f.h = max.h
--- --             win:setFrame(f)
--- --         end
--- --     end,
--- --
--- --     rightHalf = function()
--- --         local win = hs.window.focusedWindow()
--- --         if win then
--- --             local f = win:frame()
--- --             local screen = win:screen()
--- --             local max = screen:frame()
--- --
--- --             f.x = max.x + (max.w / 2)
--- --             f.y = max.y
--- --             f.w = max.w / 2
--- --             f.h = max.h
--- --             win:setFrame(f)
--- --         end
--- --     end,
--- --
--- --     topHalf = function()
--- --         local win = hs.window.focusedWindow()
--- --         if win then
--- --             local f = win:frame()
--- --             local screen = win:screen()
--- --             local max = screen:frame()
--- --
--- --             f.x = max.x
--- --             f.y = max.y
--- --             f.w = max.w
--- --             f.h = max.h / 2
--- --             win:setFrame(f)
--- --         end
--- --     end,
--- --
--- --     bottomHalf = function()
--- --         local win = hs.window.focusedWindow()
--- --         if win then
--- --             local f = win:frame()
--- --             local screen = win:screen()
--- --             local max = screen:frame()
--- --
--- --             f.x = max.x
--- --             f.y = max.y + (max.h / 2)
--- --             f.w = max.w
--- --             f.h = max.h / 2
--- --             win:setFrame(f)
--- --         end
--- --     end,
--- --
--- --     -- Quarter screen positions
--- --     topLeft = function()
--- --         local win = hs.window.focusedWindow()
--- --         if win then
--- --             local f = win:frame()
--- --             local screen = win:screen()
--- --             local max = screen:frame()
--- --
--- --             f.x = max.x
--- --             f.y = max.y
--- --             f.w = max.w / 2
--- --             f.h = max.h / 2
--- --             win:setFrame(f)
--- --         end
--- --     end,
--- --
--- --     topRight = function()
--- --         local win = hs.window.focusedWindow()
--- --         if win then
--- --             local f = win:frame()
--- --             local screen = win:screen()
--- --             local max = screen:frame()
--- --
--- --             f.x = max.x + (max.w / 2)
--- --             f.y = max.y
--- --             f.w = max.w / 2
--- --             f.h = max.h / 2
--- --             win:setFrame(f)
--- --         end
--- --     end,
--- --
--- --     bottomLeft = function()
--- --         local win = hs.window.focusedWindow()
--- --         if win then
--- --             local f = win:frame()
--- --             local screen = win:screen()
--- --             local max = screen:frame()
--- --
--- --             f.x = max.x
--- --             f.y = max.y + (max.h / 2)
--- --             f.w = max.w / 2
--- --             f.h = max.h / 2
--- --             win:setFrame(f)
--- --         end
--- --     end,
--- --
--- --     bottomRight = function()
--- --         local win = hs.window.focusedWindow()
--- --         if win then
--- --             local f = win:frame()
--- --             local screen = win:screen()
--- --             local max = screen:frame()
--- --
--- --             f.x = max.x + (max.w / 2)
--- --             f.y = max.y + (max.h / 2)
--- --             f.w = max.w / 2
--- --             f.h = max.h / 2
--- --             win:setFrame(f)
--- --         end
--- --     end,
--- --
--- --     -- Center window
--- --     center = function()
--- --         local win = hs.window.focusedWindow()
--- --         if win then
--- --             local f = win:frame()
--- --             local screen = win:screen()
--- --             local max = screen:frame()
--- --
--- --             f.x = max.x + (max.w * 0.125)
--- --             f.y = max.y + (max.h * 0.125)
--- --             f.w = max.w * 0.75
--- --             f.h = max.h * 0.75
--- --             win:setFrame(f)
--- --         end
--- --     end,
--- --
--- --     -- Center without resizing
--- --     centerNoResize = function()
--- --         local win = hs.window.focusedWindow()
--- --         if win then
--- --             local f = win:frame()
--- --             local screen = win:screen()
--- --             local max = screen:frame()
--- --
--- --             f.x = max.x + ((max.w - f.w) / 2)
--- --             f.y = max.y + ((max.h - f.h) / 2)
--- --             win:setFrame(f)
--- --         end
--- --     end,
--- --
--- --     -- Next/previous screen (multi-monitor setups)
--- --     nextScreen = function()
--- --         local win = hs.window.focusedWindow()
--- --         if win then
--- --             win:moveToScreen(win:screen():next())
--- --         end
--- --     end,
--- --
--- --     prevScreen = function()
--- --         local win = hs.window.focusedWindow()
--- --         if win then
--- --             win:moveToScreen(win:screen():previous())
--- --         end
--- --     end,
--- -- }
--- --
--- -- -- Keybindings for window management
--- -- -- Using consistent modifiers for window operations
--- -- hs.hotkey.bind(hyper, "f", windowActions.fullScreen)
--- -- hs.hotkey.bind(hyper, "left", windowActions.leftHalf)
--- -- hs.hotkey.bind(hyper, "right", windowActions.rightHalf)
--- -- hs.hotkey.bind(hyper, "up", windowActions.topHalf)
--- -- hs.hotkey.bind(hyper, "down", windowActions.bottomHalf)
--- -- hs.hotkey.bind(hyper, "1", windowActions.topLeft)
--- -- hs.hotkey.bind(hyper, "2", windowActions.topRight)
--- -- hs.hotkey.bind(hyper, "3", windowActions.bottomLeft)
--- -- hs.hotkey.bind(hyper, "4", windowActions.bottomRight)
--- -- hs.hotkey.bind(hyper, "c", windowActions.center)
--- -- hs.hotkey.bind(hyper, "m", windowActions.centerNoResize)
--- -- hs.hotkey.bind(hyper, "n", windowActions.nextScreen)
--- -- hs.hotkey.bind(hyper, "p", windowActions.prevScreen)
--- --
--- -- -- ===========================
--- -- -- Application Shortcuts
--- -- -- ===========================
--- --
--- -- -- Quick application launcher with Hyper+letter
--- -- local appShortcuts = {
--- --     t = "Terminal",           -- Terminal
--- --     b = "Brave Browser",      -- Browser
--- --     w = "Warp",               -- Warp terminal
--- --     f = "Finder",             -- Finder
--- --     s = "Slack",              -- Slack
--- --     v = "Visual Studio Code", -- VS Code
--- --     g = "Ghostty",            -- Ghostty terminal
--- --     o = "Obsidian",           -- Obsidian
--- --     z = "Zed",                -- Zed editor
--- --     i = "iTerm",              -- iTerm
--- --     c = "Claude",             -- Claude AI
--- --     d = "Cursor",             -- Cursor editor
--- -- }
--- --
--- -- -- Register app shortcuts
--- -- for key, app in pairs(appShortcuts) do
--- --     hs.hotkey.bind({"ctrl", "alt"}, key, function()
--- --         hs.application.launchOrFocus(app)
--- --     end)
--- -- end
--- --
--- -- -- ===========================
--- -- -- Clipboard Manager
--- -- -- ===========================
--- --
--- -- -- Simple clipboard history (stores recent items)
--- -- local clipboardHistory = {}
--- -- local maxClipboardHistory = 10
--- -- local lastChange = hs.pasteboard.changeCount()
--- --
--- -- -- Check for clipboard changes
--- -- local clipboardWatcher = hs.timer.new(0.5, function()
--- --     local currentChange = hs.pasteboard.changeCount()
--- --     if currentChange ~= lastChange then
--- --         lastChange = currentChange
--- --         local clipboardContent = hs.pasteboard.getContents()
--- --
--- --         if clipboardContent then
--- --             -- Only store if it's not already at the top of history
--- --             if #clipboardHistory == 0 or clipboardHistory[1] ~= clipboardContent then
--- --                 table.insert(clipboardHistory, 1, clipboardContent)
--- --                 if #clipboardHistory > maxClipboardHistory then
--- --                     table.remove(clipboardHistory)
--- --                 end
--- --             end
--- --         end
--- --     end
--- -- end)
--- --
--- -- -- Start the clipboard watcher
--- -- clipboardWatcher:start()
--- --
--- -- -- Show clipboard history
--- -- hs.hotkey.bind({"ctrl", "cmd"}, "v", function()
--- --     if #clipboardHistory == 0 then
--- --         return
--- --     end
--- --
--- --     local chooser = hs.chooser.new(function(choice)
--- --         if choice then
--- --             hs.pasteboard.setContents(choice.text)
--- --             -- Simulate paste for immediate use
--- --             hs.eventtap.keyStroke({"cmd"}, "v")
--- --         end
--- --     end)
--- --
--- --     local choices = {}
--- --     for i, item in ipairs(clipboardHistory) do
--- --         -- Truncate long items for display
--- --         local displayText = item
--- --         if #displayText > 60 then
--- --             displayText = string.sub(displayText, 1, 57) .. "..."
--- --         end
--- --
--- --         -- Replace newlines and tabs for display
--- --         displayText = displayText:gsub("\n", "⏎ ")
--- --         displayText = displayText:gsub("\t", "⇥ ")
--- --
--- --         table.insert(choices, {
--- --             text = item,
--- --             subText = "Item " .. i .. " of " .. #clipboardHistory,
--- --             uuid = i,
--- --             id = i,
--- --             display = displayText
--- --         })
--- --     end
--- --
--- --     chooser:choices(choices)
--- --     chooser:searchSubText(true)
--- --     chooser:show()
--- -- end)
--- --
--- -- -- ===========================
--- -- -- Caffeine/Caffeinate replacement
--- -- -- ===========================
--- --
--- -- -- Create a menubar item for toggling system sleep
--- -- local caffeine = hs.menubar.new()
--- --
--- -- -- Function to update menu bar icon
--- -- local function setCaffeineDisplay(state)
--- --     if state then
--- --         caffeine:setTitle("☕️")
--- --         caffeine:setTooltip("Hammerspoon: System sleep is disabled")
--- --     else
--- --         caffeine:setTitle("💤")
--- --         caffeine:setTooltip("Hammerspoon: System sleep is enabled")
--- --     end
--- -- end
--- --
--- -- -- Function to toggle system sleep
--- -- local function toggleCaffeine()
--- --     local current = hs.caffeinate.toggle("displayIdle")
--- --     setCaffeineDisplay(current)
--- -- end
--- --
--- -- -- Initialize
--- -- if caffeine then
--- --     caffeine:setClickCallback(toggleCaffeine)
--- --     setCaffeineDisplay(hs.caffeinate.get("displayIdle"))
--- -- end
--- --
--- -- -- Also add keyboard shortcut to toggle
--- -- hs.hotkey.bind({"ctrl", "alt"}, "c", toggleCaffeine)
--- --
--- -- -- ===========================
--- -- -- Screen Management
--- -- -- ===========================
--- --
--- -- -- Detect when screens change (e.g., connecting to external monitor)
--- -- hs.screen.watcher.new(function()
--- --     -- You can add custom handling for screen changes here
--- --     -- For example, reorganize windows when connecting to a dock
--- --
--- --     -- Notify of screen change
--- --     hs.notify.new({title="Hammerspoon", informativeText="Screen configuration changed"}):send()
--- -- end):start()
--- --
--- -- -- ===========================
--- -- -- Audio Device Manager
--- -- -- ===========================
--- --
--- -- -- Quick toggle between audio outputs
--- -- local function toggleAudioOutput()
--- --     local currentOutput = hs.audiodevice.defaultOutputDevice()
--- --     local devices = hs.audiodevice.allOutputDevices()
--- --
--- --     if #devices <= 1 then
--- --         hs.alert.show("Only one audio output available")
--- --         return
--- --     end
--- --
--- --     -- Find current device index
--- --     local currentIndex = 0
--- --     for i, device in ipairs(devices) do
--- --         if device:uid() == currentOutput:uid() then
--- --             currentIndex = i
--- --             break
--- --         end
--- --     end
--- --
--- --     -- Move to next device (cycling)
--- --     local nextIndex = (currentIndex % #devices) + 1
--- --     local nextDevice = devices[nextIndex]
--- --
--- --     -- Set next device as default
--- --     nextDevice:setDefaultOutputDevice()
--- --
--- --     -- Show alert with new device name
--- --     hs.alert.show("🔊 " .. nextDevice:name())
--- -- end
--- --
--- -- -- Keyboard shortcut for audio toggle
--- -- hs.hotkey.bind({"ctrl", "alt"}, "a", toggleAudioOutput)
--- --
--- -- -- ===========================
--- -- -- WiFi Watcher
--- -- -- ===========================
--- --
--- -- -- Monitor WiFi status changes
--- -- local wifiWatcher = nil
--- -- local homeSSID = "YourHomeWiFi" -- Replace with your home WiFi name
--- -- local lastSSID = hs.wifi.currentNetwork()
--- --
--- -- -- Function called when WiFi status changes
--- -- local function ssidChangedCallback()
--- --     local newSSID = hs.wifi.currentNetwork()
--- --
--- --     -- Store new SSID for comparison
--- --     if newSSID ~= lastSSID then
--- --         -- Different actions based on network
--- --         if newSSID == homeSSID then
--- --             -- At home - maybe adjust volume or turn on certain apps
--- --             hs.audiodevice.defaultOutputDevice():setVolume(50)
--- --         elseif newSSID == nil and lastSSID ~= nil then
--- --             -- WiFi disconnected
--- --             hs.notify.new({title="Hammerspoon", informativeText="WiFi disconnected"}):send()
--- --         elseif newSSID ~= nil and lastSSID == nil then
--- --             -- WiFi connected
--- --             hs.notify.new({title="Hammerspoon", informativeText="WiFi connected to " .. newSSID}):send()
--- --         end
--- --
--- --         lastSSID = newSSID
--- --     end
--- -- end
--- --
--- -- -- Start the WiFi watcher
--- -- wifiWatcher = hs.wifi.watcher.new(ssidChangedCallback)
--- -- wifiWatcher:start()
--- --
--- -- -- ===========================
--- -- -- URL Dispatch Handler
--- -- -- ===========================
--- --
--- -- -- Custom URL handler (hammerspoon://command)
--- -- hs.urlevent.bind("command", function(eventName, params)
--- --     if params["name"] == "reload" then
--- --         hs.reload()
--- --     elseif params["name"] == "caffeine" then
--- --         toggleCaffeine()
--- --     elseif params["name"] == "launch" and params["app"] then
--- --         hs.application.launchOrFocus(params["app"])
--- --     end
--- -- end)
--- --
--- -- -- ===========================
--- -- -- Spoons (Optional Plugins)
--- -- -- ===========================
--- --
--- -- -- Load Spoons if they exist in the Spoons directory
--- -- -- Examples below - uncomment as needed
--- --
--- -- -- Color picker
--- -- -- hs.loadSpoon("ColorPicker")
--- -- -- spoon.ColorPicker:bindHotkeys({show = {hyper, "p"}})
--- --
--- -- -- Window layout manager
--- -- -- hs.loadSpoon("WindowGrid")
--- -- -- spoon.WindowGrid:bindHotkeys({show_grid = {hyper, "g"}})
--- --
--- -- -- ===========================
--- -- -- Custom Functions
--- -- -- ===========================
--- --
--- -- -- Lock the screen
--- -- hs.hotkey.bind({"ctrl", "cmd"}, "l", function()
--- --     hs.caffeinate.lockScreen()
--- -- end)
--- --
--- -- -- Show date and time in large font overlay
--- -- hs.hotkey.bind({"ctrl", "cmd"}, "t", function()
--- --     local timeString = os.date("%I:%M %p")
--- --     local dateString = os.date("%A, %B %d")
--- --     hs.alert.show(timeString .. "\n" .. dateString, 2)
--- -- end)
--- --
--- -- -- Emoji picker
--- -- hs.hotkey.bind({"ctrl", "cmd"}, "e", function()
--- --     local chooser = hs.chooser.new(function(choice)
--- --         if choice then
--- --             hs.pasteboard.setContents(choice.text)
--- --             hs.eventtap.keyStroke({"cmd"}, "v")
--- --         end
--- --     end)
--- --
--- --     -- Common emojis - add or remove as needed
--- --     local emojis = {
--- --         {text = "👍", subText = "Thumbs Up"},
--- --         {text = "👌", subText = "OK"},
--- --         {text = "😊", subText = "Smile"},
--- --         {text = "😂", subText = "Laugh"},
--- --         {text = "❤️", subText = "Heart"},
--- --         {text = "🎉", subText = "Party"},
--- --         {text = "🔥", subText = "Fire"},
--- --         {text = "👏", subText = "Clap"},
--- --         {text = "🙏", subText = "Please/Thanks"},
--- --         {text = "💯", subText = "100"},
--- --         {text = "🤔", subText = "Thinking"},
--- --         {text = "👀", subText = "Eyes"},
--- --         {text = "💪", subText = "Flex"},
--- --         {text = "✅", subText = "Check"},
--- --         {text = "⚠️", subText = "Warning"},
--- --         {text = "🚀", subText = "Rocket"},
--- --         {text = "🎯", subText = "Target"},
--- --         {text = "⏱️", subText = "Timer"}
--- --     }
--- --
--- --     chooser:choices(emojis)
--- --     chooser:searchSubText(true)
--- --     chooser:show()
--- -- end)
--- --
--- -- -- ===========================
--- -- -- End of Configuration
--- -- -- ===========================
--- --
--- -- -- Display success message when everything is loaded
--- -- hs.alert.show("✅ Hammerspoon config loaded", 1)
--- --
+  -- Filter to standard windows only
+  local visibleWindows = {}
+  for _, win in ipairs(windows) do
+    if win:isStandard() and win:isVisible() then
+      table.insert(visibleWindows, win)
+    end
+  end
+
+  local count = #visibleWindows
+  if count == 0 then
+    return
+  end
+
+  -- Tile windows in columns
+  if count == 1 then
+    -- Single window: maximize
+    visibleWindows[1]:moveToUnit({ x = 0, y = 0, w = 1, h = 1 })
+  elseif count == 2 then
+    -- Two windows: 50/50 split
+    visibleWindows[1]:moveToUnit({ x = 0, y = 0, w = 0.5, h = 1 })
+    visibleWindows[2]:moveToUnit({ x = 0.5, y = 0, w = 0.5, h = 1 })
+  elseif count == 3 then
+    -- Three windows: 33/33/33 split
+    visibleWindows[1]:moveToUnit({ x = 0, y = 0, w = 0.33, h = 1 })
+    visibleWindows[2]:moveToUnit({ x = 0.33, y = 0, w = 0.34, h = 1 })
+    visibleWindows[3]:moveToUnit({ x = 0.67, y = 0, w = 0.33, h = 1 })
+  else
+    -- 4+ windows: main + stacked
+    -- First window takes left half, rest stack on right
+    visibleWindows[1]:moveToUnit({ x = 0, y = 0, w = 0.5, h = 1 })
+    local stackCount = count - 1
+    local stackHeight = 1 / stackCount
+    for i = 2, count do
+      local y = (i - 2) * stackHeight
+      visibleWindows[i]:moveToUnit({ x = 0.5, y = y, w = 0.5, h = stackHeight })
+    end
+  end
+end
+
+-- Watch for window events to trigger auto-tiling
+local windowFilter = hs.window.filter.new():setCurrentSpace(true)
+
+windowFilter:subscribe({
+  hs.window.filter.windowCreated,
+  hs.window.filter.windowDestroyed,
+  hs.window.filter.windowMinimized,
+  hs.window.filter.windowUnminimized,
+}, function()
+  if autoTileEnabled then
+    hs.timer.doAfter(0.1, tileWindows)
+  end
+end)
+
+-- Toggle auto-tiling (Hyper + Escape)
+hs.hotkey.bind(hyper, "Escape", function()
+  autoTileEnabled = not autoTileEnabled
+  if autoTileEnabled then
+    hs.alert.show("Auto-tiling ON")
+    tileWindows()
+  else
+    hs.alert.show("Auto-tiling OFF")
+  end
+end)
+
+--------------------------------------------------------------------------------
+-- Manual Window Positions (halves and thirds cycling)
+--------------------------------------------------------------------------------
+
+local positions = {
+  left = { x = 0, y = 0, w = 0.5, h = 1 },
+  right = { x = 0.5, y = 0, w = 0.5, h = 1 },
+  top = { x = 0, y = 0, w = 1, h = 0.5 },
+  bottom = { x = 0, y = 0.5, w = 1, h = 0.5 },
+  leftThird = { x = 0, y = 0, w = 0.33, h = 1 },
+  rightThird = { x = 0.67, y = 0, w = 0.33, h = 1 },
+  leftTwoThirds = { x = 0, y = 0, w = 0.67, h = 1 },
+  rightTwoThirds = { x = 0.33, y = 0, w = 0.67, h = 1 },
+  maximize = { x = 0, y = 0, w = 1, h = 1 },
+}
+
+local function moveWindow(position)
+  local win = hs.window.focusedWindow()
+  if win then
+    -- Disable auto-tiling temporarily when manually positioning
+    autoTileEnabled = false
+    win:moveToUnit(position)
+  end
+end
+
+-- Cycle through horizontal positions
+local leftCycle = { "left", "leftThird", "leftTwoThirds" }
+local leftCycleIndex = 1
+
+local rightCycle = { "right", "rightThird", "rightTwoThirds" }
+local rightCycleIndex = 1
+
+hs.hotkey.bind(hyper, "Left", function()
+  moveWindow(positions[leftCycle[leftCycleIndex]])
+  leftCycleIndex = (leftCycleIndex % #leftCycle) + 1
+  rightCycleIndex = 1
+end)
+
+hs.hotkey.bind(hyper, "Right", function()
+  moveWindow(positions[rightCycle[rightCycleIndex]])
+  rightCycleIndex = (rightCycleIndex % #rightCycle) + 1
+  leftCycleIndex = 1
+end)
+
+hs.hotkey.bind(hyper, "Up", function()
+  moveWindow(positions.top)
+end)
+
+hs.hotkey.bind(hyper, "Down", function()
+  moveWindow(positions.bottom)
+end)
+
+--------------------------------------------------------------------------------
+-- Toggle Maximize (Hyper + Enter)
+--------------------------------------------------------------------------------
+
+hs.hotkey.bind(hyper, "Return", function()
+  local win = hs.window.focusedWindow()
+  if not win then
+    return
+  end
+
+  local id = win:id()
+  local currentFrame = win:frame()
+  local screenFrame = win:screen():frame()
+
+  local isMaximized = math.abs(currentFrame.x - screenFrame.x) < 10
+    and math.abs(currentFrame.y - screenFrame.y) < 10
+    and math.abs(currentFrame.w - screenFrame.w) < 10
+    and math.abs(currentFrame.h - screenFrame.h) < 10
+
+  autoTileEnabled = false -- Disable auto-tiling when manually maximizing
+
+  if isMaximized and savedFrames[id] then
+    win:setFrame(savedFrames[id])
+    savedFrames[id] = nil
+  else
+    savedFrames[id] = currentFrame
+    win:moveToUnit(positions.maximize)
+  end
+end)
+
+--------------------------------------------------------------------------------
+-- Fuzzy Window Switcher (Hyper + W)
+--------------------------------------------------------------------------------
+
+hs.hotkey.bind(hyper, "W", function()
+  local chooser = hs.chooser.new(function(choice)
+    if choice then
+      local win = hs.window.get(choice.id)
+      if win then
+        win:focus()
+      end
+    end
+  end)
+
+  local windows = hs.window.allWindows()
+  local choices = {}
+
+  for _, win in ipairs(windows) do
+    if win:isStandard() then
+      local app = win:application()
+      table.insert(choices, {
+        text = win:title(),
+        subText = app and app:name() or "",
+        id = win:id(),
+        image = app and app:bundleID() and hs.image.imageFromAppBundle(app:bundleID()) or nil,
+      })
+    end
+  end
+
+  chooser:choices(choices)
+  chooser:searchSubText(true)
+  chooser:show()
+end)
+
+--------------------------------------------------------------------------------
+-- Startup
+--------------------------------------------------------------------------------
+
+hs.alert.show("Hammerspoon loaded (auto-tile ON)", 1)
