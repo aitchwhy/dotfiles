@@ -68,10 +68,23 @@ with lib;
 
         # Keybinds
         keybind = [
-          "cmd+equal=equalize_splits"
+          # Font zoom - must be explicit since defining keybinds can override defaults
+          "cmd+equal=increase_font_size:1"
+          "cmd+plus=increase_font_size:1"
+          "cmd+minus=decrease_font_size:1"
+          "cmd+zero=reset_font_size"
+
+          # Equalize splits - use Cmd+Ctrl+= (Ghostty's default for this)
+          "cmd+ctrl+equal=equalize_splits"
+
+          # Window management
           "super+enter=toggle_fullscreen"
+
+          # Shell prompt navigation
           "cmd+j=jump_to_prompt:1"
           "cmd+k=jump_to_prompt:-1"
+
+          # Literal newline
           "shift+enter=text:\\n"
         ];
       };
