@@ -7,40 +7,16 @@ with lib;
   options.modules.home.tools.development = {
     enable = mkEnableOption "development tools";
 
-    enableDirectoryEnv = mkOption {
-      type = types.bool;
-      default = true;
-      description = "Enable direnv for directory-specific environments";
-    };
-
     enableModernCli = mkOption {
       type = types.bool;
       default = true;
-      description = "Enable modern CLI replacements";
+      description = "Enable modern CLI replacements (eza)";
     };
   };
 
   config = mkIf config.modules.home.tools.development.enable {
-    # Directory environment management
-    programs.direnv = mkIf config.modules.home.tools.development.enableDirectoryEnv {
-      enable = true;
-      nix-direnv.enable = true;
-      silent = true;
-    };
-
-    # Fuzzy finder
-    programs.fzf = {
-      enable = true;
-      enableZshIntegration = true;
-      defaultOptions = [
-        "--height 40%"
-        "--border sharp"
-        "--layout reverse"
-        "--info inline"
-        "--preview-window=:hidden"
-        "--bind='ctrl-/:toggle-preview'"
-      ];
-    };
+    # Note: direnv, fzf, and bat have dedicated modules in tools/
+    # This module provides yazi, zoxide, eza, nix-index and dev packages
 
     # Modern file manager
     programs.yazi = {
@@ -65,14 +41,6 @@ with lib;
         "--group-directories-first"
         "--header"
       ];
-    };
-
-    programs.bat = mkIf config.modules.home.tools.development.enableModernCli {
-      enable = true;
-      config = {
-        theme = "TwoDark";
-        pager = "less -FR";
-      };
     };
 
     # Shell integration
