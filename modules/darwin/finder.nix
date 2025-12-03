@@ -43,8 +43,8 @@ with lib;
       }.${config.modules.darwin.finder.defaultView};
 
       # New window settings
-      NewWindowTarget = "Home";
-      NewWindowTargetPath = "file://$HOME/";
+      NewWindowTarget = "Other";
+      NewWindowTargetPath = "file:///Users/hank/";
     };
 
     # Additional Finder settings via CustomUserPreferences

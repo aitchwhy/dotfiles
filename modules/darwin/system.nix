@@ -12,11 +12,6 @@ with lib;
       default = "Dark";
       description = "macOS interface style";
     };
-
-    primaryUser = mkOption {
-      type = types.str;
-      description = "Primary user of the system";
-    };
   };
 
   config = mkIf config.modules.darwin.system.enable {

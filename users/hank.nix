@@ -4,10 +4,10 @@
 # - Cloud platform CLIs and infrastructure tools
 # - User-specific Git configuration
 # - Personal productivity tools
-{ pkgs, self, ... }:
+{ pkgs, ... }:
 {
   # Import home modules
-  imports = [ self.homeModules.default ];
+  imports = [ ../modules/home ];
 
   # User identity
   home = {
@@ -60,7 +60,7 @@
     poetry
 
     # Go
-    go_1_22
+    go
     gopls
     golangci-lint
 
