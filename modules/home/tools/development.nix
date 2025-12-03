@@ -94,6 +94,8 @@ with lib;
       dust # Better du
       procs # Better ps
       bottom # Better top
+      hexyl # Binary hex viewer (for Yazi previews)
+      ouch # Archive tool (for Yazi previews)
 
       # Data processing
       jq # JSON processor
