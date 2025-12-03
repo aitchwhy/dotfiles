@@ -24,11 +24,23 @@ vim.opt.rtp:prepend(lazypath)
 -- end
 
 require("lazy").setup({
+  -- Store lockfile in writable location (config dir is managed by Nix)
+  lockfile = vim.fn.stdpath("data") .. "/lazy-lock.json",
   spec = {
     -- add LazyVim and import its plugins
     { "LazyVim/LazyVim", import = "lazyvim.plugins" },
 
-    { "LazyVim/LazyVim", import = "lazyvim.plugins.extras" },
+    -- Dev essentials extras
+    { import = "lazyvim.plugins.extras.coding.blink" },
+    { import = "lazyvim.plugins.extras.editor.fzf" },
+
+    -- Language support
+    { import = "lazyvim.plugins.extras.lang.typescript" },
+    { import = "lazyvim.plugins.extras.lang.python" },
+    { import = "lazyvim.plugins.extras.lang.go" },
+    { import = "lazyvim.plugins.extras.lang.rust" },
+    { import = "lazyvim.plugins.extras.lang.nix" },
+
     -- import/override with your plugins
     { import = "plugins" },
   },
