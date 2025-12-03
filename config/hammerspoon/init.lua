@@ -3,11 +3,17 @@
 -- Kanata handles: CapsLock -> Esc (tap) | Hyper (hold)
 --
 -- Key bindings:
---   Hyper + Arrows       = Snap to half/thirds (cycles through sizes)
---   Hyper + Enter        = Fullscreen (fills screen)
+--   Hyper + Arrows        = Snap to half/thirds (cycles through sizes)
+--   Hyper + Enter         = Fullscreen (fills screen)
 --   Hyper + Shift + Enter = Toggle maximize / restore
---   Hyper + W            = Fuzzy window switcher
---   Hyper + Escape       = Toggle auto-tiling mode
+--   Hyper + W             = Fuzzy window switcher
+--   Hyper + Escape        = Toggle auto-tiling mode
+--
+-- Trackpad gestures (cursor in title bar):
+--   3-finger swipe left   = Snap window to left half
+--   3-finger swipe right  = Snap window to right half
+--   3-finger swipe up     = Maximize window
+--   3-finger swipe down   = Minimize window
 --
 -- Auto-tiling: When enabled, windows auto-arrange in columns
 
@@ -247,6 +253,67 @@ hs.hotkey.bind(hyper, "W", function()
   chooser:choices(choices)
   chooser:searchSubText(true)
   chooser:show()
+end)
+
+--------------------------------------------------------------------------------
+-- Trackpad Swipe Gestures (Swipe.spoon)
+-- Only triggers when cursor is near window title bar (like Swish)
+--------------------------------------------------------------------------------
+
+local Swipe = hs.loadSpoon("Swipe")
+
+local swipe_id, swipe_threshold
+local TITLE_BAR_HEIGHT = 50 -- pixels from top of window
+
+-- Check if cursor is in title bar region of any window
+local function isCursorInTitleBar()
+  local mousePos = hs.mouse.absolutePosition()
+  local windows = hs.window.orderedWindows()
+
+  for _, win in ipairs(windows) do
+    if win:isStandard() and win:isVisible() then
+      local frame = win:frame()
+      -- Check if cursor is within title bar region (top 50px of window)
+      if
+        mousePos.x >= frame.x
+        and mousePos.x <= frame.x + frame.w
+        and mousePos.y >= frame.y
+        and mousePos.y <= frame.y + TITLE_BAR_HEIGHT
+      then
+        return true, win
+      end
+    end
+  end
+  return false, nil
+end
+
+-- 3-finger swipe to snap windows (only when cursor in title bar)
+Swipe:start(3, function(direction, distance, id)
+  if id == swipe_id then
+    if distance > swipe_threshold then
+      swipe_threshold = math.huge -- only trigger once per swipe
+
+      local inTitleBar, win = isCursorInTitleBar()
+      if not inTitleBar or not win then
+        return
+      end
+
+      autoTileEnabled = false -- disable auto-tile when manually positioning
+
+      if direction == "left" then
+        win:moveToUnit({ x = 0, y = 0, w = 0.5, h = 1 }) -- snap left
+      elseif direction == "right" then
+        win:moveToUnit({ x = 0.5, y = 0, w = 0.5, h = 1 }) -- snap right
+      elseif direction == "up" then
+        win:moveToUnit({ x = 0, y = 0, w = 1, h = 1 }) -- maximize
+      elseif direction == "down" then
+        win:minimize() -- minimize
+      end
+    end
+  else
+    swipe_id = id
+    swipe_threshold = 0.2 -- swipe distance > 20% of trackpad
+  end
 end)
 
 --------------------------------------------------------------------------------
