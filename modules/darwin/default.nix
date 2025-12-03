@@ -13,6 +13,7 @@ with lib;
     ./system.nix
     ./keyboard.nix
     ./trackpad.nix
+    ./kanata.nix
 
     # Applications
     ./safari.nix
@@ -32,6 +33,7 @@ with lib;
       system.enable = mkDefault true;
       keyboard.enable = mkDefault true;
       trackpad.enable = mkDefault true;
+      kanata.enable = mkDefault true;
       safari.enable = mkDefault true;
       terminal.enable = mkDefault true;
       activityMonitor.enable = mkDefault true;
