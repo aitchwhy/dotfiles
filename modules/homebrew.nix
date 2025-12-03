@@ -66,7 +66,7 @@
       "setapp" # Setapp app store (Clop, LookAway, Downie, etc.)
       "fantastical" # Calendar (Flexibits)
       "cardhop" # Contacts (Flexibits)
-      "todoist" # Task management
+      "todoist-app" # Task management (renamed from todoist)
       "carbon-copy-cloner" # Backup utility
       "cleanshot" # Screenshot tool
       "a-better-finder-rename" # File renaming
@@ -83,7 +83,6 @@
 
       # Window/Gesture Management
       "swish" # Trackpad window gestures
-      # "dropover" # Removed - cask no longer available
 
       # QuickLook Plugins (preview files in Finder)
       "qlmarkdown" # Markdown preview
