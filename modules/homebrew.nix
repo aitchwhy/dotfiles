@@ -19,6 +19,11 @@
       "nikitabobko/tap" # AeroSpace window manager
     ];
 
+    # CLI tools
+    brews = [
+      "bitwarden-cli" # Bitwarden password manager CLI
+    ];
+
     # GUI Applications
     casks = [
       # Browsers
