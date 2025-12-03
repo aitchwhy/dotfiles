@@ -45,10 +45,6 @@ desc = "Untag selected files"
 on = "M"
 run = "plugin mount"
 
-[[mgr.prepend_keymap]]
-on = ["g", "r"]
-run = 'shell -- ya emit cd "$(git rev-parse --show-toplevel)"'
-
 # [[mgr.prepend_keymap]]
 # on = "k"
 # run = "plugin --sync arrow --args=-1"
@@ -67,9 +63,8 @@ run = 'shell -- ya emit cd "$(git rev-parse --show-toplevel)"'
 
 [[mgr.prepend_keymap]]
 on = "y"
-run = ['''
-shell 'echo "$@" | xclip -i -selection clipboard -t text/uri-list' --confirm
-''', "yank"]
+run = ["shell 'for f in \"$@\"; do echo \"file://$f\"; done | pbcopy' --confirm", "yank"]
+desc = "Copy file paths to clipboard and yank"
 
 # cd back to the root of the current Git repository
 [[mgr.prepend_keymap]]
@@ -116,11 +111,6 @@ desc = "Delete all bookmarks"
 ###################
 
 [[mgr.prepend_keymap]]
-on = "l"
-run = "plugin smart-enter"
-desc = "ENTER the child directory, or open the file"
-
-[[mgr.prepend_keymap]]
 on = "F"
 run = "plugin smart-filter"
 desc = "Smart filter"
@@ -134,23 +124,6 @@ desc = "Show Git file changes"
 on = "T"
 run = "plugin toggle-pane min-preview"
 desc = "Show or hide the preview pane"
-
-[[mgr.prepend_keymap]]
-on = "M"
-run = "plugin toggle-pane max-preview"
-desc = "Maximize or restore the preview pane"
-
-[[mgr.prepend_keymap]]
-on = "p"
-run = "plugin smart-paste"
-desc = "Paste into the hovered directory or CWD"
-
-[[mgr.prepend_keymap]]
-on = "y"
-run = [
-  'shell -- echo "$@" | xclip -i -selection clipboard -t text/uri-list',
-  "yank",
-]
 
 [[mgr.prepend_keymap]]
 on = ["r"]
@@ -217,11 +190,6 @@ desc = "Archive selected files"
 on = "R"
 run = "plugin rsync"
 desc = "Copy files using rsync"
-
-[[mgr.prepend_keymap]]
-on = "R"
-run = "plugin rsync --args='user@server.com'"
-desc = "Copy files using rsync to default location"
 
 ################
 # Git / Lazygit

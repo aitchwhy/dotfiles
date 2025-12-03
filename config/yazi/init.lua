@@ -72,60 +72,8 @@ require("mime-ext"):setup({
 	fallback_file1 = false,
 })
 
--- Enhanced folder rules setup with symlink display in status bar
-require("folder-rules"):setup({
-	-- Better display of symlinks in status bar
-	show_symlinks = true,
-
-	-- Special rules for specific folders
-	rules = {
-		["~/dotfiles"] = {
-			-- Special layout for dotfiles repository
-			layout = { 1, 3, 4 }, -- More space for the file listing (fixed array syntax)
-			show_hidden = true, -- Always show hidden files
-		},
-		["~/Downloads"] = {
-			-- Sort by modification time in Downloads folder
-			sort_by = "mtime",
-			sort_reverse = true, -- Most recent first
-		},
-		["~/.config"] = {
-			-- For configuration directories
-			show_hidden = true, -- Always show hidden files
-		},
-	},
-
-	-- Add custom status bar elements
-	status_elements = {
-		-- Show arrow to symlink target when hovering a symlink
-		{
-			fn = function(self)
-				local h = self._current.hovered
-				if h and h.link_to then
-					return " → " .. tostring(h.link_to)
-				else
-					return ""
-				end
-			end,
-			priority = 3300,
-			position = Status.LEFT,
-		},
-		-- Show git branch/status when in git repository
-		{
-			fn = function()
-				local child, err = Command("git"):args({ "rev-parse", "--abbrev-ref", "HEAD" }):cwd(tostring(cx.active.current.cwd)):output()
-				local result = child and { success = child.status.success, stdout = child.stdout or "" } or { success = false }
-				if result.success then
-					return " " .. result.stdout:gsub("%s+$", "")
-				else
-					return ""
-				end
-			end,
-			priority = 3400,
-			position = Status.RIGHT,
-		},
-	},
-})
+-- Folder-specific rules (simple setup - advanced features in plugin)
+require("folder-rules"):setup()
 --
 -- Enhanced bunny setup for quick jumps to common directories
 require("bunny"):setup({
