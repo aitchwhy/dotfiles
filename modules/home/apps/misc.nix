@@ -10,7 +10,8 @@ with lib;
   };
 
   config = mkIf config.modules.home.apps.misc.enable {
-    # Static configs (read-only symlinks are fine)
+    # Static configs (read-only symlinks)
+    # Note: Cursor is handled separately in cursor.nix (macOS uses ~/Library/Application Support/)
     xdg.configFile = {
       "aider".source = ../../../config/aider;
       "lazydocker".source = ../../../config/lazydocker;
@@ -20,7 +21,6 @@ with lib;
       "repomix".source = ../../../config/repomix;
       "tree-sitter".source = ../../../config/tree-sitter;
       "hazel".source = ../../../config/hazel;
-      "cursor".source = ../../../config/cursor;
     };
 
     # Wispr Flow config - COPY instead of symlink
