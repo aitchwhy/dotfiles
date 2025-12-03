@@ -41,8 +41,8 @@ with lib;
 
       # Keyboard behavior
       ApplePressAndHoldEnabled = false;
-      InitialKeyRepeat = 10;
-      KeyRepeat = 1;
+      InitialKeyRepeat = 15;  # was 10 (fastest) - more reasonable delay
+      KeyRepeat = 2;          # was 1 (fastest) - still fast but less aggressive
 
       # Text input
       NSAutomaticCapitalizationEnabled = false;

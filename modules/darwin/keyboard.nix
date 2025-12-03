@@ -9,7 +9,7 @@ with lib;
 
     remapCapsLock = mkOption {
       type = types.enum [ "none" "escape" "control" ];
-      default = "escape";
+      default = "none";  # Kanata handles CapsLock -> Escape/Hyper
       description = "Remap Caps Lock key";
     };
   };
