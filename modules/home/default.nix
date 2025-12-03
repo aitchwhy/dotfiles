@@ -27,12 +27,9 @@ with lib;
     ./editors/neovim.nix
 
     # Apps (xdg.configFile based)
-    ./apps/aerospace.nix
     ./apps/ghostty.nix
-    ./apps/karabiner.nix
     ./apps/kanata.nix
     ./apps/hammerspoon.nix
-    ./apps/swish.nix
     ./apps/raycast.nix
     ./apps/claude.nix
     ./apps/cursor.nix
@@ -71,12 +68,9 @@ with lib;
       };
 
       apps = {
-        aerospace.enable = mkDefault false; # Retired - using Hammerspoon
         ghostty.enable = mkDefault true;
-        karabiner.enable = mkDefault false; # Retired - using Kanata
         kanata.enable = mkDefault true;
         hammerspoon.enable = mkDefault true;
-        swish.enable = mkDefault true;
         raycast.enable = mkDefault true;
         claude.enable = mkDefault true;
         cursor.enable = mkDefault true;
