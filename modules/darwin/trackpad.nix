@@ -23,7 +23,6 @@ with lib;
 
       # Drag behavior
       Dragging = false;
-      # DragLock = false; # TODO: Find correct option name
     };
   };
 }

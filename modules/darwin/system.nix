@@ -50,7 +50,6 @@ with lib;
       NSAutomaticPeriodSubstitutionEnabled = false;
       NSAutomaticQuoteSubstitutionEnabled = false;
       NSAutomaticSpellingCorrectionEnabled = false;
-      # NSAutomaticTextCompletionEnabled = false; # TODO: Find correct option name
 
       # Performance
       NSAutomaticWindowAnimationsEnabled = false;
@@ -66,7 +65,6 @@ with lib;
 
       # Developer
       NSTextShowsControlCharacters = true;
-      # WebKitDeveloperExtras = true; # TODO: Find correct option name
     };
 
     # Menu bar clock
