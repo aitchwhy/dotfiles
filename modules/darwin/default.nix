@@ -19,6 +19,9 @@ with lib;
     ./terminal.nix
     ./activity-monitor.nix
     ./xcode.nix
+
+    # Activation scripts (apps without Homebrew casks)
+    ./activation/wispr-flow.nix
   ];
 
   # Enable all darwin modules by default
@@ -33,6 +36,9 @@ with lib;
       terminal.enable = mkDefault true;
       activityMonitor.enable = mkDefault true;
       xcode.enable = mkDefault true;
+
+      # Apps (activation scripts)
+      apps.wisprFlow.enable = mkDefault true;
     };
 
     # System packages - only essential system-level tools
