@@ -106,6 +106,13 @@ with lib;
       StageManagerHideWidgets = 0;
       StandardHideWidgets = 0;
       GloballyEnabled = false;
+      # macOS Tahoe 26 - Show solid menu bar background (vs floating Liquid Glass)
+      ShowMenuBarBackground = true;
+    };
+
+    # macOS Tahoe 26 - Spotlight clipboard history
+    system.defaults.CustomUserPreferences."com.apple.Spotlight" = {
+      ClipboardHistoryEnabled = true;
     };
 
     # Screensaver
