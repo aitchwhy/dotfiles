@@ -21,7 +21,7 @@ preflight:
 
 # Switch configuration (rebuild + activate) [alias: s]
 switch: preflight
-    darwin-rebuild switch --flake .#{{host}}
+    sudo darwin-rebuild switch --flake .#{{host}}
 
 alias s := switch
 
@@ -98,4 +98,4 @@ diff:
 
 # Rollback to previous generation
 rollback:
-    darwin-rebuild switch --rollback
+    sudo darwin-rebuild switch --rollback
