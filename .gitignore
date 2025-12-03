@@ -12,7 +12,6 @@ state.yml
 .config/configstore/
 
 # Auto-backups
-.config/karabiner/automatic_backups/
 *.old.json
 *-backup.txt
 
