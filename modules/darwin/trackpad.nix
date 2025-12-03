@@ -17,9 +17,9 @@ with lib;
       # Gestures
       TrackpadThreeFingerDrag = true;
 
-      # Click pressure
-      FirstClickThreshold = 0;
-      SecondClickThreshold = 0;
+      # Click pressure (0=light, 1=medium, 2=firm)
+      FirstClickThreshold = 1;   # was 0 (lightest) - medium pressure
+      SecondClickThreshold = 1;  # was 0 (lightest) - medium pressure
 
       # Drag behavior
       Dragging = false;
