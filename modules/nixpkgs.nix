@@ -2,6 +2,9 @@
 {
   # System-level Nix configuration
   nix = {
+    # Disable nix-darwin's Nix management (using Determinate Nix installer)
+    enable = false;
+
     # Core settings
     package = pkgs.nix;
     settings = {
@@ -51,7 +54,7 @@
       # Build settings
       sandbox = true;
       sandbox-fallback = false; # Fail rather than disable sandbox
-      auto-optimise-store = true; # Deduplicate store files
+      # auto-optimise-store removed - use nix.optimise.automatic instead
       min-free = 5368709120; # 5GB minimum free space
       max-free = 10737418240; # 10GB to free when running GC
 
@@ -94,28 +97,28 @@
       build-poll-interval = 1; # Check build status more frequently
     };
 
-    # Garbage collection - balanced for development and caching
-    gc = {
-      automatic = true;
-      options = "--delete-older-than 30d --max-freed $((100 * 1024**3))"; # 30 days or 100GB max
-      dates = lib.mkIf pkgs.stdenv.isLinux "weekly";
-      interval = lib.mkIf pkgs.stdenv.isDarwin {
-        Hour = 3;
-        Minute = 0;
-        Weekday = 0; # Sunday
-      };
-    };
+    # Garbage collection - Managed by Determinate Nix installer
+    # gc = {
+    #   automatic = true;
+    #   options = "--delete-older-than 30d --max-freed $((100 * 1024**3))"; # 30 days or 100GB max
+    #   dates = lib.mkIf pkgs.stdenv.isLinux "weekly";
+    #   interval = lib.mkIf pkgs.stdenv.isDarwin {
+    #     Hour = 3;
+    #     Minute = 0;
+    #     Weekday = 0; # Sunday
+    #   };
+    # };
 
-    # Store optimization
-    optimise = {
-      automatic = true;
-      dates = lib.mkIf pkgs.stdenv.isLinux [ "weekly" ];
-      interval = lib.mkIf pkgs.stdenv.isDarwin {
-        Hour = 4;
-        Minute = 0;
-        Weekday = 0; # Sunday
-      };
-    };
+    # Store optimization - Managed by Determinate Nix installer
+    # optimise = {
+    #   automatic = true;
+    #   dates = lib.mkIf pkgs.stdenv.isLinux [ "weekly" ];
+    #   interval = lib.mkIf pkgs.stdenv.isDarwin {
+    #     Hour = 4;
+    #     Minute = 0;
+    #     Weekday = 0; # Sunday
+    #   };
+    # };
 
     # Extra Nix configuration
     extraOptions = ''
@@ -154,9 +157,9 @@
       plugin-files =
     '';
 
-    # Configure Nix daemon
-    daemonIOLowPriority = true;
-    daemonCPUSchedPolicy = lib.mkIf pkgs.stdenv.isLinux "idle";
+    # Configure Nix daemon - Managed by Determinate Nix installer
+    # daemonIOLowPriority = true;
+    # daemonCPUSchedPolicy = lib.mkIf pkgs.stdenv.isLinux "idle";
   };
 
   # Nixpkgs configuration
