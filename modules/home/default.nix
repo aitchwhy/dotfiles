@@ -31,6 +31,8 @@ with lib;
     ./apps/ghostty.nix
     ./apps/karabiner.nix
     ./apps/hammerspoon.nix
+    ./apps/swish.nix
+    ./apps/raycast.nix
     ./apps/misc.nix
   ];
 
@@ -69,6 +71,8 @@ with lib;
         ghostty.enable = mkDefault true;
         karabiner.enable = mkDefault true;
         hammerspoon.enable = mkDefault true;
+        swish.enable = mkDefault true;
+        raycast.enable = mkDefault true;
         misc.enable = mkDefault true;
       };
     };
