@@ -11,7 +11,7 @@ with lib;
   config = mkIf config.modules.darwin.dock.enable {
     system.defaults.dock = {
       # Position and behavior
-      orientation = "bottom";
+      orientation = "left";
       autohide = true;
       autohide-delay = 0.0;
       autohide-time-modifier = 0.2;
@@ -28,6 +28,7 @@ with lib;
       minimize-to-application = true;
       enable-spring-load-actions-on-all-items = true;
       expose-animation-duration = 0.1;
+      expose-group-apps = true; # Group windows by application in Mission Control
 
       # Hot corners
       wvous-tl-corner = 2; # Mission Control
