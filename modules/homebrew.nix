@@ -32,6 +32,8 @@
       "tableplus"
       "warp"
       "fork" # Git GUI
+      "antigravity" # Google's AI IDE
+      "kaleidoscope" # Diff/merge tool
 
       # Terminal
       "ghostty"
@@ -45,15 +47,25 @@
       "slack"
       "zoom"
       "linear-linear" # Project management
+      "superhuman" # Email client
+      "fathom" # AI meeting recorder
 
       # Productivity
       "raycast"
       "1password"
+      "bitwarden" # Password manager
       "bartender"
       "cleanmymac"
       "iina"
       "keka"
-      "setapp" # Setapp app store (for ETA, etc.)
+      "setapp" # Setapp app store (Clop, LookAway, Downie, etc.)
+      "fantastical" # Calendar (Flexibits)
+      "cardhop" # Contacts (Flexibits)
+      "todoist" # Task management
+      "carbon-copy-cloner" # Backup utility
+      "cleanshot" # Screenshot tool
+      "a-better-finder-rename" # File renaming
+      "clop" # Image/video optimizer
 
       # AI
       "claude" # Claude Desktop
@@ -64,6 +76,20 @@
       "karabiner-elements" # Keyboard customization
       "hammerspoon" # macOS automation
 
+      # Window/Gesture Management
+      "swish" # Trackpad window gestures
+      "dropover" # Drag-and-drop shelf
+
+      # QuickLook Plugins (preview files in Finder)
+      "qlmarkdown" # Markdown preview
+      "syntax-highlight" # Code syntax highlighting
+      "quicklook-json" # JSON preview
+      "quicklook-csv" # CSV preview
+      "qlstephen" # Plain text files without extension
+      "qlvideo" # Video thumbnails/preview
+      "webpquicklook" # WebP image preview
+      "suspicious-package" # PKG installer preview
+
       # Fonts (needed for terminal/editor icons)
       "font-fira-code-nerd-font"
       "font-symbols-only-nerd-font"
@@ -73,6 +99,7 @@
     masApps = {
       "Xcode" = 497799835;
       "Amphetamine" = 937984704; # Keep Mac awake
+      "rcmd" = 1596283165; # App switcher (MAS only - no Homebrew cask)
       # "Pockity" = 1550027149; # Stripe dashboard - install manually from App Store
     };
   };
