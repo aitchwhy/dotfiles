@@ -8,14 +8,25 @@ host := env_var_or_default("HOST", "hank-mbp-m4")
 default:
     @just --list
 
+# Check for untracked nix/config files (flakes won't see them)
+preflight:
+    @untracked=$(git ls-files --others --exclude-standard modules/ config/ | head -20); \
+    if [ -n "$untracked" ]; then \
+        echo "Error: Untracked files in modules/ or config/:"; \
+        echo "$untracked" | sed 's/^/  /'; \
+        echo ""; \
+        echo "Flakes only see tracked files. Run: git add <files>"; \
+        exit 1; \
+    fi
+
 # Switch configuration (rebuild + activate) [alias: s]
-switch:
+switch: preflight
     darwin-rebuild switch --flake .#{{host}}
 
 alias s := switch
 
 # Build without switching [alias: b]
-build:
+build: preflight
     darwin-rebuild build --flake .#{{host}}
 
 alias b := build
@@ -72,6 +83,7 @@ doctor:
     @which darwin-rebuild > /dev/null && echo "✓ Darwin-rebuild installed" || echo "✗ Darwin-rebuild not found"
     @test -f flake.nix && echo "✓ Flake found" || echo "✗ No flake.nix"
     @git status --porcelain | wc -l | xargs -I {} test {} -eq 0 && echo "✓ Git clean" || echo "! Git dirty"
+    @git ls-files --others --exclude-standard modules/ config/ | wc -l | xargs -I {} test {} -eq 0 && echo "✓ No untracked modules/config" || echo "! Untracked files in modules/ or config/"
     @nix flake check --no-build > /dev/null 2>&1 && echo "✓ Flake valid" || echo "✗ Flake check failed"
     @darwin-rebuild --list-generations 2>/dev/null | tail -n 1 | grep -q . && echo "✓ System generations accessible" || echo "! No system profile access"
 
