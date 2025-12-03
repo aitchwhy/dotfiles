@@ -1,714 +1,272 @@
-// Place your key bindings in this file to override the defaultsauto[]
-// "when" clause contexts -> https://code.visualstudio.com/api/references/when-clause-contexts#conditional-operators
-// Useful default lang shortcuts -> https://code.visualstudio.com/docs/getstarted/keybindings#_default-keyboard-shortcuts
+// Place your key bindings in this file to override the defaults
+// "when" clause contexts -> https://code.visualstudio.com/api/references/when-clause-contexts
 [
-  {
-    "command": "-deleteAllRight",
-    "key": "ctrl+k",
-    "when": "textInputFocus && !editorReadonly"
-  },
-  {
-    "command": "-extension.vim_ctrl+k",
-    "key": "ctrl+k",
-    "when": "editorTextFocus && vim.active && vim.use<C-k> && !inDebugRepl"
-  },
-  {
-    "command": "workbench.action.navigateUp",
-    "key": "ctrl+k",
-    "when": "!terminalFocus"
-  },
-  {
-    "command": "-deleteLeft",
-    "key": "ctrl+h",
-    "when": "textInputFocus"
-  },
-  {
-    "command": "-extension.vim_ctrl+h",
-    "key": "ctrl+h",
-    "when": "editorTextFocus && vim.active && vim.use<C-h> && !inDebugRepl"
-  },
-  {
-    "command": "workbench.action.navigateLeft",
-    "key": "ctrl+h",
-    "when": "!terminalFocus"
-  },
-  {
-    "command": "-extension.vim_ctrl+j",
-    "key": "ctrl+j",
-    "when": "editorTextFocus && vim.active && vim.use<C-j> && !inDebugRepl"
-  },
-  {
-    "command": "-editor.action.joinLines",
-    "key": "ctrl+j",
-    "when": "editorTextFocus && !editorReadonly"
-  },
-  {
-    "command": "workbench.action.navigateDown",
-    "key": "ctrl+j",
-    "when": "!terminalFocus"
-  },
-  {
-    "command": "-notebook.centerActiveCell",
-    "key": "ctrl+l",
-    "when": "notebookEditorFocused"
-  },
-  {
-    "command": "-extension.vim_navigateCtrlL",
-    "key": "ctrl+l",
-    "when": "editorTextFocus && vim.active && vim.use<C-l> && !inDebugRepl"
-  },
-  {
-    "command": "workbench.action.navigateRight",
-    "key": "ctrl+l",
-    "when": "!terminalFocus"
-  },
-  {
-    "command": "workbench.action.decreaseViewSize",
-    "key": "ctrl+cmd+-"
-  },
-  {
-    "command": "workbench.action.increaseViewSize",
-    "key": "ctrl+cmd+="
-  },
-  {
-    "command": "-editor.action.jumpToBracket",
-    "key": "shift+cmd+\\",
-    "when": "editorTextFocus"
-  },
-  {
-    "command": "-workbench.action.terminal.focusTabs",
-    "key": "shift+cmd+\\",
-    "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported || terminalHasBeenCreated && terminalTabsFocus || terminalProcessSupported && terminalTabsFocus"
-  },
-  {
-    "command": "-workbench.action.zoomOut",
-    "key": "shift+cmd+-"
-  },
-  {
-    "command": "-editor.action.nextMatchFindAction",
-    "key": "cmd+g",
-    "when": "editorFocus"
-  },
-  {
-    "command": "-workbench.action.terminal.findNext",
-    "key": "cmd+g",
-    "when": "terminalFindFocused && terminalHasBeenCreated || terminalFindFocused && terminalProcessSupported || terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
-  },
-  {
-    "command": "git.commitStaged",
-    "key": "ctrl+g ctrl+c"
-  },
-  {
-    "command": "-extension.vim_ctrl+g",
-    "key": "ctrl+g",
-    "when": "editorTextFocus && vim.active && vim.use<C-g> && !inDebugRepl"
-  },
-  {
-    "command": "-workbench.action.gotoLine",
-    "key": "ctrl+g"
-  },
-  {
-    "command": "-editor.action.previousMatchFindAction",
-    "key": "shift+cmd+g",
-    "when": "editorFocus"
-  },
-  {
-    "command": "-workbench.action.terminal.findPrevious",
-    "key": "shift+cmd+g",
-    "when": "terminalFindFocused && terminalHasBeenCreated || terminalFindFocused && terminalProcessSupported || terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
-  },
-  {
-    "command": "-workbench.view.scm",
-    "key": "ctrl+shift+g",
-    "when": "workbench.scm.active"
-  },
-  {
-    "command": "-workbench.actions.view.problems",
-    "key": "shift+cmd+m",
-    "when": "workbench.panel.markers.view.active"
-  },
-  // Toggle
-  {
-    "command": "workbench.action.evenEditorWidths",
-    "key": "shift+cmd+m",
-    "when": "!terminalFocus"
-  },
-  {
-    "command": "workbench.action.toggleEditorWidths",
-    "key": "cmd+m",
-    "when": "!terminalFocus"
-  },
-  // Toggle maximize panel (terminal or other tooling on bottom).
-  {
-    "command": "-workbench.action.closeAllEditors",
-    "key": "cmd+k cmd+w"
-  },
-  {
-    "command": "workbench.action.closeEditorsInGroup",
-    "key": "shift+cmd+w"
-  },
-  {
-    "command": "-workbench.action.closeEditorsInGroup",
-    "key": "cmd+k w"
-  },
-  {
-    "command": "-extension.vim_ctrl+p",
-    "key": "ctrl+p",
-    "when": "suggestWidgetVisible && vim.active && vim.use<C-p> && !inDebugRepl || vim.active && vim.use<C-p> && !inDebugRepl && vim.mode == 'CommandlineInProgress' || vim.active && vim.use<C-p> && !inDebugRepl && vim.mode == 'SearchInProgressMode'"
-  },
-  {
-    "command": "-list.focusUp",
-    "key": "ctrl+p",
-    "when": "listFocus && !inputFocus"
-  },
-  {
-    "command": "-selectPrevSuggestion",
-    "key": "ctrl+p",
-    "when": "suggestWidgetMultipleSuggestions && suggestWidgetVisible && textInputFocus"
-  },
-  {
-    "command": "-showPrevParameterHint",
-    "key": "ctrl+p",
-    "when": "editorFocus && parameterHintsMultipleSignatures && parameterHintsVisible"
-  },
-  {
-    "command": "-cursorUp",
-    "key": "ctrl+p",
-    "when": "textInputFocus"
-  },
-  {
-    "command": "-workbench.action.quickOpenSelectPrevious",
-    "key": "ctrl+p",
-    "when": "inQuickOpen"
-  },
-  {
-    "command": "extension.vim_ctrl+i",
-    "key": "ctrl+p",
-    "when": "editorTextFocus && vim.active && vim.use<C-i> && !inDebugRepl"
-  },
-  {
-    "command": "-extension.vim_ctrl+i",
-    "key": "ctrl+i",
-    "when": "editorTextFocus && vim.active && vim.use<C-i> && !inDebugRepl"
-  },
-  {
-    "command": "git.stage",
-    "key": "ctrl+g ctrl+s"
-  },
-  {
-    "command": "git.push",
-    "key": "ctrl+g ctrl+p"
-  },
-  {
-    "command": "git.checkout",
-    "key": "ctrl+g ctrl+b"
-  },
-  {
-    "command": "git.pull",
-    "key": "ctrl+g ctrl+u"
-  },
-  {
-    "command": "git.stash",
-    "key": "ctrl+g ctrl+z"
-  },
-  // {
-  //   "key": "cmd+k cmd",
-  //   "command": "workbench.action.quickOpenNavigatePreviousInFilePicker",
-  //   "when": "inFilesPicker && inQuickOpen"
-  // },
-  {
-    "command": "-workbench.action.quickOpenNavigatePreviousInFilePicker",
-    "key": "shift+cmd+p",
-    "when": "inFilesPicker && inQuickOpen"
-  },
-  {
-    "command": "workbench.action.showCommands",
-    "key": "cmd+k"
-  },
-  {
-    "command": "-workbench.action.showCommands",
-    "key": "shift+cmd+p"
-  },
-  {
-    "command": "-workbench.action.keybindingsReference",
-    "key": "cmd+k cmd+r"
-  },
-  {
-    "command": "workbench.action.openGlobalKeybindings",
-    "key": "ctrl+k ctrl+s",
-    "when": "!terminalFocus"
-  },
-  {
-    "command": "-workbench.action.openGlobalKeybindings",
-    "key": "cmd+k cmd+s"
-  },
-  {
-    "command": "-workbench.action.closeWindow",
-    "key": "shift+cmd+w"
-  },
-  {
-    "command": "workbench.files.action.focusOpenEditorsView",
-    "key": "ctrl+f ctrl+e",
-    "when": "workbench.explorer.openEditorsView.active"
-  },
-  {
-    "command": "-workbench.files.action.focusOpenEditorsView",
-    "key": "cmd+k e",
-    "when": "workbench.explorer.openEditorsView.active"
-  },
-  {
-    "command": "explorer.openAndPassFocus",
-    "key": "enter",
-    "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus"
-  },
-  {
-    "command": "-renameFile",
-    "key": "enter",
-    "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus"
-  },
-  {
-    "command": "-explorer.openAndPassFocus",
-    "key": "cmd+down",
-    "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsFolder && !inputFocus"
-  },
-  {
-    "command": "-editor.foldAll",
-    "key": "cmd+k cmd+0",
-    "when": "editorTextFocus && foldingEnabled"
-  },
-  {
-    "command": "-editor.unfoldAll",
-    "key": "cmd+k cmd+j",
-    "when": "editorTextFocus && foldingEnabled"
-  },
-  // Make breadcrumbs work more like vim-vinegar
-  {
-    "command": "-editor.fold",
-    "key": "alt+cmd+[",
-    "when": "editorTextFocus && foldingEnabled"
-  },
-  {
-    "command": "-editor.unfold",
-    "key": "alt+cmd+]",
-    "when": "editorTextFocus && foldingEnabled"
-  },
-  {
-    "command": "-editor.action.revealDefinition",
-    "key": "f12",
-    "when": "editorHasDefinitionProvider && editorTextFocus && !isInEmbeddedEditor"
-  },
-  {
-    "command": "-references-view.findReferences",
-    "key": "shift+alt+f12",
-    "when": "editorHasReferenceProvider"
-  },
-  {
-    "command": "-editor.action.goToReferences",
-    "key": "shift+f12",
-    "when": "editorHasReferenceProvider && editorTextFocus && !inReferenceSearchEditor && !isInEmbeddedEditor"
-  },
-  {
-    "command": "-breadcrumbs.toggleToOn",
-    "key": "shift+cmd+.",
-    "when": "!config.breadcrumbs.enabled"
-  },
-  {
-    "command": "-workbench.action.files.openLocalFileFolder",
-    "key": "cmd+o",
-    "when": "remoteFileDialogVisible"
-  },
-  {
-    "command": "-workbench.action.files.openFileFolder",
-    "key": "cmd+o",
-    "when": "isMacNative && openFolderWorkspaceSupport"
-  },
-  {
-    "command": "-workbench.action.files.openFolderViaWorkspace",
-    "key": "cmd+o",
-    "when": "!openFolderWorkspaceSupport && workbenchState == 'workspace'"
-  },
-  {
-    "command": "-workbench.action.files.openFile",
-    "key": "cmd+o",
-    "when": "false"
-  },
-  {
-    "command": "workbench.action.gotoSymbol",
-    "key": "cmd+o"
-  },
-  {
-    "command": "-workbench.action.gotoSymbol",
-    "key": "shift+cmd+o"
-  },
-  {
-    "command": "-rust-analyzer.joinLines",
-    "key": "ctrl+shift+j",
-    "when": "editorTextFocus && editorLangId == 'rust'"
-  },
-  {
-    "command": "workbench.action.moveActiveEditorGroupDown",
-    "key": "ctrl+cmd+j"
-  },
-  {
-    "command": "-workbench.action.moveActiveEditorGroupDown",
-    "key": "cmd+k down"
-  },
-  {
-    "command": "workbench.action.moveActiveEditorGroupLeft",
-    "key": "ctrl+cmd+h"
-  },
-  {
-    "command": "-workbench.action.moveActiveEditorGroupLeft",
-    "key": "cmd+k left"
-  },
-  {
-    "command": "workbench.action.moveActiveEditorGroupRight",
-    "key": "ctrl+cmd+l"
-  },
-  {
-    "command": "-workbench.action.moveActiveEditorGroupRight",
-    "key": "cmd+k right"
-  },
-  {
-    "command": "workbench.action.moveActiveEditorGroupUp",
-    "key": "ctrl+cmd+k"
-  },
-  {
-    "command": "-workbench.action.moveActiveEditorGroupUp",
-    "key": "cmd+k up"
-  },
-  {
-    "command": "-editor.action.revealDefinitionAside",
-    "key": "cmd+k f12",
-    "when": "editorHasDefinitionProvider && editorTextFocus && !isInEmbeddedEditor"
-  },
-  {
-    "command": "explorer.newFile",
-    "key": "ctrl+n",
-    "when": "explorerViewletFocus"
-  },
-  /////////////////////////////////////
-  // Magit (Git) plugin keys.
-  /////////////////////////////////////
-  {
-    "command": "cursorTop",
-    "key": "g g",
-    "when": "editorTextFocus && editorLangId == 'magit' && vim.mode =~ /^(?!SearchInProgressMode|CommandlineInProgress).*$/"
-  },
-  {
-    "command": "magit.refresh",
-    "key": "g r",
-    "when": "editorTextFocus && editorLangId == 'magit' && vim.mode =~ /^(?!SearchInProgressMode|CommandlineInProgress).*$/"
-  },
-  {
-    "command": "extension.vim_tab",
-    "key": "tab",
-    "when": "editorTextFocus && vim.active && !inDebugRepl && vim.mode != 'Insert' && editorLangId != 'magit'"
-  },
-  {
-    "command": "-extension.vim_tab",
-    "key": "tab",
-    "when": "editorTextFocus && vim.active && !inDebugRepl && vim.mode != 'Insert'"
-  },
-  {
-    "command": "magit.discard-at-point",
-    "key": "x",
-    "when": "editorTextFocus && editorLangId == 'magit' && vim.mode =~ /^(?!SearchInProgressMode|CommandlineInProgress).*$/"
-  },
-  {
-    "command": "-magit.discard-at-point",
-    "key": "k"
-  },
-  {
-    "command": "magit.reverse-at-point",
-    "key": "-",
-    "when": "editorTextFocus && editorLangId == 'magit' && vim.mode =~ /^(?!SearchInProgressMode|CommandlineInProgress).*$/"
-  },
-  {
-    "command": "-magit.reverse-at-point",
-    "key": "v"
-  },
-  {
-    "command": "magit.reverting",
-    "key": "shift+-",
-    "when": "editorTextFocus && editorLangId == 'magit' && vim.mode =~ /^(?!SearchInProgressMode|CommandlineInProgress).*$/"
-  },
-  {
-    "command": "-magit.reverting",
-    "key": "shift+v"
-  },
-  {
-    "command": "magit.resetting",
-    "key": "shift+o",
-    "when": "editorTextFocus && editorLangId == 'magit' && vim.mode =~ /^(?!SearchInProgressMode|CommandlineInProgress).*$/"
-  },
-  {
-    "command": "-magit.resetting",
-    "key": "shift+x"
-  },
-  {
-    "command": "-magit.reset-mixed",
-    "key": "x"
-  },
-  {
-    "command": "-magit.reset-hard",
-    "key": "ctrl+u x"
-  },
-  {
-    "command": "magit.status",
-    "key": "ctrl+g"
-  },
-  {
-    "command": "-magit.status",
-    "key": "alt+x g"
-  },
-  {
-    "command": "magit.pushing",
-    "key": "p",
-    "when": "editorTextFocus && editorLangId == 'magit' && vim.mode =~ /^(?!SearchInProgressMode|CommandlineInProgress).*$/"
-  },
-  {
-    "command": "-magit.pushing",
-    "key": "shift+p",
-    "when": "editorTextFocus && editorLangId == 'magit' && vim.mode =~ /^(?!SearchInProgressMode|CommandlineInProgress).*$/"
-  },
-  {
-    "command": "-magit.show-refs",
-    "key": "y"
-  },
-  {
-    "command": "vspacecode.showMagitRefMenu",
-    "key": "y",
-    "when": "editorTextFocus && editorLangId == 'magit' && vim.mode == 'Normal'"
-  },
-  {
-    "command": "magit.move-previous-entity",
-    "key": "ctrl+k",
-    "when": "editorTextFocus && editorLangId == 'magit' && vim.mode =~ /^(?!SearchInProgressMode|CommandlineInProgress).*$/  && !terminalFocus"
-  },
-  {
-    "command": "-magit.move-previous-entity",
-    "key": "ctrl+k",
-    "when": "editorTextFocus && editorLangId == 'magit' && vim.mode =~ /^(?!SearchInProgressMode|CommandlineInProgress).*$/"
-  },
-  /////////////////////////////////////
-  // VSpaceCode (Emacs like VSCode)
-  /////////////////////////////////////
-  {
-    "command": "vspacecode.space",
-    "key": "space",
-    "when": "activeEditorGroupEmpty && focusedView == '' && !whichkeyActive && !inputFocus"
-  },
-  {
-    "command": "vspacecode.space",
-    "key": "space",
-    "when": "sideBarFocus && !inputFocus && !whichkeyActive"
-  },
-  {
-    "command": "workbench.action.quickOpenSelectNext",
-    "key": "ctrl+j",
-    "when": "inQuickOpen"
-  },
-  {
-    "command": "workbench.action.quickOpenSelectPrevious",
-    "key": "ctrl+k",
-    "when": "inQuickOpen && !terminalFocus"
-  },
-  {
-    "command": "selectNextSuggestion",
-    "key": "ctrl+j",
-    "when": "suggestWidgetMultipleSuggestions && suggestWidgetVisible && textInputFocus"
-  },
-  {
-    "command": "selectPrevSuggestion",
-    "key": "ctrl+k",
-    "when": "suggestWidgetMultipleSuggestions && suggestWidgetVisible && textInputFocus && !terminalFocus"
-  },
-  {
-    "command": "acceptSelectedSuggestion",
-    "key": "ctrl+l",
-    "when": "suggestWidgetMultipleSuggestions && suggestWidgetVisible && textInputFocus"
-  },
-  {
-    "command": "showNextParameterHint",
-    "key": "ctrl+j",
-    "when": "editorFocus && parameterHintsMultipleSignatures && parameterHintsVisible"
-  },
-  {
-    "command": "showPrevParameterHint",
-    "key": "ctrl+k",
-    "when": "editorFocus && parameterHintsMultipleSignatures && parameterHintsVisible  && !terminalFocus"
-  },
-  {
-    "command": "file-browser.stepOut",
-    "key": "ctrl+h",
-    "when": "inFileBrowser"
-  },
-  {
-    "command": "file-browser.stepIn",
-    "key": "ctrl+l",
-    "when": "inFileBrowser"
-  },
-  // Create new folder when in file explorer (new file key exists as ctrl+n)
-  {
-    "command": "explorer.newFolder",
-    "key": "ctrl+shift+n",
-    "when": "explorerViewletFocus"
-  },
-  // Make pane navigation work with integrated terminal.
-  {
-    "command": "workbench.action.navigateUp",
-    "key": "ctrl+shift+k",
-    "when": "terminalFocus"
-  },
-  {
-    "command": "workbench.action.showAllSymbols",
-    "key": "shift+cmd+o"
-  },
-  {
-    "command": "-workbench.action.showAllSymbols",
-    "key": "cmd+t"
-  },
-  {
-    "command": "testing.debugAll",
-    "key": "cmd+t"
-  },
-  {
-    "command": "-testing.debugAll",
-    "key": "cmd+; cmd+a"
-  },
-  {
-    "command": "workbench.action.quickOpenSelectPrevious",
-    "key": "ctrl+k",
-    "when": "inQuickOpen"
-  },
-  {
-    "command": "selectPrevSuggestion",
-    "key": "ctrl+k",
-    "when": "suggestWidgetMultipleSuggestions && suggestWidgetVisible && textInputFocus"
-  },
-  {
-    "command": "showPrevParameterHint",
-    "key": "ctrl+k",
-    "when": "editorFocus && parameterHintsMultipleSignatures && parameterHintsVisible"
-  },
-  {
-    "command": "selectNextCodeAction",
-    "key": "ctrl+j",
-    "when": "codeActionMenuVisible"
-  },
-  {
-    "command": "selectPrevCodeAction",
-    "key": "ctrl+k",
-    "when": "codeActionMenuVisible"
-  },
-  {
-    "command": "acceptSelectedCodeAction",
-    "key": "ctrl+l",
-    "when": "codeActionMenuVisible"
-  },
-  {
-    "command": "workbench.view.extension.github-pull-requests",
-    "key": "shift+cmd+g"
-  },
-  {
-    "command": "workbench.files.action.showActiveFileInExplorer",
-    "key": "cmd+shift+ctrl+e"
-  },
-  {
-    "command": "workbench.view.extension.project-manager",
-    "key": "shift+cmd+p"
-  },
-  {
-    "command": "workbench.action.showEditorsInActiveGroup",
-    "key": "cmd+e"
-  },
-  {
-    "command": "workbench.action.showAllEditorsByMostRecentlyUsed",
-    "key": "cmd+e"
-  },
-  {
-    "command": "extension.vim_tab",
-    "key": "tab",
-    "when": "editorFocus && vim.active && !inDebugRepl && vim.mode != 'Insert' && editorLangId != 'magit'"
-  },
-  {
-    "command": "-extension.vim_tab",
-    "key": "tab",
-    "when": "editorFocus && vim.active && !inDebugRepl && vim.mode != 'Insert'"
-  },
-  {
-    "command": "-magit.refresh",
-    "key": "g",
-    "when": "editorTextFocus && editorLangId == 'magit' && vim.mode =~ /^(?!SearchInProgressMode|CommandlineInProgress).*$/"
-  },
-  {
-    "command": "vspacecode.showMagitRefreshMenu",
-    "key": "g",
-    "when": "editorTextFocus && editorLangId == 'magit' && vim.mode =~ /^(?!SearchInProgressMode|CommandlineInProgress).*$/"
-  },
-  {
-    "command": "projectManager.listProjectsNewWindow",
-    "key": "alt+cmd+p"
-  },
-  {
-    "command": "-projectManager.listProjects",
-    "key": "alt+cmd+p"
-  },
-  {
-    "command": "-workbench.action.files.saveAs",
-    "key": "shift+cmd+s"
-  },
-  {
-    "command": "-workbench.action.files.saveLocalFile",
-    "key": "shift+cmd+s",
-    "when": "remoteFileDialogVisible"
-  },
-  {
-    "command": "-breadcrumbs.focus",
-    "key": "shift+cmd+;",
-    "when": "breadcrumbsPossible && breadcrumbsVisible"
-  },
-  {
-    "command": "reactSnippets.search",
-    "key": "ctrl+cmd+;",
-    "when": "editorTextFocus"
-  },
-  {
-    "command": "-reactSnippets.search",
-    "key": "shift+cmd+r",
-    "when": "editorTextFocus"
-  },
-  {
-    "command": "editor.action.insertSnippet",
-    "key": "shift+cmd+;"
-  },
-  {
-    "command": "workbench.action.openSnippets",
-    "key": "ctrl+alt+cmd+;"
-  },
-  {
-    "command": "workbench.action.terminal.openNativeConsole",
-    "key": "shift+cmd+c",
-    "when": "!terminalFocus"
-  },
-  {
-    "command": "-workbench.action.terminal.openNativeConsole",
-    "key": "shift+cmd+c",
-    "when": "!terminalFocus"
-  },
-  {
-    "command": "workbench.action.quickOpenSelectNext",
-    "key": "ctrl+j",
-    "when": "inProjectManagerList"
-  },
-  {
-    "command": "workbench.action.quickOpenSelectPrevious",
-    "key": "ctrl+k",
-    "when": "inProjectManagerList"
-  },
+  // ============================================
+  // Cursor AI shortcuts
+  // ============================================
   {
     "key": "cmd+i",
     "command": "composerMode.agent"
   },
+  {
+    "key": "shift+cmd+,",
+    "command": "aiSettings.action.open",
+    "when": "!isSettingsPaneOpen"
+  },
+  {
+    "key": "shift+cmd+j",
+    "command": "-aiSettings.action.open",
+    "when": "!isSettingsPaneOpen"
+  },
+
+  // ============================================
+  // Command palette (cmd+k instead of cmd+shift+p)
+  // ============================================
+  {
+    "key": "cmd+k",
+    "command": "workbench.action.showCommands"
+  },
+  {
+    "key": "shift+cmd+p",
+    "command": "-workbench.action.showCommands"
+  },
+
+  // ============================================
+  // Go to symbol (cmd+o instead of cmd+shift+o)
+  // ============================================
+  {
+    "key": "cmd+o",
+    "command": "workbench.action.gotoSymbol",
+    "when": "!accessibilityHelpIsShown && !accessibleViewIsShown"
+  },
+  {
+    "key": "shift+cmd+o",
+    "command": "-workbench.action.gotoSymbol",
+    "when": "!accessibilityHelpIsShown && !accessibleViewIsShown"
+  },
+
+  // ============================================
+  // WhichKey support
+  // ============================================
+  {
+    "key": "cmd+;",
+    "command": "whichkey.show",
+    "when": "!whichkeyVisible"
+  },
+  {
+    "key": "ctrl+space",
+    "command": "whichkey.show",
+    "when": "!whichkeyVisible && editorTextFocus"
+  },
+
+  // ============================================
+  // Lazygit integration
+  // ============================================
+  {
+    "key": "cmd+g cmd+g",
+    "command": "lazygit.openLazygit"
+  },
+  {
+    "key": "cmd+g g",
+    "command": "-lazygit.openLazygit"
+  },
+
+  // ============================================
+  // Git operations (ctrl+g prefix)
+  // ============================================
+  {
+    "key": "ctrl+g ctrl+c",
+    "command": "git.commitStaged"
+  },
+  {
+    "key": "ctrl+g ctrl+s",
+    "command": "git.stage"
+  },
+  {
+    "key": "ctrl+g ctrl+p",
+    "command": "git.push"
+  },
+  {
+    "key": "ctrl+g ctrl+b",
+    "command": "git.checkout"
+  },
+  {
+    "key": "ctrl+g ctrl+u",
+    "command": "git.pull"
+  },
+  {
+    "key": "ctrl+g ctrl+z",
+    "command": "git.stash"
+  },
+
+  // ============================================
+  // Vim-style pane navigation (ctrl+hjkl)
+  // ============================================
+  // Disable conflicting defaults
+  {
+    "key": "ctrl+k",
+    "command": "-deleteAllRight",
+    "when": "textInputFocus && !editorReadonly"
+  },
+  {
+    "key": "ctrl+k",
+    "command": "-extension.vim_ctrl+k",
+    "when": "editorTextFocus && vim.active && vim.use<C-k> && !inDebugRepl"
+  },
+  {
+    "key": "ctrl+h",
+    "command": "-deleteLeft",
+    "when": "textInputFocus"
+  },
+  {
+    "key": "ctrl+h",
+    "command": "-extension.vim_ctrl+h",
+    "when": "editorTextFocus && vim.active && vim.use<C-h> && !inDebugRepl"
+  },
+  {
+    "key": "ctrl+j",
+    "command": "-extension.vim_ctrl+j",
+    "when": "editorTextFocus && vim.active && vim.use<C-j> && !inDebugRepl"
+  },
+  {
+    "key": "ctrl+j",
+    "command": "-editor.action.joinLines",
+    "when": "editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "ctrl+l",
+    "command": "-notebook.centerActiveCell",
+    "when": "notebookEditorFocused"
+  },
+  {
+    "key": "ctrl+l",
+    "command": "-extension.vim_navigateCtrlL",
+    "when": "editorTextFocus && vim.active && vim.use<C-l> && !inDebugRepl"
+  },
+  {
+    "key": "ctrl+g",
+    "command": "-extension.vim_ctrl+g",
+    "when": "editorTextFocus && vim.active && vim.use<C-g> && !inDebugRepl"
+  },
+  {
+    "key": "ctrl+g",
+    "command": "-workbench.action.gotoLine"
+  },
+
+  // Editor pane navigation
+  {
+    "key": "ctrl+h",
+    "command": "workbench.action.navigateLeft",
+    "when": "editorTextFocus && vim.mode == 'Normal' && !suggestWidgetVisible"
+  },
+  {
+    "key": "ctrl+j",
+    "command": "workbench.action.navigateDown",
+    "when": "editorTextFocus && vim.mode == 'Normal' && !suggestWidgetVisible"
+  },
+  {
+    "key": "ctrl+k",
+    "command": "workbench.action.navigateUp",
+    "when": "editorTextFocus && vim.mode == 'Normal' && !suggestWidgetVisible"
+  },
+  {
+    "key": "ctrl+l",
+    "command": "workbench.action.navigateRight",
+    "when": "editorTextFocus && vim.mode == 'Normal' && !suggestWidgetVisible"
+  },
+
+  // Terminal pane navigation
+  {
+    "key": "ctrl+h",
+    "command": "workbench.action.terminal.focusPreviousPane",
+    "when": "terminalFocus"
+  },
+  {
+    "key": "ctrl+l",
+    "command": "workbench.action.terminal.focusNextPane",
+    "when": "terminalFocus"
+  },
+  {
+    "key": "ctrl+j",
+    "command": "workbench.action.terminal.focusNext",
+    "when": "terminalFocus"
+  },
+  {
+    "key": "ctrl+k",
+    "command": "workbench.action.terminal.focusPrevious",
+    "when": "terminalFocus"
+  },
+
+  // ============================================
+  // Terminal utilities
+  // ============================================
+  {
+    "key": "shift+enter",
+    "command": "workbench.action.terminal.sendSequence",
+    "args": {
+      "text": "\\\r\n"
+    },
+    "when": "terminalFocus"
+  },
+
+  // ============================================
+  // View size management
+  // ============================================
+  {
+    "key": "ctrl+cmd+-",
+    "command": "workbench.action.decreaseViewSize"
+  },
+  {
+    "key": "ctrl+cmd+=",
+    "command": "workbench.action.increaseViewSize"
+  },
+  {
+    "key": "cmd+m",
+    "command": "workbench.action.toggleEditorWidths",
+    "when": "!terminalFocus"
+  },
+  {
+    "key": "shift+cmd+m",
+    "command": "workbench.action.evenEditorWidths",
+    "when": "!terminalFocus"
+  },
+
+  // ============================================
+  // Explorer - enter opens file (like vim)
+  // ============================================
+  {
+    "key": "enter",
+    "command": "explorer.openAndPassFocus",
+    "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus"
+  },
+  {
+    "key": "enter",
+    "command": "-renameFile",
+    "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus"
+  },
+
+  // ============================================
+  // Window management
+  // ============================================
+  {
+    "key": "shift+cmd+w",
+    "command": "workbench.action.closeEditorsInGroup"
+  },
+  {
+    "key": "shift+cmd+w",
+    "command": "-workbench.action.closeWindow"
+  },
+
+  // ============================================
+  // Keybindings settings
+  // ============================================
+  {
+    "key": "ctrl+k ctrl+s",
+    "command": "workbench.action.openGlobalKeybindings",
+    "when": "!terminalFocus"
+  },
+  {
+    "key": "cmd+k cmd+s",
+    "command": "-workbench.action.openGlobalKeybindings"
+  }
 ]
