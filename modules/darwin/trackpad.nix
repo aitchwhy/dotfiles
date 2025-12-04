@@ -15,7 +15,8 @@ with lib;
       TrackpadRightClick = true;
 
       # Gestures
-      TrackpadThreeFingerDrag = true;
+      # Note: 3-finger drag disabled to allow Hammerspoon Swipe.spoon 4-finger gestures
+      TrackpadThreeFingerDrag = false;
 
       # Click pressure (0=light, 1=medium, 2=firm)
       FirstClickThreshold = 1;   # was 0 (lightest) - medium pressure
