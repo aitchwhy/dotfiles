@@ -27,6 +27,9 @@ with lib; {
     # Editors
     ./editors/neovim.nix
 
+    # Fonts
+    ./fonts.nix
+
     # Apps (xdg.configFile based)
     ./apps/ghostty.nix
     ./apps/kanata.nix
@@ -69,6 +72,8 @@ with lib; {
       editors = {
         neovim.enable = mkDefault true;
       };
+
+      fonts.enable = mkDefault true;
 
       apps = {
         ghostty.enable = mkDefault true;

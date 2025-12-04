@@ -12,7 +12,7 @@ with lib;
   config = mkIf config.modules.home.apps.ghostty.enable {
     programs.ghostty = {
       enable = true;
-      package = null; # Installed via Homebrew cask, not nixpkgs
+      package = pkgs.ghostty-bin; # Pre-built binary for macOS, launch via Terminal/Raycast
 
       enableZshIntegration = true;
       enableBashIntegration = true;
