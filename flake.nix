@@ -42,6 +42,7 @@
         {
           system.primaryUser = "hank";
           users.users.hank = {
+            uid = 501;
             description = "Hank Lee";
             home = "/Users/hank";
             shell = pkgs.zsh;
