@@ -34,6 +34,8 @@ let
 
     (defcfg
       process-unmapped-keys yes
+      concurrent-tap-hold yes
+      log-layer-changes no
     )
 
     ;; ============================================================================
@@ -126,11 +128,12 @@ let
     )
 
     ;; Navigation layer (activated by holding right alt)
-    ;; Provides arrow keys, page up/down, home/end on right hand
+    ;; Vim-style arrows on home row: h=left, j=down, k=up, l=right
+    ;; Also: y=home, u=pgup, i=pgdn, o=end
     (deflayer navigation
       _    _    _    _    _    _    _    _    _    _    _    _    _    _
-      _    _    _    _    _    _    home pgup up   pgdn end  _    _    _
-      _    _    _    _    _    _    _    left down rght _    _    _
+      _    _    _    _    _    _    home pgup pgdn end  _    _    _    _
+      _    _    _    _    _    _    left down up   rght _    _    _
       _    _    _    _    _    _    _    _    _    _    _    _
       _    _    _    _              _              _    _    _
     )
