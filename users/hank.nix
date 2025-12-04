@@ -87,11 +87,16 @@
     ffmpeg-full
     imagemagick
 
+    # macOS Apps (migrated from Homebrew)
+    iina # Video player
+    keka # File archiver
+
     # Security Tools
     sops
     age
     gnupg
     _1password-cli
+    bitwarden-cli # Password manager CLI (migrated from Homebrew)
 
     # Code Quality & Formatting
     # Shell
