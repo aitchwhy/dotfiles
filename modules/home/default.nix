@@ -1,9 +1,10 @@
 # Home Manager module aggregator
-{ config, lib, ... }:
-
-with lib;
-
 {
+  config,
+  lib,
+  ...
+}:
+with lib; {
   imports = [
     # Shell
     ./shell/zsh.nix
@@ -32,6 +33,7 @@ with lib;
     ./apps/hammerspoon.nix
     ./apps/raycast.nix
     ./apps/claude.nix
+    ./apps/claude-code.nix
     ./apps/cursor.nix
     ./apps/misc.nix
     ./apps/keyboard-layout.nix
@@ -73,6 +75,7 @@ with lib;
         hammerspoon.enable = mkDefault true;
         raycast.enable = mkDefault true;
         claude.enable = mkDefault true;
+        claudeCode.enable = mkDefault true;
         cursor.enable = mkDefault true;
         misc.enable = mkDefault true;
         keyboardLayout.enable = mkDefault true;
