@@ -1,12 +1,8 @@
--- FZF-LUA CONFIGURATION FOR LAZYVIM 8.X
--- Configures fzf-lua as the default fuzzy finder for LazyVim
+-- FZF-Lua fuzzy finder for LazyVim 15.x
 return {
   {
     "ibhagwan/fzf-lua",
-    -- optional for icon support
-    dependencies = { "nvim-tree/nvim-web-devicons" },
-    -- or if using mini.icons/mini.nvim
-    -- dependencies = { "echasnovski/mini.icons" },
+    dependencies = { "nvim-mini/mini.icons" },
     opts = {},
   },
 }

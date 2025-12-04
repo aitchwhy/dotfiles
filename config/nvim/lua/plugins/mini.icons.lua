@@ -1,6 +1,6 @@
 return {
   {
-    "echasnovski/mini.icons",
+    "nvim-mini/mini.icons",
     version = "*",
     opts = {
       file = {
