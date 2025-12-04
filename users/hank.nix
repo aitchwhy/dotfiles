@@ -120,6 +120,7 @@
     nixd
     nil
     nix-tree
+    tree-sitter # Required for LazyVim 15.x treesitter parser compilation
     nix-output-monitor
     nix-diff
 
