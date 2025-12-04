@@ -37,6 +37,7 @@ with lib; {
     ./apps/cursor.nix
     ./apps/misc.nix
     ./apps/keyboard-layout.nix
+    ./apps/homerow.nix
   ];
 
   config = {
@@ -79,6 +80,7 @@ with lib; {
         cursor.enable = mkDefault true;
         misc.enable = mkDefault true;
         keyboardLayout.enable = mkDefault true;
+        homerow.enable = mkDefault true;
       };
     };
 
