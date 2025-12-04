@@ -41,6 +41,7 @@ with lib; {
     ./apps/misc.nix
     ./apps/keyboard-layout.nix
     ./apps/homerow.nix
+    ./apps/default-apps.nix
   ];
 
   config = {
@@ -86,6 +87,7 @@ with lib; {
         misc.enable = mkDefault true;
         keyboardLayout.enable = mkDefault true;
         homerow.enable = mkDefault true;
+        defaultApps.enable = mkDefault true;
       };
     };
 
