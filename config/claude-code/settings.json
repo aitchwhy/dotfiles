@@ -117,8 +117,8 @@
       "Write(*/.dev.vars)",
       "Bash(rm -rf /)",
       "Bash(rm -rf ~)",
-      "Bash(sudo *)",
-      "Bash(chmod 777*)"
+      "Bash(sudo:*)",
+      "Bash(chmod 777:*)"
     ]
   },
   "hooks": {
