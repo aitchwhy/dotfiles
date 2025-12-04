@@ -30,8 +30,8 @@ module.exports = {
       ]
     ],
     'scope-enum': [
-      2, 
-      'always', 
+      2,
+      'always',
       [
         'git',
         'nvim',
@@ -43,10 +43,11 @@ module.exports = {
         'docs',
         'starship',
         'config',
-        'karabiner',
+        'kanata',
         'hammerspoon',
         'sdk',
-        'aerospace',
+        'darwin',
+        'home',
         'workflow',
         'tools',
         '*'  // Allow anything else for flexibility
