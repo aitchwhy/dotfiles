@@ -6,7 +6,13 @@
   },
   "filesystem": {
     "command": "npx",
-    "args": ["-y", "@modelcontextprotocol/server-filesystem", "/Users/hank/src", "/Users/hank/dotfiles"],
+    "args": [
+      "-y",
+      "@modelcontextprotocol/server-filesystem",
+      "/Users/hank/src",
+      "/Users/hank/dotfiles",
+      "/Users/hank/Documents"
+    ],
     "type": "stdio"
   },
   "github": {
@@ -17,6 +23,16 @@
   "sequential-thinking": {
     "command": "npx",
     "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+    "type": "stdio"
+  },
+  "context7": {
+    "command": "npx",
+    "args": ["-y", "@upstash/context7-mcp"],
+    "type": "stdio"
+  },
+  "linear": {
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-linear"],
     "type": "stdio"
   }
 }
