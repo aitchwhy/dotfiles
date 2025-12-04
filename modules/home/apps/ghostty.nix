@@ -17,6 +17,10 @@ with lib;
       enableZshIntegration = true;
       enableBashIntegration = true;
 
+      # Disable bat syntax to avoid "Dockerfile (with bash)" unresolved context warning
+      # The ghostty syntax causes bat to rebuild its cache, breaking Dockerfile syntax dependencies
+      installBatSyntax = false;
+
       settings = {
         # System behavior
         auto-update = "download";
