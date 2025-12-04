@@ -1,0 +1,156 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Grep(*)",
+      "Glob(*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(find:*)",
+      "Bash(fd:*)",
+      "Bash(rg:*)",
+      "Bash(wc:*)",
+      "Bash(which:*)",
+      "Bash(echo:*)",
+      "Bash(pwd)",
+      "Bash(cd:*)",
+      "Bash(mkdir:*)",
+      "Bash(tree:*)",
+      "Bash(eza:*)",
+      "Bash(bat:*)",
+      "Bash(delta:*)",
+      "Bash(dust:*)",
+      "Bash(duf:*)",
+      "Bash(bun:*)",
+      "Bash(bunx:*)",
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(node:*)",
+      "Bash(python:*)",
+      "Bash(python3:*)",
+      "Bash(uv:*)",
+      "Bash(uvx:*)",
+      "Bash(ruff:*)",
+      "Bash(pytest:*)",
+      "Bash(make:*)",
+      "Bash(just:*)",
+      "Bash(cargo:*)",
+      "Bash(git:*)",
+      "Bash(gh:*)",
+      "Bash(biome:*)",
+      "Bash(tsc:*)",
+      "Bash(playwright:*)",
+      "Bash(wrangler:*)",
+      "Bash(docker:*)",
+      "Bash(docker-compose:*)",
+      "Bash(kubectl:*)",
+      "Bash(terraform:*)",
+      "Bash(nix:*)",
+      "Bash(nix-shell:*)",
+      "Bash(darwin-rebuild:*)",
+      "Bash(home-manager:*)",
+      "Bash(alejandra:*)",
+      "Write(*.ts)",
+      "Write(*.tsx)",
+      "Write(*.js)",
+      "Write(*.jsx)",
+      "Write(*.json)",
+      "Write(*.md)",
+      "Write(*.py)",
+      "Write(*.nix)",
+      "Write(*.toml)",
+      "Write(*.yaml)",
+      "Write(*.yml)",
+      "Write(*.sh)",
+      "Write(*.sql)",
+      "Write(*.css)",
+      "Write(*.html)",
+      "Write(*.lua)",
+      "Write(*.kdl)"
+    ],
+    "deny": [
+      "Read(*/.env)",
+      "Read(*/.env.*)",
+      "Read(*/.dev.vars)",
+      "Read(*/secrets*)",
+      "Read(*/*.pem)",
+      "Read(*/*.key)",
+      "Read(*/.ssh/*)",
+      "Read(*/.gnupg/*)",
+      "Read(*/.netrc)",
+      "Write(*/.env)",
+      "Write(*/.env.*)",
+      "Write(*/.dev.vars)",
+      "Bash(rm -rf *)",
+      "Bash(sudo *)",
+      "Bash(chmod 777*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write(*.ts)|Write(*.tsx)|Write(*.js)|Write(*.jsx)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bunx biome check --write $CLAUDE_FILE_PATHS 2>/dev/null || true",
+            "timeout": 30
+          }
+        ]
+      },
+      {
+        "matcher": "Write(*.py)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "ruff format $CLAUDE_FILE_PATHS && ruff check --fix $CLAUDE_FILE_PATHS 2>/dev/null || true",
+            "timeout": 30
+          }
+        ]
+      },
+      {
+        "matcher": "Write(*.nix)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "alejandra --quiet $CLAUDE_FILE_PATHS 2>/dev/null || true",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash(git commit:*)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run typecheck 2>/dev/null || tsc --noEmit 2>/dev/null || true",
+            "timeout": 120
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"[$(date '+%Y-%m-%d %H:%M:%S')] Session: $(pwd)\" >> ~/.claude/session.log"
+          }
+        ]
+      }
+    ]
+  },
+  "alwaysThinkingEnabled": true,
+  "cleanupPeriodDays": 90,
+  "includeCoAuthoredBy": false,
+  "verbose": false,
+  "statusLine": {
+    "type": "command",
+    "command": "input=$(cat); dir=$(echo \"$input\" | jq -r '.workspace.current_dir'); branch=$(cd \"$dir\" && git branch --show-current 2>/dev/null); dirty=$(cd \"$dir\" && git status --porcelain 2>/dev/null | wc -l | tr -d ' '); printf \"%s%s%s\" \"$(basename \"$dir\")\" \"${branch:+ ⎇ $branch}\" \"${dirty:+0 [$dirty]}\""
+  }
+}

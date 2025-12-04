@@ -1,0 +1,22 @@
+{
+  "memory": {
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-memory"],
+    "type": "stdio"
+  },
+  "filesystem": {
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-filesystem", "/Users/hank/src", "/Users/hank/dotfiles"],
+    "type": "stdio"
+  },
+  "github": {
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-github"],
+    "type": "stdio"
+  },
+  "sequential-thinking": {
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+    "type": "stdio"
+  }
+}
