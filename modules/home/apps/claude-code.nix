@@ -1,0 +1,88 @@
+# Claude Code CLI configuration
+# Manages ~/.claude/ directory with CLAUDE.md, settings, commands, agents, skills
+# Note: This is SEPARATE from claude.nix which manages Claude Desktop
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; {
+  options.modules.home.apps.claudeCode = {
+    enable = mkEnableOption "Claude Code CLI configuration";
+  };
+
+  config = mkIf config.modules.home.apps.claudeCode.enable {
+    # jq required for JSON merging
+    home.packages = [pkgs.jq];
+
+    # Static configs (immutable - symlinked)
+    home.file = {
+      ".claude/CLAUDE.md".source = ../../../config/claude-code/CLAUDE.md;
+      ".claude/commands".source = ../../../config/claude-code/commands;
+      ".claude/agents".source = ../../../config/claude-code/agents;
+      ".claude/skills/ember-patterns".source = ../../../config/claude-code/skills/ember-patterns;
+      ".claude/skills/hono-workers".source = ../../../config/claude-code/skills/hono-workers;
+      ".claude/skills/tanstack-patterns".source = ../../../config/claude-code/skills/tanstack-patterns;
+      ".claude/skills/livekit-agents".source = ../../../config/claude-code/skills/livekit-agents;
+    };
+
+    # Mutable configs (merge/copy-on-init pattern)
+    home.activation.claudeCodeConfig = lib.hm.dag.entryAfter ["writeBoundary"] ''
+      CLAUDE_DIR="$HOME/.claude"
+      SETTINGS_FILE="$CLAUDE_DIR/settings.json"
+      MCP_FILE="$HOME/.claude.json"
+      SOURCE_SETTINGS="${../../../config/claude-code/settings.json}"
+      SOURCE_MCP="${../../../config/claude-code/mcp-servers.json}"
+
+      $DRY_RUN_CMD mkdir -p "$CLAUDE_DIR"
+      $DRY_RUN_CMD mkdir -p "$CLAUDE_DIR/skills"
+
+      # ========================================
+      # settings.json - merge hooks into existing
+      # ========================================
+      if [ -L "$SETTINGS_FILE" ]; then
+        $DRY_RUN_CMD rm "$SETTINGS_FILE"
+        echo "Removed old Claude Code settings symlink"
+      fi
+
+      if [ ! -f "$SETTINGS_FILE" ]; then
+        # Fresh install - copy source
+        $DRY_RUN_CMD cp "$SOURCE_SETTINGS" "$SETTINGS_FILE"
+        $DRY_RUN_CMD chmod 644 "$SETTINGS_FILE"
+        echo "Claude Code settings.json initialized"
+      else
+        # Existing file - merge hooks and permissions, preserve statusLine
+        MERGED=$(${pkgs.jq}/bin/jq -s '
+          .[0] as $existing | .[1] as $source |
+          $existing * {
+            permissions: ($existing.permissions // {}) * $source.permissions,
+            hooks: ($existing.hooks // {}) * $source.hooks
+          }
+        ' "$SETTINGS_FILE" "$SOURCE_SETTINGS")
+        if [ -n "$MERGED" ]; then
+          echo "$MERGED" > "$SETTINGS_FILE"
+          echo "Claude Code settings.json merged (hooks + permissions added)"
+        fi
+      fi
+
+      # ========================================
+      # ~/.claude.json - merge MCP servers
+      # ========================================
+      if [ -f "$MCP_FILE" ] && [ -f "$SOURCE_MCP" ]; then
+        # Merge new servers into existing mcpServers object
+        NEW_SERVERS=$(cat "$SOURCE_MCP")
+        MERGED=$(${pkgs.jq}/bin/jq --argjson new "$NEW_SERVERS" '
+          .mcpServers = (.mcpServers // {}) + $new
+        ' "$MCP_FILE")
+        if [ -n "$MERGED" ]; then
+          echo "$MERGED" > "$MCP_FILE"
+          echo "Claude Code MCP servers merged"
+        fi
+      fi
+
+      # Ensure session log exists
+      $DRY_RUN_CMD touch "$CLAUDE_DIR/session.log"
+    '';
+  };
+}
