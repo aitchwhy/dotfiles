@@ -1,13 +1,4 @@
------------------------------------------------------------------------------------
--- LUASNIP - SNIPPET ENGINE
------------------------------------------------------------------------------------
--- A flexible and powerful snippet engine for Neovim
--- Documentation: https://github.com/L3MON4D3/LuaSnip
--- Features:
--- * Supports multiple snippet formats (VS Code, Snipmate, etc.)
--- * Dynamic snippets, including transformations
--- * Integrates with nvim-cmp for completion
--- * LazyVim integration with common snippets
+-- LuaSnip snippet engine for LazyVim 15.x
 return {
   {
     "L3MON4D3/LuaSnip",
@@ -16,5 +7,4 @@ return {
       delete_check_events = "TextChanged",
     },
   },
-  { "saadparwaiz1/cmp_luasnip" },
 }
