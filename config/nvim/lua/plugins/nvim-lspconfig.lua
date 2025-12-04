@@ -1,4 +1,4 @@
--- ~/.config/nvim/lua/plugins/lspconfig.lua
+-- LSP configuration for LazyVim 15.x
 return {
   "neovim/nvim-lspconfig",
   opts = {
@@ -12,6 +12,7 @@ return {
           },
         },
       },
+      nixd = {}, -- Nix LSP (installed via Nix)
     },
   },
 }
