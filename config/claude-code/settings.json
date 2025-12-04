@@ -17,12 +17,20 @@
       "Bash(pwd)",
       "Bash(cd:*)",
       "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(rm:*)",
+      "Bash(touch:*)",
       "Bash(tree:*)",
       "Bash(eza:*)",
       "Bash(bat:*)",
       "Bash(delta:*)",
       "Bash(dust:*)",
       "Bash(duf:*)",
+      "Bash(sort:*)",
+      "Bash(uniq:*)",
+      "Bash(jq:*)",
+      "Bash(curl:*)",
       "Bash(bun:*)",
       "Bash(bunx:*)",
       "Bash(npm:*)",
@@ -52,6 +60,9 @@
       "Bash(darwin-rebuild:*)",
       "Bash(home-manager:*)",
       "Bash(alejandra:*)",
+      "Bash(nixfmt:*)",
+      "Bash(shfmt:*)",
+      "Bash(stylua:*)",
       "Write(*.ts)",
       "Write(*.tsx)",
       "Write(*.js)",
@@ -64,11 +75,32 @@
       "Write(*.yaml)",
       "Write(*.yml)",
       "Write(*.sh)",
+      "Write(*.bash)",
       "Write(*.sql)",
       "Write(*.css)",
+      "Write(*.scss)",
       "Write(*.html)",
       "Write(*.lua)",
-      "Write(*.kdl)"
+      "Write(*.kdl)",
+      "Edit(*.ts)",
+      "Edit(*.tsx)",
+      "Edit(*.js)",
+      "Edit(*.jsx)",
+      "Edit(*.json)",
+      "Edit(*.md)",
+      "Edit(*.py)",
+      "Edit(*.nix)",
+      "Edit(*.toml)",
+      "Edit(*.yaml)",
+      "Edit(*.yml)",
+      "Edit(*.sh)",
+      "Edit(*.bash)",
+      "Edit(*.sql)",
+      "Edit(*.css)",
+      "Edit(*.scss)",
+      "Edit(*.html)",
+      "Edit(*.lua)",
+      "Edit(*.kdl)"
     ],
     "deny": [
       "Read(*/.env)",
@@ -83,7 +115,8 @@
       "Write(*/.env)",
       "Write(*/.env.*)",
       "Write(*/.dev.vars)",
-      "Bash(rm -rf *)",
+      "Bash(rm -rf /)",
+      "Bash(rm -rf ~)",
       "Bash(sudo *)",
       "Bash(chmod 777*)"
     ]
@@ -91,37 +124,112 @@
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Write(*.ts)|Write(*.tsx)|Write(*.js)|Write(*.jsx)",
+        "matcher": "Write(*.ts)|Write(*.tsx)|Write(*.js)|Write(*.jsx)|Edit(*.ts)|Edit(*.tsx)|Edit(*.js)|Edit(*.jsx)",
         "hooks": [
           {
             "type": "command",
-            "command": "bunx biome check --write $CLAUDE_FILE_PATHS 2>/dev/null || true",
+            "command": "bunx biome check --write \"$CLAUDE_FILE_PATHS\" 2>/dev/null || true",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "tsc --noEmit --skipLibCheck 2>&1 | head -20 || true",
             "timeout": 30
           }
         ]
       },
       {
-        "matcher": "Write(*.py)",
+        "matcher": "Write(*.py)|Edit(*.py)",
         "hooks": [
           {
             "type": "command",
-            "command": "ruff format $CLAUDE_FILE_PATHS && ruff check --fix $CLAUDE_FILE_PATHS 2>/dev/null || true",
+            "command": "ruff format \"$CLAUDE_FILE_PATHS\" && ruff check --fix \"$CLAUDE_FILE_PATHS\" 2>/dev/null || true",
             "timeout": 30
           }
         ]
       },
       {
-        "matcher": "Write(*.nix)",
+        "matcher": "Write(*.nix)|Edit(*.nix)",
         "hooks": [
           {
             "type": "command",
-            "command": "alejandra --quiet $CLAUDE_FILE_PATHS 2>/dev/null || true",
+            "command": "alejandra --quiet \"$CLAUDE_FILE_PATHS\" 2>/dev/null || nixfmt \"$CLAUDE_FILE_PATHS\" 2>/dev/null || true",
             "timeout": 15
+          }
+        ]
+      },
+      {
+        "matcher": "Write(*.json)|Edit(*.json)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bunx biome check --write \"$CLAUDE_FILE_PATHS\" 2>/dev/null || jq '.' \"$CLAUDE_FILE_PATHS\" > /tmp/jq_tmp && mv /tmp/jq_tmp \"$CLAUDE_FILE_PATHS\" 2>/dev/null || true",
+            "timeout": 15
+          }
+        ]
+      },
+      {
+        "matcher": "Write(*.sh)|Write(*.bash)|Edit(*.sh)|Edit(*.bash)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "shfmt -w \"$CLAUDE_FILE_PATHS\" 2>/dev/null || true",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Write(*.yaml)|Write(*.yml)|Write(*.toml)|Edit(*.yaml)|Edit(*.yml)|Edit(*.toml)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx prettier --write \"$CLAUDE_FILE_PATHS\" 2>/dev/null || true",
+            "timeout": 15
+          }
+        ]
+      },
+      {
+        "matcher": "Write(*.lua)|Edit(*.lua)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "stylua \"$CLAUDE_FILE_PATHS\" 2>/dev/null || true",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Write(*.css)|Write(*.scss)|Edit(*.css)|Edit(*.scss)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx prettier --write \"$CLAUDE_FILE_PATHS\" 2>/dev/null || true",
+            "timeout": 15
+          }
+        ]
+      },
+      {
+        "matcher": "Write(*.sql)|Edit(*.sql)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx sql-formatter --fix \"$CLAUDE_FILE_PATHS\" 2>/dev/null || true",
+            "timeout": 10
           }
         ]
       }
     ],
     "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [[ \"$CLAUDE_TOOL_INPUT\" == *\"rm -rf /\"* ]] || [[ \"$CLAUDE_TOOL_INPUT\" == *\"rm -rf ~\"* ]]; then echo 'BLOCKED: Dangerous recursive delete' >&2; exit 1; fi",
+            "timeout": 5
+          }
+        ]
+      },
       {
         "matcher": "Bash(git commit:*)",
         "hooks": [
@@ -143,6 +251,17 @@
           }
         ]
       }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"[$(date '+%Y-%m-%d %H:%M:%S')] Session ended\" >> ~/.claude/session.log",
+            "timeout": 5
+          }
+        ]
+      }
     ]
   },
   "alwaysThinkingEnabled": true,
@@ -151,6 +270,6 @@
   "verbose": false,
   "statusLine": {
     "type": "command",
-    "command": "input=$(cat); dir=$(echo \"$input\" | jq -r '.workspace.current_dir'); branch=$(cd \"$dir\" && git branch --show-current 2>/dev/null); dirty=$(cd \"$dir\" && git status --porcelain 2>/dev/null | wc -l | tr -d ' '); printf \"%s%s%s\" \"$(basename \"$dir\")\" \"${branch:+ ⎇ $branch}\" \"${dirty:+0 [$dirty]}\""
+    "command": "input=$(cat); dir=$(echo \"$input\" | jq -r '.workspace.current_dir'); branch=$(cd \"$dir\" && git branch --show-current 2>/dev/null); dirty=$(cd \"$dir\" && git status --porcelain 2>/dev/null | wc -l | tr -d ' '); printf \"%s%s%s\" \"$(basename \"$dir\")\" \"${branch:+ @ $branch}\" \"${dirty:+0 [$dirty]}\""
   }
 }

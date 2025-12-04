@@ -18,13 +18,25 @@ with lib; {
 
     # Static configs (immutable - symlinked)
     home.file = {
+      # Core config
       ".claude/CLAUDE.md".source = ../../../config/claude-code/CLAUDE.md;
+
+      # Commands and agents
       ".claude/commands".source = ../../../config/claude-code/commands;
       ".claude/agents".source = ../../../config/claude-code/agents;
+
+      # Skills - project-specific patterns
       ".claude/skills/ember-patterns".source = ../../../config/claude-code/skills/ember-patterns;
       ".claude/skills/hono-workers".source = ../../../config/claude-code/skills/hono-workers;
       ".claude/skills/tanstack-patterns".source = ../../../config/claude-code/skills/tanstack-patterns;
       ".claude/skills/livekit-agents".source = ../../../config/claude-code/skills/livekit-agents;
+
+      # Skills - general TypeScript/engineering patterns
+      ".claude/skills/typescript-patterns".source = ../../../config/claude-code/skills/typescript-patterns;
+      ".claude/skills/zod-patterns".source = ../../../config/claude-code/skills/zod-patterns;
+      ".claude/skills/result-patterns".source = ../../../config/claude-code/skills/result-patterns;
+      ".claude/skills/tdd-patterns".source = ../../../config/claude-code/skills/tdd-patterns;
+      ".claude/skills/nix-darwin-patterns".source = ../../../config/claude-code/skills/nix-darwin-patterns;
     };
 
     # Mutable configs (merge/copy-on-init pattern)
