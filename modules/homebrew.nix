@@ -26,7 +26,6 @@
     # GUI Applications
     casks = [
       # Browsers
-      "arc"
       "google-chrome"
 
       # Development
@@ -34,8 +33,6 @@
       "orbstack"
       "proxyman"
       "tableplus"
-      "warp"
-      "fork" # Git GUI
       "antigravity" # Google's AI IDE
       "kaleidoscope" # Diff/merge tool
 
@@ -47,7 +44,6 @@
       "obsidian"
 
       # Communication
-      "discord"
       "slack"
       "zoom"
       "linear-linear" # Project management
@@ -78,6 +74,7 @@
       # System Utilities
       "karabiner-elements" # DriverKit driver for Kanata
       "hammerspoon" # macOS automation
+      "homerow" # Keyboard shortcuts for screen elements
 
       # QuickLook Plugins (preview files in Finder)
       "qlmarkdown" # Markdown preview
