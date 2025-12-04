@@ -48,6 +48,10 @@ with lib; {
     programs.home-manager.enable = true;
     home.stateVersion = mkDefault "25.05";
 
+    # Disable manual generation to avoid builtins.toFile warning
+    # See: https://github.com/nix-community/home-manager/issues/7935
+    manual.manpages.enable = false;
+
     # Enable all modules by default
     modules.home = {
       shell = {
