@@ -10,10 +10,10 @@
 --   Hyper + Escape        = Toggle auto-tiling mode
 --
 -- Trackpad gestures (cursor in title bar):
---   3-finger swipe left   = Snap window to left half
---   3-finger swipe right  = Snap window to right half
---   3-finger swipe up     = Maximize window
---   3-finger swipe down   = Minimize window
+--   4-finger swipe left   = Snap window to left half
+--   4-finger swipe right  = Snap window to right half
+--   4-finger swipe up     = Maximize window
+--   4-finger swipe down   = Minimize window
 --
 -- Auto-tiling: When enabled, windows auto-arrange in columns
 
@@ -287,8 +287,8 @@ local function isCursorInTitleBar()
   return false, nil
 end
 
--- 3-finger swipe to snap windows (only when cursor in title bar)
-Swipe:start(3, function(direction, distance, id)
+-- 4-finger swipe to snap windows (only when cursor in title bar)
+Swipe:start(4, function(direction, distance, id)
   if id == swipe_id then
     if distance > swipe_threshold then
       swipe_threshold = math.huge -- only trigger once per swipe
