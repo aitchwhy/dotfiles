@@ -3,7 +3,8 @@
 -- Kanata handles: CapsLock -> Esc (tap) | Hyper (hold)
 --
 -- Key bindings:
---   Hyper + Arrows        = Snap to half/thirds (cycles through sizes)
+--   Ctrl+Opt + Arrows     = Snap to half/thirds (cycles through sizes)
+--   Hyper + Arrows        = Move window to adjacent display
 --   Hyper + Enter         = Fullscreen (fills screen)
 --   Hyper + Shift + Enter = Toggle maximize / restore
 --   Hyper + W             = Fuzzy window switcher
@@ -15,7 +16,7 @@
 --   4-finger swipe up     = Maximize window
 --   4-finger swipe down   = Minimize window
 --
--- Auto-tiling: When enabled, windows auto-arrange in columns
+-- Auto-tiling: Per-display, triggers on resize/move
 
 --------------------------------------------------------------------------------
 -- Configuration
@@ -24,7 +25,8 @@
 hs.window.animationDuration = 0
 hs.logger.defaultLogLevel = "warning"
 
-local hyper = { "ctrl", "alt", "cmd" }
+local ctrlOpt = { "ctrl", "alt" } -- resize within display
+local hyper = { "ctrl", "alt", "cmd" } -- move between displays + maximize
 local hyperShift = { "ctrl", "alt", "cmd", "shift" }
 
 -- Store original window frames for restore
@@ -50,12 +52,12 @@ hs.pathwatcher.new(os.getenv("HOME") .. "/.hammerspoon/", reloadConfig):start()
 -- Auto-Tiling (AeroSpace-style)
 --------------------------------------------------------------------------------
 
-local function tileWindows()
+local function tileWindows(targetScreen)
   if not autoTileEnabled then
     return
   end
 
-  local screen = hs.screen.mainScreen()
+  local screen = targetScreen or hs.screen.mainScreen()
   local frame = screen:frame()
   local windows = hs.window.filter
     .new()
@@ -146,9 +148,11 @@ local positions = {
 local function moveWindow(position)
   local win = hs.window.focusedWindow()
   if win then
-    -- Disable auto-tiling temporarily when manually positioning
-    autoTileEnabled = false
     win:moveToUnit(position)
+    -- Trigger auto-tile for current screen after resize
+    hs.timer.doAfter(0.1, function()
+      tileWindows(win:screen())
+    end)
   end
 end
 
@@ -159,24 +163,77 @@ local leftCycleIndex = 1
 local rightCycle = { "right", "rightThird", "rightTwoThirds" }
 local rightCycleIndex = 1
 
-hs.hotkey.bind(hyper, "Left", function()
+hs.hotkey.bind(ctrlOpt, "Left", function()
   moveWindow(positions[leftCycle[leftCycleIndex]])
   leftCycleIndex = (leftCycleIndex % #leftCycle) + 1
   rightCycleIndex = 1
 end)
 
-hs.hotkey.bind(hyper, "Right", function()
+hs.hotkey.bind(ctrlOpt, "Right", function()
   moveWindow(positions[rightCycle[rightCycleIndex]])
   rightCycleIndex = (rightCycleIndex % #rightCycle) + 1
   leftCycleIndex = 1
 end)
 
-hs.hotkey.bind(hyper, "Up", function()
+hs.hotkey.bind(ctrlOpt, "Up", function()
   moveWindow(positions.top)
 end)
 
-hs.hotkey.bind(hyper, "Down", function()
+hs.hotkey.bind(ctrlOpt, "Down", function()
   moveWindow(positions.bottom)
+end)
+
+--------------------------------------------------------------------------------
+-- Cross-Display Movement (Hyper + Arrows)
+--------------------------------------------------------------------------------
+
+local function moveToScreen(direction)
+  local win = hs.window.focusedWindow()
+  if not win then
+    return
+  end
+
+  local currentScreen = win:screen()
+  local targetScreen
+
+  if direction == "left" then
+    targetScreen = currentScreen:toWest()
+  elseif direction == "right" then
+    targetScreen = currentScreen:toEast()
+  elseif direction == "up" then
+    targetScreen = currentScreen:toNorth()
+  elseif direction == "down" then
+    targetScreen = currentScreen:toSouth()
+  end
+
+  if not targetScreen then
+    hs.alert.show("No display in that direction")
+    return
+  end
+
+  -- Preserve unit rect (proportional position/size)
+  local unitRect = win:frame():toUnitRect(currentScreen:frame())
+  win:moveToScreen(targetScreen)
+  win:moveToUnit(unitRect)
+
+  -- Auto-tile both screens
+  hs.timer.doAfter(0.1, function()
+    tileWindows(currentScreen)
+    tileWindows(targetScreen)
+  end)
+end
+
+hs.hotkey.bind(hyper, "Left", function()
+  moveToScreen("left")
+end)
+hs.hotkey.bind(hyper, "Right", function()
+  moveToScreen("right")
+end)
+hs.hotkey.bind(hyper, "Up", function()
+  moveToScreen("up")
+end)
+hs.hotkey.bind(hyper, "Down", function()
+  moveToScreen("down")
 end)
 
 --------------------------------------------------------------------------------
@@ -186,8 +243,10 @@ end)
 hs.hotkey.bind(hyper, "Return", function()
   local win = hs.window.focusedWindow()
   if win then
-    autoTileEnabled = false
     win:moveToUnit(positions.maximize)
+    hs.timer.doAfter(0.1, function()
+      tileWindows(win:screen())
+    end)
   end
 end)
 
@@ -210,8 +269,6 @@ hs.hotkey.bind(hyperShift, "Return", function()
     and math.abs(currentFrame.w - screenFrame.w) < 10
     and math.abs(currentFrame.h - screenFrame.h) < 10
 
-  autoTileEnabled = false
-
   if isMaximized and savedFrames[id] then
     win:setFrame(savedFrames[id])
     savedFrames[id] = nil
@@ -219,6 +276,10 @@ hs.hotkey.bind(hyperShift, "Return", function()
     savedFrames[id] = currentFrame
     win:moveToUnit(positions.maximize)
   end
+
+  hs.timer.doAfter(0.1, function()
+    tileWindows(win:screen())
+  end)
 end)
 
 --------------------------------------------------------------------------------
@@ -298,8 +359,6 @@ Swipe:start(4, function(direction, distance, id)
         return
       end
 
-      autoTileEnabled = false -- disable auto-tile when manually positioning
-
       if direction == "left" then
         win:moveToUnit({ x = 0, y = 0, w = 0.5, h = 1 }) -- snap left
       elseif direction == "right" then
@@ -309,6 +368,11 @@ Swipe:start(4, function(direction, distance, id)
       elseif direction == "down" then
         win:minimize() -- minimize
       end
+
+      -- Trigger auto-tile after swipe gesture
+      hs.timer.doAfter(0.1, function()
+        tileWindows(win:screen())
+      end)
     end
   else
     swipe_id = id
