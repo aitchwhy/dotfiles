@@ -97,6 +97,15 @@ with lib; {
         ccplan = "claude --model claude-opus-4-5-20251101";
         ccfast = "claude --model claude-sonnet-4-5-20250929";
         ccnew = "claude --new";
+        ccv = "claude --verbose";
+
+        # Bun (primary JS runtime)
+        bx = "bunx";
+        bi = "bun install";
+        br = "bun run";
+        bt = "bun test";
+        bd = "bun dev";
+        bb = "bun build";
 
         # Nix management
         rebuild = "darwin-rebuild switch --flake ~/dotfiles#hank-mbp-m4";
@@ -125,11 +134,16 @@ with lib; {
         gcm = "git commit -m";
         gs = "git status";
         gp = "git push";
-        gll = "git pull";
+        gpf = "git push --force-with-lease";
         gl = "git pull";
+        gpr = "git pull --rebase";
         gd = "git diff";
+        gds = "git diff --staged";
         gco = "git checkout";
+        gsw = "git switch";
         gw = "git worktree";
+        grb = "git rebase";
+        grbi = "git rebase -i";
       }
       // optionalAttrs config.modules.home.shell.aliases.enableDockerAliases {
         # Docker
