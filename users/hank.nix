@@ -76,8 +76,8 @@
 
     # API Development
     httpie
-    insomnia
     grpcurl
+    # Note: yaak (Postman alternative) is installed via Homebrew cask
 
     # Documentation
     glow
@@ -103,8 +103,8 @@
     shellcheck
     shfmt
 
-    # Nix
-    nixpkgs-fmt
+    # Nix (nixfmt-rfc-style is the new standard, nixpkgs-fmt is deprecated)
+    nixfmt-rfc-style
     alejandra
     deadnix
     statix
