@@ -71,6 +71,7 @@
       # ─────────────────────────────────────────────────────────────
       # Productivity
       # ─────────────────────────────────────────────────────────────
+      "notion" # Workspace for notes, docs, wikis
       "raycast" # Launcher (Spotlight replacement)
       "1password" # Password manager
       "bitwarden" # Password manager (backup)
