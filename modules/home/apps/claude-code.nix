@@ -40,19 +40,19 @@ with lib; {
       ".claude/skills/observability-patterns".source = ../../../config/claude-code/skills/observability-patterns;
     };
 
-    # Mutable configs (merge/copy-on-init pattern)
+    # Mutable configs (merge/copy-on-init pattern with backup and validation)
     home.activation.claudeCodeConfig = lib.hm.dag.entryAfter ["writeBoundary"] ''
       CLAUDE_DIR="$HOME/.claude"
       SETTINGS_FILE="$CLAUDE_DIR/settings.json"
       MCP_FILE="$HOME/.claude.json"
+      BACKUP_DIR="$CLAUDE_DIR/backups"
       SOURCE_SETTINGS="${../../../config/claude-code/settings.json}"
       SOURCE_MCP="${../../../config/claude-code/mcp-servers.json}"
 
-      $DRY_RUN_CMD mkdir -p "$CLAUDE_DIR"
-      $DRY_RUN_CMD mkdir -p "$CLAUDE_DIR/skills"
+      $DRY_RUN_CMD mkdir -p "$CLAUDE_DIR" "$CLAUDE_DIR/skills" "$BACKUP_DIR"
 
       # ========================================
-      # settings.json - merge hooks into existing
+      # settings.json - merge with backup
       # ========================================
       if [ -L "$SETTINGS_FILE" ]; then
         $DRY_RUN_CMD rm "$SETTINGS_FILE"
@@ -65,6 +65,9 @@ with lib; {
         $DRY_RUN_CMD chmod 644 "$SETTINGS_FILE"
         echo "Claude Code settings.json initialized"
       else
+        # Backup before merge
+        $DRY_RUN_CMD cp "$SETTINGS_FILE" "$BACKUP_DIR/settings.$(date +%Y%m%d%H%M%S).json"
+
         # Existing file - merge hooks and permissions, preserve statusLine
         MERGED=$(${pkgs.jq}/bin/jq -s '
           .[0] as $existing | .[1] as $source |
@@ -72,27 +75,45 @@ with lib; {
             permissions: ($existing.permissions // {}) * $source.permissions,
             hooks: ($existing.hooks // {}) * $source.hooks
           }
-        ' "$SETTINGS_FILE" "$SOURCE_SETTINGS")
-        if [ -n "$MERGED" ]; then
+        ' "$SETTINGS_FILE" "$SOURCE_SETTINGS" 2>/dev/null)
+
+        # Validate merged JSON before writing
+        if [ -n "$MERGED" ] && echo "$MERGED" | ${pkgs.jq}/bin/jq empty 2>/dev/null; then
           echo "$MERGED" > "$SETTINGS_FILE"
-          echo "Claude Code settings.json merged (hooks + permissions added)"
+          echo "Claude Code settings.json merged (hooks + permissions)"
+        else
+          echo "WARNING: Merge failed, keeping existing settings.json"
         fi
       fi
 
       # ========================================
-      # ~/.claude.json - merge MCP servers
+      # ~/.claude.json - merge MCP servers with backup
       # ========================================
       if [ -f "$MCP_FILE" ] && [ -f "$SOURCE_MCP" ]; then
+        # Backup before merge
+        $DRY_RUN_CMD cp "$MCP_FILE" "$BACKUP_DIR/claude.$(date +%Y%m%d%H%M%S).json"
+
         # Merge new servers into existing mcpServers object
         NEW_SERVERS=$(cat "$SOURCE_MCP")
         MERGED=$(${pkgs.jq}/bin/jq --argjson new "$NEW_SERVERS" '
           .mcpServers = (.mcpServers // {}) + $new
-        ' "$MCP_FILE")
-        if [ -n "$MERGED" ]; then
+        ' "$MCP_FILE" 2>/dev/null)
+
+        # Validate merged JSON before writing
+        if [ -n "$MERGED" ] && echo "$MERGED" | ${pkgs.jq}/bin/jq empty 2>/dev/null; then
           echo "$MERGED" > "$MCP_FILE"
           echo "Claude Code MCP servers merged"
+        else
+          echo "WARNING: MCP merge failed, keeping existing ~/.claude.json"
         fi
+      elif [ ! -f "$MCP_FILE" ] && [ -f "$SOURCE_MCP" ]; then
+        # Initialize new ~/.claude.json
+        echo "{\"mcpServers\": $(cat "$SOURCE_MCP")}" > "$MCP_FILE"
+        echo "Claude Code ~/.claude.json initialized"
       fi
+
+      # Cleanup old backups (keep last 5)
+      ls -t "$BACKUP_DIR"/*.json 2>/dev/null | tail -n +6 | xargs -r rm -f
 
       # Ensure session log exists
       $DRY_RUN_CMD touch "$CLAUDE_DIR/session.log"
