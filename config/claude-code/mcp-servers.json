@@ -29,10 +29,5 @@
     "command": "npx",
     "args": ["-y", "@upstash/context7-mcp"],
     "type": "stdio"
-  },
-  "linear": {
-    "command": "npx",
-    "args": ["-y", "@modelcontextprotocol/server-linear"],
-    "type": "stdio"
   }
 }

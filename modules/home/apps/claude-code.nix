@@ -95,6 +95,45 @@ with lib; {
 
       # Ensure session log exists
       $DRY_RUN_CMD touch "$CLAUDE_DIR/session.log"
+
+      # ========================================
+      # improvements.jsonl - Initialize if missing
+      # ========================================
+      IMPROVEMENTS_FILE="$CLAUDE_DIR/improvements.jsonl"
+      if [ ! -f "$IMPROVEMENTS_FILE" ]; then
+        echo "" > "$IMPROVEMENTS_FILE"
+        echo "Claude Code improvements.jsonl initialized"
+      fi
+
+      # ========================================
+      # metrics/ - Initialize directory and baseline
+      # ========================================
+      METRICS_DIR="$CLAUDE_DIR/metrics"
+      $DRY_RUN_CMD mkdir -p "$METRICS_DIR"
+      if [ ! -f "$METRICS_DIR/baseline.json" ]; then
+        cat > "$METRICS_DIR/baseline.json" << 'BASELINE'
+{
+  "version": "4.0.0",
+  "installed": "$(date -Iseconds)",
+  "calibration": {
+    "brierScore": null,
+    "predictions": [],
+    "confidenceMultiplier": 1.0
+  },
+  "evolution": {
+    "memoryEntries": 0,
+    "toolsActive": 0,
+    "lastEvolution": null
+  },
+  "safety": {
+    "violations": 0,
+    "lastCheck": null,
+    "streakDays": 0
+  }
+}
+BASELINE
+        echo "Claude Code metrics baseline initialized"
+      fi
     '';
   };
 }

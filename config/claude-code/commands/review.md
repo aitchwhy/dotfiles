@@ -1,62 +1,64 @@
----
-description: Code review checklist
-allowed-tools: Read, Grep, Glob, Bash
----
+# 6-Agent Expert Review
 
-# Code Review: $ARGUMENTS
+Trigger comprehensive multi-perspective review:
 
-Review the specified files/changes against this checklist:
+## Agent Perspectives
 
-## Type Safety
+### 1. Architect
+- System design quality
+- SOLID principles adherence
+- Scalability considerations
 
-- [ ] No `any` types
-- [ ] Proper null/undefined handling
-- [ ] Branded types for IDs where appropriate
-- [ ] Result types for operations that can fail
+### 2. Security Engineer
+- Vulnerability assessment
+- Auth implementation
+- Data protection
 
-## Naming
+### 3. Performance Engineer
+- Complexity analysis
+- Resource efficiency
+- Bottleneck identification
 
-- [ ] Semantic variable names (`userId` not `id`)
-- [ ] Descriptive function names (verb + noun)
-- [ ] No abbreviations except well-known ones
+### 4. DX Advocate
+- Code readability
+- API ergonomics
+- Documentation quality
 
-## Error Handling
+### 5. Reliability Engineer
+- Error handling completeness
+- Observability coverage
+- Recovery mechanisms
 
-- [ ] All errors caught and handled
-- [ ] Meaningful error messages
-- [ ] No swallowed exceptions
+### 6. Adversarial Tester
+- Edge case coverage
+- Attack vector analysis
+- Failure mode exploration
 
-## Security
+## Protocol
 
-- [ ] No secrets in code
-- [ ] Input validation at boundaries
-- [ ] Proper authentication/authorization
-
-## Performance
-
-- [ ] No N+1 queries
-- [ ] Appropriate caching
-- [ ] No unnecessary re-renders (React)
-
-## Testing
-
-- [ ] Tests for new functionality
-- [ ] Edge cases covered
-- [ ] Tests are deterministic
-
-## Documentation
-
-- [ ] Complex logic explained
-- [ ] Public API documented
-- [ ] README updated if needed
+**Round 1**: Each agent reviews independently
+**Round 2**: Cross-agent debate on findings
+**Round 3**: Consensus building
 
 ## Output Format
+```
+┌─────────────────────────────────────────┐
+│          EXPERT REVIEW SUMMARY          │
+├─────────────────────────────────────────┤
+│ Architect:        [PASS/CONCERN/FAIL]   │
+│ Security:         [PASS/CONCERN/FAIL]   │
+│ Performance:      [PASS/CONCERN/FAIL]   │
+│ DX:               [PASS/CONCERN/FAIL]   │
+│ Reliability:      [PASS/CONCERN/FAIL]   │
+│ Adversarial:      [PASS/CONCERN/FAIL]   │
+├─────────────────────────────────────────┤
+│ Consensus:        [APPROVE/REVISE]      │
+└─────────────────────────────────────────┘
 
-**Critical** (must fix):
-- Issue description
+Key Findings:
+1. ...
+2. ...
 
-**Suggestions** (consider):
-- Improvement idea
-
-**Approved**:
-- What looks good
+Required Changes:
+1. ...
+```
