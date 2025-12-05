@@ -1,64 +1,33 @@
-# 6-Agent Expert Review
+# Quick Code Review
 
-Trigger comprehensive multi-perspective review:
+Review recent changes focusing on:
 
-## Agent Perspectives
+1. **Type Safety**: Any `any` types? Missing type guards?
+2. **Error Handling**: All error paths covered? Result types used?
+3. **Security**: Secrets exposed? Injection vectors?
+4. **Performance**: N+1 queries? Unnecessary re-renders?
 
-### 1. Architect
-- System design quality
-- SOLID principles adherence
-- Scalability considerations
+## Steps
 
-### 2. Security Engineer
-- Vulnerability assessment
-- Auth implementation
-- Data protection
-
-### 3. Performance Engineer
-- Complexity analysis
-- Resource efficiency
-- Bottleneck identification
-
-### 4. DX Advocate
-- Code readability
-- API ergonomics
-- Documentation quality
-
-### 5. Reliability Engineer
-- Error handling completeness
-- Observability coverage
-- Recovery mechanisms
-
-### 6. Adversarial Tester
-- Edge case coverage
-- Attack vector analysis
-- Failure mode exploration
-
-## Protocol
-
-**Round 1**: Each agent reviews independently
-**Round 2**: Cross-agent debate on findings
-**Round 3**: Consensus building
+1. Run `git diff HEAD~1` to see recent changes
+2. Analyze each file for the 4 focus areas
+3. Output findings in the format below
 
 ## Output Format
+
 ```
-┌─────────────────────────────────────────┐
-│          EXPERT REVIEW SUMMARY          │
-├─────────────────────────────────────────┤
-│ Architect:        [PASS/CONCERN/FAIL]   │
-│ Security:         [PASS/CONCERN/FAIL]   │
-│ Performance:      [PASS/CONCERN/FAIL]   │
-│ DX:               [PASS/CONCERN/FAIL]   │
-│ Reliability:      [PASS/CONCERN/FAIL]   │
-│ Adversarial:      [PASS/CONCERN/FAIL]   │
-├─────────────────────────────────────────┤
-│ Consensus:        [APPROVE/REVISE]      │
-└─────────────────────────────────────────┘
+REVIEW: [file/feature name]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✓ Types: [PASS/CONCERN]
+✓ Errors: [PASS/CONCERN]
+✓ Security: [PASS/CONCERN]
+✓ Performance: [PASS/CONCERN]
 
-Key Findings:
+Issues Found:
 1. ...
-2. ...
 
-Required Changes:
+Suggested Fixes:
 1. ...
 ```
+
+If all areas pass, respond with a brief "All clear" summary.
