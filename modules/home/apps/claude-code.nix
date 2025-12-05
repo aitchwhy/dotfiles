@@ -37,6 +37,7 @@ with lib; {
       ".claude/skills/result-patterns".source = ../../../config/claude-code/skills/result-patterns;
       ".claude/skills/tdd-patterns".source = ../../../config/claude-code/skills/tdd-patterns;
       ".claude/skills/nix-darwin-patterns".source = ../../../config/claude-code/skills/nix-darwin-patterns;
+      ".claude/skills/observability-patterns".source = ../../../config/claude-code/skills/observability-patterns;
     };
 
     # Mutable configs (merge/copy-on-init pattern)
