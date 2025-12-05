@@ -9,12 +9,11 @@
     package = pkgs.nix;
     settings = {
       # Enable experimental features for modern development
+      # Note: cgroups and auto-allocate-uids are Linux-only, darwin uses different isolation
       experimental-features = [
         "nix-command"
         "flakes"
         "ca-derivations"
-        "auto-allocate-uids"
-        "cgroups"
       ];
 
       # Trust settings
