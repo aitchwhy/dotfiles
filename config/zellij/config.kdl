@@ -303,8 +303,6 @@ default_cwd "/Users/hank/src"
  
 // The name of the default layout to load on startup
 // Default: "default"
-// Using "compact" to avoid zjstatus plugin timeout issues
-//
 default_layout "compact"
  
 // The folder in which Zellij will look for layouts
@@ -460,8 +458,8 @@ scrollback_lines_to_serialize 100000
  
 // Whether to show tips on startup
 // Default: true
-// 
-show_startup_tips true
+//
+show_startup_tips false
  
 // Whether to show release notes on first version run
 // Default: true
