@@ -99,14 +99,6 @@ with lib; {
         ccnew = "claude --new";
         ccv = "claude --verbose";
 
-        # Bun (primary JS runtime)
-        bx = "bunx";
-        bi = "bun install";
-        br = "bun run";
-        bt = "bun test";
-        bd = "bun dev";
-        bb = "bun build";
-
         # Nix management
         rebuild = "darwin-rebuild switch --flake ~/dotfiles#hank-mbp-m4";
         update = "nix flake update ~/dotfiles && darwin-rebuild switch --flake ~/dotfiles#hank-mbp-m4";
