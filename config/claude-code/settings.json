@@ -118,7 +118,11 @@
       "Bash(rm -rf /)",
       "Bash(rm -rf ~)",
       "Bash(sudo:*)",
-      "Bash(chmod 777:*)"
+      "Bash(chmod 777:*)",
+      "Bash(git push --force:*)",
+      "Bash(git reset --hard:*)",
+      "Write(*/.git/*)",
+      "Edit(*/.git/*)"
     ]
   },
   "hooks": {
@@ -129,12 +133,7 @@
           {
             "type": "command",
             "command": "bunx biome check --write \"$CLAUDE_FILE_PATHS\" 2>/dev/null || true",
-            "timeout": 30
-          },
-          {
-            "type": "command",
-            "command": "tsc --noEmit --skipLibCheck 2>&1 | head -20 || true",
-            "timeout": 30
+            "timeout": 15
           }
         ]
       },
@@ -227,16 +226,6 @@
             "type": "command",
             "command": "if [[ \"$CLAUDE_TOOL_INPUT\" == *\"rm -rf /\"* ]] || [[ \"$CLAUDE_TOOL_INPUT\" == *\"rm -rf ~\"* ]]; then echo 'BLOCKED: Dangerous recursive delete' >&2; exit 1; fi",
             "timeout": 5
-          }
-        ]
-      },
-      {
-        "matcher": "Bash(git commit:*)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun run typecheck 2>/dev/null || tsc --noEmit 2>/dev/null || true",
-            "timeout": 120
           }
         ]
       }
