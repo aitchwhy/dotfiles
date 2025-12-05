@@ -134,6 +134,35 @@ with lib; {
 BASELINE
         echo "Claude Code metrics baseline initialized"
       fi
+
+      # ========================================
+      # Metric tracking files - Initialize if missing
+      # ========================================
+      # Predictions for calibration
+      if [ ! -f "$METRICS_DIR/predictions.jsonl" ]; then
+        touch "$METRICS_DIR/predictions.jsonl"
+        echo "Claude Code predictions.jsonl initialized"
+      fi
+
+      # Task outcomes for success rate tracking
+      if [ ! -f "$METRICS_DIR/task-outcomes.jsonl" ]; then
+        touch "$METRICS_DIR/task-outcomes.jsonl"
+        echo "Claude Code task-outcomes.jsonl initialized"
+      fi
+
+      # MCP health for server monitoring
+      if [ ! -f "$METRICS_DIR/mcp-health.jsonl" ]; then
+        touch "$METRICS_DIR/mcp-health.jsonl"
+        echo "Claude Code mcp-health.jsonl initialized"
+      fi
+
+      # MCP usage for token tracking
+      if [ ! -f "$METRICS_DIR/mcp-usage.jsonl" ]; then
+        touch "$METRICS_DIR/mcp-usage.jsonl"
+        echo "Claude Code mcp-usage.jsonl initialized"
+      fi
+
+      echo "Claude Code v4.0 metrics infrastructure ready"
     '';
   };
 }
