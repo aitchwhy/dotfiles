@@ -15,9 +15,9 @@
     ],
     "type": "stdio"
   },
-  "github": {
+  "git": {
     "command": "npx",
-    "args": ["-y", "@modelcontextprotocol/server-github"],
+    "args": ["-y", "@modelcontextprotocol/server-git"],
     "type": "stdio"
   },
   "sequential-thinking": {
@@ -28,6 +28,11 @@
   "context7": {
     "command": "npx",
     "args": ["-y", "@upstash/context7-mcp"],
+    "type": "stdio"
+  },
+  "fetch": {
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-fetch"],
     "type": "stdio"
   }
 }
