@@ -107,6 +107,7 @@ with lib;
     home.packages = with pkgs; [
       lazygit
       commitizen
+      lefthook
     ];
   };
 }
