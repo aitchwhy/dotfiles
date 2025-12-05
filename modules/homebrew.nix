@@ -30,6 +30,7 @@
       # ─────────────────────────────────────────────────────────────
       # Development
       # ─────────────────────────────────────────────────────────────
+      "claude-code" # Claude CLI
       "cursor" # AI-first code editor
       "orbstack" # Docker/Linux VM (faster than Docker Desktop)
       "proxyman" # HTTP debugging proxy
