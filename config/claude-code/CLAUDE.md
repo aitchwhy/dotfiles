@@ -197,6 +197,53 @@ type LearningScope =
 // 3. 6-agent expert review consensus
 ```
 
+### File-Scope Learnings Format
+
+Add learnings as JSDoc comments at the top of files:
+
+```typescript
+/**
+ * @file user-service.ts
+ * @description User authentication and profile management
+ *
+ * LEARNINGS:
+ * - UserId branded type catches 80% of ID-mixing bugs at compile time
+ * - Result<User, AuthError> eliminates try/catch boilerplate
+ * - Zod validation at API boundary, trust internally after parse
+ * - Cache invalidation on profile update prevents stale reads
+ *
+ * ANTI-PATTERNS DISCOVERED:
+ * - Don't store raw passwords even temporarily (use hash immediately)
+ * - Avoid optional chaining on validated data (already parsed)
+ *
+ * LAST_UPDATED: 2025-12-04
+ * CONFIDENCE: 90%
+ */
+
+import { z } from 'zod';
+import { UserId } from './types';
+// ...rest of file
+```
+
+Python equivalent:
+```python
+"""
+user_service.py - User authentication and profile management
+
+LEARNINGS:
+- Pydantic model_validate() over dict unpacking for type safety
+- async context managers for DB connections prevent leaks
+- match statements cleaner than if/elif for auth state
+
+ANTI-PATTERNS DISCOVERED:
+- Don't catch broad Exception - catch specific errors
+- Avoid mutable default arguments in function signatures
+
+LAST_UPDATED: 2025-12-04
+CONFIDENCE: 85%
+"""
+```
+
 ---
 
 ## TECH STACK (Frozen Dec 2025)
