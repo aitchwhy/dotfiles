@@ -3,12 +3,12 @@
 -- Kanata handles: CapsLock -> Esc (tap) | Hyper (hold)
 --
 -- Key bindings:
---   Ctrl+Opt + Arrows     = Snap to half/thirds (cycles through sizes)
---   Hyper + Arrows        = Move window to adjacent display
---   Hyper + Enter         = Fullscreen (fills screen)
---   Hyper + Shift + Enter = Toggle maximize / restore
---   Hyper + W             = Fuzzy window switcher
---   Hyper + Escape        = Toggle auto-tiling mode
+--   Ctrl+Opt + Arrows       = Cycle half → third → two-thirds in that direction
+--   Ctrl+Opt+Cmd + Arrows   = Move window to adjacent display
+--   Ctrl+Opt+Cmd + Enter    = Fullscreen (fills screen)
+--   Ctrl+Opt+Cmd+Shift + Enter = Toggle maximize / restore
+--   Ctrl+Opt+Cmd + W        = Fuzzy window switcher
+--   Ctrl+Opt+Cmd + Escape   = Toggle auto-tiling mode
 --
 -- Trackpad gestures (cursor in title bar):
 --   4-finger swipe left   = Snap window to left half
@@ -134,14 +134,21 @@ end)
 --------------------------------------------------------------------------------
 
 local positions = {
+  -- Horizontal positions (full height)
   left = { x = 0, y = 0, w = 0.5, h = 1 },
   right = { x = 0.5, y = 0, w = 0.5, h = 1 },
+  leftThird = { x = 0, y = 0, w = 1/3, h = 1 },
+  rightThird = { x = 2/3, y = 0, w = 1/3, h = 1 },
+  leftTwoThirds = { x = 0, y = 0, w = 2/3, h = 1 },
+  rightTwoThirds = { x = 1/3, y = 0, w = 2/3, h = 1 },
+  -- Vertical positions (full width)
   top = { x = 0, y = 0, w = 1, h = 0.5 },
   bottom = { x = 0, y = 0.5, w = 1, h = 0.5 },
-  leftThird = { x = 0, y = 0, w = 0.33, h = 1 },
-  rightThird = { x = 0.67, y = 0, w = 0.33, h = 1 },
-  leftTwoThirds = { x = 0, y = 0, w = 0.67, h = 1 },
-  rightTwoThirds = { x = 0.33, y = 0, w = 0.67, h = 1 },
+  topThird = { x = 0, y = 0, w = 1, h = 1/3 },
+  bottomThird = { x = 0, y = 2/3, w = 1, h = 1/3 },
+  topTwoThirds = { x = 0, y = 0, w = 1, h = 2/3 },
+  bottomTwoThirds = { x = 0, y = 1/3, w = 1, h = 2/3 },
+  -- Full screen
   maximize = { x = 0, y = 0, w = 1, h = 1 },
 }
 
@@ -156,35 +163,40 @@ local function moveWindow(position)
   end
 end
 
--- Cycle through horizontal positions
-local leftCycle = { "left", "leftThird", "leftTwoThirds" }
-local leftCycleIndex = 1
+-- Cycle through positions: half → third → two-thirds
+-- Each direction has its own cycle that resets when switching directions
+local cycles = {
+  left = { "left", "leftThird", "leftTwoThirds" },
+  right = { "right", "rightThird", "rightTwoThirds" },
+  up = { "top", "topThird", "topTwoThirds" },
+  down = { "bottom", "bottomThird", "bottomTwoThirds" },
+}
 
-local rightCycle = { "right", "rightThird", "rightTwoThirds" }
-local rightCycleIndex = 1
+local cycleIndices = { left = 1, right = 1, up = 1, down = 1 }
+local lastDirection = nil
 
-hs.hotkey.bind(ctrlOpt, "Left", function()
-  moveWindow(positions[leftCycle[leftCycleIndex]])
-  leftCycleIndex = (leftCycleIndex % #leftCycle) + 1
-  rightCycleIndex = 1
-end)
+local function cyclePosition(direction)
+  -- Reset other directions when switching
+  if lastDirection ~= direction then
+    for k, _ in pairs(cycleIndices) do
+      cycleIndices[k] = 1
+    end
+    lastDirection = direction
+  end
 
-hs.hotkey.bind(ctrlOpt, "Right", function()
-  moveWindow(positions[rightCycle[rightCycleIndex]])
-  rightCycleIndex = (rightCycleIndex % #rightCycle) + 1
-  leftCycleIndex = 1
-end)
+  local cycle = cycles[direction]
+  local idx = cycleIndices[direction]
+  moveWindow(positions[cycle[idx]])
+  cycleIndices[direction] = (idx % #cycle) + 1
+end
 
-hs.hotkey.bind(ctrlOpt, "Up", function()
-  moveWindow(positions.top)
-end)
-
-hs.hotkey.bind(ctrlOpt, "Down", function()
-  moveWindow(positions.bottom)
-end)
+hs.hotkey.bind(ctrlOpt, "Left", function() cyclePosition("left") end)
+hs.hotkey.bind(ctrlOpt, "Right", function() cyclePosition("right") end)
+hs.hotkey.bind(ctrlOpt, "Up", function() cyclePosition("up") end)
+hs.hotkey.bind(ctrlOpt, "Down", function() cyclePosition("down") end)
 
 --------------------------------------------------------------------------------
--- Cross-Display Movement (Hyper + Arrows)
+-- Cross-Display Movement (Ctrl+Opt+Cmd + Arrows)
 --------------------------------------------------------------------------------
 
 local function moveToScreen(direction)
@@ -237,7 +249,7 @@ hs.hotkey.bind(hyper, "Down", function()
 end)
 
 --------------------------------------------------------------------------------
--- Fullscreen (Hyper + Enter) - just fills the screen
+-- Fullscreen (Ctrl+Opt+Cmd + Enter) - just fills the screen
 --------------------------------------------------------------------------------
 
 hs.hotkey.bind(hyper, "Return", function()
@@ -251,7 +263,7 @@ hs.hotkey.bind(hyper, "Return", function()
 end)
 
 --------------------------------------------------------------------------------
--- Toggle Maximize/Restore (Hyper + Shift + Enter)
+-- Toggle Maximize/Restore (Ctrl+Opt+Cmd+Shift + Enter)
 --------------------------------------------------------------------------------
 
 hs.hotkey.bind(hyperShift, "Return", function()
@@ -283,7 +295,7 @@ hs.hotkey.bind(hyperShift, "Return", function()
 end)
 
 --------------------------------------------------------------------------------
--- Fuzzy Window Switcher (Hyper + W)
+-- Fuzzy Window Switcher (Ctrl+Opt+Cmd + W)
 --------------------------------------------------------------------------------
 
 hs.hotkey.bind(hyper, "W", function()
