@@ -77,7 +77,7 @@
 
     # Development shell
     devShells.${system}.default = pkgs.mkShell {
-      packages = with pkgs; [ nixd nixpkgs-fmt deadnix statix just git fd ];
+      packages = with pkgs; [ nixd nixfmt-rfc-style deadnix statix just git fd ];
       shellHook = ''
         echo "Nix Darwin Dev Shell"
         echo "  rebuild  - darwin-rebuild switch --flake .#hank-mbp-m4"
