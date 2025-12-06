@@ -1,9 +1,4 @@
-// Place your key bindings in this file to override the defaults
-// "when" clause contexts -> https://code.visualstudio.com/api/references/when-clause-contexts
 [
-  // ============================================
-  // Cursor AI shortcuts
-  // ============================================
   {
     "key": "cmd+i",
     "command": "composerMode.agent"
@@ -18,10 +13,6 @@
     "command": "-aiSettings.action.open",
     "when": "!isSettingsPaneOpen"
   },
-
-  // ============================================
-  // Command palette (cmd+k instead of cmd+shift+p)
-  // ============================================
   {
     "key": "cmd+k",
     "command": "workbench.action.showCommands"
@@ -30,10 +21,6 @@
     "key": "shift+cmd+p",
     "command": "-workbench.action.showCommands"
   },
-
-  // ============================================
-  // Go to symbol (cmd+o instead of cmd+shift+o)
-  // ============================================
   {
     "key": "cmd+o",
     "command": "workbench.action.gotoSymbol",
@@ -44,10 +31,6 @@
     "command": "-workbench.action.gotoSymbol",
     "when": "!accessibilityHelpIsShown && !accessibleViewIsShown"
   },
-
-  // ============================================
-  // WhichKey support
-  // ============================================
   {
     "key": "cmd+;",
     "command": "whichkey.show",
@@ -58,10 +41,6 @@
     "command": "whichkey.show",
     "when": "!whichkeyVisible && editorTextFocus"
   },
-
-  // ============================================
-  // Lazygit integration
-  // ============================================
   {
     "key": "cmd+g cmd+g",
     "command": "lazygit.openLazygit"
@@ -70,10 +49,6 @@
     "key": "cmd+g g",
     "command": "-lazygit.openLazygit"
   },
-
-  // ============================================
-  // Git operations (ctrl+g prefix)
-  // ============================================
   {
     "key": "ctrl+g ctrl+c",
     "command": "git.commitStaged"
@@ -98,11 +73,6 @@
     "key": "ctrl+g ctrl+z",
     "command": "git.stash"
   },
-
-  // ============================================
-  // Vim-style pane navigation (ctrl+hjkl)
-  // ============================================
-  // Disable conflicting defaults
   {
     "key": "ctrl+k",
     "command": "-deleteAllRight",
@@ -152,8 +122,6 @@
     "key": "ctrl+g",
     "command": "-workbench.action.gotoLine"
   },
-
-  // Editor pane navigation
   {
     "key": "ctrl+h",
     "command": "workbench.action.navigateLeft",
@@ -174,8 +142,6 @@
     "command": "workbench.action.navigateRight",
     "when": "editorTextFocus && vim.mode == 'Normal' && !suggestWidgetVisible"
   },
-
-  // Terminal pane navigation
   {
     "key": "ctrl+h",
     "command": "workbench.action.terminal.focusPreviousPane",
@@ -196,10 +162,6 @@
     "command": "workbench.action.terminal.focusPrevious",
     "when": "terminalFocus"
   },
-
-  // ============================================
-  // Terminal utilities
-  // ============================================
   {
     "key": "shift+enter",
     "command": "workbench.action.terminal.sendSequence",
@@ -208,10 +170,6 @@
     },
     "when": "terminalFocus"
   },
-
-  // ============================================
-  // View size management
-  // ============================================
   {
     "key": "ctrl+cmd+-",
     "command": "workbench.action.decreaseViewSize"
@@ -230,10 +188,6 @@
     "command": "workbench.action.evenEditorWidths",
     "when": "!terminalFocus"
   },
-
-  // ============================================
-  // Explorer - enter opens file (like vim)
-  // ============================================
   {
     "key": "enter",
     "command": "explorer.openAndPassFocus",
@@ -244,10 +198,6 @@
     "command": "-renameFile",
     "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus"
   },
-
-  // ============================================
-  // Window management
-  // ============================================
   {
     "key": "shift+cmd+w",
     "command": "workbench.action.closeEditorsInGroup"
@@ -256,10 +206,6 @@
     "key": "shift+cmd+w",
     "command": "-workbench.action.closeWindow"
   },
-
-  // ============================================
-  // Keybindings settings
-  // ============================================
   {
     "key": "ctrl+k ctrl+s",
     "command": "workbench.action.openGlobalKeybindings",
