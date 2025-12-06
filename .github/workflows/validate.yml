@@ -1,0 +1,81 @@
+name: Validate PR
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  nix-check:
+    name: Nix Flake Check
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+        with:
+          extra-conf: |
+            experimental-features = nix-command flakes
+
+      - name: Setup Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Check Flake
+        run: nix flake check --no-build
+
+  evolution-check:
+    name: Evolution TypeScript
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install Dependencies
+        working-directory: config/claude-code/evolution
+        run: bun install --frozen-lockfile
+
+      - name: Type Check
+        working-directory: config/claude-code/evolution
+        run: bun run tsc --noEmit
+
+      - name: Lint
+        working-directory: config/claude-code/evolution
+        run: bunx biome check .
+
+  config-validate:
+    name: Validate Configs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate JSON Files
+        run: |
+          echo "Validating JSON files..."
+          find . -name '*.json' -not -path './node_modules/*' -not -path './.git/*' | while read file; do
+            # Skip JSONC files in cursor/vscode directories
+            if [[ "$file" == *cursor* ]] || [[ "$file" == *vscode* ]]; then
+              echo "Skipping JSONC: $file"
+              continue
+            fi
+            echo "Checking: $file"
+            python3 -m json.tool "$file" > /dev/null || { echo "Invalid JSON: $file"; exit 1; }
+          done
+
+      - name: Validate YAML Files
+        run: |
+          echo "Validating YAML files..."
+          pip install pyyaml
+          find . -name '*.yaml' -o -name '*.yml' | while read file; do
+            echo "Checking: $file"
+            python3 -c "import yaml; yaml.safe_load(open('$file'))" || { echo "Invalid YAML: $file"; exit 1; }
+          done
