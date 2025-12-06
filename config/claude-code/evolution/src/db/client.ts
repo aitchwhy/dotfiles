@@ -1,0 +1,418 @@
+/**
+ * Evolution System Database Client
+ *
+ * Uses Bun's native SQLite for zero-dependency database access.
+ * All operations return Result types for type-safe error handling.
+ */
+import { Database } from 'bun:sqlite';
+import { readFileSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { type Result, Ok, Err, tryCatch } from '../lib/result';
+import {
+  type Session,
+  type SessionInsert,
+  type Task,
+  type TaskInsert,
+  type Commit,
+  type CommitInsert,
+  type Lesson,
+  type LessonInsert,
+  type Metric,
+  type MetricInsert,
+  type EvolutionCycle,
+  type EvolutionCycleInsert,
+  type GraderRun,
+  type GraderRunInsert,
+  type Research,
+  type ResearchInsert,
+  type DoraMetric,
+  type ScoreTrend,
+  type LessonEffectiveness,
+  type GraderTrend,
+  SessionSchema,
+  TaskSchema,
+  CommitSchema,
+  LessonSchema,
+  MetricSchema,
+  EvolutionCycleSchema,
+  GraderRunSchema,
+  ResearchSchema,
+  DoraMetricSchema,
+  ScoreTrendSchema,
+  LessonEffectivenessSchema,
+  GraderTrendSchema,
+} from './schema';
+
+// ============================================================================
+// Database Location
+// ============================================================================
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const DEFAULT_DB_PATH = join(process.env['HOME'] ?? '', 'dotfiles', '.claude-metrics', 'evolution.db');
+const MIGRATIONS_DIR = join(__dirname, 'migrations');
+
+// ============================================================================
+// Database Client Class
+// ============================================================================
+
+export class EvolutionDB {
+  private db: Database;
+  private readonly dbPath: string;
+
+  private constructor(db: Database, dbPath: string) {
+    this.db = db;
+    this.dbPath = dbPath;
+  }
+
+  /**
+   * Initialize the database connection and run migrations
+   */
+  static init(dbPath: string = DEFAULT_DB_PATH): Result<EvolutionDB, Error> {
+    return tryCatch(() => {
+      // Ensure directory exists
+      const dbDir = dirname(dbPath);
+      const { mkdirSync } = require('node:fs');
+      mkdirSync(dbDir, { recursive: true });
+
+      const db = new Database(dbPath);
+
+      // Enable WAL mode for better concurrent access
+      db.exec('PRAGMA journal_mode = WAL');
+      db.exec('PRAGMA synchronous = NORMAL');
+      db.exec('PRAGMA foreign_keys = ON');
+
+      const client = new EvolutionDB(db, dbPath);
+
+      // Run migrations
+      const migrationResult = client.runMigrations();
+      if (!migrationResult.ok) {
+        db.close();
+        throw migrationResult.error;
+      }
+
+      return client;
+    });
+  }
+
+  /**
+   * Run all pending migrations
+   */
+  private runMigrations(): Result<void, Error> {
+    return tryCatch(() => {
+      // Create migrations tracking table
+      this.db.exec(`
+        CREATE TABLE IF NOT EXISTS _migrations (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL UNIQUE,
+          applied_at TEXT NOT NULL DEFAULT (datetime('now'))
+        )
+      `);
+
+      // Get applied migrations
+      const applied = new Set(
+        this.db
+          .query<{ name: string }, []>('SELECT name FROM _migrations')
+          .all()
+          .map((row) => row.name)
+      );
+
+      // Find and apply pending migrations
+      const { readdirSync } = require('node:fs');
+      const files = readdirSync(MIGRATIONS_DIR).filter(
+        (f: string) => f.endsWith('.sql') && !applied.has(f)
+      );
+      files.sort();
+
+      for (const file of files) {
+        const sql = readFileSync(join(MIGRATIONS_DIR, file), 'utf-8');
+        this.db.exec(sql);
+        this.db.run('INSERT INTO _migrations (name) VALUES (?)', [file]);
+        console.log(`Applied migration: ${file}`);
+      }
+    });
+  }
+
+  /**
+   * Close the database connection
+   */
+  close(): void {
+    this.db.close();
+  }
+
+  // ==========================================================================
+  // Session Operations
+  // ==========================================================================
+
+  insertSession(session: SessionInsert): Result<Session, Error> {
+    return tryCatch(() => {
+      const stmt = this.db.prepare(`
+        INSERT INTO sessions (id, started_at, ended_at, working_directory, hostname, git_branch, initial_score, final_score, files_modified, commits_made, metadata)
+        VALUES ($id, $started_at, $ended_at, $working_directory, $hostname, $git_branch, $initial_score, $final_score, $files_modified, $commits_made, $metadata)
+        RETURNING *
+      `);
+      const row = stmt.get({
+        $id: session.id,
+        $started_at: session.started_at,
+        $ended_at: session.ended_at ?? null,
+        $working_directory: session.working_directory,
+        $hostname: session.hostname,
+        $git_branch: session.git_branch,
+        $initial_score: session.initial_score,
+        $final_score: session.final_score ?? null,
+        $files_modified: session.files_modified,
+        $commits_made: session.commits_made,
+        $metadata: session.metadata,
+      });
+      return SessionSchema.parse(row);
+    });
+  }
+
+  updateSession(id: string, updates: Partial<Session>): Result<Session | null, Error> {
+    return tryCatch(() => {
+      const fields = Object.keys(updates)
+        .map((k) => `${k} = $${k}`)
+        .join(', ');
+      if (!fields) return null;
+
+      const stmt = this.db.prepare(`UPDATE sessions SET ${fields} WHERE id = $id RETURNING *`);
+      const row = stmt.get({ $id: id, ...prefixKeys(updates) });
+      return row ? SessionSchema.parse(row) : null;
+    });
+  }
+
+  getSession(id: string): Result<Session | null, Error> {
+    return tryCatch(() => {
+      const row = this.db.query<Session, [string]>('SELECT * FROM sessions WHERE id = ?').get(id);
+      return row ? SessionSchema.parse(row) : null;
+    });
+  }
+
+  // ==========================================================================
+  // Task Operations
+  // ==========================================================================
+
+  insertTask(task: TaskInsert): Result<Task, Error> {
+    return tryCatch(() => {
+      const stmt = this.db.prepare(`
+        INSERT INTO tasks (id, session_id, started_at, ended_at, description, status, files_touched, metadata)
+        VALUES ($id, $session_id, $started_at, $ended_at, $description, $status, $files_touched, $metadata)
+        RETURNING *
+      `);
+      const row = stmt.get({
+        $id: task.id,
+        $session_id: task.session_id,
+        $started_at: task.started_at,
+        $ended_at: task.ended_at ?? null,
+        $description: task.description,
+        $status: task.status,
+        $files_touched: task.files_touched,
+        $metadata: task.metadata,
+      });
+      return TaskSchema.parse(row);
+    });
+  }
+
+  // ==========================================================================
+  // Lesson Operations
+  // ==========================================================================
+
+  insertLesson(lesson: LessonInsert): Result<Lesson, Error> {
+    return tryCatch(() => {
+      const stmt = this.db.prepare(`
+        INSERT INTO lessons (created_at, lesson, source, category, confidence, times_applied, last_applied_at)
+        VALUES ($created_at, $lesson, $source, $category, $confidence, $times_applied, $last_applied_at)
+        RETURNING *
+      `);
+      const row = stmt.get({
+        $created_at: lesson.created_at,
+        $lesson: lesson.lesson,
+        $source: lesson.source,
+        $category: lesson.category,
+        $confidence: lesson.confidence,
+        $times_applied: lesson.times_applied ?? 0,
+        $last_applied_at: lesson.last_applied_at ?? null,
+      });
+      return LessonSchema.parse(row);
+    });
+  }
+
+  getAllLessons(): Result<readonly Lesson[], Error> {
+    return tryCatch(() => {
+      const rows = this.db.query<Lesson, []>('SELECT * FROM lessons ORDER BY created_at DESC').all();
+      return rows.map((row) => LessonSchema.parse(row));
+    });
+  }
+
+  // ==========================================================================
+  // Evolution Cycle Operations
+  // ==========================================================================
+
+  insertEvolutionCycle(cycle: EvolutionCycleInsert): Result<EvolutionCycle, Error> {
+    return tryCatch(() => {
+      const stmt = this.db.prepare(`
+        INSERT INTO evolution_cycles (started_at, ended_at, overall_score, recommendation, trigger, session_id, proposals, applied_proposals)
+        VALUES ($started_at, $ended_at, $overall_score, $recommendation, $trigger, $session_id, $proposals, $applied_proposals)
+        RETURNING *
+      `);
+      const row = stmt.get({
+        $started_at: cycle.started_at,
+        $ended_at: cycle.ended_at,
+        $overall_score: cycle.overall_score,
+        $recommendation: cycle.recommendation,
+        $trigger: cycle.trigger,
+        $session_id: cycle.session_id,
+        $proposals: cycle.proposals,
+        $applied_proposals: cycle.applied_proposals,
+      });
+      return EvolutionCycleSchema.parse(row);
+    });
+  }
+
+  getLatestEvolutionCycle(): Result<EvolutionCycle | null, Error> {
+    return tryCatch(() => {
+      const row = this.db
+        .query<EvolutionCycle, []>('SELECT * FROM evolution_cycles ORDER BY started_at DESC LIMIT 1')
+        .get();
+      return row ? EvolutionCycleSchema.parse(row) : null;
+    });
+  }
+
+  // ==========================================================================
+  // Grader Run Operations
+  // ==========================================================================
+
+  insertGraderRun(run: GraderRunInsert): Result<GraderRun, Error> {
+    return tryCatch(() => {
+      const stmt = this.db.prepare(`
+        INSERT INTO grader_runs (evolution_cycle_id, grader_name, started_at, ended_at, score, passed, issues, raw_output, execution_time_ms)
+        VALUES ($evolution_cycle_id, $grader_name, $started_at, $ended_at, $score, $passed, $issues, $raw_output, $execution_time_ms)
+        RETURNING *
+      `);
+      const row = stmt.get({
+        $evolution_cycle_id: run.evolution_cycle_id,
+        $grader_name: run.grader_name,
+        $started_at: run.started_at,
+        $ended_at: run.ended_at,
+        $score: run.score,
+        $passed: run.passed ? 1 : 0,
+        $issues: run.issues,
+        $raw_output: run.raw_output,
+        $execution_time_ms: run.execution_time_ms,
+      });
+      if (!row) throw new Error('Insert failed');
+      return GraderRunSchema.parse({ ...row, passed: Boolean((row as Record<string, unknown>)['passed']) });
+    });
+  }
+
+  getGraderRunsByCycle(cycleId: number): Result<readonly GraderRun[], Error> {
+    return tryCatch(() => {
+      const rows = this.db
+        .query<GraderRun, [number]>('SELECT * FROM grader_runs WHERE evolution_cycle_id = ? ORDER BY grader_name')
+        .all(cycleId);
+      return rows.map((row) => GraderRunSchema.parse({ ...row, passed: Boolean(row.passed) }));
+    });
+  }
+
+  // ==========================================================================
+  // Metric Operations
+  // ==========================================================================
+
+  insertMetric(metric: MetricInsert): Result<Metric, Error> {
+    return tryCatch(() => {
+      const stmt = this.db.prepare(`
+        INSERT OR REPLACE INTO metrics (recorded_at, metric_name, metric_value, labels)
+        VALUES ($recorded_at, $metric_name, $metric_value, $labels)
+        RETURNING *
+      `);
+      const row = stmt.get({
+        $recorded_at: metric.recorded_at,
+        $metric_name: metric.metric_name,
+        $metric_value: metric.metric_value,
+        $labels: metric.labels,
+      });
+      return MetricSchema.parse(row);
+    });
+  }
+
+  // ==========================================================================
+  // View Queries
+  // ==========================================================================
+
+  getDoraMetrics(days: number = 30): Result<readonly DoraMetric[], Error> {
+    return tryCatch(() => {
+      const rows = this.db
+        .query<DoraMetric, [number]>(
+          `SELECT * FROM v_dora_metrics WHERE date >= date('now', '-' || ? || ' days')`
+        )
+        .all(days);
+      return rows.map((row) => DoraMetricSchema.parse(row));
+    });
+  }
+
+  getScoreTrend(days: number = 30): Result<readonly ScoreTrend[], Error> {
+    return tryCatch(() => {
+      const rows = this.db
+        .query<ScoreTrend, [number]>(
+          `SELECT * FROM v_score_trend WHERE date >= date('now', '-' || ? || ' days')`
+        )
+        .all(days);
+      return rows.map((row) => ScoreTrendSchema.parse(row));
+    });
+  }
+
+  getLessonEffectiveness(): Result<readonly LessonEffectiveness[], Error> {
+    return tryCatch(() => {
+      const rows = this.db.query<LessonEffectiveness, []>('SELECT * FROM v_lesson_effectiveness').all();
+      return rows.map((row) => LessonEffectivenessSchema.parse(row));
+    });
+  }
+
+  getGraderTrends(days: number = 30): Result<readonly GraderTrend[], Error> {
+    return tryCatch(() => {
+      const rows = this.db
+        .query<GraderTrend, [number]>(
+          `SELECT * FROM v_grader_trends WHERE date >= date('now', '-' || ? || ' days')`
+        )
+        .all(days);
+      return rows.map((row) => GraderTrendSchema.parse(row));
+    });
+  }
+}
+
+// ============================================================================
+// Helpers
+// ============================================================================
+
+function prefixKeys<T extends Record<string, unknown>>(obj: T): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(obj)) {
+    result[`$${key}`] = value;
+  }
+  return result;
+}
+
+// ============================================================================
+// Singleton Export
+// ============================================================================
+
+let dbInstance: EvolutionDB | null = null;
+
+export function getDB(): Result<EvolutionDB, Error> {
+  if (dbInstance) return Ok(dbInstance);
+
+  const result = EvolutionDB.init();
+  if (result.ok) {
+    dbInstance = result.data;
+  }
+  return result;
+}
+
+export function closeDB(): void {
+  if (dbInstance) {
+    dbInstance.close();
+    dbInstance = null;
+  }
+}
