@@ -268,3 +268,127 @@ export const GraderTrendSchema = z.object({
 });
 
 export type GraderTrend = z.infer<typeof GraderTrendSchema>;
+
+// ============================================================================
+// Verification System Schemas (Added in migration 002)
+// ============================================================================
+
+// Verification enums
+export const VerificationStatus = z.enum(['pending', 'verified', 'failed', 'skipped']);
+export type VerificationStatus = z.infer<typeof VerificationStatus>;
+
+export const ClaimType = z.enum(['behavior', 'fix', 'feature', 'refactor']);
+export type ClaimType = z.infer<typeof ClaimType>;
+
+export const TddPhase = z.enum(['red', 'green', 'refactor']);
+export type TddPhase = z.infer<typeof TddPhase>;
+
+export const AssumptionSeverity = z.enum(['high', 'medium', 'low']);
+export type AssumptionSeverity = z.infer<typeof AssumptionSeverity>;
+
+// Verification Claim Schema
+export const VerificationClaimSchema = z.object({
+  id: z.number().int().positive(),
+  session_id: z.string(),
+  claim_text: z.string().min(1),
+  claim_type: ClaimType,
+  verification_status: VerificationStatus.default('pending'),
+  test_file: z.string().nullable(),
+  test_name: z.string().nullable(),
+  test_output: z.string().nullable(),
+  verified_at: z.string().datetime().nullable(),
+  created_at: z.string().datetime(),
+});
+
+export type VerificationClaim = z.infer<typeof VerificationClaimSchema>;
+
+export const VerificationClaimInsertSchema = VerificationClaimSchema.omit({
+  id: true,
+  verified_at: true,
+  created_at: true,
+}).extend({
+  verified_at: z.string().datetime().optional(),
+  created_at: z.string().datetime().optional(),
+});
+
+export type VerificationClaimInsert = z.infer<typeof VerificationClaimInsertSchema>;
+
+// TDD Cycle Schema
+export const TddCycleSchema = z.object({
+  id: z.number().int().positive(),
+  session_id: z.string(),
+  cycle_number: z.number().int().positive(),
+  phase: TddPhase,
+  test_file: z.string().nullable(),
+  source_file: z.string().nullable(),
+  started_at: z.string().datetime(),
+  completed_at: z.string().datetime().nullable(),
+});
+
+export type TddCycle = z.infer<typeof TddCycleSchema>;
+
+export const TddCycleInsertSchema = TddCycleSchema.omit({
+  id: true,
+  started_at: true,
+  completed_at: true,
+}).extend({
+  started_at: z.string().datetime().optional(),
+  completed_at: z.string().datetime().optional(),
+});
+
+export type TddCycleInsert = z.infer<typeof TddCycleInsertSchema>;
+
+// Assumption Log Schema
+export const AssumptionLogSchema = z.object({
+  id: z.number().int().positive(),
+  session_id: z.string(),
+  assumption_text: z.string().min(1),
+  context: z.string().nullable(),
+  severity: AssumptionSeverity,
+  logged_at: z.string().datetime(),
+});
+
+export type AssumptionLog = z.infer<typeof AssumptionLogSchema>;
+
+export const AssumptionLogInsertSchema = AssumptionLogSchema.omit({
+  id: true,
+  logged_at: true,
+}).extend({
+  logged_at: z.string().datetime().optional(),
+});
+
+export type AssumptionLogInsert = z.infer<typeof AssumptionLogInsertSchema>;
+
+// ============================================================================
+// Verification Analytics Views (read-only)
+// ============================================================================
+
+export const SessionEffectivenessSchema = z.object({
+  session_id: z.string(),
+  total_claims: z.number().int(),
+  verified_claims: z.number().int(),
+  failed_claims: z.number().int(),
+  pending_claims: z.number().int(),
+  verification_rate: z.number(),
+});
+
+export type SessionEffectiveness = z.infer<typeof SessionEffectivenessSchema>;
+
+export const TddComplianceSchema = z.object({
+  session_id: z.string(),
+  total_cycles: z.number().int(),
+  red_phases: z.number().int(),
+  green_phases: z.number().int(),
+  refactor_phases: z.number().int(),
+});
+
+export type TddCompliance = z.infer<typeof TddComplianceSchema>;
+
+export const AssumptionTrendSchema = z.object({
+  date: z.string(),
+  severity: AssumptionSeverity,
+  count: z.number().int(),
+  sample_texts: z.string().nullable(),
+});
+
+export type AssumptionTrend = z.infer<typeof AssumptionTrendSchema>;
