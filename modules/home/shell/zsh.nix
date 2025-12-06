@@ -93,6 +93,22 @@ with lib;
         function has_command() {
           command -v "$1" &> /dev/null
         }
+
+        # ========================================
+        # Ghostty terminfo helpers
+        # ========================================
+
+        # Deploy xterm-ghostty terminfo to a remote server
+        # Usage: ghostty-terminfo user@host
+        function ghostty-terminfo() {
+          if [[ -z "$1" ]]; then
+            echo "Usage: ghostty-terminfo user@host"
+            echo "Installs Ghostty terminfo on remote server to fix backspace/rendering issues"
+            return 1
+          fi
+          infocmp -x xterm-ghostty | ssh "$1" -- tic -x -
+          echo "✓ Installed xterm-ghostty terminfo on $1"
+        }
       '';
 
       history = {
