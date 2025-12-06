@@ -20,5 +20,10 @@ with lib;
       remapCapsLockToEscape = config.modules.darwin.keyboard.remapCapsLock == "escape";
       remapCapsLockToControl = config.modules.darwin.keyboard.remapCapsLock == "control";
     };
+
+    # Function keys act as media keys by default (brightness, volume, etc.)
+    # F12 = Volume Up, F11 = Volume Down, F10 = Mute, etc.
+    # Press Fn + F1-F12 for actual function keys
+    system.defaults.NSGlobalDomain."com.apple.keyboard.fnState" = false;
   };
 }

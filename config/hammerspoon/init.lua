@@ -1,6 +1,5 @@
 -- Hammerspoon Configuration
 -- AeroSpace-style auto-tiling window management
--- Kanata handles: CapsLock -> Esc (tap) | Hyper (hold)
 --
 -- Key bindings:
 --   Ctrl+Opt + Arrows       = Cycle half → third → two-thirds in that direction
