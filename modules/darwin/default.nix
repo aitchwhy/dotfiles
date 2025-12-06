@@ -13,6 +13,11 @@ with lib;
     ./system.nix
     ./keyboard.nix
     ./trackpad.nix
+    ./gestures.nix
+    ./screenshots.nix
+    ./spaces.nix
+    ./window-manager.nix
+    ./input-devices.nix
     ./kanata.nix
 
     # Applications
@@ -33,6 +38,11 @@ with lib;
       system.enable = mkDefault true;
       keyboard.enable = mkDefault true;
       trackpad.enable = mkDefault true;
+      gestures.enable = mkDefault true;
+      screenshots.enable = mkDefault true;
+      spaces.enable = mkDefault true;
+      windowManager.enable = mkDefault true;
+      inputDevices.enable = mkDefault true;
       kanata.enable = mkDefault true;
       safari.enable = mkDefault false; # Disabled: macOS sandboxing prevents writing to Safari container
       terminal.enable = mkDefault true;

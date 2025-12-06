@@ -34,7 +34,9 @@ with lib; {
     # Apps (xdg.configFile based)
     ./apps/ghostty.nix
     ./apps/kanata.nix
-    ./apps/hammerspoon.nix
+    ./apps/swish.nix
+    ./apps/aerospace.nix
+    ./apps/bartender.nix
     ./apps/raycast.nix
     ./apps/claude.nix
     ./apps/claude-code.nix
@@ -85,7 +87,9 @@ with lib; {
       apps = {
         ghostty.enable = mkDefault true;
         kanata.enable = mkDefault true;
-        hammerspoon.enable = mkDefault true;
+        swish.enable = mkDefault true;
+        aerospace.enable = mkDefault true;
+        bartender.enable = mkDefault true;
         raycast.enable = mkDefault true;
         claude.enable = mkDefault true;
         claudeCode.enable = mkDefault true;
