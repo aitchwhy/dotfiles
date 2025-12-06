@@ -1,0 +1,212 @@
+# AeroSpace Configuration
+# Tiling window manager for macOS
+# https://github.com/nikitabobko/AeroSpace
+#
+# Replaces Hammerspoon window management with native tiling WM
+#
+# Key bindings (matching Hammerspoon conventions):
+#   Ctrl+Opt + hjkl/Arrows  = Resize/snap within display
+#   Ctrl+Opt+Cmd + Arrows   = Move window to adjacent monitor
+#   Ctrl+Opt+Cmd + Enter    = Toggle fullscreen
+#   Alt + 1-9               = Switch workspace
+#   Alt+Shift + 1-9         = Move window to workspace
+#
+# Trackpad gestures are handled by Swish (not AeroSpace)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Startup
+# ─────────────────────────────────────────────────────────────────────────────
+
+start-at-login = true
+after-login-command = []
+after-startup-command = []
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Layout & Normalization
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Flatten nested containers for simpler layout
+enable-normalization-flatten-containers = true
+enable-normalization-opposite-orientation-for-nested-containers = true
+
+# Default layout
+default-root-container-layout = 'tiles'
+default-root-container-orientation = 'auto'
+
+# Focus follows mouse when switching monitors
+on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
+on-focus-changed = ['move-mouse window-lazy-center']
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Gaps
+# ─────────────────────────────────────────────────────────────────────────────
+
+accordion-padding = 30
+
+[gaps]
+inner.horizontal = 10
+inner.vertical = 10
+outer.left = 10
+outer.bottom = 10
+outer.top = 10
+outer.right = 10
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Key Bindings - Main Mode
+# ─────────────────────────────────────────────────────────────────────────────
+
+[mode.main.binding]
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Focus Movement (Alt + hjkl)
+# Vim-style navigation between windows
+# ─────────────────────────────────────────────────────────────────────────────
+
+alt-h = 'focus left'
+alt-j = 'focus down'
+alt-k = 'focus up'
+alt-l = 'focus right'
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Window Movement (Alt+Shift + hjkl)
+# Move focused window within tiling layout
+# ─────────────────────────────────────────────────────────────────────────────
+
+alt-shift-h = 'move left'
+alt-shift-j = 'move down'
+alt-shift-k = 'move up'
+alt-shift-l = 'move right'
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Window Snapping (Ctrl+Opt + Arrows)
+# Match Hammerspoon: Snap to half/third/two-thirds
+# ─────────────────────────────────────────────────────────────────────────────
+
+ctrl-alt-left = 'move-node-to-workspace --wrap-around prev'
+ctrl-alt-right = 'move-node-to-workspace --wrap-around next'
+ctrl-alt-up = 'fullscreen'
+ctrl-alt-down = 'layout floating'
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Cross-Display Movement (Ctrl+Opt+Cmd + Arrows)
+# Match Hammerspoon: Move window to adjacent monitor
+# ─────────────────────────────────────────────────────────────────────────────
+
+ctrl-alt-cmd-left = 'move-node-to-monitor --wrap-around prev'
+ctrl-alt-cmd-right = 'move-node-to-monitor --wrap-around next'
+ctrl-alt-cmd-up = 'move-node-to-monitor --wrap-around prev'
+ctrl-alt-cmd-down = 'move-node-to-monitor --wrap-around next'
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Fullscreen & Layout (Ctrl+Opt+Cmd + Enter)
+# ─────────────────────────────────────────────────────────────────────────────
+
+ctrl-alt-cmd-enter = 'fullscreen'
+alt-f = 'fullscreen'
+
+# Toggle between floating and tiling
+alt-shift-space = 'layout floating tiling'
+
+# Layout modes
+alt-slash = 'layout tiles horizontal vertical'
+alt-comma = 'layout accordion horizontal vertical'
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Resize (Alt + minus/equal)
+# ─────────────────────────────────────────────────────────────────────────────
+
+alt-minus = 'resize smart -50'
+alt-equal = 'resize smart +50'
+
+# Fine-grained resize
+alt-shift-minus = 'resize smart -20'
+alt-shift-equal = 'resize smart +20'
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Workspace Switching (Alt + 1-9)
+# ─────────────────────────────────────────────────────────────────────────────
+
+alt-1 = 'workspace 1'
+alt-2 = 'workspace 2'
+alt-3 = 'workspace 3'
+alt-4 = 'workspace 4'
+alt-5 = 'workspace 5'
+alt-6 = 'workspace 6'
+alt-7 = 'workspace 7'
+alt-8 = 'workspace 8'
+alt-9 = 'workspace 9'
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Move Window to Workspace (Alt+Shift + 1-9)
+# ─────────────────────────────────────────────────────────────────────────────
+
+alt-shift-1 = 'move-node-to-workspace 1'
+alt-shift-2 = 'move-node-to-workspace 2'
+alt-shift-3 = 'move-node-to-workspace 3'
+alt-shift-4 = 'move-node-to-workspace 4'
+alt-shift-5 = 'move-node-to-workspace 5'
+alt-shift-6 = 'move-node-to-workspace 6'
+alt-shift-7 = 'move-node-to-workspace 7'
+alt-shift-8 = 'move-node-to-workspace 8'
+alt-shift-9 = 'move-node-to-workspace 9'
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Service Mode (Alt+Shift + ;)
+# For reload, flatten, and other service commands
+# ─────────────────────────────────────────────────────────────────────────────
+
+alt-shift-semicolon = 'mode service'
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Service Mode Bindings
+# ─────────────────────────────────────────────────────────────────────────────
+
+[mode.service.binding]
+esc = ['reload-config', 'mode main']
+r = ['flatten-workspace-tree', 'mode main']
+backspace = ['close-all-windows-but-current', 'mode main']
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Window Rules
+# Assign specific apps to workspaces or float by default
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Float certain apps by default
+[[on-window-detected]]
+if.app-id = 'com.apple.systempreferences'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.finder'
+check-further-callbacks = true
+
+[[on-window-detected]]
+if.app-id = 'com.raycast.macos'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.1password.1password'
+run = 'layout floating'
+
+# Assign development apps to workspace 1
+[[on-window-detected]]
+if.app-id = 'com.todesktop.230313mzl4w4u92'
+run = 'move-node-to-workspace 1'
+
+[[on-window-detected]]
+if.app-id = 'dev.warp.Warp-Stable'
+run = 'move-node-to-workspace 1'
+
+# Assign browser to workspace 2
+[[on-window-detected]]
+if.app-id = 'com.google.Chrome'
+run = 'move-node-to-workspace 2'
+
+# Assign communication to workspace 3
+[[on-window-detected]]
+if.app-id = 'com.tinyspeck.slackmacgap'
+run = 'move-node-to-workspace 3'
+
+[[on-window-detected]]
+if.app-id = 'us.zoom.xos'
+run = 'move-node-to-workspace 3'
