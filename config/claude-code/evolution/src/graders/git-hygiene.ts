@@ -7,7 +7,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { BaseGrader, runShell } from './base';
-import { type GraderOutput, type GraderIssue, DEFAULT_GRADER_CONFIGS } from './types';
+import { DEFAULT_GRADER_CONFIGS, type GraderIssue, type GraderOutput } from './types';
 
 const POINTS = {
   UNSTAGED_CHANGES: 30,
@@ -31,12 +31,12 @@ const REQUIRED_GITIGNORE = ['.env', '.envrc', '*.gpg', '.dev.vars'];
 
 // Dangerous patterns that indicate actual secrets (not just env var references)
 const SECRET_PATTERNS = [
-  /sk-[a-zA-Z0-9]{20,}/,                    // OpenAI keys
-  /ghp_[a-zA-Z0-9]{36}/,                    // GitHub personal access tokens
-  /gho_[a-zA-Z0-9]{36}/,                    // GitHub OAuth tokens
-  /-----BEGIN.*PRIVATE KEY-----/,           // Private keys
-  /AKIA[0-9A-Z]{16}/,                       // AWS access keys
-  /xox[baprs]-[0-9a-zA-Z-]{10,}/,          // Slack tokens
+  /sk-[a-zA-Z0-9]{20,}/, // OpenAI keys
+  /ghp_[a-zA-Z0-9]{36}/, // GitHub personal access tokens
+  /gho_[a-zA-Z0-9]{36}/, // GitHub OAuth tokens
+  /-----BEGIN.*PRIVATE KEY-----/, // Private keys
+  /AKIA[0-9A-Z]{16}/, // AWS access keys
+  /xox[baprs]-[0-9a-zA-Z-]{10,}/, // Slack tokens
 ];
 
 export class GitHygieneGrader extends BaseGrader {
@@ -131,7 +131,7 @@ export class GitHygieneGrader extends BaseGrader {
 
   private async checkUnstagedChanges(): Promise<{ count: number }> {
     const result = await runShell('git diff --name-only | wc -l', this.dotfilesPath);
-    const count = result.ok ? parseInt(result.data.stdout.trim()) || 0 : 0;
+    const count = result.ok ? parseInt(result.data.stdout.trim(), 10) || 0 : 0;
     return { count };
   }
 
@@ -140,10 +140,7 @@ export class GitHygieneGrader extends BaseGrader {
     conventional: number;
     nonConventional: number;
   }> {
-    const result = await runShell(
-      "git log --oneline -10 --format='%s'",
-      this.dotfilesPath
-    );
+    const result = await runShell("git log --oneline -10 --format='%s'", this.dotfilesPath);
 
     if (!result.ok) {
       return { total: 0, conventional: 0, nonConventional: 0 };
@@ -187,7 +184,7 @@ export class GitHygieneGrader extends BaseGrader {
       );
 
       if (result.ok && result.data.stdout.trim()) {
-        foundPatterns.push(pattern.source.slice(0, 30) + '...');
+        foundPatterns.push(`${pattern.source.slice(0, 30)}...`);
       }
     }
 

@@ -6,42 +6,36 @@
  */
 import { Database } from 'bun:sqlite';
 import { readFileSync } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { type Result, Ok, Err, tryCatch } from '../lib/result';
+import { Ok, type Result, tryCatch } from '../lib/result';
 import {
-  type Session,
-  type SessionInsert,
-  type Task,
-  type TaskInsert,
-  type Commit,
-  type CommitInsert,
-  type Lesson,
-  type LessonInsert,
-  type Metric,
-  type MetricInsert,
+  type DoraMetric,
+  DoraMetricSchema,
   type EvolutionCycle,
   type EvolutionCycleInsert,
+  EvolutionCycleSchema,
   type GraderRun,
   type GraderRunInsert,
-  type Research,
-  type ResearchInsert,
-  type DoraMetric,
-  type ScoreTrend,
-  type LessonEffectiveness,
-  type GraderTrend,
-  SessionSchema,
-  TaskSchema,
-  CommitSchema,
-  LessonSchema,
-  MetricSchema,
-  EvolutionCycleSchema,
   GraderRunSchema,
-  ResearchSchema,
-  DoraMetricSchema,
-  ScoreTrendSchema,
-  LessonEffectivenessSchema,
+  type GraderTrend,
   GraderTrendSchema,
+  type Lesson,
+  type LessonEffectiveness,
+  LessonEffectivenessSchema,
+  type LessonInsert,
+  LessonSchema,
+  type Metric,
+  type MetricInsert,
+  MetricSchema,
+  type ScoreTrend,
+  ScoreTrendSchema,
+  type Session,
+  type SessionInsert,
+  SessionSchema,
+  type Task,
+  type TaskInsert,
+  TaskSchema,
 } from './schema';
 
 // ============================================================================
@@ -51,7 +45,7 @@ import {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const DEFAULT_DB_PATH = join(process.env['HOME'] ?? '', 'dotfiles', '.claude-metrics', 'evolution.db');
+const DEFAULT_DB_PATH = join(process.env.HOME ?? '', 'dotfiles', '.claude-metrics', 'evolution.db');
 const MIGRATIONS_DIR = join(__dirname, 'migrations');
 
 // ============================================================================
@@ -60,7 +54,6 @@ const MIGRATIONS_DIR = join(__dirname, 'migrations');
 
 export class EvolutionDB {
   private db: Database;
-  private readonly dbPath: string;
 
   private constructor(db: Database, dbPath: string) {
     this.db = db;
@@ -241,7 +234,9 @@ export class EvolutionDB {
 
   getAllLessons(): Result<readonly Lesson[], Error> {
     return tryCatch(() => {
-      const rows = this.db.query<Lesson, []>('SELECT * FROM lessons ORDER BY created_at DESC').all();
+      const rows = this.db
+        .query<Lesson, []>('SELECT * FROM lessons ORDER BY created_at DESC')
+        .all();
       return rows.map((row) => LessonSchema.parse(row));
     });
   }
@@ -274,7 +269,9 @@ export class EvolutionDB {
   getLatestEvolutionCycle(): Result<EvolutionCycle | null, Error> {
     return tryCatch(() => {
       const row = this.db
-        .query<EvolutionCycle, []>('SELECT * FROM evolution_cycles ORDER BY started_at DESC LIMIT 1')
+        .query<EvolutionCycle, []>(
+          'SELECT * FROM evolution_cycles ORDER BY started_at DESC LIMIT 1'
+        )
         .get();
       return row ? EvolutionCycleSchema.parse(row) : null;
     });
@@ -303,14 +300,19 @@ export class EvolutionDB {
         $execution_time_ms: run.execution_time_ms,
       });
       if (!row) throw new Error('Insert failed');
-      return GraderRunSchema.parse({ ...row, passed: Boolean((row as Record<string, unknown>)['passed']) });
+      return GraderRunSchema.parse({
+        ...row,
+        passed: Boolean((row as Record<string, unknown>).passed),
+      });
     });
   }
 
   getGraderRunsByCycle(cycleId: number): Result<readonly GraderRun[], Error> {
     return tryCatch(() => {
       const rows = this.db
-        .query<GraderRun, [number]>('SELECT * FROM grader_runs WHERE evolution_cycle_id = ? ORDER BY grader_name')
+        .query<GraderRun, [number]>(
+          'SELECT * FROM grader_runs WHERE evolution_cycle_id = ? ORDER BY grader_name'
+        )
         .all(cycleId);
       return rows.map((row) => GraderRunSchema.parse({ ...row, passed: Boolean(row.passed) }));
     });
@@ -365,7 +367,9 @@ export class EvolutionDB {
 
   getLessonEffectiveness(): Result<readonly LessonEffectiveness[], Error> {
     return tryCatch(() => {
-      const rows = this.db.query<LessonEffectiveness, []>('SELECT * FROM v_lesson_effectiveness').all();
+      const rows = this.db
+        .query<LessonEffectiveness, []>('SELECT * FROM v_lesson_effectiveness')
+        .all();
       return rows.map((row) => LessonEffectivenessSchema.parse(row));
     });
   }

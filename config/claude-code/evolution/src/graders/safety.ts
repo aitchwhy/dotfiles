@@ -6,10 +6,10 @@
  *
  * This is a CRITICAL grader - must score 100% to pass.
  */
-import { readFileSync, statSync, readdirSync } from 'node:fs';
-import { join, extname } from 'node:path';
+import { readFileSync, statSync } from 'node:fs';
+import { extname, join } from 'node:path';
 import { BaseGrader, runShell } from './base';
-import { type GraderOutput, type GraderIssue, DEFAULT_GRADER_CONFIGS } from './types';
+import { DEFAULT_GRADER_CONFIGS, type GraderIssue, type GraderOutput } from './types';
 
 // High-entropy patterns that indicate actual secrets
 const SECRET_PATTERNS = [
@@ -47,7 +47,7 @@ const SCANNABLE_EXTENSIONS = [
 
 export class SafetyGrader extends BaseGrader {
   constructor(dotfilesPath?: string) {
-    super(DEFAULT_GRADER_CONFIGS['safety']!, dotfilesPath);
+    super(DEFAULT_GRADER_CONFIGS.safety!, dotfilesPath);
   }
 
   protected async execute(): Promise<GraderOutput> {
@@ -175,7 +175,7 @@ export class SafetyGrader extends BaseGrader {
       { path: '.config/gh', maxMode: 0o700 },
     ];
 
-    const home = process.env['HOME'] ?? '';
+    const home = process.env.HOME ?? '';
 
     for (const { path, maxMode } of sensitiveLocations) {
       const fullPath = join(home, path);

@@ -1,4 +1,6 @@
 #!/usr/bin/env bun
+import { closeDB, getDB } from './db/client';
+import type { EvolutionCycleInsert, GraderRunInsert } from './db/schema';
 /**
  * Evolution System CLI
  *
@@ -8,9 +10,7 @@
  *   audit   - Comprehensive security audit
  *   metrics - Display DORA metrics dashboard
  */
-import { runAllGraders, printGradeResult } from './graders';
-import { getDB, closeDB } from './db/client';
-import { type EvolutionCycleInsert, type GraderRunInsert } from './db/schema';
+import { printGradeResult, runAllGraders } from './graders';
 
 // ============================================================================
 // CLI Argument Parsing
@@ -19,7 +19,7 @@ import { type EvolutionCycleInsert, type GraderRunInsert } from './db/schema';
 const command = process.argv[2];
 const args = process.argv.slice(3);
 
-const DOTFILES_PATH = process.env['DOTFILES'] ?? `${process.env['HOME']}/dotfiles`;
+const DOTFILES_PATH = process.env.DOTFILES ?? `${process.env.HOME}/dotfiles`;
 
 // ============================================================================
 // Commands
@@ -69,7 +69,7 @@ async function gradeCommand(options: { ci?: boolean; save?: boolean }): Promise<
             passed: output.passed,
             issues: JSON.stringify(output.issues),
             raw_output: output.rawOutput ?? null,
-            execution_time_ms: output.metrics?.['execution_time_ms'] ?? null,
+            execution_time_ms: output.metrics?.execution_time_ms ?? null,
           };
           db.insertGraderRun(runInsert);
         }
@@ -139,11 +139,13 @@ async function metricsCommand(): Promise<number> {
     console.log('-'.repeat(40));
     for (const row of lessonResult.data) {
       const category = row.category ?? 'uncategorized';
-      console.log(`${category.padEnd(20)} ${row.lesson_count} lessons, ${row.avg_applications.toFixed(1)} avg uses`);
+      console.log(
+        `${category.padEnd(20)} ${row.lesson_count} lessons, ${row.avg_applications.toFixed(1)} avg uses`
+      );
     }
   }
 
-  console.log('\n' + '='.repeat(60) + '\n');
+  console.log(`\n${'='.repeat(60)}\n`);
 
   closeDB();
   return 0;
@@ -161,7 +163,7 @@ async function auditCommand(): Promise<number> {
   }
 
   // Focus on safety results
-  const safetyResult = result.data.results['safety'];
+  const safetyResult = result.data.results.safety;
   if (safetyResult) {
     console.log('\n🔒 SECURITY AUDIT RESULTS');
     console.log('='.repeat(60));

@@ -6,10 +6,10 @@
  *
  * NOTE: Handles JSONC (JSON with Comments) for VSCode/Cursor config files.
  */
-import { readFileSync, existsSync, lstatSync } from 'node:fs';
+import { existsSync, lstatSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { BaseGrader, runShell } from './base';
-import { type GraderOutput, type GraderIssue, DEFAULT_GRADER_CONFIGS } from './types';
+import { DEFAULT_GRADER_CONFIGS, type GraderIssue, type GraderOutput } from './types';
 
 const POINTS = {
   JSON_FILE: 5,
@@ -169,7 +169,7 @@ export class ConfigValidityGrader extends BaseGrader {
     validCount: number;
   } {
     const issues: GraderIssue[] = [];
-    const home = process.env['HOME'] ?? '';
+    const home = process.env.HOME ?? '';
     let validCount = 0;
 
     for (const link of CRITICAL_SYMLINKS) {

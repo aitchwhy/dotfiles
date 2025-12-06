@@ -3,22 +3,23 @@
  *
  * Central export for all graders and utilities.
  */
-export * from './types';
+
 export * from './base';
-export { NixHealthGrader } from './nix-health';
 export { ConfigValidityGrader } from './config-validity';
 export { GitHygieneGrader } from './git-hygiene';
+export { NixHealthGrader } from './nix-health';
 export { PerformanceGrader } from './performance';
 export { SafetyGrader } from './safety';
+export * from './types';
 
-import { type Result, Ok, Err, all } from '../lib/result';
-import { type GraderConfig, type GraderOutput, DEFAULT_GRADER_CONFIGS } from './types';
-import { NixHealthGrader } from './nix-health';
+import { Err, Ok, type Result } from '../lib/result';
+import type { BaseGrader } from './base';
 import { ConfigValidityGrader } from './config-validity';
 import { GitHygieneGrader } from './git-hygiene';
+import { NixHealthGrader } from './nix-health';
 import { PerformanceGrader } from './performance';
 import { SafetyGrader } from './safety';
-import type { BaseGrader } from './base';
+import { DEFAULT_GRADER_CONFIGS, type GraderConfig, type GraderOutput } from './types';
 
 // ============================================================================
 // Grader Factory
@@ -80,7 +81,7 @@ export async function runAllGraders(dotfilesPath?: string): Promise<Result<Grade
   let totalWeight = 0;
   let weightedScore = 0;
 
-  for (const [name, { output, config }] of Object.entries(results)) {
+  for (const [_name, { output, config }] of Object.entries(results)) {
     totalWeight += config.weight;
     weightedScore += output.score * config.weight;
   }
@@ -116,7 +117,7 @@ export async function runAllGraders(dotfilesPath?: string): Promise<Result<Grade
 export function printGradeResult(result: GradeResult): void {
   const { overallScore, recommendation, results, executionTimeMs } = result;
 
-  console.log('\n' + '='.repeat(60));
+  console.log(`\n${'='.repeat(60)}`);
   console.log('EVOLUTION GRADE REPORT');
   console.log('='.repeat(60));
 
@@ -130,20 +131,20 @@ export function printGradeResult(result: GradeResult): void {
 
     if (output.issues.length > 0) {
       for (const issue of output.issues) {
-        const icon = issue.severity === 'error' ? '  ❌' : issue.severity === 'warning' ? '  ⚠️' : '  ℹ️';
+        const icon =
+          issue.severity === 'error' ? '  ❌' : issue.severity === 'warning' ? '  ⚠️' : '  ℹ️';
         console.log(`${icon} ${issue.message}`);
       }
     }
   }
 
   // Print summary
-  console.log('\n' + '-'.repeat(60));
+  console.log(`\n${'-'.repeat(60)}`);
   const overallPercent = (overallScore * 100).toFixed(1);
-  const recEmoji =
-    recommendation === 'stable' ? '🟢' : recommendation === 'improve' ? '🟡' : '🔴';
+  const recEmoji = recommendation === 'stable' ? '🟢' : recommendation === 'improve' ? '🟡' : '🔴';
 
   console.log(`Overall Score: ${overallPercent}%`);
   console.log(`Recommendation: ${recEmoji} ${recommendation.toUpperCase()}`);
   console.log(`Execution Time: ${(executionTimeMs / 1000).toFixed(2)}s`);
-  console.log('='.repeat(60) + '\n');
+  console.log(`${'='.repeat(60)}\n`);
 }

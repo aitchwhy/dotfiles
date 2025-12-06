@@ -5,7 +5,7 @@
  * Weight: 30% of overall score
  */
 import { BaseGrader, runShell } from './base';
-import { type GraderOutput, type GraderIssue, DEFAULT_GRADER_CONFIGS } from './types';
+import { DEFAULT_GRADER_CONFIGS, type GraderIssue, type GraderOutput } from './types';
 
 const POINTS = {
   FLAKE_CHECK: 40,
@@ -14,7 +14,8 @@ const POINTS = {
   DEPRECATED_PATTERNS: 15,
 } as const;
 
-const TOTAL_POINTS = POINTS.FLAKE_CHECK + POINTS.FLAKE_EVAL + POINTS.NIX_FMT + POINTS.DEPRECATED_PATTERNS;
+const TOTAL_POINTS =
+  POINTS.FLAKE_CHECK + POINTS.FLAKE_EVAL + POINTS.NIX_FMT + POINTS.DEPRECATED_PATTERNS;
 
 export class NixHealthGrader extends BaseGrader {
   constructor(dotfilesPath?: string) {
@@ -49,9 +50,7 @@ export class NixHealthGrader extends BaseGrader {
     }
 
     // 3. Nix fmt (15 pts) - Is the code formatted correctly?
-    const fmtCheck = await runShell(
-      `alejandra --check "${this.dotfilesPath}" 2>&1 | head -20`
-    );
+    const fmtCheck = await runShell(`alejandra --check "${this.dotfilesPath}" 2>&1 | head -20`);
     if (!fmtCheck.ok || fmtCheck.data.exitCode !== 0) {
       deductions += POINTS.NIX_FMT;
       const unformattedFiles = fmtCheck.ok
@@ -72,7 +71,7 @@ export class NixHealthGrader extends BaseGrader {
       `grep -r "with lib;" "${this.dotfilesPath}"/*.nix "${this.dotfilesPath}"/modules/ 2>/dev/null | wc -l`
     );
     const deprecatedCount = deprecatedCheck.ok
-      ? parseInt(deprecatedCheck.data.stdout.trim()) || 0
+      ? parseInt(deprecatedCheck.data.stdout.trim(), 10) || 0
       : 0;
 
     if (deprecatedCount > 5) {

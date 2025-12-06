@@ -6,13 +6,13 @@
  * - ~/.claude-metrics/history.jsonl → evolution_cycles + grader_runs
  * - config/claude-code/evolution/lessons/lessons.jsonl → lessons
  */
-import { readFileSync, existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { getDB, closeDB } from '../src/db/client';
+import { closeDB, getDB } from '../src/db/client';
 import type { EvolutionCycleInsert, GraderRunInsert, LessonInsert } from '../src/db/schema';
 
-const HOME = process.env['HOME'] ?? '';
-const DOTFILES = process.env['DOTFILES'] ?? join(HOME, 'dotfiles');
+const HOME = process.env.HOME ?? '';
+const DOTFILES = process.env.DOTFILES ?? join(HOME, 'dotfiles');
 const METRICS_DIR = join(HOME, 'dotfiles', '.claude-metrics');
 
 // ============================================================================
@@ -130,7 +130,14 @@ async function migrateHistory(): Promise<{ cycles: number; runs: number }> {
 }
 
 async function migrateLessons(): Promise<number> {
-  const lessonsPath = join(DOTFILES, 'config', 'claude-code', 'evolution', 'lessons', 'lessons.jsonl');
+  const lessonsPath = join(
+    DOTFILES,
+    'config',
+    'claude-code',
+    'evolution',
+    'lessons',
+    'lessons.jsonl'
+  );
 
   if (!existsSync(lessonsPath)) {
     console.log('No lessons.jsonl found, skipping...');
@@ -200,7 +207,7 @@ async function main() {
     closeDB();
   }
 
-  console.log('\n' + '='.repeat(50));
+  console.log(`\n${'='.repeat(50)}`);
 }
 
 main();

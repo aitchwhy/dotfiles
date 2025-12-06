@@ -3,8 +3,8 @@
  *
  * All graders extend this abstract class to ensure consistent interface.
  */
-import { type Result, Ok, Err, tryCatchAsync } from '../lib/result';
-import { type GraderConfig, type GraderOutput, type GraderIssue } from './types';
+import { Err, Ok, type Result, tryCatchAsync } from '../lib/result';
+import type { GraderConfig, GraderIssue, GraderOutput } from './types';
 
 // ============================================================================
 // Abstract Base Class
@@ -16,7 +16,7 @@ export abstract class BaseGrader {
 
   constructor(config: GraderConfig, dotfilesPath?: string) {
     this.config = config;
-    this.dotfilesPath = dotfilesPath ?? `${process.env['HOME']}/dotfiles`;
+    this.dotfilesPath = dotfilesPath ?? `${process.env.HOME}/dotfiles`;
   }
 
   /**
@@ -40,7 +40,7 @@ export abstract class BaseGrader {
 
     // Add execution time metric if successful
     if (result.ok && result.data.metrics) {
-      result.data.metrics['execution_time_ms'] = Date.now() - startTime;
+      result.data.metrics.execution_time_ms = Date.now() - startTime;
     }
 
     return result;
@@ -94,10 +94,7 @@ export interface ShellResult {
   stderr: string;
 }
 
-export async function runShell(
-  command: string,
-  cwd?: string
-): Promise<Result<ShellResult, Error>> {
+export async function runShell(command: string, cwd?: string): Promise<Result<ShellResult, Error>> {
   return tryCatchAsync(async () => {
     const proc = Bun.spawn(['sh', '-c', command], {
       cwd: cwd ?? process.cwd(),
@@ -127,7 +124,9 @@ export async function runShellExpectSuccess(
   if (!result.ok) return result;
 
   if (result.data.exitCode !== 0) {
-    return Err(new Error(`Command failed with exit code ${result.data.exitCode}: ${result.data.stderr}`));
+    return Err(
+      new Error(`Command failed with exit code ${result.data.exitCode}: ${result.data.stderr}`)
+    );
   }
 
   return Ok(result.data.stdout);
