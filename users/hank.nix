@@ -82,6 +82,7 @@
     # Documentation
     glow
     pandoc
+    tldr # Community-maintained man page summaries
 
     # Media Processing
     ffmpeg-full
