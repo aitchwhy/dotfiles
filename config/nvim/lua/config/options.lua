@@ -6,6 +6,7 @@ vim.g.lazyvim_cmp = "blink.cmp"
 vim.g.lazyvim_picker = "fzf"
 vim.g.autoformat = true
 vim.g.snacks_animate = false
+vim.g.ai_cmp = false -- Disable ghost text for AI completions (set true to enable)
 
 -- Editor settings
 vim.opt.termguicolors = true
