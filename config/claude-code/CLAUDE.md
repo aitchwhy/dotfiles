@@ -1,8 +1,8 @@
-# CLAUDE CODE v5.0
-# Minimal Effective Configuration
+# CLAUDE CODE v6.0
+# Verification-First Development
 
 > **Managed via**: `~/dotfiles` with Nix + home-manager symlinks
-> **Version**: 5.0.0 | December 2025
+> **Version**: 6.0.0 | December 2025
 
 ---
 
@@ -18,6 +18,45 @@ Tools: Cursor, Claude Code, Ghostty, Hammerspoon, Yazi, Zellij.
 - "ultrathink" → 32K reasoning tokens (maximum depth)
 
 Default: Ultrathink for non-trivial tasks.
+
+---
+
+## VERIFICATION-FIRST PHILOSOPHY
+
+**Every claim about code behavior must be backed by test evidence.**
+
+The word "should" is BANNED when describing current behavior.
+
+### Banned Language → Required Replacement
+
+| ❌ BANNED | ✅ REQUIRED |
+|-----------|-------------|
+| "should now work" | "VERIFIED via [test]: [assertion passed]" |
+| "should fix the bug" | "VERIFIED via [test]: [specific output]" |
+| "this fixes" | "UNVERIFIED: requires [test_name]" |
+| "will now have" | "VERIFIED via [test]: [assertion]" |
+| "probably works" | "UNVERIFIED: needs [specific test]" |
+
+### Evidence Format
+
+```
+✅ VERIFIED: [claim]
+   Test: [file]:[test_name]
+   Command: [exact command]
+   Output: [assertion output]
+
+⚠️ UNVERIFIED: [claim]
+   Reason: [why not verified]
+   Needed: [test that would verify]
+```
+
+### Hook Enforcement
+
+Three hooks enforce verification-first:
+
+1. **TDD Enforcer** (PreToolUse): Blocks source edits without test files
+2. **Assumption Detector** (Stop): Blocks sessions with "should" language
+3. **Verification Gate** (Stop): Blocks sessions with pending claims
 
 ---
 
@@ -107,13 +146,14 @@ const Err = <E>(error: E): Result<never, E> => ({ ok: false, error });
 
 ---
 
-## TESTING (TDD)
+## TESTING (TDD + Verification)
 
-Red-Green-Refactor cycle:
+Red-Green-Refactor cycle with verification:
 
-1. **Red**: Write failing test for expected behavior
+1. **Red**: Write failing test that defines expected behavior
 2. **Green**: Write minimal code to pass
 3. **Refactor**: Improve while green
+4. **Verify**: Document test evidence in response
 
 Hierarchy: E2E (few) → Integration (moderate) → Unit (many)
 
@@ -125,6 +165,16 @@ describe('Feature', () => {
 });
 ```
 
+### Multi-Language Test Commands
+
+| Language | Run Tests | Pattern Match |
+|----------|-----------|---------------|
+| TypeScript | `bun test` | `bun test --grep "pattern"` |
+| Python | `pytest` | `pytest -k "pattern"` |
+| Go | `go test ./...` | `go test -run "Pattern"` |
+| Rust | `cargo test` | `cargo test pattern` |
+| Shell | `bats tests/` | `bats tests/file.bats` |
+
 ---
 
 ## QUALITY GATES
@@ -134,11 +184,13 @@ describe('Feature', () => {
 2. Pass `bunx biome check` (zero lint errors)
 3. Include tests for new functionality
 4. Use conventional commits
+5. **Have verification evidence (no "should work")**
 
 ### Every New File MUST:
 1. Have explicit types (no inferred `any`)
 2. Export schemas before types
 3. Use Result types for fallible functions
+4. **Have corresponding test file**
 
 ---
 
@@ -167,6 +219,8 @@ Atomic commits. Never commit broken code. Rebase over merge.
 - `any` appearing anywhere
 - Missing error handling on async operations
 - Tests that seem to pass but don't verify behavior
+- **Using "should" language without test evidence**
+- **Editing source files without corresponding test**
 
 ---
 
@@ -182,6 +236,8 @@ Atomic commits. Never commit broken code. Rebase over merge.
 | `null` | `undefined` |
 | Magic numbers | Named expressions |
 | Commented-out code | Delete it |
+| **"should work"** | **"VERIFIED via [test]"** |
+| **"this fixes"** | **"UNVERIFIED: needs [test]"** |
 
 ---
 
@@ -199,6 +255,7 @@ Nix for packages. Homebrew only for GUI apps and casks.
 |---------|---------|
 | `/tdd` | Test-driven development cycle |
 | `/validate` | Run typecheck + lint + test |
+| `/verify` | **Verify claim with test evidence** |
 | `/commit` | Conventional commit helper |
 | `/pr` | Pull request creation |
 | `/fix` | Structured bug fixing |
@@ -212,4 +269,17 @@ Nix for packages. Homebrew only for GUI apps and casks.
 
 ---
 
-*v5.0.0 - Consolidated from v4.0 ULTRATHINK system. Aspirational features removed.*
+## SKILLS
+
+| Skill | Purpose |
+|-------|---------|
+| `verification-first` | **Ban assumptions, require test evidence** |
+| `tdd-patterns` | Red-Green-Refactor patterns |
+| `typescript-patterns` | Elite TypeScript patterns |
+| `result-patterns` | Error handling with Result types |
+| `zod-patterns` | Schema-first development |
+| `nix-darwin-patterns` | Nix flakes + home-manager |
+
+---
+
+*v6.0.0 - Verification-first system. "Should" is banned. Test evidence required.*
