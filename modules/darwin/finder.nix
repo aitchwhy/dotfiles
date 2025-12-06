@@ -3,9 +3,16 @@
   config,
   lib,
   ...
-}: let
-  inherit (lib) mkEnableOption mkOption mkIf types;
-in {
+}:
+let
+  inherit (lib)
+    mkEnableOption
+    mkOption
+    mkIf
+    types
+    ;
+in
+{
   options.modules.darwin.finder = {
     enable = mkEnableOption "macOS Finder customization";
 
@@ -16,7 +23,12 @@ in {
     };
 
     defaultView = mkOption {
-      type = types.enum ["icon" "list" "column" "gallery"];
+      type = types.enum [
+        "icon"
+        "list"
+        "column"
+        "gallery"
+      ];
       default = "column";
       description = "Default Finder view style";
     };
@@ -44,9 +56,8 @@ in {
           list = "Nlsv";
           column = "clmv";
           gallery = "glyv";
-        }.${
-          config.modules.darwin.finder.defaultView
-        };
+        }
+        .${config.modules.darwin.finder.defaultView};
 
       # New window settings
       NewWindowTarget = "Other";

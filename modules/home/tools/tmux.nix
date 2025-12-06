@@ -3,9 +3,16 @@
   config,
   lib,
   ...
-}: let
-  inherit (lib) mkEnableOption mkOption mkIf types;
-in {
+}:
+let
+  inherit (lib)
+    mkEnableOption
+    mkOption
+    mkIf
+    types
+    ;
+in
+{
   options.modules.home.tools.tmux = {
     enable = mkEnableOption "tmux configuration";
 

@@ -12,8 +12,15 @@
   config,
   lib,
   ...
-}: let
-  inherit (lib) mkEnableOption mkOption mkIf mkAfter types;
+}:
+let
+  inherit (lib)
+    mkEnableOption
+    mkOption
+    mkIf
+    mkAfter
+    types
+    ;
   cfg = config.modules.darwin.trackpad;
 
   # Click pressure: 0=light, 1=medium, 2=firm
@@ -22,16 +29,13 @@
       light = 0;
       medium = 1;
       firm = 2;
-    }.${
-      cfg.clickPressure
-    };
+    }
+    .${cfg.clickPressure};
 
   # Gesture value: 0=disabled, 2=enabled
-  gestureVal = enabled:
-    if enabled
-    then 2
-    else 0;
-in {
+  gestureVal = enabled: if enabled then 2 else 0;
+in
+{
   options.modules.darwin.trackpad = {
     enable = mkEnableOption "macOS trackpad customization";
 
@@ -57,7 +61,11 @@ in {
     };
 
     clickPressure = mkOption {
-      type = types.enum ["light" "medium" "firm"];
+      type = types.enum [
+        "light"
+        "medium"
+        "firm"
+      ];
       default = "medium";
       description = "Click pressure threshold for Force Touch trackpad";
     };
@@ -152,17 +160,35 @@ in {
       echo ">>> Applying trackpad gesture settings for Swish compatibility..."
 
       # Built-in trackpad
-      /usr/bin/defaults write com.apple.AppleMultitouchTrackpad TrackpadFourFingerPinchGesture -int ${toString (gestureVal (!cfg.disableSystemGestures))}
-      /usr/bin/defaults write com.apple.AppleMultitouchTrackpad TrackpadFourFingerVertSwipeGesture -int ${toString (gestureVal (!cfg.disableSystemGestures))}
-      /usr/bin/defaults write com.apple.AppleMultitouchTrackpad TrackpadFourFingerHorizSwipeGesture -int ${toString (gestureVal (!cfg.disableSystemGestures))}
-      /usr/bin/defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerHorizSwipeGesture -int ${toString (gestureVal (!cfg.disableSystemGestures))}
-      /usr/bin/defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerVertSwipeGesture -int ${toString (gestureVal (!cfg.disableSystemGestures))}
-      /usr/bin/defaults write com.apple.AppleMultitouchTrackpad TrackpadFiveFingerPinchGesture -int ${toString (gestureVal (!cfg.disableSystemGestures))}
+      /usr/bin/defaults write com.apple.AppleMultitouchTrackpad TrackpadFourFingerPinchGesture -int ${
+        toString (gestureVal (!cfg.disableSystemGestures))
+      }
+      /usr/bin/defaults write com.apple.AppleMultitouchTrackpad TrackpadFourFingerVertSwipeGesture -int ${
+        toString (gestureVal (!cfg.disableSystemGestures))
+      }
+      /usr/bin/defaults write com.apple.AppleMultitouchTrackpad TrackpadFourFingerHorizSwipeGesture -int ${
+        toString (gestureVal (!cfg.disableSystemGestures))
+      }
+      /usr/bin/defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerHorizSwipeGesture -int ${
+        toString (gestureVal (!cfg.disableSystemGestures))
+      }
+      /usr/bin/defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerVertSwipeGesture -int ${
+        toString (gestureVal (!cfg.disableSystemGestures))
+      }
+      /usr/bin/defaults write com.apple.AppleMultitouchTrackpad TrackpadFiveFingerPinchGesture -int ${
+        toString (gestureVal (!cfg.disableSystemGestures))
+      }
 
       # Bluetooth trackpad
-      /usr/bin/defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadFourFingerPinchGesture -int ${toString (gestureVal (!cfg.disableSystemGestures))}
-      /usr/bin/defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadFourFingerVertSwipeGesture -int ${toString (gestureVal (!cfg.disableSystemGestures))}
-      /usr/bin/defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadFourFingerHorizSwipeGesture -int ${toString (gestureVal (!cfg.disableSystemGestures))}
+      /usr/bin/defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadFourFingerPinchGesture -int ${
+        toString (gestureVal (!cfg.disableSystemGestures))
+      }
+      /usr/bin/defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadFourFingerVertSwipeGesture -int ${
+        toString (gestureVal (!cfg.disableSystemGestures))
+      }
+      /usr/bin/defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadFourFingerHorizSwipeGesture -int ${
+        toString (gestureVal (!cfg.disableSystemGestures))
+      }
 
       # Refresh preferences daemon
       /usr/bin/killall cfprefsd 2>/dev/null || true

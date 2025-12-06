@@ -13,7 +13,8 @@
   lib,
   pkgs,
   ...
-}: let
+}:
+let
   inherit (lib) mkEnableOption mkIf;
   cfg = config.modules.home.apps.kanata;
 
@@ -102,14 +103,15 @@
       _    _    _    _              _              _    _    _
     )
   '';
-in {
+in
+{
   options.modules.home.apps.kanata = {
     enable = mkEnableOption "Kanata keyboard remapper config";
   };
 
   config = mkIf cfg.enable {
     # Install kanata binary (for manual testing)
-    home.packages = [pkgs.kanata];
+    home.packages = [ pkgs.kanata ];
 
     # Generate config from Nix (not sourced from external file)
     xdg.configFile."kanata/kanata.kbd".text = kanataConfig;

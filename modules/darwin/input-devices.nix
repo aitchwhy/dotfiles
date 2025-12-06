@@ -4,10 +4,17 @@
   config,
   lib,
   ...
-}: let
-  inherit (lib) mkEnableOption mkOption mkIf types;
+}:
+let
+  inherit (lib)
+    mkEnableOption
+    mkOption
+    mkIf
+    types
+    ;
   cfg = config.modules.darwin.inputDevices;
-in {
+in
+{
   options.modules.darwin.inputDevices = {
     enable = mkEnableOption "External input device configuration";
 
@@ -30,7 +37,10 @@ in {
     };
 
     mouseButtonMode = mkOption {
-      type = types.enum ["OneButton" "TwoButton"];
+      type = types.enum [
+        "OneButton"
+        "TwoButton"
+      ];
       default = "TwoButton";
       description = "Mouse button mode for Apple mice";
     };

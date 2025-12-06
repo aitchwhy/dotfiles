@@ -4,10 +4,17 @@
   config,
   lib,
   ...
-}: let
-  inherit (lib) mkEnableOption mkOption mkIf types;
+}:
+let
+  inherit (lib)
+    mkEnableOption
+    mkOption
+    mkIf
+    types
+    ;
   cfg = config.modules.darwin.screenshots;
-in {
+in
+{
   options.modules.darwin.screenshots = {
     enable = mkEnableOption "macOS screenshot customization";
 
@@ -18,7 +25,14 @@ in {
     };
 
     format = mkOption {
-      type = types.enum ["png" "jpg" "pdf" "tiff" "gif" "bmp"];
+      type = types.enum [
+        "png"
+        "jpg"
+        "pdf"
+        "tiff"
+        "gif"
+        "bmp"
+      ];
       default = "png";
       description = "Screenshot file format";
     };

@@ -4,9 +4,11 @@
   lib,
   pkgs,
   ...
-}: let
+}:
+let
   inherit (lib) mkDefault;
-in {
+in
+{
   imports = [
     # UI
     ./dock.nix

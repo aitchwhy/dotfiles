@@ -5,7 +5,8 @@
   config,
   lib,
   ...
-}: let
+}:
+let
   inherit (lib) concatStringsSep mkEnableOption mkIf;
   # Determinate Nix profile paths (in priority order)
   # Primary: /etc/profiles/per-user/hank/bin (where npx actually lives)
@@ -19,21 +20,21 @@
   pathString = concatStringsSep ":" nixPaths;
 
   # Wrapper to inject PATH for Electron apps that can't find Nix binaries
-  wrapNpxCommand = pkg: extraArgs: let
-    argsString =
-      if extraArgs == []
-      then ""
-      else " " + (concatStringsSep " " extraArgs);
-  in {
-    command = "/bin/sh";
-    args = [
-      "-c"
-      "PATH=${pathString}:$PATH exec npx -y ${pkg}${argsString}"
-    ];
-  };
+  wrapNpxCommand =
+    pkg: extraArgs:
+    let
+      argsString = if extraArgs == [ ] then "" else " " + (concatStringsSep " " extraArgs);
+    in
+    {
+      command = "/bin/sh";
+      args = [
+        "-c"
+        "PATH=${pathString}:$PATH exec npx -y ${pkg}${argsString}"
+      ];
+    };
 
   mcpServers = {
-    context7 = wrapNpxCommand "@upstash/context7-mcp" [];
+    context7 = wrapNpxCommand "@upstash/context7-mcp" [ ];
     filesystem = wrapNpxCommand "@modelcontextprotocol/server-filesystem" [
       "$HOME/src"
       "$HOME/dotfiles"
@@ -41,13 +42,14 @@
       "$HOME/Documents"
       "$HOME/Downloads"
     ];
-    memory = wrapNpxCommand "@modelcontextprotocol/server-memory" [];
-    github = wrapNpxCommand "@modelcontextprotocol/server-github" [];
-    "sequential-thinking" = wrapNpxCommand "@modelcontextprotocol/server-sequential-thinking" [];
+    memory = wrapNpxCommand "@modelcontextprotocol/server-memory" [ ];
+    github = wrapNpxCommand "@modelcontextprotocol/server-github" [ ];
+    "sequential-thinking" = wrapNpxCommand "@modelcontextprotocol/server-sequential-thinking" [ ];
   };
 
-  configJson = builtins.toJSON {inherit mcpServers;};
-in {
+  configJson = builtins.toJSON { inherit mcpServers; };
+in
+{
   options.modules.home.apps.claude = {
     enable = mkEnableOption "Claude Desktop MCP servers";
   };

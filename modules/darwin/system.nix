@@ -3,14 +3,25 @@
   config,
   lib,
   ...
-}: let
-  inherit (lib) mkEnableOption mkOption mkIf types;
-in {
+}:
+let
+  inherit (lib)
+    mkEnableOption
+    mkOption
+    mkIf
+    types
+    ;
+in
+{
   options.modules.darwin.system = {
     enable = mkEnableOption "macOS system defaults";
 
     interfaceStyle = mkOption {
-      type = types.enum ["Light" "Dark" "Auto"];
+      type = types.enum [
+        "Light"
+        "Dark"
+        "Auto"
+      ];
       default = "Dark";
       description = "macOS interface style";
     };

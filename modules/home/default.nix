@@ -3,9 +3,11 @@
   config,
   lib,
   ...
-}: let
+}:
+let
   inherit (lib) mkDefault;
-in {
+in
+{
   imports = [
     # Shell
     ./shell/zsh.nix

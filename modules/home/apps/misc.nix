@@ -4,9 +4,11 @@
   config,
   lib,
   ...
-}: let
+}:
+let
   inherit (lib) mkEnableOption mkIf;
-in {
+in
+{
   options.modules.home.apps.misc = {
     enable = mkEnableOption "miscellaneous app configs";
   };
@@ -28,7 +30,7 @@ in {
     # Wispr Flow config - COPY instead of symlink
     # Wispr Flow needs to write vocabulary/dictionary at runtime
     # Base config is tracked in git, runtime changes are preserved
-    home.activation.wisprFlowConfig = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    home.activation.wisprFlowConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       CONFIG_DIR="$HOME/Library/Application Support/Wispr Flow"
       CONFIG_FILE="$CONFIG_DIR/config.json"
       SOURCE_FILE="${../../../config/wispr-flow/config.json}"

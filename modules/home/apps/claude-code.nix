@@ -6,16 +6,18 @@
   lib,
   pkgs,
   ...
-}: let
+}:
+let
   inherit (lib) mkEnableOption mkIf;
-in {
+in
+{
   options.modules.home.apps.claudeCode = {
     enable = mkEnableOption "Claude Code CLI configuration";
   };
 
   config = mkIf config.modules.home.apps.claudeCode.enable {
     # jq required for JSON merging
-    home.packages = [pkgs.jq];
+    home.packages = [ pkgs.jq ];
 
     # Static configs (immutable - symlinked)
     home.file = {
@@ -33,18 +35,21 @@ in {
       ".claude/skills/livekit-agents".source = ../../../config/claude-code/skills/livekit-agents;
 
       # Skills - general TypeScript/engineering patterns
-      ".claude/skills/typescript-patterns".source = ../../../config/claude-code/skills/typescript-patterns;
+      ".claude/skills/typescript-patterns".source =
+        ../../../config/claude-code/skills/typescript-patterns;
       ".claude/skills/zod-patterns".source = ../../../config/claude-code/skills/zod-patterns;
       ".claude/skills/result-patterns".source = ../../../config/claude-code/skills/result-patterns;
       ".claude/skills/tdd-patterns".source = ../../../config/claude-code/skills/tdd-patterns;
-      ".claude/skills/nix-darwin-patterns".source = ../../../config/claude-code/skills/nix-darwin-patterns;
-      ".claude/skills/observability-patterns".source = ../../../config/claude-code/skills/observability-patterns;
+      ".claude/skills/nix-darwin-patterns".source =
+        ../../../config/claude-code/skills/nix-darwin-patterns;
+      ".claude/skills/observability-patterns".source =
+        ../../../config/claude-code/skills/observability-patterns;
       ".claude/skills/clean-code".source = ../../../config/claude-code/skills/clean-code;
       ".claude/skills/twelve-factor".source = ../../../config/claude-code/skills/twelve-factor;
     };
 
     # Mutable configs (merge/copy-on-init pattern with backup and validation)
-    home.activation.claudeCodeConfig = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    home.activation.claudeCodeConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       CLAUDE_DIR="$HOME/.claude"
       SETTINGS_FILE="$CLAUDE_DIR/settings.json"
       MCP_FILE="$HOME/.claude.json"

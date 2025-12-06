@@ -3,9 +3,11 @@
   config,
   lib,
   ...
-}: let
+}:
+let
   inherit (lib) mkEnableOption mkIf;
-in {
+in
+{
   options.modules.darwin.safari = {
     enable = mkEnableOption "Safari customization";
   };

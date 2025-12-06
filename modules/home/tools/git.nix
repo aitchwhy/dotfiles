@@ -4,9 +4,16 @@
   lib,
   pkgs,
   ...
-}: let
-  inherit (lib) mkEnableOption mkOption mkIf types;
-in {
+}:
+let
+  inherit (lib)
+    mkEnableOption
+    mkOption
+    mkIf
+    types
+    ;
+in
+{
   options.modules.home.tools.git = {
     enable = mkEnableOption "Git configuration";
 
