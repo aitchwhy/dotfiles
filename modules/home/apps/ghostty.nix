@@ -66,9 +66,12 @@ with lib;
 
         # Shell integration
         # Using "detect" to let terminal multiplexers (Zellij) handle their own integration
-        # Disabling cursor,title features that conflict with Zellij's terminal management
+        # Features:
+        #   no-cursor,no-title: Prevent conflicts with Zellij's terminal management
+        #   ssh-terminfo: Auto-install xterm-ghostty terminfo on SSH to new servers
+        #   ssh-env: Fallback to xterm-256color if terminfo install fails
         shell-integration = "detect";
-        shell-integration-features = "no-cursor,no-title";
+        shell-integration-features = "no-cursor,no-title,ssh-terminfo,ssh-env";
 
         # Keybinds
         keybind = [
