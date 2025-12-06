@@ -23,7 +23,14 @@ with lib; {
         # Global commit-msg hook - validates conventional commits
         # Managed by: ~/dotfiles/modules/home/tools/git-hooks.nix
 
-        # Skip if repo has its own hook manager
+        # If repo has its own commit-msg hook, delegate to it
+        REPO_HOOK=".git/hooks/commit-msg"
+        if [[ -x "$REPO_HOOK" ]]; then
+          exec "$REPO_HOOK" "$@"
+        fi
+
+        # If repo has a hook manager config but no hook installed yet, skip
+        # (user should run `lefthook install` or `npx husky install`)
         if [[ -f "lefthook.yml" ]] || [[ -f ".lefthook.yml" ]] || [[ -d ".husky" ]]; then
           exit 0
         fi
