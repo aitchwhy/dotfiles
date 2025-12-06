@@ -1,9 +1,11 @@
 # Yazi file manager configuration
-{ config, lib, ... }:
-
-with lib;
-
 {
+  config,
+  lib,
+  ...
+}: let
+  inherit (lib) mkEnableOption mkIf;
+in {
   options.modules.home.tools.yazi = {
     enable = mkEnableOption "yazi file manager";
   };

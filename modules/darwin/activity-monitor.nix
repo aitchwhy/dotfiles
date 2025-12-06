@@ -1,9 +1,11 @@
 # Activity Monitor configuration
-{ config, lib, ... }:
-
-with lib;
-
 {
+  config,
+  lib,
+  ...
+}: let
+  inherit (lib) mkEnableOption mkIf;
+in {
   options.modules.darwin.activityMonitor = {
     enable = mkEnableOption "Activity Monitor customization";
   };

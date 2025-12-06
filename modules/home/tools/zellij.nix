@@ -1,9 +1,11 @@
 # Zellij terminal multiplexer configuration
-{ config, lib, ... }:
-
-with lib;
-
 {
+  config,
+  lib,
+  ...
+}: let
+  inherit (lib) mkEnableOption mkIf;
+in {
   options.modules.home.tools.zellij = {
     enable = mkEnableOption "zellij terminal multiplexer";
   };

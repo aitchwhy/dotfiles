@@ -1,15 +1,17 @@
 # macOS keyboard configuration
-{ config, lib, ... }:
-
-with lib;
-
 {
+  config,
+  lib,
+  ...
+}: let
+  inherit (lib) mkEnableOption mkOption mkIf types;
+in {
   options.modules.darwin.keyboard = {
     enable = mkEnableOption "macOS keyboard customization";
 
     remapCapsLock = mkOption {
-      type = types.enum [ "none" "escape" "control" ];
-      default = "none";  # Kanata handles CapsLock -> Escape/Hyper
+      type = types.enum ["none" "escape" "control"];
+      default = "none"; # Kanata handles CapsLock -> Escape/Hyper
       description = "Remap Caps Lock key";
     };
   };

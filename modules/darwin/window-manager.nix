@@ -1,13 +1,13 @@
 # macOS Window Manager configuration
 # Controls Stage Manager, desktop icons, and window behavior
-{ config, lib, ... }:
-
-with lib;
-
-let
-  cfg = config.modules.darwin.windowManager;
-in
 {
+  config,
+  lib,
+  ...
+}: let
+  inherit (lib) mkEnableOption mkOption mkIf types;
+  cfg = config.modules.darwin.windowManager;
+in {
   options.modules.darwin.windowManager = {
     enable = mkEnableOption "macOS Window Manager configuration";
 

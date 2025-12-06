@@ -1,9 +1,11 @@
 # Starship prompt configuration
-{ config, lib, ... }:
-
-with lib;
-
 {
+  config,
+  lib,
+  ...
+}: let
+  inherit (lib) mkEnableOption mkIf concatStrings;
+in {
   options.modules.home.shell.starship = {
     enable = mkEnableOption "starship prompt";
   };

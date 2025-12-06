@@ -6,8 +6,9 @@
   lib,
   pkgs,
   ...
-}:
-with lib; {
+}: let
+  inherit (lib) mkEnableOption mkIf;
+in {
   options.modules.home.apps.claudeCode = {
     enable = mkEnableOption "Claude Code CLI configuration";
   };
@@ -38,6 +39,8 @@ with lib; {
       ".claude/skills/tdd-patterns".source = ../../../config/claude-code/skills/tdd-patterns;
       ".claude/skills/nix-darwin-patterns".source = ../../../config/claude-code/skills/nix-darwin-patterns;
       ".claude/skills/observability-patterns".source = ../../../config/claude-code/skills/observability-patterns;
+      ".claude/skills/clean-code".source = ../../../config/claude-code/skills/clean-code;
+      ".claude/skills/twelve-factor".source = ../../../config/claude-code/skills/twelve-factor;
     };
 
     # Mutable configs (merge/copy-on-init pattern with backup and validation)

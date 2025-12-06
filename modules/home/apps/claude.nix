@@ -5,8 +5,8 @@
   config,
   lib,
   ...
-}:
-with lib; let
+}: let
+  inherit (lib) concatStringsSep mkEnableOption mkIf;
   # Determinate Nix profile paths (in priority order)
   # Primary: /etc/profiles/per-user/hank/bin (where npx actually lives)
   # Fallbacks for different Nix setups

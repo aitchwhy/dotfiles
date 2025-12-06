@@ -1,9 +1,11 @@
 # Zsh shell configuration
-{ config, lib, ... }:
-
-with lib;
-
 {
+  config,
+  lib,
+  ...
+}: let
+  inherit (lib) mkEnableOption mkIf;
+in {
   options.modules.home.shell.zsh = {
     enable = mkEnableOption "Zsh shell configuration";
   };

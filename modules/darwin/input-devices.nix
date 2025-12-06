@@ -1,13 +1,13 @@
 # macOS input device configuration
 # Mouse, external trackpad, and other pointing device settings
-{ config, lib, ... }:
-
-with lib;
-
-let
-  cfg = config.modules.darwin.inputDevices;
-in
 {
+  config,
+  lib,
+  ...
+}: let
+  inherit (lib) mkEnableOption mkOption mkIf types;
+  cfg = config.modules.darwin.inputDevices;
+in {
   options.modules.darwin.inputDevices = {
     enable = mkEnableOption "External input device configuration";
 

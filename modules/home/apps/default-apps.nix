@@ -5,8 +5,9 @@
   lib,
   pkgs,
   ...
-}:
-with lib; {
+}: let
+  inherit (lib) mkEnableOption mkIf;
+in {
   options.modules.home.apps.defaultApps = {
     enable = mkEnableOption "default application handlers";
   };

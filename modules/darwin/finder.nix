@@ -1,9 +1,11 @@
 # macOS Finder configuration
-{ config, lib, ... }:
-
-with lib;
-
 {
+  config,
+  lib,
+  ...
+}: let
+  inherit (lib) mkEnableOption mkOption mkIf types;
+in {
   options.modules.darwin.finder = {
     enable = mkEnableOption "macOS Finder customization";
 
@@ -14,7 +16,7 @@ with lib;
     };
 
     defaultView = mkOption {
-      type = types.enum [ "icon" "list" "column" "gallery" ];
+      type = types.enum ["icon" "list" "column" "gallery"];
       default = "column";
       description = "Default Finder view style";
     };
@@ -36,12 +38,15 @@ with lib;
       FXDefaultSearchScope = "SCcf"; # Search current folder
 
       # View settings
-      FXPreferredViewStyle = {
-        icon = "icnv";
-        list = "Nlsv";
-        column = "clmv";
-        gallery = "glyv";
-      }.${config.modules.darwin.finder.defaultView};
+      FXPreferredViewStyle =
+        {
+          icon = "icnv";
+          list = "Nlsv";
+          column = "clmv";
+          gallery = "glyv";
+        }.${
+          config.modules.darwin.finder.defaultView
+        };
 
       # New window settings
       NewWindowTarget = "Other";

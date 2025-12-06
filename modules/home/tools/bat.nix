@@ -1,9 +1,11 @@
 # Bat (cat replacement) configuration
-{ config, lib, ... }:
-
-with lib;
-
 {
+  config,
+  lib,
+  ...
+}: let
+  inherit (lib) mkEnableOption mkIf;
+in {
   options.modules.home.tools.bat = {
     enable = mkEnableOption "bat syntax highlighting";
   };

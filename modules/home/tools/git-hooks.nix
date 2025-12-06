@@ -5,8 +5,9 @@
   lib,
   pkgs,
   ...
-}:
-with lib; {
+}: let
+  inherit (lib) mkEnableOption mkIf;
+in {
   options.modules.home.tools.git-hooks = {
     enable = mkEnableOption "global git hooks";
   };

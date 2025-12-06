@@ -6,14 +6,14 @@
 #
 # NOTE: Bartender is installed via Homebrew (modules/homebrew.nix)
 # This module is for tracking and potential future defaults management.
-{ config, lib, ... }:
-
-with lib;
-
-let
-  cfg = config.modules.home.apps.bartender;
-in
 {
+  config,
+  lib,
+  ...
+}: let
+  inherit (lib) mkEnableOption mkOption mkIf types;
+  cfg = config.modules.home.apps.bartender;
+in {
   options.modules.home.apps.bartender = {
     enable = mkEnableOption "Bartender menu bar organizer";
 

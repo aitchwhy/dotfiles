@@ -2,7 +2,7 @@
   description = "Hank's Nix Configuration";
 
   nixConfig = {
-    experimental-features = [ "nix-command" "flakes" ];
+    experimental-features = ["nix-command" "flakes"];
     warn-dirty = false;
     accept-flake-config = true;
   };
@@ -23,15 +23,20 @@
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
   };
 
-  outputs = { self, nixpkgs, nix-darwin, home-manager, nix-homebrew, ... }@inputs:
-  let
+  outputs = {
+    self,
+    nixpkgs,
+    nix-darwin,
+    home-manager,
+    nix-homebrew,
+    ...
+  } @ inputs: let
     system = "aarch64-darwin";
     pkgs = nixpkgs.legacyPackages.${system};
-  in
-  {
+  in {
     darwinConfigurations.hank-mbp-m4 = nix-darwin.lib.darwinSystem {
       inherit system;
-      specialArgs = { inherit inputs self; };
+      specialArgs = {inherit inputs self;};
       modules = [
         ./modules/nixpkgs.nix
         ./modules/darwin
@@ -48,7 +53,7 @@
             shell = pkgs.zsh;
           };
           programs.zsh.enable = true;
-          environment.shells = [ pkgs.bashInteractive pkgs.zsh ];
+          environment.shells = [pkgs.bashInteractive pkgs.zsh];
         }
 
         # Home Manager
@@ -57,7 +62,7 @@
           home-manager = {
             useGlobalPkgs = true;
             useUserPackages = true;
-            extraSpecialArgs = { inherit inputs self; };
+            extraSpecialArgs = {inherit inputs self;};
             users.hank = import ./users/hank.nix;
             backupFileExtension = "backup";
           };
@@ -77,7 +82,7 @@
 
     # Development shell
     devShells.${system}.default = pkgs.mkShell {
-      packages = with pkgs; [ nixd nixfmt-rfc-style deadnix statix just git fd ];
+      packages = with pkgs; [nixd nixfmt-rfc-style deadnix statix just git fd];
       shellHook = ''
         echo "Nix Darwin Dev Shell"
         echo "  rebuild  - darwin-rebuild switch --flake .#hank-mbp-m4"

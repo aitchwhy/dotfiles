@@ -1,10 +1,13 @@
 # Wispr Flow voice dictation - manual installation via activation script
 # No Homebrew cask available, downloads directly from wisprflow.ai
-{ config, lib, pkgs, ... }:
-
-with lib;
-
 {
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  inherit (lib) mkEnableOption mkIf;
+in {
   options.modules.darwin.apps.wisprFlow = {
     enable = mkEnableOption "Wispr Flow voice dictation";
   };

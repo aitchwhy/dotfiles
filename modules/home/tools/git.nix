@@ -1,9 +1,12 @@
 # Git configuration and tools
-{ config, lib, pkgs, ... }:
-
-with lib;
-
 {
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  inherit (lib) mkEnableOption mkOption mkIf types;
+in {
   options.modules.home.tools.git = {
     enable = mkEnableOption "Git configuration";
 

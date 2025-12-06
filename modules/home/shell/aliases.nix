@@ -3,8 +3,9 @@
   config,
   lib,
   ...
-}:
-with lib; {
+}: let
+  inherit (lib) mkEnableOption mkOption mkIf types optionalAttrs;
+in {
   options.modules.home.shell.aliases = {
     enable = mkEnableOption "shell aliases";
 

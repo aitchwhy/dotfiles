@@ -1,9 +1,11 @@
 # Atuin shell history configuration
-{ config, lib, ... }:
-
-with lib;
-
 {
+  config,
+  lib,
+  ...
+}: let
+  inherit (lib) mkEnableOption mkIf;
+in {
   options.modules.home.tools.atuin = {
     enable = mkEnableOption "atuin shell history";
   };
@@ -56,7 +58,7 @@ with lib;
           "yarn"
         ];
 
-        common_prefix = [ "sudo" ];
+        common_prefix = ["sudo"];
 
         sync.records = true;
         theme.name = "autumn";

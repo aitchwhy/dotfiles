@@ -1,9 +1,11 @@
 # Safari browser configuration
-{ config, lib, ... }:
-
-with lib;
-
 {
+  config,
+  lib,
+  ...
+}: let
+  inherit (lib) mkEnableOption mkIf;
+in {
   options.modules.darwin.safari = {
     enable = mkEnableOption "Safari customization";
   };

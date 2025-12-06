@@ -8,27 +8,30 @@
 #   3. com.apple.driver.AppleBluetoothMultitouch.trackpad (external trackpad)
 #
 # TEST: After applying, 4-finger gestures should NOT trigger Mission Control/Launchpad
-{ config, lib, ... }:
-
-with lib;
-
-let
+{
+  config,
+  lib,
+  ...
+}: let
+  inherit (lib) mkEnableOption mkOption mkIf mkAfter types;
   cfg = config.modules.darwin.trackpad;
 
   # Click pressure: 0=light, 1=medium, 2=firm
-  clickThreshold = {
-    light = 0;
-    medium = 1;
-    firm = 2;
-  }.${cfg.clickPressure};
+  clickThreshold =
+    {
+      light = 0;
+      medium = 1;
+      firm = 2;
+    }.${
+      cfg.clickPressure
+    };
 
   # Gesture value: 0=disabled, 2=enabled
   gestureVal = enabled:
     if enabled
     then 2
     else 0;
-in
-{
+in {
   options.modules.darwin.trackpad = {
     enable = mkEnableOption "macOS trackpad customization";
 

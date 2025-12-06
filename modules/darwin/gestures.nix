@@ -10,14 +10,14 @@
 #   37 = Show Desktop (another binding)
 #   160 = Launchpad
 #   163 = Notification Center
-{ config, lib, ... }:
-
-with lib;
-
-let
-  cfg = config.modules.darwin.gestures;
-in
 {
+  config,
+  lib,
+  ...
+}: let
+  inherit (lib) mkEnableOption mkOption mkIf types;
+  cfg = config.modules.darwin.gestures;
+in {
   options.modules.darwin.gestures = {
     enable = mkEnableOption "macOS gesture and hotkey customization";
 

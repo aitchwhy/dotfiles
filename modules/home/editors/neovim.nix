@@ -1,9 +1,11 @@
 # Neovim editor configuration
-{ config, lib, ... }:
-
-with lib;
-
 {
+  config,
+  lib,
+  ...
+}: let
+  inherit (lib) mkEnableOption mkOption mkIf types;
+in {
   options.modules.home.editors.neovim = {
     enable = mkEnableOption "Neovim editor";
 

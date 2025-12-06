@@ -1,9 +1,11 @@
 # Terminal.app configuration
-{ config, lib, ... }:
-
-with lib;
-
 {
+  config,
+  lib,
+  ...
+}: let
+  inherit (lib) mkEnableOption mkIf;
+in {
   options.modules.darwin.terminal = {
     enable = mkEnableOption "Terminal.app customization";
   };

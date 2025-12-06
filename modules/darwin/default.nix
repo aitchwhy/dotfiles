@@ -1,9 +1,12 @@
 # macOS (Darwin) system configuration module aggregator
-{ config, lib, pkgs, ... }:
-
-with lib;
-
 {
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  inherit (lib) mkDefault;
+in {
   imports = [
     # UI
     ./dock.nix

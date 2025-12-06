@@ -4,10 +4,9 @@
 # - Cloud platform CLIs and infrastructure tools
 # - User-specific Git configuration
 # - Personal productivity tools
-{ pkgs, ... }:
-{
+{pkgs, ...}: {
   # Import home modules
-  imports = [ ../modules/home ];
+  imports = [../modules/home];
 
   # User identity
   home = {

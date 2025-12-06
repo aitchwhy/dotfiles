@@ -8,14 +8,14 @@
 #   - Alt + f: Toggle fullscreen
 #
 # Trackpad gestures are handled by Swish (not AeroSpace)
-{ config, lib, ... }:
-
-with lib;
-
-let
-  cfg = config.modules.home.apps.aerospace;
-in
 {
+  config,
+  lib,
+  ...
+}: let
+  inherit (lib) mkEnableOption mkIf;
+  cfg = config.modules.home.apps.aerospace;
+in {
   options.modules.home.apps.aerospace = {
     enable = mkEnableOption "AeroSpace tiling window manager";
   };

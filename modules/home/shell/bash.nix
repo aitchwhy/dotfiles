@@ -1,9 +1,11 @@
 # Bash shell configuration
-{ config, lib, ... }:
-
-with lib;
-
 {
+  config,
+  lib,
+  ...
+}: let
+  inherit (lib) mkEnableOption mkIf;
+in {
   options.modules.home.shell.bash = {
     enable = mkEnableOption "Bash shell configuration";
   };

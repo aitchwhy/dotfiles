@@ -1,10 +1,12 @@
 # Raycast launcher configuration
 # Key settings managed via plist defaults
-{ config, lib, ... }:
-
-with lib;
-
 {
+  config,
+  lib,
+  ...
+}: let
+  inherit (lib) mkEnableOption mkIf;
+in {
   options.modules.home.apps.raycast = {
     enable = mkEnableOption "Raycast launcher settings";
   };

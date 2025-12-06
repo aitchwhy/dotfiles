@@ -1,10 +1,12 @@
 # Custom keyboard layout without dead keys or special characters
 # Option key acts purely as a modifier (for Karabiner/Hammerspoon)
-{ config, lib, ... }:
-
-with lib;
-
 {
+  config,
+  lib,
+  ...
+}: let
+  inherit (lib) mkEnableOption mkIf;
+in {
   options.modules.home.apps.keyboardLayout = {
     enable = mkEnableOption "US keyboard layout without special characters on Option";
   };

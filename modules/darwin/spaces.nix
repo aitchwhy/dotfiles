@@ -1,13 +1,13 @@
 # macOS Spaces / Mission Control configuration
 # Controls space behavior, auto-rearranging, and multi-display handling
-{ config, lib, ... }:
-
-with lib;
-
-let
-  cfg = config.modules.darwin.spaces;
-in
 {
+  config,
+  lib,
+  ...
+}: let
+  inherit (lib) mkEnableOption mkOption mkIf types;
+  cfg = config.modules.darwin.spaces;
+in {
   options.modules.darwin.spaces = {
     enable = mkEnableOption "macOS Spaces/Mission Control configuration";
 

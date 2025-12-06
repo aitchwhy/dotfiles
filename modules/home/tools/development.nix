@@ -1,9 +1,12 @@
 # Development tools configuration
-{ config, lib, pkgs, ... }:
-
-with lib;
-
 {
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  inherit (lib) mkEnableOption mkOption mkIf types;
+in {
   options.modules.home.tools.development = {
     enable = mkEnableOption "development tools";
 

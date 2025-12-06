@@ -1,10 +1,13 @@
 # Ghostty terminal configuration
 # Uses native home-manager programs.ghostty module
-{ config, lib, pkgs, ... }:
-
-with lib;
-
 {
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  inherit (lib) mkEnableOption mkIf;
+in {
   options.modules.home.apps.ghostty = {
     enable = mkEnableOption "ghostty terminal";
   };

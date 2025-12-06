@@ -1,13 +1,13 @@
 # macOS screenshot configuration
 # Controls format, location, shadow, and other screenshot behavior
-{ config, lib, ... }:
-
-with lib;
-
-let
-  cfg = config.modules.darwin.screenshots;
-in
 {
+  config,
+  lib,
+  ...
+}: let
+  inherit (lib) mkEnableOption mkOption mkIf types;
+  cfg = config.modules.darwin.screenshots;
+in {
   options.modules.darwin.screenshots = {
     enable = mkEnableOption "macOS screenshot customization";
 

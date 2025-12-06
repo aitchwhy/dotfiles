@@ -9,14 +9,14 @@
 #
 # NOTE: Requires system trackpad gestures to be DISABLED
 # (see modules/darwin/trackpad.nix disableSystemGestures option)
-{ config, lib, ... }:
-
-with lib;
-
-let
-  cfg = config.modules.home.apps.swish;
-in
 {
+  config,
+  lib,
+  ...
+}: let
+  inherit (lib) mkEnableOption mkOption mkIf types;
+  cfg = config.modules.home.apps.swish;
+in {
   options.modules.home.apps.swish = {
     enable = mkEnableOption "Swish trackpad window management";
 

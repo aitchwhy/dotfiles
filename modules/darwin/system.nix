@@ -1,14 +1,16 @@
 # macOS system-wide defaults
-{ config, lib, ... }:
-
-with lib;
-
 {
+  config,
+  lib,
+  ...
+}: let
+  inherit (lib) mkEnableOption mkOption mkIf types;
+in {
   options.modules.darwin.system = {
     enable = mkEnableOption "macOS system defaults";
 
     interfaceStyle = mkOption {
-      type = types.enum [ "Light" "Dark" "Auto" ];
+      type = types.enum ["Light" "Dark" "Auto"];
       default = "Dark";
       description = "macOS interface style";
     };
@@ -41,8 +43,8 @@ with lib;
 
       # Keyboard behavior
       ApplePressAndHoldEnabled = false;
-      InitialKeyRepeat = 15;  # was 10 (fastest) - more reasonable delay
-      KeyRepeat = 2;          # was 1 (fastest) - still fast but less aggressive
+      InitialKeyRepeat = 15; # was 10 (fastest) - more reasonable delay
+      KeyRepeat = 2; # was 1 (fastest) - still fast but less aggressive
 
       # Text input
       NSAutomaticCapitalizationEnabled = false;
