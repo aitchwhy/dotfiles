@@ -238,6 +238,16 @@
             "timeout": 5
           }
         ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run \"$HOME/dotfiles/config/claude-code/evolution/hooks/tdd-enforcer.ts\"",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "SessionStart": [
@@ -276,6 +286,24 @@
             "type": "command",
             "command": "bash \"$HOME/dotfiles/config/claude-code/evolution/hooks/session-stop.sh\"",
             "timeout": 30
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run \"$HOME/dotfiles/config/claude-code/evolution/hooks/verification-gate.ts\"",
+            "timeout": 15
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run \"$HOME/dotfiles/config/claude-code/evolution/hooks/assumption-detector.ts\"",
+            "timeout": 15
           }
         ]
       }
