@@ -27,3 +27,6 @@ lib/clients/api/specs/
 
 # Claude Code local settings (user-specific, not config)
 .claude/settings.local.json
+
+# Evolution system runtime metrics (machine-specific)
+.claude-metrics/
