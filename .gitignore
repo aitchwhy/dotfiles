@@ -1,3 +1,6 @@
+# Nix build outputs
+result
+
 # Generated files
 repomix-output.xml
 state.yml
