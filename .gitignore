@@ -30,3 +30,11 @@ lib/clients/api/specs/
 
 # Evolution system runtime metrics (machine-specific)
 .claude-metrics/
+
+# Secrets (never commit)
+.env
+.env.local
+.env.*.local
+.envrc
+*.gpg
+.dev.vars
