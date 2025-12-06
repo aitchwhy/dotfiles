@@ -19,7 +19,7 @@ import { printGradeResult, runAllGraders } from './graders';
 const command = process.argv[2];
 const args = process.argv.slice(3);
 
-const DOTFILES_PATH = process.env.DOTFILES ?? `${process.env.HOME}/dotfiles`;
+const DOTFILES_PATH = process.env['DOTFILES'] ?? `${process.env['HOME']}/dotfiles`;
 
 // ============================================================================
 // Commands
@@ -69,7 +69,7 @@ async function gradeCommand(options: { ci?: boolean; save?: boolean }): Promise<
             passed: output.passed,
             issues: JSON.stringify(output.issues),
             raw_output: output.rawOutput ?? null,
-            execution_time_ms: output.metrics?.execution_time_ms ?? null,
+            execution_time_ms: output.metrics?.['execution_time_ms'] ?? null,
           };
           db.insertGraderRun(runInsert);
         }
@@ -163,7 +163,7 @@ async function auditCommand(): Promise<number> {
   }
 
   // Focus on safety results
-  const safetyResult = result.data.results.safety;
+  const safetyResult = result.data.results['safety'];
   if (safetyResult) {
     console.log('\n🔒 SECURITY AUDIT RESULTS');
     console.log('='.repeat(60));

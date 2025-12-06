@@ -21,7 +21,7 @@ const THRESHOLDS = {
 
 export class PerformanceGrader extends BaseGrader {
   constructor(dotfilesPath?: string) {
-    super(DEFAULT_GRADER_CONFIGS.performance!, dotfilesPath);
+    super(DEFAULT_GRADER_CONFIGS['performance']!, dotfilesPath);
   }
 
   protected async execute(): Promise<GraderOutput> {

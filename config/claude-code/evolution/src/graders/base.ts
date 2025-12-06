@@ -16,7 +16,7 @@ export abstract class BaseGrader {
 
   constructor(config: GraderConfig, dotfilesPath?: string) {
     this.config = config;
-    this.dotfilesPath = dotfilesPath ?? `${process.env.HOME}/dotfiles`;
+    this.dotfilesPath = dotfilesPath ?? `${process.env['HOME']}/dotfiles`;
   }
 
   /**
@@ -40,7 +40,7 @@ export abstract class BaseGrader {
 
     // Add execution time metric if successful
     if (result.ok && result.data.metrics) {
-      result.data.metrics.execution_time_ms = Date.now() - startTime;
+      result.data.metrics['execution_time_ms'] = Date.now() - startTime;
     }
 
     return result;

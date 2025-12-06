@@ -47,7 +47,7 @@ const SCANNABLE_EXTENSIONS = [
 
 export class SafetyGrader extends BaseGrader {
   constructor(dotfilesPath?: string) {
-    super(DEFAULT_GRADER_CONFIGS.safety!, dotfilesPath);
+    super(DEFAULT_GRADER_CONFIGS['safety']!, dotfilesPath);
   }
 
   protected async execute(): Promise<GraderOutput> {
@@ -175,7 +175,7 @@ export class SafetyGrader extends BaseGrader {
       { path: '.config/gh', maxMode: 0o700 },
     ];
 
-    const home = process.env.HOME ?? '';
+    const home = process.env['HOME'] ?? '';
 
     for (const { path, maxMode } of sensitiveLocations) {
       const fullPath = join(home, path);

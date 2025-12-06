@@ -11,8 +11,8 @@ import { join } from 'node:path';
 import { closeDB, getDB } from '../src/db/client';
 import type { EvolutionCycleInsert, GraderRunInsert, LessonInsert } from '../src/db/schema';
 
-const HOME = process.env.HOME ?? '';
-const DOTFILES = process.env.DOTFILES ?? join(HOME, 'dotfiles');
+const HOME = process.env['HOME'] ?? '';
+const DOTFILES = process.env['DOTFILES'] ?? join(HOME, 'dotfiles');
 const METRICS_DIR = join(HOME, 'dotfiles', '.claude-metrics');
 
 // ============================================================================

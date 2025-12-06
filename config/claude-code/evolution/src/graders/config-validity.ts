@@ -169,7 +169,7 @@ export class ConfigValidityGrader extends BaseGrader {
     validCount: number;
   } {
     const issues: GraderIssue[] = [];
-    const home = process.env.HOME ?? '';
+    const home = process.env['HOME'] ?? '';
     let validCount = 0;
 
     for (const link of CRITICAL_SYMLINKS) {

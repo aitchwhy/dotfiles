@@ -45,7 +45,12 @@ import {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const DEFAULT_DB_PATH = join(process.env.HOME ?? '', 'dotfiles', '.claude-metrics', 'evolution.db');
+const DEFAULT_DB_PATH = join(
+  process.env['HOME'] ?? '',
+  'dotfiles',
+  '.claude-metrics',
+  'evolution.db'
+);
 const MIGRATIONS_DIR = join(__dirname, 'migrations');
 
 // ============================================================================
@@ -55,9 +60,9 @@ const MIGRATIONS_DIR = join(__dirname, 'migrations');
 export class EvolutionDB {
   private db: Database;
 
-  private constructor(db: Database, dbPath: string) {
+  private constructor(db: Database, _dbPath: string) {
     this.db = db;
-    this.dbPath = dbPath;
+    // dbPath stored for potential future debugging use
   }
 
   /**
@@ -302,7 +307,7 @@ export class EvolutionDB {
       if (!row) throw new Error('Insert failed');
       return GraderRunSchema.parse({
         ...row,
-        passed: Boolean((row as Record<string, unknown>).passed),
+        passed: Boolean((row as Record<string, unknown>)['passed']),
       });
     });
   }
