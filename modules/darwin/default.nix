@@ -34,7 +34,7 @@ with lib;
       keyboard.enable = mkDefault true;
       trackpad.enable = mkDefault true;
       kanata.enable = mkDefault true;
-      safari.enable = mkDefault true;
+      safari.enable = mkDefault false; # Disabled: macOS sandboxing prevents writing to Safari container
       terminal.enable = mkDefault true;
       activityMonitor.enable = mkDefault true;
       xcode.enable = mkDefault true;
