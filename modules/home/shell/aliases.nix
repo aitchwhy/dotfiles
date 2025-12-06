@@ -32,8 +32,8 @@ with lib; {
         la = "ls -la";
         lt = "ls -la --tree";
 
-        # Modern CLI replacements
-        cat = "bat";
+        # Modern CLI replacements (use bat/fd/rg explicitly when needed)
+        # NOTE: cat alias removed - breaks heredoc in tooling (Claude Code commits)
         find = "fd";
         grep = "rg";
         ls = "eza --git --icons";
