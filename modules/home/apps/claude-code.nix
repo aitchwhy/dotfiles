@@ -46,6 +46,8 @@ in
         ../../../config/claude-code/skills/observability-patterns;
       ".claude/skills/clean-code".source = ../../../config/claude-code/skills/clean-code;
       ".claude/skills/twelve-factor".source = ../../../config/claude-code/skills/twelve-factor;
+      ".claude/skills/verification-first".source =
+        ../../../config/claude-code/skills/verification-first;
     };
 
     # Mutable configs (merge/copy-on-init pattern with backup and validation)
@@ -126,7 +128,7 @@ in
       # Ensure session log exists
       $DRY_RUN_CMD touch "$CLAUDE_DIR/session.log"
 
-      echo "Claude Code v5.0 configuration ready"
+      echo "Claude Code v6.0 configuration ready (verification-first)"
     '';
   };
 }
