@@ -216,6 +216,16 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/dotfiles/config/claude-code/evolution/hooks/post-edit.sh\"",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "PreToolUse": [
@@ -239,6 +249,15 @@
             "command": "echo \"[$(date '+%Y-%m-%d %H:%M:%S')] Session: $(pwd)\" >> ~/.claude/session.log"
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/dotfiles/config/claude-code/evolution/hooks/session-start.sh\"",
+            "timeout": 5
+          }
+        ]
       }
     ],
     "Stop": [
@@ -248,6 +267,15 @@
             "type": "command",
             "command": "echo \"[$(date '+%Y-%m-%d %H:%M:%S')] Session ended | Dir: $(basename \"$PWD\") | Files: $(git diff --name-only HEAD~5 2>/dev/null | wc -l | tr -d ' ') modified | Commits: $(git log --oneline --since='1 hour ago' 2>/dev/null | wc -l | tr -d ' ')\" >> ~/.claude/session.log",
             "timeout": 10
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/dotfiles/config/claude-code/evolution/hooks/session-stop.sh\"",
+            "timeout": 30
           }
         ]
       }
