@@ -5,16 +5,18 @@
   lib,
   pkgs,
   ...
-}: let
+}:
+let
   inherit (lib) mkEnableOption mkIf;
-in {
+in
+{
   options.modules.home.tools.git-hooks = {
     enable = mkEnableOption "global git hooks";
   };
 
   config = mkIf config.modules.home.tools.git-hooks.enable {
     # Set global hooks path
-    programs.git.extraConfig.core.hooksPath = "${config.home.homeDirectory}/.config/git/hooks";
+    programs.git.settings.core.hooksPath = "${config.home.homeDirectory}/.config/git/hooks";
 
     # Create commit-msg hook
     home.file.".config/git/hooks/commit-msg" = {
