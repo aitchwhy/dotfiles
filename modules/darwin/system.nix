@@ -77,35 +77,13 @@ with lib;
       ShowDayOfWeek = true;
     };
 
-    # Screenshots
-    system.defaults.CustomUserPreferences."com.apple.screencapture" = {
-      location = "~/Desktop/Screenshots";
-      type = "png";
-      disable-shadow = true;
-      include-date = true;
-    };
+    # NOTE: Screenshots moved to screenshots.nix
+    # NOTE: Spaces moved to spaces.nix
+    # NOTE: Window Manager moved to window-manager.nix
 
     # Disable ads
     system.defaults.CustomUserPreferences."com.apple.AdLib" = {
       allowApplePersonalizedAdvertising = false;
-    };
-
-    # Spaces
-    system.defaults.CustomUserPreferences."com.apple.spaces" = {
-      "spans-displays" = 0;
-      "mru-spaces" = false;
-    };
-
-    # Window Manager
-    system.defaults.CustomUserPreferences."com.apple.WindowManager" = {
-      EnableStandardClickToShowDesktop = 0;
-      StandardHideDesktopIcons = 0;
-      HideDesktop = 0;
-      StageManagerHideWidgets = 0;
-      StandardHideWidgets = 0;
-      GloballyEnabled = false;
-      # macOS Tahoe 26 - Show solid menu bar background (vs floating Liquid Glass)
-      ShowMenuBarBackground = true;
     };
 
     # macOS Tahoe 26 - Spotlight clipboard history
@@ -123,8 +101,8 @@ with lib;
     system.defaults.CustomUserPreferences."com.apple.ImageCapture".disableHotPlug = true;
 
     # Other defaults
+    # NOTE: AppleSpacesSwitchOnActivate moved to spaces.nix
     system.defaults.CustomUserPreferences.".GlobalPreferences" = {
-      AppleSpacesSwitchOnActivate = true;
       WebAutomaticTextReplacementEnabled = false;
       WebContinuousSpellCheckingEnabled = false;
       WebAutomaticSpellingCorrectionEnabled = false;
