@@ -15,7 +15,9 @@
     };
 
     # Taps (formula repositories)
-    taps = [];
+    taps = [
+      "nikitabobko/tap" # AeroSpace tiling window manager
+    ];
 
     # CLI tools (most in home.packages via Nix)
     brews = [];
@@ -107,8 +109,13 @@
       # System Utilities
       # ─────────────────────────────────────────────────────────────
       "karabiner-elements" # DriverKit driver for Kanata
-      "hammerspoon" # macOS automation
       "homerow" # Keyboard shortcuts for screen elements
+
+      # ─────────────────────────────────────────────────────────────
+      # Window Management (replaces Hammerspoon)
+      # ─────────────────────────────────────────────────────────────
+      "swish" # Trackpad gestures for window management
+      "aerospace" # Tiling window manager (from nikitabobko/tap)
 
       # ─────────────────────────────────────────────────────────────
       # QuickLook Plugins
