@@ -5,7 +5,7 @@
  * Covers multiple languages: TypeScript, JavaScript, Python, Go, Rust, Shell
  */
 
-import { describe, test, expect } from 'bun:test';
+import { describe, expect, test } from 'bun:test';
 
 // ============================================================================
 // Multi-Language TDD Enforcer Tests
@@ -340,16 +340,14 @@ describe('Assumption Detector', () => {
 
     for (const pattern of HIGH_SEVERITY_PATTERNS) {
       pattern.lastIndex = 0;
-      let match;
-      while ((match = pattern.exec(text)) !== null) {
+      for (const match of text.matchAll(pattern)) {
         high.push(match[0]);
       }
     }
 
     for (const pattern of MEDIUM_SEVERITY_PATTERNS) {
       pattern.lastIndex = 0;
-      let match;
-      while ((match = pattern.exec(text)) !== null) {
+      for (const match of text.matchAll(pattern)) {
         medium.push(match[0]);
       }
     }

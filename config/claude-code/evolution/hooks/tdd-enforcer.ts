@@ -234,7 +234,7 @@ async function main() {
     return;
   }
 
-  let input;
+  let input: z.infer<typeof HookInputSchema>;
   try {
     input = HookInputSchema.parse(JSON.parse(rawInput));
   } catch {
@@ -306,7 +306,10 @@ async function main() {
 Write the test FIRST (Red phase), then implement the code.
 
 Expected one of:
-${testPaths.slice(0, 5).map((p) => `  - ${p}`).join('\n')}
+${testPaths
+  .slice(0, 5)
+  .map((p) => `  - ${p}`)
+  .join('\n')}
 
 TDD Cycle:
   1. RED: Write a failing test

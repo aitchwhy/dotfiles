@@ -15,8 +15,8 @@
  */
 
 import { Database } from 'bun:sqlite';
+import { existsSync, readFileSync } from 'node:fs';
 import { z } from 'zod';
-import { readFileSync, existsSync } from 'fs';
 
 // Hook input schema matching Claude Code's Stop event
 const HookInputSchema = z.object({
@@ -60,8 +60,7 @@ function extractAssumptions(transcript: string): Assumption[] {
   for (const { pattern, severity } of PATTERNS) {
     // Reset regex state for global patterns
     pattern.lastIndex = 0;
-    let match;
-    while ((match = pattern.exec(transcript)) !== null) {
+    for (const match of transcript.matchAll(pattern)) {
       const start = Math.max(0, match.index - 50);
       const end = Math.min(transcript.length, match.index + match[0].length + 50);
       const context = transcript.slice(start, end).replace(/\n/g, ' ').trim();
@@ -113,7 +112,7 @@ async function main() {
     return;
   }
 
-  let input;
+  let input: z.infer<typeof HookInputSchema>;
   try {
     input = HookInputSchema.parse(JSON.parse(rawInput));
   } catch {

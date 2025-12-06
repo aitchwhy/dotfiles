@@ -11,8 +11,8 @@
  */
 
 import { Database } from 'bun:sqlite';
+import { existsSync } from 'node:fs';
 import { z } from 'zod';
-import { existsSync } from 'fs';
 
 // Hook input schema matching Claude Code's Stop event
 const HookInputSchema = z.object({
@@ -74,7 +74,7 @@ async function main() {
     return;
   }
 
-  let input;
+  let input: z.infer<typeof HookInputSchema>;
   try {
     input = HookInputSchema.parse(JSON.parse(rawInput));
   } catch {
