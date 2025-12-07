@@ -4,11 +4,11 @@
 set -euo pipefail
 
 DOTFILES="${DOTFILES:-$HOME/dotfiles}"
-LESSONS="$DOTFILES/config/claude-code/evolution/lessons/lessons.jsonl"
 METRICS="$DOTFILES/.claude-metrics"
 GRADE_SCRIPT="$DOTFILES/config/claude-code/evolution/grade.sh"
+EVOLUTION_CLI="$DOTFILES/config/claude-code/evolution/src/index.ts"
 
-mkdir -p "$(dirname "$LESSONS")" "$METRICS"
+mkdir -p "$METRICS"
 
 # Try to find session transcripts (fallback gracefully if not found)
 # Claude Code stores sessions in ~/.claude/projects/<project-hash>/
@@ -40,11 +40,11 @@ if [[ -n "$LATEST_SESSION" && -f "$LATEST_SESSION" ]]; then
         grep -iE "$PATTERNS" |
         head -3 || echo "")
 
-    # Save any insights found
+    # Save any insights found to SQLite via CLI
     if [[ -n "$INSIGHTS" ]]; then
         while IFS= read -r insight; do
             if [[ -n "$insight" && ${#insight} -gt 10 ]]; then
-                jq -n --arg l "$insight" '{timestamp:(now|todate),lesson:$l,source:"session"}' >> "$LESSONS"
+                bun run "$EVOLUTION_CLI" lesson add "$insight" --source session >/dev/null 2>&1 || true
             fi
         done <<< "$INSIGHTS"
     fi

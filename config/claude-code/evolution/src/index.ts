@@ -1,6 +1,7 @@
 #!/usr/bin/env bun
 import { closeDB, getDB } from './db/client';
-import type { EvolutionCycleInsert, GraderRunInsert } from './db/schema';
+import type { EvolutionCycleInsert, GraderRunInsert, LessonInsert } from './db/schema';
+import { LessonSource } from './db/schema';
 /**
  * Evolution System CLI
  *
@@ -9,6 +10,7 @@ import type { EvolutionCycleInsert, GraderRunInsert } from './db/schema';
  *   reflect - Analyze session and generate lessons
  *   audit   - Comprehensive security audit
  *   metrics - Display DORA metrics dashboard
+ *   lesson  - Manage lessons (add, list, recent)
  */
 import { printGradeResult, runAllGraders } from './graders';
 
@@ -187,6 +189,131 @@ async function auditCommand(): Promise<number> {
 }
 
 // ============================================================================
+// Lesson Commands
+// ============================================================================
+
+async function lessonCommand(subcommand: string, lessonArgs: string[]): Promise<number> {
+  const dbResult = getDB();
+  if (!dbResult.ok) {
+    console.error(`❌ Database error: ${dbResult.error.message}`);
+    return 1;
+  }
+
+  const db = dbResult.data;
+
+  try {
+    switch (subcommand) {
+      case 'add': {
+        // Parse: lesson add "text" --source reflection
+        const sourceIdx = lessonArgs.indexOf('--source');
+        const source = sourceIdx !== -1 ? lessonArgs[sourceIdx + 1] : 'manual';
+        const text = lessonArgs.filter((_, i) => i !== sourceIdx && i !== sourceIdx + 1).join(' ');
+
+        if (!text) {
+          console.error('Usage: lesson add "text" --source <reflection|session|manual|grader>');
+          return 1;
+        }
+
+        // Validate source
+        const sourceResult = LessonSource.safeParse(source);
+        if (!sourceResult.success) {
+          console.error(
+            `Invalid source: ${source}. Must be one of: reflection, session, manual, grader`
+          );
+          return 1;
+        }
+
+        const lesson: LessonInsert = {
+          created_at: new Date().toISOString(),
+          lesson: text,
+          source: sourceResult.data,
+          category: null,
+          confidence: 1.0,
+        };
+
+        const result = db.insertLesson(lesson);
+        if (!result.ok) {
+          console.error(`❌ Failed to add lesson: ${result.error.message}`);
+          return 1;
+        }
+
+        console.log(`✅ Lesson added (id: ${result.data.id})`);
+        return 0;
+      }
+
+      case 'list': {
+        // Parse: lesson list [--limit N]
+        const limitIdx = lessonArgs.indexOf('--limit');
+        const limit = limitIdx !== -1 ? Number.parseInt(lessonArgs[limitIdx + 1] ?? '20', 10) : 20;
+
+        const result = db.getAllLessons();
+        if (!result.ok) {
+          console.error(`❌ Failed to list lessons: ${result.error.message}`);
+          return 1;
+        }
+
+        const lessons = result.data.slice(0, limit);
+        console.log(`\n📚 Lessons (${lessons.length} of ${result.data.length})\n`);
+        console.log('-'.repeat(60));
+
+        for (const lesson of lessons) {
+          const date = new Date(lesson.created_at).toLocaleDateString();
+          const preview =
+            lesson.lesson.length > 60 ? `${lesson.lesson.slice(0, 60)}...` : lesson.lesson;
+          console.log(`[${lesson.id}] ${date} (${lesson.source}): ${preview}`);
+        }
+
+        console.log('');
+        return 0;
+      }
+
+      case 'recent': {
+        // Parse: lesson recent [--count N]
+        // Output: semicolon-separated lessons for session-start.sh
+        const countIdx = lessonArgs.indexOf('--count');
+        const count = countIdx !== -1 ? Number.parseInt(lessonArgs[countIdx + 1] ?? '5', 10) : 5;
+
+        const result = db.getAllLessons();
+        if (!result.ok) {
+          console.error(`❌ Failed to get lessons: ${result.error.message}`);
+          return 1;
+        }
+
+        const lessons = result.data.slice(0, count);
+        const output = lessons.map((l) => l.lesson).join('; ');
+        console.log(output);
+        return 0;
+      }
+
+      default:
+        console.log(`
+Lesson Commands
+
+Usage:
+  bun run src/index.ts lesson <command> [options]
+
+Commands:
+  add <text> --source <type>   Add a new lesson
+                               Sources: reflection, session, manual, grader
+
+  list [--limit N]             List lessons (default: 20)
+
+  recent [--count N]           Get recent lessons as semicolon-separated text
+                               For use by session-start.sh hook
+
+Examples:
+  bun run src/index.ts lesson add "Always use Result types" --source manual
+  bun run src/index.ts lesson list --limit 10
+  bun run src/index.ts lesson recent --count 5
+`);
+        return subcommand ? 1 : 0;
+    }
+  } finally {
+    closeDB();
+  }
+}
+
+// ============================================================================
 // Main
 // ============================================================================
 
@@ -208,6 +335,9 @@ async function main(): Promise<number> {
       console.log('📝 Reflection not yet implemented in TypeScript');
       return 0;
 
+    case 'lesson':
+      return lessonCommand(args[0] ?? '', args.slice(1));
+
     default:
       console.log(`
 Evolution System CLI
@@ -226,11 +356,14 @@ Commands:
 
   metrics  Display DORA metrics dashboard
 
+  lesson   Manage lessons (add, list, recent)
+           Run 'lesson' without args for subcommand help
+
 Examples:
   bun run src/index.ts grade
   bun run src/index.ts grade --ci --save
   bun run src/index.ts metrics
-  bun run src/index.ts audit
+  bun run src/index.ts lesson add "Use Result types" --source manual
 `);
       return command ? 1 : 0;
   }

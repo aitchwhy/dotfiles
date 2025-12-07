@@ -5,7 +5,7 @@ set -euo pipefail
 
 DOTFILES="${DOTFILES:-$HOME/dotfiles}"
 METRICS="$DOTFILES/.claude-metrics/latest.json"
-LESSONS="$DOTFILES/config/claude-code/evolution/lessons/lessons.jsonl"
+EVOLUTION_CLI="$DOTFILES/config/claude-code/evolution/src/index.ts"
 
 OUTPUT=""
 
@@ -27,12 +27,10 @@ if [[ -f "$METRICS" ]]; then
     fi
 fi
 
-# Load recent lessons as context (last 5)
-if [[ -f "$LESSONS" && -s "$LESSONS" ]]; then
-    RECENT=$(tail -5 "$LESSONS" 2>/dev/null | jq -rs 'map(.lesson // empty) | join("; ")' 2>/dev/null || echo "")
-    if [[ -n "$RECENT" && "$RECENT" != "null" ]]; then
-        OUTPUT+="Recent lessons: $RECENT"
-    fi
+# Load recent lessons from SQLite via CLI
+RECENT=$(bun run "$EVOLUTION_CLI" lesson recent --count 5 2>/dev/null || echo "")
+if [[ -n "$RECENT" && "$RECENT" != "null" ]]; then
+    OUTPUT+="Recent lessons: $RECENT"
 fi
 
 # Output JSON for Claude to consume (if we have anything to say)

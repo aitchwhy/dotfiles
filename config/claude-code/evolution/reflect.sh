@@ -5,7 +5,7 @@ set -euo pipefail
 
 DOTFILES="${DOTFILES:-$HOME/dotfiles}"
 METRICS="$DOTFILES/.claude-metrics/latest.json"
-LESSONS="$DOTFILES/config/claude-code/evolution/lessons/lessons.jsonl"
+EVOLUTION_CLI="$DOTFILES/config/claude-code/evolution/src/index.ts"
 
 # Check if metrics exist
 if [[ ! -f "$METRICS" ]]; then
@@ -82,14 +82,14 @@ Respond with JSON only (no markdown):
     echo "$REFLECTION" | jq -r '.proposals[]? | "  → \(.action)\n    (\(.rationale))"' 2>/dev/null || echo "  (could not parse API response)"
     echo ""
 
-    # Save learned lessons
+    # Save learned lessons to SQLite via CLI
     LEARNED=$(echo "$REFLECTION" | jq -r '.lessons[]?' 2>/dev/null)
     if [[ -n "$LEARNED" ]]; then
         echo "Lessons learned:"
         echo "$LEARNED" | while read -r l; do
             if [[ -n "$l" && "$l" != "null" ]]; then
                 echo "  📝 $l"
-                jq -n --arg l "$l" '{timestamp:(now|todate),lesson:$l,source:"reflection"}' >> "$LESSONS"
+                bun run "$EVOLUTION_CLI" lesson add "$l" --source reflection >/dev/null 2>&1 || true
             fi
         done
     fi
