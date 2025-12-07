@@ -1,5 +1,6 @@
 # macOS gesture and symbolic hotkey configuration
 # Disables system gestures to allow Swish to intercept trackpad input
+# Disables Spotlight shortcuts to allow Raycast to use Cmd+Space
 #
 # Symbolic Hotkey IDs:
 #   32 = Mission Control
@@ -8,6 +9,8 @@
 #   35 = (unused)
 #   36 = Show Desktop (another binding)
 #   37 = Show Desktop (another binding)
+#   64 = Spotlight Search (Cmd+Space)
+#   65 = Spotlight Finder Search (Cmd+Opt+Space)
 #   160 = Launchpad
 #   163 = Notification Center
 {
@@ -57,6 +60,12 @@ in
       default = true;
       description = "Disable Notification Center two-finger swipe from right edge";
     };
+
+    disableSpotlight = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Disable Spotlight shortcuts (Cmd+Space) to allow Raycast";
+    };
   };
 
   config = mkIf cfg.enable {
@@ -88,6 +97,14 @@ in
         # Notification Center
         "163" = {
           enabled = !cfg.disableNotificationCenter;
+        };
+        # Spotlight Search (Cmd+Space) - let Raycast handle it
+        "64" = {
+          enabled = !cfg.disableSpotlight;
+        };
+        # Spotlight Finder Search (Cmd+Opt+Space)
+        "65" = {
+          enabled = !cfg.disableSpotlight;
         };
       };
     };

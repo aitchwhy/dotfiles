@@ -40,9 +40,6 @@ in
     system.activationScripts.postActivation.text = ''
       echo "Restarting Kanata daemon..."
       /bin/launchctl kickstart -k system/org.kanata.daemon 2>/dev/null || true
-
-      echo "Reloading Hammerspoon config..."
-      /usr/bin/open -g hammerspoon://reload 2>/dev/null || true
     '';
   };
 }

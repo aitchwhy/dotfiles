@@ -19,13 +19,13 @@ in
     # Bundle ID: com.superultra.Homerow
     targets.darwin.defaults."com.superultra.Homerow" = {
       # Click on screen with letter preview: Opt+Shift+Space
-      # Scroll mode: Shift+Opt+J
+      # Scroll mode: Opt+Shift+S (changed from J to avoid AeroSpace conflict)
       # Note: Homerow uses key code integers for modifiers
       # Shift = 131072, Option = 524288, Shift+Option = 655360
-      # Space = 49, J = 38
+      # Space = 49, J = 38, S = 1
       clickShortcutKeyCode = 49; # Space
       clickShortcutModifiers = 655360; # Opt+Shift
-      scrollShortcutKeyCode = 38; # J
+      scrollShortcutKeyCode = 1; # S (was J=38, conflicts with AeroSpace Alt+Shift+J)
       scrollShortcutModifiers = 655360; # Opt+Shift
     };
   };

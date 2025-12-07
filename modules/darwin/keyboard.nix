@@ -22,8 +22,11 @@ in
         "escape"
         "control"
       ];
-      default = "none"; # Kanata handles CapsLock -> Escape/Hyper
-      description = "Remap Caps Lock key";
+      # Set to "none" - Kanata handles CapsLock with tap-hold:
+      #   Tap = Escape, Hold = Hyper (Ctrl+Alt+Cmd)
+      # See: modules/home/apps/kanata.nix
+      default = "none";
+      description = "Remap Caps Lock key (set to 'none' when using Kanata)";
     };
   };
 
