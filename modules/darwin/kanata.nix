@@ -37,9 +37,10 @@ in
 
     # Restart daemons after activation (config may have changed)
     # This runs at the end of every `darwin-rebuild switch`
+    # Note: Fully detach with nohup + redirect to avoid blocking darwin-rebuild
     system.activationScripts.postActivation.text = ''
       echo "Restarting Kanata daemon..."
-      /bin/launchctl kickstart -k system/org.kanata.daemon 2>/dev/null || true
+      nohup /bin/launchctl kickstart -k system/org.kanata.daemon >/dev/null 2>&1 &
     '';
   };
 }
