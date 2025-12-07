@@ -34,9 +34,10 @@ if [[ -n "$LATEST_SESSION" && -f "$LATEST_SESSION" ]]; then
     # Look for patterns that indicate lessons/insights
     PATTERNS="lesson|learned|remember|important|always|never|mistake|insight|note to self"
 
-    # Extract text from assistant messages that match our patterns
-    INSIGHTS=$(grep -iE "$PATTERNS" "$LATEST_SESSION" 2>/dev/null |
-        jq -r 'select(.type == "assistant") | .message.content // empty' 2>/dev/null |
+    # Extract text from assistant messages, then filter for insight patterns
+    # FIX: jq first to extract text from valid JSONL, then grep for patterns
+    INSIGHTS=$(jq -r 'select(.type == "assistant") | .message.content // empty' "$LATEST_SESSION" 2>/dev/null |
+        grep -iE "$PATTERNS" |
         head -3 || echo "")
 
     # Save any insights found
