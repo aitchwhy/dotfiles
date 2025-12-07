@@ -15,13 +15,30 @@
   # System identification
   modules.nixos.system.hostname = "cloud";
 
+  # SOPS secrets configuration
+  sops = {
+    defaultSopsFile = ../../secrets/secrets.yaml;
+    age.keyFile = "/var/lib/sops-nix/key.txt";
+    secrets = {
+      tailscale-auth = {
+        owner = "root";
+        group = "root";
+        mode = "0400";
+      };
+      github-token = {
+        owner = "hank";
+        group = "users";
+        mode = "0400";
+      };
+    };
+  };
+
   # Tailscale configuration
   modules.nixos.services.tailscale = {
     enable = true;
     ssh = true;
     exitNode = false;
-    # Auth key provided via sops-nix at deployment time
-    # authKeyFile = config.sops.secrets.tailscale-auth.path;
+    authKeyFile = config.sops.secrets.tailscale-auth.path;
   };
 
   # Docker configuration
@@ -29,25 +46,6 @@
     enable = true;
     storageDriver = "overlay2";
   };
-
-  # SOPS secrets configuration
-  # Uncomment when secrets are set up:
-  # sops = {
-  #   defaultSopsFile = ../../secrets/secrets.yaml;
-  #   age.keyFile = "/var/lib/sops-nix/key.txt";
-  #   secrets = {
-  #     tailscale-auth = {
-  #       owner = "root";
-  #       group = "root";
-  #       mode = "0400";
-  #     };
-  #     github-token = {
-  #       owner = "hank";
-  #       group = "users";
-  #       mode = "0400";
-  #     };
-  #   };
-  # };
 
   # Cloud-specific settings
   boot = {
