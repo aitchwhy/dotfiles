@@ -101,6 +101,56 @@ rollback:
     sudo darwin-rebuild switch --rollback
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# CLOUD (NixOS Remote Deployment)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Cloud host for deployment
+cloud_host := env_var_or_default("CLOUD_HOST", "cloud")
+
+# Build cloud configuration locally
+cloud-build:
+    nix build .#nixosConfigurations.{{cloud_host}}.config.system.build.toplevel --no-link --print-out-paths
+
+# Deploy NixOS to a new server (initial install)
+cloud-deploy IP:
+    @echo "Deploying NixOS to {{IP}}..."
+    @echo "This will ERASE ALL DATA on the target server!"
+    @read -p "Are you sure? (yes/no): " confirm; \
+    if [ "$$confirm" = "yes" ]; then \
+        nix run github:nix-community/nixos-anywhere -- \
+            --flake .#{{cloud_host}} \
+            --build-on-remote \
+            root@{{IP}}; \
+    else \
+        echo "Aborted."; \
+    fi
+
+# Update existing cloud server
+cloud-update:
+    @echo "Updating {{cloud_host}} via SSH..."
+    ssh {{cloud_host}} "cd /etc/nixos && sudo nixos-rebuild switch --flake .#{{cloud_host}}"
+
+# SSH to cloud server
+cloud-ssh:
+    ssh {{cloud_host}}
+
+# SSH with mosh (resilient connection)
+cloud-mosh:
+    mosh {{cloud_host}}
+
+# Attach to Zellij session on cloud
+cloud-attach:
+    ssh -t {{cloud_host}} "zellij attach dev || zellij -s dev"
+
+# Show cloud server status
+cloud-status:
+    @ssh {{cloud_host}} "echo '=== System ===' && uname -a && echo && \
+        echo '=== Uptime ===' && uptime && echo && \
+        echo '=== Memory ===' && free -h && echo && \
+        echo '=== Disk ===' && df -h / && echo && \
+        echo '=== Tailscale ===' && tailscale status || true"
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # SELF-EVOLUTION
 # ═══════════════════════════════════════════════════════════════════════════════
 
