@@ -23,6 +23,7 @@ in
     home.file = {
       # Core config
       ".claude/CLAUDE.md".source = ../../../config/claude-code/CLAUDE.md;
+      ".claude/VERSIONS.md".source = ../../../config/claude-code/VERSIONS.md;
 
       # Commands and agents
       ".claude/commands".source = ../../../config/claude-code/commands;
@@ -128,7 +129,7 @@ in
       # Ensure session log exists
       $DRY_RUN_CMD touch "$CLAUDE_DIR/session.log"
 
-      echo "Claude Code v6.0 configuration ready (verification-first)"
+      echo "Claude Code v7.0 configuration ready (verification-first)"
     '';
   };
 }

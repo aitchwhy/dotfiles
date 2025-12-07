@@ -1,8 +1,9 @@
-# CLAUDE CODE v6.0
+# CLAUDE CODE v7.0
 # Verification-First Development
 
 > **Managed via**: `~/dotfiles` with Nix + home-manager symlinks
-> **Version**: 6.0.0 | December 2025
+> **Version**: 7.0.0 | December 2025
+> **Versions**: See `VERSIONS.md` for exact pinned versions
 
 ---
 
@@ -57,6 +58,25 @@ Three hooks enforce verification-first:
 1. **TDD Enforcer** (PreToolUse): Blocks source edits without test files
 2. **Assumption Detector** (Stop): Blocks sessions with "should" language
 3. **Verification Gate** (Stop): Blocks sessions with pending claims
+
+---
+
+## SESSION WORKFLOW
+
+### On Session Start
+- Read project README.md and CLAUDE.md
+- Identify tech stack versions (check package.json, flake.nix)
+- Look for existing test patterns
+
+### Before Any Code Change
+- Identify tests affected by the change
+- Run existing tests first to establish baseline
+- Write new test (Red phase) before implementation
+
+### Before Commit
+- Run full validation: `tsc --noEmit && bunx biome check && bun test`
+- Format verification evidence in response
+- Use conventional commit format
 
 ---
 
@@ -229,8 +249,11 @@ Atomic commits. Never commit broken code. Rebase over merge.
 | Bad | Good |
 |-----|------|
 | ESLint/Prettier | Biome |
-| npm/yarn | Bun |
-| Express | Hono |
+| npm/yarn/pnpm | Bun |
+| Express/Fastify | Hono |
+| Prisma | Drizzle ORM |
+| Jest | `bun test` |
+| zod/v3 | `zod` (v4 default) |
 | pip | UV |
 | `any` | `unknown` + type guards |
 | `null` | `undefined` |
@@ -282,4 +305,4 @@ Nix for packages. Homebrew only for GUI apps and casks.
 
 ---
 
-*v6.0.0 - Verification-first system. "Should" is banned. Test evidence required.*
+*v7.0.0 - Session workflow added. Version pinning externalized to VERSIONS.md.*
