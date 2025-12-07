@@ -13,7 +13,7 @@
   ];
 
   # System identification
-  modules.nixos.system.hostname = "cloud-dev";
+  modules.nixos.system.hostname = "cloud";
 
   # Tailscale configuration
   modules.nixos.services.tailscale = {

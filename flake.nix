@@ -114,13 +114,13 @@
       };
 
       # NixOS configuration for cloud development
-      nixosConfigurations.cloud-dev = nixpkgs.lib.nixosSystem {
+      nixosConfigurations.cloud = nixpkgs.lib.nixosSystem {
         system = linuxSystem;
         specialArgs = { inherit inputs self; };
         modules = [
           disko.nixosModules.disko
           sops-nix.nixosModules.sops
-          ./hosts/cloud-dev/configuration.nix
+          ./hosts/cloud/configuration.nix
           ./modules/nixpkgs.nix
           ./modules/nixos
 
