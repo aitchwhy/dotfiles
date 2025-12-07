@@ -53,16 +53,14 @@ in
 
     # Systemd settings
     systemd = {
-      # Enable watchdog for automatic recovery
-      watchdog = {
-        runtimeTime = "30s";
-        rebootTime = "10m";
+      # Manager settings
+      settings.Manager = {
+        # Watchdog for automatic recovery
+        RuntimeWatchdogSec = "30s";
+        RebootWatchdogSec = "10m";
+        # Service timeout
+        DefaultTimeoutStopSec = "30s";
       };
-
-      # Journal settings
-      extraConfig = ''
-        DefaultTimeoutStopSec=30s
-      '';
     };
 
     # Services
@@ -84,17 +82,22 @@ in
       memoryPercent = 50;
     };
 
-    # Automatic garbage collection
-    nix.gc = {
-      automatic = true;
-      dates = "weekly";
-      options = "--delete-older-than 30d";
-    };
+    # Nix daemon configuration
+    nix = {
+      enable = true;
 
-    # Automatic store optimization
-    nix.optimise = {
-      automatic = true;
-      dates = [ "weekly" ];
+      # Automatic garbage collection
+      gc = {
+        automatic = true;
+        dates = "weekly";
+        options = "--delete-older-than 30d";
+      };
+
+      # Automatic store optimization
+      optimise = {
+        automatic = true;
+        dates = [ "weekly" ];
+      };
     };
   };
 }
