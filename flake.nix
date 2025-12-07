@@ -44,15 +44,28 @@
       nix-darwin,
       home-manager,
       nix-homebrew,
+      disko,
+      sops-nix,
       ...
     }@inputs:
     let
-      system = "aarch64-darwin";
-      pkgs = nixpkgs.legacyPackages.${system};
+      # System definitions
+      darwinSystem = "aarch64-darwin";
+      linuxSystem = "x86_64-linux";
+
+      # Package sets
+      darwinPkgs = nixpkgs.legacyPackages.${darwinSystem};
+      linuxPkgs = nixpkgs.legacyPackages.${linuxSystem};
+
+      # Helper for multi-system support
+      forAllSystems = nixpkgs.lib.genAttrs [
+        darwinSystem
+        linuxSystem
+      ];
     in
     {
       darwinConfigurations.hank-mbp-m4 = nix-darwin.lib.darwinSystem {
-        inherit system;
+        system = darwinSystem;
         specialArgs = { inherit inputs self; };
         modules = [
           ./modules/nixpkgs.nix
@@ -67,12 +80,12 @@
               uid = 501;
               description = "Hank Lee";
               home = "/Users/hank";
-              shell = pkgs.zsh;
+              shell = darwinPkgs.zsh;
             };
             programs.zsh.enable = true;
             environment.shells = [
-              pkgs.bashInteractive
-              pkgs.zsh
+              darwinPkgs.bashInteractive
+              darwinPkgs.zsh
             ];
           }
 
@@ -100,24 +113,60 @@
         ];
       };
 
-      # Development shell
-      devShells.${system}.default = pkgs.mkShell {
-        packages = with pkgs; [
-          nixd
-          nixfmt-rfc-style
-          deadnix
-          statix
-          just
-          git
-          fd
+      # NixOS configuration for cloud development
+      nixosConfigurations.cloud-dev = nixpkgs.lib.nixosSystem {
+        system = linuxSystem;
+        specialArgs = { inherit inputs self; };
+        modules = [
+          disko.nixosModules.disko
+          sops-nix.nixosModules.sops
+          ./hosts/cloud-dev/configuration.nix
+          ./modules/nixpkgs.nix
+          ./modules/nixos
+
+          # Home Manager for NixOS
+          home-manager.nixosModules.home-manager
+          {
+            home-manager = {
+              useGlobalPkgs = true;
+              useUserPackages = true;
+              extraSpecialArgs = { inherit inputs self; };
+              users.hank = import ./users/hank-linux.nix;
+              backupFileExtension = "backup";
+            };
+          }
         ];
-        shellHook = ''
-          echo "Nix Darwin Dev Shell"
-          echo "  rebuild  - darwin-rebuild switch --flake .#hank-mbp-m4"
-          echo "  update   - nix flake update"
-        '';
       };
 
-      formatter.${system} = pkgs.nixfmt-rfc-style;
+      # Development shells (multi-system)
+      devShells = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        {
+          default = pkgs.mkShell {
+            packages = with pkgs; [
+              nixd
+              nixfmt-rfc-style
+              deadnix
+              statix
+              just
+              git
+              fd
+            ];
+            shellHook = ''
+              echo "Nix Dev Shell (${system})"
+              echo "Commands:"
+              echo "  just switch  - Rebuild and switch configuration"
+              echo "  just update  - Update flake inputs"
+              echo "  just fmt     - Format Nix files"
+            '';
+          };
+        }
+      );
+
+      # Formatters (multi-system)
+      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-rfc-style);
     };
 }
