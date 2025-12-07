@@ -7,8 +7,9 @@
 {
   # System-level Nix configuration
   nix = {
-    # Disable nix-darwin's Nix management (using Determinate Nix installer)
-    enable = false;
+    # On Darwin: Determinate Nix installer manages the daemon externally
+    # On NixOS: Let system.nix manage nix.enable
+    enable = lib.mkIf pkgs.stdenv.isDarwin false;
 
     # Core settings
     package = pkgs.nix;
