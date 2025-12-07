@@ -5,7 +5,7 @@
  * Weight: 10% of overall score
  */
 import { BaseGrader, runShell } from './base';
-import { DEFAULT_GRADER_CONFIGS, type GraderIssue, type GraderOutput } from './types';
+import { type GraderIssue, type GraderOutput, PERFORMANCE_CONFIG } from './types';
 
 const THRESHOLDS = {
   // Flake eval time thresholds (seconds)
@@ -21,7 +21,7 @@ const THRESHOLDS = {
 
 export class PerformanceGrader extends BaseGrader {
   constructor(dotfilesPath?: string) {
-    super(DEFAULT_GRADER_CONFIGS['performance']!, dotfilesPath);
+    super(PERFORMANCE_CONFIG, dotfilesPath);
   }
 
   protected async execute(): Promise<GraderOutput> {

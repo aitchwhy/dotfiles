@@ -9,7 +9,7 @@
 import { existsSync, lstatSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { BaseGrader, runShell } from './base';
-import { DEFAULT_GRADER_CONFIGS, type GraderIssue, type GraderOutput } from './types';
+import { CONFIG_VALIDITY_CONFIG, type GraderIssue, type GraderOutput } from './types';
 
 const POINTS = {
   JSON_FILE: 5,
@@ -30,7 +30,7 @@ const CRITICAL_SYMLINKS = [
 
 export class ConfigValidityGrader extends BaseGrader {
   constructor(dotfilesPath?: string) {
-    super(DEFAULT_GRADER_CONFIGS['config-validity']!, dotfilesPath);
+    super(CONFIG_VALIDITY_CONFIG, dotfilesPath);
   }
 
   protected async execute(): Promise<GraderOutput> {
@@ -214,7 +214,7 @@ export class ConfigValidityGrader extends BaseGrader {
     let inMultiLineComment = false;
 
     for (let i = 0; i < content.length; i++) {
-      const char = content[i]!;
+      const char = content.charAt(i);
       const nextChar = content[i + 1];
 
       if (inSingleLineComment) {

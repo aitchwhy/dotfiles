@@ -7,7 +7,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { BaseGrader, runShell } from './base';
-import { DEFAULT_GRADER_CONFIGS, type GraderIssue, type GraderOutput } from './types';
+import { GIT_HYGIENE_CONFIG, type GraderIssue, type GraderOutput } from './types';
 
 const POINTS = {
   UNSTAGED_CHANGES: 30,
@@ -41,7 +41,7 @@ const SECRET_PATTERNS = [
 
 export class GitHygieneGrader extends BaseGrader {
   constructor(dotfilesPath?: string) {
-    super(DEFAULT_GRADER_CONFIGS['git-hygiene']!, dotfilesPath);
+    super(GIT_HYGIENE_CONFIG, dotfilesPath);
   }
 
   protected async execute(): Promise<GraderOutput> {

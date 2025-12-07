@@ -5,7 +5,7 @@
  * Weight: 30% of overall score
  */
 import { BaseGrader, runShell } from './base';
-import { DEFAULT_GRADER_CONFIGS, type GraderIssue, type GraderOutput } from './types';
+import { type GraderIssue, type GraderOutput, NIX_HEALTH_CONFIG } from './types';
 
 const POINTS = {
   FLAKE_CHECK: 40,
@@ -19,7 +19,7 @@ const TOTAL_POINTS =
 
 export class NixHealthGrader extends BaseGrader {
   constructor(dotfilesPath?: string) {
-    super(DEFAULT_GRADER_CONFIGS['nix-health']!, dotfilesPath);
+    super(NIX_HEALTH_CONFIG, dotfilesPath);
   }
 
   protected async execute(): Promise<GraderOutput> {

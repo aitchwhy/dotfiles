@@ -9,7 +9,7 @@
 import { readFileSync, statSync } from 'node:fs';
 import { extname, join } from 'node:path';
 import { BaseGrader, runShell } from './base';
-import { DEFAULT_GRADER_CONFIGS, type GraderIssue, type GraderOutput } from './types';
+import { type GraderIssue, type GraderOutput, SAFETY_CONFIG } from './types';
 
 // High-entropy patterns that indicate actual secrets
 const SECRET_PATTERNS = [
@@ -47,7 +47,7 @@ const SCANNABLE_EXTENSIONS = [
 
 export class SafetyGrader extends BaseGrader {
   constructor(dotfilesPath?: string) {
-    super(DEFAULT_GRADER_CONFIGS['safety']!, dotfilesPath);
+    super(SAFETY_CONFIG, dotfilesPath);
   }
 
   protected async execute(): Promise<GraderOutput> {
