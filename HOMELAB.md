@@ -544,13 +544,13 @@ sops = {
 
 ## Implementation Roadmap
 
-### Phase 1: Foundation (Immediate)
+### Phase 1: Foundation ✅ Complete
 
-- [ ] Add sops-nix to flake.nix inputs
-- [ ] Add NixOS configuration to flake.nix outputs
-- [ ] Create `modules/nixos/` directory structure
-- [ ] Create `hosts/cloud/` configuration
-- [ ] Extract cross-platform modules
+- [x] Add sops-nix to flake.nix inputs
+- [x] Add NixOS configuration to flake.nix outputs
+- [x] Create `modules/nixos/` directory structure
+- [x] Create `hosts/cloud/` configuration
+- [x] Extract cross-platform modules (users/hank-linux.nix)
 
 ### Phase 2: Infrastructure (Day 2-3)
 
