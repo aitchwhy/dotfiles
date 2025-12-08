@@ -57,6 +57,9 @@
       darwinPkgs = nixpkgs.legacyPackages.${darwinSystem};
       linuxPkgs = nixpkgs.legacyPackages.${linuxSystem};
 
+      # Centralized version management (Universal Project Factory)
+      versions = import ./lib/versions.nix;
+
       # Helper for multi-system support
       forAllSystems = nixpkgs.lib.genAttrs [
         darwinSystem
@@ -66,7 +69,7 @@
     {
       darwinConfigurations.hank-mbp-m4 = nix-darwin.lib.darwinSystem {
         system = darwinSystem;
-        specialArgs = { inherit inputs self; };
+        specialArgs = { inherit inputs self versions; };
         modules = [
           ./modules/nixpkgs.nix
           ./modules/darwin
@@ -95,7 +98,7 @@
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
-              extraSpecialArgs = { inherit inputs self; };
+              extraSpecialArgs = { inherit inputs self versions; };
               users.hank = import ./users/hank.nix;
               backupFileExtension = "backup";
             };
@@ -116,7 +119,7 @@
       # NixOS configuration for cloud development
       nixosConfigurations.cloud = nixpkgs.lib.nixosSystem {
         system = linuxSystem;
-        specialArgs = { inherit inputs self; };
+        specialArgs = { inherit inputs self versions; };
         modules = [
           disko.nixosModules.disko
           sops-nix.nixosModules.sops
@@ -130,7 +133,7 @@
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
-              extraSpecialArgs = { inherit inputs self; };
+              extraSpecialArgs = { inherit inputs self versions; };
               users.hank = import ./users/hank-linux.nix;
               backupFileExtension = "backup";
             };

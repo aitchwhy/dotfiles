@@ -48,6 +48,7 @@ in
     ./apps/keyboard-layout.nix
     ./apps/homerow.nix
     ./apps/default-apps.nix
+    ./apps/factory.nix
   ];
 
   config = {
@@ -101,6 +102,7 @@ in
         keyboardLayout.enable = mkDefault true;
         homerow.enable = mkDefault true;
         defaultApps.enable = mkDefault true;
+        factory.enable = mkDefault true;
       };
     };
 
