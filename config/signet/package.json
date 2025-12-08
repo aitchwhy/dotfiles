@@ -1,8 +1,8 @@
 {
-  "name": "@dotfiles/factory",
+  "name": "@dotfiles/signet",
   "version": "1.0.0",
   "type": "module",
-  "description": "Universal Project Factory - Generate formally consistent software systems",
+  "description": "Signet - Generate formally consistent software systems with hexagonal architecture",
   "scripts": {
     "dev": "bun run --watch src/cli.ts",
     "start": "bun run src/cli.ts",

@@ -1,7 +1,7 @@
 /**
  * ProjectSpec Schema
  *
- * The formal specification language for the Universal Project Factory.
+ * The formal specification language for Signet.
  * Every project is a parameter instantiation of this schema.
  *
  * Uses Effect Schema for parse-don't-validate semantics.

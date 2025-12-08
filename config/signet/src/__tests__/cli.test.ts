@@ -1,12 +1,12 @@
 /**
- * FCS CLI Tests
+ * Signet CLI Tests
  *
- * Tests for the Factory CLI commands.
+ * Tests for the Signet CLI commands.
  */
 import { describe, expect, test } from 'bun:test'
 import { initCommand, genCommand, validateCommand, enforceCommand, mainCommand } from '@/cli'
 
-describe('FCS CLI', () => {
+describe('Signet CLI', () => {
   describe('initCommand', () => {
     test('exists and is a command', () => {
       expect(initCommand).toBeDefined()

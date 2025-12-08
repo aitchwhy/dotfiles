@@ -1,14 +1,15 @@
 /**
- * FCS CLI - Factory Code System
+ * Signet CLI - Code Quality & Generation Platform
  *
- * Command-line interface for the Universal Project Factory.
+ * Generates formally consistent software systems with hexagonal architecture.
+ * Powered by Effect-TS, OXC, and ast-grep for high-performance AST analysis.
  *
  * Commands:
- *   fcs init <type> <name>   - Initialize a new project
- *   fcs gen <type> <name>    - Generate a workspace in existing project
- *   fcs validate [path]      - Validate project against spec
- *   fcs enforce [--fix]      - Run architecture enforcers
- *   fcs reconcile [path]     - Detect and fix code drift via AST analysis
+ *   signet init <type> <name>   - Initialize a new project
+ *   signet gen <type> <name>    - Generate a workspace in existing project
+ *   signet validate [path]      - Validate project against spec
+ *   signet enforce [--fix]      - Run architecture enforcers
+ *   signet reconcile [path]     - Detect and fix code drift via AST analysis
  */
 import { Args, Command, Options } from '@effect/cli'
 import { NodeContext, NodeRuntime } from '@effect/platform-node'
@@ -112,7 +113,7 @@ export const initCommand = Command.make(
       // Initialize git repository
       yield* gitInit(targetPath).pipe(Effect.provide(GitLive))
       yield* gitAdd(targetPath, ['.']).pipe(Effect.provide(GitLive))
-      yield* gitCommit(targetPath, 'chore: initial commit from factory').pipe(
+      yield* gitCommit(targetPath, 'chore: initial commit from signet').pipe(
         Effect.provide(GitLive)
       )
 
@@ -302,7 +303,7 @@ export const reconcileCommand = Command.make(
       const targetPath = Option.getOrElse(path, () => '.')
       yield* Console.log(`\n🔄 Reconciling drift at: ${targetPath}${dryRun ? ' (dry-run)' : ''}\n`)
 
-      // Default pattern config for Factory-generated projects (OXC-based)
+      // Default pattern config for Signet-generated projects (OXC-based)
       const patterns: PatternConfig = {
         requireZodImport: true,
         requireResultType: true,
@@ -447,19 +448,19 @@ export const reconcileCommand = Command.make(
 // Main Command
 // =============================================================================
 
-export const mainCommand = Command.make('fcs', {}, () =>
+export const mainCommand = Command.make('signet', {}, () =>
   Console.log(`
-🏭 Factory Code System (FCS)
+🔏 Signet - Code Quality & Generation Platform
 
-Universal Project Factory for generating formally consistent software systems.
-Powered by OXC + ast-grep for high-performance AST analysis and pattern enforcement.
+Generates formally consistent software systems with hexagonal architecture.
+Powered by Effect-TS, OXC, and ast-grep for high-performance AST analysis.
 
 Commands:
-  fcs init <type> <name>   Initialize a new project
-  fcs gen <type> <name>    Generate a workspace in existing project
-  fcs validate [path]      Validate project against spec and patterns
-  fcs enforce [--fix]      Run architecture enforcers
-  fcs reconcile [path]     Detect and fix code drift via AST analysis
+  signet init <type> <name>   Initialize a new project
+  signet gen <type> <name>    Generate a workspace in existing project
+  signet validate [path]      Validate project against spec and patterns
+  signet enforce [--fix]      Run architecture enforcers
+  signet reconcile [path]     Detect and fix code drift via AST analysis
 
 Project Types:
   monorepo    Bun workspaces monorepo
@@ -474,13 +475,13 @@ Reconcile Options:
   --rules <dir>           Custom YAML rules directory (default: rules/)
 
 Examples:
-  fcs init monorepo ember-platform
-  fcs gen api voice-service
-  fcs gen ui web-app
-  fcs validate
-  fcs enforce --fix
-  fcs reconcile --dry-run --verbose
-  fcs reconcile --rules ./custom-rules
+  signet init monorepo ember-platform
+  signet gen api voice-service
+  signet gen ui web-app
+  signet validate
+  signet enforce --fix
+  signet reconcile --dry-run --verbose
+  signet reconcile --rules ./custom-rules
 `)
 ).pipe(
   Command.withSubcommands([initCommand, genCommand, validateCommand, enforceCommand, reconcileCommand])
@@ -491,8 +492,8 @@ Examples:
 // =============================================================================
 
 const cli = Command.run(mainCommand, {
-  name: 'fcs',
-  version: '0.1.0',
+  name: 'signet',
+  version: '1.0.0',
 })
 
 // Only run if this is the main module

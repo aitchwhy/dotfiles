@@ -63,7 +63,7 @@ export const checkStructure = (
         rule: 'missing-package-json',
         severity: 'error',
         message: 'Missing package.json',
-        suggestion: 'Run fcs init to create project structure',
+        suggestion: 'Run signet init to create project structure',
       })
     }
 
