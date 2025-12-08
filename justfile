@@ -167,3 +167,27 @@ evolve-init:
     @mkdir -p .claude-metrics config/claude-code/evolution/lessons
     @chmod +x config/claude-code/evolution/*.sh config/claude-code/evolution/**/*.sh 2>/dev/null || true
     @echo "✓ Evolution system initialized"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# REPOMIX (Codebase Snapshots)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Pack current directory with defaults
+rx *ARGS:
+    repomix {{ ARGS }}
+
+# Pack ember-platform with project config
+rx-ember *ARGS:
+    repomix --cwd ~/src/ember-platform {{ ARGS }}
+
+# Pack dotfiles for config sharing
+rx-dotfiles *ARGS:
+    repomix --cwd ~/dotfiles {{ ARGS }}
+
+# Pack a remote GitHub repository
+rx-remote REPO *ARGS:
+    repomix --remote {{ REPO }} --compress {{ ARGS }}
+
+# Pack and copy output path to clipboard
+rx-clip *ARGS:
+    repomix {{ ARGS }} && echo "$(pwd)/repomix-output.xml" | pbcopy && echo "✓ Path copied to clipboard"
