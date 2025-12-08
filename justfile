@@ -191,3 +191,31 @@ rx-remote REPO *ARGS:
 
 rx-config:
     @~/.local/bin/rx config
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SIGNET (Code Quality & Generation Platform)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Signet CLI - run any command
+sig *ARGS:
+    @signet {{ ARGS }}
+
+# Validate project structure against spec
+sig-validate PATH=".":
+    @signet validate {{ PATH }}
+
+# Check system health and version alignment
+sig-doctor:
+    @signet doctor
+
+# Auto-fix architecture drift
+sig-comply PATH=".":
+    @signet comply {{ PATH }}
+
+# Initialize new project (types: monorepo, api, ui, library, infra)
+sig-init TYPE NAME:
+    @signet init {{ TYPE }} {{ NAME }}
+
+# Generate workspace in existing project
+sig-gen TYPE NAME:
+    @signet gen {{ TYPE }} {{ NAME }}
