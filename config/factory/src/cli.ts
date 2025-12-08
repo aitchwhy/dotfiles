@@ -8,6 +8,7 @@
  *   fcs gen <type> <name>    - Generate a workspace in existing project
  *   fcs validate [path]      - Validate project against spec
  *   fcs enforce [--fix]      - Run architecture enforcers
+ *   fcs reconcile [path]     - Detect and fix code drift via AST analysis
  */
 import { Args, Command, Options } from '@effect/cli'
 import { NodeContext, NodeRuntime } from '@effect/platform-node'
@@ -18,9 +19,18 @@ import { generateUi } from '@/generators/ui'
 import { generateMonorepo } from '@/generators/monorepo'
 import { generateInfra } from '@/generators/infra'
 import { TemplateEngineLive } from '@/layers/template-engine'
-import { FileSystemLive, writeTree } from '@/layers/file-system'
+import { FileSystemLive, writeTree, readFile } from '@/layers/file-system'
 import { GitLive, gitInit, gitAdd, gitCommit } from '@/layers/git'
+import {
+  AstEngineLive,
+  createSourceFile,
+  detectDrift,
+  reconcile,
+  type PatternConfig,
+} from '@/layers/ast-engine'
 import type { ProjectSpec } from '@/schema/project-spec'
+import { readdir } from 'node:fs/promises'
+import { join } from 'node:path'
 
 // =============================================================================
 // Arguments & Options
@@ -33,6 +43,8 @@ const projectType = Args.text({ name: 'type' })
 const projectName = Args.text({ name: 'name' })
 const pathArg = Args.text({ name: 'path' }).pipe(Args.optional)
 const fixOption = Options.boolean('fix').pipe(Options.withDefault(false))
+const dryRunOption = Options.boolean('dry-run').pipe(Options.withDefault(false))
+const verboseOption = Options.boolean('verbose').pipe(Options.withDefault(false))
 
 const validateProjectType = (type: string): Effect.Effect<ProjectType, Error> => {
   if (PROJECT_TYPES.includes(type as ProjectType)) {
@@ -184,6 +196,131 @@ export const enforceCommand = Command.make('enforce', { fix: fixOption }, ({ fix
 )
 
 // =============================================================================
+// Reconcile Command
+// =============================================================================
+
+/**
+ * Files to exclude from drift detection (infrastructure files)
+ */
+const EXCLUDED_FILES = ['ast-engine.ts', 'ast-engine.test.ts'] as const
+
+/**
+ * Recursively find all TypeScript files in a directory
+ */
+async function findTsFiles(dir: string): Promise<string[]> {
+  const files: string[] = []
+  const entries = await readdir(dir, { withFileTypes: true })
+
+  for (const entry of entries) {
+    const fullPath = join(dir, entry.name)
+    if (entry.isDirectory()) {
+      // Skip node_modules and hidden directories
+      if (!entry.name.startsWith('.') && entry.name !== 'node_modules') {
+        files.push(...(await findTsFiles(fullPath)))
+      }
+    } else if (entry.isFile() && entry.name.endsWith('.ts') && !entry.name.endsWith('.d.ts')) {
+      // Skip excluded infrastructure files
+      if (!EXCLUDED_FILES.some((excluded) => entry.name === excluded)) {
+        files.push(fullPath)
+      }
+    }
+  }
+
+  return files
+}
+
+export const reconcileCommand = Command.make(
+  'reconcile',
+  { path: pathArg, dryRun: dryRunOption, verbose: verboseOption },
+  ({ path, dryRun, verbose }) =>
+    Effect.gen(function* () {
+      const targetPath = Option.getOrElse(path, () => '.')
+      yield* Console.log(`\n🔄 Reconciling drift at: ${targetPath}${dryRun ? ' (dry-run)' : ''}\n`)
+
+      // Default pattern config for Factory-generated projects
+      const patterns: PatternConfig = {
+        requireZodImport: true,
+        requireResultType: true,
+        requireExplicitExports: false,
+      }
+
+      // Find all TypeScript files
+      const tsFiles = yield* Effect.tryPromise({
+        try: () => findTsFiles(targetPath),
+        catch: (e) => new Error(`Failed to scan directory: ${e}`),
+      })
+
+      if (tsFiles.length === 0) {
+        yield* Console.log('No TypeScript files found.')
+        return
+      }
+
+      yield* Console.log(`Found ${tsFiles.length} TypeScript files to analyze...\n`)
+
+      let totalIssues = 0
+      let totalErrors = 0
+      let totalWarnings = 0
+      let filesWithIssues = 0
+
+      // Analyze each file
+      for (const filePath of tsFiles) {
+        const content = yield* readFile(filePath).pipe(Effect.provide(FileSystemLive))
+        const sf = yield* createSourceFile(filePath, content).pipe(Effect.provide(AstEngineLive))
+        const report = yield* detectDrift(sf, patterns).pipe(Effect.provide(AstEngineLive))
+
+        if (report.issues.length > 0) {
+          filesWithIssues++
+          totalIssues += report.issues.length
+          if (report.hasErrors) totalErrors += report.issues.filter((i) => i.severity === 'error').length
+          if (report.hasWarnings) totalWarnings += report.issues.filter((i) => i.severity === 'warning').length
+
+          // Print file header
+          yield* Console.log(`📄 ${filePath}`)
+
+          // Print each issue
+          for (const issue of report.issues) {
+            const icon = issue.severity === 'error' ? '❌' : '⚠️'
+            const line = issue.line ? `:${issue.line}` : ''
+            yield* Console.log(`   ${icon} ${issue.message}${line}`)
+
+            if (verbose && issue.fix) {
+              yield* Console.log(`      💡 Fix: ${issue.fix.description}`)
+            }
+          }
+
+          // Apply fixes if not dry-run
+          if (!dryRun && report.issues.some((i) => i.fix)) {
+            const fixableIssues = report.issues.filter((i) => i.fix)
+            const fixed = yield* reconcile(sf, fixableIssues).pipe(Effect.provide(AstEngineLive))
+
+            // Write fixed content back to file
+            yield* writeTree({ [filePath]: fixed }, '.').pipe(Effect.provide(FileSystemLive))
+            yield* Console.log(`   ✅ Applied ${fixableIssues.length} fix(es)`)
+          }
+
+          yield* Console.log('')
+        } else if (verbose) {
+          yield* Console.log(`✓ ${filePath}`)
+        }
+      }
+
+      // Summary
+      yield* Console.log('─'.repeat(50))
+      if (totalIssues === 0) {
+        yield* Console.log('✅ No drift detected!')
+      } else {
+        yield* Console.log(`Found ${totalIssues} issue(s) in ${filesWithIssues} file(s):`)
+        if (totalErrors > 0) yield* Console.log(`  ❌ ${totalErrors} error(s)`)
+        if (totalWarnings > 0) yield* Console.log(`  ⚠️  ${totalWarnings} warning(s)`)
+
+        if (dryRun) {
+          yield* Console.log('\nRun without --dry-run to apply fixes.')
+        }
+      }
+    })
+)
+
+// =============================================================================
 // Main Command
 // =============================================================================
 
@@ -198,6 +335,7 @@ Commands:
   fcs gen <type> <name>    Generate a workspace in existing project
   fcs validate [path]      Validate project against spec
   fcs enforce [--fix]      Run architecture enforcers
+  fcs reconcile [path]     Detect and fix code drift
 
 Project Types:
   monorepo    Bun workspaces monorepo
@@ -212,9 +350,10 @@ Examples:
   fcs gen ui web-app
   fcs validate
   fcs enforce --fix
+  fcs reconcile --dry-run --verbose
 `)
 ).pipe(
-  Command.withSubcommands([initCommand, genCommand, validateCommand, enforceCommand])
+  Command.withSubcommands([initCommand, genCommand, validateCommand, enforceCommand, reconcileCommand])
 )
 
 // =============================================================================
