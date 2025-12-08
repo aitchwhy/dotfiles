@@ -4,23 +4,15 @@ description: LiveKit Agents patterns for Python voice agents including STT/TTS i
 allowed-tools: Read, Write, Bash(python:*), Bash(uv:*)
 ---
 
-# LiveKit Agents (Python)
-
 ## Agent Structure
 
+### Basic Voice Agent
+
 ```python
-# apps/agent/src/main.py
-from livekit.agents import (
-    Agent,
-    AgentContext,
-    JobContext,
-    WorkerOptions,
-    cli,
-)
+from livekit.agents import Agent, AgentContext, JobContext, WorkerOptions, cli
 from livekit.agents.llm import openai
 from livekit.agents.stt import deepgram
 from livekit.agents.tts import cartesia
-
 
 class VoiceAgent(Agent):
     def __init__(self):
@@ -33,17 +25,17 @@ class VoiceAgent(Agent):
         response = await self.llm.generate(text)
         await ctx.say(response, tts=self.tts)
 
-
 async def entrypoint(ctx: JobContext):
     agent = VoiceAgent()
     await agent.start(ctx)
-
 
 if __name__ == "__main__":
     cli.run_app(WorkerOptions(entrypoint_fnc=entrypoint))
 ```
 
 ## Async Patterns
+
+### Parallel Operations
 
 ```python
 import asyncio
@@ -65,23 +57,22 @@ task = asyncio.create_task(log_analytics(event))
 
 ## Environment Setup
 
+### UV Commands
+
 ```bash
-# Use UV for dependency management
 cd apps/agent
-uv sync
+uv sync                        # Install dependencies
+uv run python -m src.main dev  # Run locally
 
-# Run locally
-uv run python -m src.main dev
-
-# Environment variables
+# Required environment variables
 export LIVEKIT_URL="wss://..."
-export LIVEKIT_API_KEY="..."
-export LIVEKIT_API_SECRET="..."
 export DEEPGRAM_API_KEY="..."
 export OPENAI_API_KEY="..."
 ```
 
 ## Error Handling
+
+### Agent Error Handling
 
 ```python
 from livekit.agents import AgentError

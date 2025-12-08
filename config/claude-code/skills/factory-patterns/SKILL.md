@@ -1,6 +1,8 @@
-# Factory Patterns Skill
-
-Patterns for using the Universal Project Factory (FCS) to generate formally consistent software systems.
+---
+name: factory-patterns
+description: Patterns for using the Universal Project Factory (FCS) to generate formally consistent software systems with hexagonal architecture.
+allowed-tools: Read, Write, Edit, Bash
+---
 
 ## When to Use This Skill
 
@@ -9,9 +11,9 @@ Patterns for using the Universal Project Factory (FCS) to generate formally cons
 - Understanding hexagonal architecture patterns
 - Working with Effect-TS layers and ports/adapters
 
-## Core Patterns
+## Hexagonal Architecture (Ports and Adapters)
 
-### 1. Hexagonal Architecture (Ports and Adapters)
+### Directory Structure
 
 ```
 src/
@@ -26,9 +28,9 @@ src/
     └── api.ts       # Provides adapters as layers
 ```
 
-**Key Rule**: Ports define interfaces. Adapters implement them. App uses ports only.
+## Effect Layer Pattern
 
-### 2. Effect Layer Pattern
+### Port and Adapter
 
 ```typescript
 // Port (Interface)
@@ -51,44 +53,7 @@ const program = myBusinessLogic.pipe(
 )
 ```
 
-### 3. ProjectSpec Schema
-
-All generated projects follow the ProjectSpec schema:
-
-```typescript
-type ProjectSpec = {
-  name: string              // kebab-case project name
-  type: 'monorepo' | 'api' | 'ui' | 'library' | 'infra'
-  infra: {
-    runtime: 'bun' | 'node'
-    database?: 'turso' | 'd1' | 'neon'
-    queue?: 'temporal' | 'sqs'
-  }
-  observability: {
-    processCompose: true    // Always required
-    metrics: boolean
-    debugger: 'vscode' | 'nvim-dap'
-  }
-}
-```
-
-### 4. Monorepo Structure
-
-```
-platform/
-├── apps/                 # Deployable applications
-│   ├── api/              # fcs gen api <name>
-│   └── web/              # fcs gen ui <name>
-├── packages/             # Shared packages
-│   └── shared/           # @platform/shared
-├── package.json          # Bun workspaces
-├── tsconfig.json         # Project references
-├── tsconfig.base.json    # Shared compiler options
-├── biome.json            # Linting/formatting
-└── process-compose.yaml  # Local development
-```
-
-### 5. Generator Selection
+## Generator Selection
 
 | Need | Command | What You Get |
 |------|---------|--------------|
@@ -108,7 +73,7 @@ platform/
 
 ## Validation
 
-Always run after making changes:
+### Always Validate
 
 ```bash
 fcs validate     # Check structure

@@ -4,9 +4,9 @@ description: TanStack Router and Query patterns including file-based routing, da
 allowed-tools: Read, Write
 ---
 
-# TanStack Router + Query Patterns
-
 ## File-Based Routing
+
+### Route Directory Structure
 
 ```
 src/routes/
@@ -23,8 +23,9 @@ src/routes/
 
 ## Route Definition
 
+### Route with Loader
+
 ```typescript
-// src/routes/users/$userId.tsx
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/users/$userId')({
@@ -42,15 +43,9 @@ function UserPage() {
 
 ## Query Patterns
 
-```typescript
-// Prefetch on hover
-const userQuery = useSuspenseQuery({
-  queryKey: ['user', userId],
-  queryFn: () => fetchUser(userId),
-  staleTime: 5 * 60 * 1000, // 5 minutes
-});
+### Optimistic Updates
 
-// Optimistic updates
+```typescript
 const mutation = useMutation({
   mutationFn: updateUser,
   onMutate: async (newData) => {
@@ -69,6 +64,8 @@ const mutation = useMutation({
 ```
 
 ## Search Params
+
+### Validated Search Params
 
 ```typescript
 import { z } from 'zod';

@@ -4,11 +4,11 @@ description: Hono on Cloudflare Workers patterns including environment access, t
 allowed-tools: Read, Write
 ---
 
-# Hono on Cloudflare Workers
-
 ## Environment Access
 
-Workers don't have `process.env`. Use context bindings:
+### Use Context Bindings
+
+Workers don't have process.env. Use context bindings:
 
 ```typescript
 // WRONG: process.env doesn't exist in Workers
@@ -20,13 +20,12 @@ const token = c.env.API_KEY;
 
 ## Typed Bindings
 
-Always type your environment bindings:
+### Always Type Environment
 
 ```typescript
 type Env = {
   DATABASE_URL: string;
   API_KEY: string;
-  SESSION_SECRET: string;
   KV_STORE: KVNamespace;
   R2_BUCKET: R2Bucket;
 };
@@ -35,6 +34,8 @@ const app = new Hono<{ Bindings: Env }>();
 ```
 
 ## Middleware Pattern
+
+### Auth Middleware
 
 ```typescript
 import { createMiddleware } from 'hono/factory';
@@ -52,6 +53,8 @@ const authMiddleware = createMiddleware<{ Bindings: Env }>(
 ```
 
 ## Zod Validation
+
+### Request Validation
 
 ```typescript
 import { zValidator } from '@hono/zod-validator';
@@ -73,12 +76,11 @@ app.post('/users',
 
 ## Error Handling
 
+### Global Error Handler
+
 ```typescript
 app.onError((err, c) => {
   console.error(err);
-  return c.json({
-    ok: false,
-    error: err.message
-  }, 500);
+  return c.json({ ok: false, error: err.message }, 500);
 });
 ```

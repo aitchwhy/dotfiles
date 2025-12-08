@@ -4,8 +4,6 @@ description: Clean code patterns for Nix and TypeScript. Explicit imports, Resul
 allowed-tools: Read, Write, Edit, Grep, Glob
 ---
 
-# Clean Code Patterns
-
 ## Nix-Specific Patterns
 
 ### Explicit Library Imports (Never `with lib;`)
@@ -67,6 +65,8 @@ in
 ```
 
 ### Module Structure
+
+Standard Nix module layout: options first, then config:
 
 ```nix
 { config, lib, pkgs, ... }:
@@ -142,6 +142,8 @@ for (let itemIdx = 0; itemIdx < items.length; itemIdx++) { ... }
 
 ### Magic Numbers as Expressions
 
+Use self-documenting expressions instead of unexplained constants:
+
 ```typescript
 // Bad: unexplained constants
 const timeout = 86400000;
@@ -177,6 +179,8 @@ function calculatePrice(item: Item) {
 
 ### Comments Explain "Why", Not "What"
 
+Code shows what; comments explain why:
+
 ```typescript
 // Bad: describes what code does (obvious from code)
 // Loop through users and check if active
@@ -191,6 +195,8 @@ const activeUsers = users.filter(user => user.isActive);
 ```
 
 ### Readonly by Default
+
+Use readonly to prevent accidental mutations:
 
 ```typescript
 // Bad: mutable data invites bugs
@@ -213,6 +219,8 @@ function processUsers(users: readonly User[]): ProcessedUser[] {
 ```
 
 ### Early Returns Over Nesting
+
+Use guard clauses to reduce nesting:
 
 ```typescript
 // Bad: deeply nested conditions
@@ -246,6 +254,8 @@ function processRequest(req: Request) {
 
 ### One Concept Per File
 
+Avoid kitchen-sink modules:
+
 ```
 # Bad: kitchen sink modules
 src/
@@ -264,6 +274,8 @@ src/
 ```
 
 ### Barrel Exports (Use Sparingly)
+
+Re-exports for clean imports, but use judiciously:
 
 ```typescript
 // src/lib/index.ts - re-exports for clean imports
