@@ -1,0 +1,20 @@
+# Zod: Require import when using z.* API
+# @see https://zod.dev
+id: zod-require-import
+language: TypeScript
+severity: error
+message: "Files using Zod API (z.*) must import z from 'zod'"
+note: |
+  When using Zod schema builders like z.object(), z.string(), etc.,
+  ensure the z namespace is properly imported from 'zod' or 'zod/v4'.
+
+rule:
+  pattern: z.$METHOD($$$ARGS)
+  not:
+    precedes:
+      any:
+        - pattern: import { z } from 'zod'
+        - pattern: import { z } from 'zod/v4'
+        - pattern: import * as z from 'zod'
+      stopBy: end
+

@@ -1,0 +1,24 @@
+# Effect.js: Port/Adapter pattern enforcement
+# @see https://effect.website/docs/requirements-management/services
+id: effect-ports-require-layer
+language: TypeScript
+severity: warning
+message: "Effect Context.Tag (Port) should have a corresponding Layer (Adapter)"
+note: |
+  Effect.js Port/Adapter pattern requires:
+  1. A Context.Tag defining the service interface (Port)
+  2. A Layer.succeed/Layer.effect providing the implementation (Adapter)
+
+  This ensures proper dependency injection and testability.
+
+  Example:
+    export class MyService extends Context.Tag('MyService')<MyService, MyServiceImpl>() {}
+    export const MyServiceLive = Layer.succeed(MyService, makeMyService())
+
+rule:
+  pattern: class $NAME extends Context.Tag($$$TAG)<$$$TYPES>() {}
+  not:
+    follows:
+      pattern: export const $$$LIVE = Layer.$METHOD($$$ARGS)
+      stopBy: end
+

@@ -1,0 +1,23 @@
+# ast-grep configuration for Universal Project Factory
+# @see https://ast-grep.github.io/reference/sgconfig.html
+
+ruleDirs:
+  - rules
+
+testConfigs:
+  - testDir: rule-tests
+
+languageGlobs:
+  TypeScript:
+    - "**/*.ts"
+    - "**/*.tsx"
+    - "!**/node_modules/**"
+    - "!**/dist/**"
+    - "!**/.git/**"
+  JavaScript:
+    - "**/*.js"
+    - "**/*.jsx"
+    - "**/*.mjs"
+    - "!**/node_modules/**"
+  Json:
+    - "**/package.json"

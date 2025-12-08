@@ -1,0 +1,27 @@
+# Result Types: Domain errors should not throw
+# @see Parse Don't Validate pattern
+id: result-types-no-throw-domain
+language: TypeScript
+severity: warning
+message: "Consider returning Result<T, E> instead of throwing for domain errors"
+note: |
+  Domain errors (validation failures, business rule violations) are expected outcomes,
+  not exceptional conditions. Use Result types for explicit error handling.
+
+  Reserve throw for truly exceptional cases (programmer errors, system failures).
+
+  Pattern: Result<T, E> = { ok: true, data: T } | { ok: false, error: E }
+
+rule:
+  pattern: throw new $ERROR($$$MSG)
+  inside:
+    any:
+      - kind: function_declaration
+      - kind: arrow_function
+      - kind: method_definition
+    stopBy: end
+  not:
+    inside:
+      pattern: catch ($E) { $$$ }
+      stopBy: end
+

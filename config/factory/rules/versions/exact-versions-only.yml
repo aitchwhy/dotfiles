@@ -1,0 +1,20 @@
+# Package.json: Require exact version numbers
+# @see https://docs.npmjs.com/cli/v10/configuring-npm/package-json#dependencies
+id: versions-exact-only
+language: Json
+severity: error
+message: "Dependencies must use exact versions (no ^ or ~ prefixes)"
+note: |
+  Exact versions ensure reproducible builds and prevent unexpected breaking changes.
+  Use lockfiles and exact versions for predictable dependency resolution.
+
+  Bad:  "^1.2.3" or "~1.2.3"
+  Good: "1.2.3"
+
+rule:
+  kind: string
+  regex: '^"[\^~]'
+  inside:
+    kind: pair
+    stopBy: end
+

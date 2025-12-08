@@ -1,0 +1,18 @@
+# XState v5: Require setup().createMachine() pattern
+# @see https://stately.ai/docs/migration#use-setup-to-define-your-machine-setup
+id: xstate-require-setup-machine
+language: TypeScript
+severity: error
+message: "XState v5: Use setup().createMachine() instead of bare createMachine() for proper type inference"
+note: |
+  XState v5 requires the setup() function to properly infer types for context, events, and actions.
+  Bare createMachine() calls lose type safety.
+
+rule:
+  pattern: createMachine($CONFIG)
+  not:
+    inside:
+      pattern: setup($$$).createMachine($$$)
+      stopBy: end
+
+fix: setup({}).createMachine($CONFIG)
