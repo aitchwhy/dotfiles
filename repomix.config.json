@@ -1,0 +1,47 @@
+{
+  "$schema": "https://repomix.com/schemas/latest/schema.json",
+  "output": {
+    "filePath": "repomix-output.xml",
+    "style": "xml",
+    "parsableStyle": true,
+    "compress": true,
+    "fileSummary": true,
+    "directoryStructure": true,
+    "topFilesLength": 10,
+    "showLineNumbers": false,
+    "copyToClipboard": false,
+    "includeEmptyDirectories": false,
+    "instructionFilePath": "config/claude-code/CLAUDE.md",
+    "git": {
+      "sortByChanges": true,
+      "sortByChangesMaxCommits": 50
+    }
+  },
+  "include": [
+    "flake.nix",
+    "flake.lock",
+    "justfile",
+    "modules/**/*.nix",
+    "config/**/*.json",
+    "config/**/*.md",
+    "config/**/*.nix",
+    "config/**/*.lua",
+    "config/**/*.kdl",
+    "users/**/*.nix"
+  ],
+  "ignore": {
+    "useGitignore": true,
+    "useDefaultPatterns": true,
+    "customPatterns": [
+      "config/factory/node_modules/**",
+      "**/*.code-profile",
+      "**/tmtheme.xml",
+      "result",
+      ".direnv/**",
+      "repomix-output.xml"
+    ]
+  },
+  "security": {
+    "enableSecurityCheck": false
+  }
+}

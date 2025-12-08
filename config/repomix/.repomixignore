@@ -1,24 +1,35 @@
-# Cache directories
+# Global repomix ignore patterns
+# Used by configs in this directory
+
+# Cache and temp directories
 .cache/
 tmp/
+.direnv/
 
 # Build outputs
 dist/
 build/
+out/
+.next/
+
+# Dependencies
+node_modules/
+
+# Generated code
+gen/**/*.ts
+gen/**/*.py
+gen/**/*.js
+
+# Data directories
+data/
 
 # Logs
 *.log
 
+# Project-specific (Anterior platform)
 gateways/noggin/src/@anterior/models/data/fhir/r5/service_request_r5.ts
 
-data/
-
-tmp/
-
-*.log
-
-gen/**/*.ts
-gen/**/*.py
-gen/**/*.js
-gen/**/*.js
-A
+# Repomix outputs
+repomix-output.xml
+repomix-output.md
+repomix-output.txt
