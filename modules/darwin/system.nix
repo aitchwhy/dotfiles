@@ -113,12 +113,21 @@ in
     # Disable image capture hotplug
     system.defaults.CustomUserPreferences."com.apple.ImageCapture".disableHotPlug = true;
 
+    # Accessibility - show icons in window title bars
+    system.defaults.CustomUserPreferences."com.apple.universalaccess" = {
+      showWindowTitlebarIcons = true;
+    };
+
     # Other defaults
     # NOTE: AppleSpacesSwitchOnActivate moved to spaces.nix
     system.defaults.CustomUserPreferences.".GlobalPreferences" = {
       WebAutomaticTextReplacementEnabled = false;
       WebContinuousSpellCheckingEnabled = false;
       WebAutomaticSpellingCorrectionEnabled = false;
+
+      # Window state management (macos-defaults.com best practices)
+      NSQuitAlwaysKeepsWindows = true; # Restore windows on app relaunch
+      NSCloseAlwaysConfirmsChanges = true; # Confirm before closing unsaved docs
     };
 
     # Disable quarantine
