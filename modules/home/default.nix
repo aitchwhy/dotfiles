@@ -49,6 +49,7 @@ in
     ./apps/homerow.nix
     ./apps/default-apps.nix
     ./apps/factory.nix
+    ./apps/prompt-system.nix
   ];
 
   config = {
@@ -103,6 +104,7 @@ in
         homerow.enable = mkDefault true;
         defaultApps.enable = mkDefault true;
         factory.enable = mkDefault true;
+        promptSystem.enable = mkDefault true;
       };
     };
 
