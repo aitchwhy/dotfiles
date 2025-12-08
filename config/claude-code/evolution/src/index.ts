@@ -314,6 +314,78 @@ Examples:
 }
 
 // ============================================================================
+// GC Command
+// ============================================================================
+
+async function gcCommand(options: {
+  threshold: number;
+  staleDays: number;
+  dryRun: boolean;
+}): Promise<number> {
+  const dbResult = getDB();
+  if (!dbResult.ok) {
+    console.error(`❌ Database error: ${dbResult.error.message}`);
+    return 1;
+  }
+
+  const db = dbResult.data;
+
+  try {
+    // Get initial count
+    const initialResult = db.getLessonCount();
+    const initialCount = initialResult.ok ? initialResult.data : 0;
+
+    console.log('\n🗑️  LESSONS GARBAGE COLLECTION\n');
+    console.log('='.repeat(50));
+    console.log(`\nCurrent lessons: ${initialCount}`);
+    console.log(`Threshold: ${options.threshold}`);
+    console.log(`Stale days: ${options.staleDays}`);
+
+    if (options.dryRun) {
+      console.log('\n⚠️  DRY RUN - no changes will be made\n');
+    }
+
+    if (options.dryRun) {
+      // Show what would be deleted without actually deleting
+      console.log('\nWould run:');
+      console.log('  1. Delete garbage lessons (JSON fragments)');
+      console.log(`  2. Delete stale lessons (>${options.staleDays} days, <2 uses)`);
+      console.log(`  3. Compact to ${options.threshold} lessons`);
+      closeDB();
+      return 0;
+    }
+
+    // Run auto-GC
+    const gcResult = db.autoGC(options.threshold, options.staleDays);
+
+    if (!gcResult.ok) {
+      console.error(`❌ GC failed: ${gcResult.error.message}`);
+      return 1;
+    }
+
+    const { garbage, stale, compacted } = gcResult.data;
+    const total = garbage + stale + compacted;
+
+    console.log('\n📊 Results:');
+    console.log(`  Garbage deleted: ${garbage}`);
+    console.log(`  Stale deleted: ${stale}`);
+    console.log(`  Compacted: ${compacted}`);
+    console.log(`  ────────────────`);
+    console.log(`  Total removed: ${total}`);
+
+    // Get final count
+    const finalResult = db.getLessonCount();
+    const finalCount = finalResult.ok ? finalResult.data : 0;
+    console.log(`\nFinal lessons: ${finalCount}`);
+    console.log('='.repeat(50) + '\n');
+
+    return 0;
+  } finally {
+    closeDB();
+  }
+}
+
+// ============================================================================
 // Main
 // ============================================================================
 
@@ -338,6 +410,17 @@ async function main(): Promise<number> {
     case 'lesson':
       return lessonCommand(args[0] ?? '', args.slice(1));
 
+    case 'gc':
+      return gcCommand({
+        threshold: args.includes('--threshold')
+          ? Number.parseInt(args[args.indexOf('--threshold') + 1] ?? '20', 10)
+          : 20,
+        staleDays: args.includes('--stale-days')
+          ? Number.parseInt(args[args.indexOf('--stale-days') + 1] ?? '30', 10)
+          : 30,
+        dryRun: args.includes('--dry-run'),
+      });
+
     default:
       console.log(`
 Evolution System CLI
@@ -359,11 +442,17 @@ Commands:
   lesson   Manage lessons (add, list, recent)
            Run 'lesson' without args for subcommand help
 
+  gc       Auto garbage collect lessons
+           --threshold N   Max lessons to keep (default: 20)
+           --stale-days N  Delete unused lessons older than N days (default: 30)
+           --dry-run       Show what would be deleted without deleting
+
 Examples:
   bun run src/index.ts grade
   bun run src/index.ts grade --ci --save
   bun run src/index.ts metrics
   bun run src/index.ts lesson add "Use Result types" --source manual
+  bun run src/index.ts gc --threshold 15 --stale-days 14
 `);
       return command ? 1 : 0;
   }
