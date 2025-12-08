@@ -75,15 +75,15 @@ describe('API Generator', () => {
       expect(tree['src/adapters/d1.ts']).toContain('D1Database')
     })
 
-    test('generates health route', async () => {
+    test('generates health handlers', async () => {
       const spec = makeSpec()
 
       const program = generateApi(spec).pipe(Effect.provide(TemplateEngineLive))
       const tree = await Effect.runPromise(program)
 
-      expect(tree['src/routes/health.ts']).toBeDefined()
-      expect(tree['src/routes/health.ts']).toContain('healthRoutes')
-      expect(tree['src/routes/health.ts']).toContain('/ready')
+      expect(tree['src/handlers/health.ts']).toBeDefined()
+      expect(tree['src/handlers/health.ts']).toContain('healthRoutes')
+      expect(tree['src/handlers/health.ts']).toContain('/health/ready')
     })
 
     test('generates error middleware', async () => {

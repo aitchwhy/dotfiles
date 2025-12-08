@@ -17,15 +17,23 @@ import type { ProjectSpec } from '@/schema/project-spec'
 // =============================================================================
 
 const SERVER_TS_TEMPLATE = `/**
- * {{name}} - Hono Server
+ * {{name}} - Hono Server (Composition Root)
  *
- * Composition root that wires routes and middleware.
+ * This is the ONLY file that should import Hono directly.
+ * All route handlers are pure Effect functions wired here.
+ *
+ * Hexagonal Architecture:
+ * - Routes (src/handlers/*) = Pure Effect handlers, framework-agnostic
+ * - Server (this file) = Composition root, wires handlers to HTTP
+ * - Ports (src/ports/*) = Abstract interfaces (Context.Tag)
+ * - Adapters (src/adapters/*) = Concrete implementations (Layer)
  */
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
+import { Effect, Runtime } from 'effect'
 import { errorMiddleware } from './middleware/error'
-import { healthRoutes } from './routes/health'
+import { healthRoutes, type HealthResponse } from './handlers/health'
 
 const app = new Hono()
 
@@ -34,8 +42,19 @@ app.use('*', logger())
 app.use('*', cors())
 app.onError(errorMiddleware)
 
-// Routes
-app.route('/health', healthRoutes)
+// Create runtime for Effect execution
+const runtime = Runtime.defaultRuntime
+
+/**
+ * Wire Effect handlers to Hono routes
+ * This is where framework-specific code lives
+ */
+for (const route of healthRoutes) {
+  app.on(route.method, route.path, async (c) => {
+    const result = await Runtime.runPromise(runtime)(route.handler as Effect.Effect<HealthResponse>)
+    return c.json(result)
+  })
+}
 
 export { app }
 `
@@ -152,32 +171,46 @@ export const D1Live = (db: D1Database) => Layer.succeed(Database, makeD1Service(
 `
 
 // =============================================================================
-// Templates - Routes
+// Templates - Routes (Pure Effect Handlers - NO Hono imports)
 // =============================================================================
 
-const HEALTH_ROUTE_TEMPLATE = `/**
- * Health Routes
+const HEALTH_HANDLER_TEMPLATE = `/**
+ * Health Handlers
  *
- * Liveness and readiness probes.
+ * Pure Effect handlers for liveness and readiness probes.
+ * Framework-agnostic: NO Hono imports allowed here.
+ * The composition root (server.ts) wires these to HTTP routes.
  */
-import { Hono } from 'hono'
+import { Effect } from 'effect'
 
-export const healthRoutes = new Hono()
+/** Response type for health endpoints */
+export interface HealthResponse {
+  readonly status: 'ok' | 'ready' | 'degraded'
+  readonly timestamp: string
+}
 
-healthRoutes.get('/', (c) => {
-  return c.json({
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-  })
+/**
+ * Liveness probe - returns ok if service is running
+ */
+export const livenessHandler = Effect.succeed<HealthResponse>({
+  status: 'ok',
+  timestamp: new Date().toISOString(),
 })
 
-healthRoutes.get('/ready', (c) => {
-  // TODO: Add database connectivity check
-  return c.json({
-    status: 'ready',
-    timestamp: new Date().toISOString(),
-  })
+/**
+ * Readiness probe - returns ready if service can handle requests
+ * TODO: Add dependency checks (database, external services)
+ */
+export const readinessHandler = Effect.succeed<HealthResponse>({
+  status: 'ready',
+  timestamp: new Date().toISOString(),
 })
+
+/** Route definitions for the composition root */
+export const healthRoutes = [
+  { method: 'GET' as const, path: '/health', handler: livenessHandler },
+  { method: 'GET' as const, path: '/health/ready', handler: readinessHandler },
+] as const
 `
 
 // =============================================================================
@@ -274,7 +307,7 @@ export const generateApi = (
   const templates: FileTree = {
     'src/server.ts': SERVER_TS_TEMPLATE,
     'src/index.ts': INDEX_TS_TEMPLATE,
-    'src/routes/health.ts': HEALTH_ROUTE_TEMPLATE,
+    'src/handlers/health.ts': HEALTH_HANDLER_TEMPLATE, // Pure Effect handlers (no Hono)
     'src/middleware/error.ts': ERROR_MIDDLEWARE_TEMPLATE,
     'src/lib/result.ts': RESULT_TS_TEMPLATE,
     'wrangler.toml': WRANGLER_TOML_TEMPLATE,
