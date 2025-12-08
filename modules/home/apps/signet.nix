@@ -43,6 +43,13 @@ in
 
         exec ${pkgs.bun}/bin/bun run "$SIGNET_DIR/src/cli.ts" "$@"
       '')
+
+      # Short alias 's' for quick access
+      (pkgs.writeShellScriptBin "s" ''
+        # s - Signet CLI shorthand
+        # Delegates to signet command
+        exec signet "$@"
+      '')
     ];
 
     # Environment variables
