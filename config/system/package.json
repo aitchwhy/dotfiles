@@ -14,7 +14,7 @@
     "validate": "bun run typecheck && bun run lint && bun test"
   },
   "dependencies": {
-    "zod": "^4.0.2",
+    "zod": "^4.1.13",
     "effect": "^3.19.9",
     "@effect/platform": "^0.93.6",
     "@effect/platform-node": "^0.103.0"
