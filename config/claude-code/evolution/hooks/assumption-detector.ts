@@ -141,10 +141,6 @@ async function logAssumptions(sessionId: string, assumptions: Assumption[]): Pro
 }
 
 async function main() {
-  // DISABLED: Settings cached from session start - remove this after session ends
-  console.log(JSON.stringify({ continue: true }));
-  process.exit(0);
-
   let rawInput: string;
   try {
     rawInput = await Bun.stdin.text();
