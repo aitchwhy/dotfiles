@@ -34,5 +34,10 @@
     "command": "npx",
     "args": ["-y", "@modelcontextprotocol/server-fetch"],
     "type": "stdio"
+  },
+  "repomix": {
+    "command": "npx",
+    "args": ["-y", "repomix", "--mcp"],
+    "type": "stdio"
   }
 }

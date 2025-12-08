@@ -268,6 +268,7 @@ Atomic commits. Never commit broken code. Rebase over merge.
 
 Modern tools: eza (ls), bat (cat), rg (grep), fd (find), delta (diff).
 History: Atuin. Prompt: Starship. Files: Yazi. Multiplexer: Zellij.
+Repomix: `rx` (pack), `rx-ember` (ember-platform), `rx-dotfiles` (configs).
 Nix for packages. Homebrew only for GUI apps and casks.
 
 ---
@@ -302,6 +303,7 @@ Nix for packages. Homebrew only for GUI apps and casks.
 | `result-patterns` | Error handling with Result types |
 | `zod-patterns` | Schema-first development |
 | `nix-darwin-patterns` | Nix flakes + home-manager |
+| `repomix-patterns` | Codebase packaging for AI context |
 
 ---
 
