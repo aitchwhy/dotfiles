@@ -168,6 +168,16 @@
         ]
       },
       {
+        "matcher": "Write(**/package.json)|Edit(**/package.json)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run \"$HOME/dotfiles/config/claude-code/evolution/hooks/enforce-versions.ts\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
         "matcher": "Write(*.sh)|Write(*.bash)|Edit(*.sh)|Edit(*.bash)",
         "hooks": [
           {
