@@ -1,0 +1,299 @@
+#!/usr/bin/env bash
+# rx - Repomix codebase packaging CLI
+# UV-like interface for repomix operations
+set -euo pipefail
+
+VERSION="1.0.0"
+DOTFILES="${DOTFILES:-$HOME/dotfiles}"
+EMBER="$HOME/src/ember-platform"
+
+# Colors (only if terminal supports it)
+if [[ -t 1 ]]; then
+    RED='\033[0;31m'
+    GREEN='\033[0;32m'
+    YELLOW='\033[0;33m'
+    BLUE='\033[0;34m'
+    CYAN='\033[0;36m'
+    BOLD='\033[1m'
+    DIM='\033[2m'
+    NC='\033[0m'
+else
+    RED='' GREEN='' YELLOW='' BLUE='' CYAN='' BOLD='' DIM='' NC=''
+fi
+
+show_help() {
+    echo -e "${CYAN}rx${NC} - Repomix codebase packaging CLI"
+    echo ""
+    echo -e "${YELLOW}Usage:${NC} rx <COMMAND> [OPTIONS]"
+    echo ""
+    echo -e "${YELLOW}Commands:${NC}"
+    echo -e "  ${GREEN}pack${NC} [path]       Pack directory (default: current)"
+    echo -e "  ${GREEN}copy${NC} [path]       Pack and copy output path to clipboard"
+    echo -e "  ${GREEN}dots${NC}              Pack dotfiles repository"
+    echo -e "  ${GREEN}ember${NC}             Pack ember-platform repository"
+    echo -e "  ${GREEN}remote${NC} <repo>     Pack a remote GitHub repository"
+    echo -e "  ${GREEN}config${NC}            Interactive config editor"
+    echo -e "  ${GREEN}init${NC}              Initialize repomix.config.json"
+    echo -e "  ${GREEN}validate${NC} [path]   Validate config file"
+    echo -e "  ${GREEN}help${NC}              Show this help"
+    echo ""
+    echo -e "${YELLOW}Options:${NC}"
+    echo "  -c, --compress    Enable compression (default)"
+    echo "  --no-compress     Disable compression"
+    echo -e "  -o, --output      Output file path"
+    echo ""
+    echo -e "${YELLOW}Aliases:${NC}"
+    echo -e "  ${DIM}rxy = rx copy     rxd = rx dots${NC}"
+    echo -e "  ${DIM}rxe = rx ember    rxr = rx remote${NC}"
+    echo ""
+    echo -e "${YELLOW}Examples:${NC}"
+    echo "  rx                    # Show this help"
+    echo "  rx pack               # Pack current directory"
+    echo "  rx copy               # Pack and copy path to clipboard"
+    echo "  rxy                   # Same as 'rx copy'"
+    echo "  rx remote user/repo   # Pack GitHub repository"
+}
+
+# Pack current directory or specified path
+cmd_pack() {
+    local path="${1:-.}"
+    local compress="--compress"
+
+    # Parse options
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --no-compress) compress="" ;;
+            -o|--output) shift; output="--output $1" ;;
+            *) path="$1" ;;
+        esac
+        shift
+    done
+
+    echo -e "${CYAN}Packing${NC} $path..."
+    repomix $compress ${output:-} "$path"
+    echo -e "${GREEN}✓${NC} Done: repomix-output.xml"
+}
+
+# Pack and copy output path to clipboard
+cmd_copy() {
+    local path="${1:-.}"
+
+    echo -e "${CYAN}Packing${NC} $path..."
+    repomix --compress "$path"
+
+    local output_path
+    output_path="$(pwd)/repomix-output.xml"
+    echo "$output_path" | pbcopy
+    echo -e "${GREEN}✓${NC} Path copied to clipboard: $output_path"
+}
+
+# Pack dotfiles repository
+cmd_dots() {
+    echo -e "${CYAN}Packing${NC} dotfiles..."
+    repomix --cwd "$DOTFILES" "$@"
+    echo -e "${GREEN}✓${NC} Done: $DOTFILES/repomix-output.xml"
+}
+
+# Pack ember-platform repository
+cmd_ember() {
+    if [[ ! -d "$EMBER" ]]; then
+        echo -e "${RED}Error:${NC} ember-platform not found at $EMBER"
+        exit 1
+    fi
+
+    echo -e "${CYAN}Packing${NC} ember-platform..."
+    repomix --cwd "$EMBER" "$@"
+    echo -e "${GREEN}✓${NC} Done: $EMBER/repomix-output.xml"
+}
+
+# Pack remote repository
+cmd_remote() {
+    local repo="${1:-}"
+
+    if [[ -z "$repo" ]]; then
+        echo -e "${RED}Error:${NC} Repository required"
+        echo "Usage: rx remote <user/repo>"
+        exit 1
+    fi
+
+    shift
+    echo -e "${CYAN}Packing remote${NC} $repo..."
+    repomix --remote "$repo" --compress "$@"
+    echo -e "${GREEN}✓${NC} Done"
+}
+
+# Interactive config editor
+cmd_config() {
+    # Check for required tools
+    if ! command -v gum &>/dev/null; then
+        echo -e "${RED}Error:${NC} gum not installed. Run: nix-shell -p gum"
+        exit 1
+    fi
+    if ! command -v fzf &>/dev/null; then
+        echo -e "${RED}Error:${NC} fzf not installed"
+        exit 1
+    fi
+
+    # Find config files
+    local configs=()
+    [[ -f "./repomix.config.json" ]] && configs+=("./repomix.config.json")
+    [[ -f "$DOTFILES/repomix.config.json" ]] && configs+=("$DOTFILES/repomix.config.json")
+    [[ -f "$EMBER/repomix.config.json" ]] && configs+=("$EMBER/repomix.config.json")
+    configs+=("[Create new config]")
+
+    # Select config file
+    local config
+    config=$(printf '%s\n' "${configs[@]}" | fzf --prompt="Select config: " --height=10)
+
+    if [[ "$config" == "[Create new config]" ]]; then
+        cmd_init
+        config="./repomix.config.json"
+    fi
+
+    if [[ ! -f "$config" ]]; then
+        echo -e "${RED}Error:${NC} Config not found: $config"
+        exit 1
+    fi
+
+    # Select section to edit
+    local section
+    section=$(gum choose "output" "include" "ignore" "security" "tokenCount" "View full config" --header="Select section to edit")
+
+    if [[ "$section" == "View full config" ]]; then
+        ${EDITOR:-vim} "$config"
+        cmd_validate "$config"
+        return
+    fi
+
+    # Extract section to temp file
+    local tmp
+    tmp=$(mktemp --suffix=.json)
+
+    if jq -e ".$section" "$config" >/dev/null 2>&1; then
+        jq ".$section" "$config" > "$tmp"
+    else
+        echo "{}" > "$tmp"
+    fi
+
+    # Edit section
+    ${EDITOR:-vim} "$tmp"
+
+    # Validate edited JSON
+    if ! jq empty "$tmp" 2>/dev/null; then
+        gum style --foreground 1 "✗ Invalid JSON in edited section"
+        rm "$tmp"
+        exit 1
+    fi
+
+    # Merge back
+    local new_value
+    new_value=$(cat "$tmp")
+    jq ".$section = $new_value" "$config" > "${config}.tmp" && mv "${config}.tmp" "$config"
+    rm "$tmp"
+
+    # Validate final config
+    cmd_validate "$config"
+}
+
+# Initialize new config
+cmd_init() {
+    if [[ -f "./repomix.config.json" ]]; then
+        echo -e "${YELLOW}Warning:${NC} repomix.config.json already exists"
+        if command -v gum &>/dev/null; then
+            gum confirm "Overwrite?" || exit 0
+        else
+            read -p "Overwrite? [y/N] " -n 1 -r
+            echo
+            [[ ! $REPLY =~ ^[Yy]$ ]] && exit 0
+        fi
+    fi
+
+    cat > "./repomix.config.json" << 'EOF'
+{
+  "$schema": "https://repomix.com/schemas/latest/schema.json",
+  "output": {
+    "filePath": "repomix-output.xml",
+    "style": "xml",
+    "parsableStyle": true,
+    "compress": true,
+    "fileSummary": true,
+    "directoryStructure": true,
+    "topFilesLength": 10,
+    "git": {
+      "sortByChanges": true,
+      "sortByChangesMaxCommits": 100
+    }
+  },
+  "include": ["**/*"],
+  "ignore": {
+    "useGitignore": true,
+    "useDefaultPatterns": true,
+    "customPatterns": []
+  },
+  "security": {
+    "enableSecurityCheck": true
+  }
+}
+EOF
+
+    echo -e "${GREEN}✓${NC} Created repomix.config.json"
+    echo -e "${DIM}Edit with: rx config${NC}"
+}
+
+# Validate config file
+cmd_validate() {
+    local config="${1:-./repomix.config.json}"
+
+    if [[ ! -f "$config" ]]; then
+        echo -e "${RED}Error:${NC} Config not found: $config"
+        exit 1
+    fi
+
+    # Check JSON syntax
+    if ! jq empty "$config" 2>/dev/null; then
+        echo -e "${RED}✗${NC} Invalid JSON: $config"
+        # Show error details
+        jq . "$config" 2>&1 | head -5
+        exit 1
+    fi
+
+    # Check required fields
+    local has_output has_ignore
+    has_output=$(jq -e '.output' "$config" 2>/dev/null && echo "yes" || echo "no")
+    has_ignore=$(jq -e '.ignore' "$config" 2>/dev/null && echo "yes" || echo "no")
+
+    if [[ "$has_output" != "yes" ]]; then
+        echo -e "${YELLOW}Warning:${NC} Missing 'output' section"
+    fi
+
+    echo -e "${GREEN}✓${NC} Config valid: $config"
+
+    # Show summary
+    local files tokens
+    files=$(jq -r '.include | length' "$config" 2>/dev/null || echo "?")
+    echo -e "${DIM}  Include patterns: $files${NC}"
+}
+
+main() {
+    case "${1:-}" in
+        pack)     shift; cmd_pack "$@" ;;
+        copy)     shift; cmd_copy "$@" ;;
+        dots)     shift; cmd_dots "$@" ;;
+        ember)    shift; cmd_ember "$@" ;;
+        remote)   shift; cmd_remote "$@" ;;
+        config)   cmd_config ;;
+        init)     cmd_init ;;
+        validate) shift; cmd_validate "$@" ;;
+        help|--help|-h) show_help ;;
+        --version|-v) echo "rx $VERSION" ;;
+        "") show_help ;;
+        *)
+            echo -e "${RED}Error:${NC} Unknown command: $1"
+            echo ""
+            show_help
+            exit 1
+            ;;
+    esac
+}
+
+main "$@"
