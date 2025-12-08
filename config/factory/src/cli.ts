@@ -28,6 +28,13 @@ import {
   reconcile,
   type PatternConfig,
 } from '@/layers/ast-engine'
+import {
+  PatternEngineLive,
+  loadRulesFromDirectory,
+  applyRules,
+  applyAllFixes,
+  type PatternMatch,
+} from '@/layers/patterns'
 import type { ProjectSpec } from '@/schema/project-spec'
 import { readdir } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -45,6 +52,7 @@ const pathArg = Args.text({ name: 'path' }).pipe(Args.optional)
 const fixOption = Options.boolean('fix').pipe(Options.withDefault(false))
 const dryRunOption = Options.boolean('dry-run').pipe(Options.withDefault(false))
 const verboseOption = Options.boolean('verbose').pipe(Options.withDefault(false))
+const rulesOption = Options.text('rules').pipe(Options.withDefault('rules'))
 
 const validateProjectType = (type: string): Effect.Effect<ProjectType, Error> => {
   if (PROJECT_TYPES.includes(type as ProjectType)) {
@@ -158,18 +166,75 @@ export const genCommand = Command.make(
 // Validate Command
 // =============================================================================
 
-export const validateCommand = Command.make('validate', { path: pathArg }, ({ path }) =>
-  Effect.gen(function* () {
-    const targetPath = Option.getOrElse(path, () => '.')
-    yield* Console.log(`\n🔍 Validating project at: ${targetPath}\n`)
+export const validateCommand = Command.make(
+  'validate',
+  { path: pathArg, verbose: verboseOption, rulesDir: rulesOption },
+  ({ path, verbose: _verbose, rulesDir }) =>
+    Effect.gen(function* () {
+      const targetPath = Option.getOrElse(path, () => '.')
+      yield* Console.log(`\n🔍 Validating project at: ${targetPath}\n`)
 
-    // TODO: Implement validation against ProjectSpec
-    yield* Console.log('Checking project structure...')
-    yield* Console.log('Checking dependencies...')
-    yield* Console.log('Checking TypeScript config...')
+      // Load YAML pattern rules (ast-grep based)
+      const yamlRules = yield* loadRulesFromDirectory(rulesDir).pipe(
+        Effect.provide(PatternEngineLive),
+        Effect.catchAll(() => Effect.succeed([] as const))
+      )
 
-    yield* Console.log(`\n✅ Validation passed`)
-  })
+      if (yamlRules.length > 0) {
+        yield* Console.log(`Loaded ${yamlRules.length} pattern rule(s)\n`)
+      }
+
+      // Find all TypeScript files
+      const tsFiles = yield* Effect.tryPromise({
+        try: () => findTsFiles(targetPath),
+        catch: (e) => new Error(`Failed to scan directory: ${e}`),
+      })
+
+      if (tsFiles.length === 0) {
+        yield* Console.log('No TypeScript files found.')
+        return
+      }
+
+      yield* Console.log('Checking project structure...')
+      yield* Console.log('Checking dependencies...')
+      yield* Console.log('Checking TypeScript config...')
+
+      // Run pattern validation
+      let totalErrors = 0
+      let totalWarnings = 0
+
+      for (const filePath of tsFiles) {
+        const content = yield* readFile(filePath).pipe(Effect.provide(FileSystemLive))
+        const patternResult = yield* applyRules(content, 'TypeScript', yamlRules, filePath).pipe(
+          Effect.provide(PatternEngineLive),
+          Effect.catchAll(() => Effect.succeed({ matches: [], errors: [] as readonly string[] }))
+        )
+
+        const errors = patternResult.matches.filter((m: PatternMatch) => m.severity === 'error')
+        const warnings = patternResult.matches.filter((m: PatternMatch) => m.severity === 'warning')
+
+        if (errors.length > 0 || warnings.length > 0) {
+          yield* Console.log(`\n📄 ${filePath}`)
+          for (const m of patternResult.matches) {
+            const icon = m.severity === 'error' ? '❌' : '⚠️'
+            yield* Console.log(`   ${icon} [${m.rule}] ${m.message}:${m.node.range.start.line}`)
+          }
+        }
+
+        totalErrors += errors.length
+        totalWarnings += warnings.length
+      }
+
+      yield* Console.log('')
+      if (totalErrors > 0) {
+        yield* Console.log(`\n❌ Validation failed: ${totalErrors} error(s), ${totalWarnings} warning(s)`)
+        yield* Effect.fail(new Error('Validation failed'))
+      } else if (totalWarnings > 0) {
+        yield* Console.log(`\n⚠️ Validation passed with ${totalWarnings} warning(s)`)
+      } else {
+        yield* Console.log(`\n✅ Validation passed`)
+      }
+    })
 )
 
 // =============================================================================
@@ -231,17 +296,32 @@ async function findTsFiles(dir: string): Promise<string[]> {
 
 export const reconcileCommand = Command.make(
   'reconcile',
-  { path: pathArg, dryRun: dryRunOption, verbose: verboseOption },
-  ({ path, dryRun, verbose }) =>
+  { path: pathArg, dryRun: dryRunOption, verbose: verboseOption, rulesDir: rulesOption },
+  ({ path, dryRun, verbose, rulesDir }) =>
     Effect.gen(function* () {
       const targetPath = Option.getOrElse(path, () => '.')
       yield* Console.log(`\n🔄 Reconciling drift at: ${targetPath}${dryRun ? ' (dry-run)' : ''}\n`)
 
-      // Default pattern config for Factory-generated projects
+      // Default pattern config for Factory-generated projects (OXC-based)
       const patterns: PatternConfig = {
         requireZodImport: true,
         requireResultType: true,
         requireExplicitExports: false,
+      }
+
+      // Load YAML pattern rules (ast-grep based)
+      const yamlRules = yield* loadRulesFromDirectory(rulesDir).pipe(
+        Effect.provide(PatternEngineLive),
+        Effect.catchAll((e) => {
+          if (verbose) {
+            Console.log(`⚠️ Could not load YAML rules from ${rulesDir}: ${e.message}`)
+          }
+          return Effect.succeed([] as const)
+        })
+      )
+
+      if (yamlRules.length > 0) {
+        yield* Console.log(`Loaded ${yamlRules.length} pattern rule(s) from ${rulesDir}/\n`)
       }
 
       // Find all TypeScript files
@@ -265,20 +345,47 @@ export const reconcileCommand = Command.make(
       // Analyze each file
       for (const filePath of tsFiles) {
         const content = yield* readFile(filePath).pipe(Effect.provide(FileSystemLive))
-        const sf = yield* createSourceFile(filePath, content).pipe(Effect.provide(AstEngineLive))
-        const report = yield* detectDrift(sf, patterns).pipe(Effect.provide(AstEngineLive))
 
-        if (report.issues.length > 0) {
+        // 1. Run OXC-based drift detection
+        const sf = yield* createSourceFile(filePath, content).pipe(Effect.provide(AstEngineLive))
+        const driftReport = yield* detectDrift(sf, patterns).pipe(Effect.provide(AstEngineLive))
+
+        // 2. Run ast-grep YAML pattern rules
+        const patternResult = yield* applyRules(content, 'TypeScript', yamlRules, filePath).pipe(
+          Effect.provide(PatternEngineLive),
+          Effect.catchAll(() => Effect.succeed({ matches: [], errors: [] as readonly string[] }))
+        )
+
+        // Combine issues from both engines
+        const patternIssues = patternResult.matches.map((m: PatternMatch) => ({
+          type: 'pattern-violation' as const,
+          severity: m.severity,
+          message: `[${m.rule}] ${m.message}`,
+          line: m.node.range.start.line,
+          fix: m.fix
+            ? {
+                description: `Replace with: ${m.fix.replacement.slice(0, 50)}${m.fix.replacement.length > 50 ? '...' : ''}`,
+                replacement: m.fix.replacement,
+              }
+            : undefined,
+        }))
+
+        const allIssues = [...driftReport.issues, ...patternIssues]
+
+        if (allIssues.length > 0) {
           filesWithIssues++
-          totalIssues += report.issues.length
-          if (report.hasErrors) totalErrors += report.issues.filter((i) => i.severity === 'error').length
-          if (report.hasWarnings) totalWarnings += report.issues.filter((i) => i.severity === 'warning').length
+          totalIssues += allIssues.length
+
+          const errors = allIssues.filter((i) => i.severity === 'error').length
+          const warnings = allIssues.filter((i) => i.severity === 'warning').length
+          totalErrors += errors
+          totalWarnings += warnings
 
           // Print file header
           yield* Console.log(`📄 ${filePath}`)
 
           // Print each issue
-          for (const issue of report.issues) {
+          for (const issue of allIssues) {
             const icon = issue.severity === 'error' ? '❌' : '⚠️'
             const line = issue.line ? `:${issue.line}` : ''
             yield* Console.log(`   ${icon} ${issue.message}${line}`)
@@ -289,13 +396,29 @@ export const reconcileCommand = Command.make(
           }
 
           // Apply fixes if not dry-run
-          if (!dryRun && report.issues.some((i) => i.fix)) {
-            const fixableIssues = report.issues.filter((i) => i.fix)
-            const fixed = yield* reconcile(sf, fixableIssues).pipe(Effect.provide(AstEngineLive))
+          if (!dryRun) {
+            let fixedContent = content
 
-            // Write fixed content back to file
-            yield* writeTree({ [filePath]: fixed }, '.').pipe(Effect.provide(FileSystemLive))
-            yield* Console.log(`   ✅ Applied ${fixableIssues.length} fix(es)`)
+            // Apply OXC drift fixes
+            const driftFixableIssues = driftReport.issues.filter((i) => i.fix)
+            if (driftFixableIssues.length > 0) {
+              fixedContent = yield* reconcile(sf, driftFixableIssues).pipe(Effect.provide(AstEngineLive))
+            }
+
+            // Apply ast-grep pattern fixes
+            const patternFixableMatches = patternResult.matches.filter((m: PatternMatch) => m.fix)
+            if (patternFixableMatches.length > 0) {
+              fixedContent = yield* applyAllFixes(fixedContent, patternFixableMatches).pipe(
+                Effect.provide(PatternEngineLive)
+              )
+            }
+
+            const totalFixes = driftFixableIssues.length + patternFixableMatches.length
+            if (totalFixes > 0) {
+              // Write fixed content back to file
+              yield* writeTree({ [filePath]: fixedContent }, '.').pipe(Effect.provide(FileSystemLive))
+              yield* Console.log(`   ✅ Applied ${totalFixes} fix(es)`)
+            }
           }
 
           yield* Console.log('')
@@ -329,13 +452,14 @@ export const mainCommand = Command.make('fcs', {}, () =>
 🏭 Factory Code System (FCS)
 
 Universal Project Factory for generating formally consistent software systems.
+Powered by OXC + ast-grep for high-performance AST analysis and pattern enforcement.
 
 Commands:
   fcs init <type> <name>   Initialize a new project
   fcs gen <type> <name>    Generate a workspace in existing project
-  fcs validate [path]      Validate project against spec
+  fcs validate [path]      Validate project against spec and patterns
   fcs enforce [--fix]      Run architecture enforcers
-  fcs reconcile [path]     Detect and fix code drift
+  fcs reconcile [path]     Detect and fix code drift via AST analysis
 
 Project Types:
   monorepo    Bun workspaces monorepo
@@ -344,6 +468,11 @@ Project Types:
   library     Standalone TypeScript library
   infra       Pulumi + process-compose infrastructure
 
+Reconcile Options:
+  --dry-run               Preview changes without applying
+  --verbose               Show detailed output
+  --rules <dir>           Custom YAML rules directory (default: rules/)
+
 Examples:
   fcs init monorepo ember-platform
   fcs gen api voice-service
@@ -351,6 +480,7 @@ Examples:
   fcs validate
   fcs enforce --fix
   fcs reconcile --dry-run --verbose
+  fcs reconcile --rules ./custom-rules
 `)
 ).pipe(
   Command.withSubcommands([initCommand, genCommand, validateCommand, enforceCommand, reconcileCommand])
