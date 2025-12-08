@@ -337,15 +337,6 @@
             "timeout": 15
           }
         ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun run \"$HOME/dotfiles/config/claude-code/evolution/hooks/assumption-detector.ts\"",
-            "timeout": 15
-          }
-        ]
       }
     ]
   },
