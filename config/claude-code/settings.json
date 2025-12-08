@@ -226,6 +226,16 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run \"$HOME/dotfiles/config/claude-code/evolution/hooks/atomic-git-sentinel.ts\"",
+            "timeout": 30
+          }
+        ]
       }
     ],
     "PreToolUse": [
@@ -344,15 +354,6 @@
             "type": "command",
             "command": "bun run \"$HOME/dotfiles/config/claude-code/evolution/hooks/verification-gate.ts\"",
             "timeout": 15
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun run \"$HOME/dotfiles/config/claude-code/evolution/hooks/semantic-commit-sentinel.ts\"",
-            "timeout": 30
           }
         ]
       }
