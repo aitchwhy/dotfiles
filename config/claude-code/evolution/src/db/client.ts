@@ -389,6 +389,121 @@ export class EvolutionDB {
       return rows.map((row) => GraderTrendSchema.parse(row));
     });
   }
+
+  // ==========================================================================
+  // Auto-GC Operations
+  // ==========================================================================
+
+  /**
+   * Get lesson count for threshold checks
+   */
+  getLessonCount(): Result<number, Error> {
+    return tryCatch(() => {
+      const row = this.db
+        .query<{ count: number }, []>('SELECT COUNT(*) as count FROM lessons')
+        .get();
+      return row?.count ?? 0;
+    });
+  }
+
+  /**
+   * Delete lessons that match garbage patterns (JSON fragments)
+   * Returns number of deleted lessons
+   */
+  deleteGarbageLessons(): Result<number, Error> {
+    return tryCatch(() => {
+      const garbagePatterns = [
+        '    "thinking":%',
+        '    "text":%',
+        '      "prompt":%',
+        '      "content":%',
+        '              "label":%',
+      ];
+
+      let deleted = 0;
+      for (const pattern of garbagePatterns) {
+        const result = this.db.run('DELETE FROM lessons WHERE lesson LIKE ?', [pattern]);
+        deleted += result.changes;
+      }
+
+      // Also delete JSON-like patterns
+      const jsonResult = this.db.run(
+        `DELETE FROM lessons WHERE lesson LIKE '{%' OR lesson LIKE '[%' OR lesson LIKE '"%'`
+      );
+      deleted += jsonResult.changes;
+
+      return deleted;
+    });
+  }
+
+  /**
+   * Delete oldest lessons above threshold, keeping only the most recent N
+   * @param threshold Maximum number of lessons to keep
+   * Returns number of deleted lessons
+   */
+  compactLessons(threshold: number = 20): Result<number, Error> {
+    return tryCatch(() => {
+      const countResult = this.getLessonCount();
+      if (!countResult.ok) throw countResult.error;
+
+      const count = countResult.data;
+      if (count <= threshold) return 0;
+
+      // Delete oldest lessons, keeping only threshold count
+      const result = this.db.run(
+        `DELETE FROM lessons WHERE id NOT IN (
+          SELECT id FROM lessons ORDER BY created_at DESC LIMIT ?
+        )`,
+        [threshold]
+      );
+
+      return result.changes;
+    });
+  }
+
+  /**
+   * Delete lessons older than specified days with low application count
+   * @param days Lessons older than this many days are candidates
+   * @param minApplications Lessons with fewer applications than this are deleted
+   */
+  deleteStaleLessons(days: number = 30, minApplications: number = 2): Result<number, Error> {
+    return tryCatch(() => {
+      const result = this.db.run(
+        `DELETE FROM lessons
+         WHERE created_at < datetime('now', '-' || ? || ' days')
+         AND times_applied < ?`,
+        [days, minApplications]
+      );
+      return result.changes;
+    });
+  }
+
+  /**
+   * Run full auto-GC cycle:
+   * 1. Delete garbage lessons (JSON fragments)
+   * 2. Delete stale unused lessons (>30 days, <2 applications)
+   * 3. Compact if above threshold
+   *
+   * @param threshold Maximum lessons to keep (default: 20)
+   * @param staleDays Delete unused lessons older than this (default: 30)
+   */
+  autoGC(
+    threshold: number = 20,
+    staleDays: number = 30
+  ): Result<{ garbage: number; stale: number; compacted: number }, Error> {
+    return tryCatch(() => {
+      const garbageResult = this.deleteGarbageLessons();
+      const garbage = garbageResult.ok ? garbageResult.data : 0;
+
+      const staleResult = this.deleteStaleLessons(staleDays, 2);
+      const stale = staleResult.ok ? staleResult.data : 0;
+
+      const compactResult = this.compactLessons(threshold);
+      const compacted = compactResult.ok ? compactResult.data : 0;
+
+      return { garbage, stale, compacted };
+    });
+  }
 }
 
 // ============================================================================
