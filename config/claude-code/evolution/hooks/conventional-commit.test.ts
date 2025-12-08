@@ -4,8 +4,9 @@
 import { describe, expect, test } from 'bun:test';
 
 describe('Conventional Commit Hook', () => {
+  // IMPORTANT: First character after `: ` must be lowercase (matches commitlint subject-case)
   const CONVENTIONAL_COMMIT_REGEX =
-    /^(feat|fix|refactor|test|docs|chore|perf|ci)(\([a-z0-9-]+\))?!?:\s+\S/;
+    /^(feat|fix|refactor|test|docs|chore|perf|ci)(\([a-z0-9-]+\))?!?:\s+[a-z]/;
 
   function isValidCommitMessage(message: string): boolean {
     return CONVENTIONAL_COMMIT_REGEX.test(message);
@@ -46,6 +47,13 @@ describe('Conventional Commit Hook', () => {
       'feat:', // no description
       'feature: wrong type',
       'Fix: capitalized type',
+      // Uppercase first letter after colon (violates subject-case)
+      'feat: Add uppercase first letter',
+      'fix(api): Handle null response',
+      'feat(web): Add TalkMachine for voice recording',
+      'refactor: Refactored the code',
+      'docs: Update README',
+      'chore: Update dependencies',
     ];
 
     test.each(INVALID_MESSAGES)('blocks: %s', (message) => {
