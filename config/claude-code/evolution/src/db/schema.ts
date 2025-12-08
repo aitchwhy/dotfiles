@@ -392,3 +392,187 @@ export const AssumptionTrendSchema = z.object({
 });
 
 export type AssumptionTrend = z.infer<typeof AssumptionTrendSchema>;
+
+// ============================================================================
+// Generator Drift Schemas (Added in migration 003)
+// ============================================================================
+
+export const DriftType = z.enum([
+  'missing-import',
+  'missing-zod-schema',
+  'missing-result-type',
+  'missing-export',
+  'invalid-import-path',
+]);
+export type DriftType = z.infer<typeof DriftType>;
+
+export const DriftSeverity = z.enum(['error', 'warning']);
+export type DriftSeverity = z.infer<typeof DriftSeverity>;
+
+export const GeneratorDriftSchema = z.object({
+  id: z.number().int().positive(),
+  detected_at: z.string().datetime(),
+  file_path: z.string(),
+  drift_type: DriftType,
+  severity: DriftSeverity,
+  message: z.string(),
+  line_number: z.number().int().positive().nullable(),
+  generator_name: z.string().nullable(),
+  project_path: z.string(),
+  fix_applied: z.union([z.literal(0), z.literal(1)]),
+  fix_applied_at: z.string().datetime().nullable(),
+  session_id: z.string().nullable(),
+});
+
+export type GeneratorDrift = z.infer<typeof GeneratorDriftSchema>;
+
+export const GeneratorDriftInsertSchema = GeneratorDriftSchema.omit({
+  id: true,
+  detected_at: true,
+  fix_applied: true,
+  fix_applied_at: true,
+}).extend({
+  detected_at: z.string().datetime().optional(),
+  fix_applied: z.union([z.literal(0), z.literal(1)]).optional(),
+  fix_applied_at: z.string().datetime().optional(),
+});
+
+export type GeneratorDriftInsert = z.infer<typeof GeneratorDriftInsertSchema>;
+
+// ============================================================================
+// Rule Violations Schemas (Added in migration 003)
+// ============================================================================
+
+export const RuleSource = z.enum(['hook', 'grader', 'enforcer', 'linter']);
+export type RuleSource = z.infer<typeof RuleSource>;
+
+export const ViolationSeverity = z.enum(['error', 'warning', 'info']);
+export type ViolationSeverity = z.infer<typeof ViolationSeverity>;
+
+export const RuleViolationSchema = z.object({
+  id: z.number().int().positive(),
+  detected_at: z.string().datetime(),
+  rule_source: RuleSource,
+  rule_name: z.string(),
+  file_path: z.string().nullable(),
+  line_number: z.number().int().positive().nullable(),
+  violation_message: z.string(),
+  severity: ViolationSeverity,
+  auto_fixed: z.union([z.literal(0), z.literal(1)]),
+  session_id: z.string().nullable(),
+});
+
+export type RuleViolation = z.infer<typeof RuleViolationSchema>;
+
+export const RuleViolationInsertSchema = RuleViolationSchema.omit({
+  id: true,
+  detected_at: true,
+  auto_fixed: true,
+}).extend({
+  detected_at: z.string().datetime().optional(),
+  auto_fixed: z.union([z.literal(0), z.literal(1)]).optional(),
+});
+
+export type RuleViolationInsert = z.infer<typeof RuleViolationInsertSchema>;
+
+// ============================================================================
+// Patch Proposals Schemas (Added in migration 003)
+// ============================================================================
+
+export const PatchType = z.enum([
+  'skill-update',
+  'rule-update',
+  'hook-update',
+  'generator-fix',
+  'schema-change',
+]);
+export type PatchType = z.infer<typeof PatchType>;
+
+export const PatchStatus = z.enum(['pending', 'approved', 'rejected', 'applied']);
+export type PatchStatus = z.infer<typeof PatchStatus>;
+
+export const PatchProposalSchema = z.object({
+  id: z.number().int().positive(),
+  created_at: z.string().datetime(),
+  patch_type: PatchType,
+  target_file: z.string(),
+  description: z.string(),
+  rationale: z.string(),
+  patch_content: z.string(),
+  status: PatchStatus,
+  confidence: z.number().min(0).max(1),
+  evidence_count: z.number().int().nonnegative(),
+  reviewed_at: z.string().datetime().nullable(),
+  applied_at: z.string().datetime().nullable(),
+  applied_by: z.string().nullable(),
+});
+
+export type PatchProposal = z.infer<typeof PatchProposalSchema>;
+
+export const PatchProposalInsertSchema = PatchProposalSchema.omit({
+  id: true,
+  created_at: true,
+  status: true,
+  reviewed_at: true,
+  applied_at: true,
+  applied_by: true,
+}).extend({
+  created_at: z.string().datetime().optional(),
+  status: PatchStatus.optional(),
+  reviewed_at: z.string().datetime().optional(),
+  applied_at: z.string().datetime().optional(),
+  applied_by: z.string().optional(),
+});
+
+export type PatchProposalInsert = z.infer<typeof PatchProposalInsertSchema>;
+
+// ============================================================================
+// Reflector Analytics Views (read-only)
+// ============================================================================
+
+export const DriftHotspotSchema = z.object({
+  generator_name: z.string().nullable(),
+  drift_type: DriftType,
+  occurrence_count: z.number().int(),
+  affected_files: z.number().int(),
+  fixed_count: z.number().int(),
+  last_seen: z.string().datetime(),
+});
+
+export type DriftHotspot = z.infer<typeof DriftHotspotSchema>;
+
+export const ViolationPatternSchema = z.object({
+  rule_source: RuleSource,
+  rule_name: z.string(),
+  severity: ViolationSeverity,
+  total_violations: z.number().int(),
+  affected_files: z.number().int(),
+  auto_fixed_count: z.number().int(),
+  first_seen: z.string().datetime(),
+  last_seen: z.string().datetime(),
+});
+
+export type ViolationPattern = z.infer<typeof ViolationPatternSchema>;
+
+export const PatchSummarySchema = z.object({
+  patch_type: PatchType,
+  status: PatchStatus,
+  count: z.number().int(),
+  avg_confidence: z.number(),
+  avg_evidence: z.number(),
+});
+
+export type PatchSummary = z.infer<typeof PatchSummarySchema>;
+
+export const ActiveIssueSchema = z.object({
+  issue_type: z.enum(['drift', 'violation']),
+  id: z.number().int().positive(),
+  detected_at: z.string().datetime(),
+  file_path: z.string().nullable(),
+  issue_name: z.string(),
+  message: z.string(),
+  severity: z.string(),
+  context: z.string().nullable(),
+});
+
+export type ActiveIssue = z.infer<typeof ActiveIssueSchema>;
