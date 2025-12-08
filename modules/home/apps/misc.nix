@@ -27,6 +27,12 @@ in
       "hazel".source = ../../../config/hazel;
     };
 
+    # CLI scripts (executable symlinks to ~/.local/bin)
+    home.file.".local/bin/rx" = {
+      source = ../../../config/scripts/rx;
+      executable = true;
+    };
+
     # Wispr Flow config - COPY instead of symlink
     # Wispr Flow needs to write vocabulary/dictionary at runtime
     # Base config is tracked in git, runtime changes are preserved

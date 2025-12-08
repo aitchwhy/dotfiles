@@ -129,6 +129,7 @@
     mkcert # Local HTTPS certs
     ngrok # Expose local servers
     caddy # Modern web server
+    gum # TUI components for rx config editor
 
     # GitHub
     gh
