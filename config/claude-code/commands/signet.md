@@ -1,3 +1,7 @@
+---
+description: Signet code quality workflows
+---
+
 # Signet (Code Quality & Generation Platform)
 
 Guide me through using Signet to create formally consistent software systems.

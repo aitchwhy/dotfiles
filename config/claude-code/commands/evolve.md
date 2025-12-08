@@ -1,3 +1,7 @@
+---
+description: Evolution system management
+---
+
 # /evolve - Self-Evolution System
 
 Run the dotfiles self-evolution system to grade health, reflect on issues, and propose improvements.

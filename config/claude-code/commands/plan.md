@@ -1,3 +1,7 @@
+---
+description: Implementation planning
+---
+
 # Implementation Planning
 
 Generate a detailed implementation plan before coding.
