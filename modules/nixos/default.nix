@@ -47,54 +47,26 @@ in
       keyMap = mkDefault "us";
     };
 
-    # Essential packages for remote development
+    # Minimal packages - add more via flake overlays later
     environment.systemPackages = with pkgs; [
-      # Editors
-      neovim
-      helix
-
-      # Shell utilities
       git
       curl
-      wget
       htop
-      btop
-      tree
-      fd
-      ripgrep
-      jq
-      yq-go
-
-      # Networking
-      mtr
-      dnsutils
-      inetutils
-
-      # System
-      pciutils
-      usbutils
-      lsof
-
-      # Compression
-      gzip
-      unzip
-      zstd
-
-      # Development
-      gnumake
-      gcc
-
-      # Nix tools
-      nix-tree
-      nix-output-monitor
     ];
 
-    # Programs
+    # Minimal programs
     programs = {
-      zsh.enable = true;
       git.enable = true;
-      mosh.enable = true;
-      tmux.enable = true;
     };
+
+    # Use binary caches for faster builds
+    nix.settings.substituters = [
+      "https://cache.nixos.org"
+      "https://nix-community.cachix.org"
+    ];
+    nix.settings.trusted-public-keys = [
+      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+    ];
   };
 }

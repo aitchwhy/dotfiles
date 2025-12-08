@@ -41,62 +41,19 @@
     authKeyFile = config.sops.secrets.tailscale-auth.path;
   };
 
-  # Docker configuration
-  modules.nixos.services.docker = {
-    enable = true;
-    storageDriver = "overlay2";
-  };
+  # Docker - disabled for minimal build, enable later
+  # modules.nixos.services.docker = {
+  #   enable = true;
+  #   storageDriver = "overlay2";
+  # };
 
-  # Cloud-specific settings
-  boot = {
-    # Most cloud providers use GRUB
-    loader.grub = {
-      enable = true;
-      device = "nodev";
-      efiSupport = true;
-      efiInstallAsRemovable = true;
-    };
-  };
-
-  # Network configuration
-  networking = {
-    useDHCP = true;
-    interfaces = { }; # Let DHCP configure interfaces
-  };
-
-  # Development tools (in addition to modules/nixos packages)
+  # Minimal packages - add more later
   environment.systemPackages = with pkgs; [
-    # Claude Code dependencies
-    nodejs_22
-    bun
-
-    # Language toolchains
-    python312
-    uv
-    go
-
-    # Additional development tools
-    lazygit
-    delta
-    eza
-    bat
-    zoxide
-
-    # Persistent session tools
-    zellij
-    mosh
+    git
+    vim
+    htop
+    tmux
   ];
-
-  # Enable user lingering for persistent user services
-  systemd.tmpfiles.rules = [
-    "f /var/lib/systemd/linger/hank 0644 root root -"
-  ];
-
-  # Increase limits for development
-  boot.kernel.sysctl = {
-    "fs.inotify.max_user_watches" = 524288;
-    "fs.inotify.max_user_instances" = 1024;
-  };
 
   # System state version
   system.stateVersion = "24.11";
