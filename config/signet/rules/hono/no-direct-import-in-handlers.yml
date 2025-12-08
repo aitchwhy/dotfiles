@@ -1,0 +1,30 @@
+# No Direct Hono Imports in Handlers
+#
+# Hexagonal architecture requires route handlers to be framework-agnostic.
+# Handlers should be pure Effect functions that receive dependencies via Context.Tag.
+# Only the composition root (server.ts) should import Hono directly.
+#
+# BAD:  import { Hono } from 'hono'  // in handlers/*.ts
+# GOOD: import { Effect } from 'effect'  // Pure Effect handlers
+#
+# This rule enforces the hexagonal boundary between HTTP framework and business logic.
+
+id: hono-no-direct-import-in-handlers
+language: TypeScript
+severity: error
+message: |
+  Direct Hono imports are forbidden in handlers.
+  Handlers should be pure Effect functions - framework-agnostic.
+
+  Move this import to src/server.ts (composition root).
+  Use Context.Tag for dependencies instead of direct imports.
+
+note: |
+  Hexagonal Architecture Pattern:
+  - src/handlers/*.ts  → Pure Effect handlers (NO Hono)
+  - src/server.ts      → Composition root (Hono OK here)
+  - src/ports/*.ts     → Abstract interfaces (Context.Tag)
+  - src/adapters/*.ts  → Concrete implementations (Layer)
+
+rule:
+  pattern: import { $$$IMPORTS } from 'hono'
