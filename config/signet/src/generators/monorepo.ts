@@ -11,6 +11,7 @@ import { Effect } from 'effect'
 import type { FileTree } from '@/layers/file-system'
 import { renderTemplates, TemplateEngine } from '@/layers/template-engine'
 import type { ProjectSpec } from '@/schema/project-spec'
+import versions from '../../versions.json'
 
 // =============================================================================
 // Templates - Root Configuration
@@ -36,11 +37,11 @@ const ROOT_PACKAGE_JSON_TEMPLATE = `{
     "validate": "bun run typecheck && bun run lint && bun run test"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.8",
-    "typescript": "^5.9.3"
+    "@biomejs/biome": "^{{biomeVersion}}",
+    "typescript": "^{{typescriptVersion}}"
   },
   "engines": {
-    "bun": ">=1.3.0"
+    "bun": ">={{bunVersion}}"
   }
 }`
 
@@ -144,11 +145,11 @@ const SHARED_PACKAGE_JSON_TEMPLATE = `{
     "test": "bun test"
   },
   "dependencies": {
-    "zod": "^3.24.0"
+    "zod": "^{{zodVersion}}"
   },
   "devDependencies": {
-    "@types/bun": "^1.2.10",
-    "typescript": "^5.9.3"
+    "@types/bun": "^{{bunTypesVersion}}",
+    "typescript": "^{{typescriptVersion}}"
   }
 }`
 
@@ -343,13 +344,24 @@ bun validate
 
 /**
  * Generate Bun workspaces monorepo structure
+ *
+ * Uses versions from versions.json as single source of truth.
  */
 export const generateMonorepo = (
   spec: ProjectSpec
 ): Effect.Effect<FileTree, Error, TemplateEngine> => {
+  const npmVersions = versions.npm as Record<string, string>
+  const runtimeVersions = versions.runtime as Record<string, string>
+
   const data = {
     name: spec.name,
     description: spec.description,
+    // Versions from single source of truth
+    zodVersion: npmVersions['zod'],
+    typescriptVersion: npmVersions['typescript'],
+    biomeVersion: npmVersions['@biomejs/biome'],
+    bunTypesVersion: npmVersions['@types/bun'],
+    bunVersion: runtimeVersions['bun'],
   }
 
   const templates: FileTree = {

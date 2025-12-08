@@ -16,6 +16,7 @@ import { Effect } from 'effect'
 import type { FileTree } from '@/layers/file-system'
 import { renderTemplates, TemplateEngine } from '@/layers/template-engine'
 import type { ProjectSpec } from '@/schema/project-spec'
+import versions from '../../versions.json'
 
 // =============================================================================
 // Types
@@ -45,20 +46,20 @@ const PACKAGE_JSON_TEMPLATE = `{
     "validate": "bun run typecheck && bun run lint && bun test"
   },
   "dependencies": {
-    "zod": "^3.24.0"
+    "zod": "^{{zodVersion}}"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.8",
+    "@biomejs/biome": "^{{biomeVersion}}",
 {{#if isBun}}
-    "@types/bun": "^1.2.10",
+    "@types/bun": "^{{bunTypesVersion}}",
 {{/if}}
-    "typescript": "^5.9.3"
+    "typescript": "^{{typescriptVersion}}"
   },
   "engines": {
 {{#if isBun}}
-    "bun": ">=1.3.0"
+    "bun": ">={{bunVersion}}"
 {{else}}
-    "node": ">=22.0.0"
+    "node": ">={{nodeVersion}}"
 {{/if}}
   }
 }`
@@ -312,15 +313,27 @@ export const tryCatchAsync = async <T>(fn: () => Promise<T>): Promise<Result<T, 
 
 /**
  * Generate core project files from ProjectSpec
+ *
+ * Uses versions from versions.json as single source of truth.
  */
 export const generateCore = (
   spec: ProjectSpec
 ): Effect.Effect<FileTree, Error, TemplateEngine> => {
+  const npmVersions = versions.npm as Record<string, string>
+  const runtimeVersions = versions.runtime as Record<string, string>
+
   const data = {
     name: spec.name,
     description: spec.description,
     isBun: spec.infra.runtime === 'bun',
     isNode: spec.infra.runtime === 'node',
+    // Versions from single source of truth
+    zodVersion: npmVersions['zod'],
+    typescriptVersion: npmVersions['typescript'],
+    biomeVersion: npmVersions['@biomejs/biome'],
+    bunTypesVersion: npmVersions['@types/bun'],
+    bunVersion: runtimeVersions['bun'],
+    nodeVersion: runtimeVersions['node'],
   }
 
   const templates: FileTree = {
