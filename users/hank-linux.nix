@@ -28,6 +28,7 @@
     bartender.enable = false; # macOS menu bar organizer
     raycast.enable = false; # macOS launcher
     homerow.enable = false; # macOS keyboard shortcuts
+    betterdisplay.enable = false; # macOS display management (DDC, HiDPI)
     keyboardLayout.enable = false; # macOS keyboard layout
     defaultApps.enable = false; # macOS default app associations
     cursor.enable = false; # macOS GUI editor (use remote SSH instead)

@@ -110,6 +110,7 @@
       # ─────────────────────────────────────────────────────────────
       "karabiner-elements" # DriverKit driver for Kanata
       "homerow" # Keyboard shortcuts for screen elements
+      "betterdisplay" # Display management: HiDPI, DDC brightness, resolution scaling
 
       # ─────────────────────────────────────────────────────────────
       # Window Management (replaces Hammerspoon)

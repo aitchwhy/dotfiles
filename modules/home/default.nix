@@ -47,6 +47,7 @@ in
     ./apps/misc.nix
     ./apps/keyboard-layout.nix
     ./apps/homerow.nix
+    ./apps/betterdisplay.nix
     ./apps/default-apps.nix
     ./apps/factory.nix
     ./apps/prompt-system.nix
@@ -102,6 +103,7 @@ in
         misc.enable = mkDefault true;
         keyboardLayout.enable = mkDefault true;
         homerow.enable = mkDefault true;
+        betterdisplay.enable = mkDefault true;
         defaultApps.enable = mkDefault true;
         factory.enable = mkDefault true;
         promptSystem.enable = mkDefault true;
