@@ -31,8 +31,9 @@ const VALID_TYPES = ['feat', 'fix', 'refactor', 'test', 'docs', 'chore', 'perf',
 
 // Matches: type(scope): description or type: description
 // Allows optional ! for breaking changes
+// IMPORTANT: First character after `: ` must be lowercase (matches commitlint subject-case)
 const CONVENTIONAL_COMMIT_REGEX =
-  /^(feat|fix|refactor|test|docs|chore|perf|ci)(\([a-z0-9-]+\))?!?:\s+\S/;
+  /^(feat|fix|refactor|test|docs|chore|perf|ci)(\([a-z0-9-]+\))?!?:\s+[a-z]/;
 
 // ============================================================================
 // Command Parsing
@@ -130,7 +131,7 @@ async function main() {
 
 Invalid: '${message.substring(0, 50)}${message.length > 50 ? '...' : ''}'
 
-Expected format: type(scope): description
+Expected format: type(scope): description (lowercase first letter after colon)
 
 Valid types: ${VALID_TYPES.join(', ')}
 
@@ -143,7 +144,9 @@ Examples:
 
 Breaking changes: add ! before colon
   feat!: breaking change
-  fix(auth)!: breaking fix`,
+  fix(auth)!: breaking fix
+
+Note: First character after ': ' must be lowercase`,
     })
   );
 }
