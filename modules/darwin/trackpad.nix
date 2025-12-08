@@ -1,13 +1,14 @@
 # macOS trackpad configuration
-# Comprehensive trackpad settings for Swish compatibility
+# Comprehensive trackpad settings with granular gesture control
 #
-# CRITICAL: System gestures MUST be disabled for Swish to intercept trackpad input.
 # This module configures THREE domains:
 #   1. system.defaults.trackpad (high-level nix-darwin API)
 #   2. com.apple.AppleMultitouchTrackpad (built-in trackpad)
 #   3. com.apple.driver.AppleBluetoothMultitouch.trackpad (external trackpad)
 #
-# TEST: After applying, 4-finger gestures should NOT trigger Mission Control/Launchpad
+# Gesture compatibility:
+#   - 4-finger horizontal swipe: ENABLED by default (spaces/full-screen navigation)
+#   - Other multi-finger gestures: DISABLED by default (for Swish window management)
 {
   config,
   lib,
@@ -34,6 +35,10 @@ let
 
   # Gesture value: 0=disabled, 2=enabled
   gestureVal = enabled: if enabled then 2 else 0;
+
+  # Granular gesture values
+  fourFingerHorizVal = gestureVal cfg.enableFourFingerHorizSwipe;
+  swishConflictVal = gestureVal (!cfg.disableSwishConflicts);
 in
 {
   options.modules.darwin.trackpad = {
@@ -56,7 +61,7 @@ in
       default = false;
       description = ''
         Enable three-finger drag.
-        NOTE: Conflicts with some Swish gestures. Test before enabling.
+        NOTE: Conflicts with Swish 3-finger gestures. Test before enabling.
       '';
     };
 
@@ -76,13 +81,27 @@ in
       description = "Natural (inverted) scrolling direction";
     };
 
-    disableSystemGestures = mkOption {
+    enableFourFingerHorizSwipe = mkOption {
       type = types.bool;
       default = true;
       description = ''
-        Disable macOS system gestures (Mission Control, Launchpad, App Exposé).
-        REQUIRED for Swish to intercept trackpad gestures.
-        When true: 4-finger gestures pass through to Swish.
+        Enable 4-finger horizontal swipe for switching spaces/full-screen apps.
+        This gesture is independent of Swish and should generally be enabled.
+      '';
+    };
+
+    disableSwishConflicts = mkOption {
+      type = types.bool;
+      default = true;
+      description = ''
+        Disable gestures that conflict with Swish window management:
+        - 3-finger horizontal/vertical swipes
+        - 4-finger vertical swipe (Mission Control)
+        - 4-finger pinch (Launchpad)
+        - 5-finger pinch
+        - 2-finger right edge swipe (Notification Center)
+
+        When true: These gestures pass through to Swish.
         When false: macOS intercepts gestures for built-in features.
       '';
     };
@@ -111,15 +130,17 @@ in
       FirstClickThreshold = clickThreshold;
       SecondClickThreshold = clickThreshold;
 
-      # CRITICAL: System gesture settings for Swish compatibility
-      # All set to 0 when disableSystemGestures = true
-      TrackpadFourFingerHorizSwipeGesture = gestureVal (!cfg.disableSystemGestures);
-      TrackpadFourFingerVertSwipeGesture = gestureVal (!cfg.disableSystemGestures);
-      TrackpadFourFingerPinchGesture = gestureVal (!cfg.disableSystemGestures);
-      TrackpadFiveFingerPinchGesture = gestureVal (!cfg.disableSystemGestures);
-      TrackpadThreeFingerHorizSwipeGesture = gestureVal (!cfg.disableSystemGestures);
-      TrackpadThreeFingerVertSwipeGesture = gestureVal (!cfg.disableSystemGestures);
-      TrackpadTwoFingerFromRightEdgeSwipeGesture = gestureVal (!cfg.disableSystemGestures);
+      # Granular gesture control
+      # 4-finger horizontal: controlled separately for spaces navigation
+      TrackpadFourFingerHorizSwipeGesture = fourFingerHorizVal;
+
+      # These gestures conflict with Swish - disable by default
+      TrackpadFourFingerVertSwipeGesture = swishConflictVal;
+      TrackpadFourFingerPinchGesture = swishConflictVal;
+      TrackpadFiveFingerPinchGesture = swishConflictVal;
+      TrackpadThreeFingerHorizSwipeGesture = swishConflictVal;
+      TrackpadThreeFingerVertSwipeGesture = swishConflictVal;
+      TrackpadTwoFingerFromRightEdgeSwipeGesture = swishConflictVal;
 
       # Keep useful gestures enabled (pinch-to-zoom, rotate)
       TrackpadTwoFingerDoubleTapGesture = 1; # Smart zoom
@@ -139,14 +160,14 @@ in
       FirstClickThreshold = clickThreshold;
       SecondClickThreshold = clickThreshold;
 
-      # System gesture disabling
-      TrackpadFourFingerHorizSwipeGesture = gestureVal (!cfg.disableSystemGestures);
-      TrackpadFourFingerVertSwipeGesture = gestureVal (!cfg.disableSystemGestures);
-      TrackpadFourFingerPinchGesture = gestureVal (!cfg.disableSystemGestures);
-      TrackpadFiveFingerPinchGesture = gestureVal (!cfg.disableSystemGestures);
-      TrackpadThreeFingerHorizSwipeGesture = gestureVal (!cfg.disableSystemGestures);
-      TrackpadThreeFingerVertSwipeGesture = gestureVal (!cfg.disableSystemGestures);
-      TrackpadTwoFingerFromRightEdgeSwipeGesture = gestureVal (!cfg.disableSystemGestures);
+      # Granular gesture control (same as built-in)
+      TrackpadFourFingerHorizSwipeGesture = fourFingerHorizVal;
+      TrackpadFourFingerVertSwipeGesture = swishConflictVal;
+      TrackpadFourFingerPinchGesture = swishConflictVal;
+      TrackpadFiveFingerPinchGesture = swishConflictVal;
+      TrackpadThreeFingerHorizSwipeGesture = swishConflictVal;
+      TrackpadThreeFingerVertSwipeGesture = swishConflictVal;
+      TrackpadTwoFingerFromRightEdgeSwipeGesture = swishConflictVal;
 
       # Keep useful gestures
       TrackpadTwoFingerDoubleTapGesture = 1;
@@ -157,43 +178,28 @@ in
     # Activation script to force-apply gesture settings
     # Some settings require manual writes to take effect
     system.activationScripts.postActivation.text = lib.mkAfter ''
-      echo ">>> Applying trackpad gesture settings for Swish compatibility..."
+      echo ">>> Applying trackpad gesture settings..."
 
-      # Built-in trackpad
-      /usr/bin/defaults write com.apple.AppleMultitouchTrackpad TrackpadFourFingerPinchGesture -int ${
-        toString (gestureVal (!cfg.disableSystemGestures))
-      }
-      /usr/bin/defaults write com.apple.AppleMultitouchTrackpad TrackpadFourFingerVertSwipeGesture -int ${
-        toString (gestureVal (!cfg.disableSystemGestures))
-      }
-      /usr/bin/defaults write com.apple.AppleMultitouchTrackpad TrackpadFourFingerHorizSwipeGesture -int ${
-        toString (gestureVal (!cfg.disableSystemGestures))
-      }
-      /usr/bin/defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerHorizSwipeGesture -int ${
-        toString (gestureVal (!cfg.disableSystemGestures))
-      }
-      /usr/bin/defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerVertSwipeGesture -int ${
-        toString (gestureVal (!cfg.disableSystemGestures))
-      }
-      /usr/bin/defaults write com.apple.AppleMultitouchTrackpad TrackpadFiveFingerPinchGesture -int ${
-        toString (gestureVal (!cfg.disableSystemGestures))
-      }
+      # Built-in trackpad - 4-finger horizontal (spaces navigation)
+      /usr/bin/defaults write com.apple.AppleMultitouchTrackpad TrackpadFourFingerHorizSwipeGesture -int ${toString fourFingerHorizVal}
 
-      # Bluetooth trackpad
-      /usr/bin/defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadFourFingerPinchGesture -int ${
-        toString (gestureVal (!cfg.disableSystemGestures))
-      }
-      /usr/bin/defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadFourFingerVertSwipeGesture -int ${
-        toString (gestureVal (!cfg.disableSystemGestures))
-      }
-      /usr/bin/defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadFourFingerHorizSwipeGesture -int ${
-        toString (gestureVal (!cfg.disableSystemGestures))
-      }
+      # Built-in trackpad - Swish conflict gestures
+      /usr/bin/defaults write com.apple.AppleMultitouchTrackpad TrackpadFourFingerVertSwipeGesture -int ${toString swishConflictVal}
+      /usr/bin/defaults write com.apple.AppleMultitouchTrackpad TrackpadFourFingerPinchGesture -int ${toString swishConflictVal}
+      /usr/bin/defaults write com.apple.AppleMultitouchTrackpad TrackpadFiveFingerPinchGesture -int ${toString swishConflictVal}
+      /usr/bin/defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerHorizSwipeGesture -int ${toString swishConflictVal}
+      /usr/bin/defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerVertSwipeGesture -int ${toString swishConflictVal}
+
+      # Bluetooth trackpad - same settings
+      /usr/bin/defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadFourFingerHorizSwipeGesture -int ${toString fourFingerHorizVal}
+      /usr/bin/defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadFourFingerVertSwipeGesture -int ${toString swishConflictVal}
+      /usr/bin/defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadFourFingerPinchGesture -int ${toString swishConflictVal}
 
       # Refresh preferences daemon
       /usr/bin/killall cfprefsd 2>/dev/null || true
 
-      echo ">>> Trackpad settings applied. LOG OUT AND LOG BACK IN for full effect."
+      echo ">>> Trackpad: 4-finger horiz=${toString fourFingerHorizVal} (spaces), Swish conflicts=${toString swishConflictVal}"
+      echo ">>> LOG OUT AND LOG BACK IN for full effect."
     '';
   };
 }
