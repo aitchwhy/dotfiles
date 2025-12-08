@@ -448,6 +448,170 @@ export const reconcileCommand = Command.make(
 // Main Command
 // =============================================================================
 
+// =============================================================================
+// Doctor Command - System Health Check
+// =============================================================================
+
+export const doctorCommand = Command.make('doctor', {}, () =>
+  Effect.gen(function* () {
+    yield* Console.log('\n🩺 Signet Health Check\n')
+    yield* Console.log('─'.repeat(50))
+
+    let issues = 0
+
+    // Check 1: Runtime versions
+    yield* Console.log('\n📦 Runtime Environment')
+    const bunVersion = process.versions.bun || 'N/A'
+    const nodeVersion = process.version
+    yield* Console.log(`  ✓ Bun: ${bunVersion}`)
+    yield* Console.log(`  ✓ Node: ${nodeVersion}`)
+
+    // Check 2: Effect-TS availability
+    yield* Console.log('\n⚡ Effect-TS Integration')
+    yield* Console.log('  ✓ effect: available')
+    yield* Console.log('  ✓ @effect/cli: available')
+
+    // Check 3: AST tools
+    yield* Console.log('\n🔍 AST Analysis Tools')
+    const astGrepResult = yield* Effect.either(
+      Effect.tryPromise({
+        try: () => import('@ast-grep/napi'),
+        catch: () => new Error('Not found'),
+      })
+    )
+    if (astGrepResult._tag === 'Right') {
+      yield* Console.log('  ✓ @ast-grep/napi: available')
+    } else {
+      yield* Console.log('  ⚠️ @ast-grep/napi: not found')
+      issues++
+    }
+
+    // Check 4: Rules directory
+    yield* Console.log('\n📐 Architecture Rules')
+    const rulesDir = join(process.cwd(), 'rules')
+    const rulesResult = yield* Effect.either(
+      Effect.tryPromise({
+        try: () => readdir(rulesDir),
+        catch: () => new Error('Rules directory not found'),
+      })
+    )
+    if (rulesResult._tag === 'Right') {
+      const ruleCount = rulesResult.right.length
+      yield* Console.log(`  ✓ Rules directory: ${ruleCount} rule categories`)
+    } else {
+      yield* Console.log('  ℹ️ No local rules directory (using defaults)')
+    }
+
+    // Summary
+    yield* Console.log('\n' + '─'.repeat(50))
+    if (issues === 0) {
+      yield* Console.log('✅ All checks passed! Signet is healthy.\n')
+    } else {
+      yield* Console.log(`⚠️ Found ${issues} issue(s). Run 'signet comply' to attempt fixes.\n`)
+    }
+  })
+)
+
+// =============================================================================
+// Comply Command - Auto-fix Drift (Alias for reconcile --fix)
+// =============================================================================
+
+export const complyCommand = Command.make(
+  'comply',
+  { path: pathArg, verbose: verboseOption },
+  ({ path, verbose }) =>
+    Effect.gen(function* () {
+      const targetPath = Option.getOrElse(path, () => '.')
+      yield* Console.log(`\n🔧 Auto-fixing architecture drift at: ${targetPath}\n`)
+
+      // Run reconciliation with auto-fix enabled
+      const rulesDir = join(process.cwd(), 'rules')
+
+      // Load rules
+      const rulesResult = yield* Effect.either(
+        loadRulesFromDirectory(rulesDir).pipe(Effect.provide(PatternEngineLive))
+      )
+
+      const rules = rulesResult._tag === 'Right' ? rulesResult.right : []
+
+      if (rules.length === 0) {
+        yield* Console.log('ℹ️  No rules found. Skipping pattern enforcement.')
+        return
+      }
+
+      yield* Console.log(`📐 Loaded ${rules.length} architecture rules`)
+
+      // Find TypeScript files
+      const findTsFiles = async (dir: string): Promise<string[]> => {
+        const files: string[] = []
+        const entries = await readdir(dir, { withFileTypes: true })
+        for (const entry of entries) {
+          const fullPath = join(dir, entry.name)
+          if (entry.isDirectory() && !['node_modules', '.git', 'dist'].includes(entry.name)) {
+            files.push(...(await findTsFiles(fullPath)))
+          } else if (entry.name.endsWith('.ts') || entry.name.endsWith('.tsx')) {
+            files.push(fullPath)
+          }
+        }
+        return files
+      }
+
+      const tsFiles = yield* Effect.tryPromise({
+        try: () => findTsFiles(targetPath),
+        catch: (e) => new Error(`Failed to scan directory: ${e}`),
+      })
+
+      yield* Console.log(`🔍 Scanning ${tsFiles.length} TypeScript files...`)
+
+      let totalFixes = 0
+
+      for (const file of tsFiles) {
+        const contentResult = yield* Effect.either(
+          readFile(file).pipe(Effect.provide(FileSystemLive))
+        )
+
+        if (contentResult._tag === 'Left') continue
+
+        const content = contentResult.right
+
+        // Apply rules and get matches
+        const result = yield* applyRules(content, 'TypeScript', rules, file).pipe(
+          Effect.provide(PatternEngineLive)
+        )
+
+        const fixableMatches = result.matches.filter(
+          (m): m is PatternMatch & { fix: string } => m.fix !== undefined
+        )
+
+        if (fixableMatches.length > 0) {
+          // Apply fixes
+          const fixedContent = yield* applyAllFixes(content, fixableMatches).pipe(
+            Effect.provide(PatternEngineLive)
+          )
+
+          if (fixedContent !== content) {
+            // Write back
+            yield* Effect.tryPromise({
+              try: () => Bun.write(file, fixedContent),
+              catch: (e) => new Error(`Failed to write ${file}: ${e}`),
+            })
+
+            totalFixes += fixableMatches.length
+            if (verbose) {
+              yield* Console.log(`  ✓ Fixed ${fixableMatches.length} issue(s) in ${file}`)
+            }
+          }
+        }
+      }
+
+      yield* Console.log(`\n✅ Applied ${totalFixes} fix(es) across ${tsFiles.length} files.\n`)
+    })
+)
+
+// =============================================================================
+// Main Command
+// =============================================================================
+
 export const mainCommand = Command.make('signet', {}, () =>
   Console.log(`
 🔏 Signet - Code Quality & Generation Platform
@@ -461,6 +625,8 @@ Commands:
   signet validate [path]      Validate project against spec and patterns
   signet enforce [--fix]      Run architecture enforcers
   signet reconcile [path]     Detect and fix code drift via AST analysis
+  signet doctor               Check system health and dependencies
+  signet comply [path]        Auto-fix architecture drift (reconcile --fix)
 
 Project Types:
   monorepo    Bun workspaces monorepo
@@ -481,10 +647,19 @@ Examples:
   signet validate
   signet enforce --fix
   signet reconcile --dry-run --verbose
-  signet reconcile --rules ./custom-rules
+  signet doctor
+  signet comply --verbose
 `)
 ).pipe(
-  Command.withSubcommands([initCommand, genCommand, validateCommand, enforceCommand, reconcileCommand])
+  Command.withSubcommands([
+    initCommand,
+    genCommand,
+    validateCommand,
+    enforceCommand,
+    reconcileCommand,
+    doctorCommand,
+    complyCommand,
+  ])
 )
 
 // =============================================================================
