@@ -1,19 +1,41 @@
 /**
  * AST Engine Effect Layer
  *
- * Provides TypeScript AST manipulation via ts-morph as an Effect Layer.
+ * Provides TypeScript AST manipulation via OXC as an Effect Layer.
  * Used for drift detection and code reconciliation.
  *
  * This is the Port/Adapter pattern:
  * - Port: AstEngineService interface
- * - Adapter: AstEngineLive implementation using ts-morph
+ * - Adapter: AstEngineLive implementation using OXC
+ *
+ * @see https://www.npmjs.com/package/oxc-parser
+ * @version oxc-parser@0.101.0
  */
 import { Context, Effect, Layer } from 'effect'
-import { Project, type SourceFile } from 'ts-morph'
+import { parseSync } from 'oxc-parser'
+import type { Program } from 'oxc-parser'
 
 // =============================================================================
 // Types
 // =============================================================================
+
+/**
+ * Parsed source file representation (OXC-based)
+ */
+export interface ParsedSource {
+  readonly filePath: string
+  readonly content: string
+  readonly program: Program
+  readonly errors: readonly ParseError[]
+}
+
+/**
+ * Parse error from OXC
+ */
+export interface ParseError {
+  readonly message: string
+  readonly span: { readonly start: number; readonly end: number }
+}
 
 /**
  * Types of drift that can be detected
@@ -68,14 +90,14 @@ export interface PatternConfig {
  * AST Engine service interface (Port)
  */
 export interface AstEngineService {
-  readonly createSourceFile: (path: string, content: string) => Effect.Effect<SourceFile, Error>
-  readonly parseSourceFile: (path: string) => Effect.Effect<SourceFile, Error>
+  readonly createSourceFile: (path: string, content: string) => Effect.Effect<ParsedSource, Error>
+  readonly parseSourceFile: (path: string) => Effect.Effect<ParsedSource, Error>
   readonly detectDrift: (
-    sf: SourceFile,
+    source: ParsedSource,
     patterns: PatternConfig
   ) => Effect.Effect<DriftReport, Error>
   readonly reconcile: (
-    sf: SourceFile,
+    source: ParsedSource,
     issues: readonly DriftIssue[]
   ) => Effect.Effect<string, Error>
 }
@@ -132,18 +154,21 @@ const ZOD_API_PATTERNS = [
  * Check if a file uses zod (z.) but doesn't import it
  * Uses specific Zod API patterns to avoid false positives from regex patterns
  */
-function checkZodImport(sf: SourceFile): DriftIssue | undefined {
-  const text = sf.getFullText()
+function checkZodImport(source: ParsedSource): DriftIssue | undefined {
+  const text = source.content
 
   // Check if any Zod API pattern is used in the file
   const usesZod = ZOD_API_PATTERNS.some((pattern) => text.includes(pattern))
   if (!usesZod) return undefined
 
-  // Check if zod is imported
-  const imports = sf.getImportDeclarations()
-  const hasZodImport = imports.some(
-    (imp) => imp.getModuleSpecifierValue() === 'zod' || imp.getModuleSpecifierValue() === 'zod/v4'
-  )
+  // Check if zod is imported by looking at import statements in the AST
+  const hasZodImport = source.program.body.some((stmt) => {
+    if (stmt.type === 'ImportDeclaration') {
+      const importSource = stmt.source.value
+      return importSource === 'zod' || importSource === 'zod/v4'
+    }
+    return false
+  })
 
   if (!hasZodImport) {
     return {
@@ -162,32 +187,44 @@ function checkZodImport(sf: SourceFile): DriftIssue | undefined {
 
 /**
  * Check if async functions that could fail return Result type
+ * Uses pattern-based heuristics since OXC doesn't provide full type inference
  */
-function checkResultType(sf: SourceFile): DriftIssue[] {
+function checkResultType(source: ParsedSource): DriftIssue[] {
   const issues: DriftIssue[] = []
+  const text = source.content
 
-  // Get all exported functions
-  const functions = sf.getFunctions().filter((fn) => fn.isExported())
+  // Find exported function declarations using regex patterns
+  // This is a simplified heuristic approach since OXC doesn't provide type inference
+  const exportedFunctionPattern =
+    /export\s+(async\s+)?function\s+(\w+)\s*\([^)]*\)\s*:\s*([^{]+)/g
+  let match: RegExpExecArray | null
 
-  for (const fn of functions) {
-    const returnType = fn.getReturnType().getText()
-    const isAsync = fn.isAsync()
-    const name = fn.getName() ?? 'anonymous'
+  while ((match = exportedFunctionPattern.exec(text)) !== null) {
+    const isAsync = Boolean(match[1])
+    const name = match[2] ?? ''
+    const returnType = (match[3] ?? '').trim()
+
+    // Skip if we couldn't extract name or return type
+    if (!name || !returnType) continue
 
     // Check if function returns Promise but not Result
     if (isAsync && returnType.includes('Promise<') && !returnType.includes('Result<')) {
       // Heuristic: handler functions that deal with external data should return Result
+      const nameLower = name.toLowerCase()
       const isHandler =
-        name.toLowerCase().includes('handle') ||
-        name.toLowerCase().includes('process') ||
-        name.toLowerCase().includes('fetch')
+        nameLower.includes('handle') ||
+        nameLower.includes('process') ||
+        nameLower.includes('fetch')
 
       if (isHandler) {
+        // Calculate approximate line number
+        const lineNumber = text.substring(0, match.index).split('\n').length
+
         issues.push({
           type: 'missing-result-type',
           severity: 'warning',
           message: `Async function '${name}' could fail but doesn't return Result type`,
-          line: fn.getStartLineNumber(),
+          line: lineNumber,
           fix: {
             description: 'Change return type to Promise<Result<...>>',
             replacement: 'Promise<Result<Response, Error>>',
@@ -198,15 +235,18 @@ function checkResultType(sf: SourceFile): DriftIssue[] {
 
     // Check non-async functions that could fail
     if (!isAsync && !returnType.includes('Result<')) {
-      const hasParseInName = name.toLowerCase().includes('parse')
-      const hasValidateInName = name.toLowerCase().includes('validate')
+      const nameLower = name.toLowerCase()
+      const hasParseInName = nameLower.includes('parse')
+      const hasValidateInName = nameLower.includes('validate')
 
       if (hasParseInName || hasValidateInName) {
+        const lineNumber = text.substring(0, match.index).split('\n').length
+
         issues.push({
           type: 'missing-result-type',
           severity: 'warning',
           message: `Function '${name}' appears to parse/validate but doesn't return Result type`,
-          line: fn.getStartLineNumber(),
+          line: lineNumber,
         })
       }
     }
@@ -218,24 +258,23 @@ function checkResultType(sf: SourceFile): DriftIssue[] {
 /**
  * Run all drift detection checks on a source file
  */
-function runDriftDetection(sf: SourceFile, patterns: PatternConfig): DriftReport {
+function runDriftDetection(source: ParsedSource, patterns: PatternConfig): DriftReport {
   const issues: DriftIssue[] = []
-  const filePath = sf.getFilePath()
 
   // Check Zod import
   if (patterns.requireZodImport) {
-    const zodIssue = checkZodImport(sf)
+    const zodIssue = checkZodImport(source)
     if (zodIssue) issues.push(zodIssue)
   }
 
   // Check Result type usage
   if (patterns.requireResultType) {
-    const resultIssues = checkResultType(sf)
+    const resultIssues = checkResultType(source)
     issues.push(...resultIssues)
   }
 
   return {
-    filePath,
+    filePath: source.filePath,
     issues,
     hasErrors: issues.some((i) => i.severity === 'error'),
     hasWarnings: issues.some((i) => i.severity === 'warning'),
@@ -246,64 +285,77 @@ function runDriftDetection(sf: SourceFile, patterns: PatternConfig): DriftReport
 // Live Implementation (Adapter)
 // =============================================================================
 
+import { readFile } from 'node:fs/promises'
+
 /**
- * Create a ts-morph Project instance (singleton per service)
+ * Parse source code using OXC
  */
-const createProject = (): Project => {
-  return new Project({
-    useInMemoryFileSystem: true,
-    compilerOptions: {
-      strict: true,
-      target: 99, // ESNext
-      module: 99, // ESNext
-    },
-  })
+const parseWithOxc = (filePath: string, content: string): ParsedSource => {
+  const result = parseSync(filePath, content)
+
+  return {
+    filePath,
+    content,
+    program: result.program,
+    errors: result.errors.map((e) => ({
+      message: e.message,
+      // OXC errors use 'labels' array with spans, fallback to 0 if not available
+      span: {
+        start: (e as unknown as { labels?: Array<{ span: { start: number } }> }).labels?.[0]?.span?.start ?? 0,
+        end: (e as unknown as { labels?: Array<{ span: { end: number } }> }).labels?.[0]?.span?.end ?? 0,
+      },
+    })),
+  }
 }
 
 /**
  * Create the live AstEngine service implementation
  */
-const makeAstEngineService = (): AstEngineService => {
-  const project = createProject()
+const makeAstEngineService = (): AstEngineService => ({
+  createSourceFile: (path: string, content: string) =>
+    Effect.try({
+      try: () => parseWithOxc(path, content),
+      catch: (e) => new Error(`Failed to create source file ${path}: ${e}`),
+    }),
 
-  return {
-    createSourceFile: (path: string, content: string) =>
-      Effect.try({
-        try: () => project.createSourceFile(path, content, { overwrite: true }),
-        catch: (e) => new Error(`Failed to create source file ${path}: ${e}`),
-      }),
+  parseSourceFile: (path: string) =>
+    Effect.tryPromise({
+      try: async () => {
+        const content = await readFile(path, 'utf-8')
+        return parseWithOxc(path, content)
+      },
+      catch: (e) => new Error(`Failed to parse source file ${path}: ${e}`),
+    }),
 
-    parseSourceFile: (path: string) =>
-      Effect.try({
-        try: () => {
-          const sf = project.addSourceFileAtPath(path)
-          return sf
-        },
-        catch: (e) => new Error(`Failed to parse source file ${path}: ${e}`),
-      }),
+  detectDrift: (source: ParsedSource, patterns: PatternConfig) =>
+    Effect.try({
+      try: () => runDriftDetection(source, patterns),
+      catch: (e) => new Error(`Failed to detect drift: ${e}`),
+    }),
 
-    detectDrift: (sf: SourceFile, patterns: PatternConfig) =>
-      Effect.try({
-        try: () => runDriftDetection(sf, patterns),
-        catch: (e) => new Error(`Failed to detect drift: ${e}`),
-      }),
+  reconcile: (source: ParsedSource, issues: readonly DriftIssue[]) =>
+    Effect.try({
+      try: () => {
+        let content = source.content
 
-    reconcile: (sf: SourceFile, issues: readonly DriftIssue[]) =>
-      Effect.try({
-        try: () => {
-          // Apply fixes for issues that have them
-          for (const issue of issues) {
-            if (issue.fix && issue.type === 'missing-import') {
-              // Prepend import to file
-              sf.insertText(0, issue.fix.replacement)
-            }
+        // Apply fixes for issues that have them
+        // Sort by position (reverse order) to preserve offsets
+        const fixableIssues = [...issues]
+          .filter((i) => i.fix)
+          .sort((a, b) => (b.line ?? 0) - (a.line ?? 0))
+
+        for (const issue of fixableIssues) {
+          if (issue.fix && issue.type === 'missing-import') {
+            // Prepend import to file
+            content = issue.fix.replacement + content
           }
-          return sf.getFullText()
-        },
-        catch: (e) => new Error(`Failed to reconcile: ${e}`),
-      }),
-  }
-}
+        }
+
+        return content
+      },
+      catch: (e) => new Error(`Failed to reconcile: ${e}`),
+    }),
+})
 
 /**
  * AstEngineLive - the live Layer providing the AstEngine service
@@ -320,29 +372,29 @@ export const AstEngineLive = Layer.succeed(AstEngine, makeAstEngineService())
 export const createSourceFile = (
   path: string,
   content: string
-): Effect.Effect<SourceFile, Error, AstEngine> =>
+): Effect.Effect<ParsedSource, Error, AstEngine> =>
   Effect.flatMap(AstEngine, (engine) => engine.createSourceFile(path, content))
 
 /**
  * Parse a source file from disk - requires AstEngine in context
  */
-export const parseSourceFile = (path: string): Effect.Effect<SourceFile, Error, AstEngine> =>
+export const parseSourceFile = (path: string): Effect.Effect<ParsedSource, Error, AstEngine> =>
   Effect.flatMap(AstEngine, (engine) => engine.parseSourceFile(path))
 
 /**
  * Detect drift in a source file - requires AstEngine in context
  */
 export const detectDrift = (
-  sf: SourceFile,
+  source: ParsedSource,
   patterns: PatternConfig
 ): Effect.Effect<DriftReport, Error, AstEngine> =>
-  Effect.flatMap(AstEngine, (engine) => engine.detectDrift(sf, patterns))
+  Effect.flatMap(AstEngine, (engine) => engine.detectDrift(source, patterns))
 
 /**
  * Reconcile drift issues in a source file - requires AstEngine in context
  */
 export const reconcile = (
-  sf: SourceFile,
+  source: ParsedSource,
   issues: readonly DriftIssue[]
 ): Effect.Effect<string, Error, AstEngine> =>
-  Effect.flatMap(AstEngine, (engine) => engine.reconcile(sf, issues))
+  Effect.flatMap(AstEngine, (engine) => engine.reconcile(source, issues))

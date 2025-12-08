@@ -1,25 +1,22 @@
 /**
  * AST Engine Tests
  *
- * Tests for the ts-morph based AST Engine layer.
+ * Tests for the OXC based AST Engine layer.
  */
 import { describe, expect, test } from 'bun:test'
-import { Effect, Exit } from 'effect'
+import { Effect } from 'effect'
 import {
-  AstEngine,
   AstEngineLive,
-  type DriftIssue,
   type PatternConfig,
   createSourceFile,
   detectDrift,
-  parseSourceFile,
 } from './ast-engine'
 
 describe('AstEngine', () => {
   describe('createSourceFile', () => {
     test('creates a source file from content', async () => {
       const program = createSourceFile('test.ts', 'const x: number = 42;').pipe(
-        Effect.map((sf) => sf.getFullText()),
+        Effect.map((source) => source.content),
         Effect.provide(AstEngineLive)
       )
 
@@ -34,7 +31,7 @@ import { z } from 'zod';
 export const schema = z.string();`
 
       const program = createSourceFile('test.ts', content).pipe(
-        Effect.map((sf) => sf.getImportDeclarations().length),
+        Effect.map((source) => source.program.body.filter((s) => s.type === 'ImportDeclaration').length),
         Effect.provide(AstEngineLive)
       )
 
@@ -54,7 +51,7 @@ export const schema = z.string();`
       }
 
       const program = createSourceFile('schema.ts', content).pipe(
-        Effect.flatMap((sf) => detectDrift(sf, patterns)),
+        Effect.flatMap((source) => detectDrift(source, patterns)),
         Effect.provide(AstEngineLive)
       )
 
@@ -75,7 +72,7 @@ export const schema = z.object({ name: z.string() });`
       }
 
       const program = createSourceFile('schema.ts', content).pipe(
-        Effect.flatMap((sf) => detectDrift(sf, patterns)),
+        Effect.flatMap((source) => detectDrift(source, patterns)),
         Effect.provide(AstEngineLive)
       )
 
@@ -97,7 +94,7 @@ export const schema = z.object({ name: z.string() });`
       }
 
       const program = createSourceFile('handler.ts', content).pipe(
-        Effect.flatMap((sf) => detectDrift(sf, patterns)),
+        Effect.flatMap((source) => detectDrift(source, patterns)),
         Effect.provide(AstEngineLive)
       )
 
@@ -121,7 +118,7 @@ export function parseUser(input: unknown): Result<User, Error> {
       }
 
       const program = createSourceFile('parser.ts', content).pipe(
-        Effect.flatMap((sf) => detectDrift(sf, patterns)),
+        Effect.flatMap((source) => detectDrift(source, patterns)),
         Effect.provide(AstEngineLive)
       )
 
@@ -142,7 +139,7 @@ export function parseUser(input: unknown): Result<User, Error> {
       }
 
       const program = createSourceFile('myfile.ts', content).pipe(
-        Effect.flatMap((sf) => detectDrift(sf, patterns)),
+        Effect.flatMap((source) => detectDrift(source, patterns)),
         Effect.provide(AstEngineLive)
       )
 
@@ -160,7 +157,7 @@ export function parseUser(input: unknown): Result<User, Error> {
       }
 
       const program = createSourceFile('test.ts', content).pipe(
-        Effect.flatMap((sf) => detectDrift(sf, patterns)),
+        Effect.flatMap((source) => detectDrift(source, patterns)),
         Effect.provide(AstEngineLive)
       )
 
