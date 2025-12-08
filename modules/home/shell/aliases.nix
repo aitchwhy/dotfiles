@@ -94,8 +94,13 @@ in
       sp = "supabase";
       ts = "tailscale";
       hf = "huggingface-cli";
-      rx = "repomix";
       at = "atuin";
+
+      # Repomix CLI (rx is the script in ~/.local/bin)
+      rxy = "rx copy";    # Pack and copy to clipboard
+      rxd = "rx dots";    # Pack dotfiles
+      rxe = "rx ember";   # Pack ember-platform
+      rxr = "rx remote";  # Pack remote repo
 
       # Claude Code
       cc = "claude";
