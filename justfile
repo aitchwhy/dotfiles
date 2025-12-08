@@ -169,25 +169,25 @@ evolve-init:
     @echo "✓ Evolution system initialized"
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# REPOMIX (Codebase Snapshots)
+# REPOMIX (Codebase Snapshots) - Delegates to ~/.local/bin/rx
 # ═══════════════════════════════════════════════════════════════════════════════
 
-# Pack current directory with defaults
+# Repomix CLI - show help or run subcommand
 rx *ARGS:
-    repomix {{ ARGS }}
+    @~/.local/bin/rx {{ ARGS }}
 
-# Pack ember-platform with project config
+# Aliases for common operations
+rx-copy *ARGS:
+    @~/.local/bin/rx copy {{ ARGS }}
+
+rx-dots *ARGS:
+    @~/.local/bin/rx dots {{ ARGS }}
+
 rx-ember *ARGS:
-    repomix --cwd ~/src/ember-platform {{ ARGS }}
+    @~/.local/bin/rx ember {{ ARGS }}
 
-# Pack dotfiles for config sharing
-rx-dotfiles *ARGS:
-    repomix --cwd ~/dotfiles {{ ARGS }}
-
-# Pack a remote GitHub repository
 rx-remote REPO *ARGS:
-    repomix --remote {{ REPO }} --compress {{ ARGS }}
+    @~/.local/bin/rx remote {{ REPO }} {{ ARGS }}
 
-# Pack and copy output path to clipboard
-rx-clip *ARGS:
-    repomix {{ ARGS }} && echo "$(pwd)/repomix-output.xml" | pbcopy && echo "✓ Path copied to clipboard"
+rx-config:
+    @~/.local/bin/rx config
