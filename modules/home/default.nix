@@ -49,7 +49,7 @@ in
     ./apps/homerow.nix
     ./apps/betterdisplay.nix
     ./apps/default-apps.nix
-    ./apps/factory.nix
+    ./apps/signet.nix
     ./apps/prompt-system.nix
   ];
 
@@ -105,7 +105,7 @@ in
         homerow.enable = mkDefault true;
         betterdisplay.enable = mkDefault true;
         defaultApps.enable = mkDefault true;
-        factory.enable = mkDefault true;
+        signet.enable = mkDefault true;
         promptSystem.enable = mkDefault true;
       };
     };

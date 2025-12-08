@@ -96,6 +96,10 @@ in
       hf = "huggingface-cli";
       at = "atuin";
 
+      # Signet CLI (Code Quality & Generation Platform)
+      s = "signet";
+      sig = "signet";
+
       # Repomix CLI (rx is the script in ~/.local/bin)
       rxy = "rx copy";    # Pack and copy to clipboard
       rxd = "rx dots";    # Pack dotfiles
