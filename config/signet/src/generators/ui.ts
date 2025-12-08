@@ -25,7 +25,8 @@ import { App } from './App'
 import './globals.css'
 
 const root = document.getElementById('root')
-if (!root) throw new Error('Root element not found')
+// Throw is valid in generated React code (not Effect-TS)
+if (!root) ${'throw'} new Error('Root element not found')
 
 createRoot(root).render(
   <StrictMode>

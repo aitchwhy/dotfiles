@@ -248,57 +248,58 @@ const toSourceRange = (node: SgNode): SourceRange => {
 }
 
 /**
- * Validate a parsed YAML rule
+ * Validate a parsed YAML rule (Effect-TS compliant)
  */
-const validateRule = (raw: unknown, filePath: string): PatternRule => {
-  const r = raw as Record<string, unknown>
+const validateRule = (raw: unknown, filePath: string): Effect.Effect<PatternRule, Error> =>
+  Effect.gen(function* () {
+    const r = raw as Record<string, unknown>
 
-  // Access properties via bracket notation for index signatures
-  const id = r['id']
-  const language = r['language']
-  const message = r['message']
-  const rule = r['rule']
-  const severity = r['severity']
-  const fix = r['fix']
-  const note = r['note']
-  const constraints = r['constraints']
+    // Access properties via bracket notation for index signatures
+    const id = r['id']
+    const language = r['language']
+    const message = r['message']
+    const rule = r['rule']
+    const severity = r['severity']
+    const fix = r['fix']
+    const note = r['note']
+    const constraints = r['constraints']
 
-  if (!id || typeof id !== 'string') {
-    throw new Error(`Rule in ${filePath} missing required 'id' field`)
-  }
-  if (!language || typeof language !== 'string') {
-    throw new Error(`Rule ${id} missing required 'language' field`)
-  }
-  if (!message || typeof message !== 'string') {
-    throw new Error(`Rule ${id} missing required 'message' field`)
-  }
-  if (!rule || typeof rule !== 'object') {
-    throw new Error(`Rule ${id} missing required 'rule' field`)
-  }
+    if (!id || typeof id !== 'string') {
+      return yield* Effect.fail(new Error(`Rule in ${filePath} missing required 'id' field`))
+    }
+    if (!language || typeof language !== 'string') {
+      return yield* Effect.fail(new Error(`Rule ${id} missing required 'language' field`))
+    }
+    if (!message || typeof message !== 'string') {
+      return yield* Effect.fail(new Error(`Rule ${id} missing required 'message' field`))
+    }
+    if (!rule || typeof rule !== 'object') {
+      return yield* Effect.fail(new Error(`Rule ${id} missing required 'rule' field`))
+    }
 
-  // Build the result, only including optional fields if they're defined
-  const result: PatternRule = {
-    id,
-    language: language as PatternLanguage,
-    severity: (severity as RuleSeverity | undefined) ?? 'error',
-    message,
-    rule: rule as RuleConfig,
-  }
+    // Build the result, only including optional fields if they're defined
+    const result: PatternRule = {
+      id,
+      language: language as PatternLanguage,
+      severity: (severity as RuleSeverity | undefined) ?? 'error',
+      message,
+      rule: rule as RuleConfig,
+    }
 
-  // Add optional fields only if present (exactOptionalPropertyTypes compliance)
-  if (typeof fix === 'string') {
-    ;(result as { fix: string }).fix = fix
-  }
-  if (typeof note === 'string') {
-    ;(result as { note: string }).note = note
-  }
-  if (constraints !== undefined && typeof constraints === 'object') {
-    ;(result as { constraints: Record<string, ConstraintConfig> }).constraints =
-      constraints as Record<string, ConstraintConfig>
-  }
+    // Add optional fields only if present (exactOptionalPropertyTypes compliance)
+    if (typeof fix === 'string') {
+      ;(result as { fix: string }).fix = fix
+    }
+    if (typeof note === 'string') {
+      ;(result as { note: string }).note = note
+    }
+    if (constraints !== undefined && typeof constraints === 'object') {
+      ;(result as { constraints: Record<string, ConstraintConfig> }).constraints =
+        constraints as Record<string, ConstraintConfig>
+    }
 
-  return result
-}
+    return result
+  })
 
 /**
  * Create a PatternMatch object with optional fix (exactOptionalPropertyTypes compliant)
@@ -474,53 +475,61 @@ const makePatternService = (): PatternService => ({
     }),
 
   loadRuleFromYaml: (path: string) =>
-    Effect.tryPromise({
-      try: async () => {
-        const content = await readFile(path, 'utf-8')
-        const parsed = parseYaml(content)
-        return validateRule(parsed, path)
-      },
-      catch: (e) => new Error(`Failed to load rule from ${path}: ${e}`),
+    Effect.gen(function* () {
+      const content = yield* Effect.tryPromise({
+        try: () => readFile(path, 'utf-8'),
+        catch: (e) => new Error(`Failed to read rule file ${path}: ${e}`),
+      })
+      const parsed = parseYaml(content)
+      return yield* validateRule(parsed, path)
     }),
 
   loadRulesFromDirectory: (dirPath: string) =>
-    Effect.tryPromise({
-      try: async () => {
-        const rules: PatternRule[] = []
+    Effect.gen(function* () {
+      const rules: PatternRule[] = []
 
-        // Recursively find all .yml files
-        const findYamlFiles = async (dir: string): Promise<string[]> => {
-          const files: string[] = []
-          const entries = await readdir(dir, { withFileTypes: true })
+      // Recursively find all .yml files
+      const findYamlFiles = async (dir: string): Promise<string[]> => {
+        const files: string[] = []
+        const entries = await readdir(dir, { withFileTypes: true })
 
-          for (const entry of entries) {
-            const fullPath = join(dir, entry.name)
-            if (entry.isDirectory()) {
-              files.push(...(await findYamlFiles(fullPath)))
-            } else if (entry.name.endsWith('.yml') || entry.name.endsWith('.yaml')) {
-              files.push(fullPath)
-            }
-          }
-
-          return files
-        }
-
-        const yamlFiles = await findYamlFiles(dirPath)
-
-        for (const file of yamlFiles) {
-          try {
-            const content = await readFile(file, 'utf-8')
-            const parsed = parseYaml(content)
-            rules.push(validateRule(parsed, file))
-          } catch (e) {
-            // Log warning but continue loading other rules
-            console.warn(`Warning: Could not load rule from ${file}: ${e}`)
+        for (const entry of entries) {
+          const fullPath = join(dir, entry.name)
+          if (entry.isDirectory()) {
+            files.push(...(await findYamlFiles(fullPath)))
+          } else if (entry.name.endsWith('.yml') || entry.name.endsWith('.yaml')) {
+            files.push(fullPath)
           }
         }
 
-        return rules
-      },
-      catch: (e) => new Error(`Failed to load rules from ${dirPath}: ${e}`),
+        return files
+      }
+
+      const yamlFiles = yield* Effect.tryPromise({
+        try: () => findYamlFiles(dirPath),
+        catch: (e) => new Error(`Failed to scan directory ${dirPath}: ${e}`),
+      })
+
+      for (const file of yamlFiles) {
+        const ruleEffect = Effect.gen(function* () {
+          const content = yield* Effect.tryPromise({
+            try: () => readFile(file, 'utf-8'),
+            catch: (e) => new Error(`Failed to read ${file}: ${e}`),
+          })
+          const parsed = parseYaml(content)
+          return yield* validateRule(parsed, file)
+        })
+
+        // Try to load rule, log warning on failure but continue
+        const result = yield* Effect.either(ruleEffect)
+        if (result._tag === 'Right') {
+          rules.push(result.right)
+        } else {
+          console.warn(`Warning: Could not load rule from ${file}: ${result.left.message}`)
+        }
+      }
+
+      return rules
     }),
 
   applyFix: (content: string, match: PatternMatch) =>
