@@ -3,9 +3,10 @@
  *
  * Validates all cursor rule definitions against the CursorRule schema.
  */
+
+import { describe, expect, test } from 'bun:test'
 import { readdir } from 'node:fs/promises'
 import { join } from 'node:path'
-import { describe, expect, test } from 'bun:test'
 import { CursorRule } from '@/schema'
 
 const DEFINITIONS_DIR = join(import.meta.dir, '../../../src/definitions/cursor-rules')

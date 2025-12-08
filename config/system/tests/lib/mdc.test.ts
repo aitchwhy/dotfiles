@@ -110,7 +110,7 @@ This is raw markdown that should be preserved exactly.
       expect(markdown).toContain('```typescript')
       expect(markdown).toContain('// ✅ DO: Explicit type annotation')
       expect(markdown).toContain('const x: number = 42;')
-      expect(markdown).toContain('// ❌ DON\'T: Missing type annotation')
+      expect(markdown).toContain("// ❌ DON'T: Missing type annotation")
       expect(markdown).toContain('const x = 42;')
     })
 

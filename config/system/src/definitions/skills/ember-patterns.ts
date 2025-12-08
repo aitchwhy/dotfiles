@@ -18,7 +18,8 @@ export const emberPatternsSkill: SystemSkill = {
       patterns: [
         {
           title: 'Dynamic Secure Flag',
-          description: 'Cookies fail on localhost if secure: true. Always use dynamic configuration',
+          description:
+            'Cookies fail on localhost if secure: true. Always use dynamic configuration',
           annotation: 'do',
           language: 'typescript',
           code: `const isLocalhost = url.hostname === "localhost" || url.hostname === "127.0.0.1";

@@ -4,14 +4,33 @@
  * Generic tests that validate all skill definitions against the schema.
  * Each skill file exports a {name}Skill constant that must pass validation.
  */
-import { describe, test, expect } from 'bun:test'
-import { SystemSkill } from '@/schema'
+import { describe, expect, test } from 'bun:test'
 import { readdirSync } from 'node:fs'
-import { join, dirname } from 'node:path'
+import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { SystemSkill } from '@/schema'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const skillsDir = join(__dirname, '../../../src/definitions/skills')
+
+/**
+ * Load a skill from a module file, throwing if not found
+ */
+async function loadSkill(file: string): Promise<{ name: string; export: string; skill: unknown }> {
+  const modulePath = join(skillsDir, file)
+  const module = await import(modulePath)
+  const skillExport = Object.keys(module).find((k) => k.endsWith('Skill'))
+
+  if (!skillExport) {
+    throw new Error(`No skill export found in ${file}`)
+  }
+
+  return {
+    name: file.replace('.ts', ''),
+    export: skillExport,
+    skill: module[skillExport],
+  }
+}
 
 // Dynamically discover and test all skill definitions
 describe('skill definitions', () => {
@@ -29,24 +48,15 @@ describe('skill definitions', () => {
 
     describe(`${skillName}`, () => {
       test('exports a valid skill', async () => {
-        const modulePath = join(skillsDir, file)
-        const module = await import(modulePath)
-
-        // Find the skill export (convention: {camelCase}Skill)
-        const skillExport = Object.keys(module).find((k) => k.endsWith('Skill'))
+        const { skill, export: skillExport } = await loadSkill(file)
         expect(skillExport).toBeDefined()
-
-        const skill = module[skillExport!]
         expect(skill).toBeDefined()
       })
 
       test('validates against SystemSkill schema', async () => {
-        const modulePath = join(skillsDir, file)
-        const module = await import(modulePath)
-        const skillExport = Object.keys(module).find((k) => k.endsWith('Skill'))!
-        const skill = module[skillExport]
-
+        const { skill } = await loadSkill(file)
         const result = SystemSkill.safeParse(skill)
+
         if (!result.success) {
           console.error(`Validation errors for ${skillName}:`, result.error.issues)
         }
@@ -54,40 +64,27 @@ describe('skill definitions', () => {
       })
 
       test('has valid name matching filename', async () => {
-        const modulePath = join(skillsDir, file)
-        const module = await import(modulePath)
-        const skillExport = Object.keys(module).find((k) => k.endsWith('Skill'))!
-        const skill = module[skillExport]
-
-        expect(skill.name).toBe(skillName)
+        const { skill, name } = await loadSkill(file)
+        expect((skill as { name: string }).name).toBe(name)
       })
 
       test('has description between 20-300 chars', async () => {
-        const modulePath = join(skillsDir, file)
-        const module = await import(modulePath)
-        const skillExport = Object.keys(module).find((k) => k.endsWith('Skill'))!
-        const skill = module[skillExport]
-
-        expect(skill.description.length).toBeGreaterThanOrEqual(20)
-        expect(skill.description.length).toBeLessThanOrEqual(300)
+        const { skill } = await loadSkill(file)
+        const s = skill as { description: string }
+        expect(s.description.length).toBeGreaterThanOrEqual(20)
+        expect(s.description.length).toBeLessThanOrEqual(300)
       })
 
       test('has at least one allowed tool', async () => {
-        const modulePath = join(skillsDir, file)
-        const module = await import(modulePath)
-        const skillExport = Object.keys(module).find((k) => k.endsWith('Skill'))!
-        const skill = module[skillExport]
-
-        expect(skill.allowedTools.length).toBeGreaterThanOrEqual(1)
+        const { skill } = await loadSkill(file)
+        const s = skill as { allowedTools: string[] }
+        expect(s.allowedTools.length).toBeGreaterThanOrEqual(1)
       })
 
       test('has at least one section', async () => {
-        const modulePath = join(skillsDir, file)
-        const module = await import(modulePath)
-        const skillExport = Object.keys(module).find((k) => k.endsWith('Skill'))!
-        const skill = module[skillExport]
-
-        expect(skill.sections.length).toBeGreaterThanOrEqual(1)
+        const { skill } = await loadSkill(file)
+        const s = skill as { sections: unknown[] }
+        expect(s.sections.length).toBeGreaterThanOrEqual(1)
       })
     })
   }

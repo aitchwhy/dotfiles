@@ -8,7 +8,8 @@ import type { CursorRule } from '@/schema'
 
 export const selfImproveRule: CursorRule = {
   name: 'self-improve' as CursorRule['name'],
-  description: 'Guidelines for continuously improving Cursor rules based on emerging code patterns and best practices.',
+  description:
+    'Guidelines for continuously improving Cursor rules based on emerging code patterns and best practices.',
   globs: ['**/*'],
   alwaysApply: true,
 

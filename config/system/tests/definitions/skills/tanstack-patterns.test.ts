@@ -1,7 +1,7 @@
 /**
  * TanStack Patterns Skill Tests
  */
-import { describe, test, expect } from 'bun:test'
+import { describe, expect, test } from 'bun:test'
 import { SystemSkill } from '@/schema'
 
 describe('tanstack-patterns skill', () => {

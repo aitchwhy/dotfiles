@@ -8,7 +8,8 @@ import type { CursorRule } from '@/schema'
 
 export const cursorRulesRule: CursorRule = {
   name: 'cursor-rules' as CursorRule['name'],
-  description: 'Guidelines for creating and maintaining Cursor rules to ensure consistency and effectiveness.',
+  description:
+    'Guidelines for creating and maintaining Cursor rules to ensure consistency and effectiveness.',
   globs: ['.cursor/rules/*.mdc'],
   alwaysApply: true,
 
