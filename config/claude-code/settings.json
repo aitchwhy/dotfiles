@@ -260,12 +260,12 @@
         ]
       },
       {
-        "matcher": "Bash",
+        "matcher": "Bash(git commit:*)|Bash(git -C:*commit:*)",
         "hooks": [
           {
             "type": "command",
             "command": "bun run \"$HOME/dotfiles/config/claude-code/evolution/hooks/conventional-commit.ts\"",
-            "timeout": 5
+            "timeout": 10
           }
         ]
       },
