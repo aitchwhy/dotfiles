@@ -1,13 +1,13 @@
 ---
-name: factory-patterns
-description: Patterns for using the Universal Project Factory (FCS) to generate formally consistent software systems with hexagonal architecture.
+name: signet-patterns
+description: Patterns for using Signet to generate formally consistent software systems with hexagonal architecture.
 allowed-tools: Read, Write, Edit, Bash
 ---
 
 ## When to Use This Skill
 
-- Creating new projects with `fcs init`
-- Adding workspaces to existing monorepos with `fcs gen`
+- Creating new projects with `signet init`
+- Adding workspaces to existing monorepos with `signet gen`
 - Understanding hexagonal architecture patterns
 - Working with Effect-TS layers and ports/adapters
 
@@ -57,11 +57,11 @@ const program = myBusinessLogic.pipe(
 
 | Need | Command | What You Get |
 |------|---------|--------------|
-| New platform | `fcs init monorepo <name>` | Workspace + shared pkg |
-| Backend API | `fcs gen api <name>` | Hexagonal Hono |
-| Frontend | `fcs gen ui <name>` | React 19 + XState |
-| Library | `fcs gen library <name>` | TypeScript package |
-| Deployment | `fcs gen infra <name>` | Pulumi + process-compose |
+| New platform | `signet init monorepo <name>` | Workspace + shared pkg |
+| Backend API | `signet gen api <name>` | Hexagonal Hono |
+| Frontend | `signet gen ui <name>` | React 19 + XState |
+| Library | `signet gen library <name>` | TypeScript package |
+| Deployment | `signet gen infra <name>` | Pulumi + process-compose |
 
 ## Anti-Patterns to Avoid
 
@@ -69,14 +69,14 @@ const program = myBusinessLogic.pipe(
 2. **Circular dependencies** - Extract shared code
 3. **Mixed layer imports** - Follow layer ordering
 4. **Skipping process-compose** - Always include for observability
-5. **Manual project setup** - Use FCS generators
+5. **Manual project setup** - Use Signet generators
 
 ## Validation
 
 ### Always Validate
 
 ```bash
-fcs validate     # Check structure
-fcs enforce      # Check architecture
-bun validate     # Typecheck + lint + test
+signet validate     # Check structure
+signet enforce      # Check architecture
+bun validate        # Typecheck + lint + test
 ```

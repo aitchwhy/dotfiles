@@ -1,28 +1,28 @@
-# Factory Code System (FCS)
+# Signet (Code Quality & Generation Platform)
 
-Guide me through using the Universal Project Factory.
+Guide me through using Signet to create formally consistent software systems.
 
 ## Available Commands
 
 1. **Initialize a new project**:
    ```bash
-   fcs init <type> <name>
+   signet init <type> <name>
    ```
    Types: `monorepo`, `api`, `ui`, `library`, `infra`
 
 2. **Generate a workspace in existing project**:
    ```bash
-   fcs gen <type> <name>
+   signet gen <type> <name>
    ```
 
 3. **Validate project structure**:
    ```bash
-   fcs validate [path]
+   signet validate [path]
    ```
 
 4. **Run architecture enforcers**:
    ```bash
-   fcs enforce [--fix]
+   signet enforce [--fix]
    ```
 
 ## Workflow
@@ -31,21 +31,21 @@ Guide me through using the Universal Project Factory.
 
 ```bash
 # Initialize monorepo
-fcs init monorepo ember-platform
+signet init monorepo ember-platform
 cd ember-platform
 
 # Add API service
-fcs gen api voice-service
+signet gen api voice-service
 
 # Add web frontend
-fcs gen ui web-app
+signet gen ui web-app
 
 # Add infrastructure
-fcs gen infra deployment
+signet gen infra deployment
 
 # Validate everything
-fcs validate
-fcs enforce
+signet validate
+signet enforce
 ```
 
 ### Project Types
