@@ -54,16 +54,53 @@ interface Assumption {
   context: string;
 }
 
+/**
+ * Strip content that shouldn't be scanned for assumptions:
+ * - Fenced code blocks (```...```)
+ * - Inline code (`...`)
+ * - Quoted strings ("..." or '...')
+ * - JSON content (tool outputs, file contents)
+ *
+ * This prevents false positives from:
+ * - Documentation examples showing banned patterns
+ * - Test file contents with "should work" assertions
+ * - Code samples and configuration
+ */
+function stripExcludedContent(text: string): string {
+  let result = text;
+
+  // Remove fenced code blocks (```...```)
+  result = result.replace(/```[\s\S]*?```/g, ' ');
+
+  // Remove inline code (`...`)
+  result = result.replace(/`[^`]+`/g, ' ');
+
+  // Remove JSON objects/arrays (tool outputs)
+  result = result.replace(/\{[\s\S]*?\}/g, ' ');
+  result = result.replace(/\[[\s\S]*?\]/g, ' ');
+
+  // Remove double-quoted strings (but keep surrounding context)
+  result = result.replace(/"[^"]*"/g, ' ');
+
+  // Remove single-quoted strings
+  result = result.replace(/'[^']*'/g, ' ');
+
+  return result;
+}
+
 function extractAssumptions(transcript: string): Assumption[] {
   const assumptions: Assumption[] = [];
+
+  // Strip excluded content before scanning
+  const cleanTranscript = stripExcludedContent(transcript);
 
   for (const { pattern, severity } of PATTERNS) {
     // Reset regex state for global patterns
     pattern.lastIndex = 0;
-    for (const match of transcript.matchAll(pattern)) {
+    for (const match of cleanTranscript.matchAll(pattern)) {
       const start = Math.max(0, match.index - 50);
-      const end = Math.min(transcript.length, match.index + match[0].length + 50);
-      const context = transcript.slice(start, end).replace(/\n/g, ' ').trim();
+      const end = Math.min(cleanTranscript.length, match.index + match[0].length + 50);
+      const context = cleanTranscript.slice(start, end).replace(/\n/g, ' ').trim();
 
       assumptions.push({
         text: match[0],
@@ -148,22 +185,20 @@ async function main() {
     const highSeverity = assumptions.filter((a) => a.severity === 'high');
 
     if (highSeverity.length > 0) {
-      // BLOCK: High-severity assumptions detected
-      console.log(
-        JSON.stringify({
-          continue: false,
-          reason: `BLOCKED: ${highSeverity.length} unverified assumption(s) detected:
+      // BLOCK: Use exit code 2 (blocking error) with stderr
+      // Exit code 2 is Claude Code's signal for "blocking error"
+      const errorMsg = `BLOCKED: ${highSeverity.length} unverified assumption(s) detected:
 
 ${highSeverity.map((a) => `  ❌ "${a.text}"`).join('\n')}
 
 Replace "should" with verified evidence:
-  - "VERIFIED via [test_name]: [specific assertion passed]"
-  - "UNVERIFIED: [claim] - requires test: [specific test needed]"
+  ✅ VERIFIED via [test]: [assertion passed]
+  ⚠️ UNVERIFIED: [claim] - requires [test]
 
-The phrase "should work" is banned. Only "verified" or "UNVERIFIED" are allowed.`,
-        })
-      );
-      return;
+The phrase "should work" is banned. Only "verified" or "UNVERIFIED" are allowed.`;
+
+      console.error(errorMsg);
+      process.exit(2);
     }
 
     // Medium severity - warn but allow
@@ -187,6 +222,7 @@ Consider replacing with verified evidence next time.`,
 
 main().catch((e) => {
   console.error('Assumption Detector error:', e);
-  // On error, allow continuation to avoid blocking
+  // On error, allow continuation to avoid blocking (fail-safe)
   console.log(JSON.stringify({ continue: true }));
+  process.exit(0);
 });
