@@ -57,7 +57,7 @@
       darwinPkgs = nixpkgs.legacyPackages.${darwinSystem};
       linuxPkgs = nixpkgs.legacyPackages.${linuxSystem};
 
-      # Centralized version management (Universal Project Factory)
+      # Centralized version management (Signet)
       versions = import ./lib/versions.nix;
 
       # Helper for multi-system support

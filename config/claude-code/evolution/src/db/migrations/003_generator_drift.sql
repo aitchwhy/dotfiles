@@ -1,13 +1,13 @@
 -- =============================================================================
 -- Migration 003: Generator Drift & Reflector System
 -- =============================================================================
--- Adds tables for tracking drift from Factory generators, rule violations,
+-- Adds tables for tracking drift from Signet generators, rule violations,
 -- and patch proposals from the Reflector agent.
 
 -- =============================================================================
 -- Generator Drift Table
 -- =============================================================================
--- Tracks drift detected by `fcs reconcile` in Factory-generated projects
+-- Tracks drift detected by `signet reconcile` in Signet-generated projects
 
 CREATE TABLE IF NOT EXISTS generator_drift (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
