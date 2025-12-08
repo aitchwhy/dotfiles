@@ -10,11 +10,18 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Ok, type Result, tryCatch } from '../lib/result';
 import {
+  type ActiveIssue,
+  ActiveIssueSchema,
   type DoraMetric,
   DoraMetricSchema,
+  type DriftHotspot,
+  DriftHotspotSchema,
   type EvolutionCycle,
   type EvolutionCycleInsert,
   EvolutionCycleSchema,
+  type GeneratorDrift,
+  type GeneratorDriftInsert,
+  GeneratorDriftSchema,
   type GraderRun,
   type GraderRunInsert,
   GraderRunSchema,
@@ -28,6 +35,13 @@ import {
   type Metric,
   type MetricInsert,
   MetricSchema,
+  type PatchProposal,
+  type PatchProposalInsert,
+  PatchProposalSchema,
+  type PatchStatus,
+  type RuleViolation,
+  type RuleViolationInsert,
+  RuleViolationSchema,
   type ScoreTrend,
   ScoreTrendSchema,
   type Session,
@@ -36,6 +50,8 @@ import {
   type Task,
   type TaskInsert,
   TaskSchema,
+  type ViolationPattern,
+  ViolationPatternSchema,
 } from './schema';
 
 // ============================================================================
@@ -387,6 +403,147 @@ export class EvolutionDB {
         )
         .all(days);
       return rows.map((row) => GraderTrendSchema.parse(row));
+    });
+  }
+
+  // ==========================================================================
+  // Generator Drift Operations (Migration 003)
+  // ==========================================================================
+
+  insertDrift(drift: GeneratorDriftInsert): Result<GeneratorDrift, Error> {
+    return tryCatch(() => {
+      const stmt = this.db.prepare(`
+        INSERT INTO generator_drift (file_path, drift_type, severity, message, line_number, generator_name, project_path, session_id)
+        VALUES ($file_path, $drift_type, $severity, $message, $line_number, $generator_name, $project_path, $session_id)
+        RETURNING *
+      `);
+      const row = stmt.get({
+        $file_path: drift.file_path,
+        $drift_type: drift.drift_type,
+        $severity: drift.severity,
+        $message: drift.message,
+        $line_number: drift.line_number,
+        $generator_name: drift.generator_name,
+        $project_path: drift.project_path,
+        $session_id: drift.session_id,
+      });
+      return GeneratorDriftSchema.parse(row);
+    });
+  }
+
+  markDriftFixed(id: number): Result<GeneratorDrift | null, Error> {
+    return tryCatch(() => {
+      const stmt = this.db.prepare(`
+        UPDATE generator_drift
+        SET fix_applied = 1, fix_applied_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+        WHERE id = $id
+        RETURNING *
+      `);
+      const row = stmt.get({ $id: id });
+      return row ? GeneratorDriftSchema.parse(row) : null;
+    });
+  }
+
+  getDriftHotspots(): Result<readonly DriftHotspot[], Error> {
+    return tryCatch(() => {
+      const rows = this.db
+        .query<DriftHotspot, []>('SELECT * FROM v_drift_hotspots')
+        .all();
+      return rows.map((row) => DriftHotspotSchema.parse(row));
+    });
+  }
+
+  // ==========================================================================
+  // Rule Violation Operations (Migration 003)
+  // ==========================================================================
+
+  insertViolation(violation: RuleViolationInsert): Result<RuleViolation, Error> {
+    return tryCatch(() => {
+      const stmt = this.db.prepare(`
+        INSERT INTO rule_violations (rule_source, rule_name, file_path, line_number, violation_message, severity, session_id)
+        VALUES ($rule_source, $rule_name, $file_path, $line_number, $violation_message, $severity, $session_id)
+        RETURNING *
+      `);
+      const row = stmt.get({
+        $rule_source: violation.rule_source,
+        $rule_name: violation.rule_name,
+        $file_path: violation.file_path,
+        $line_number: violation.line_number,
+        $violation_message: violation.violation_message,
+        $severity: violation.severity,
+        $session_id: violation.session_id,
+      });
+      return RuleViolationSchema.parse(row);
+    });
+  }
+
+  getViolationPatterns(): Result<readonly ViolationPattern[], Error> {
+    return tryCatch(() => {
+      const rows = this.db
+        .query<ViolationPattern, []>('SELECT * FROM v_violation_patterns')
+        .all();
+      return rows.map((row) => ViolationPatternSchema.parse(row));
+    });
+  }
+
+  // ==========================================================================
+  // Patch Proposal Operations (Migration 003)
+  // ==========================================================================
+
+  insertPatch(patch: PatchProposalInsert): Result<PatchProposal, Error> {
+    return tryCatch(() => {
+      const stmt = this.db.prepare(`
+        INSERT INTO patch_proposals (patch_type, target_file, description, rationale, patch_content, confidence, evidence_count)
+        VALUES ($patch_type, $target_file, $description, $rationale, $patch_content, $confidence, $evidence_count)
+        RETURNING *
+      `);
+      const row = stmt.get({
+        $patch_type: patch.patch_type,
+        $target_file: patch.target_file,
+        $description: patch.description,
+        $rationale: patch.rationale,
+        $patch_content: patch.patch_content,
+        $confidence: patch.confidence,
+        $evidence_count: patch.evidence_count,
+      });
+      return PatchProposalSchema.parse(row);
+    });
+  }
+
+  updatePatchStatus(id: number, status: PatchStatus): Result<PatchProposal | null, Error> {
+    return tryCatch(() => {
+      const stmt = this.db.prepare(`
+        UPDATE patch_proposals
+        SET status = $status,
+            reviewed_at = CASE WHEN $status IN ('approved', 'rejected') THEN strftime('%Y-%m-%dT%H:%M:%fZ', 'now') ELSE reviewed_at END,
+            applied_at = CASE WHEN $status = 'applied' THEN strftime('%Y-%m-%dT%H:%M:%fZ', 'now') ELSE applied_at END
+        WHERE id = $id
+        RETURNING *
+      `);
+      const row = stmt.get({ $id: id, $status: status });
+      return row ? PatchProposalSchema.parse(row) : null;
+    });
+  }
+
+  getPendingPatches(): Result<readonly PatchProposal[], Error> {
+    return tryCatch(() => {
+      const rows = this.db
+        .query<PatchProposal, []>("SELECT * FROM patch_proposals WHERE status = 'pending' ORDER BY confidence DESC")
+        .all();
+      return rows.map((row) => PatchProposalSchema.parse(row));
+    });
+  }
+
+  // ==========================================================================
+  // Active Issues View (Migration 003)
+  // ==========================================================================
+
+  getActiveIssues(limit: number = 100): Result<readonly ActiveIssue[], Error> {
+    return tryCatch(() => {
+      const rows = this.db
+        .query<ActiveIssue, [number]>('SELECT * FROM v_active_issues LIMIT ?')
+        .all(limit);
+      return rows.map((row) => ActiveIssueSchema.parse(row));
     });
   }
 
