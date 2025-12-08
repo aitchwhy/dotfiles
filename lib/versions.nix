@@ -1,12 +1,12 @@
-# Universal Project Factory - Centralized Version Management
+# Signet - Centralized Version Management
 # Frozen: December 2025
-# Updated: 2025-12-07
+# Updated: 2025-12-08
 #
 # This is the single source of truth for all version numbers.
 # Consumed by:
 #   - flake.nix (via specialArgs)
-#   - modules/home/apps/factory.nix (generates versions.json)
-#   - config/factory/src/schema/versions.ts (imports versions.json)
+#   - modules/home/apps/signet.nix (generates versions.json)
+#   - config/signet/src/schema/versions.ts (imports versions.json)
 #
 # Version format: Exact versions for reproducibility (no ranges)
 {
@@ -21,18 +21,11 @@
   };
 
   # ===========================================================================
-  # TYPESCRIPT ECOSYSTEM
+  # TYPESCRIPT ECOSYSTEM (deprecated - use npm section below)
   # ===========================================================================
-  typescript = {
-    typescript = "5.9.3";
-    effect = "3.12.4"; # Functional standard library
-    effect-cli = "0.50.0";
-    effect-platform = "0.72.0";
-    effect-platform-node = "0.66.0";
-    effect-schema = "0.76.0";
-    zod = "3.25.1";
-    biome = "2.3.8"; # Lint + format
-  };
+  # NOTE: The npm section is the single source of truth for TypeScript deps.
+  # This section is retained only for backwards compatibility with any
+  # external consumers. All new code should reference the npm section.
 
   # ===========================================================================
   # FRONTEND
@@ -40,10 +33,10 @@
   frontend = {
     react = "19.2.1";
     react-dom = "19.2.1";
-    xstate = "5.19.0"; # Actor model state machines
+    xstate = "5.24.0"; # Actor model state machines
     tanstack-router = "1.140.0";
-    tanstack-query = "5.62.0";
-    tailwindcss = "4.1.0";
+    tanstack-query = "5.90.12";
+    tailwindcss = "4.1.17";
   };
 
   # ===========================================================================
@@ -71,8 +64,8 @@
   # ===========================================================================
   testing = {
     playwright = "1.57.0";
-    vitest = "2.1.0";
-    vite = "7.2.6";
+    vitest = "4.0.15";
+    vite = "7.2.7";
     bruno-cli = "1.30.0"; # API testing
   };
 
@@ -89,8 +82,8 @@
   # DATABASE ADAPTERS
   # ===========================================================================
   databases = {
-    libsql-client = "0.14.0"; # Turso
-    postgres = "3.4.0";
+    libsql-client = "0.15.15"; # Turso
+    postgres = "3.4.7";
   };
 
   # ===========================================================================
@@ -106,7 +99,7 @@
   # ===========================================================================
   meta = {
     frozen = "2025-12";
-    updated = "2025-12-07";
+    updated = "2025-12-08";
     # Used for documentation and drift detection
   };
 
@@ -124,30 +117,30 @@
     "@effect/platform-bun" = "0.86.0";
     "@effect/printer" = "0.47.0";
     "@effect/printer-ansi" = "0.47.0";
-    zod = "3.24.0";
+    zod = "4.1.13";
 
     # Frontend
-    react = "19.0.0";
-    react-dom = "19.0.0";
-    xstate = "5.19.0";
-    "@tanstack/react-router" = "1.93.1";
-    "@tanstack/react-query" = "5.62.0";
-    tailwindcss = "4.0.0";
+    react = "19.2.1";
+    react-dom = "19.2.1";
+    xstate = "5.24.0";
+    "@tanstack/react-router" = "1.140.0";
+    "@tanstack/react-query" = "5.90.12";
+    tailwindcss = "4.1.17";
 
     # Backend
-    hono = "4.6.0";
-    drizzle-orm = "0.38.0";
+    hono = "4.10.7";
+    drizzle-orm = "0.45.0";
 
     # Database
-    "@libsql/client" = "0.14.0";
-    postgres = "3.4.0";
+    "@libsql/client" = "0.15.15";
+    postgres = "3.4.7";
 
     # Testing
-    "@playwright/test" = "1.49.0";
-    vitest = "2.1.0";
+    "@playwright/test" = "1.57.0";
+    vitest = "4.0.15";
 
     # Build
-    vite = "6.0.0";
+    vite = "7.2.7";
     handlebars = "4.7.8";
 
     # Dev
