@@ -1,0 +1,267 @@
+/**
+ * Infrastructure Generator
+ *
+ * Generates infrastructure-as-code with:
+ * - process-compose.yaml for local development
+ * - Pulumi TypeScript project for cloud infrastructure
+ * - VSCode/Neovim debug configurations
+ */
+import { Effect } from 'effect'
+import type { FileTree } from '@/layers/file-system'
+import { renderTemplates, TemplateEngine } from '@/layers/template-engine'
+import type { ProjectSpec } from '@/schema/project-spec'
+
+// =============================================================================
+// Templates - Process Compose
+// =============================================================================
+
+const PROCESS_COMPOSE_TEMPLATE = `version: "0.5"
+
+# {{name}} - Local Development Orchestrator
+# Start with: process-compose up
+
+processes:
+  # Example API service
+  api:
+    command: bun run dev
+    working_dir: ./apps/api
+    availability:
+      restart: on_failure
+      max_restarts: 3
+    readiness_probe:
+      http_get:
+        host: 127.0.0.1
+        port: 3000
+        path: /health
+      initial_delay_seconds: 2
+      period_seconds: 5
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+
+  # Example web service (depends on API)
+  web:
+    command: bun run dev
+    working_dir: ./apps/web
+    depends_on:
+      api:
+        condition: process_healthy
+    environment:
+      - NODE_ENV=development
+      - API_URL=http://localhost:3000
+
+# Log configuration
+log_level: info
+log_location: ./.logs
+
+# TUI configuration
+tui: true
+`
+
+// =============================================================================
+// Templates - Debug Configurations
+// =============================================================================
+
+const VSCODE_LAUNCH_TEMPLATE = `{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "bun",
+      "request": "launch",
+      "name": "Debug Current File",
+      "program": "\${file}",
+      "cwd": "\${workspaceFolder}",
+      "stopOnEntry": false
+    },
+    {
+      "type": "bun",
+      "request": "launch",
+      "name": "Debug API",
+      "program": "\${workspaceFolder}/apps/api/src/index.ts",
+      "cwd": "\${workspaceFolder}/apps/api",
+      "env": {
+        "NODE_ENV": "development"
+      }
+    },
+    {
+      "type": "bun",
+      "request": "launch",
+      "name": "Debug Tests",
+      "program": "\${workspaceFolder}/node_modules/bun/bin/bun",
+      "args": ["test", "\${file}"],
+      "cwd": "\${workspaceFolder}"
+    },
+    {
+      "type": "bun",
+      "request": "attach",
+      "name": "Attach to Process",
+      "url": "ws://localhost:6499"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Debug Full Stack",
+      "configurations": ["Debug API"],
+      "stopAll": true
+    }
+  ]
+}`
+
+const NVIM_DAP_TEMPLATE = `-- {{name}} DAP Configuration
+-- Load with: require('.nvim.dap')
+
+local dap = require('dap')
+
+-- Bun adapter
+dap.adapters.bun = {
+  type = 'server',
+  host = '127.0.0.1',
+  port = 6499,
+}
+
+-- Configurations
+dap.configurations.typescript = {
+  {
+    type = 'bun',
+    request = 'launch',
+    name = 'Debug Current File',
+    program = '\${file}',
+    cwd = '\${workspaceFolder}',
+  },
+  {
+    type = 'bun',
+    request = 'launch',
+    name = 'Debug API',
+    program = '\${workspaceFolder}/apps/api/src/index.ts',
+    cwd = '\${workspaceFolder}/apps/api',
+    env = {
+      NODE_ENV = 'development',
+    },
+  },
+  {
+    type = 'bun',
+    request = 'attach',
+    name = 'Attach to Process',
+    port = 6499,
+  },
+}
+
+-- Also apply to JavaScript
+dap.configurations.javascript = dap.configurations.typescript
+`
+
+// =============================================================================
+// Templates - Pulumi
+// =============================================================================
+
+const PULUMI_YAML_TEMPLATE = `name: {{name}}
+runtime:
+  name: nodejs
+  options:
+    typescript: true
+description: {{name}} infrastructure
+`
+
+const PULUMI_DEV_YAML_TEMPLATE = `config:
+  {{name}}:environment: dev
+`
+
+const PULUMI_INDEX_TEMPLATE = `/**
+ * {{name}} - Infrastructure as Code
+ *
+ * Pulumi TypeScript infrastructure definitions.
+ */
+import * as pulumi from '@pulumi/pulumi'
+
+// Configuration
+const config = new pulumi.Config()
+const environment = config.require('environment')
+
+// Export stack outputs
+export const env = environment
+export const stackName = pulumi.getStack()
+
+// TODO: Add your infrastructure resources here
+// Examples:
+// - Cloudflare Workers
+// - D1 Databases
+// - R2 Storage
+// - DNS Records
+`
+
+const PULUMI_PACKAGE_JSON_TEMPLATE = `{
+  "name": "{{name}}-infra",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "index.ts",
+  "scripts": {
+    "preview": "pulumi preview",
+    "up": "pulumi up",
+    "destroy": "pulumi destroy",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@pulumi/pulumi": "^3.0.0",
+    "@pulumi/cloudflare": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.9.3"
+  }
+}`
+
+const PULUMI_TSCONFIG_TEMPLATE = `{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "outDir": "./bin"
+  },
+  "include": ["*.ts"],
+  "exclude": ["node_modules"]
+}`
+
+// =============================================================================
+// Generator
+// =============================================================================
+
+/**
+ * Generate infrastructure files (Pulumi + process-compose + debug config)
+ */
+export const generateInfra = (
+  spec: ProjectSpec
+): Effect.Effect<FileTree, Error, TemplateEngine> => {
+  const data = {
+    name: spec.name,
+    description: spec.description,
+    isVscode: spec.observability.debugger === 'vscode',
+    isNvimDap: spec.observability.debugger === 'nvim-dap',
+  }
+
+  // Base templates
+  const templates: FileTree = {
+    // Process Compose
+    'process-compose.yaml': PROCESS_COMPOSE_TEMPLATE,
+
+    // Pulumi
+    'Pulumi.yaml': PULUMI_YAML_TEMPLATE,
+    'Pulumi.dev.yaml': PULUMI_DEV_YAML_TEMPLATE,
+    'index.ts': PULUMI_INDEX_TEMPLATE,
+    'package.json': PULUMI_PACKAGE_JSON_TEMPLATE,
+    'tsconfig.json': PULUMI_TSCONFIG_TEMPLATE,
+  }
+
+  // Conditional: Debug configuration based on editor
+  if (spec.observability.debugger === 'vscode') {
+    templates['.vscode/launch.json'] = VSCODE_LAUNCH_TEMPLATE
+  } else if (spec.observability.debugger === 'nvim-dap') {
+    templates['.nvim/dap.lua'] = NVIM_DAP_TEMPLATE
+  }
+
+  return renderTemplates(templates, data)
+}
