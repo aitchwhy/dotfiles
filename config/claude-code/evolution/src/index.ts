@@ -7,12 +7,13 @@ import { LessonSource } from './db/schema';
  *
  * Commands:
  *   grade   - Run all graders and report score
- *   reflect - Analyze session and generate lessons
+ *   reflect - Analyze drift/violations and generate proposals
  *   audit   - Comprehensive security audit
  *   metrics - Display DORA metrics dashboard
  *   lesson  - Manage lessons (add, list, recent)
  */
 import { printGradeResult, runAllGraders } from './graders';
+import { Reflector } from './agents/reflector';
 
 // ============================================================================
 // CLI Argument Parsing
@@ -186,6 +187,173 @@ async function auditCommand(): Promise<number> {
   }
 
   return safetyResult?.output.passed ? 0 : 1;
+}
+
+// ============================================================================
+// Reflect Command
+// ============================================================================
+
+async function reflectCommand(options: {
+  review: boolean;
+  apply: boolean;
+  save: boolean;
+  minEvidence: number;
+}): Promise<number> {
+  const dbResult = getDB();
+  if (!dbResult.ok) {
+    console.error(`❌ Database error: ${dbResult.error.message}`);
+    return 1;
+  }
+
+  const db = dbResult.data;
+  const reflector = new Reflector(db);
+
+  try {
+    // Review mode - show pending patches
+    if (options.review) {
+      const pendingResult = reflector.review();
+      if (!pendingResult.ok) {
+        console.error(`❌ Review failed: ${pendingResult.error.message}`);
+        return 1;
+      }
+
+      const patches = pendingResult.data;
+
+      console.log('\n🔍 PENDING PATCH PROPOSALS\n');
+      console.log('='.repeat(60));
+
+      if (patches.length === 0) {
+        console.log('\nNo pending patches to review.\n');
+        return 0;
+      }
+
+      for (const patch of patches) {
+        console.log(`\n📝 [${patch.id}] ${patch.patch_type}`);
+        console.log(`   Target: ${patch.target_file}`);
+        console.log(`   Description: ${patch.description}`);
+        console.log(`   Confidence: ${(patch.confidence * 100).toFixed(1)}%`);
+        console.log(`   Evidence: ${patch.evidence_count} issues`);
+        console.log(`   Created: ${patch.created_at}`);
+        console.log('-'.repeat(60));
+        console.log(patch.rationale);
+      }
+
+      console.log(`\n${'='.repeat(60)}`);
+      console.log(`\nTotal: ${patches.length} pending patch(es)\n`);
+      console.log('Use: bun run src/index.ts reflect --apply <id> to apply a patch\n');
+
+      return 0;
+    }
+
+    // Apply mode - apply a specific patch
+    if (options.apply) {
+      const patchIdArg = args[args.indexOf('--apply') + 1];
+      if (!patchIdArg) {
+        console.error('❌ Please specify a patch ID: --apply <id>');
+        return 1;
+      }
+
+      const patchId = Number.parseInt(patchIdArg, 10);
+      if (Number.isNaN(patchId)) {
+        console.error(`❌ Invalid patch ID: ${patchIdArg}`);
+        return 1;
+      }
+
+      // First approve, then apply
+      const approveResult = reflector.decide(patchId, 'approved');
+      if (!approveResult.ok) {
+        console.error(`❌ Failed to approve patch: ${approveResult.error.message}`);
+        return 1;
+      }
+
+      const applyResult = reflector.apply(patchId, 'manual');
+      if (!applyResult.ok) {
+        console.error(`❌ Failed to apply patch: ${applyResult.error.message}`);
+        return 1;
+      }
+
+      if (!applyResult.data) {
+        console.error(`❌ Patch ${patchId} not found`);
+        return 1;
+      }
+
+      console.log(`✅ Patch ${patchId} approved and marked as applied`);
+      console.log(`   Target: ${applyResult.data.target_file}`);
+      console.log('\n⚠️  Note: The patch content has been marked as applied but not');
+      console.log('   automatically written to disk. Review and apply manually:\n');
+      console.log(applyResult.data.patch_content);
+
+      return 0;
+    }
+
+    // Default: analyze and optionally generate proposals
+    console.log('🔄 REFLECTOR ANALYSIS\n');
+    console.log('='.repeat(60));
+
+    const result = reflector.reflect({ minEvidence: options.minEvidence });
+    if (!result.ok) {
+      console.error(`❌ Reflection failed: ${result.error.message}`);
+      return 1;
+    }
+
+    const { summary, hotspots, proposals } = result.data;
+
+    // Summary
+    console.log('\n📊 Summary');
+    console.log('-'.repeat(40));
+    console.log(`  Total drift issues: ${summary.totalDrift}`);
+    console.log(`  Total violations: ${summary.totalViolations}`);
+    console.log(`  Proposals generated: ${summary.proposalsGenerated}`);
+
+    // Drift hotspots
+    if (hotspots.drift.length > 0) {
+      console.log('\n🔥 Drift Hotspots');
+      console.log('-'.repeat(40));
+      for (const h of hotspots.drift.slice(0, 5)) {
+        const gen = h.generator_name ?? 'unknown';
+        console.log(`  ${h.drift_type} (${gen}): ${h.occurrence_count} occurrences`);
+      }
+    }
+
+    // Violation patterns
+    if (hotspots.violations.length > 0) {
+      console.log('\n⚠️  Violation Patterns');
+      console.log('-'.repeat(40));
+      for (const v of hotspots.violations.slice(0, 5)) {
+        console.log(`  ${v.rule_name} (${v.rule_source}): ${v.total_violations} violations`);
+      }
+    }
+
+    // Proposals
+    if (proposals.length > 0) {
+      console.log('\n💡 Generated Proposals');
+      console.log('-'.repeat(40));
+      for (const p of proposals) {
+        console.log(`  [${(p.confidence * 100).toFixed(0)}%] ${p.description}`);
+      }
+
+      // Save proposals if requested
+      if (options.save) {
+        console.log('\n📝 Saving proposals to database...');
+        let saved = 0;
+        for (const proposal of proposals) {
+          const saveResult = reflector.propose(proposal);
+          if (saveResult.ok) {
+            saved++;
+          }
+        }
+        console.log(`  ✅ ${saved} proposal(s) saved`);
+      } else {
+        console.log('\nUse --save to save proposals to database');
+      }
+    }
+
+    console.log(`\n${'='.repeat(60)}\n`);
+
+    return 0;
+  } finally {
+    closeDB();
+  }
 }
 
 // ============================================================================
@@ -404,8 +572,14 @@ async function main(): Promise<number> {
       return auditCommand();
 
     case 'reflect':
-      console.log('📝 Reflection not yet implemented in TypeScript');
-      return 0;
+      return reflectCommand({
+        review: args.includes('--review'),
+        apply: args.includes('--apply'),
+        save: args.includes('--save') || args.includes('-s'),
+        minEvidence: args.includes('--min-evidence')
+          ? Number.parseInt(args[args.indexOf('--min-evidence') + 1] ?? '5', 10)
+          : 5,
+      });
 
     case 'lesson':
       return lessonCommand(args[0] ?? '', args.slice(1));
@@ -433,7 +607,11 @@ Commands:
            --ci     Exit with code 1 if score < 80%
            --save   Save results to database
 
-  reflect  Analyze session and generate lessons (WIP)
+  reflect  Analyze drift/violations and generate patch proposals
+           --review        List pending patches for review
+           --apply <id>    Approve and mark patch as applied
+           --save          Save generated proposals to database
+           --min-evidence  Minimum issues to trigger proposal (default: 5)
 
   audit    Run security-focused audit
 
@@ -450,6 +628,9 @@ Commands:
 Examples:
   bun run src/index.ts grade
   bun run src/index.ts grade --ci --save
+  bun run src/index.ts reflect
+  bun run src/index.ts reflect --review
+  bun run src/index.ts reflect --save
   bun run src/index.ts metrics
   bun run src/index.ts lesson add "Use Result types" --source manual
   bun run src/index.ts gc --threshold 15 --stale-days 14
