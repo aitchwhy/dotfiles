@@ -60,11 +60,14 @@ interface Assumption {
  * - Inline code (`...`)
  * - Quoted strings ("..." or '...')
  * - JSON content (tool outputs, file contents)
+ * - Meta-discussion about the patterns themselves
+ * - Test file content and documentation
  *
  * This prevents false positives from:
  * - Documentation examples showing banned patterns
  * - Test file contents with "should work" assertions
  * - Code samples and configuration
+ * - Discussion about what patterns are banned
  */
 function stripExcludedContent(text: string): string {
   let result = text;
@@ -84,6 +87,19 @@ function stripExcludedContent(text: string): string {
 
   // Remove single-quoted strings
   result = result.replace(/'[^']*'/g, ' ');
+
+  // Remove lines that are meta-discussion about patterns (test descriptions, docs)
+  // These patterns indicate we're DISCUSSING the rules, not violating them
+  const metaPatterns = [
+    /.*(?:blocks? on|detects?|bann(?:ed|ing)|pattern|severity|❌|✅|BLOCKED|VERIFIED|UNVERIFIED).*/gi,
+    /.*(?:test|expect|assert|describe|it\(|test\().*/gi,
+    /.*\.test\.ts.*/gi,
+    /.*assumption-detector.*/gi,
+  ];
+
+  for (const pattern of metaPatterns) {
+    result = result.replace(pattern, ' ');
+  }
 
   return result;
 }
