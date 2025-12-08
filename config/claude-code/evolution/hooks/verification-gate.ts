@@ -93,13 +93,11 @@ async function main() {
   const unverified = await getUnverifiedClaims(input.session_id);
 
   if (unverified.length > 0) {
-    // BLOCK: Unverified claims exist
+    // BLOCK: Use exit code 2 (blocking error) with stderr
+    // Exit code 2 is Claude Code's signal for "blocking error"
     const claimsList = unverified.map((c) => `  - [${c.claim_type}] ${c.claim_text}`).join('\n');
 
-    console.log(
-      JSON.stringify({
-        continue: false,
-        reason: `BLOCKED: ${unverified.length} unverified claim(s) require proof:
+    const errorMsg = `BLOCKED: ${unverified.length} unverified claim(s) require proof:
 
 ${claimsList}
 
@@ -110,10 +108,10 @@ To unblock, either:
 Verification format:
   ✅ VERIFIED: [claim]
      Test: [test_file]:[test_name]
-     Output: [relevant test output]`,
-      })
-    );
-    return;
+     Output: [relevant test output]`;
+
+    console.error(errorMsg);
+    process.exit(2);
   }
 
   console.log(JSON.stringify({ continue: true }));
@@ -121,6 +119,7 @@ Verification format:
 
 main().catch((e) => {
   console.error('Verification Gate error:', e);
-  // On error, allow continuation to avoid blocking
+  // On error, allow continuation to avoid blocking (fail-safe)
   console.log(JSON.stringify({ continue: true }));
+  process.exit(0);
 });
