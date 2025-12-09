@@ -54,16 +54,38 @@ type Request =
 
 ## Parse Don't Validate
 
-### Validate at Boundaries
+### TypeScript Types as Source of Truth
 
-Parse once at boundary, fully typed internally:
+Define the TypeScript type first. Schemas validate data matches that type.
+See `zod-patterns` skill for full Zod examples.
+
+```typescript
+// 1. TypeScript type is source of truth
+type User = {
+  readonly id: string;
+  readonly email: string;
+  readonly role: 'admin' | 'user' | 'guest';
+};
+
+// 2. Schema satisfies the type (never use z.infer)
+const userSchema = z.object({
+  id: z.string().uuid(),
+  email: z.string().email(),
+  role: z.enum(['admin', 'user', 'guest']),
+}) satisfies z.ZodType<User>;
+```
+
+### Parse at Boundaries, Type Internally
+
+Parse once at system boundary, fully typed internally:
 
 ```typescript
 function processUser(data: unknown): Result<ProcessedUser, ValidationError> {
-  const parsed = UserSchema.safeParse(data);
+  const parsed = userSchema.safeParse(data);
   if (!parsed.success) {
     return Err({ code: 'VALIDATION_ERROR', issues: parsed.error.issues });
   }
+  // parsed.data is fully typed as User
   return Ok(transformToProcessedUser(parsed.data));
 }
 ```
