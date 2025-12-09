@@ -27,7 +27,7 @@ async function runHook(
   try {
     return { ...JSON.parse(output.trim()), exitCode };
   } catch {
-    return { decision: 'allow', reason: `Parse error: ${output}`, exitCode };
+    return { decision: 'approve', reason: `Parse error: ${output}`, exitCode };
   }
 }
 
@@ -48,7 +48,7 @@ describe('Hook Integration Tests', () => {
         tool_name: 'Bash',
         tool_input: { command: 'git commit -m "feat(api): add user endpoint"' },
       });
-      expect(result.decision).toBe('allow');
+      expect(result.decision).toBe('approve');
     });
 
     test('blocks invalid commit message', async () => {
@@ -79,7 +79,7 @@ describe('Hook Integration Tests', () => {
         tool_name: 'Bash',
         tool_input: { command: 'git commit -m "feat: add new feature"' },
       });
-      expect(result.decision).toBe('allow');
+      expect(result.decision).toBe('approve');
     });
 
     test('allows non-git commands', async () => {
@@ -89,7 +89,7 @@ describe('Hook Integration Tests', () => {
         tool_name: 'Bash',
         tool_input: { command: 'ls -la' },
       });
-      expect(result.decision).toBe('allow');
+      expect(result.decision).toBe('approve');
     });
   });
 
@@ -111,7 +111,7 @@ describe('Hook Integration Tests', () => {
         tool_name: 'Write',
         tool_input: { file_path: '/project/package.json' },
       });
-      expect(result.decision).toBe('allow');
+      expect(result.decision).toBe('approve');
     });
 
     test('blocks .eslintrc files', async () => {
@@ -137,7 +137,7 @@ describe('Hook Integration Tests', () => {
           content: 'import { z } from "zod";\nimport { Hono } from "hono";',
         },
       });
-      expect(result.decision).toBe('allow');
+      expect(result.decision).toBe('approve');
     });
   });
 
@@ -166,7 +166,7 @@ describe('Hook Integration Tests', () => {
           content: 'const x: unknown = 5;',
         },
       });
-      expect(result.decision).toBe('allow');
+      expect(result.decision).toBe('approve');
     });
 
     test('allows any in comments', async () => {
@@ -179,7 +179,7 @@ describe('Hook Integration Tests', () => {
           content: '// TODO: fix any type later\nconst x: string = "test";',
         },
       });
-      expect(result.decision).toBe('allow');
+      expect(result.decision).toBe('approve');
     });
   });
 
@@ -191,7 +191,7 @@ describe('Hook Integration Tests', () => {
         tool_name: 'Write',
         tool_input: { file_path: '/project/src/user.test.ts' },
       });
-      expect(result.decision).toBe('allow');
+      expect(result.decision).toBe('approve');
     });
 
     test('allows excluded paths', async () => {
@@ -201,7 +201,7 @@ describe('Hook Integration Tests', () => {
         tool_name: 'Write',
         tool_input: { file_path: '/project/node_modules/lodash/index.ts' },
       });
-      expect(result.decision).toBe('allow');
+      expect(result.decision).toBe('approve');
     });
 
     test('allows non-source files', async () => {
@@ -211,7 +211,7 @@ describe('Hook Integration Tests', () => {
         tool_name: 'Write',
         tool_input: { file_path: '/project/README.md' },
       });
-      expect(result.decision).toBe('allow');
+      expect(result.decision).toBe('approve');
     });
   });
 
@@ -235,7 +235,7 @@ describe('Hook Integration Tests', () => {
     test('unified-guard handles missing input gracefully', async () => {
       const result = await runHook(unifiedGuard, {});
       // Should allow when input is malformed
-      expect(result.decision).toBe('allow');
+      expect(result.decision).toBe('approve');
     });
 
     test('unified-guard handles wrong tool gracefully', async () => {
@@ -246,7 +246,7 @@ describe('Hook Integration Tests', () => {
         tool_input: {},
       });
       // Should allow for unknown tools
-      expect(result.decision).toBe('allow');
+      expect(result.decision).toBe('approve');
     });
   });
 });
