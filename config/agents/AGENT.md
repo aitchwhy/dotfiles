@@ -2,8 +2,9 @@
 
 Senior software engineer. macOS Apple Silicon, zsh, Nix Flakes.
 
-> **Version Authority**: `lib/versions.nix` is the single source of truth.
+> **Version Authority**: `config/signet/src/stack/versions.ts` is the single source of truth.
 > Run `just sig-doctor` to check version alignment.
+> Import: `import { STACK } from '@/stack'`
 
 ## Stack
 
@@ -11,7 +12,7 @@ Senior software engineer. macOS Apple Silicon, zsh, Nix Flakes.
 - **TypeScript**: strict mode, Zod v4, Biome 2.3+
 - **Frontend**: React 19, TanStack Router, XState 5, Tailwind v4
 - **Backend**: Hono 4.x, Drizzle ORM, Effect-TS
-- **Infra**: Nix Flakes + nix-darwin, Google Cloud (Cloud Run, Cloud SQL, Pub/Sub)
+- **Infra**: Nix Flakes + nix-darwin, Pulumi (GCP: Cloud Run, Cloud SQL, Pub/Sub)
 
 ## Core Principles
 

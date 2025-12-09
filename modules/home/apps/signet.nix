@@ -2,20 +2,19 @@
 # Provides the Signet CLI for generating formally consistent software projects.
 #
 # Features:
-# - Centralized version management (from lib/versions.nix)
+# - Centralized version management (from src/stack/versions.ts)
 # - Code generation for monorepos, APIs, UIs, infrastructure
 # - Hexagonal architecture enforcement
 # - Effect-TS based with OXC + ast-grep AST analysis
+# - Pulumi components for GCP infrastructure
 {
   config,
   lib,
   pkgs,
-  versions,
   ...
 }:
 let
   inherit (lib) mkEnableOption mkIf;
-  versionsJson = builtins.toJSON versions;
 in
 {
   options.modules.home.apps.signet = {
@@ -58,7 +57,7 @@ in
       SIGNET_VERSIONS = "${config.home.homeDirectory}/dotfiles/config/signet/versions.json";
     };
 
-    # Generate versions.json from versions.nix on activation
+    # Generate versions.json from src/stack/versions.ts on activation
     home.activation.signetSetup = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
             SIGNET_DIR="${config.home.homeDirectory}/dotfiles/config/signet"
             VERSIONS_FILE="$SIGNET_DIR/versions.json"
@@ -66,17 +65,19 @@ in
             # Create signet directory if it doesn't exist
             $DRY_RUN_CMD mkdir -p "$SIGNET_DIR"
 
-            # Write versions.json from Nix-evaluated versions
-            cat > "$VERSIONS_FILE" << 'EOF'
-      ${versionsJson}
-      EOF
-
-            echo "Signet versions.json generated from lib/versions.nix"
-
             # Install dependencies if package.json exists but node_modules doesn't
             if [ -f "$SIGNET_DIR/package.json" ] && [ ! -d "$SIGNET_DIR/node_modules" ]; then
               echo "Installing signet dependencies..."
               cd "$SIGNET_DIR" && ${pkgs.bun}/bin/bun install --frozen-lockfile 2>/dev/null || true
+            fi
+
+            # Generate versions.json from TypeScript STACK
+            if [ -f "$SIGNET_DIR/src/stack/versions.ts" ]; then
+              echo "Generating versions.json from src/stack/versions.ts..."
+              cd "$SIGNET_DIR" && ${pkgs.bun}/bin/bun -e "
+                import { versionsJson } from './src/stack/versions.ts';
+                console.log(versionsJson);
+              " > "$VERSIONS_FILE" 2>/dev/null || echo "Warning: Could not generate versions.json"
             fi
     '';
   };
