@@ -1,6 +1,10 @@
 # Claude Desktop MCP server configuration
 # Uses /bin/sh wrapper to inject Nix PATH for Electron app compatibility
 # Electron apps don't inherit shell PATH, so we must explicitly inject Nix paths
+#
+# NOTE: Keep MCP servers in sync with config/agents/mcp-servers.json
+# This module uses wrapNpxCommand for Electron PATH compatibility.
+# Claude Code CLI uses direct npx commands (see agents.nix).
 {
   config,
   lib,
@@ -34,17 +38,18 @@ let
     };
 
   mcpServers = {
-    context7 = wrapNpxCommand "@upstash/context7-mcp" [ ];
+    # Keep in sync with config/agents/mcp-servers.json
+    memory = wrapNpxCommand "@modelcontextprotocol/server-memory" [ ];
     filesystem = wrapNpxCommand "@modelcontextprotocol/server-filesystem" [
       "$HOME/src"
       "$HOME/dotfiles"
-      "$HOME/Obsidian"
       "$HOME/Documents"
-      "$HOME/Downloads"
     ];
-    memory = wrapNpxCommand "@modelcontextprotocol/server-memory" [ ];
-    github = wrapNpxCommand "@modelcontextprotocol/server-github" [ ];
+    git = wrapNpxCommand "@modelcontextprotocol/server-git" [ ];
     "sequential-thinking" = wrapNpxCommand "@modelcontextprotocol/server-sequential-thinking" [ ];
+    context7 = wrapNpxCommand "@upstash/context7-mcp" [ ];
+    fetch = wrapNpxCommand "@modelcontextprotocol/server-fetch" [ ];
+    repomix = wrapNpxCommand "repomix" [ "--mcp" ];
   };
 
   configJson = builtins.toJSON { inherit mcpServers; };

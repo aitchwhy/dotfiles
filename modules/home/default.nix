@@ -42,7 +42,7 @@ in
     ./apps/bartender.nix
     ./apps/raycast.nix
     ./apps/claude.nix
-    ./apps/claude-code.nix
+    ../../config/agents/nix/agents.nix
     ./apps/cursor.nix
     ./apps/misc.nix
     ./apps/keyboard-layout.nix
@@ -99,7 +99,7 @@ in
         bartender.enable = mkDefault true;
         raycast.enable = mkDefault true;
         claude.enable = mkDefault true;
-        claudeCode.enable = mkDefault true;
+        agents.enable = mkDefault true;
         cursor.enable = mkDefault true;
         misc.enable = mkDefault true;
         keyboardLayout.enable = mkDefault true;
