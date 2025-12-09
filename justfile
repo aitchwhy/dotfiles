@@ -91,6 +91,16 @@ doctor:
 nvim-test:
     @bash tests/nvim-health.sh
 
+# AI CLI smoke tests (tests Claude config and knowledge)
+test-ai:
+    @echo "Running AI CLI smoke tests..."
+    @bats tests/ai-cli.bats
+
+# AI CLI smoke tests (static only, no API calls)
+test-ai-static:
+    @echo "Running static AI CLI tests only..."
+    @bats tests/ai-cli.bats --filter-tags '!live'
+
 # Quick rebuild with validation
 rebuild: fmt check switch
     @echo "✓ Configuration rebuilt successfully"
