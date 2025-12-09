@@ -23,7 +23,6 @@ in
     home.file = {
       # Core config
       ".claude/CLAUDE.md".source = ../../../config/claude-code/CLAUDE.md;
-      ".claude/VERSIONS.md".source = ../../../config/claude-code/VERSIONS.md;
 
       # Commands and agents
       ".claude/commands".source = ../../../config/claude-code/commands;
@@ -79,12 +78,13 @@ in
         # Backup before merge
         $DRY_RUN_CMD cp "$SETTINGS_FILE" "$BACKUP_DIR/settings.$(date +%Y%m%d%H%M%S).json"
 
-        # Existing file - merge hooks and permissions, preserve statusLine
+        # Existing file - merge hooks/permissions, enforce enabledPlugins from source
         MERGED=$(${pkgs.jq}/bin/jq -s '
           .[0] as $existing | .[1] as $source |
           $existing * {
             permissions: ($existing.permissions // {}) * $source.permissions,
-            hooks: ($existing.hooks // {}) * $source.hooks
+            hooks: ($existing.hooks // {}) * $source.hooks,
+            enabledPlugins: $source.enabledPlugins
           }
         ' "$SETTINGS_FILE" "$SOURCE_SETTINGS" 2>/dev/null)
 
