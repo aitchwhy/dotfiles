@@ -4,7 +4,6 @@
  * Tests for shell script lifecycle hooks:
  * - session-start.sh
  * - session-stop.sh
- * - post-edit.sh
  */
 
 import { describe, expect, test } from 'bun:test';
@@ -12,7 +11,7 @@ import { describe, expect, test } from 'bun:test';
 const HOOKS_DIR = `${import.meta.dir}/../../hooks`;
 
 // All shell hook scripts
-const SHELL_HOOKS = ['session-start.sh', 'session-stop.sh', 'post-edit.sh'];
+const SHELL_HOOKS = ['session-start.sh', 'session-stop.sh'];
 
 describe('Shell Hooks', () => {
   describe('file existence', () => {
@@ -60,22 +59,6 @@ describe('Shell Hooks', () => {
 
       await proc.exited;
       // Script should exit cleanly (0) or with info warning (1)
-      expect([0, 1]).toContain(proc.exitCode);
-    });
-
-    test('post-edit.sh runs without error', async () => {
-      const proc = Bun.spawn(['bash', `${HOOKS_DIR}/post-edit.sh`], {
-        stdout: 'pipe',
-        stderr: 'pipe',
-        env: {
-          ...process.env,
-          HOME: process.env.HOME || '/tmp',
-          CLAUDE_FILE_PATHS: '/tmp/test.ts', // Provide expected env var
-        },
-      });
-
-      await proc.exited;
-      // Script should exit cleanly
       expect([0, 1]).toContain(proc.exitCode);
     });
   });
