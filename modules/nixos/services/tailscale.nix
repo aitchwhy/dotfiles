@@ -7,7 +7,12 @@
   ...
 }:
 let
-  inherit (lib) mkDefault mkOption types mkIf;
+  inherit (lib)
+    mkDefault
+    mkOption
+    types
+    mkIf
+    ;
 in
 {
   options.modules.nixos.services.tailscale = {
@@ -46,14 +51,10 @@ in
       authKeyFile = config.modules.nixos.services.tailscale.authKeyFile;
 
       # Extra arguments
-      extraUpFlags =
-        [ "--ssh" ]
-        ++ (
-          if config.modules.nixos.services.tailscale.exitNode then
-            [ "--advertise-exit-node" ]
-          else
-            [ ]
-        );
+      extraUpFlags = [
+        "--ssh"
+      ]
+      ++ (if config.modules.nixos.services.tailscale.exitNode then [ "--advertise-exit-node" ] else [ ]);
     };
 
     # Trust Tailscale interface in firewall
