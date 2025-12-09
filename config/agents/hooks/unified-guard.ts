@@ -144,7 +144,7 @@ function checkForbiddenFiles(filePath: string): string | null {
 Reason: ${forbidden.reason} instead of this file
 Alternative: ${forbidden.alternative}
 
-See STACK.md for approved tools.`;
+See lib/versions.nix for approved tools.`;
       }
     } else {
       if (forbidden.pattern.test(fileName) || forbidden.pattern.test(filePath)) {
@@ -153,7 +153,7 @@ See STACK.md for approved tools.`;
 Reason: ${forbidden.reason} instead of this file
 Alternative: ${forbidden.alternative}
 
-See STACK.md for approved tools.`;
+See lib/versions.nix for approved tools.`;
       }
     }
   }
@@ -220,7 +220,7 @@ Use ${forbidden.alternative} instead.
 ${forbidden.docs ? `Docs: ${forbidden.docs}` : ''}
 
 This package is blocked by stack standards.
-See STACK.md for approved packages.`;
+See lib/versions.nix for approved packages.`;
       }
     }
   }
