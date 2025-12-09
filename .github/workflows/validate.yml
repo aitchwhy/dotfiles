@@ -39,15 +39,15 @@ jobs:
         uses: oven-sh/setup-bun@v2
 
       - name: Install Dependencies
-        working-directory: config/claude-code/evolution
+        working-directory: config/agents/evolution
         run: bun install --frozen-lockfile
 
       - name: Type Check
-        working-directory: config/claude-code/evolution
+        working-directory: config/agents/evolution
         run: bun run tsc --noEmit
 
       - name: Lint
-        working-directory: config/claude-code/evolution
+        working-directory: config/agents/evolution
         run: bunx biome check .
 
   config-validate:

@@ -35,7 +35,7 @@ jobs:
           bun-version: latest
 
       - name: Install Dependencies
-        working-directory: config/claude-code/evolution
+        working-directory: config/agents/evolution
         run: bun install --frozen-lockfile
 
       - name: Validate Nix Flake
@@ -43,7 +43,7 @@ jobs:
 
       - name: Run Evolution Graders
         id: grade
-        working-directory: config/claude-code/evolution
+        working-directory: config/agents/evolution
         run: |
           OUTPUT=$(bun run src/index.ts grade --ci 2>&1) || EXIT_CODE=$?
           echo "$OUTPUT"
@@ -92,7 +92,7 @@ jobs:
             \`\`\`bash
             cd ~/dotfiles
             nix flake check
-            bun run --cwd config/claude-code/evolution src/index.ts grade
+            bun run --cwd config/agents/evolution src/index.ts grade
             \`\`\`
 
             ---
