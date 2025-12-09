@@ -71,6 +71,7 @@
         system = darwinSystem;
         specialArgs = { inherit inputs self versions; };
         modules = [
+          sops-nix.darwinModules.sops
           ./modules/nixpkgs.nix
           ./modules/darwin
           ./modules/homebrew.nix
@@ -171,5 +172,45 @@
 
       # Formatters (multi-system)
       formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-rfc-style);
+
+      # Checks (multi-system)
+      checks = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        {
+          # Validate AI CLI configuration files
+          ai-cli-config = pkgs.runCommand "ai-cli-config-check" {
+            nativeBuildInputs = [ pkgs.jq ];
+            src = ./.;
+          } ''
+            cd $src
+
+            echo "Validating JSON configs..."
+            ${pkgs.jq}/bin/jq . config/agents/settings/claude-code.json > /dev/null
+            ${pkgs.jq}/bin/jq . config/agents/settings/gemini.json > /dev/null
+            ${pkgs.jq}/bin/jq . config/agents/mcp-servers.json > /dev/null
+
+            echo "Checking skill directories..."
+            test -d config/agents/skills/typescript-patterns
+            test -d config/agents/skills/zod-patterns
+            test -d config/agents/skills/result-patterns
+            test -d config/agents/skills/tdd-patterns
+            test -d config/agents/skills/verification-first
+
+            echo "Verifying each skill has SKILL.md..."
+            for skill in config/agents/skills/*/; do
+              test -f "$skill/SKILL.md" || {
+                echo "Missing SKILL.md in $skill"
+                exit 1
+              }
+            done
+
+            echo "All AI CLI config checks passed!"
+            touch $out
+          '';
+        }
+      );
     };
 }
