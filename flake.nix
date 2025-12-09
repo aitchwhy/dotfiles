@@ -57,8 +57,8 @@
       darwinPkgs = nixpkgs.legacyPackages.${darwinSystem};
       linuxPkgs = nixpkgs.legacyPackages.${linuxSystem};
 
-      # Centralized version management (Signet)
-      versions = import ./lib/versions.nix;
+      # NOTE: Version management moved to config/signet/src/stack/versions.ts
+      # Use `signet` CLI or import from TypeScript directly
 
       # Helper for multi-system support
       forAllSystems = nixpkgs.lib.genAttrs [
@@ -69,7 +69,7 @@
     {
       darwinConfigurations.hank-mbp-m4 = nix-darwin.lib.darwinSystem {
         system = darwinSystem;
-        specialArgs = { inherit inputs self versions; };
+        specialArgs = { inherit inputs self; };
         modules = [
           sops-nix.darwinModules.sops
           ./modules/nixpkgs.nix
@@ -99,7 +99,7 @@
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
-              extraSpecialArgs = { inherit inputs self versions; };
+              extraSpecialArgs = { inherit inputs self; };
               users.hank = import ./users/hank.nix;
               backupFileExtension = "backup";
             };
@@ -120,7 +120,7 @@
       # NixOS configuration for cloud development
       nixosConfigurations.cloud = nixpkgs.lib.nixosSystem {
         system = linuxSystem;
-        specialArgs = { inherit inputs self versions; };
+        specialArgs = { inherit inputs self; };
         modules = [
           disko.nixosModules.disko
           sops-nix.nixosModules.sops
@@ -134,7 +134,7 @@
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
-              extraSpecialArgs = { inherit inputs self versions; };
+              extraSpecialArgs = { inherit inputs self; };
               users.hank = import ./users/hank-linux.nix;
               backupFileExtension = "backup";
             };
