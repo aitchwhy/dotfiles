@@ -101,6 +101,11 @@ test-ai-static:
     @echo "Running static AI CLI tests only..."
     @bats tests/ai-cli.bats --filter-tags '!live'
 
+# Repomix configuration tests
+test-rx:
+    @echo "Running Repomix tests..."
+    @bats tests/repomix.bats
+
 # Quick rebuild with validation
 rebuild: fmt check switch
     @echo "✓ Configuration rebuilt successfully"
