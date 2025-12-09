@@ -25,12 +25,13 @@
     "@effect/platform-bun": "0.86.0",
     "@effect/printer": "0.47.0",
     "@effect/printer-ansi": "0.47.0",
+    "zod": "4.1.13",
     "handlebars": "4.7.8",
     "oxc-parser": "0.101.0",
     "oxc-transform": "0.101.0",
     "@ast-grep/napi": "0.33.1",
     "yaml": "2.7.0",
-    "better-auth": "1.4.5",
+    "better-auth": "1.4.6",
     "@temporalio/client": "1.13.0",
     "@temporalio/workflow": "1.13.0",
     "@temporalio/activity": "1.13.0",
@@ -40,7 +41,11 @@
     "@opentelemetry/exporter-trace-otlp-http": "0.57.0",
     "posthog-node": "5.14.1",
     "ioredis": "5.8.2",
-    "@restatedev/restate-sdk": "1.9.1"
+    "@restatedev/restate-sdk": "1.9.1",
+    "@pulumi/pulumi": "3.210.0",
+    "@pulumi/gcp": "9.6.0",
+    "@pulumi/random": "4.18.4",
+    "@pulumi/policy": "1.20.0"
   },
   "devDependencies": {
     "oxlint": "1.32.0",
