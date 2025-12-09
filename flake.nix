@@ -180,26 +180,20 @@
           pkgs = nixpkgs.legacyPackages.${system};
         in
         {
-          # Validate AI CLI configuration files
+          # Validate AI CLI configuration files (single source of truth)
           ai-cli-config = pkgs.runCommand "ai-cli-config-check" {
             nativeBuildInputs = [ pkgs.jq ];
             src = ./.;
           } ''
             cd $src
 
-            echo "Validating JSON configs..."
-            ${pkgs.jq}/bin/jq . config/agents/settings/claude-code.json > /dev/null
-            ${pkgs.jq}/bin/jq . config/agents/settings/gemini.json > /dev/null
-            ${pkgs.jq}/bin/jq . config/agents/mcp-servers.json > /dev/null
+            # Validate all JSON configs
+            for json in config/agents/settings/*.json config/agents/mcp-servers.json; do
+              echo "Validating $json..."
+              ${pkgs.jq}/bin/jq . "$json" > /dev/null
+            done
 
-            echo "Checking skill directories..."
-            test -d config/agents/skills/typescript-patterns
-            test -d config/agents/skills/zod-patterns
-            test -d config/agents/skills/result-patterns
-            test -d config/agents/skills/tdd-patterns
-            test -d config/agents/skills/verification-first
-
-            echo "Verifying each skill has SKILL.md..."
+            # Validate each skill has SKILL.md (source IS the test data)
             for skill in config/agents/skills/*/; do
               test -f "$skill/SKILL.md" || {
                 echo "Missing SKILL.md in $skill"
@@ -207,7 +201,7 @@
               }
             done
 
-            echo "All AI CLI config checks passed!"
+            echo "All AI CLI config checks passed"
             touch $out
           '';
         }
