@@ -51,7 +51,6 @@ in
     ./apps/default-apps.nix
     ./apps/paste.nix
     ./apps/signet.nix
-    ./apps/prompt-system.nix
   ];
 
   config = {
@@ -108,7 +107,6 @@ in
         defaultApps.enable = mkDefault true;
         paste.enable = mkDefault true;
         signet.enable = mkDefault true;
-        promptSystem.enable = mkDefault true;
       };
     };
 
