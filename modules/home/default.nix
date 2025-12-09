@@ -49,6 +49,7 @@ in
     ./apps/homerow.nix
     ./apps/betterdisplay.nix
     ./apps/default-apps.nix
+    ./apps/paste.nix
     ./apps/signet.nix
     ./apps/prompt-system.nix
   ];
@@ -105,6 +106,7 @@ in
         homerow.enable = mkDefault true;
         betterdisplay.enable = mkDefault true;
         defaultApps.enable = mkDefault true;
+        paste.enable = mkDefault true;
         signet.enable = mkDefault true;
         promptSystem.enable = mkDefault true;
       };
