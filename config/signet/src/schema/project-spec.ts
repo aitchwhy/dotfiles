@@ -50,8 +50,32 @@ export type DatabaseType = typeof DatabaseType.Type
 /**
  * Queue types
  */
-export const QueueType = Schema.Literal('temporal', 'sqs')
+export const QueueType = Schema.Literal('redis', 'sqs', 'none')
 export type QueueType = typeof QueueType.Type
+
+/**
+ * Auth types
+ */
+export const AuthType = Schema.Literal('better-auth', 'none')
+export type AuthType = typeof AuthType.Type
+
+/**
+ * Workflow/Durable Execution types
+ */
+export const WorkflowType = Schema.Literal('temporal', 'restate', 'none')
+export type WorkflowType = typeof WorkflowType.Type
+
+/**
+ * Telemetry provider types
+ */
+export const TelemetryProvider = Schema.Literal('opentelemetry', 'posthog', 'both', 'none')
+export type TelemetryProvider = typeof TelemetryProvider.Type
+
+/**
+ * Cache types
+ */
+export const CacheType = Schema.Literal('redis', 'none')
+export type CacheType = typeof CacheType.Type
 
 /**
  * Runtime types
@@ -86,6 +110,10 @@ export const InfraConfig = Schema.Struct({
   runtime: RuntimeType,
   database: Schema.optional(DatabaseType),
   queue: Schema.optional(QueueType),
+  cache: Schema.optional(CacheType),
+  auth: Schema.optional(AuthType),
+  workflow: Schema.optional(WorkflowType),
+  telemetry: Schema.optional(TelemetryProvider),
 })
 export type InfraConfig = typeof InfraConfig.Type
 

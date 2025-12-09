@@ -13,7 +13,7 @@
  */
 import { Args, Command, Options } from '@effect/cli'
 import { NodeContext, NodeRuntime } from '@effect/platform-node'
-import { Console, Effect, Option } from 'effect'
+import { Console, Effect, Option, Schema } from 'effect'
 import { generateCore } from '@/generators/core'
 import { generateApi } from '@/generators/api'
 import { generateUi } from '@/generators/ui'
@@ -36,7 +36,7 @@ import {
   applyAllFixes,
   type PatternMatch,
 } from '@/layers/patterns'
-import type { ProjectSpec } from '@/schema/project-spec'
+import { ProjectName, type ProjectSpec } from '@/schema/project-spec'
 import { readdir } from 'node:fs/promises'
 import { join } from 'node:path'
 
@@ -74,9 +74,9 @@ export const initCommand = Command.make(
       const validType = yield* validateProjectType(type)
       yield* Console.log(`\n🏭 Initializing ${validType} project: ${name}\n`)
 
-      // Create project spec
+      // Create project spec (brand the name via Schema validation)
       const spec: ProjectSpec = {
-        name,
+        name: Schema.decodeSync(ProjectName)(name),
         type: validType,
         infra: { runtime: 'bun' },
         observability: { processCompose: true, metrics: false, debugger: 'vscode' },
@@ -138,7 +138,7 @@ export const genCommand = Command.make(
       yield* Console.log(`\n🔧 Generating ${validType} workspace: ${name}\n`)
 
       const spec: ProjectSpec = {
-        name,
+        name: Schema.decodeSync(ProjectName)(name),
         type: validType,
         infra: { runtime: 'bun' },
         observability: { processCompose: true, metrics: false, debugger: 'vscode' },
