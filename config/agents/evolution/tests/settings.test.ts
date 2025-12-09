@@ -5,10 +5,10 @@
  */
 
 import { describe, expect, test } from 'bun:test';
-import { validateSettings, isValidPermissionPattern, SettingsSchema } from '../src/schemas/resources';
+import { isValidPermissionPattern, validateSettings } from '../src/schemas/resources';
 
 const SETTINGS_PATH = `${import.meta.dir}/../../settings.json`;
-const HOOKS_DIR = `${import.meta.dir}/../hooks`;
+const HOOKS_DIR = `${import.meta.dir}/../../hooks`;
 
 describe('Settings.json Validation', () => {
   let settings: unknown;
@@ -92,7 +92,9 @@ describe('Settings.json Validation', () => {
         settings = await Bun.file(SETTINGS_PATH).json();
       }
 
-      const s = settings as { hooks: { PreToolUse?: Array<{ matcher: string; hooks: unknown[] }> } };
+      const s = settings as {
+        hooks: { PreToolUse?: Array<{ matcher: string; hooks: unknown[] }> };
+      };
       if (s.hooks.PreToolUse) {
         expect(Array.isArray(s.hooks.PreToolUse)).toBe(true);
         for (const hook of s.hooks.PreToolUse) {
@@ -108,7 +110,9 @@ describe('Settings.json Validation', () => {
         settings = await Bun.file(SETTINGS_PATH).json();
       }
 
-      const s = settings as { hooks: { PostToolUse?: Array<{ matcher: string; hooks: unknown[] }> } };
+      const s = settings as {
+        hooks: { PostToolUse?: Array<{ matcher: string; hooks: unknown[] }> };
+      };
       if (s.hooks.PostToolUse) {
         expect(Array.isArray(s.hooks.PostToolUse)).toBe(true);
         for (const hook of s.hooks.PostToolUse) {
@@ -148,7 +152,7 @@ describe('Settings.json Validation', () => {
           // Extract file path from bun run commands
           const bunRunMatch = command.match(/bun run "([^"]+)"/);
           if (bunRunMatch) {
-            const filePath = bunRunMatch[1]?.replace('$HOME/dotfiles/config/claude-code/evolution/hooks/', '');
+            const filePath = bunRunMatch[1]?.replace('$HOME/dotfiles/config/agents/hooks/', '');
             if (filePath && !filePath.includes('$')) {
               const fullPath = `${HOOKS_DIR}/${filePath}`;
               const file = Bun.file(fullPath);
@@ -163,7 +167,7 @@ describe('Settings.json Validation', () => {
           // Extract file path from bash commands
           const bashMatch = command.match(/bash "([^"]+)"/);
           if (bashMatch) {
-            const filePath = bashMatch[1]?.replace('$HOME/dotfiles/config/claude-code/evolution/hooks/', '');
+            const filePath = bashMatch[1]?.replace('$HOME/dotfiles/config/agents/hooks/', '');
             if (filePath && !filePath.includes('$')) {
               const fullPath = `${HOOKS_DIR}/${filePath}`;
               const file = Bun.file(fullPath);

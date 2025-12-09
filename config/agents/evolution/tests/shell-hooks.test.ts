@@ -9,7 +9,7 @@
 
 import { describe, expect, test } from 'bun:test';
 
-const HOOKS_DIR = `${import.meta.dir}/../hooks`;
+const HOOKS_DIR = `${import.meta.dir}/../../hooks`;
 
 // All shell hook scripts
 const SHELL_HOOKS = ['session-start.sh', 'session-stop.sh', 'post-edit.sh'];
