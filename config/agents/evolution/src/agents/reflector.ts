@@ -10,14 +10,15 @@
  * 3. Generate patch proposals with confidence scores
  * 4. Store proposals for review
  */
-import { Err, Ok, type Result } from '../lib/result';
-import { EvolutionDB } from '../db/client';
+
+import type { EvolutionDB } from '../db/client';
 import type {
   DriftHotspot,
   PatchProposal,
   PatchProposalInsert,
   ViolationPattern,
 } from '../db/schema';
+import { Err, Ok, type Result } from '../lib/result';
 
 // ============================================================================
 // Types
@@ -57,14 +58,14 @@ function driftToTargetFile(driftType: string): string {
   switch (driftType) {
     case 'missing-import':
     case 'missing-zod-schema':
-      return 'config/system/src/definitions/skills/zod-patterns.ts';
+      return 'config/agents/skills/zod-patterns/SKILL.md';
     case 'missing-result-type':
-      return 'config/system/src/definitions/skills/result-patterns.ts';
+      return 'config/agents/skills/result-patterns/SKILL.md';
     case 'missing-export':
     case 'invalid-import-path':
-      return 'config/system/src/definitions/skills/typescript-patterns.ts';
+      return 'config/agents/skills/typescript-patterns/SKILL.md';
     default:
-      return 'config/system/src/definitions/skills/clean-code.ts';
+      return 'config/agents/skills/clean-code/SKILL.md';
   }
 }
 
@@ -73,12 +74,12 @@ function driftToTargetFile(driftType: string): string {
  */
 function violationToTargetFile(ruleName: string, ruleSource: string): string {
   if (ruleSource === 'hook') {
-    return `config/claude-code/evolution/hooks/${ruleName}.ts`;
+    return `config/agents/hooks/${ruleName}.ts`;
   }
   if (ruleSource === 'grader') {
-    return `config/claude-code/evolution/src/graders/${ruleName}.ts`;
+    return `config/agents/evolution/src/graders/${ruleName}.ts`;
   }
-  return 'config/system/src/definitions/skills/verification-first.ts';
+  return 'config/agents/skills/verification-first/SKILL.md';
 }
 
 /**
@@ -112,7 +113,7 @@ function generateViolationDescription(pattern: ViolationPattern): string {
 /**
  * Generate patch content stub (placeholder for actual diff generation)
  */
-function generatePatchContent(type: 'drift' | 'violation', name: string, count: number): string {
+function generatePatchContent(_type: 'drift' | 'violation', name: string, count: number): string {
   return `/**
  * AUTO-GENERATED PATCH STUB
  *
@@ -174,7 +175,10 @@ export class Reflector {
       if (hotspot.occurrence_count < minEvidence) continue;
 
       const severity = hotspot.drift_type.includes('missing') ? 'error' : 'warning';
-      const confidence = calculateConfidence(hotspot.occurrence_count, severity as 'error' | 'warning');
+      const confidence = calculateConfidence(
+        hotspot.occurrence_count,
+        severity as 'error' | 'warning'
+      );
 
       if (confidence < minConfidence) continue;
 
@@ -193,7 +197,10 @@ export class Reflector {
     for (const pattern of violationPatterns) {
       if (pattern.total_violations < minEvidence) continue;
 
-      const confidence = calculateConfidence(pattern.total_violations, pattern.severity as 'error' | 'warning');
+      const confidence = calculateConfidence(
+        pattern.total_violations,
+        pattern.severity as 'error' | 'warning'
+      );
 
       if (confidence < minConfidence) continue;
 
@@ -202,7 +209,11 @@ export class Reflector {
         target_file: violationToTargetFile(pattern.rule_name, pattern.rule_source),
         description: generateViolationDescription(pattern),
         rationale: `${pattern.total_violations} violations of ${pattern.rule_name} rule from ${pattern.rule_source}. First seen: ${pattern.first_seen}, Last seen: ${pattern.last_seen}.`,
-        patch_content: generatePatchContent('violation', pattern.rule_name, pattern.total_violations),
+        patch_content: generatePatchContent(
+          'violation',
+          pattern.rule_name,
+          pattern.total_violations
+        ),
         confidence,
         evidence_count: pattern.total_violations,
       });
@@ -249,7 +260,10 @@ export class Reflector {
   /**
    * Apply an approved patch (mark as applied)
    */
-  apply(patchId: number, appliedBy: 'auto' | 'manual' = 'manual'): Result<PatchProposal | null, Error> {
+  apply(
+    patchId: number,
+    _appliedBy: 'auto' | 'manual' = 'manual'
+  ): Result<PatchProposal | null, Error> {
     // First check if patch is approved
     const pendingResult = this.db.getPendingPatches();
     if (!pendingResult.ok) return pendingResult;
