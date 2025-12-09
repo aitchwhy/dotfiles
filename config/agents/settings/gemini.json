@@ -1,0 +1,33 @@
+{
+  "core": {
+    "model": "gemini-2.5-pro",
+    "checkpointing": true
+  },
+  "context": {
+    "fileName": ["GEMINI.md", "AGENT.md"],
+    "refreshIncludesDirectories": true
+  },
+  "workspace": {
+    "includeDirectories": ["~/src", "~/dotfiles"]
+  },
+  "coreTools": {
+    "enabled": [
+      "list_directory",
+      "glob",
+      "read_file",
+      "write_file",
+      "replace",
+      "search_file_content",
+      "run_shell_command",
+      "web_search",
+      "web_fetch"
+    ]
+  },
+  "shell": {
+    "useNodePty": true,
+    "maxTimeout": 300
+  },
+  "privacy": {
+    "usageStatisticsEnabled": false
+  }
+}
