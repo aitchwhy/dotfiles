@@ -35,7 +35,7 @@
     claude.enable = false; # Claude Desktop (macOS GUI app)
 
     # Keep cross-platform modules
-    claudeCode.enable = true; # Claude Code CLI works on Linux
+    agents.enable = true; # AI agent configs (Claude Code, Gemini CLI)
     misc.enable = true;
   };
 
