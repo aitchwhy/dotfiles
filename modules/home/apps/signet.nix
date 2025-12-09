@@ -60,24 +60,24 @@ in
 
     # Generate versions.json from versions.nix on activation
     home.activation.signetSetup = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      SIGNET_DIR="${config.home.homeDirectory}/dotfiles/config/signet"
-      VERSIONS_FILE="$SIGNET_DIR/versions.json"
+            SIGNET_DIR="${config.home.homeDirectory}/dotfiles/config/signet"
+            VERSIONS_FILE="$SIGNET_DIR/versions.json"
 
-      # Create signet directory if it doesn't exist
-      $DRY_RUN_CMD mkdir -p "$SIGNET_DIR"
+            # Create signet directory if it doesn't exist
+            $DRY_RUN_CMD mkdir -p "$SIGNET_DIR"
 
-      # Write versions.json from Nix-evaluated versions
-      cat > "$VERSIONS_FILE" << 'EOF'
-${versionsJson}
-EOF
+            # Write versions.json from Nix-evaluated versions
+            cat > "$VERSIONS_FILE" << 'EOF'
+      ${versionsJson}
+      EOF
 
-      echo "Signet versions.json generated from lib/versions.nix"
+            echo "Signet versions.json generated from lib/versions.nix"
 
-      # Install dependencies if package.json exists but node_modules doesn't
-      if [ -f "$SIGNET_DIR/package.json" ] && [ ! -d "$SIGNET_DIR/node_modules" ]; then
-        echo "Installing signet dependencies..."
-        cd "$SIGNET_DIR" && ${pkgs.bun}/bin/bun install --frozen-lockfile 2>/dev/null || true
-      fi
+            # Install dependencies if package.json exists but node_modules doesn't
+            if [ -f "$SIGNET_DIR/package.json" ] && [ ! -d "$SIGNET_DIR/node_modules" ]; then
+              echo "Installing signet dependencies..."
+              cd "$SIGNET_DIR" && ${pkgs.bun}/bin/bun install --frozen-lockfile 2>/dev/null || true
+            fi
     '';
   };
 }

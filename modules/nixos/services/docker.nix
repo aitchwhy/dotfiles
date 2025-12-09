@@ -7,7 +7,12 @@
   ...
 }:
 let
-  inherit (lib) mkDefault mkOption types mkIf;
+  inherit (lib)
+    mkDefault
+    mkOption
+    types
+    mkIf
+    ;
 in
 {
   options.modules.nixos.services.docker = {
@@ -40,7 +45,10 @@ in
       # Daemon configuration
       daemon.settings = {
         # Use local DNS
-        dns = [ "1.1.1.1" "8.8.8.8" ];
+        dns = [
+          "1.1.1.1"
+          "8.8.8.8"
+        ];
 
         # Logging
         log-driver = "json-file";

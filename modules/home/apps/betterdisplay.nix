@@ -14,7 +14,12 @@
   ...
 }:
 let
-  inherit (lib) mkEnableOption mkOption mkIf types;
+  inherit (lib)
+    mkEnableOption
+    mkOption
+    mkIf
+    types
+    ;
   cfg = config.modules.home.apps.betterdisplay;
 in
 {
