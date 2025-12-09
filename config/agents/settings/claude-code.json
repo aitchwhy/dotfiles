@@ -5,6 +5,108 @@
     "allow": [],
     "deny": []
   },
-  "hooks": {},
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run \"$HOME/dotfiles/config/agents/hooks/unified-polish.ts\"",
+            "timeout": 60
+          }
+        ]
+      },
+      {
+        "matcher": "Write(**/package.json)|Edit(**/package.json)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run \"$HOME/dotfiles/config/agents/hooks/enforce-versions.ts\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run \"$HOME/dotfiles/config/agents/hooks/unified-guard.ts\"",
+            "timeout": 20
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"[$(date '+%Y-%m-%d %H:%M:%S')] Session: $(pwd)\" >> ~/.claude/session.log"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/dotfiles/config/agents/hooks/session-start.sh\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"[$(date '+%Y-%m-%d %H:%M:%S')] Session ended | Dir: $(basename \"$PWD\") | Files: $(git diff --name-only HEAD~5 2>/dev/null | wc -l | tr -d ' ') modified | Commits: $(git log --oneline --since='1 hour ago' 2>/dev/null | wc -l | tr -d ' ')\" >> ~/.claude/session.log",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/dotfiles/config/agents/hooks/session-stop.sh\"",
+            "timeout": 30
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run \"$HOME/dotfiles/config/agents/hooks/verification-gate.ts\"",
+            "timeout": 15
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run \"$HOME/dotfiles/config/agents/hooks/assumption-detector.ts\"",
+            "timeout": 15
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run \"$HOME/dotfiles/config/agents/hooks/stack-enforcer.ts\"",
+            "timeout": 20
+          }
+        ]
+      }
+    ]
+  },
   "enabledPlugins": []
 }
