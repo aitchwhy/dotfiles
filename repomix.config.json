@@ -11,7 +11,7 @@
     "showLineNumbers": false,
     "copyToClipboard": false,
     "includeEmptyDirectories": false,
-    "instructionFilePath": "config/claude-code/CLAUDE.md",
+    "instructionFilePath": "config/agents/AGENT.md",
     "git": {
       "sortByChanges": true,
       "sortByChangesMaxCommits": 50
