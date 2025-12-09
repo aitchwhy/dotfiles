@@ -3,8 +3,7 @@
  * Version Enforcer Hook
  *
  * PostToolUse hook that auto-corrects package.json versions on write.
- * Reads canonical versions from versions.json and corrects any
- * package.json that was just written with outdated or mismatched versions.
+ * Uses STACK from signet/src/stack as the single source of truth.
  *
  * Trigger: PostToolUse on Write to any package.json
  * Mode: Auto-correct with warning (PostToolUse cannot block)
@@ -12,6 +11,26 @@
 
 import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
+
+// Import STACK from signet (absolute path for Bun)
+let STACK: { npm: Record<string, string> }
+try {
+  const stackModule = await import(
+    join(process.env.HOME ?? '', 'dotfiles/config/signet/src/stack/versions.ts')
+  )
+  STACK = stackModule.STACK
+} catch {
+  // Fallback to versions.json if STACK import fails
+  const versionsPath = join(
+    process.env.HOME ?? '',
+    'dotfiles/config/signet/versions.json'
+  )
+  if (existsSync(versionsPath)) {
+    STACK = JSON.parse(readFileSync(versionsPath, 'utf-8'))
+  } else {
+    STACK = { npm: {} }
+  }
+}
 
 // =============================================================================
 // Types
@@ -35,12 +54,8 @@ interface HookOutput {
 // Configuration
 // =============================================================================
 
-const VERSIONS_PATH =
-  process.env.SIGNET_VERSIONS ??
-  join(process.env.HOME ?? '', 'dotfiles/config/signet/versions.json')
-
 // Packages to enforce (only correct these - don't interfere with user choices)
-// Synced with lib/versions.nix npm section
+// Synced with signet/src/stack/versions.ts npm section
 const ENFORCED_PACKAGES = [
   // Core
   'zod',
@@ -66,6 +81,9 @@ const ENFORCED_PACKAGES = [
   // Testing
   'vitest',
   '@playwright/test',
+  // Pulumi
+  '@pulumi/pulumi',
+  '@pulumi/gcp',
 ] as const
 
 // =============================================================================
@@ -101,19 +119,8 @@ async function main(): Promise<void> {
     return output({ continue: true })
   }
 
-  // Load canonical versions
-  if (!existsSync(VERSIONS_PATH)) {
-    return output({ continue: true })
-  }
-
-  let versions: { npm: Record<string, string> }
-  try {
-    versions = JSON.parse(readFileSync(VERSIONS_PATH, 'utf-8'))
-  } catch {
-    return output({ continue: true })
-  }
-
-  const npmVersions = versions.npm
+  // Use STACK.npm as source of truth
+  const npmVersions = STACK.npm
 
   // Read the just-written package.json
   let pkg: {
@@ -160,7 +167,7 @@ async function main(): Promise<void> {
       additionalContext: `📦 Auto-corrected versions in ${filePath}:
 ${corrections.map((c) => `  • ${c}`).join('\n')}
 
-Source: ${VERSIONS_PATH}`,
+Source: signet/src/stack/versions.ts (SSOT)`,
     })
   }
 

@@ -3,7 +3,7 @@
  * Stack Enforcer Hook
  *
  * Stop hook that validates stack compliance at session end.
- * Checks package.json versions against versions.json and detects forbidden deps.
+ * Uses STACK from signet/src/stack as the single source of truth.
  *
  * Trigger: Stop event
  * Mode: STRICT (env STACK_ENFORCER_STRICT=true) blocks, default warns
@@ -12,6 +12,26 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { z } from 'zod';
+
+// Import STACK from signet (absolute path for Bun)
+let STACK: { npm: Record<string, string>; meta: { ssotVersion: string } };
+try {
+  const stackModule = await import(
+    join(process.env.HOME ?? '', 'dotfiles/config/signet/src/stack/versions.ts')
+  );
+  STACK = stackModule.STACK;
+} catch {
+  // Fallback to versions.json if STACK import fails
+  const versionsPath = join(
+    process.env.HOME ?? '',
+    'dotfiles/config/signet/versions.json'
+  );
+  if (existsSync(versionsPath)) {
+    STACK = JSON.parse(readFileSync(versionsPath, 'utf-8'));
+  } else {
+    STACK = { npm: {}, meta: { ssotVersion: 'unknown' } };
+  }
+}
 
 // =============================================================================
 // Types
@@ -36,11 +56,8 @@ interface Violation {
 // Configuration
 // =============================================================================
 
-const VERSIONS_PATH =
-  process.env.SIGNET_VERSIONS ??
-  join(process.env.HOME ?? '', 'dotfiles/config/signet/versions.json');
-
 const STRICT_MODE = process.env.STACK_ENFORCER_STRICT === 'true';
+const SSOT_PATH = 'signet/src/stack/versions.ts';
 
 // Forbidden dependencies - these have better alternatives
 const FORBIDDEN_DEPS: Record<string, string> = {
@@ -241,22 +258,14 @@ async function main() {
     return;
   }
 
-  // Load canonical versions
-  if (!existsSync(VERSIONS_PATH)) {
+  // Verify STACK is loaded
+  if (!STACK.npm || Object.keys(STACK.npm).length === 0) {
     console.log(
       JSON.stringify({
         continue: true,
-        warning: `⚠️  versions.json not found at ${VERSIONS_PATH}. Run 'just switch' to generate.`,
+        warning: `⚠️  STACK not loaded. Check ${SSOT_PATH}.`,
       })
     );
-    return;
-  }
-
-  let versions: { npm: Record<string, string> };
-  try {
-    versions = JSON.parse(readFileSync(VERSIONS_PATH, 'utf-8'));
-  } catch {
-    console.log(JSON.stringify({ continue: true }));
     return;
   }
 
@@ -272,7 +281,7 @@ async function main() {
   // Analyze each package.json
   const allViolations: Violation[] = [];
   for (const pkgPath of packageJsonFiles) {
-    allViolations.push(...analyzePackageJson(pkgPath, versions.npm));
+    allViolations.push(...analyzePackageJson(pkgPath, STACK.npm));
   }
 
   if (allViolations.length === 0) {
@@ -290,7 +299,7 @@ async function main() {
   const mediumSeverity = allViolations.filter((v) => v.severity === 'medium');
 
   // Format violation report
-  const report = `Stack Compliance Issues:
+  const report = `Stack Compliance Issues (SSOT v${STACK.meta?.ssotVersion ?? 'unknown'}):
 
 ${highSeverity.length > 0 ? `❌ FORBIDDEN DEPENDENCIES (${highSeverity.length}):
 ${highSeverity.map((v) => `  • ${v.message}\n    in ${v.file}`).join('\n')}
@@ -298,7 +307,7 @@ ${highSeverity.map((v) => `  • ${v.message}\n    in ${v.file}`).join('\n')}
 ${mediumSeverity.length > 0 ? `⚠️  VERSION DRIFT (${mediumSeverity.length}):
 ${mediumSeverity.map((v) => `  • ${v.message}\n    in ${v.file}`).join('\n')}
 ` : ''}
-Source of truth: ${VERSIONS_PATH}`;
+Source of truth: ${SSOT_PATH}`;
 
   // Block if high severity violations in STRICT mode
   if (highSeverity.length > 0 && STRICT_MODE) {
