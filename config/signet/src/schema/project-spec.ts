@@ -4,152 +4,134 @@
  * The formal specification language for Signet.
  * Every project is a parameter instantiation of this schema.
  *
+ * Pattern: TypeScript types are source of truth, schemas satisfy types.
  * Uses Effect Schema for parse-don't-validate semantics.
  */
-import { Schema } from 'effect'
+import { Schema } from 'effect';
 
 // =============================================================================
-// Branded Types
+// Effect Schema Branded Types
 // =============================================================================
 
-/**
- * Project name - must be lowercase kebab-case starting with letter
- */
-export const ProjectName = Schema.String.pipe(
+// For Effect Schema, the schema IS the source of truth for branded types
+// because Effect's brand() creates a unique nominal type at the schema level.
+// We derive types from these specific schemas (exception to TS-first rule).
+
+export const projectNameSchema = Schema.String.pipe(
   Schema.pattern(/^[a-z][a-z0-9-]*$/),
   Schema.brand('ProjectName')
-)
-export type ProjectName = typeof ProjectName.Type
+);
+export type ProjectName = typeof projectNameSchema.Type;
 
-/**
- * Port number - must be in valid range (1024-65535)
- */
-export const Port = Schema.Number.pipe(
+export const portSchema = Schema.Number.pipe(
   Schema.int(),
   Schema.between(1024, 65535),
   Schema.brand('Port')
-)
-export type Port = typeof Port.Type
+);
+export type Port = typeof portSchema.Type;
 
 // =============================================================================
-// Enums / Literals
+// TypeScript Types (Source of Truth for Non-Branded Types)
 // =============================================================================
 
 /**
  * Project types supported by the factory
  */
-export const ProjectType = Schema.Literal('monorepo', 'api', 'ui', 'infra', 'library')
-export type ProjectType = typeof ProjectType.Type
+export type ProjectType = 'monorepo' | 'api' | 'ui' | 'infra' | 'library';
 
 /**
  * Database types
  */
-export const DatabaseType = Schema.Literal('turso', 'd1', 'neon')
-export type DatabaseType = typeof DatabaseType.Type
+export type DatabaseType = 'turso' | 'd1' | 'neon';
 
 /**
  * Queue types
  */
-export const QueueType = Schema.Literal('redis', 'sqs', 'none')
-export type QueueType = typeof QueueType.Type
+export type QueueType = 'redis' | 'sqs' | 'none';
 
 /**
  * Auth types
  */
-export const AuthType = Schema.Literal('better-auth', 'none')
-export type AuthType = typeof AuthType.Type
+export type AuthType = 'better-auth' | 'none';
 
 /**
  * Workflow/Durable Execution types
  */
-export const WorkflowType = Schema.Literal('temporal', 'restate', 'none')
-export type WorkflowType = typeof WorkflowType.Type
+export type WorkflowType = 'temporal' | 'restate' | 'none';
 
 /**
  * Telemetry provider types
  */
-export const TelemetryProvider = Schema.Literal('opentelemetry', 'posthog', 'both', 'none')
-export type TelemetryProvider = typeof TelemetryProvider.Type
+export type TelemetryProvider = 'opentelemetry' | 'posthog' | 'both' | 'none';
 
 /**
  * Cache types
  */
-export const CacheType = Schema.Literal('redis', 'none')
-export type CacheType = typeof CacheType.Type
+export type CacheType = 'redis' | 'none';
 
 /**
  * Runtime types
  */
-export const RuntimeType = Schema.Literal('bun', 'node')
-export type RuntimeType = typeof RuntimeType.Type
+export type RuntimeType = 'bun' | 'node';
 
 /**
  * Debugger types
  */
-export const DebuggerType = Schema.Literal('vscode', 'nvim-dap')
-export type DebuggerType = typeof DebuggerType.Type
-
-// =============================================================================
-// Config Objects
-// =============================================================================
+export type DebuggerType = 'vscode' | 'nvim-dap';
 
 /**
  * Port configuration for services
  */
-export const PortConfig = Schema.Struct({
-  http: Schema.optional(Port),
-  debug: Schema.optional(Port),
-  metrics: Schema.optional(Port),
-})
-export type PortConfig = typeof PortConfig.Type
+export type PortConfig = {
+  readonly http?: Port | undefined;
+  readonly debug?: Port | undefined;
+  readonly metrics?: Port | undefined;
+};
 
 /**
  * Infrastructure configuration
  */
-export const InfraConfig = Schema.Struct({
-  runtime: RuntimeType,
-  database: Schema.optional(DatabaseType),
-  queue: Schema.optional(QueueType),
-  cache: Schema.optional(CacheType),
-  auth: Schema.optional(AuthType),
-  workflow: Schema.optional(WorkflowType),
-  telemetry: Schema.optional(TelemetryProvider),
-})
-export type InfraConfig = typeof InfraConfig.Type
+export type InfraConfig = {
+  readonly runtime: RuntimeType;
+  readonly database?: DatabaseType | undefined;
+  readonly queue?: QueueType | undefined;
+  readonly cache?: CacheType | undefined;
+  readonly auth?: AuthType | undefined;
+  readonly workflow?: WorkflowType | undefined;
+  readonly telemetry?: TelemetryProvider | undefined;
+};
 
 /**
  * Observability configuration (REQUIRED for all projects)
  */
-export const ObservabilityConfig = Schema.Struct({
-  processCompose: Schema.Literal(true), // Always required
-  metrics: Schema.Boolean,
-  debugger: DebuggerType,
-})
-export type ObservabilityConfig = typeof ObservabilityConfig.Type
-
-// =============================================================================
-// Hexagonal Architecture
-// =============================================================================
+export type ObservabilityConfig = {
+  readonly processCompose: true;
+  readonly metrics: boolean;
+  readonly debugger: DebuggerType;
+};
 
 /**
  * Port definition for hexagonal architecture
  */
-export const PortDefinition = Schema.Struct({
-  method: Schema.String,
-  input: Schema.Unknown,
-  output: Schema.Unknown,
-})
-export type PortDefinition = typeof PortDefinition.Type
+export type PortDefinition = {
+  readonly method: string;
+  readonly input: unknown;
+  readonly output: unknown;
+};
 
 /**
  * Ports record - maps port names to definitions
  */
-export const Ports = Schema.Record({ key: Schema.String, value: PortDefinition })
-export type Ports = typeof Ports.Type
+export type Ports = Record<string, PortDefinition>;
 
-// =============================================================================
-// Main Schema
-// =============================================================================
+/**
+ * Workspace definition
+ */
+export type Workspace = {
+  readonly name: ProjectName;
+  readonly type: ProjectType;
+  readonly path: string;
+};
 
 /**
  * ProjectSpec - The complete project specification
@@ -157,42 +139,134 @@ export type Ports = typeof Ports.Type
  * This is the DNA of every generated project.
  * All other schemas derive from or compose with this.
  */
-export const ProjectSpec = Schema.Struct({
-  // Metadata
-  name: ProjectName,
+export type ProjectSpec = {
+  readonly name: ProjectName;
+  readonly description?: string | undefined;
+  readonly type: ProjectType;
+  readonly ports?: PortConfig | undefined;
+  readonly hexagonal?:
+    | {
+        readonly ports?: Ports | undefined;
+      }
+    | undefined;
+  readonly infra: InfraConfig;
+  readonly observability: ObservabilityConfig;
+  readonly workspaces?: readonly Workspace[] | undefined;
+};
+
+// =============================================================================
+// Effect Schemas (Satisfy TypeScript Types)
+// =============================================================================
+
+// Literal/Enum schemas
+export const projectTypeSchema = Schema.Literal(
+  'monorepo',
+  'api',
+  'ui',
+  'infra',
+  'library'
+) satisfies Schema.Schema<ProjectType>;
+
+export const databaseTypeSchema = Schema.Literal(
+  'turso',
+  'd1',
+  'neon'
+) satisfies Schema.Schema<DatabaseType>;
+
+export const queueTypeSchema = Schema.Literal(
+  'redis',
+  'sqs',
+  'none'
+) satisfies Schema.Schema<QueueType>;
+
+export const authTypeSchema = Schema.Literal(
+  'better-auth',
+  'none'
+) satisfies Schema.Schema<AuthType>;
+
+export const workflowTypeSchema = Schema.Literal(
+  'temporal',
+  'restate',
+  'none'
+) satisfies Schema.Schema<WorkflowType>;
+
+export const telemetryProviderSchema = Schema.Literal(
+  'opentelemetry',
+  'posthog',
+  'both',
+  'none'
+) satisfies Schema.Schema<TelemetryProvider>;
+
+export const cacheTypeSchema = Schema.Literal(
+  'redis',
+  'none'
+) satisfies Schema.Schema<CacheType>;
+
+export const runtimeTypeSchema = Schema.Literal(
+  'bun',
+  'node'
+) satisfies Schema.Schema<RuntimeType>;
+
+export const debuggerTypeSchema = Schema.Literal(
+  'vscode',
+  'nvim-dap'
+) satisfies Schema.Schema<DebuggerType>;
+
+// Config object schemas
+export const portConfigSchema = Schema.Struct({
+  http: Schema.optional(portSchema),
+  debug: Schema.optional(portSchema),
+  metrics: Schema.optional(portSchema),
+});
+
+export const infraConfigSchema = Schema.Struct({
+  runtime: runtimeTypeSchema,
+  database: Schema.optional(databaseTypeSchema),
+  queue: Schema.optional(queueTypeSchema),
+  cache: Schema.optional(cacheTypeSchema),
+  auth: Schema.optional(authTypeSchema),
+  workflow: Schema.optional(workflowTypeSchema),
+  telemetry: Schema.optional(telemetryProviderSchema),
+});
+
+export const observabilityConfigSchema = Schema.Struct({
+  processCompose: Schema.Literal(true),
+  metrics: Schema.Boolean,
+  debugger: debuggerTypeSchema,
+});
+
+export const portDefinitionSchema = Schema.Struct({
+  method: Schema.String,
+  input: Schema.Unknown,
+  output: Schema.Unknown,
+}) satisfies Schema.Schema<PortDefinition>;
+
+export const portsSchema = Schema.Record({
+  key: Schema.String,
+  value: portDefinitionSchema,
+});
+
+export const workspaceSchema = Schema.Struct({
+  name: projectNameSchema,
+  type: projectTypeSchema,
+  path: Schema.String,
+});
+
+// Main ProjectSpec schema
+export const projectSpecSchema = Schema.Struct({
+  name: projectNameSchema,
   description: Schema.optional(Schema.String),
-
-  // Project type
-  type: ProjectType,
-
-  // Network configuration
-  ports: Schema.optional(PortConfig),
-
-  // Hexagonal architecture (optional - mainly for API projects)
+  type: projectTypeSchema,
+  ports: Schema.optional(portConfigSchema),
   hexagonal: Schema.optional(
     Schema.Struct({
-      ports: Schema.optional(Ports),
+      ports: Schema.optional(portsSchema),
     })
   ),
-
-  // Infrastructure (REQUIRED)
-  infra: InfraConfig,
-
-  // Observability (REQUIRED - process-compose is always on)
-  observability: ObservabilityConfig,
-
-  // Workspaces (for monorepos)
-  workspaces: Schema.optional(
-    Schema.Array(
-      Schema.Struct({
-        name: ProjectName,
-        type: ProjectType,
-        path: Schema.String,
-      })
-    )
-  ),
-})
-export type ProjectSpec = typeof ProjectSpec.Type
+  infra: infraConfigSchema,
+  observability: observabilityConfigSchema,
+  workspaces: Schema.optional(Schema.Array(workspaceSchema)),
+});
 
 // =============================================================================
 // Helpers
@@ -201,14 +275,37 @@ export type ProjectSpec = typeof ProjectSpec.Type
 /**
  * Decode unknown input to ProjectSpec
  */
-export const decodeProjectSpec = Schema.decodeUnknown(ProjectSpec)
+export const decodeProjectSpec = Schema.decodeUnknown(projectSpecSchema);
 
 /**
  * Encode ProjectSpec to unknown (for serialization)
  */
-export const encodeProjectSpec = Schema.encode(ProjectSpec)
+export const encodeProjectSpec = Schema.encode(projectSpecSchema);
 
 /**
  * Validate that input is a valid ProjectSpec
  */
-export const isProjectSpec = Schema.is(ProjectSpec)
+export const isProjectSpec = Schema.is(projectSpecSchema);
+
+// =============================================================================
+// Legacy Exports (for backwards compatibility during migration)
+// =============================================================================
+
+// These match the old PascalCase export names
+export const ProjectName = projectNameSchema;
+export const Port = portSchema;
+export const ProjectType = projectTypeSchema;
+export const DatabaseType = databaseTypeSchema;
+export const QueueType = queueTypeSchema;
+export const AuthType = authTypeSchema;
+export const WorkflowType = workflowTypeSchema;
+export const TelemetryProvider = telemetryProviderSchema;
+export const CacheType = cacheTypeSchema;
+export const RuntimeType = runtimeTypeSchema;
+export const DebuggerType = debuggerTypeSchema;
+export const PortConfig = portConfigSchema;
+export const InfraConfig = infraConfigSchema;
+export const ObservabilityConfig = observabilityConfigSchema;
+export const PortDefinition = portDefinitionSchema;
+export const Ports = portsSchema;
+export const ProjectSpec = projectSpecSchema;
