@@ -53,6 +53,133 @@ const program = myBusinessLogic.pipe(
 )
 ```
 
+## TypeScript-First Effect Schema
+
+Same philosophy as `zod-patterns`: TypeScript types are source of truth.
+Effect Schema validates runtime data matches the type contract.
+
+### Naming Convention
+
+- TypeScript type: `Thing` (PascalCase)
+- Effect Schema: `thingSchema` (camelCase)
+
+### Core Pattern
+
+```typescript
+import { Schema } from 'effect';
+
+// 1. TypeScript type is source of truth
+type Session = {
+  readonly id: string;
+  readonly userId: string;
+  readonly expiresAt: Date;
+  readonly createdAt: Date;
+};
+
+// 2. Effect Schema satisfies the TS type
+const sessionSchema = Schema.Struct({
+  id: Schema.String,
+  userId: Schema.String,
+  expiresAt: Schema.Date,
+  createdAt: Schema.Date,
+}) satisfies Schema.Schema<Session>;
+
+// BANNED - never derive types from schemas
+type Session = Schema.Schema.Type<typeof sessionSchema>; // NEVER DO THIS
+```
+
+### Branded Types (TS-First)
+
+```typescript
+import { Schema } from 'effect';
+
+// 1. TypeScript branded type
+declare const __brand: unique symbol;
+type Brand<T, B extends string> = T & { readonly [__brand]: B };
+type ProjectName = Brand<string, 'ProjectName'>;
+
+// 2. Constructor function
+const ProjectName = (name: string): ProjectName => name as ProjectName;
+
+// 3. Effect Schema with brand
+const projectNameSchema = Schema.String.pipe(
+  Schema.pattern(/^[a-z][a-z0-9-]*$/),
+  Schema.transform(
+    Schema.String as Schema.Schema<ProjectName>,
+    { decode: (s) => s as ProjectName, encode: (s) => s }
+  )
+);
+```
+
+### Port Data Contracts
+
+```typescript
+import { Schema, Context, Effect, Layer } from 'effect';
+
+// 1. TypeScript types for data contracts
+type User = {
+  readonly id: string;
+  readonly email: string;
+  readonly name: string | undefined;
+  readonly emailVerified: boolean;
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
+};
+
+type AuthErrorCode =
+  | 'INVALID_CREDENTIALS'
+  | 'SESSION_EXPIRED'
+  | 'SESSION_NOT_FOUND'
+  | 'USER_NOT_FOUND'
+  | 'RATE_LIMITED'
+  | 'INTERNAL_ERROR';
+
+// 2. Effect Schemas satisfy the types
+const userSchema = Schema.Struct({
+  id: Schema.String,
+  email: Schema.String,
+  name: Schema.optional(Schema.String),
+  emailVerified: Schema.Boolean,
+  createdAt: Schema.Date,
+  updatedAt: Schema.Date,
+}) satisfies Schema.Schema<User>;
+
+// 3. Tagged Error with TS-first pattern
+type AuthError = {
+  readonly _tag: 'AuthError';
+  readonly code: AuthErrorCode;
+  readonly message: string;
+};
+
+class AuthError extends Schema.TaggedError<AuthError>()('AuthError', {
+  code: Schema.Literal(
+    'INVALID_CREDENTIALS',
+    'SESSION_EXPIRED',
+    'SESSION_NOT_FOUND',
+    'USER_NOT_FOUND',
+    'RATE_LIMITED',
+    'INTERNAL_ERROR',
+  ),
+  message: Schema.String,
+}) {}
+```
+
+### Decode/Encode Helpers
+
+```typescript
+// Parse unknown data with Result-like API
+const decodeUser = Schema.decodeUnknown(userSchema);
+const encodeUser = Schema.encode(userSchema);
+const isUser = Schema.is(userSchema);
+
+// Usage in Effect pipeline
+const program = Effect.gen(function* () {
+  const rawData = yield* fetchUserData();
+  const user = yield* decodeUser(rawData);
+  return user; // Fully typed as User
+});
+```
+
 ## Generator Selection
 
 | Need | Command | What You Get |
