@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * Unified Polish - Consolidated PostToolUse formatter + auto-commit
+ * Unified Polish - Consolidated PostToolUse formatter
  *
  * REPLACES:
  * - TypeScript/JS formatter (biome)
@@ -12,13 +12,12 @@
  * - Lua formatter (stylua)
  * - CSS/SCSS formatter (prettier)
  * - SQL formatter (sql-formatter)
- * - atomic-git-sentinel.ts (auto-commit)
  *
  * Key optimization: All formatters run in PARALLEL via Promise.all()
- * This consolidation reduces shell spawns from 12 → 1 per Write/Edit operation.
+ * This consolidation reduces shell spawns from 9 → 1 per Write/Edit operation.
  */
 
-import { spawn, $ } from 'bun';
+import { spawn } from 'bun';
 
 // ============================================================================
 // Configuration
@@ -162,93 +161,6 @@ if (sqlFiles.length > 0) {
 // ============================================================================
 
 await Promise.all(tasks);
-
-// ============================================================================
-// Auto-Commit (consolidated from atomic-git-sentinel.ts)
-// ============================================================================
-
-async function autoCommit(): Promise<void> {
-  try {
-    // Check if in git repo
-    const gitCheck = await $`git rev-parse --git-dir`.quiet().nothrow();
-    if (gitCheck.exitCode !== 0) return;
-
-    // Check for changes
-    const status = await $`git status --porcelain`.text();
-    if (!status.trim()) return;
-
-    // Stage all changed files
-    await $`git add .`.quiet();
-
-    // Generate commit message
-    const message = generateCommitMessage(filePaths);
-
-    // Commit (skip hooks to avoid recursion)
-    await $`git commit -m ${message} --no-verify`.quiet().nothrow();
-  } catch {
-    // Auto-commit should never fail the hook
-  }
-}
-
-function generateCommitMessage(files: string[]): string {
-  const type = inferCommitType(files);
-  const scope = inferScope(files);
-  const description = inferDescription(files);
-  return `${type}(${scope}): ${description}`;
-}
-
-function inferCommitType(files: string[]): string {
-  const hasTests = files.some((f) => 
-    f.includes('.test.') || f.includes('.spec.') || f.includes('_test.')
-  );
-  const allDocs = files.every((f) => f.endsWith('.md') || f.endsWith('.mdx'));
-  const allConfigs = files.every((f) => 
-    f.endsWith('.json') || f.endsWith('.yaml') || f.endsWith('.yml') ||
-    f.endsWith('.toml') || f.endsWith('.nix') || f.startsWith('.')
-  );
-
-  if (hasTests) return 'test';
-  if (allDocs) return 'docs';
-  if (allConfigs) return 'chore';
-  return 'feat';
-}
-
-function inferScope(files: string[]): string {
-  const dirs = [...new Set(files.map((f) => {
-    const parts = f.split('/').filter(Boolean);
-    // Get meaningful directory
-    if (parts.includes('hooks')) return 'hooks';
-    if (parts.includes('layers')) return 'layers';
-    if (parts.includes('src')) return parts[parts.indexOf('src') + 1] || 'src';
-    return parts[parts.length - 2] || 'root';
-  }))];
-
-  if (dirs.length === 1) return dirs[0]!;
-  return 'misc';
-}
-
-function inferDescription(files: string[]): string {
-  const names = files.map((f) => {
-    const name = f.split('/').pop() || f;
-    return name
-      .replace(/\.(ts|tsx|js|jsx|test|spec|md|json|nix|yaml|yml)$/g, '')
-      .replace(/\.test$/, '')
-      .replace(/\.spec$/, '');
-  });
-
-  const unique = [...new Set(names)].slice(0, 3);
-  
-  if (files.length === 1) {
-    return `update ${unique[0]}`;
-  } else if (unique.length <= 3) {
-    return `update ${unique.join(', ')}`;
-  } else {
-    return `update ${files.length} files`;
-  }
-}
-
-// Run auto-commit after formatting
-await autoCommit();
 
 // Output success for PostToolUse
 console.log(JSON.stringify({ continue: true }));
