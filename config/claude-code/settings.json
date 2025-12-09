@@ -61,6 +61,7 @@
       "Bash(nix-shell:*)",
       "Bash(darwin-rebuild:*)",
       "Bash(home-manager:*)",
+      "Bash(sudo darwin-rebuild:*)",
       "Bash(alejandra:*)",
       "Bash(nixfmt:*)",
       "Bash(shfmt:*)",
