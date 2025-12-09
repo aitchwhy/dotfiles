@@ -170,16 +170,16 @@ cloud-status:
 
 # Full evolution cycle (grade + reflect)
 evolve *ARGS:
-    @bash config/claude-code/evolution/evolve.sh {{ ARGS }}
+    @bash config/agents/evolution/evolve.sh {{ ARGS }}
 
 # Quick status dashboard
 evolve-status:
-    @bash config/claude-code/evolution/evolve.sh status
+    @bash config/agents/evolution/evolve.sh status
 
 # Initialize evolution system
 evolve-init:
-    @mkdir -p .claude-metrics config/claude-code/evolution/lessons
-    @chmod +x config/claude-code/evolution/*.sh config/claude-code/evolution/**/*.sh 2>/dev/null || true
+    @mkdir -p .claude-metrics config/agents/evolution/lessons
+    @chmod +x config/agents/evolution/*.sh config/agents/evolution/**/*.sh 2>/dev/null || true
     @echo "✓ Evolution system initialized"
 
 # ═══════════════════════════════════════════════════════════════════════════════
