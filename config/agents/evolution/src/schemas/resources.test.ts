@@ -39,8 +39,8 @@ allowed-tools: Read, Write, Bash
 This is the skill body.`;
 
       const result = schemas.parseFrontmatter(content);
-      expect(result.frontmatter.description).toBe('Test skill description');
-      expect(result.frontmatter.name).toBe('test-skill');
+      expect(result.frontmatter['description']).toBe('Test skill description');
+      expect(result.frontmatter['name']).toBe('test-skill');
       expect(result.frontmatter['allowed-tools']).toBe('Read, Write, Bash');
       expect(result.body).toContain('# Skill Content');
     });

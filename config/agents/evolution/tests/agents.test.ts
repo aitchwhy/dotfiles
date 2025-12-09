@@ -5,7 +5,7 @@
  */
 
 import { describe, expect, test } from 'bun:test';
-import { validateAgent, parseFrontmatter } from '../src/schemas/resources';
+import { parseFrontmatter, validateAgent } from '../src/schemas/resources';
 
 const AGENTS_DIR = `${import.meta.dir}/../../agents`;
 
@@ -56,9 +56,9 @@ describe('Agents Validation', () => {
       const content = await file.text();
 
       const { frontmatter } = parseFrontmatter(content);
-      expect(frontmatter.description).toBeDefined();
-      expect(typeof frontmatter.description).toBe('string');
-      expect((frontmatter.description as string).length).toBeGreaterThan(0);
+      expect(frontmatter['description']).toBeDefined();
+      expect(typeof frontmatter['description']).toBe('string');
+      expect((frontmatter['description'] as string).length).toBeGreaterThan(0);
     });
 
     test.each(AGENT_NAMES)('agent %s has body content', async (name) => {

@@ -5,7 +5,7 @@
  */
 
 import { describe, expect, test } from 'bun:test';
-import { validateSkill, parseFrontmatter } from '../src/schemas/resources';
+import { parseFrontmatter, validateSkill } from '../src/schemas/resources';
 
 const SKILLS_DIR = `${import.meta.dir}/../../skills`;
 
@@ -72,9 +72,9 @@ describe('Skills Validation', () => {
       const content = await file.text();
 
       const { frontmatter } = parseFrontmatter(content);
-      expect(frontmatter.description).toBeDefined();
-      expect(typeof frontmatter.description).toBe('string');
-      expect((frontmatter.description as string).length).toBeGreaterThan(0);
+      expect(frontmatter['description']).toBeDefined();
+      expect(typeof frontmatter['description']).toBe('string');
+      expect((frontmatter['description'] as string).length).toBeGreaterThan(0);
     });
 
     test.each(SKILL_NAMES)('skill %s has body content', async (name) => {

@@ -22,6 +22,6 @@ rule:
     stopBy: end
   not:
     inside:
-      pattern: catch ($E) { $$$ }
+      kind: catch_clause
       stopBy: end
 

@@ -19,7 +19,7 @@ const versionPattern = /^\d+\.\d+\.\d+(-[\w.]+)?$/;
 const versionString = z.string().regex(versionPattern, 'Must be valid semver');
 
 /** Nix flake URL (e.g., "github:owner/repo" or "github:owner/repo/branch") */
-const flakeUrlPattern = /^github:[\w-]+\/[\w-]+(\/[\w.-]+)?$/;
+const flakeUrlPattern = /^github:[\w-]+\/[\w.-]+(\/[\w.-]+)?$/;
 
 const flakeUrl = z.string().regex(flakeUrlPattern, 'Must be valid flake URL');
 

@@ -6,10 +6,10 @@
  */
 import { afterAll, beforeAll, describe, expect, test } from 'bun:test';
 import { rmSync } from 'node:fs';
-import { join } from 'node:path';
 import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { Reflector } from '../../src/agents/reflector';
 import { EvolutionDB } from '../../src/db/client';
-import { Reflector, type ReflectorOutput } from '../../src/agents/reflector';
 
 describe('Reflector Agent', () => {
   let db: EvolutionDB;
@@ -68,7 +68,7 @@ describe('Reflector Agent', () => {
           (h) => h.drift_type === 'missing-result-type'
         );
         expect(resultTypeHotspot).toBeDefined();
-        expect(resultTypeHotspot!.occurrence_count).toBeGreaterThanOrEqual(5);
+        expect(resultTypeHotspot?.occurrence_count).toBeGreaterThanOrEqual(5);
       }
     });
 
@@ -93,7 +93,7 @@ describe('Reflector Agent', () => {
           (v) => v.rule_name === 'assumption-detector'
         );
         expect(assumptionPattern).toBeDefined();
-        expect(assumptionPattern!.total_violations).toBeGreaterThanOrEqual(3);
+        expect(assumptionPattern?.total_violations).toBeGreaterThanOrEqual(3);
       }
     });
 

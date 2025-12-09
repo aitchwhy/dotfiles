@@ -141,7 +141,10 @@ export function parseFrontmatter(content: string): {
     let value: string | string[] = line.slice(colonIndex + 1).trim();
 
     // Remove quotes if present
-    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
       value = value.slice(1, -1);
     }
 
@@ -162,7 +165,7 @@ export function parseFrontmatter(content: string): {
 /**
  * Validate a skill file
  */
-export function validateSkill(content: string): z.SafeParseReturnType<unknown, SkillFrontmatter> {
+export function validateSkill(content: string) {
   const { frontmatter } = parseFrontmatter(content);
   return SkillFrontmatterSchema.safeParse(frontmatter);
 }
@@ -170,7 +173,7 @@ export function validateSkill(content: string): z.SafeParseReturnType<unknown, S
 /**
  * Validate a command file
  */
-export function validateCommand(content: string): z.SafeParseReturnType<unknown, CommandFrontmatter> {
+export function validateCommand(content: string) {
   const { frontmatter } = parseFrontmatter(content);
   return CommandFrontmatterSchema.safeParse(frontmatter);
 }
@@ -178,7 +181,7 @@ export function validateCommand(content: string): z.SafeParseReturnType<unknown,
 /**
  * Validate an agent file
  */
-export function validateAgent(content: string): z.SafeParseReturnType<unknown, AgentFrontmatter> {
+export function validateAgent(content: string) {
   const { frontmatter } = parseFrontmatter(content);
   return AgentFrontmatterSchema.safeParse(frontmatter);
 }
@@ -186,7 +189,7 @@ export function validateAgent(content: string): z.SafeParseReturnType<unknown, A
 /**
  * Validate settings.json content
  */
-export function validateSettings(content: unknown): z.SafeParseReturnType<unknown, Settings> {
+export function validateSettings(content: unknown) {
   return SettingsSchema.safeParse(content);
 }
 

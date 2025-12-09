@@ -4,25 +4,20 @@
  * Tests for the new Zod schemas added in migration 003.
  */
 import { describe, expect, test } from 'bun:test';
-import { z } from 'zod';
 
 // Import the schemas we're about to create
 import {
-  DriftType,
-  DriftSeverity,
-  GeneratorDriftSchema,
-  GeneratorDriftInsertSchema,
-  RuleSource,
-  ViolationSeverity,
-  RuleViolationSchema,
-  RuleViolationInsertSchema,
-  PatchType,
-  PatchStatus,
-  PatchProposalSchema,
-  PatchProposalInsertSchema,
-  DriftHotspotSchema,
-  ViolationPatternSchema,
   ActiveIssueSchema,
+  DriftHotspotSchema,
+  DriftType,
+  GeneratorDriftInsertSchema,
+  GeneratorDriftSchema,
+  PatchProposalSchema,
+  PatchStatus,
+  PatchType,
+  RuleSource,
+  RuleViolationSchema,
+  ViolationPatternSchema,
 } from '../../src/db/schema';
 
 describe('Generator Drift Schemas', () => {
@@ -63,7 +58,7 @@ describe('Generator Drift Schemas', () => {
     });
 
     test('requires file_path', () => {
-      const { file_path, ...invalid } = validDrift;
+      const { file_path: _file_path, ...invalid } = validDrift;
       const result = GeneratorDriftSchema.safeParse(invalid);
       expect(result.success).toBe(false);
     });
@@ -133,9 +128,15 @@ describe('Rule Violation Schemas', () => {
     });
 
     test('severity can be error, warning, or info', () => {
-      expect(RuleViolationSchema.safeParse({ ...validViolation, severity: 'error' }).success).toBe(true);
-      expect(RuleViolationSchema.safeParse({ ...validViolation, severity: 'warning' }).success).toBe(true);
-      expect(RuleViolationSchema.safeParse({ ...validViolation, severity: 'info' }).success).toBe(true);
+      expect(RuleViolationSchema.safeParse({ ...validViolation, severity: 'error' }).success).toBe(
+        true
+      );
+      expect(
+        RuleViolationSchema.safeParse({ ...validViolation, severity: 'warning' }).success
+      ).toBe(true);
+      expect(RuleViolationSchema.safeParse({ ...validViolation, severity: 'info' }).success).toBe(
+        true
+      );
     });
   });
 });
@@ -187,13 +188,21 @@ describe('Patch Proposal Schemas', () => {
       expect(PatchProposalSchema.safeParse({ ...validPatch, confidence: 1 }).success).toBe(true);
       expect(PatchProposalSchema.safeParse({ ...validPatch, confidence: 0.5 }).success).toBe(true);
       expect(PatchProposalSchema.safeParse({ ...validPatch, confidence: 1.5 }).success).toBe(false);
-      expect(PatchProposalSchema.safeParse({ ...validPatch, confidence: -0.1 }).success).toBe(false);
+      expect(PatchProposalSchema.safeParse({ ...validPatch, confidence: -0.1 }).success).toBe(
+        false
+      );
     });
 
     test('evidence_count must be non-negative', () => {
-      expect(PatchProposalSchema.safeParse({ ...validPatch, evidence_count: 0 }).success).toBe(true);
-      expect(PatchProposalSchema.safeParse({ ...validPatch, evidence_count: 100 }).success).toBe(true);
-      expect(PatchProposalSchema.safeParse({ ...validPatch, evidence_count: -1 }).success).toBe(false);
+      expect(PatchProposalSchema.safeParse({ ...validPatch, evidence_count: 0 }).success).toBe(
+        true
+      );
+      expect(PatchProposalSchema.safeParse({ ...validPatch, evidence_count: 100 }).success).toBe(
+        true
+      );
+      expect(PatchProposalSchema.safeParse({ ...validPatch, evidence_count: -1 }).success).toBe(
+        false
+      );
     });
   });
 });

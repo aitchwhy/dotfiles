@@ -5,8 +5,8 @@
  */
 import { afterAll, beforeAll, describe, expect, test } from 'bun:test';
 import { rmSync } from 'node:fs';
-import { join } from 'node:path';
 import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { EvolutionDB } from '../../src/db/client';
 
 describe('Drift & Reflector DB Operations', () => {
@@ -75,7 +75,7 @@ describe('Drift & Reflector DB Operations', () => {
           (h) => h.generator_name === 'api' && h.drift_type === 'missing-import'
         );
         expect(apiHotspot).toBeDefined();
-        expect(apiHotspot!.occurrence_count).toBeGreaterThanOrEqual(3);
+        expect(apiHotspot?.occurrence_count).toBeGreaterThanOrEqual(3);
       }
     });
 

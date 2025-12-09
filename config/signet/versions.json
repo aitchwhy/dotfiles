@@ -55,6 +55,24 @@
     "posthog-node": "5.14.1",
     "datadog-agent": "7.60.0"
   },
+  "nix": {
+    "nixpkgs": "nixos-unstable",
+    "nix-darwin": "github:LnL7/nix-darwin",
+    "home-manager": "github:nix-community/home-manager",
+    "flake-parts": "github:hercules-ci/flake-parts",
+    "git-hooks-nix": "github:cachix/git-hooks.nix",
+    "nixfmt-rfc-style": "0.6.0",
+    "deadnix": "1.2.1",
+    "statix": "0.5.8",
+    "alejandra": "3.1.0",
+    "nixd": "2.6.1",
+    "nix-output-monitor": "2.1.2",
+    "nix-tree": "0.3.1",
+    "nix-diff": "1.0.18",
+    "disko": "github:nix-community/disko",
+    "sops-nix": "github:Mic92/sops-nix",
+    "nix-homebrew": "github:zhaofengli-wip/nix-homebrew"
+  },
   "npm": {
     "typescript": "5.9.3",
     "effect": "3.19.9",

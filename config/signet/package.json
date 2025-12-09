@@ -14,8 +14,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "bunx oxlint src tests",
     "lint:fix": "bunx oxlint --fix src tests",
-    "lint:ast": "sg scan",
-    "test:rules": "sg test",
+    "lint:ast": "ast-grep scan",
+    "test:rules": "ast-grep test",
     "validate": "bun run typecheck && bun run lint && bun run lint:ast && vitest run"
   },
   "dependencies": {
@@ -49,14 +49,18 @@
     "@pulumi/policy": "1.20.0"
   },
   "devDependencies": {
-    "oxlint": "1.32.0",
-    "vitest": "4.0.15",
-    "@vitest/ui": "4.0.15",
+    "@ast-grep/cli": "0.40.0",
     "@playwright/test": "1.57.0",
     "@types/bun": "1.2.10",
-    "typescript": "5.9.3"
+    "@vitest/ui": "4.0.15",
+    "oxlint": "1.32.0",
+    "typescript": "5.9.3",
+    "vitest": "4.0.15"
   },
   "engines": {
     "bun": ">=1.3.4"
-  }
+  },
+  "trustedDependencies": [
+    "@ast-grep/cli"
+  ]
 }

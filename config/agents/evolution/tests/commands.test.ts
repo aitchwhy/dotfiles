@@ -5,7 +5,7 @@
  */
 
 import { describe, expect, test } from 'bun:test';
-import { validateCommand, parseFrontmatter } from '../src/schemas/resources';
+import { parseFrontmatter, validateCommand } from '../src/schemas/resources';
 
 const COMMANDS_DIR = `${import.meta.dir}/../../commands`;
 
@@ -73,9 +73,9 @@ describe('Commands Validation', () => {
       const content = await file.text();
 
       const { frontmatter } = parseFrontmatter(content);
-      expect(frontmatter.description).toBeDefined();
-      expect(typeof frontmatter.description).toBe('string');
-      expect((frontmatter.description as string).length).toBeGreaterThan(0);
+      expect(frontmatter['description']).toBeDefined();
+      expect(typeof frontmatter['description']).toBe('string');
+      expect((frontmatter['description'] as string).length).toBeGreaterThan(0);
     });
 
     test.each(COMMAND_NAMES)('command /%s has body content', async (name) => {

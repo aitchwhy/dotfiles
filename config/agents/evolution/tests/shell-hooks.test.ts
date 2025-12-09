@@ -37,7 +37,7 @@ describe('Shell Hooks', () => {
         stderr: 'pipe',
         env: {
           ...process.env,
-          HOME: process.env.HOME || '/tmp',
+          HOME: process.env['HOME'] || '/tmp',
           // Provide minimal environment for script
         },
       });
@@ -53,7 +53,7 @@ describe('Shell Hooks', () => {
         stderr: 'pipe',
         env: {
           ...process.env,
-          HOME: process.env.HOME || '/tmp',
+          HOME: process.env['HOME'] || '/tmp',
         },
       });
 

@@ -1,8 +1,10 @@
 # Zod: Require import when using z.* API
 # @see https://zod.dev
+# FIXME: Disabled - rule has false positives due to ast-grep sibling matching limitations
+# The follows/precedes matchers check siblings, not across scopes
 id: zod-require-import
 language: TypeScript
-severity: error
+severity: off
 message: "Files using Zod API (z.*) must import z from 'zod'"
 note: |
   When using Zod schema builders like z.object(), z.string(), etc.,
@@ -11,7 +13,7 @@ note: |
 rule:
   pattern: z.$METHOD($$$ARGS)
   not:
-    precedes:
+    follows:
       any:
         - pattern: import { z } from 'zod'
         - pattern: import { z } from 'zod/v4'

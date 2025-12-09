@@ -446,9 +446,7 @@ export class EvolutionDB {
 
   getDriftHotspots(): Result<readonly DriftHotspot[], Error> {
     return tryCatch(() => {
-      const rows = this.db
-        .query<DriftHotspot, []>('SELECT * FROM v_drift_hotspots')
-        .all();
+      const rows = this.db.query<DriftHotspot, []>('SELECT * FROM v_drift_hotspots').all();
       return rows.map((row) => DriftHotspotSchema.parse(row));
     });
   }
@@ -479,9 +477,7 @@ export class EvolutionDB {
 
   getViolationPatterns(): Result<readonly ViolationPattern[], Error> {
     return tryCatch(() => {
-      const rows = this.db
-        .query<ViolationPattern, []>('SELECT * FROM v_violation_patterns')
-        .all();
+      const rows = this.db.query<ViolationPattern, []>('SELECT * FROM v_violation_patterns').all();
       return rows.map((row) => ViolationPatternSchema.parse(row));
     });
   }
@@ -528,7 +524,9 @@ export class EvolutionDB {
   getPendingPatches(): Result<readonly PatchProposal[], Error> {
     return tryCatch(() => {
       const rows = this.db
-        .query<PatchProposal, []>("SELECT * FROM patch_proposals WHERE status = 'pending' ORDER BY confidence DESC")
+        .query<PatchProposal, []>(
+          "SELECT * FROM patch_proposals WHERE status = 'pending' ORDER BY confidence DESC"
+        )
         .all();
       return rows.map((row) => PatchProposalSchema.parse(row));
     });

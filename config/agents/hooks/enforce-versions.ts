@@ -12,23 +12,31 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 
-// Import STACK from signet (absolute path for Bun)
+// Load versions from SIGNET_VERSIONS env var (for testing) or default paths
 let STACK: { npm: Record<string, string> }
-try {
-  const stackModule = await import(
-    join(process.env.HOME ?? '', 'dotfiles/config/signet/src/stack/versions.ts')
-  )
-  STACK = stackModule.STACK
-} catch {
-  // Fallback to versions.json if STACK import fails
-  const versionsPath = join(
-    process.env.HOME ?? '',
-    'dotfiles/config/signet/versions.json'
-  )
-  if (existsSync(versionsPath)) {
-    STACK = JSON.parse(readFileSync(versionsPath, 'utf-8'))
-  } else {
-    STACK = { npm: {} }
+
+// Check for test-provided versions path first
+const envVersionsPath = process.env['SIGNET_VERSIONS']
+if (envVersionsPath && existsSync(envVersionsPath)) {
+  STACK = JSON.parse(readFileSync(envVersionsPath, 'utf-8'))
+} else {
+  // Try to import STACK from signet (absolute path for Bun)
+  try {
+    const stackModule = await import(
+      join(process.env['HOME'] ?? '', 'dotfiles/config/signet/src/stack/versions.ts')
+    )
+    STACK = stackModule.STACK
+  } catch {
+    // Fallback to versions.json if STACK import fails
+    const versionsPath = join(
+      process.env['HOME'] ?? '',
+      'dotfiles/config/signet/versions.json'
+    )
+    if (existsSync(versionsPath)) {
+      STACK = JSON.parse(readFileSync(versionsPath, 'utf-8'))
+    } else {
+      STACK = { npm: {} }
+    }
   }
 }
 

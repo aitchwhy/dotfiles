@@ -1,4 +1,5 @@
 #!/usr/bin/env bun
+import { Reflector } from './agents/reflector';
 import { closeDB, getDB } from './db/client';
 import type { EvolutionCycleInsert, GraderRunInsert, LessonInsert } from './db/schema';
 import { LessonSource } from './db/schema';
@@ -13,7 +14,6 @@ import { LessonSource } from './db/schema';
  *   lesson  - Manage lessons (add, list, recent)
  */
 import { printGradeResult, runAllGraders } from './graders';
-import { Reflector } from './agents/reflector';
 
 // ============================================================================
 // CLI Argument Parsing
@@ -545,7 +545,7 @@ async function gcCommand(options: {
     const finalResult = db.getLessonCount();
     const finalCount = finalResult.ok ? finalResult.data : 0;
     console.log(`\nFinal lessons: ${finalCount}`);
-    console.log('='.repeat(50) + '\n');
+    console.log(`${'='.repeat(50)}\n`);
 
     return 0;
   } finally {
