@@ -4,11 +4,9 @@
   lib,
   pkgs,
   ...
-}:
-let
+}: let
   inherit (lib) mkDefault;
-in
-{
+in {
   imports = [
     # UI
     ./dock.nix
@@ -45,6 +43,7 @@ in
       trackpad.enable = mkDefault true;
       gestures.enable = mkDefault true;
       screenshots.enable = mkDefault true;
+      screenshots.disableSystemHotkeys = mkDefault true; # Free Cmd+Shift+3/4/5 for CleanShot X
       spaces.enable = mkDefault true;
       windowManager.enable = mkDefault true;
       inputDevices.enable = mkDefault true;
