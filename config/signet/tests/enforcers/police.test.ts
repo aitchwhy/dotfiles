@@ -4,12 +4,12 @@
  * Tests for structure, naming, and dependency validation.
  */
 import { Effect } from 'effect'
-import { describe, expect, test } from 'bun:test'
+import { describe, expect, test } from 'vitest'
 import {
   checkStructure,
   checkNamingConventions,
   checkDependencyHygiene,
-  type PoliceViolation,
+  
 } from '@/enforcers/police'
 
 describe('Police Enforcer', () => {

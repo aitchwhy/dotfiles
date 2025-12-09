@@ -4,20 +4,10 @@
  * Tests for the hexagonal Hono API generator.
  */
 import { Effect } from 'effect'
-import { describe, expect, test } from 'bun:test'
+import { describe, expect, test } from 'vitest'
 import { generateApi } from '@/generators/api'
 import { TemplateEngineLive } from '@/layers/template-engine'
-import type { ProjectSpec } from '@/schema/project-spec'
-
-// Minimal valid ProjectSpec for API testing
-const makeSpec = (overrides: Partial<ProjectSpec> = {}): ProjectSpec =>
-  ({
-    name: 'test-api',
-    type: 'api',
-    infra: { runtime: 'bun', database: 'turso' },
-    observability: { processCompose: true, metrics: false, debugger: 'vscode' },
-    ...overrides,
-  }) as ProjectSpec
+import { makeSpec } from '@tests/helpers/test-spec'
 
 describe('API Generator', () => {
   describe('generateApi', () => {

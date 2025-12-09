@@ -3,10 +3,10 @@
  *
  * Tests for the Effect Layer that handles Handlebars template rendering.
  */
-import { Effect, Exit, Layer } from 'effect'
-import { describe, expect, test } from 'bun:test'
+import { Effect } from 'effect'
+import { describe, expect, test } from 'vitest'
 import {
-  TemplateEngine,
+  
   TemplateEngineLive,
   renderTemplate,
   renderTemplates,

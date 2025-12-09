@@ -3,7 +3,7 @@
  *
  * Tests for the Signet CLI commands.
  */
-import { describe, expect, test } from 'bun:test'
+import { describe, expect, test } from 'vitest'
 import { initCommand, genCommand, validateCommand, enforceCommand, mainCommand } from '@/cli'
 
 describe('Signet CLI', () => {

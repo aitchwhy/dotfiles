@@ -4,20 +4,10 @@
  * Tests for the Bun workspaces monorepo generator.
  */
 import { Effect } from 'effect'
-import { describe, expect, test } from 'bun:test'
+import { describe, expect, test } from 'vitest'
 import { generateMonorepo } from '@/generators/monorepo'
 import { TemplateEngineLive } from '@/layers/template-engine'
-import type { ProjectSpec } from '@/schema/project-spec'
-
-// Minimal valid ProjectSpec for monorepo testing
-const makeSpec = (overrides: Partial<ProjectSpec> = {}): ProjectSpec =>
-  ({
-    name: 'test-platform',
-    type: 'monorepo',
-    infra: { runtime: 'bun' },
-    observability: { processCompose: true, metrics: false, debugger: 'vscode' },
-    ...overrides,
-  }) as ProjectSpec
+import { makeSpec } from '@tests/helpers/test-spec'
 
 describe('Monorepo Generator', () => {
   describe('generateMonorepo', () => {

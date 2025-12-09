@@ -3,7 +3,7 @@
  *
  * Tests for the OXC based AST Engine layer.
  */
-import { describe, expect, test } from 'bun:test'
+import { describe, expect, test } from 'vitest'
 import { Effect } from 'effect'
 import {
   AstEngineLive,

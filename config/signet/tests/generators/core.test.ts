@@ -3,21 +3,11 @@
  *
  * Tests for the base generator that all other generators extend.
  */
-import { Effect, Layer } from 'effect'
-import { describe, expect, test } from 'bun:test'
-import { generateCore, type CoreGeneratorConfig } from '@/generators/core'
+import { Effect } from 'effect'
+import { describe, expect, test } from 'vitest'
+import { generateCore } from '@/generators/core'
 import { TemplateEngineLive } from '@/layers/template-engine'
-import type { ProjectSpec } from '@/schema/project-spec'
-
-// Minimal valid ProjectSpec for testing
-const makeSpec = (overrides: Partial<ProjectSpec> = {}): ProjectSpec =>
-  ({
-    name: 'test-project',
-    type: 'library',
-    infra: { runtime: 'bun' },
-    observability: { processCompose: true, metrics: false, debugger: 'vscode' },
-    ...overrides,
-  }) as ProjectSpec
+import { makeSpec } from '@tests/helpers/test-spec'
 
 describe('Core Generator', () => {
   describe('generateCore', () => {
@@ -116,10 +106,10 @@ describe('Core Generator', () => {
       const nodeProgram = generateCore(nodeSpec).pipe(Effect.provide(TemplateEngineLive))
 
       const bunTree = await Effect.runPromise(bunProgram)
-      const nodeTree = await Effect.runPromise(nodeProgram)
+      // Run nodeProgram to ensure it generates successfully (validates both runtimes work)
+      await Effect.runPromise(nodeProgram)
 
       const bunPkg = JSON.parse(bunTree['package.json']!)
-      const nodePkg = JSON.parse(nodeTree['package.json']!)
 
       // Bun should have @types/bun
       expect(bunPkg.devDependencies['@types/bun']).toBeDefined()

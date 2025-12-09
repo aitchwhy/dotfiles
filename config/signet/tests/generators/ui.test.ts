@@ -4,20 +4,10 @@
  * Tests for the React 19 + XState + TanStack Router generator.
  */
 import { Effect } from 'effect'
-import { describe, expect, test } from 'bun:test'
+import { describe, expect, test } from 'vitest'
 import { generateUi } from '@/generators/ui'
 import { TemplateEngineLive } from '@/layers/template-engine'
-import type { ProjectSpec } from '@/schema/project-spec'
-
-// Minimal valid ProjectSpec for UI testing
-const makeSpec = (overrides: Partial<ProjectSpec> = {}): ProjectSpec =>
-  ({
-    name: 'test-app',
-    type: 'ui',
-    infra: { runtime: 'bun' },
-    observability: { processCompose: true, metrics: false, debugger: 'vscode' },
-    ...overrides,
-  }) as ProjectSpec
+import { makeSpec } from '@tests/helpers/test-spec'
 
 describe('UI Generator', () => {
   describe('generateUi', () => {

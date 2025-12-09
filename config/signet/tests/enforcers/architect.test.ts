@@ -4,12 +4,12 @@
  * Tests for hexagonal boundary and architecture validation.
  */
 import { Effect } from 'effect'
-import { describe, expect, test } from 'bun:test'
+import { describe, expect, test } from 'vitest'
 import {
   checkHexagonalBoundaries,
   checkCircularDependencies,
   checkLayerViolations,
-  type ArchitectViolation,
+  
 } from '@/enforcers/architect'
 
 describe('Architect Enforcer', () => {

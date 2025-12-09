@@ -3,7 +3,7 @@
  *
  * Tests for the Result type utilities used throughout the Factory.
  */
-import { describe, expect, test } from 'bun:test'
+import { describe, expect, test } from 'vitest'
 import { Err, Ok, flatMap, isErr, isOk, map, tryCatch, tryCatchAsync, unwrapOr } from '@/lib/result'
 
 describe('Result', () => {
@@ -11,13 +11,17 @@ describe('Result', () => {
     test('creates a success result', () => {
       const result = Ok(42)
       expect(result.ok).toBe(true)
-      expect(result.data).toBe(42)
+      if (result.ok) {
+        expect(result.data).toBe(42)
+      }
     })
 
     test('works with complex types', () => {
       const result = Ok({ name: 'test', value: 123 })
       expect(result.ok).toBe(true)
-      expect(result.data).toEqual({ name: 'test', value: 123 })
+      if (result.ok) {
+        expect(result.data).toEqual({ name: 'test', value: 123 })
+      }
     })
   })
 
@@ -26,13 +30,17 @@ describe('Result', () => {
       const error = new Error('test error')
       const result = Err(error)
       expect(result.ok).toBe(false)
-      expect(result.error).toBe(error)
+      if (!result.ok) {
+        expect(result.error).toBe(error)
+      }
     })
 
     test('works with custom error types', () => {
       const result = Err({ code: 'NOT_FOUND', message: 'Not found' })
       expect(result.ok).toBe(false)
-      expect(result.error).toEqual({ code: 'NOT_FOUND', message: 'Not found' })
+      if (!result.ok) {
+        expect(result.error).toEqual({ code: 'NOT_FOUND', message: 'Not found' })
+      }
     })
   })
 

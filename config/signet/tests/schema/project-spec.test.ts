@@ -5,17 +5,17 @@
  * the formal specification for generated projects.
  */
 import { Schema } from 'effect'
-import { describe, expect, test } from 'bun:test'
+import { describe, expect, test } from 'vitest'
 import {
-  DatabaseType,
-  DebuggerType,
+  
+  
   InfraConfig,
   ObservabilityConfig,
   PortConfig,
   ProjectName,
   ProjectSpec,
   ProjectType,
-  RuntimeType,
+  
 } from '@/schema/project-spec'
 
 describe('ProjectSpec Schema', () => {
@@ -198,7 +198,7 @@ describe('ProjectSpec Schema', () => {
         infra: {
           runtime: 'bun',
           database: 'turso',
-          queue: 'temporal',
+          workflow: 'temporal',
         },
         observability: {
           processCompose: true,

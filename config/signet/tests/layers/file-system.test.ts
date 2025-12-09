@@ -3,13 +3,13 @@
  *
  * Tests for the Effect Layer that handles file system operations.
  */
-import { Effect, Exit, Layer } from 'effect'
-import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
-import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
+import { Effect, Exit } from 'effect'
+import { afterEach, beforeEach, describe, expect, test } from 'vitest'
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import {
-  FileSystem,
+  
   FileSystemLive,
   type FileTree,
   createDirectory,
@@ -59,8 +59,8 @@ describe('FileSystem Layer', () => {
       await Effect.runPromise(program)
 
       expect(existsSync(filePath)).toBe(true)
-      const content = Bun.file(filePath).text()
-      expect(await content).toBe('test content')
+      const content = readFileSync(filePath, 'utf-8')
+      expect(content).toBe('test content')
     })
 
     test('creates parent directories', async () => {
@@ -79,7 +79,7 @@ describe('FileSystem Layer', () => {
       const program = writeFile(filePath, 'new content').pipe(Effect.provide(FileSystemLive))
       await Effect.runPromise(program)
 
-      const content = await Bun.file(filePath).text()
+      const content = readFileSync(filePath, 'utf-8')
       expect(content).toBe('new content')
     })
   })
@@ -124,8 +124,8 @@ describe('FileSystem Layer', () => {
       const program = writeTree(tree, testDir).pipe(Effect.provide(FileSystemLive))
       await Effect.runPromise(program)
 
-      expect(await Bun.file(join(testDir, 'file1.txt')).text()).toBe('content 1')
-      expect(await Bun.file(join(testDir, 'file2.txt')).text()).toBe('content 2')
+      expect(readFileSync(join(testDir, 'file1.txt'), 'utf-8')).toBe('content 1')
+      expect(readFileSync(join(testDir, 'file2.txt'), 'utf-8')).toBe('content 2')
     })
 
     test('writes nested file tree', async () => {
@@ -138,9 +138,9 @@ describe('FileSystem Layer', () => {
       const program = writeTree(tree, testDir).pipe(Effect.provide(FileSystemLive))
       await Effect.runPromise(program)
 
-      expect(await Bun.file(join(testDir, 'root.txt')).text()).toBe('root content')
-      expect(await Bun.file(join(testDir, 'src/index.ts')).text()).toBe('export {}')
-      expect(await Bun.file(join(testDir, 'src/lib/utils.ts')).text()).toBe(
+      expect(readFileSync(join(testDir, 'root.txt'), 'utf-8')).toBe('root content')
+      expect(readFileSync(join(testDir, 'src/index.ts'), 'utf-8')).toBe('export {}')
+      expect(readFileSync(join(testDir, 'src/lib/utils.ts'), 'utf-8')).toBe(
         'export const utils = {}'
       )
     })

@@ -3,12 +3,12 @@
  *
  * Tests for the Effect Layer that handles git operations.
  */
-import { Effect, Exit } from 'effect'
-import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
+import { Effect } from 'effect'
+import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
-import { Git, GitLive, gitInit, gitAdd, gitCommit } from '@/layers/git'
+import { GitLive, gitInit, gitAdd, gitCommit } from '@/layers/git'
 
 describe('Git Layer', () => {
   let testDir: string

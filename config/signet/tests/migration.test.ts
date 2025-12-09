@@ -9,13 +9,15 @@
  *
  * Run: bun test config/signet/tests/migration.test.ts
  */
-import { afterAll, beforeAll, describe, expect, test } from 'bun:test'
-import { execSync, spawnSync } from 'node:child_process'
+import { afterAll, beforeAll, describe, expect, test } from 'vitest'
+import { spawnSync } from 'node:child_process'
 import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
-const SIGNET_SRC = join(import.meta.dir, '..', 'src')
+const __dirname = dirname(fileURLToPath(import.meta.url))
+const SIGNET_SRC = join(__dirname, '..', 'src')
 
 // =============================================================================
 // Helper Functions
@@ -74,7 +76,7 @@ describe('Signet CLI', () => {
 
 describe('Shell Configuration', () => {
   test('s alias is defined in aliases.nix', () => {
-    const aliasesPath = join(import.meta.dir, '..', '..', '..', 'modules', 'home', 'shell', 'aliases.nix')
+    const aliasesPath = join(__dirname, '..', '..', '..', 'modules', 'home', 'shell', 'aliases.nix')
 
     const content = readFileSync(aliasesPath, 'utf-8')
 

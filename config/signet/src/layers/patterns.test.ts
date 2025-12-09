@@ -4,7 +4,7 @@
  * Tests for the ast-grep based pattern matching service.
  * Following TDD: Red → Green → Refactor
  */
-import { describe, test, expect } from 'bun:test'
+import { describe, test, expect } from 'vitest'
 import { Effect } from 'effect'
 import {
   PatternEngineLive,

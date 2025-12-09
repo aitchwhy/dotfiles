@@ -4,20 +4,10 @@
  * Tests for the Pulumi + process-compose infrastructure generator.
  */
 import { Effect } from 'effect'
-import { describe, expect, test } from 'bun:test'
+import { describe, expect, test } from 'vitest'
 import { generateInfra } from '@/generators/infra'
 import { TemplateEngineLive } from '@/layers/template-engine'
-import type { ProjectSpec } from '@/schema/project-spec'
-
-// Minimal valid ProjectSpec for infra testing
-const makeSpec = (overrides: Partial<ProjectSpec> = {}): ProjectSpec =>
-  ({
-    name: 'test-infra',
-    type: 'infra',
-    infra: { runtime: 'bun' },
-    observability: { processCompose: true, metrics: false, debugger: 'vscode' },
-    ...overrides,
-  }) as ProjectSpec
+import { makeSpec } from '@tests/helpers/test-spec'
 
 describe('Infrastructure Generator', () => {
   describe('generateInfra', () => {
