@@ -1,7 +1,7 @@
 ---
 name: clean-code
-description: Clean code patterns for Nix and TypeScript. Explicit imports, Result types, function size limits. Apply to dotfiles and TypeScript projects.
-allowed-tools: Read, Write, Edit, Grep, Glob
+description: Clean code patterns for Nix and TypeScript. Explicit imports, Result types, function size limits, Biome enforcement. Apply to dotfiles and TypeScript projects.
+allowed-tools: Read, Write, Edit, Grep, Glob, Bash
 ---
 
 ## Nix-Specific Patterns
@@ -284,4 +284,127 @@ export { formatDate, parseDate } from './date';
 
 // Consumer gets clean imports
 import { Result, Ok, formatDate } from '@/lib';
+```
+
+## Biome Enforcement
+
+### MANDATORY: Run After Every Code Change
+
+After writing, modifying, or refactoring TypeScript/JavaScript code:
+
+```bash
+biome check --write .  # Format + lint + auto-fix
+bun typecheck          # Type check (or tsc --noEmit)
+```
+
+### Recommended biome.json Configuration
+
+```json
+{
+  "$schema": "https://biomejs.dev/schemas/2.0.0/schema.json",
+  "organizeImports": {
+    "enabled": true
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "suspicious": {
+        "noExplicitAny": "error"
+      },
+      "complexity": {
+        "noExcessiveCognitiveComplexity": {
+          "level": "warn",
+          "options": { "maxAllowedComplexity": 15 }
+        }
+      },
+      "style": {
+        "noNonNullAssertion": "error",
+        "useConst": "error"
+      },
+      "correctness": {
+        "noUnusedVariables": "error",
+        "noUnusedImports": "error"
+      }
+    }
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "trailingCommas": "all",
+      "semicolons": "always"
+    }
+  }
+}
+```
+
+### Critical Rules (NEVER Disable)
+
+| Rule | Why |
+|------|-----|
+| `noExplicitAny` | Forces `unknown` + type guards |
+| `noUnusedVariables` | Dead code removal |
+| `noUnusedImports` | Clean imports |
+| `noNonNullAssertion` | Forces null checks |
+| `useConst` | Immutability by default |
+
+### Auto-Fix Workflow
+
+```typescript
+// Before: messy code with issues
+import {foo,bar} from './utils'
+let unused = 'hello';
+const x:any = getData();
+console.log(x!.value);
+
+// After: biome check --write
+import { bar, foo } from './utils';
+const x: unknown = getData();
+if (isData(x)) {
+  console.log(x.value);
+}
+```
+
+### CI Integration
+
+```yaml
+# .github/workflows/check.yml
+- name: Lint & Format
+  run: biome ci .
+
+- name: Typecheck
+  run: bun typecheck
+```
+
+### Never Use `any`
+
+```typescript
+// WRONG - any disables type checking
+function process(data: any) {
+  return data.foo.bar; // No type errors, but will crash
+}
+
+// CORRECT - unknown requires validation
+function process(data: unknown): Result<ProcessedData, Error> {
+  if (!isValidData(data)) {
+    return Err(new Error('Invalid data'));
+  }
+  return Ok(data.foo.bar); // Type-safe after validation
+}
+
+// Type guard
+function isValidData(data: unknown): data is { foo: { bar: string } } {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'foo' in data &&
+    typeof (data as any).foo?.bar === 'string'
+  );
+}
 ```
