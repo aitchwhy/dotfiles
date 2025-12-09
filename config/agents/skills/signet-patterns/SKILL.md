@@ -17,15 +17,32 @@ allowed-tools: Read, Write, Edit, Bash
 
 ```
 src/
-├── ports/           # Interfaces (what the app needs)
+├── types/           # TypeScript types (SOURCE OF TRUTH)
+│   ├── user.ts      # User, UserId, CreateUserInput
+│   ├── order.ts     # Order domain types
+│   └── events.ts    # Event types
+├── schemas/         # Zod/Effect schemas (satisfies TS types)
+│   ├── user.ts      # userSchema, createUserInputSchema
+│   └── events.ts    # Event validation schemas
+├── domain/          # Domain layer
+│   └── errors/      # Tagged errors (Data.TaggedError)
+├── ports/           # Port interfaces (Context.Tag)
 │   └── database.ts  # Context.Tag<Database, DatabaseService>
-├── adapters/        # Implementations (how it's provided)
-│   ├── turso.ts     # Layer.succeed(Database, TursoService)
-│   └── d1.ts        # Layer.succeed(Database, D1Service)
-├── app/             # Business logic (depends on ports only)
-│   └── service.ts   # Uses Database port, not adapters
-└── routes/          # Entry points (wires everything)
-    └── api.ts       # Provides adapters as layers
+├── services/        # Use cases / application services
+│   └── user.ts      # Effect.gen functions composing ports
+├── adapters/        # Adapter implementations (Layers)
+│   ├── inbound/
+│   │   ├── http/    # Hono routes
+│   │   ├── trpc/    # tRPC procedures
+│   │   └── pubsub/  # Event handlers
+│   └── outbound/
+│       ├── turso.ts # Layer.succeed(Database, TursoService)
+│       └── d1.ts    # Layer.succeed(Database, D1Service)
+├── db/              # Database schema and migrations
+│   ├── schema.ts    # Drizzle schema
+│   └── migrations/  # Migration files
+├── lib/             # Infrastructure utilities
+└── index.ts         # Application entry point
 ```
 
 ## Effect Layer Pattern
@@ -190,7 +207,7 @@ const program = Effect.gen(function* () {
 | Library | `signet gen library <name>` | TypeScript package |
 | Deployment | `signet gen infra <name>` | Pulumi + process-compose |
 
-> **Version Matrix**: See `STACK.md` for exact pinned versions (Bun, TypeScript, Effect, React, Hono, etc.)
+> **Version Matrix**: See `lib/versions.nix` for exact pinned versions (Bun, TypeScript, Effect, React, Hono, etc.)
 
 ## Anti-Patterns to Avoid
 
