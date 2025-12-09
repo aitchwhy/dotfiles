@@ -117,6 +117,39 @@ export const STACK = {
   },
 
   // ===========================================================================
+  // NIX ECOSYSTEM (December 2025)
+  // ===========================================================================
+  nix: {
+    // Core flake inputs
+    nixpkgs: 'nixos-unstable',
+    'nix-darwin': 'github:LnL7/nix-darwin',
+    'home-manager': 'github:nix-community/home-manager',
+
+    // Flake architecture (December 2025 standard)
+    'flake-parts': 'github:hercules-ci/flake-parts',
+    'git-hooks-nix': 'github:cachix/git-hooks.nix',
+
+    // Formatters & linters
+    'nixfmt-rfc-style': '0.6.0',
+    deadnix: '1.2.1',
+    statix: '0.5.8',
+    alejandra: '3.1.0',
+
+    // Language server
+    nixd: '2.6.1',
+
+    // Build tooling
+    'nix-output-monitor': '2.1.2',
+    'nix-tree': '0.3.1',
+    'nix-diff': '1.0.18',
+
+    // Optional inputs
+    disko: 'github:nix-community/disko',
+    'sops-nix': 'github:Mic92/sops-nix',
+    'nix-homebrew': 'github:zhaofengli-wip/nix-homebrew',
+  },
+
+  // ===========================================================================
   // FLAT NPM DEPENDENCIES (for package.json generation)
   // ===========================================================================
   npm: {

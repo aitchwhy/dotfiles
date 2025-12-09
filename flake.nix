@@ -13,6 +13,16 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
+    # Flake architecture (December 2025 standard)
+    flake-parts.url = "github:hercules-ci/flake-parts";
+
+    # Pre-commit hooks (formerly pre-commit-hooks.nix)
+    git-hooks-nix = {
+      url = "github:cachix/git-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # Darwin & Home Manager
     nix-darwin = {
       url = "github:LnL7/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -23,6 +33,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Homebrew integration (no nixpkgs input to follow)
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
 
     # NixOS remote deployment
@@ -38,191 +49,27 @@
   };
 
   outputs =
-    {
-      self,
-      nixpkgs,
-      nix-darwin,
-      home-manager,
-      nix-homebrew,
-      disko,
-      sops-nix,
-      ...
-    }@inputs:
-    let
-      # System definitions
-      darwinSystem = "aarch64-darwin";
-      linuxSystem = "x86_64-linux";
-
-      # Package sets
-      darwinPkgs = nixpkgs.legacyPackages.${darwinSystem};
-      linuxPkgs = nixpkgs.legacyPackages.${linuxSystem};
-
-      # NOTE: Version management moved to config/signet/src/stack/versions.ts
-      # Use `signet` CLI or import from TypeScript directly
-
-      # Helper for multi-system support
-      forAllSystems = nixpkgs.lib.genAttrs [
-        darwinSystem
-        linuxSystem
+    inputs@{ flake-parts, ... }:
+    flake-parts.lib.mkFlake { inherit inputs; } {
+      imports = [
+        inputs.git-hooks-nix.flakeModule
+        ./flake/darwin.nix
+        ./flake/nixos.nix
+        ./flake/devshells.nix
+        ./flake/checks.nix
       ];
-    in
-    {
-      darwinConfigurations.hank-mbp-m4 = nix-darwin.lib.darwinSystem {
-        system = darwinSystem;
-        specialArgs = { inherit inputs self; };
-        modules = [
-          sops-nix.darwinModules.sops
-          ./modules/nixpkgs.nix
-          ./modules/darwin
-          ./modules/homebrew.nix
-          ./hosts/hank-mbp-m4.nix
 
-          # User configuration
-          {
-            system.primaryUser = "hank";
-            users.users.hank = {
-              uid = 501;
-              description = "Hank Lee";
-              home = "/Users/hank";
-              shell = darwinPkgs.zsh;
-            };
-            programs.zsh.enable = true;
-            environment.shells = [
-              darwinPkgs.bashInteractive
-              darwinPkgs.zsh
-            ];
-          }
+      systems = [
+        "aarch64-darwin"
+        "x86_64-linux"
+      ];
 
-          # Home Manager
-          home-manager.darwinModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-              extraSpecialArgs = { inherit inputs self; };
-              users.hank = import ./users/hank.nix;
-              backupFileExtension = "backup";
-            };
-          }
-
-          # Homebrew
-          nix-homebrew.darwinModules.nix-homebrew
-          {
-            nix-homebrew = {
-              enable = true;
-              user = "hank";
-              autoMigrate = true;
-            };
-          }
-        ];
-      };
-
-      # NixOS configuration for cloud development
-      nixosConfigurations.cloud = nixpkgs.lib.nixosSystem {
-        system = linuxSystem;
-        specialArgs = { inherit inputs self; };
-        modules = [
-          disko.nixosModules.disko
-          sops-nix.nixosModules.sops
-          ./hosts/cloud/configuration.nix
-          ./modules/nixpkgs.nix
-          ./modules/nixos
-
-          # Home Manager for NixOS
-          home-manager.nixosModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-              extraSpecialArgs = { inherit inputs self; };
-              users.hank = import ./users/hank-linux.nix;
-              backupFileExtension = "backup";
-            };
-          }
-        ];
-      };
-
-      # Development shells (multi-system)
-      devShells = forAllSystems (
-        system:
-        let
-          pkgs = nixpkgs.legacyPackages.${system};
-        in
+      # Per-system configuration
+      perSystem =
+        { pkgs, ... }:
         {
-          default = pkgs.mkShell {
-            packages = with pkgs; [
-              nixd
-              nixfmt-rfc-style
-              deadnix
-              statix
-              just
-              git
-              fd
-            ];
-            shellHook = ''
-              echo "Nix Dev Shell (${system})"
-              echo "Commands:"
-              echo "  just switch  - Rebuild and switch configuration"
-              echo "  just update  - Update flake inputs"
-              echo "  just fmt     - Format Nix files"
-            '';
-          };
-        }
-      );
-
-      # Formatters (multi-system)
-      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-rfc-style);
-
-      # Checks (multi-system)
-      checks = forAllSystems (
-        system:
-        let
-          pkgs = nixpkgs.legacyPackages.${system};
-        in
-        {
-          # Validate AI CLI configuration files (single source of truth)
-          ai-cli-config = pkgs.runCommand "ai-cli-config-check" {
-            nativeBuildInputs = [ pkgs.jq ];
-            src = ./.;
-          } ''
-            cd $src
-
-            # Validate JSON configs
-            for json in config/agents/settings/*.json config/agents/mcp-servers.json; do
-              echo "✓ $json"
-              ${pkgs.jq}/bin/jq . "$json" > /dev/null
-            done
-
-            # Validate skills
-            for skill in config/agents/skills/*/; do
-              test -f "$skill/SKILL.md" || { echo "Missing SKILL.md in $skill"; exit 1; }
-              echo "✓ $skill"
-            done
-
-            # Validate commands
-            for cmd in config/agents/commands/*.md; do
-              test -f "$cmd" || { echo "Missing command: $cmd"; exit 1; }
-              echo "✓ $cmd"
-            done
-
-            # Validate hooks referenced in settings exist
-            for hook in unified-guard.ts unified-polish.ts enforce-versions.ts \
-                        session-start.sh session-stop.sh verification-gate.ts assumption-detector.ts; do
-              test -f "config/agents/hooks/$hook" || { echo "Missing hook: $hook"; exit 1; }
-              echo "✓ hooks/$hook"
-            done
-
-            # Output coverage summary
-            echo ""
-            echo "Coverage: $(ls config/agents/skills/ | wc -l | tr -d ' ') skills"
-            echo "Coverage: $(ls config/agents/commands/*.md | wc -l | tr -d ' ') commands"
-            echo "Coverage: $(ls config/agents/hooks/*.ts config/agents/hooks/*.sh 2>/dev/null | wc -l | tr -d ' ') hooks"
-
-            echo ""
-            echo "All AI CLI config checks passed"
-            touch $out
-          '';
-        }
-      );
+          # Formatter (nixfmt-rfc-style is December 2025 standard)
+          formatter = pkgs.nixfmt-rfc-style;
+        };
     };
 }

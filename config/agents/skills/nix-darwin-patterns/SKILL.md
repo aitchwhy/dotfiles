@@ -93,6 +93,43 @@ in
 }
 ```
 
+## Modern Architecture (December 2025)
+
+### flake-parts Integration
+
+For dotfiles and darwin configurations, use flake-parts:
+
+```nix
+{ self, inputs, withSystem, ... }:
+{
+  flake.darwinConfigurations.hostname = withSystem "aarch64-darwin" (
+    ctx@{ pkgs, ... }:
+    inputs.nix-darwin.lib.darwinSystem {
+      specialArgs = { inherit inputs self; };
+      modules = [
+        ../modules/darwin
+        inputs.home-manager.darwinModules.home-manager
+        {
+          home-manager = {
+            useGlobalPkgs = true;
+            useUserPackages = true;
+            extraSpecialArgs = { inherit inputs self; };
+            users.username = import ../users/username.nix;
+          };
+        }
+      ];
+    }
+  );
+}
+```
+
+### Key Points
+
+- Use `withSystem` to access `self` in system-specific contexts
+- Pass `self` via `specialArgs` for home-manager modules
+- Use `perSystem.devShells.default` instead of manual `forAllSystems`
+- See `nix-flake-parts` skill for full flake-parts patterns
+
 ## Common Commands
 
 ### Darwin Rebuild

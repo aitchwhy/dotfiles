@@ -38,6 +38,16 @@
             "timeout": 20
           }
         ]
+      },
+      {
+        "matcher": "Write(**/flake.nix)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run \"$HOME/dotfiles/config/agents/hooks/validate-flake.ts\"",
+            "timeout": 5
+          }
+        ]
       }
     ],
     "SessionStart": [

@@ -38,7 +38,15 @@ check: lint test
 # Lint and format check
 lint:
     nix fmt -- --check
-    nix flake check
+    nix flake check --no-build
+
+# Run pre-commit hooks on all files
+lint-all:
+    nix develop -c pre-commit run --all-files
+
+# Run pre-commit hooks on staged files only
+lint-staged:
+    nix develop -c pre-commit run
 
 # Test the build
 test:
@@ -71,7 +79,7 @@ info:
 
 alias i := info
 
-# Development shell
+# Development shell (with pre-commit hooks)
 dev:
     nix develop -c $SHELL
 
@@ -105,6 +113,10 @@ test-ai-static:
 test-rx:
     @echo "Running Repomix tests..."
     @bats tests/repomix.bats
+
+# Full validation pipeline (format check + flake check + build test)
+validate: lint test
+    @echo "✓ All validation passed"
 
 # Quick rebuild with validation
 rebuild: fmt check switch

@@ -123,6 +123,7 @@ return Effect.fail(new UserNotFoundError({ id }));
 | `result-patterns` | Error handling |
 | `tdd-patterns` | Red-Green-Refactor |
 | `nix-darwin-patterns` | Nix flakes + home-manager |
+| `nix-flake-parts` | Modular flakes with flake-parts |
 | `hono-workers` | Cloudflare Workers APIs |
 | `tanstack-patterns` | Router + Query |
 | `ember-patterns` | Ember platform |

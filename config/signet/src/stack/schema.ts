@@ -18,6 +18,14 @@ const versionPattern = /^\d+\.\d+\.\d+(-[\w.]+)?$/;
 
 const versionString = z.string().regex(versionPattern, 'Must be valid semver');
 
+/** Nix flake URL (e.g., "github:owner/repo" or "github:owner/repo/branch") */
+const flakeUrlPattern = /^github:[\w-]+\/[\w-]+(\/[\w.-]+)?$/;
+
+const flakeUrl = z.string().regex(flakeUrlPattern, 'Must be valid flake URL');
+
+/** Nix branch name (e.g., "nixos-unstable") */
+const nixBranch = z.string().min(1);
+
 // =============================================================================
 // TYPESCRIPT TYPES (Source of Truth)
 // =============================================================================
@@ -107,6 +115,39 @@ export type ObservabilityVersions = {
   readonly 'posthog-js': string;
   readonly 'posthog-node': string;
   readonly 'datadog-agent': string;
+};
+
+/**
+ * Nix ecosystem versions (flake URLs and tool versions)
+ */
+export type NixVersions = {
+  // Core flake inputs
+  readonly nixpkgs: string;
+  readonly 'nix-darwin': string;
+  readonly 'home-manager': string;
+
+  // Flake architecture (December 2025 standard)
+  readonly 'flake-parts': string;
+  readonly 'git-hooks-nix': string;
+
+  // Formatters & linters
+  readonly 'nixfmt-rfc-style': string;
+  readonly deadnix: string;
+  readonly statix: string;
+  readonly alejandra: string;
+
+  // Language server
+  readonly nixd: string;
+
+  // Build tooling
+  readonly 'nix-output-monitor': string;
+  readonly 'nix-tree': string;
+  readonly 'nix-diff': string;
+
+  // Optional inputs
+  readonly disko: string;
+  readonly 'sops-nix': string;
+  readonly 'nix-homebrew': string;
 };
 
 /**
@@ -209,6 +250,7 @@ export type StackDefinition = {
   readonly databases: DatabaseVersions;
   readonly services: ServiceVersions;
   readonly observability: ObservabilityVersions;
+  readonly nix: NixVersions;
   readonly npm: NpmVersions;
 };
 
@@ -281,6 +323,36 @@ export const stackMetaSchema = z.object({
   updated: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   ssotVersion: versionString,
 }) satisfies z.ZodType<StackMeta>;
+
+export const nixVersionsSchema = z.object({
+  // Core flake inputs
+  nixpkgs: nixBranch,
+  'nix-darwin': flakeUrl,
+  'home-manager': flakeUrl,
+
+  // Flake architecture
+  'flake-parts': flakeUrl,
+  'git-hooks-nix': flakeUrl,
+
+  // Formatters & linters (semver)
+  'nixfmt-rfc-style': versionString,
+  deadnix: versionString,
+  statix: versionString,
+  alejandra: versionString,
+
+  // Language server
+  nixd: versionString,
+
+  // Build tooling
+  'nix-output-monitor': versionString,
+  'nix-tree': versionString,
+  'nix-diff': versionString,
+
+  // Optional inputs
+  disko: flakeUrl,
+  'sops-nix': flakeUrl,
+  'nix-homebrew': flakeUrl,
+}) satisfies z.ZodType<NixVersions>;
 
 export const npmVersionsSchema = z.object({
   // Core
@@ -365,6 +437,7 @@ export const stackDefinitionSchema = z.object({
   databases: databaseVersionsSchema,
   services: serviceVersionsSchema,
   observability: observabilityVersionsSchema,
+  nix: nixVersionsSchema,
   npm: npmVersionsSchema,
 }) satisfies z.ZodType<StackDefinition>;
 
