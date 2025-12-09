@@ -80,9 +80,6 @@ export {
   type SubscriptionConfig,
 } from './components';
 
-// Policies - Policy as Code
-export {
-  versionPolicies,
-  hexagonalPolicies,
-  effectPolicies,
-} from './policies';
+// Policies - Policy as Code (lazy-loaded to avoid process.exit in tests)
+// Use getPolicyPacks() when you need actual PolicyPack instances
+export { getPolicyPacks, type PolicyPack } from './policies';
