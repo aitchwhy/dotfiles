@@ -1,12 +1,12 @@
 # Tech Stack SSOT — December 2025
 
 > **Single Source of Truth for all technology decisions, versions, and architectural patterns.**
-> 
+>
 > This document is declarative: the running system MUST match this specification.
 > Any drift between this spec and runtime is a bug to be corrected.
 
-**Version:** 1.1.0  
-**Last Updated:** December 9, 2025  
+**Version:** 1.2.0
+**Last Updated:** December 9, 2025
 **Owner:** Hank Lee
 
 ---
@@ -25,6 +25,7 @@
 10. [Configuration Files](#10-configuration-files)
 11. [Development Workflow](#11-development-workflow)
 12. [Quality Gates](#12-quality-gates)
+13. [Appendix: Temporal (Optional)](#appendix-temporal-optional)
 
 ---
 
@@ -56,9 +57,7 @@ All managed infrastructure runs on Google Cloud Platform to minimize toolset spr
 | Observability | Cloud Trace, Cloud Logging, Cloud Monitoring |
 | Container Registry | Artifact Registry |
 | CI/CD | Cloud Build |
-| Durable Execution | Temporal Cloud* |
-
-*Temporal Cloud is the only external managed service—GCP Workflows lacks equivalent capabilities (replay, signals, queries, deterministic execution).
+| Infrastructure as Code | Pulumi (TypeScript) |
 
 ### 1.3 Maximum Rigor Through Paradigms
 
@@ -66,21 +65,47 @@ All managed infrastructure runs on Google Cloud Platform to minimize toolset spr
 |----------|------|-------------------|
 | **Algebraic Effects** | Effect-TS | Untyped errors, hidden dependencies, race conditions |
 | **Finite State Machines** | XState | Impossible states, state explosion, UI logic bugs |
-| **Durable Execution** | Temporal | Lost updates, inconsistent state, debugging blind spots |
-| **Parse Don't Validate** | Zod | Invalid data propagation |
+| **TypeScript-First Validation** | Zod + `satisfies` | Type drift between compile-time and runtime |
 | **Schema-First RPC** | tRPC | Client/server type drift |
 
 ### 1.4 Type Safety Hierarchy
 
 ```
-Zod Schema (runtime) → TypeScript Type (compile-time) → Effect-TS (typed errors + DI)
+TypeScript Type (source of truth) → Zod Schema (runtime validation via satisfies)
 ```
 
 **Rules:**
-- Schema is ALWAYS the source of truth
-- Types are ALWAYS inferred from schemas via `z.infer<>`
+- **TypeScript type is ALWAYS the source of truth**
+- **NEVER use `z.infer<>`** — define the type explicitly first
+- Zod schemas MUST use `satisfies` to ensure conformance to the TypeScript type
 - No `any` — use `unknown` + type guards
 - No type assertions without adjacent validation
+
+**Naming Convention:**
+- TypeScript type: `PascalCase` (e.g., `User`, `CreateUserInput`)
+- Zod schema: `camelCase` + `Schema` suffix (e.g., `userSchema`, `createUserInputSchema`)
+
+**Pattern:**
+
+```typescript
+// ✅ CORRECT: TypeScript type is source of truth
+interface User {
+  readonly id: string;
+  readonly email: string;
+  readonly name?: string;
+  readonly createdAt: Date;
+}
+
+const userSchema = z.object({
+  id: z.string().uuid(),
+  email: z.string().email(),
+  name: z.string().min(1).max(100).optional(),
+  createdAt: z.date(),
+}) satisfies z.ZodType<User>;
+
+// ❌ NEVER: Inferring types from Zod
+// type User = z.infer<typeof userSchema>;  // FORBIDDEN
+```
 
 ### 1.5 Error Handling Philosophy
 
@@ -110,8 +135,8 @@ function getUser(id: string): Effect<User, UserNotFoundError | DatabaseError, Da
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                         LAYER 0: FOUNDATION                                  │
-│  Nix Flakes • nix-direnv • Process Compose • Secret Manager • Git           │
-│  PURPOSE: Hermetic environments, secrets, version control                   │
+│  Nix Flakes • nix-direnv • Process Compose • Secret Manager • Git • Pulumi │
+│  PURPOSE: Hermetic environments, secrets, version control, IaC             │
 └─────────────────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
@@ -124,8 +149,8 @@ function getUser(id: string): Effect<User, UserNotFoundError | DatabaseError, Da
                                     ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                         LAYER 2: APPLICATION                                 │
-│  Effect-TS • XState • tRPC • Hono • Temporal • Drizzle • Zod               │
-│  PURPOSE: Business logic, state, API, persistence, workflows               │
+│  Effect-TS • XState • tRPC • Hono • Drizzle • Zod                          │
+│  PURPOSE: Business logic, state, API, persistence                          │
 └─────────────────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
@@ -157,6 +182,7 @@ All versions are pinned. Updates require explicit version bump in this document.
   sops = "3.9.0";           # Local secrets only
   age = "1.2.0";            # Local secrets only
   google-cloud-sdk = "504.0.1";
+  pulumi = "3.142.0";
 
   # ═══════════════════════════════════════════════════════════════════════════
   # LAYER 1: RUNTIME
@@ -199,16 +225,6 @@ All versions are pinned. Updates require explicit version bump in this document.
   pg = "8.13.0";                    # PostgreSQL driver
   google-cloud-pubsub = "4.9.0";   # Pub/Sub client
   ioredis = "5.4.1";               # Redis client for Memorystore
-
-  # ═══════════════════════════════════════════════════════════════════════════
-  # LAYER 2: APPLICATION — Durable Execution (Temporal Cloud)
-  # ═══════════════════════════════════════════════════════════════════════════
-  temporalio-client = "1.13.2";
-  temporalio-worker = "1.13.2";
-  temporalio-workflow = "1.13.2";
-  temporalio-activity = "1.13.2";
-  temporalio-common = "1.13.2";
-  temporalio-testing = "1.13.2";
 
   # ═══════════════════════════════════════════════════════════════════════════
   # LAYER 2: APPLICATION — Authentication
@@ -274,11 +290,6 @@ All versions are pinned. Updates require explicit version bump in this document.
     "pg": "8.13.0",
     "@google-cloud/pubsub": "4.9.0",
     "ioredis": "5.4.1",
-    "@temporalio/client": "1.13.2",
-    "@temporalio/worker": "1.13.2",
-    "@temporalio/workflow": "1.13.2",
-    "@temporalio/activity": "1.13.2",
-    "@temporalio/common": "1.13.2",
     "better-auth": "1.3.8",
     "react": "19.2.1",
     "react-dom": "19.2.1",
@@ -291,7 +302,6 @@ All versions are pinned. Updates require explicit version bump in this document.
   "devDependencies": {
     "typescript": "5.9.3",
     "drizzle-kit": "0.30.0",
-    "@temporalio/testing": "1.13.2",
     "vitest": "4.0.15",
     "@vitest/ui": "4.0.15",
     "@vitest/coverage-v8": "4.0.15",
@@ -305,11 +315,25 @@ All versions are pinned. Updates require explicit version bump in this document.
 }
 ```
 
-### 3.3 Google Cloud Services
+### 3.3 Pulumi Package Mapping (infra/package.json)
+
+```json
+{
+  "name": "ember-infra",
+  "devDependencies": {
+    "@pulumi/pulumi": "3.142.0",
+    "@pulumi/gcp": "8.12.0",
+    "@pulumi/docker": "4.5.7",
+    "typescript": "5.9.3"
+  }
+}
+```
+
+### 3.4 Google Cloud Services
 
 | Service | Purpose | Local Equivalent |
 |---------|---------|------------------|
-| **Cloud Run** | Container hosting (API, Workers) | Process Compose |
+| **Cloud Run** | Container hosting (API) | Process Compose |
 | **Cloud SQL** | PostgreSQL 16 | Local PostgreSQL |
 | **Memorystore** | Redis 7.2 | Local Redis |
 | **Pub/Sub** | Event streaming | Local emulator |
@@ -328,7 +352,7 @@ All versions are pinned. Updates require explicit version bump in this document.
 
 **Purpose:** Hermetic, reproducible development environments across all machines.
 
-**Rationale:** 
+**Rationale:**
 - Declarative: environment defined in code, versioned in git
 - Reproducible: same inputs always produce same outputs
 - Isolated: no global pollution, multiple versions coexist
@@ -357,7 +381,109 @@ process-compose down      # Stop all services
 process-compose logs app  # View app logs
 ```
 
-### 4.3 Secrets Management
+### 4.3 Pulumi (TypeScript)
+
+**Purpose:** Infrastructure as Code with full TypeScript type safety.
+
+**Rationale:**
+- TypeScript: same language as application code
+- Type safety: catch infrastructure errors at compile time
+- Reusable components: share infrastructure patterns as packages
+- State management: Pulumi Cloud or self-hosted backend
+
+**Project Structure:**
+```
+infra/
+├── index.ts              # Main Pulumi program
+├── package.json          # Pulumi dependencies
+├── tsconfig.json         # TypeScript config
+├── Pulumi.yaml           # Project definition
+├── Pulumi.dev.yaml       # Dev stack config
+└── Pulumi.prod.yaml      # Prod stack config
+```
+
+**Example Infrastructure:**
+
+```typescript
+// infra/index.ts
+import * as pulumi from "@pulumi/pulumi";
+import * as gcp from "@pulumi/gcp";
+
+const config = new pulumi.Config();
+const project = gcp.config.project;
+const region = config.require("region");
+
+// Cloud SQL PostgreSQL
+const dbInstance = new gcp.sql.DatabaseInstance("ember-db", {
+  databaseVersion: "POSTGRES_16",
+  region,
+  settings: {
+    tier: "db-f1-micro",
+    ipConfiguration: {
+      ipv4Enabled: false,
+      privateNetwork: vpc.id,
+    },
+    backupConfiguration: {
+      enabled: true,
+      startTime: "03:00",
+    },
+  },
+  deletionProtection: true,
+});
+
+const database = new gcp.sql.Database("ember", {
+  instance: dbInstance.name,
+  name: "ember",
+});
+
+const dbUser = new gcp.sql.User("ember-user", {
+  instance: dbInstance.name,
+  name: "ember",
+  password: config.requireSecret("dbPassword"),
+});
+
+// Memorystore Redis
+const redis = new gcp.redis.Instance("ember-cache", {
+  region,
+  tier: "BASIC",
+  memorySizeGb: 1,
+  redisVersion: "REDIS_7_2",
+  authorizedNetwork: vpc.id,
+});
+
+// Cloud Run Service
+const apiService = new gcp.cloudrunv2.Service("ember-api", {
+  location: region,
+  template: {
+    containers: [{
+      image: pulumi.interpolate`${region}-docker.pkg.dev/${project}/ember/api:latest`,
+      ports: [{ containerPort: 8080 }],
+      envs: [
+        { name: "DATABASE_URL", valueSource: { secretKeyRef: { secret: dbUrlSecret.secretId, version: "latest" } } },
+        { name: "REDIS_URL", value: pulumi.interpolate`redis://${redis.host}:${redis.port}` },
+      ],
+      resources: {
+        limits: { cpu: "1", memory: "512Mi" },
+      },
+    }],
+    vpcAccess: {
+      connector: vpcConnector.id,
+      egress: "PRIVATE_RANGES_ONLY",
+    },
+  },
+});
+
+// Pub/Sub Topics
+const userEventsTopic = new gcp.pubsub.Topic("user-events");
+const orderEventsTopic = new gcp.pubsub.Topic("order-events");
+
+// Exports
+export const apiUrl = apiService.uri;
+export const dbConnectionName = dbInstance.connectionName;
+export const redisHost = redis.host;
+```
+
+### 4.4 Secrets Management
 
 **Local Development:** SOPS + Age
 - Secrets encrypted in git
@@ -387,7 +513,7 @@ class Secrets extends Context.Tag("Secrets")<Secrets, SecretsService>() {}
 const SecretManagerLive = Layer.sync(Secrets, () => {
   const client = new SecretManagerServiceClient();
   const projectId = process.env.GCP_PROJECT_ID!;
-  
+
   return {
     get: (name) => Effect.tryPromise({
       try: async () => {
@@ -419,13 +545,11 @@ export { Secrets, SecretManagerLive, EnvSecretsLive };
 
 **Rationale:**
 - Current release with latest V8 optimizations
-- Required for Temporal Worker (uses Node-specific APIs)
 - LTS track provides stability guarantees
 - Wide ecosystem compatibility
 
 **When to Use:**
 - Production deployments on Cloud Run
-- Temporal Workers (required)
 - When Bun compatibility issues arise
 
 ### 5.2 Bun 1.3.4
@@ -443,10 +567,6 @@ export { Secrets, SecretManagerLive, EnvSecretsLive };
 - Development server (`bun run dev`)
 - Unit tests (`bun test` or `vitest`)
 - Scripts and tooling
-
-**Limitations:**
-- Temporal Worker requires Node.js (uses `worker_threads`, `vm`)
-- Some native modules may have compatibility issues
 
 ### 5.3 TypeScript 5.9.3
 
@@ -575,7 +695,7 @@ Effect.runPromise(program);
 import { createMachine, assign, fromPromise } from "xstate";
 import { useMachine } from "@xstate/react";
 
-// 1. Define context and events
+// 1. Define context and events with TypeScript types first
 interface FetchContext {
   data: User | null;
   error: string | null;
@@ -663,13 +783,82 @@ function UserProfile({ userId }: { userId: string }) {
 }
 ```
 
-### 6.3 tRPC 11.7.2
+### 6.3 Zod 4.1.13 (with TypeScript-First Pattern)
+
+**Purpose:** Runtime validation that conforms to TypeScript types.
+
+**Critical Rule:** TypeScript type is ALWAYS the source of truth. Zod schemas use `satisfies` to ensure conformance.
+
+**Pattern:**
+
+```typescript
+// src/types/user.ts — TypeScript types (source of truth)
+export interface UserId extends String {
+  readonly _brand: unique symbol;
+}
+
+export interface User {
+  readonly id: UserId;
+  readonly email: string;
+  readonly name?: string;
+  readonly createdAt: Date;
+}
+
+export interface CreateUserInput {
+  readonly email: string;
+  readonly name?: string;
+}
+
+// src/schemas/user.ts — Zod schemas (runtime validation)
+import { z } from "zod";
+import type { User, UserId, CreateUserInput } from "../types/user";
+
+// Schema conforms to TypeScript type via satisfies
+export const userIdSchema = z.string().uuid() satisfies z.ZodType<UserId>;
+
+export const userSchema = z.object({
+  id: userIdSchema,
+  email: z.string().email(),
+  name: z.string().min(1).max(100).optional(),
+  createdAt: z.date(),
+}) satisfies z.ZodType<User>;
+
+export const createUserInputSchema = z.object({
+  email: z.string().email(),
+  name: z.string().min(1).max(100).optional(),
+}) satisfies z.ZodType<CreateUserInput>;
+
+// ❌ NEVER DO THIS:
+// type User = z.infer<typeof userSchema>;  // FORBIDDEN
+```
+
+**Validation at Boundaries:**
+
+```typescript
+// src/adapters/inbound/trpc/user-router.ts
+import { router, publicProcedure } from "../trpc";
+import { createUserInputSchema, userSchema } from "../../../schemas/user";
+import type { User, CreateUserInput } from "../../../types/user";
+
+export const userRouter = router({
+  create: publicProcedure
+    .input(createUserInputSchema)  // Runtime validation
+    .output(userSchema)            // Runtime validation
+    .mutation(async ({ input }): Promise<User> => {
+      // input is typed as CreateUserInput
+      // return type is User
+      return createUser(input);
+    }),
+});
+```
+
+### 6.4 tRPC 11.7.2
 
 **Purpose:** End-to-end type-safe RPC between client and server.
 
 **Rationale:**
 - Zero code generation — types inferred from server
-- Works with any validator (Zod, Effect Schema)
+- Works with Zod for runtime validation
 - Subscriptions for real-time
 - Batching and caching built-in
 
@@ -678,7 +867,6 @@ function UserProfile({ userId }: { userId: string }) {
 ```typescript
 // src/server/trpc.ts
 import { initTRPC, TRPCError } from "@trpc/server";
-import { z } from "zod";
 
 const t = initTRPC.create();
 
@@ -687,18 +875,29 @@ export const publicProcedure = t.procedure;
 
 // src/server/routers/user.ts
 import { router, publicProcedure } from "../trpc";
-import { UserSchema } from "../schemas/user";
+import { userSchema, createUserInputSchema } from "../schemas/user";
+import type { User } from "../types/user";
 
 export const userRouter = router({
   getById: publicProcedure
     .input(z.object({ id: z.string().uuid() }))
-    .output(UserSchema)
-    .query(async ({ input }) => {
+    .output(userSchema)
+    .query(async ({ input }): Promise<User> => {
       const program = getUser(input.id).pipe(
         Effect.provide(DrizzleUserRepo),
         Effect.catchTag("UserNotFoundError", () =>
           Effect.fail(new TRPCError({ code: "NOT_FOUND" }))
         )
+      );
+      return Effect.runPromise(program);
+    }),
+
+  create: publicProcedure
+    .input(createUserInputSchema)
+    .output(userSchema)
+    .mutation(async ({ input }): Promise<User> => {
+      const program = createUser(input).pipe(
+        Effect.provide(DrizzleUserRepo)
       );
       return Effect.runPromise(program);
     }),
@@ -710,19 +909,9 @@ export const appRouter = router({
 });
 
 export type AppRouter = typeof appRouter;
-
-// src/server/index.ts
-import { Hono } from "hono";
-import { trpcServer } from "@hono/trpc-server";
-import { appRouter } from "./routers";
-
-const app = new Hono();
-app.use("/trpc/*", trpcServer({ router: appRouter }));
-
-export default app;
 ```
 
-### 6.4 Hono 4.10.7
+### 6.5 Hono 4.10.7
 
 **Purpose:** Ultrafast, Web Standards-based HTTP framework.
 
@@ -759,115 +948,6 @@ const port = parseInt(process.env.PORT ?? "8080");
 serve({ fetch: app.fetch, port });
 ```
 
-### 6.5 Temporal 1.13.2 (Temporal Cloud)
-
-**Purpose:** Durable execution for long-running workflows.
-
-**Rationale:**
-- **Fault Tolerance:** Workflows survive crashes, restarts, deployments
-- **Event Sourcing:** Complete audit trail of all executions
-- **Time Travel:** Replay any historical execution exactly
-- **Saga Pattern:** Automatic compensation for failed distributed transactions
-
-**Why Temporal Cloud (not GCP Workflows):**
-- Deterministic replay (GCP Workflows lacks this)
-- Signals and queries for workflow interaction
-- Local activities for low-latency operations
-- TypeScript SDK with full type safety
-
-**Connection Setup:**
-
-```typescript
-// src/temporal/client.ts
-import { Client, Connection } from "@temporalio/client";
-
-export async function createTemporalClient() {
-  const connection = await Connection.connect({
-    address: process.env.TEMPORAL_ADDRESS!, // e.g., "namespace.tmprl.cloud:7233"
-    tls: {
-      clientCertPair: {
-        crt: Buffer.from(process.env.TEMPORAL_TLS_CERT!, "base64"),
-        key: Buffer.from(process.env.TEMPORAL_TLS_KEY!, "base64"),
-      },
-    },
-  });
-
-  return new Client({
-    connection,
-    namespace: process.env.TEMPORAL_NAMESPACE!,
-  });
-}
-```
-
-**Workflow Example:**
-
-```typescript
-// src/temporal/workflows/phone-auth.ts
-import { proxyActivities, sleep, defineSignal, setHandler } from "@temporalio/workflow";
-import type * as activities from "../activities/phone-auth";
-
-const { sendVerificationCode, verifyCode } = proxyActivities<typeof activities>({
-  startToCloseTimeout: "30s",
-  retry: { maximumAttempts: 3 },
-});
-
-export const codeEnteredSignal = defineSignal<[string]>("codeEntered");
-
-export async function phoneAuthWorkflow(phoneNumber: string): Promise<{ success: boolean }> {
-  let enteredCode: string | null = null;
-
-  setHandler(codeEnteredSignal, (code) => {
-    enteredCode = code;
-  });
-
-  const { code: expectedCode } = await sendVerificationCode(phoneNumber);
-
-  const deadline = Date.now() + 5 * 60 * 1000; // 5 minutes
-  while (!enteredCode && Date.now() < deadline) {
-    await sleep("5s");
-  }
-
-  if (!enteredCode) {
-    return { success: false };
-  }
-
-  const isValid = await verifyCode(phoneNumber, enteredCode, expectedCode);
-  return { success: isValid };
-}
-```
-
-**Worker Setup (runs on Cloud Run):**
-
-```typescript
-// src/temporal/worker.ts
-import { Worker, NativeConnection } from "@temporalio/worker";
-import * as activities from "./activities/phone-auth";
-
-async function run() {
-  const connection = await NativeConnection.connect({
-    address: process.env.TEMPORAL_ADDRESS!,
-    tls: {
-      clientCertPair: {
-        crt: Buffer.from(process.env.TEMPORAL_TLS_CERT!, "base64"),
-        key: Buffer.from(process.env.TEMPORAL_TLS_KEY!, "base64"),
-      },
-    },
-  });
-
-  const worker = await Worker.create({
-    connection,
-    namespace: process.env.TEMPORAL_NAMESPACE!,
-    taskQueue: "phone-auth",
-    workflowsPath: require.resolve("./workflows/phone-auth"),
-    activities,
-  });
-
-  await worker.run();
-}
-
-run().catch(console.error);
-```
-
 ### 6.6 Drizzle ORM 0.44.7 + Cloud SQL PostgreSQL
 
 **Purpose:** Type-safe SQL query builder with managed PostgreSQL.
@@ -893,8 +973,9 @@ export const users = pgTable("users", {
     .defaultNow(),
 });
 
-export type User = typeof users.$inferSelect;
-export type NewUser = typeof users.$inferInsert;
+// Drizzle infers its own types for DB operations
+export type DbUser = typeof users.$inferSelect;
+export type DbNewUser = typeof users.$inferInsert;
 ```
 
 **Database Connection:**
@@ -925,23 +1006,34 @@ export const db = drizzle(pool, { schema });
 **Publisher:**
 
 ```typescript
-// src/services/events.ts
-import { PubSub } from "@google-cloud/pubsub";
-import { Effect, Context, Layer, Data } from "effect";
+// src/types/events.ts — TypeScript types first
+export interface UserCreatedEvent {
+  readonly type: "user.created";
+  readonly data: {
+    readonly userId: string;
+    readonly email: string;
+    readonly createdAt: string;
+  };
+}
+
+// src/schemas/events.ts — Zod schemas conform to types
 import { z } from "zod";
+import type { UserCreatedEvent } from "../types/events";
 
-const pubsub = new PubSub();
-
-export const UserCreatedSchema = z.object({
+export const userCreatedEventSchema = z.object({
   type: z.literal("user.created"),
   data: z.object({
     userId: z.string().uuid(),
     email: z.string().email(),
     createdAt: z.string().datetime(),
   }),
-});
+}) satisfies z.ZodType<UserCreatedEvent>;
 
-export type UserCreatedEvent = z.infer<typeof UserCreatedSchema>;
+// src/services/events.ts
+import { PubSub } from "@google-cloud/pubsub";
+import { Effect, Context, Layer, Data } from "effect";
+
+const pubsub = new PubSub();
 
 interface EventPublisher {
   readonly publish: <T>(topic: string, event: T) => Effect.Effect<string, PublishError>;
@@ -1022,39 +1114,7 @@ const RedisLive = Layer.succeed(Cache, {
 export { Cache, RedisLive };
 ```
 
-### 6.9 Zod 4.1.13
-
-**Purpose:** Runtime validation with static type inference.
-
-**Rationale:**
-- Schema-first: define once, use everywhere
-- Runtime validation at boundaries
-- TypeScript inference via `z.infer<>`
-- Excellent error messages
-
-**Schema Definition:**
-
-```typescript
-// src/schemas/user.ts
-import { z } from "zod";
-
-export const UserIdSchema = z.string().uuid().brand<"UserId">();
-export type UserId = z.infer<typeof UserIdSchema>;
-
-export const UserSchema = z.object({
-  id: UserIdSchema,
-  email: z.string().email(),
-  name: z.string().min(1).max(100).optional(),
-  createdAt: z.date(),
-});
-
-export type User = z.infer<typeof UserSchema>;
-
-export const CreateUserSchema = UserSchema.omit({ id: true, createdAt: true });
-export type CreateUser = z.infer<typeof CreateUserSchema>;
-```
-
-### 6.10 React 19.2.1 + TanStack Router 1.140.0
+### 6.9 React 19.2.1 + TanStack Router 1.140.0
 
 **Purpose:** UI rendering and type-safe routing.
 
@@ -1179,27 +1239,6 @@ process.on("SIGTERM", () => {
 });
 ```
 
-**Structured Logging (Cloud Logging):**
-
-```typescript
-// src/lib/logger.ts
-import { Effect } from "effect";
-
-interface LogEntry {
-  severity: "DEBUG" | "INFO" | "WARNING" | "ERROR";
-  message: string;
-  [key: string]: unknown;
-}
-
-export const log = (entry: LogEntry) => Effect.sync(() => {
-  console.log(JSON.stringify({
-    ...entry,
-    timestamp: new Date().toISOString(),
-    "logging.googleapis.com/trace": process.env.TRACE_ID,
-  }));
-});
-```
-
 ### 7.5 PostHog 1.301.0
 
 **Purpose:** Product analytics, A/B testing, feature flags.
@@ -1242,10 +1281,9 @@ export async function isFeatureEnabled(
 │                                                                             │
 │  ┌─────────────────────────────────────────────────────────────────────┐   │
 │  │                         DOMAIN LAYER                                 │   │
-│  │  - Entities (User, Order, etc.)                                     │   │
-│  │  - Value Objects (UserId, Email, etc.)                              │   │
-│  │  - Domain Events                                                    │   │
-│  │  - Domain Errors (UserNotFoundError, etc.)                          │   │
+│  │  - TypeScript types (src/types/) — SOURCE OF TRUTH                  │   │
+│  │  - Zod schemas (src/schemas/) — runtime validation via satisfies    │   │
+│  │  - Domain Errors (Data.TaggedError)                                 │   │
 │  └─────────────────────────────────────────────────────────────────────┘   │
 │                                    │                                         │
 │                                    ▼                                         │
@@ -1253,7 +1291,7 @@ export async function isFeatureEnabled(
 │  │                         PORTS (Interfaces)                           │   │
 │  │  - UserRepository: Context.Tag                                      │   │
 │  │  - NotificationService: Context.Tag                                 │   │
-│  │  - PaymentGateway: Context.Tag                                      │   │
+│  │  - EventPublisher: Context.Tag                                      │   │
 │  └─────────────────────────────────────────────────────────────────────┘   │
 │                                    │                                         │
 │                                    ▼                                         │
@@ -1273,8 +1311,8 @@ export async function isFeatureEnabled(
 │                         │ │                         │ │                         │
 │  - Hono HTTP routes     │ │  - DrizzleUserRepo      │ │  - TwilioNotification   │
 │  - tRPC procedures      │ │    (Layer)              │ │    (Layer)              │
-│  - Temporal workflows   │ │  - StripePayment        │ │  - PubSubEvents         │
-│  - Pub/Sub handlers     │ │    (Layer)              │ │    (Layer)              │
+│  - Pub/Sub handlers     │ │  - StripePayment        │ │  - PubSubEvents         │
+│                         │ │    (Layer)              │ │    (Layer)              │
 └─────────────────────────┘ └─────────────────────────┘ └─────────────────────────┘
 ```
 
@@ -1282,26 +1320,68 @@ export async function isFeatureEnabled(
 
 ```
 src/
-├── domain/                    # Domain layer (pure)
-│   ├── entities/
-│   ├── values/
-│   ├── errors/
-│   └── events/
+├── types/                     # TypeScript types (SOURCE OF TRUTH)
+│   ├── user.ts                # User, UserId, CreateUserInput
+│   ├── order.ts
+│   └── events.ts
+├── schemas/                   # Zod schemas (satisfies TS types)
+│   ├── user.ts                # userSchema, createUserInputSchema
+│   ├── order.ts
+│   └── events.ts
+├── domain/                    # Domain layer
+│   └── errors/                # Domain errors (Data.TaggedError)
 ├── ports/                     # Port interfaces (Context.Tag)
 ├── services/                  # Use cases / application services
 ├── adapters/                  # Adapter implementations (Layers)
 │   ├── inbound/
 │   │   ├── http/
 │   │   ├── trpc/
-│   │   ├── temporal/
 │   │   └── pubsub/
 │   └── outbound/
-├── schemas/                   # Zod schemas (source of truth)
 ├── db/                        # Database
 │   ├── schema.ts
 │   └── migrations/
 ├── lib/                       # Infrastructure
 └── index.ts                   # Application entry point
+```
+
+### 8.3 Type/Schema File Organization
+
+```typescript
+// src/types/user.ts — TypeScript types (SOURCE OF TRUTH)
+export interface UserId extends String {
+  readonly _brand: unique symbol;
+}
+
+export interface User {
+  readonly id: UserId;
+  readonly email: string;
+  readonly name?: string;
+  readonly createdAt: Date;
+}
+
+export interface CreateUserInput {
+  readonly email: string;
+  readonly name?: string;
+}
+
+// src/schemas/user.ts — Zod schemas (conform via satisfies)
+import { z } from "zod";
+import type { User, UserId, CreateUserInput } from "../types/user";
+
+export const userIdSchema = z.string().uuid() satisfies z.ZodType<UserId>;
+
+export const userSchema = z.object({
+  id: userIdSchema,
+  email: z.string().email(),
+  name: z.string().min(1).max(100).optional(),
+  createdAt: z.date(),
+}) satisfies z.ZodType<User>;
+
+export const createUserInputSchema = z.object({
+  email: z.string().email(),
+  name: z.string().min(1).max(100).optional(),
+}) satisfies z.ZodType<CreateUserInput>;
 ```
 
 ---
@@ -1316,20 +1396,23 @@ project-root/
 ├── config/
 │   └── claude-code/
 ├── e2e/
-├── infra/
-│   ├── terraform/
-│   │   ├── main.tf
-│   │   ├── cloud-run.tf
-│   │   ├── cloud-sql.tf
-│   │   ├── memorystore.tf
-│   │   ├── pubsub.tf
-│   │   └── secrets.tf
-│   └── cloudbuild.yaml
+├── infra/                      # Pulumi infrastructure
+│   ├── index.ts                # Main Pulumi program
+│   ├── package.json
+│   ├── tsconfig.json
+│   ├── Pulumi.yaml
+│   ├── Pulumi.dev.yaml
+│   └── Pulumi.prod.yaml
 ├── src/
-├── temporal/
-│   ├── workflows/
-│   ├── activities/
-│   └── worker.ts
+│   ├── types/                  # TypeScript types (SOURCE OF TRUTH)
+│   ├── schemas/                # Zod schemas (satisfies TS types)
+│   ├── domain/
+│   ├── ports/
+│   ├── services/
+│   ├── adapters/
+│   ├── db/
+│   ├── lib/
+│   └── index.ts
 ├── .envrc
 ├── .sops.yaml
 ├── flake.nix
@@ -1371,8 +1454,6 @@ processes:
         condition: process_healthy
       redis:
         condition: process_healthy
-      temporal:
-        condition: process_healthy
 
   db:
     command: |
@@ -1394,24 +1475,6 @@ processes:
         command: "redis-cli ping"
       initial_delay_seconds: 2
       period_seconds: 5
-
-  temporal:
-    command: temporal server start-dev --db-filename /tmp/temporal.db
-    readiness_probe:
-      http_get:
-        host: localhost
-        port: 7233
-        path: /health
-      initial_delay_seconds: 5
-      period_seconds: 10
-
-  temporal-worker:
-    command: bun run temporal:worker
-    depends_on:
-      temporal:
-        condition: process_healthy
-      app:
-        condition: process_healthy
 
   pubsub-emulator:
     command: |
@@ -1445,8 +1508,8 @@ processes:
             bun
             postgresql_16
             redis
-            temporal-cli
             google-cloud-sdk
+            pulumi
             process-compose
             sops
             age
@@ -1493,7 +1556,7 @@ steps:
   - name: "node:25-alpine"
     entrypoint: "npm"
     args: ["ci"]
-  
+
   - name: "node:25-alpine"
     entrypoint: "npm"
     args: ["run", "validate"]
@@ -1526,7 +1589,7 @@ steps:
       - "managed"
       - "--allow-unauthenticated"
       - "--set-secrets"
-      - "DATABASE_URL=database-url:latest,TEMPORAL_TLS_CERT=temporal-cert:latest,TEMPORAL_TLS_KEY=temporal-key:latest"
+      - "DATABASE_URL=database-url:latest"
       - "--vpc-connector"
       - "ember-vpc-connector"
 
@@ -1538,7 +1601,15 @@ options:
   logging: CLOUD_LOGGING_ONLY
 ```
 
-### 10.5 package.json scripts
+### 10.5 infra/Pulumi.yaml
+
+```yaml
+name: ember-infra
+runtime: nodejs
+description: Ember infrastructure on Google Cloud
+```
+
+### 10.6 package.json scripts
 
 ```json
 {
@@ -1558,7 +1629,9 @@ options:
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
-    "temporal:worker": "bun run temporal/worker.ts"
+    "infra:preview": "cd infra && pulumi preview",
+    "infra:up": "cd infra && pulumi up",
+    "infra:destroy": "cd infra && pulumi destroy"
   }
 }
 ```
@@ -1582,10 +1655,18 @@ bun run test:watch
 ```bash
 bun run validate
 git add .
-git commit -m "feat(auth): add phone verification workflow"
+git commit -m "feat(auth): add phone verification"
 ```
 
-### 11.3 Deployment
+### 11.3 Infrastructure Changes
+
+```bash
+cd infra
+pulumi preview    # Review changes
+pulumi up         # Apply changes
+```
+
+### 11.4 Deployment
 
 ```bash
 git push origin main  # Triggers Cloud Build
@@ -1604,12 +1685,20 @@ git push origin main  # Triggers Cloud Build
 | Unit Tests | `bun run test` | All pass |
 | E2E Tests | `bun run test:e2e` | All pass (CI only) |
 
+### 12.2 Type/Schema Rules
+
+- [ ] TypeScript type defined in `src/types/` (PascalCase: `User`)
+- [ ] Zod schema defined in `src/schemas/` (camelCase: `userSchema`)
+- [ ] Schema uses `satisfies z.ZodType<T>` to conform to TS type
+- [ ] **NEVER** use `z.infer<>` to derive types
+
 ---
 
 ## Appendix A: Anti-Patterns
 
 | ❌ Don't | ✅ Do |
 |----------|-------|
+| `z.infer<typeof schema>` | Define TS type first, schema `satisfies` type |
 | `any` | `unknown` + type guards |
 | `throw` for expected failures | Effect-TS typed errors |
 | Multiple `useState` + `useEffect` | XState machine |
@@ -1620,10 +1709,8 @@ git push origin main  # Triggers Cloud Build
 | Prisma | Drizzle ORM |
 | npm/yarn/pnpm | Bun |
 | Docker Compose (dev) | Process Compose |
+| Terraform | Pulumi (TypeScript) |
 | Multiple cloud vendors | Consolidate to GCP |
-| Self-managed databases | Cloud SQL |
-| Self-managed Redis | Memorystore |
-| Self-managed Kafka | Pub/Sub |
 
 ---
 
@@ -1632,16 +1719,109 @@ git push origin main  # Triggers Cloud Build
 | Resource | Name | Purpose |
 |----------|------|---------|
 | **Cloud Run** | `ember-api` | API server |
-| **Cloud Run** | `ember-temporal-worker` | Temporal worker |
 | **Cloud SQL** | `ember-postgres` | PostgreSQL 16 |
 | **Memorystore** | `ember-redis` | Redis 7.2 cache |
 | **Pub/Sub Topic** | `user-events` | User domain events |
 | **Pub/Sub Topic** | `order-events` | Order domain events |
 | **Artifact Registry** | `ember` | Container images |
 | **Secret Manager** | `database-url` | DB connection string |
-| **Secret Manager** | `temporal-cert` | Temporal TLS cert |
-| **Secret Manager** | `temporal-key` | Temporal TLS key |
 | **VPC Connector** | `ember-vpc-connector` | Private network access |
+
+---
+
+## Appendix: Temporal (Optional)
+
+> **Status:** Optional. Use only if durable execution requirements exceed what Pub/Sub + Cloud Run can provide.
+
+**When to Add Temporal:**
+- Long-running workflows (>30 minutes)
+- Human-in-the-loop workflows requiring signals
+- Complex saga patterns with compensation
+- Need for deterministic replay and time-travel debugging
+
+**If Temporal is Needed:**
+
+Add to versions.nix:
+```nix
+temporalio-client = "1.13.2";
+temporalio-worker = "1.13.2";
+temporalio-workflow = "1.13.2";
+temporalio-activity = "1.13.2";
+temporalio-common = "1.13.2";
+temporalio-testing = "1.13.2";
+```
+
+Add to package.json:
+```json
+{
+  "@temporalio/client": "1.13.2",
+  "@temporalio/worker": "1.13.2",
+  "@temporalio/workflow": "1.13.2",
+  "@temporalio/activity": "1.13.2",
+  "@temporalio/common": "1.13.2"
+}
+```
+
+**Temporal Cloud Connection:**
+
+```typescript
+// src/temporal/client.ts
+import { Client, Connection } from "@temporalio/client";
+
+export async function createTemporalClient() {
+  const connection = await Connection.connect({
+    address: process.env.TEMPORAL_ADDRESS!,
+    tls: {
+      clientCertPair: {
+        crt: Buffer.from(process.env.TEMPORAL_TLS_CERT!, "base64"),
+        key: Buffer.from(process.env.TEMPORAL_TLS_KEY!, "base64"),
+      },
+    },
+  });
+
+  return new Client({
+    connection,
+    namespace: process.env.TEMPORAL_NAMESPACE!,
+  });
+}
+```
+
+**Workflow Example:**
+
+```typescript
+// src/temporal/workflows/phone-auth.ts
+import { proxyActivities, sleep, defineSignal, setHandler } from "@temporalio/workflow";
+import type * as activities from "../activities/phone-auth";
+
+const { sendVerificationCode, verifyCode } = proxyActivities<typeof activities>({
+  startToCloseTimeout: "30s",
+  retry: { maximumAttempts: 3 },
+});
+
+export const codeEnteredSignal = defineSignal<[string]>("codeEntered");
+
+export async function phoneAuthWorkflow(phoneNumber: string): Promise<{ success: boolean }> {
+  let enteredCode: string | null = null;
+
+  setHandler(codeEnteredSignal, (code) => {
+    enteredCode = code;
+  });
+
+  const { code: expectedCode } = await sendVerificationCode(phoneNumber);
+
+  const deadline = Date.now() + 5 * 60 * 1000;
+  while (!enteredCode && Date.now() < deadline) {
+    await sleep("5s");
+  }
+
+  if (!enteredCode) {
+    return { success: false };
+  }
+
+  const isValid = await verifyCode(phoneNumber, enteredCode, expectedCode);
+  return { success: isValid };
+}
+```
 
 ---
 
