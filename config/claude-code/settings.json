@@ -48,6 +48,8 @@
       "Bash(git:*)",
       "Bash(gh:*)",
       "Bash(biome:*)",
+      "Bash(oxlint:*)",
+      "Bash(vitest:*)",
       "Bash(tsc:*)",
       "Bash(playwright:*)",
       "Bash(wrangler:*)",

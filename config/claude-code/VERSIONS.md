@@ -1,115 +1,121 @@
-# Tech Stack Versions
-## December 2025 — Frozen
+# VERSIONS.md - Frozen December 2025
 
-> **Purpose**: Exact version pinning for reproducible environments.
-> **Updated**: December 6, 2025
-
----
+> Single Source of Truth for all version numbers
+> Updated: December 8, 2025
 
 ## Runtime
 
-| Tool | Minimum | Recommended | Notes |
-|------|---------|-------------|-------|
-| **Bun** | 1.3.0 | 1.3.3+ | Primary runtime, test runner, package manager |
-| **Node.js** | 22.0.0 | 22 LTS | Fallback only when Bun incompatible |
-| **UV** | 0.5.0 | 0.5+ | Python package manager (NEVER pip) |
-
----
+| Package | Version | Notes |
+|---------|---------|-------|
+| Bun | 1.3.4 | Primary runtime |
+| Node.js | 22.21.1 | LTS fallback |
+| UV | 0.5.1 | Python package manager |
+| Volta | 2.0.1 | Node version manager |
 
 ## TypeScript Ecosystem
 
 | Package | Version | Notes |
 |---------|---------|-------|
-| **TypeScript** | 5.9.3+ | Strict mode mandatory |
-| **Zod** | 4.1+ | Schema validation (NOT zod/v3) |
-| **Biome** | 2.3.8+ | Lint + format (NOT ESLint/Prettier) |
-
----
+| TypeScript | 5.9.3 | Strict mode |
+| Effect-TS | 3.19.9 | Functional effect system |
+| Zod | 4.1.13 | Schema validation |
 
 ## Frontend
 
 | Package | Version | Notes |
 |---------|---------|-------|
-| **React** | 19.2+ | Server Components, Actions, `use()` hook |
-| **TanStack Router** | 1.120+ | Type-safe file-based routing |
-| **TanStack Query** | 5.65+ | Server state management |
-| **Tailwind CSS** | 4.1+ | V4 CSS-first config |
-| **shadcn/ui** | Latest | Copy-paste Radix components |
+| React | 19.2.1 | UI library |
+| React DOM | 19.2.1 | DOM bindings |
+| TanStack Router | 1.140.0 | Type-safe routing |
+| XState | 5.24.0 | State management + API state |
+| Tailwind CSS | 4.1.17 | Utility-first CSS |
 
----
+> **Note**: TanStack Query removed - XState actors handle API state
 
 ## Backend
 
 | Package | Version | Notes |
 |---------|---------|-------|
-| **HonoJS** | 4.10+ | Web Standard API (NOT Express/Fastify) |
-| **Drizzle ORM** | 0.44+ | Type-safe SQL (NOT Prisma) |
-| **D1/Turso/Neon** | Latest | SQLite or Postgres |
+| Hono | 4.10.7 | Web framework |
+| Drizzle ORM | 0.45.0 | Database ORM |
+| Drizzle Kit | 0.30.0 | Migration toolkit |
 
----
+## Authentication
+
+| Package | Version | Notes |
+|---------|---------|-------|
+| Better-Auth | 1.4.5 | TypeScript-first auth |
+
+## Durable Workflows
+
+| Package | Version | Notes |
+|---------|---------|-------|
+| @temporalio/client | 1.13.0 | Temporal client |
+| @temporalio/worker | 1.13.0 | Temporal worker |
+| @temporalio/workflow | 1.13.0 | Workflow definitions |
+| @temporalio/activity | 1.13.0 | Activity definitions |
+| @restatedev/restate-sdk | 1.9.1 | Alternative workflow engine |
+
+## Observability
+
+| Package | Version | Notes |
+|---------|---------|-------|
+| @opentelemetry/api | 1.9.0 | Tracing API |
+| @opentelemetry/sdk-trace-node | 2.2.0 | Node.js SDK |
+| @opentelemetry/exporter-trace-otlp-http | 0.57.0 | OTLP exporter |
+| posthog-js | 1.298.0 | Client analytics |
+| posthog-node | 5.14.1 | Server analytics |
+
+## Cache & Queue
+
+| Package | Version | Notes |
+|---------|---------|-------|
+| ioredis | 5.8.2 | Redis client |
+
+## Database
+
+| Package | Version | Notes |
+|---------|---------|-------|
+| @libsql/client | 0.15.15 | Turso client |
+| postgres | 3.4.7 | PostgreSQL driver |
+
+## Testing
+
+| Package | Version | Notes |
+|---------|---------|-------|
+| Vitest | 4.0.15 | Unit/integration testing |
+| @vitest/ui | 4.0.15 | Test UI |
+| @playwright/test | 1.57.0 | E2E testing |
+
+## Build & Dev
+
+| Package | Version | Notes |
+|---------|---------|-------|
+| Vite | 7.2.7 | Build tool |
+| oxlint | 1.32.0 | Rust-based linter (Signet) |
+| @biomejs/biome | 2.3.8 | General projects |
+| @types/bun | 1.2.10 | Bun types |
+| @ast-grep/napi | 0.33.1 | AST analysis |
+
+## Infrastructure
+
+| Package | Version | Notes |
+|---------|---------|-------|
+| Pulumi | 4.15.0 | Infrastructure as Code |
+| flyctl | 0.3.64 | Fly.io CLI |
+| turso-cli | 0.98.2 | Turso CLI |
+| process-compose | 1.5.0 | Dev orchestration |
+| Tailscale | 1.78.0 | Mesh networking |
 
 ## Python
 
 | Package | Version | Notes |
 |---------|---------|-------|
-| **Python** | 3.13+ | Via UV only |
-| **Pydantic** | 2.10+ | Schema validation |
-| **Ruff** | 0.8+ | Lint + format (NOT Black/isort/flake8) |
+| Python | 3.13.1 | Runtime |
+| Pydantic | 2.10.0 | Validation |
+| Ruff | 0.8.0 | Lint + format |
 
 ---
 
-## Infrastructure
-
-| Tool | Version | Notes |
-|------|---------|-------|
-| **Nix** | 24.11+ | Flakes enabled |
-| **nix-darwin** | Latest | macOS system config |
-| **Home Manager** | Latest | User environment |
-| **Cloudflare Workers** | Latest | Edge deployment |
-| **Fly.io** | Latest | Container deployment |
-
----
-
-## Forbidden Tools
-
-| Tool | Reason | Replacement |
-|------|--------|-------------|
-| npm / yarn / pnpm | Use Bun | `bun install` |
-| ESLint | Use Biome | `bunx biome check` |
-| Prettier | Use Biome | `bunx biome format` |
-| Jest | Use Bun | `bun test` |
-| Express | Use Hono | `hono` |
-| Fastify | Use Hono | `hono` |
-| Prisma | Use Drizzle | `drizzle-orm` |
-| pip | Use UV | `uv pip` |
-| zod/v3 | Use v4 | `import { z } from 'zod'` |
-
----
-
-## Lockfile Reference
-
-| Package Manager | Lockfile | Status |
-|-----------------|----------|--------|
-| Bun | `bun.lockb` | ✅ Required |
-| npm | `package-lock.json` | ❌ Forbidden |
-| yarn | `yarn.lock` | ❌ Forbidden |
-| pnpm | `pnpm-lock.yaml` | ❌ Forbidden |
-
----
-
-## Config File Reference
-
-| Purpose | File | Status |
-|---------|------|--------|
-| Linting | `biome.json` | ✅ Required |
-| Linting | `.eslintrc*` | ❌ Forbidden |
-| Formatting | `biome.json` | ✅ Required |
-| Formatting | `.prettierrc*` | ❌ Forbidden |
-| Testing | Native `bun test` | ✅ Required |
-| Testing | `jest.config.*` | ❌ Forbidden |
-| ORM | `drizzle.config.ts` | ✅ Preferred |
-| ORM | `prisma/schema.prisma` | ❌ Forbidden |
-
----
-
-*Last verified: December 6, 2025*
+*Frozen: December 2025*
+*Source: lib/versions.nix*
