@@ -40,16 +40,32 @@ const VERSIONS_PATH =
   join(process.env.HOME ?? '', 'dotfiles/config/signet/versions.json')
 
 // Packages to enforce (only correct these - don't interfere with user choices)
+// Synced with lib/versions.nix npm section
 const ENFORCED_PACKAGES = [
+  // Core
   'zod',
   'typescript',
   '@biomejs/biome',
   '@types/bun',
+  // Effect ecosystem
   'effect',
+  '@effect/cli',
+  '@effect/platform',
+  '@effect/platform-node',
+  // Backend
   'hono',
   'drizzle-orm',
+  'drizzle-kit',
+  // Frontend
   'react',
   'react-dom',
+  '@tanstack/react-router',
+  'tailwindcss',
+  'xstate',
+  '@xstate/react',
+  // Testing
+  'vitest',
+  '@playwright/test',
 ] as const
 
 // =============================================================================

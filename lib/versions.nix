@@ -1,6 +1,6 @@
 # Signet - Centralized Version Management
 # Frozen: December 2025
-# Updated: 2025-12-08
+# Updated: 2025-12-09
 # SSOT Version: 2.0.0 (Dec 8, 2025 Migration)
 #
 # This is the single source of truth for all version numbers.
@@ -16,7 +16,7 @@
   # ===========================================================================
   runtime = {
     bun = "1.3.4"; # Anthropic-acquired, latest stable
-    node = "22.21.1"; # LTS (updated)
+    node = "25.2.1"; # Current (NOT LTS - user preference)
     uv = "0.5.1"; # Python manager (Rust)
     volta = "2.0.1"; # Tool manager (Rust)
   };
@@ -92,7 +92,7 @@
   # AUTH & SERVICES
   # ===========================================================================
   services = {
-    better-auth = "1.4.5"; # TypeScript-first auth (replaces Clerk)
+    better-auth = "1.4.6"; # TypeScript-first auth (replaces Clerk)
     livekit = "2.9.0";
   };
 
@@ -112,13 +112,13 @@
   # ===========================================================================
   meta = {
     frozen = "2025-12";
-    updated = "2025-12-08";
+    updated = "2025-12-09";
     # Used for documentation and drift detection
   };
 
   # ===========================================================================
   # HELPER: Flat npm dependencies for package.json generation
-  # SSOT December 8, 2025 - All versions frozen
+  # SSOT December 9, 2025 - All versions frozen
   # ===========================================================================
   npm = {
     # Core (Effect ecosystem - versions must be compatible)
@@ -148,7 +148,7 @@
     drizzle-kit = "0.30.0";
 
     # Auth
-    better-auth = "1.4.5";
+    better-auth = "1.4.6";
 
     # Durable Workflows
     "@temporalio/client" = "1.13.0";

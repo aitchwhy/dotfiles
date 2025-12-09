@@ -170,7 +170,8 @@ function getUser(id: string): Effect<User, UserNotFoundError | DatabaseError, Da
 All versions are pinned. Updates require explicit version bump in this document.
 
 ```nix
-# versions.nix — Generated from this document
+# SSOT: lib/versions.nix — This section must match lib/versions.nix
+# Run: diff <(grep -E "^\s+\w+ =" lib/versions.nix) <(grep -E "^\s+\w+ =" STACK.md) to check drift
 {
   # ═══════════════════════════════════════════════════════════════════════════
   # LAYER 0: FOUNDATION
@@ -185,9 +186,9 @@ All versions are pinned. Updates require explicit version bump in this document.
   pulumi = "3.142.0";
 
   # ═══════════════════════════════════════════════════════════════════════════
-  # LAYER 1: RUNTIME
+  # LAYER 1: RUNTIME (synced with lib/versions.nix)
   # ═══════════════════════════════════════════════════════════════════════════
-  nodejs = "25.2.1";
+  nodejs = "22.21.1";  # LTS - matches lib/versions.nix runtime.node
   bun = "1.3.4";
   typescript = "5.9.3";
 
@@ -209,27 +210,27 @@ All versions are pinned. Updates require explicit version bump in this document.
   # ═══════════════════════════════════════════════════════════════════════════
   # LAYER 2: APPLICATION — State Management
   # ═══════════════════════════════════════════════════════════════════════════
-  effect = "3.19.10";
-  effect-platform = "0.72.0";
-  effect-platform-node = "0.69.0";
+  effect = "3.19.9";  # synced with lib/versions.nix npm.effect
+  effect-platform = "0.93.6";  # @effect/platform
+  effect-platform-node = "0.103.0";  # @effect/platform-node
   effect-schema = "0.99.0";
   xstate = "5.24.0";
-  xstate-react = "6.0.0";
+  xstate-react = "5.0.0";  # @xstate/react - synced with versions.nix
   xstate-store = "3.13.0";
 
   # ═══════════════════════════════════════════════════════════════════════════
   # LAYER 2: APPLICATION — Data Access (Google Cloud)
   # ═══════════════════════════════════════════════════════════════════════════
-  drizzle-orm = "0.44.7";
+  drizzle-orm = "0.45.0";  # synced with lib/versions.nix
   drizzle-kit = "0.30.0";
   pg = "8.13.0";                    # PostgreSQL driver
   google-cloud-pubsub = "4.9.0";   # Pub/Sub client
-  ioredis = "5.4.1";               # Redis client for Memorystore
+  ioredis = "5.8.2";               # Redis client for Memorystore - synced
 
   # ═══════════════════════════════════════════════════════════════════════════
   # LAYER 2: APPLICATION — Authentication
   # ═══════════════════════════════════════════════════════════════════════════
-  better-auth = "1.3.8";
+  better-auth = "1.4.5";  # synced with lib/versions.nix
 
   # ═══════════════════════════════════════════════════════════════════════════
   # LAYER 2: APPLICATION — Frontend
@@ -237,7 +238,7 @@ All versions are pinned. Updates require explicit version bump in this document.
   react = "19.2.1";
   react-dom = "19.2.1";
   tanstack-router = "1.140.0";
-  tailwindcss = "4.0.0";
+  tailwindcss = "4.1.17";  # synced with lib/versions.nix
 
   # ═══════════════════════════════════════════════════════════════════════════
   # LAYER 3: OPERATIONAL — Testing
@@ -253,7 +254,7 @@ All versions are pinned. Updates require explicit version bump in this document.
   # LAYER 3: OPERATIONAL — Code Quality
   # ═══════════════════════════════════════════════════════════════════════════
   oxlint = "1.32.0";
-  ast-grep = "0.30.0";
+  ast-grep = "0.33.1";  # synced with lib/versions.nix
 
   # ═══════════════════════════════════════════════════════════════════════════
   # LAYER 3: OPERATIONAL — Observability (OpenTelemetry → GCP)

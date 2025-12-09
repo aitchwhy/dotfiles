@@ -2,6 +2,9 @@
 
 Senior software engineer. macOS Apple Silicon, zsh, Nix Flakes.
 
+> **Canonical Reference**: See [STACK.md](../../STACK.md) for authoritative version matrix.
+> This document uses version ranges for readability; `lib/versions.nix` is the SSOT.
+
 ## Stack
 
 - **Runtime**: Bun 1.3+, Node 22+, UV 0.5+ (Python)
