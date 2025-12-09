@@ -40,7 +40,7 @@ type HookInput = z.infer<typeof HookInputSchema>;
 // ============================================================================
 
 function allow(): void {
-  console.log(JSON.stringify({ decision: 'allow' }));
+  console.log(JSON.stringify({ decision: 'approve' }));
 }
 
 function block(reason: string): void {
