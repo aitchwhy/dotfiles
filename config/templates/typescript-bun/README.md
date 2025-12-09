@@ -93,4 +93,4 @@ bun add -d @types/react @types/react-dom
 
 ---
 
-*Template from ~/dotfiles — See VERSIONS.md for exact pinned versions*
+*Template from ~/dotfiles — See STACK.md for complete version matrix*

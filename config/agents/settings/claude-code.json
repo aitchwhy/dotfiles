@@ -1,0 +1,10 @@
+{
+  "cleanupPeriodDays": 90,
+  "includeCoAuthoredBy": false,
+  "permissions": {
+    "allow": [],
+    "deny": []
+  },
+  "hooks": {},
+  "enabledPlugins": []
+}

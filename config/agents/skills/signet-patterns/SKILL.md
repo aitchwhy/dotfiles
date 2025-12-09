@@ -190,6 +190,8 @@ const program = Effect.gen(function* () {
 | Library | `signet gen library <name>` | TypeScript package |
 | Deployment | `signet gen infra <name>` | Pulumi + process-compose |
 
+> **Version Matrix**: See `STACK.md` for exact pinned versions (Bun, TypeScript, Effect, React, Hono, etc.)
+
 ## Anti-Patterns to Avoid
 
 1. **App importing adapters directly** - Use ports

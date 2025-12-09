@@ -513,7 +513,7 @@ sops = {
 ```
 ~/.claude/
 ├── CLAUDE.md            # → ~/dotfiles/config/claude-code/CLAUDE.md
-├── VERSIONS.md          # → ~/dotfiles/config/claude-code/VERSIONS.md
+├── STACK.md             # → ~/dotfiles/STACK.md (single source of truth)
 ├── settings.json        # Merged from dotfiles
 ├── commands/            # → ~/dotfiles/config/claude-code/commands/
 ├── skills/              # → ~/dotfiles/config/claude-code/skills/
