@@ -4,6 +4,10 @@ id: versions-exact-only
 language: Json
 severity: error
 message: "Dependencies must use exact versions (no ^ or ~ prefixes)"
+files:
+  - "package.json"
+ignores:
+  - "**/node_modules/**"
 note: |
   Exact versions ensure reproducible builds and prevent unexpected breaking changes.
   Use lockfiles and exact versions for predictable dependency resolution.

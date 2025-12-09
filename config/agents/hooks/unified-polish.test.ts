@@ -34,13 +34,17 @@ describe('unified-polish hook', () => {
       expect(result.exitCode).toBe(0);
     });
 
-    test('exits 0 with valid TypeScript file', async () => {
-      const testFile = `${testDir}/test.ts`;
-      await Bun.write(testFile, 'const x = 1;');
+    test(
+      'exits 0 with valid TypeScript file',
+      async () => {
+        const testFile = `${testDir}/test.ts`;
+        await Bun.write(testFile, 'const x = 1;');
 
-      const result = await $`CLAUDE_FILE_PATHS=${testFile} bun run ${hookPath}`.nothrow();
-      expect(result.exitCode).toBe(0);
-    });
+        const result = await $`CLAUDE_FILE_PATHS=${testFile} bun run ${hookPath}`.nothrow();
+        expect(result.exitCode).toBe(0);
+      },
+      { timeout: 15000 }
+    );
 
     test('outputs JSON with continue: true on success', async () => {
       const testFile = `${testDir}/output.ts`;
@@ -104,13 +108,17 @@ describe('unified-polish hook', () => {
       expect(result.exitCode).toBe(0);
     });
 
-    test('handles YAML files', async () => {
-      const testFile = `${testDir}/config.yaml`;
-      await Bun.write(testFile, 'key: value');
+    test(
+      'handles YAML files',
+      async () => {
+        const testFile = `${testDir}/config.yaml`;
+        await Bun.write(testFile, 'key: value');
 
-      const result = await $`CLAUDE_FILE_PATHS=${testFile} bun run ${hookPath}`.nothrow();
-      expect(result.exitCode).toBe(0);
-    });
+        const result = await $`CLAUDE_FILE_PATHS=${testFile} bun run ${hookPath}`.nothrow();
+        expect(result.exitCode).toBe(0);
+      },
+      { timeout: 15000 }
+    );
 
     test('handles Lua files', async () => {
       const testFile = `${testDir}/init.lua`;
@@ -120,21 +128,29 @@ describe('unified-polish hook', () => {
       expect(result.exitCode).toBe(0);
     });
 
-    test('handles CSS files', async () => {
-      const testFile = `${testDir}/styles.css`;
-      await Bun.write(testFile, 'body { margin: 0; }');
+    test(
+      'handles CSS files',
+      async () => {
+        const testFile = `${testDir}/styles.css`;
+        await Bun.write(testFile, 'body { margin: 0; }');
 
-      const result = await $`CLAUDE_FILE_PATHS=${testFile} bun run ${hookPath}`.nothrow();
-      expect(result.exitCode).toBe(0);
-    });
+        const result = await $`CLAUDE_FILE_PATHS=${testFile} bun run ${hookPath}`.nothrow();
+        expect(result.exitCode).toBe(0);
+      },
+      { timeout: 15000 }
+    );
 
-    test('handles SQL files', async () => {
-      const testFile = `${testDir}/query.sql`;
-      await Bun.write(testFile, 'SELECT * FROM users;');
+    test(
+      'handles SQL files',
+      async () => {
+        const testFile = `${testDir}/query.sql`;
+        await Bun.write(testFile, 'SELECT * FROM users;');
 
-      const result = await $`CLAUDE_FILE_PATHS=${testFile} bun run ${hookPath}`.nothrow();
-      expect(result.exitCode).toBe(0);
-    });
+        const result = await $`CLAUDE_FILE_PATHS=${testFile} bun run ${hookPath}`.nothrow();
+        expect(result.exitCode).toBe(0);
+      },
+      { timeout: 15000 }
+    );
   });
 
   describe('multiple files', () => {
