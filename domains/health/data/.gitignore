@@ -1,1 +1,8 @@
+# Large health data exports (use DVC for versioning)
 /apple-health
+
+# 23andMe DNA data exports (extremely sensitive - never commit)
+/23andme-*/
+
+# WHOOP biometric data exports
+/WHOOP/
