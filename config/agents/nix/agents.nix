@@ -26,7 +26,6 @@ in
       # Claude Code CLI
       # ========================================
       ".claude/CLAUDE.md".source = config.lib.file.mkOutOfStoreSymlink "${agentsDir}/AGENT.md";
-      ".claude/STACK.md".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/STACK.md";
       ".claude/commands".source = config.lib.file.mkOutOfStoreSymlink "${agentsDir}/commands";
       ".claude/agents".source = config.lib.file.mkOutOfStoreSymlink "${agentsDir}/agents";
 
