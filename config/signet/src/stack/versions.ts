@@ -228,7 +228,7 @@ export function getNpmVersions(): Record<string, string> {
  * Check if a package version matches the SSOT
  */
 export function isVersionMatch(pkg: string, version: string): boolean {
-  const npmVersions = STACK.npm as Record<string, string>;
+  const npmVersions: Readonly<Record<string, string>> = STACK.npm;
   const expected = npmVersions[pkg];
   if (!expected) return true; // Unknown packages are allowed
   return expected === version;
@@ -241,7 +241,7 @@ export function getDrift(
   dependencies: Record<string, string>
 ): Array<{ pkg: string; expected: string; actual: string }> {
   const drift: Array<{ pkg: string; expected: string; actual: string }> = [];
-  const npmVersions = STACK.npm as Record<string, string>;
+  const npmVersions: Readonly<Record<string, string>> = STACK.npm;
 
   for (const [pkg, version] of Object.entries(dependencies)) {
     const expected = npmVersions[pkg];
