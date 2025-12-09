@@ -64,6 +64,9 @@ in
       # Essential CLI tools
       just
 
+      # NH - Modern Nix Helper (nh darwin switch, nh clean)
+      nh
+
       # Modern Unix replacements
       ripgrep # Better grep
       fd # Better find

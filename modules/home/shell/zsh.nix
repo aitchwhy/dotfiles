@@ -19,6 +19,14 @@ in
       syntaxHighlighting.enable = true;
       enableCompletion = true;
 
+      # NH (Nix Helper) aliases for modern nix-darwin experience
+      shellAliases = {
+        nhs = "nh darwin switch";
+        nhb = "nh darwin build";
+        nhc = "nh clean all --keep 5 --keep-since 7d";
+        nhu = "nix flake update && nh darwin switch";
+      };
+
       initContent = ''
         # Fast directory navigation
         setopt AUTO_CD

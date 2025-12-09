@@ -27,6 +27,9 @@ in
     ./tailscale.nix
     ./secrets.nix
 
+    # Services
+    ./services/evolution-agent.nix
+
     # Applications
     ./safari.nix
     ./terminal.nix
@@ -59,6 +62,9 @@ in
       terminal.enable = mkDefault true;
       activityMonitor.enable = mkDefault true;
       xcode.enable = mkDefault true;
+
+      # Services
+      evolutionAgent.enable = mkDefault true;
 
       # Apps (activation scripts)
       apps.wisprFlow.enable = mkDefault true;

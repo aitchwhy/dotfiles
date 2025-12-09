@@ -238,3 +238,13 @@ sig-init TYPE NAME:
 # Generate workspace in existing project
 sig-gen TYPE NAME:
     @signet gen {{ TYPE }} {{ NAME }}
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# CONTEXT GENERATION
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Generate editor rules from canonical AGENT.md and SKILL.md files
+gen-context:
+    @echo "Generating editor context rules..."
+    @bun run scripts/gen-rules.ts
+    @echo "Generated .cursorrules and .windsurfrules"

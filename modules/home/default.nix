@@ -126,6 +126,7 @@ in
 
       # Path shortcuts
       DOTFILES = "$HOME/dotfiles";
+      FLAKE = "$HOME/dotfiles"; # For NH (Nix Helper)
       CFS = "$HOME/dotfiles/config";
       CFSZSH = "$HOME/dotfiles/config/zsh";
       CMD = "$HOME/dotfiles/scripts";

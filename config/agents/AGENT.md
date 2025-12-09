@@ -6,6 +6,41 @@ Senior software engineer. macOS Apple Silicon, zsh, Nix Flakes.
 > Run `just sig-doctor` to check version alignment.
 > Import: `import { STACK } from '@/stack'`
 
+## Context Protocol
+
+This repository uses **pull-based context** - dynamically discover information rather than relying on pre-packaged XML dumps.
+
+**Do NOT read `repomix-output.xml`.** Instead, use filesystem MCP tools to build your mental map:
+
+| Tool | Purpose |
+|------|---------|
+| `ls`, `find` | Discover directory structure |
+| `grep`, `rg` | Search file contents |
+| `Read` | Read specific files |
+| `Glob` | Pattern-match file paths |
+
+### Context Generation
+
+Run `just gen-context` to generate editor-specific rule files:
+
+| Target | File | Generated From |
+|--------|------|----------------|
+| Cursor | `.cursorrules` | AGENT.md + SKILL.md files |
+| Windsurf | `.windsurfrules` | AGENT.md + SKILL.md files |
+| Claude CLI | `~/.claude/CLAUDE.md` | Symlinked |
+
+## Language Barrier
+
+**Ban assumption language. Replace with evidence.**
+
+| BANNED | REQUIRED |
+|--------|----------|
+| "should work" | "verified via [test/output]" |
+| "probably" | "error output shows" |
+| "likely" | "confirmed by running" |
+| "I think" | Evidence-based statements only |
+| "might" | "UNVERIFIED: requires [test_name]" |
+
 ## Stack
 
 - **Runtime**: Bun 1.3+, Node 25+ (current, not LTS), UV 0.5+ (Python)
