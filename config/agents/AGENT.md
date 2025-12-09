@@ -2,16 +2,50 @@
 
 Senior software engineer. macOS Apple Silicon, zsh, Nix Flakes.
 
-> **Canonical Reference**: See [STACK.md](../../STACK.md) for authoritative version matrix.
-> This document uses version ranges for readability; `lib/versions.nix` is the SSOT.
+> **Version Authority**: `lib/versions.nix` is the single source of truth.
+> Run `just sig-doctor` to check version alignment.
 
 ## Stack
 
-- **Runtime**: Bun 1.3+, Node 22+, UV 0.5+ (Python)
+- **Runtime**: Bun 1.3+, Node 25+ (current, not LTS), UV 0.5+ (Python)
 - **TypeScript**: strict mode, Zod v4, Biome 2.3+
-- **Frontend**: React 19, TanStack Router/Query, Tailwind v4
-- **Backend**: Hono 4.x on Cloudflare Workers, Drizzle ORM
-- **Infra**: Nix Flakes + nix-darwin, GitHub Actions
+- **Frontend**: React 19, TanStack Router, XState 5, Tailwind v4
+- **Backend**: Hono 4.x, Drizzle ORM, Effect-TS
+- **Infra**: Nix Flakes + nix-darwin, Google Cloud (Cloud Run, Cloud SQL, Pub/Sub)
+
+## Core Principles
+
+### Environment Parity
+```
+localhost === CI === production
+```
+Achieved via: Nix Flakes (hermetic), Process Compose (orchestration), Cloud Build (identical images).
+
+### Type Safety Hierarchy
+```
+TypeScript Type (source of truth) → Zod Schema (runtime validation via satisfies)
+```
+- **TypeScript type is ALWAYS the source of truth**
+- **NEVER use `z.infer<>`** — define the type explicitly first
+- Zod schemas MUST use `satisfies` to ensure conformance
+- No `any` — use `unknown` + type guards
+
+### Error Handling Philosophy
+```typescript
+// ❌ NEVER: throw for expected failures
+if (!user) throw new Error("Not found");
+
+// ✅ ALWAYS: typed errors with Effect-TS or Result types
+return Effect.fail(new UserNotFoundError({ id }));
+```
+
+### Maximum Rigor Through Paradigms
+
+| Paradigm | Tool | What It Eliminates |
+|----------|------|-------------------|
+| Algebraic Effects | Effect-TS | Untyped errors, hidden dependencies |
+| Finite State Machines | XState | Impossible states, state explosion |
+| TypeScript-First Validation | Zod + `satisfies` | Type drift |
 
 ## Principles
 
