@@ -21,3 +21,4 @@ languageGlobs:
     - "!**/node_modules/**"
   Json:
     - "**/package.json"
+    - "!**/node_modules/**"
