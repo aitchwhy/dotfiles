@@ -1,4 +1,4 @@
-# Bartender menu bar organizer
+# Bartender 6 menu bar organizer
 # https://www.macbartender.com/
 #
 # Bartender hides and shows menu bar items.
@@ -32,12 +32,12 @@ in
   };
 
   config = mkIf cfg.enable {
-    # Bartender preferences are stored in:
-    # ~/Library/Preferences/com.surteesstudios.Bartender-4.plist
+    # Bartender 6 preferences are stored in:
+    # ~/Library/Preferences/com.surteesstudios.Bartender.plist
     #
     # Most settings require Bartender's UI to configure properly.
     # We can set a few basic defaults:
-    targets.darwin.defaults."com.surteesstudios.Bartender-4" = {
+    targets.darwin.defaults."com.surteesstudios.Bartender" = {
       showForUpdates = cfg.showForUpdates;
     };
   };
