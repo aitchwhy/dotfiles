@@ -1,8 +1,8 @@
 -- Blink.cmp completion engine for LazyVim 15.x
+-- NOTE: Copilot integration handled by lazyvim.plugins.extras.ai.copilot
 return {
   {
     "saghen/blink.cmp",
-    dependencies = { "giuxtaposition/blink-cmp-copilot" },
     opts = {
       snippets = {
         preset = "luasnip",
@@ -29,19 +29,6 @@ return {
         },
       },
       signature = { enabled = true },
-      sources = {
-        compat = {},
-        default = { "lsp", "path", "snippets", "buffer", "copilot" },
-        providers = {
-          copilot = {
-            name = "copilot",
-            module = "blink-cmp-copilot",
-            kind = "Copilot",
-            score_offset = 100,
-            async = true,
-          },
-        },
-      },
     },
   },
   {

@@ -33,6 +33,7 @@ require("lazy").setup({
     -- Dev essentials extras
     { import = "lazyvim.plugins.extras.coding.blink" },
     { import = "lazyvim.plugins.extras.editor.fzf" },
+    { import = "lazyvim.plugins.extras.ai.copilot" },
 
     -- Language support
     { import = "lazyvim.plugins.extras.lang.typescript" },
