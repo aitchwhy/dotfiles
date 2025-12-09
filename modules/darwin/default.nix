@@ -4,9 +4,11 @@
   lib,
   pkgs,
   ...
-}: let
+}:
+let
   inherit (lib) mkDefault;
-in {
+in
+{
   imports = [
     # UI
     ./dock.nix
@@ -22,6 +24,8 @@ in {
     ./window-manager.nix
     ./input-devices.nix
     ./kanata.nix
+    ./tailscale.nix
+    ./secrets.nix
 
     # Applications
     ./safari.nix
@@ -49,6 +53,8 @@ in {
       windowManager.enable = mkDefault true;
       inputDevices.enable = mkDefault true;
       kanata.enable = mkDefault true;
+      tailscale.enable = mkDefault true;
+      secrets.enable = mkDefault true;
       safari.enable = mkDefault false; # Disabled: macOS sandboxing prevents writing to Safari container
       terminal.enable = mkDefault true;
       activityMonitor.enable = mkDefault true;
