@@ -12,10 +12,11 @@ Senior software engineer. macOS Apple Silicon, zsh, Nix Flakes.
 
 ## Principles
 
-- Schema-first: Zod/Pydantic are source of truth
+- TypeScript-first: TS types are source of truth, schemas satisfy types
 - Parse don't validate: `unknown` in, typed out
 - Result types for fallible operations
 - No `any` - use `unknown` + type guards
+- Biome enforced: format + lint after every code change
 - Conventional commits: `type(scope): description`
 
 ## Verification-First
@@ -43,8 +44,9 @@ Senior software engineer. macOS Apple Silicon, zsh, Nix Flakes.
 
 | Skill | Purpose |
 |-------|---------|
-| `typescript-patterns` | Branded types, Result types |
-| `zod-patterns` | Schema-first development |
+| `typescript-patterns` | Branded types, Result types, parse don't validate |
+| `zod-patterns` | TypeScript-first Zod (never use z.infer) |
+| `signet-patterns` | Hexagonal architecture, Effect Schema |
 | `result-patterns` | Error handling |
 | `tdd-patterns` | Red-Green-Refactor |
 | `nix-darwin-patterns` | Nix flakes + home-manager |
@@ -52,7 +54,7 @@ Senior software engineer. macOS Apple Silicon, zsh, Nix Flakes.
 | `tanstack-patterns` | Router + Query |
 | `ember-patterns` | Ember platform |
 | `verification-first` | Test evidence |
-| `clean-code` | Code quality |
+| `clean-code` | Code quality, Biome enforcement |
 
 ## Pattern Quick Reference
 
@@ -67,15 +69,30 @@ const Ok = <T>(data: T): Result<T, never> => ({ ok: true, data });
 const Err = <E>(error: E): Result<never, E> => ({ ok: false, error });
 ```
 
-### Zod Schema
+### TypeScript-First Zod
 
 ```typescript
-export const UserSchema = z.object({
+// 1. TypeScript type is source of truth
+type User = {
+  readonly id: string;
+  readonly email: string;
+  readonly role: 'admin' | 'user' | 'guest';
+};
+
+// 2. Schema satisfies the type (NEVER use z.infer)
+const userSchema = z.object({
   id: z.string().uuid(),
   email: z.string().email(),
   role: z.enum(['admin', 'user', 'guest']),
-});
-export type User = z.infer<typeof UserSchema>;
+}) satisfies z.ZodType<User>;
+```
+
+### Biome Enforcement
+
+After writing/modifying TypeScript code, always run:
+```bash
+biome check --write .  # Format + lint + fix
+bun typecheck          # Type check
 ```
 
 ## Project-Specific: Ember
