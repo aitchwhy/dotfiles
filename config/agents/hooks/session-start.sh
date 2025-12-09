@@ -33,9 +33,11 @@ if [[ -n "$RECENT" && "$RECENT" != "null" ]]; then
     OUTPUT+="Recent lessons: $RECENT"
 fi
 
-# Output JSON for Claude to consume (if we have anything to say)
+# Output JSON for Claude to consume
 if [[ -n "$OUTPUT" ]]; then
-    jq -n --arg ctx "$OUTPUT" '{additionalContext: $ctx}'
+    jq -n --arg ctx "$OUTPUT" '{continue: true, additionalContext: $ctx}'
+else
+    echo '{"continue": true}'
 fi
 
 exit 0

@@ -55,4 +55,6 @@ if [[ -x "$GRADE_SCRIPT" ]]; then
     nohup "$GRADE_SCRIPT" > "$METRICS/last-grade.log" 2>&1 &
 fi
 
+# Output valid JSON for Claude Code
+echo '{"continue": true}'
 exit 0
