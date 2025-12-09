@@ -134,8 +134,8 @@ export class ApiService extends SignetComponent {
       containers: [
         {
           image: args.image,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ports: [{ containerPort: args.port ?? 3000, name: 'http1' }] as any,
+          // Pulumi types expect single ServiceTemplateContainerPorts, not array
+          ports: { containerPort: args.port ?? 3000, name: 'http1' },
           resources: {
             limits: {
               memory: args.memory ?? '512Mi',
