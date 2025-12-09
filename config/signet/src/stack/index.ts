@@ -66,9 +66,6 @@ export {
 export {
   SignetComponent,
   type SignetComponentArgs,
-  Ok,
-  Err,
-  type ComponentResult,
   GcpProject,
   type GcpProjectArgs,
   ApiService,

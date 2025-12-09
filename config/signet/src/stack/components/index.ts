@@ -6,7 +6,7 @@
  */
 
 // Base component
-export { SignetComponent, type SignetComponentArgs, Ok, Err, type ComponentResult } from './base';
+export { SignetComponent, type SignetComponentArgs } from './base';
 
 // GCP Components
 export { GcpProject, type GcpProjectArgs } from './gcp-project';

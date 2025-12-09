@@ -132,27 +132,6 @@ export abstract class SignetComponent extends pulumi.ComponentResource {
   }
 }
 
-// =============================================================================
-// HELPER TYPES
-// =============================================================================
-
-/**
- * Result type for component operations
- */
-export type ComponentResult<T, E = Error> =
-  | { readonly ok: true; readonly data: T }
-  | { readonly ok: false; readonly error: E };
-
-/**
- * Create a successful result
- */
-export function Ok<T>(data: T): ComponentResult<T, never> {
-  return { ok: true, data };
-}
-
-/**
- * Create a failed result
- */
-export function Err<E>(error: E): ComponentResult<never, E> {
-  return { ok: false, error };
-}
+// NOTE: Result types (Ok, Err, ComponentResult) were removed as unused.
+// Components use Pulumi's native error handling. For application-level
+// Result types, use src/lib/result.ts instead.
