@@ -77,7 +77,9 @@ export const versionPolicies = new PolicyPack('signet-versions', {
         gcp.sql.DatabaseInstance,
         (instance, _args, reportViolation) => {
           const version = instance.databaseVersion;
-          if (!APPROVED_POSTGRES_VERSIONS.includes(version as any)) {
+          // Widen array type for string comparison (avoids 'as any')
+          const approvedVersions: readonly string[] = APPROVED_POSTGRES_VERSIONS;
+          if (!approvedVersions.includes(version)) {
             reportViolation(
               `PostgreSQL version "${version}" is not approved. ` +
                 `Use one of: ${APPROVED_POSTGRES_VERSIONS.join(', ')}`
