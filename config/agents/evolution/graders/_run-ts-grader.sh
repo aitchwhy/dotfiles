@@ -12,5 +12,7 @@ if [[ -z "$GRADER_NAME" ]]; then
 fi
 
 cd "$SCRIPT_DIR/.."
-bun run src/graders/cli.ts "$GRADER_NAME" 2>/dev/null || \
+bun run src/graders/cli.ts "$GRADER_NAME" 2>/dev/null || {
     echo "{\"grader\":\"$GRADER_NAME\",\"score\":0,\"passed\":false,\"issues\":[\"grader execution error\"]}"
+    exit 1
+}

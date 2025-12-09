@@ -5,7 +5,7 @@ set -euo pipefail
 
 DOTFILES="${DOTFILES:-$HOME/dotfiles}"
 METRICS="$DOTFILES/.claude-metrics/latest.json"
-EVOLUTION_CLI="$DOTFILES/config/claude-code/evolution/src/index.ts"
+EVOLUTION_CLI="$DOTFILES/config/agents/evolution/src/index.ts"
 
 # Check if metrics exist
 if [[ ! -f "$METRICS" ]]; then

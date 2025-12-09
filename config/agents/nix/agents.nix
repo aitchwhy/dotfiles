@@ -25,12 +25,9 @@ in
       # ========================================
       # Claude Code CLI
       # ========================================
-      ".claude/CLAUDE.md".source =
-        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/AGENT.md";
-      ".claude/commands".source =
-        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/commands";
-      ".claude/agents".source =
-        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/agents";
+      ".claude/CLAUDE.md".source = config.lib.file.mkOutOfStoreSymlink "${agentsDir}/AGENT.md";
+      ".claude/commands".source = config.lib.file.mkOutOfStoreSymlink "${agentsDir}/commands";
+      ".claude/agents".source = config.lib.file.mkOutOfStoreSymlink "${agentsDir}/agents";
 
       # Skills - project-specific patterns
       ".claude/skills/ember-patterns".source =
@@ -69,8 +66,7 @@ in
       # ========================================
       # Gemini CLI
       # ========================================
-      ".gemini/GEMINI.md".source =
-        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/AGENT.md";
+      ".gemini/GEMINI.md".source = config.lib.file.mkOutOfStoreSymlink "${agentsDir}/AGENT.md";
       ".gemini/settings.json".source =
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/settings/gemini.json";
       ".gemini/mcp-servers.json".source =

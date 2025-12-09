@@ -210,6 +210,15 @@
             "timeout": 15
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run \"$HOME/dotfiles/config/agents/hooks/assumption-detector.ts\"",
+            "timeout": 15
+          }
+        ]
       }
     ]
   },
@@ -219,7 +228,7 @@
   "verbose": false,
   "statusLine": {
     "type": "command",
-    "command": "input=$(cat); dir=$(echo \"$input\" | jq -r '.workspace.current_dir'); branch=$(cd \"$dir\" && git branch --show-current 2>/dev/null); dirty=$(cd \"$dir\" && git status --porcelain 2>/dev/null | wc -l | tr -d ' '); printf \"%s%s%s\" \"$(basename \"$dir\")\" \"${branch:+ @ $branch}\" \"${dirty:+0 [$dirty]}\""
+    "command": "input=$(cat); dir=$(echo \"$input\" | jq -r '.workspace.current_dir'); branch=$(cd \"$dir\" && git branch --show-current 2>/dev/null); dirty=$(cd \"$dir\" && git status --porcelain 2>/dev/null | wc -l | tr -d ' '); printf \"%s%s%s\" \"$(basename \"$dir\")\" \"${branch:+ @ $branch}\" \"${dirty:+ [$dirty]}\""
   },
   "enabledPlugins": {
     "code-review@claude-code-plugins": true,
