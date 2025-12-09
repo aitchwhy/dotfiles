@@ -87,6 +87,10 @@ doctor:
     @nix flake check --no-build > /dev/null 2>&1 && echo "✓ Flake valid" || echo "✗ Flake check failed"
     @darwin-rebuild --list-generations 2>/dev/null | tail -n 1 | grep -q . && echo "✓ System generations accessible" || echo "! No system profile access"
 
+# NeoVim startup health check (no Lua errors)
+nvim-test:
+    @bash tests/nvim-health.sh
+
 # Quick rebuild with validation
 rebuild: fmt check switch
     @echo "✓ Configuration rebuilt successfully"
