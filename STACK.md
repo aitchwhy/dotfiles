@@ -5,9 +5,9 @@
 > This document is declarative: the running system MUST match this specification.
 > Any drift between this spec and runtime is a bug to be corrected.
 
-**Version:** 1.0.0  
+**Version:** 1.1.0  
 **Last Updated:** December 9, 2025  
-**Owner:** Hank Kim
+**Owner:** Hank Lee
 
 ---
 
@@ -39,10 +39,28 @@ localhost === CI === production
 Achieved through:
 - **Nix Flakes** for hermetic, reproducible environments
 - **Process Compose** for local service orchestration
-- **nix2container** for identical production images
-- **SOPS + Age** for encrypted secrets in git
+- **Cloud Build + Artifact Registry** for identical production images
+- **Secret Manager** for production secrets (SOPS locally)
 
-### 1.2 Maximum Rigor Through Paradigms
+### 1.2 Google Cloud Consolidation
+
+All managed infrastructure runs on Google Cloud Platform to minimize toolset sprawl:
+
+| Concern | Google Cloud Service |
+|---------|---------------------|
+| Compute | Cloud Run |
+| Database | Cloud SQL (PostgreSQL) |
+| Cache | Memorystore (Redis) |
+| Messaging | Pub/Sub |
+| Secrets | Secret Manager |
+| Observability | Cloud Trace, Cloud Logging, Cloud Monitoring |
+| Container Registry | Artifact Registry |
+| CI/CD | Cloud Build |
+| Durable Execution | Temporal Cloud* |
+
+*Temporal Cloud is the only external managed service—GCP Workflows lacks equivalent capabilities (replay, signals, queries, deterministic execution).
+
+### 1.3 Maximum Rigor Through Paradigms
 
 | Paradigm | Tool | What It Eliminates |
 |----------|------|-------------------|
@@ -52,7 +70,7 @@ Achieved through:
 | **Parse Don't Validate** | Zod | Invalid data propagation |
 | **Schema-First RPC** | tRPC | Client/server type drift |
 
-### 1.3 Type Safety Hierarchy
+### 1.4 Type Safety Hierarchy
 
 ```
 Zod Schema (runtime) → TypeScript Type (compile-time) → Effect-TS (typed errors + DI)
@@ -64,7 +82,7 @@ Zod Schema (runtime) → TypeScript Type (compile-time) → Effect-TS (typed err
 - No `any` — use `unknown` + type guards
 - No type assertions without adjacent validation
 
-### 1.4 Error Handling Philosophy
+### 1.5 Error Handling Philosophy
 
 ```typescript
 // ❌ NEVER: throw for expected failures
@@ -92,7 +110,7 @@ function getUser(id: string): Effect<User, UserNotFoundError | DatabaseError, Da
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                         LAYER 0: FOUNDATION                                  │
-│  Nix Flakes • nix-direnv • Process Compose • SOPS • Git                     │
+│  Nix Flakes • nix-direnv • Process Compose • Secret Manager • Git           │
 │  PURPOSE: Hermetic environments, secrets, version control                   │
 └─────────────────────────────────────────────────────────────────────────────┘
                                     │
@@ -113,7 +131,7 @@ function getUser(id: string): Effect<User, UserNotFoundError | DatabaseError, Da
                                     ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                         LAYER 3: OPERATIONAL                                 │
-│  Vitest • Playwright • OXC • OpenTelemetry • GitHub Actions • Fly.io       │
+│  Vitest • Playwright • OXC • OpenTelemetry • Cloud Build • Cloud Run       │
 │  PURPOSE: Testing, quality, observability, deployment                       │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -136,8 +154,9 @@ All versions are pinned. Updates require explicit version bump in this document.
   home-manager = "24.11";
   nix-direnv = "3.0.6";
   process-compose = "1.5.0";
-  sops = "3.9.0";
-  age = "1.2.0";
+  sops = "3.9.0";           # Local secrets only
+  age = "1.2.0";            # Local secrets only
+  google-cloud-sdk = "504.0.1";
 
   # ═══════════════════════════════════════════════════════════════════════════
   # LAYER 1: RUNTIME
@@ -173,14 +192,16 @@ All versions are pinned. Updates require explicit version bump in this document.
   xstate-store = "3.13.0";
 
   # ═══════════════════════════════════════════════════════════════════════════
-  # LAYER 2: APPLICATION — Data Access
+  # LAYER 2: APPLICATION — Data Access (Google Cloud)
   # ═══════════════════════════════════════════════════════════════════════════
   drizzle-orm = "0.44.7";
   drizzle-kit = "0.30.0";
-  libsql-client = "0.14.0";
+  pg = "8.13.0";                    # PostgreSQL driver
+  google-cloud-pubsub = "4.9.0";   # Pub/Sub client
+  ioredis = "5.4.1";               # Redis client for Memorystore
 
   # ═══════════════════════════════════════════════════════════════════════════
-  # LAYER 2: APPLICATION — Durable Execution
+  # LAYER 2: APPLICATION — Durable Execution (Temporal Cloud)
   # ═══════════════════════════════════════════════════════════════════════════
   temporalio-client = "1.13.2";
   temporalio-worker = "1.13.2";
@@ -219,11 +240,12 @@ All versions are pinned. Updates require explicit version bump in this document.
   ast-grep = "0.30.0";
 
   # ═══════════════════════════════════════════════════════════════════════════
-  # LAYER 3: OPERATIONAL — Observability
+  # LAYER 3: OPERATIONAL — Observability (OpenTelemetry → GCP)
   # ═══════════════════════════════════════════════════════════════════════════
   opentelemetry-sdk-node = "1.28.0";
   opentelemetry-auto-instrumentations-node = "0.52.0";
   opentelemetry-exporter-trace-otlp-http = "0.56.0";
+  google-cloud-opentelemetry-cloud-trace-exporter = "2.4.1";
   posthog-js = "1.301.0";
   posthog-node = "5.17.0";
 }
@@ -249,7 +271,9 @@ All versions are pinned. Updates require explicit version bump in this document.
     "@xstate/react": "6.0.0",
     "@xstate/store": "3.13.0",
     "drizzle-orm": "0.44.7",
-    "@libsql/client": "0.14.0",
+    "pg": "8.13.0",
+    "@google-cloud/pubsub": "4.9.0",
+    "ioredis": "5.4.1",
     "@temporalio/client": "1.13.2",
     "@temporalio/worker": "1.13.2",
     "@temporalio/workflow": "1.13.2",
@@ -261,7 +285,7 @@ All versions are pinned. Updates require explicit version bump in this document.
     "@tanstack/react-router": "1.140.0",
     "@opentelemetry/sdk-node": "1.28.0",
     "@opentelemetry/auto-instrumentations-node": "0.52.0",
-    "@opentelemetry/exporter-trace-otlp-http": "0.56.0",
+    "@google-cloud/opentelemetry-cloud-trace-exporter": "2.4.1",
     "posthog-node": "5.17.0"
   },
   "devDependencies": {
@@ -275,10 +299,26 @@ All versions are pinned. Updates require explicit version bump in this document.
     "@playwright/test": "1.57.0",
     "oxlint": "1.32.0",
     "tailwindcss": "4.0.0",
-    "posthog-js": "1.301.0"
+    "posthog-js": "1.301.0",
+    "@types/pg": "8.11.10"
   }
 }
 ```
+
+### 3.3 Google Cloud Services
+
+| Service | Purpose | Local Equivalent |
+|---------|---------|------------------|
+| **Cloud Run** | Container hosting (API, Workers) | Process Compose |
+| **Cloud SQL** | PostgreSQL 16 | Local PostgreSQL |
+| **Memorystore** | Redis 7.2 | Local Redis |
+| **Pub/Sub** | Event streaming | Local emulator |
+| **Secret Manager** | Production secrets | SOPS + Age |
+| **Cloud Build** | CI/CD pipelines | Local builds |
+| **Artifact Registry** | Container images | Local Docker |
+| **Cloud Trace** | Distributed tracing | Jaeger local |
+| **Cloud Logging** | Centralized logs | stdout |
+| **Cloud Monitoring** | Metrics & alerts | Local metrics |
 
 ---
 
@@ -307,7 +347,7 @@ All versions are pinned. Updates require explicit version bump in this document.
 - Replaces Docker Compose for development (faster startup)
 - Defines service dependencies declaratively
 - Provides log aggregation and health checks
-- Configuration mirrors production topology
+- Configuration mirrors production topology on Cloud Run
 
 **Usage:**
 ```bash
@@ -317,19 +357,57 @@ process-compose down      # Stop all services
 process-compose logs app  # View app logs
 ```
 
-### 4.3 SOPS + Age
+### 4.3 Secrets Management
 
-**Purpose:** Encrypted secrets stored in git, decrypted at runtime.
+**Local Development:** SOPS + Age
+- Secrets encrypted in git
+- Decrypted automatically via `.envrc`
 
-**Rationale:**
-- Secrets are version-controlled alongside code
-- Age provides modern, simple key management
-- SOPS supports partial encryption (encrypt values, not keys)
-- Works with Nix, GitHub Actions, and local development
+**Production:** Google Secret Manager
+- Secrets stored in GCP
+- Accessed via Workload Identity (no keys in code)
+- Mounted as environment variables in Cloud Run
 
-**Key Files:**
-- `.sops.yaml` — Encryption rules and key references
-- `secrets/` — Encrypted secret files
+```typescript
+// src/lib/secrets.ts
+import { SecretManagerServiceClient } from "@google-cloud/secret-manager";
+import { Effect, Layer, Context, Data } from "effect";
+
+class SecretsError extends Data.TaggedError("SecretsError")<{
+  readonly cause: unknown;
+}> {}
+
+interface SecretsService {
+  readonly get: (name: string) => Effect.Effect<string, SecretsError>;
+}
+
+class Secrets extends Context.Tag("Secrets")<Secrets, SecretsService>() {}
+
+// Production: Secret Manager
+const SecretManagerLive = Layer.sync(Secrets, () => {
+  const client = new SecretManagerServiceClient();
+  const projectId = process.env.GCP_PROJECT_ID!;
+  
+  return {
+    get: (name) => Effect.tryPromise({
+      try: async () => {
+        const [version] = await client.accessSecretVersion({
+          name: `projects/${projectId}/secrets/${name}/versions/latest`,
+        });
+        return version.payload?.data?.toString() ?? "";
+      },
+      catch: (e) => new SecretsError({ cause: e }),
+    }),
+  };
+});
+
+// Local: Environment variables (from SOPS)
+const EnvSecretsLive = Layer.succeed(Secrets, {
+  get: (name) => Effect.sync(() => process.env[name] ?? ""),
+});
+
+export { Secrets, SecretManagerLive, EnvSecretsLive };
+```
 
 ---
 
@@ -346,7 +424,7 @@ process-compose logs app  # View app logs
 - Wide ecosystem compatibility
 
 **When to Use:**
-- Production deployments
+- Production deployments on Cloud Run
 - Temporal Workers (required)
 - When Bun compatibility issues arise
 
@@ -357,7 +435,7 @@ process-compose logs app  # View app logs
 **Rationale:**
 - 30x faster package installs than npm
 - Built-in bundler, test runner, TypeScript support
-- Native SQLite, Redis clients
+- Native PostgreSQL, Redis clients
 - Hot reloading in development
 
 **When to Use:**
@@ -480,12 +558,6 @@ const program = getUser("123").pipe(
 Effect.runPromise(program);
 ```
 
-**When to Use:**
-- All backend business logic
-- Service definitions and dependency injection
-- Error handling for expected failures
-- Concurrent operations with resource management
-
 ### 6.2 XState 5.24.0
 
 **Purpose:** Finite state machines for frontend state management.
@@ -591,16 +663,6 @@ function UserProfile({ userId }: { userId: string }) {
 }
 ```
 
-**When to Use:**
-- All UI state that has distinct modes (loading, success, error, etc.)
-- Multi-step flows (wizards, onboarding, checkout)
-- Complex interactions with multiple states
-- Any state that would otherwise use multiple `useState` + `useEffect`
-
-**When NOT to Use:**
-- Simple boolean toggles
-- Form field values (use native form state or simple store)
-
 ### 6.3 tRPC 11.7.2
 
 **Purpose:** End-to-end type-safe RPC between client and server.
@@ -632,7 +694,6 @@ export const userRouter = router({
     .input(z.object({ id: z.string().uuid() }))
     .output(UserSchema)
     .query(async ({ input }) => {
-      // Effect-TS integration
       const program = getUser(input.id).pipe(
         Effect.provide(DrizzleUserRepo),
         Effect.catchTag("UserNotFoundError", () =>
@@ -661,34 +722,13 @@ app.use("/trpc/*", trpcServer({ router: appRouter }));
 export default app;
 ```
 
-**Client Setup:**
-
-```typescript
-// src/client/trpc.ts
-import { createTRPCClient, httpBatchLink } from "@trpc/client";
-import type { AppRouter } from "../server/routers";
-
-export const trpc = createTRPCClient<AppRouter>({
-  links: [
-    httpBatchLink({
-      url: "/trpc",
-    }),
-  ],
-});
-
-// Usage in XState actor
-const fetchUser = fromPromise(async ({ input }: { input: { userId: string } }) => {
-  return trpc.user.getById.query({ id: input.userId });
-});
-```
-
 ### 6.4 Hono 4.10.7
 
 **Purpose:** Ultrafast, Web Standards-based HTTP framework.
 
 **Rationale:**
 - Zero dependencies, ~12kb minified
-- Runs everywhere: Cloudflare Workers, Bun, Node.js, Deno
+- Runs everywhere: Cloud Run, Bun, Node.js, Deno
 - Web Standards (Request/Response)
 - Built-in middleware ecosystem
 
@@ -708,17 +748,18 @@ const app = new Hono();
 app.use("*", logger());
 app.use("*", cors());
 
-// Health check
+// Health check (required for Cloud Run)
 app.get("/health", (c) => c.json({ status: "ok" }));
 
 // tRPC
 app.use("/trpc/*", trpcServer({ router: appRouter }));
 
 // Start server
-serve({ fetch: app.fetch, port: 8080 });
+const port = parseInt(process.env.PORT ?? "8080");
+serve({ fetch: app.fetch, port });
 ```
 
-### 6.5 Temporal 1.13.2
+### 6.5 Temporal 1.13.2 (Temporal Cloud)
 
 **Purpose:** Durable execution for long-running workflows.
 
@@ -727,6 +768,36 @@ serve({ fetch: app.fetch, port: 8080 });
 - **Event Sourcing:** Complete audit trail of all executions
 - **Time Travel:** Replay any historical execution exactly
 - **Saga Pattern:** Automatic compensation for failed distributed transactions
+
+**Why Temporal Cloud (not GCP Workflows):**
+- Deterministic replay (GCP Workflows lacks this)
+- Signals and queries for workflow interaction
+- Local activities for low-latency operations
+- TypeScript SDK with full type safety
+
+**Connection Setup:**
+
+```typescript
+// src/temporal/client.ts
+import { Client, Connection } from "@temporalio/client";
+
+export async function createTemporalClient() {
+  const connection = await Connection.connect({
+    address: process.env.TEMPORAL_ADDRESS!, // e.g., "namespace.tmprl.cloud:7233"
+    tls: {
+      clientCertPair: {
+        crt: Buffer.from(process.env.TEMPORAL_TLS_CERT!, "base64"),
+        key: Buffer.from(process.env.TEMPORAL_TLS_KEY!, "base64"),
+      },
+    },
+  });
+
+  return new Client({
+    connection,
+    namespace: process.env.TEMPORAL_NAMESPACE!,
+  });
+}
+```
 
 **Workflow Example:**
 
@@ -749,41 +820,23 @@ export async function phoneAuthWorkflow(phoneNumber: string): Promise<{ success:
     enteredCode = code;
   });
 
-  // Send verification code
   const { code: expectedCode } = await sendVerificationCode(phoneNumber);
 
-  // Wait for user to enter code (with timeout)
   const deadline = Date.now() + 5 * 60 * 1000; // 5 minutes
   while (!enteredCode && Date.now() < deadline) {
     await sleep("5s");
   }
 
   if (!enteredCode) {
-    return { success: false }; // Timeout
+    return { success: false };
   }
 
-  // Verify code
   const isValid = await verifyCode(phoneNumber, enteredCode, expectedCode);
   return { success: isValid };
 }
-
-// src/temporal/activities/phone-auth.ts
-import { Effect } from "effect";
-import { TwilioService } from "../../services/twilio";
-
-export async function sendVerificationCode(phoneNumber: string) {
-  const program = Effect.gen(function* () {
-    const twilio = yield* TwilioService;
-    const code = Math.random().toString().slice(2, 8);
-    yield* twilio.sendSms(phoneNumber, `Your code: ${code}`);
-    return { code };
-  }).pipe(Effect.provide(TwilioLive));
-
-  return Effect.runPromise(program);
-}
 ```
 
-**Worker Setup:**
+**Worker Setup (runs on Cloud Run):**
 
 ```typescript
 // src/temporal/worker.ts
@@ -791,11 +844,19 @@ import { Worker, NativeConnection } from "@temporalio/worker";
 import * as activities from "./activities/phone-auth";
 
 async function run() {
-  const connection = await NativeConnection.connect({ address: "localhost:7233" });
+  const connection = await NativeConnection.connect({
+    address: process.env.TEMPORAL_ADDRESS!,
+    tls: {
+      clientCertPair: {
+        crt: Buffer.from(process.env.TEMPORAL_TLS_CERT!, "base64"),
+        key: Buffer.from(process.env.TEMPORAL_TLS_KEY!, "base64"),
+      },
+    },
+  });
 
   const worker = await Worker.create({
     connection,
-    namespace: "default",
+    namespace: process.env.TEMPORAL_NAMESPACE!,
     taskQueue: "phone-auth",
     workflowsPath: require.resolve("./workflows/phone-auth"),
     activities,
@@ -807,59 +868,161 @@ async function run() {
 run().catch(console.error);
 ```
 
-### 6.6 Drizzle ORM 0.44.7
+### 6.6 Drizzle ORM 0.44.7 + Cloud SQL PostgreSQL
 
-**Purpose:** Type-safe SQL query builder and ORM.
+**Purpose:** Type-safe SQL query builder with managed PostgreSQL.
 
 **Rationale:**
 - SQL-first: write SQL, get types
 - Zero runtime overhead
-- Works with SQLite, PostgreSQL, MySQL
-- Migrations with `drizzle-kit`
+- Cloud SQL provides managed PostgreSQL with automatic backups
+- Private VPC connection from Cloud Run
 
 **Schema Definition:**
 
 ```typescript
 // src/db/schema.ts
-import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
-import { createId } from "@paralleldrive/cuid2";
+import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
-export const users = sqliteTable("users", {
-  id: text("id").primaryKey().$defaultFn(() => createId()),
+export const users = pgTable("users", {
+  id: uuid("id").primaryKey().defaultRandom(),
   email: text("email").notNull().unique(),
   name: text("name"),
-  createdAt: integer("created_at", { mode: "timestamp" })
+  createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
-    .$defaultFn(() => new Date()),
+    .defaultNow(),
 });
 
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 ```
 
-**Integration with Effect-TS:**
+**Database Connection:**
 
 ```typescript
-// src/services/database.ts
-import { Effect, Context, Layer } from "effect";
-import { drizzle } from "drizzle-orm/libsql";
-import { createClient } from "@libsql/client";
-import * as schema from "../db/schema";
+// src/db/index.ts
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
+import * as schema from "./schema";
 
-interface DatabaseService {
-  readonly db: ReturnType<typeof drizzle>;
-}
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
 
-class Database extends Context.Tag("Database")<Database, DatabaseService>() {}
-
-const DatabaseLive = Layer.sync(Database, () => ({
-  db: drizzle(createClient({ url: process.env.DATABASE_URL! }), { schema }),
-}));
-
-export { Database, DatabaseLive };
+export const db = drizzle(pool, { schema });
 ```
 
-### 6.7 Zod 4.1.13
+### 6.7 Google Cloud Pub/Sub
+
+**Purpose:** Event streaming and async messaging.
+
+**Rationale:**
+- Fully managed, scales automatically
+- At-least-once delivery with acknowledgment
+- Dead letter queues for failed messages
+- Integrates with Cloud Run via push subscriptions
+
+**Publisher:**
+
+```typescript
+// src/services/events.ts
+import { PubSub } from "@google-cloud/pubsub";
+import { Effect, Context, Layer, Data } from "effect";
+import { z } from "zod";
+
+const pubsub = new PubSub();
+
+export const UserCreatedSchema = z.object({
+  type: z.literal("user.created"),
+  data: z.object({
+    userId: z.string().uuid(),
+    email: z.string().email(),
+    createdAt: z.string().datetime(),
+  }),
+});
+
+export type UserCreatedEvent = z.infer<typeof UserCreatedSchema>;
+
+interface EventPublisher {
+  readonly publish: <T>(topic: string, event: T) => Effect.Effect<string, PublishError>;
+}
+
+class Events extends Context.Tag("Events")<Events, EventPublisher>() {}
+
+class PublishError extends Data.TaggedError("PublishError")<{
+  readonly cause: unknown;
+}> {}
+
+const PubSubEventsLive = Layer.succeed(Events, {
+  publish: (topic, event) => Effect.tryPromise({
+    try: async () => {
+      const messageId = await pubsub
+        .topic(topic)
+        .publishMessage({ json: event });
+      return messageId;
+    },
+    catch: (e) => new PublishError({ cause: e }),
+  }),
+});
+
+export { Events, PubSubEventsLive };
+```
+
+### 6.8 Memorystore (Redis)
+
+**Purpose:** Caching and rate limiting.
+
+**Rationale:**
+- Fully managed Redis 7.2
+- Private VPC connection from Cloud Run
+- Automatic failover and persistence
+
+**Connection:**
+
+```typescript
+// src/services/cache.ts
+import Redis from "ioredis";
+import { Effect, Context, Layer, Data } from "effect";
+
+const redis = new Redis(process.env.REDIS_URL!);
+
+interface CacheService {
+  readonly get: (key: string) => Effect.Effect<string | null, CacheError>;
+  readonly set: (key: string, value: string, ttlSeconds?: number) => Effect.Effect<void, CacheError>;
+  readonly del: (key: string) => Effect.Effect<void, CacheError>;
+}
+
+class Cache extends Context.Tag("Cache")<Cache, CacheService>() {}
+
+class CacheError extends Data.TaggedError("CacheError")<{
+  readonly cause: unknown;
+}> {}
+
+const RedisLive = Layer.succeed(Cache, {
+  get: (key) => Effect.tryPromise({
+    try: () => redis.get(key),
+    catch: (e) => new CacheError({ cause: e }),
+  }),
+  set: (key, value, ttl) => Effect.tryPromise({
+    try: async () => {
+      if (ttl) {
+        await redis.setex(key, ttl, value);
+      } else {
+        await redis.set(key, value);
+      }
+    },
+    catch: (e) => new CacheError({ cause: e }),
+  }),
+  del: (key) => Effect.tryPromise({
+    try: async () => { await redis.del(key); },
+    catch: (e) => new CacheError({ cause: e }),
+  }),
+});
+
+export { Cache, RedisLive };
+```
+
+### 6.9 Zod 4.1.13
 
 **Purpose:** Runtime validation with static type inference.
 
@@ -891,7 +1054,7 @@ export const CreateUserSchema = UserSchema.omit({ id: true, createdAt: true });
 export type CreateUser = z.infer<typeof CreateUserSchema>;
 ```
 
-### 6.8 React 19.2.1 + TanStack Router 1.140.0
+### 6.10 React 19.2.1 + TanStack Router 1.140.0
 
 **Purpose:** UI rendering and type-safe routing.
 
@@ -907,12 +1070,6 @@ export type CreateUser = z.infer<typeof CreateUserSchema>;
 ### 7.1 Vitest 4.0.15
 
 **Purpose:** Fast, Vite-native unit and integration testing.
-
-**Rationale:**
-- Native ESM support
-- Compatible with Jest API
-- Browser Mode for component testing (stable in v4)
-- Built-in visual regression testing
 
 **Configuration:**
 
@@ -940,12 +1097,6 @@ export default defineConfig({
 ### 7.2 Playwright 1.57.0
 
 **Purpose:** End-to-end browser testing.
-
-**Rationale:**
-- Cross-browser: Chromium, Firefox, WebKit
-- Auto-wait and retry for reliable tests
-- Trace viewer for debugging
-- Chrome for Testing builds (as of 1.57)
 
 **Configuration:**
 
@@ -981,16 +1132,9 @@ export default defineConfig({
 
 **Purpose:** Rust-based linter, 50-100x faster than ESLint.
 
-**Rationale:**
-- Blazing fast (Rust-based)
-- 600+ rules
-- Drop-in ESLint replacement
-- No configuration needed for defaults
-
 **Configuration:**
 
 ```json
-// oxlint.config.json
 {
   "rules": {
     "no-unused-vars": "error",
@@ -1003,15 +1147,9 @@ export default defineConfig({
 }
 ```
 
-### 7.4 OpenTelemetry 1.28.0
+### 7.4 OpenTelemetry → Google Cloud Observability
 
-**Purpose:** Vendor-neutral observability (traces, metrics, logs).
-
-**Rationale:**
-- Standard protocol, works with any backend
-- Auto-instrumentation for common libraries
-- Effect-TS integration via `Effect.withSpan()`
-- Export to Datadog, Jaeger, or any OTLP collector
+**Purpose:** Vendor-neutral observability exported to GCP.
 
 **Setup:**
 
@@ -1019,7 +1157,7 @@ export default defineConfig({
 // src/lib/telemetry.ts
 import { NodeSDK } from "@opentelemetry/sdk-node";
 import { getNodeAutoInstrumentations } from "@opentelemetry/auto-instrumentations-node";
-import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
+import { TraceExporter } from "@google-cloud/opentelemetry-cloud-trace-exporter";
 import { Resource } from "@opentelemetry/resources";
 import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from "@opentelemetry/semantic-conventions";
 
@@ -1028,8 +1166,8 @@ const sdk = new NodeSDK({
     [ATTR_SERVICE_NAME]: "ember-api",
     [ATTR_SERVICE_VERSION]: process.env.npm_package_version ?? "0.0.0",
   }),
-  traceExporter: new OTLPTraceExporter({
-    url: process.env.OTEL_EXPORTER_OTLP_ENDPOINT ?? "http://localhost:4318/v1/traces",
+  traceExporter: new TraceExporter({
+    projectId: process.env.GCP_PROJECT_ID,
   }),
   instrumentations: [getNodeAutoInstrumentations()],
 });
@@ -1041,15 +1179,30 @@ process.on("SIGTERM", () => {
 });
 ```
 
+**Structured Logging (Cloud Logging):**
+
+```typescript
+// src/lib/logger.ts
+import { Effect } from "effect";
+
+interface LogEntry {
+  severity: "DEBUG" | "INFO" | "WARNING" | "ERROR";
+  message: string;
+  [key: string]: unknown;
+}
+
+export const log = (entry: LogEntry) => Effect.sync(() => {
+  console.log(JSON.stringify({
+    ...entry,
+    timestamp: new Date().toISOString(),
+    "logging.googleapis.com/trace": process.env.TRACE_ID,
+  }));
+});
+```
+
 ### 7.5 PostHog 1.301.0
 
 **Purpose:** Product analytics, A/B testing, feature flags.
-
-**Rationale:**
-- Open-source, self-hostable
-- Session recording
-- Feature flags with gradual rollout
-- Funnel analysis
 
 **Setup:**
 
@@ -1120,8 +1273,8 @@ export async function isFeatureEnabled(
 │                         │ │                         │ │                         │
 │  - Hono HTTP routes     │ │  - DrizzleUserRepo      │ │  - TwilioNotification   │
 │  - tRPC procedures      │ │    (Layer)              │ │    (Layer)              │
-│  - Temporal workflows   │ │  - StripePayment        │ │  - SendGridEmail        │
-│                         │ │    (Layer)              │ │    (Layer)              │
+│  - Temporal workflows   │ │  - StripePayment        │ │  - PubSubEvents         │
+│  - Pub/Sub handlers     │ │    (Layer)              │ │    (Layer)              │
 └─────────────────────────┘ └─────────────────────────┘ └─────────────────────────┘
 ```
 
@@ -1130,109 +1283,25 @@ export async function isFeatureEnabled(
 ```
 src/
 ├── domain/                    # Domain layer (pure)
-│   ├── entities/              # Domain entities
-│   │   └── user.ts
-│   ├── values/                # Value objects + branded types
-│   │   └── user-id.ts
-│   ├── errors/                # Domain errors (Data.TaggedError)
-│   │   └── user-errors.ts
-│   └── events/                # Domain events
-│       └── user-events.ts
-│
+│   ├── entities/
+│   ├── values/
+│   ├── errors/
+│   └── events/
 ├── ports/                     # Port interfaces (Context.Tag)
-│   ├── user-repository.ts
-│   ├── notification-service.ts
-│   └── payment-gateway.ts
-│
 ├── services/                  # Use cases / application services
-│   ├── user-service.ts
-│   └── order-service.ts
-│
 ├── adapters/                  # Adapter implementations (Layers)
 │   ├── inbound/
-│   │   ├── http/              # Hono routes
-│   │   │   └── user-routes.ts
-│   │   ├── trpc/              # tRPC routers
-│   │   │   └── user-router.ts
-│   │   └── temporal/          # Temporal workflows
-│   │       └── phone-auth.ts
+│   │   ├── http/
+│   │   ├── trpc/
+│   │   ├── temporal/
+│   │   └── pubsub/
 │   └── outbound/
-│       ├── drizzle-user-repo.ts
-│       ├── twilio-notification.ts
-│       └── stripe-payment.ts
-│
 ├── schemas/                   # Zod schemas (source of truth)
-│   ├── user.ts
-│   └── order.ts
-│
 ├── db/                        # Database
-│   ├── schema.ts              # Drizzle schema
+│   ├── schema.ts
 │   └── migrations/
-│
 ├── lib/                       # Infrastructure
-│   ├── telemetry.ts           # OpenTelemetry setup
-│   └── posthog.ts             # Analytics
-│
 └── index.ts                   # Application entry point
-```
-
-### 8.3 State Machine Pattern for UI
-
-Every UI flow with distinct states MUST use XState:
-
-```typescript
-// Pattern: Fetch Machine
-const fetchMachine = createMachine({
-  id: "fetch",
-  initial: "idle",
-  context: { data: null, error: null },
-  states: {
-    idle: { on: { FETCH: "loading" } },
-    loading: {
-      invoke: {
-        src: "fetchData",
-        onDone: { target: "success", actions: "setData" },
-        onError: { target: "failure", actions: "setError" },
-      },
-    },
-    success: { on: { REFRESH: "loading" } },
-    failure: { on: { RETRY: "loading" } },
-  },
-});
-
-// Pattern: Multi-step Flow
-const wizardMachine = createMachine({
-  id: "wizard",
-  initial: "step1",
-  context: { step1Data: null, step2Data: null },
-  states: {
-    step1: {
-      on: {
-        NEXT: { target: "step2", actions: "saveStep1" },
-      },
-    },
-    step2: {
-      on: {
-        BACK: "step1",
-        NEXT: { target: "step3", actions: "saveStep2" },
-      },
-    },
-    step3: {
-      on: {
-        BACK: "step2",
-        SUBMIT: "submitting",
-      },
-    },
-    submitting: {
-      invoke: {
-        src: "submitWizard",
-        onDone: "complete",
-        onError: "step3",
-      },
-    },
-    complete: { type: "final" },
-  },
-});
 ```
 
 ---
@@ -1243,35 +1312,36 @@ const wizardMachine = createMachine({
 project-root/
 ├── .github/
 │   └── workflows/
-│       └── ci.yml              # GitHub Actions CI/CD
-│
+│       └── deploy.yml
 ├── config/
-│   └── claude-code/            # AI assistant configuration
-│       ├── CLAUDE.md
-│       └── skills/
-│
-├── e2e/                        # Playwright E2E tests
-│   └── auth.spec.ts
-│
-├── src/                        # Application source (see 8.2)
-│
-├── temporal/                   # Temporal workflows (separate for Worker)
+│   └── claude-code/
+├── e2e/
+├── infra/
+│   ├── terraform/
+│   │   ├── main.tf
+│   │   ├── cloud-run.tf
+│   │   ├── cloud-sql.tf
+│   │   ├── memorystore.tf
+│   │   ├── pubsub.tf
+│   │   └── secrets.tf
+│   └── cloudbuild.yaml
+├── src/
+├── temporal/
 │   ├── workflows/
 │   ├── activities/
 │   └── worker.ts
-│
-├── .envrc                      # Direnv: `use flake`
-├── .sops.yaml                  # SOPS encryption config
-├── flake.nix                   # Nix flake
-├── flake.lock                  # Pinned Nix dependencies
-├── process-compose.yaml        # Local service orchestration
-├── fly.toml                    # Fly.io deployment config
-├── package.json                # npm dependencies
-├── tsconfig.json               # TypeScript config
-├── vitest.config.ts            # Vitest config
-├── playwright.config.ts        # Playwright config
-├── oxlint.config.json          # OXC linter config
-└── drizzle.config.ts           # Drizzle ORM config
+├── .envrc
+├── .sops.yaml
+├── flake.nix
+├── flake.lock
+├── process-compose.yaml
+├── Dockerfile
+├── package.json
+├── tsconfig.json
+├── vitest.config.ts
+├── playwright.config.ts
+├── oxlint.config.json
+└── drizzle.config.ts
 ```
 
 ---
@@ -1299,8 +1369,31 @@ processes:
     depends_on:
       db:
         condition: process_healthy
+      redis:
+        condition: process_healthy
       temporal:
         condition: process_healthy
+
+  db:
+    command: |
+      docker run --rm -p 5432:5432 \
+        -e POSTGRES_USER=postgres \
+        -e POSTGRES_PASSWORD=postgres \
+        -e POSTGRES_DB=ember \
+        postgres:16-alpine
+    readiness_probe:
+      exec:
+        command: "pg_isready -h localhost -p 5432"
+      initial_delay_seconds: 3
+      period_seconds: 5
+
+  redis:
+    command: docker run --rm -p 6379:6379 redis:7.2-alpine
+    readiness_probe:
+      exec:
+        command: "redis-cli ping"
+      initial_delay_seconds: 2
+      period_seconds: 5
 
   temporal:
     command: temporal server start-dev --db-filename /tmp/temporal.db
@@ -1320,25 +1413,20 @@ processes:
       app:
         condition: process_healthy
 
-  db:
-    command: turso dev --db-file /tmp/local.db
-    readiness_probe:
-      exec:
-        command: "turso db shell /tmp/local.db 'SELECT 1'"
-      initial_delay_seconds: 2
-      period_seconds: 5
-
-  otel-collector:
-    command: otelcol --config /etc/otel-collector-config.yaml
+  pubsub-emulator:
+    command: |
+      gcloud beta emulators pubsub start \
+        --project=ember-local \
+        --host-port=localhost:8085
     environment:
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318
+      - PUBSUB_EMULATOR_HOST=localhost:8085
 ```
 
 ### 10.2 flake.nix
 
 ```nix
 {
-  description = "Project development environment";
+  description = "Ember development environment";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
@@ -1353,68 +1441,104 @@ processes:
       {
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
-            # Runtime
-            nodejs_22  # Use 22 LTS for stability; 25 when available in nixpkgs
+            nodejs_22
             bun
-            
-            # Database
-            turso-cli
-            
-            # Temporal
+            postgresql_16
+            redis
             temporal-cli
-            
-            # Tools
+            google-cloud-sdk
             process-compose
             sops
             age
-            
-            # Observability
-            otel-collector
+            docker
           ];
 
           shellHook = ''
             export PATH="$PWD/node_modules/.bin:$PATH"
+            export PUBSUB_EMULATOR_HOST=localhost:8085
             echo "🚀 Development environment ready"
+            echo "Run: process-compose up"
           '';
         };
       });
 }
 ```
 
-### 10.3 tsconfig.json
+### 10.3 Dockerfile
 
-```json
-{
-  "compilerOptions": {
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "verbatimModuleSyntax": true,
-    "moduleResolution": "bundler",
-    "module": "ESNext",
-    "target": "ESNext",
-    "lib": ["ESNext"],
-    "skipLibCheck": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "outDir": "dist",
-    "rootDir": "src",
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"]
-    }
-  },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
-}
+```dockerfile
+FROM node:25-alpine AS builder
+WORKDIR /app
+COPY package.json bun.lockb ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+FROM node:25-alpine AS runner
+WORKDIR /app
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./
+ENV PORT=8080
+EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
+CMD ["node", "dist/index.js"]
 ```
 
-### 10.4 package.json scripts
+### 10.4 cloudbuild.yaml
+
+```yaml
+steps:
+  - name: "node:25-alpine"
+    entrypoint: "npm"
+    args: ["ci"]
+  
+  - name: "node:25-alpine"
+    entrypoint: "npm"
+    args: ["run", "validate"]
+
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - "build"
+      - "-t"
+      - "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/api:${SHORT_SHA}"
+      - "-t"
+      - "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/api:latest"
+      - "."
+
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - "push"
+      - "--all-tags"
+      - "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/api"
+
+  - name: "gcr.io/cloud-builders/gcloud"
+    args:
+      - "run"
+      - "deploy"
+      - "ember-api"
+      - "--image"
+      - "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/api:${SHORT_SHA}"
+      - "--region"
+      - "${_REGION}"
+      - "--platform"
+      - "managed"
+      - "--allow-unauthenticated"
+      - "--set-secrets"
+      - "DATABASE_URL=database-url:latest,TEMPORAL_TLS_CERT=temporal-cert:latest,TEMPORAL_TLS_KEY=temporal-key:latest"
+      - "--vpc-connector"
+      - "ember-vpc-connector"
+
+substitutions:
+  _REGION: us-east1
+  _REPO: ember
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+```
+
+### 10.5 package.json scripts
 
 ```json
 {
@@ -1446,52 +1570,26 @@ processes:
 ### 11.1 Daily Development
 
 ```bash
-# 1. Enter development environment
 cd project-root
-# nix-direnv auto-activates, or manually:
 nix develop
-
-# 2. Start all services
 process-compose up
-
-# 3. Run tests in watch mode (separate terminal)
+# Separate terminal:
 bun run test:watch
-
-# 4. View Temporal UI
-open http://localhost:8233
-
-# 5. View app
-open http://localhost:8080
 ```
 
 ### 11.2 Before Commit
 
 ```bash
-# Run full validation
 bun run validate
-
-# If all passes, commit with conventional format
 git add .
 git commit -m "feat(auth): add phone verification workflow"
 ```
 
-### 11.3 TDD Cycle
+### 11.3 Deployment
 
-1. **Red:** Write failing test that defines expected behavior
-2. **Green:** Write minimal code to make test pass
-3. **Refactor:** Improve code while keeping tests green
-4. **Verify:** Run `bun run validate`
-
-### 11.4 Adding a New Feature
-
-1. Define Zod schema in `src/schemas/`
-2. Create domain error if needed in `src/domain/errors/`
-3. Define port interface in `src/ports/`
-4. Implement use case in `src/services/`
-5. Create adapter in `src/adapters/`
-6. Add tRPC procedure in `src/adapters/inbound/trpc/`
-7. Create XState machine for UI flow
-8. Write tests at each layer
+```bash
+git push origin main  # Triggers Cloud Build
+```
 
 ---
 
@@ -1505,60 +1603,6 @@ git commit -m "feat(auth): add phone verification workflow"
 | Linting | `bun run lint` | Zero errors |
 | Unit Tests | `bun run test` | All pass |
 | E2E Tests | `bun run test:e2e` | All pass (CI only) |
-
-### 12.2 Every New File MUST
-
-- [ ] Have explicit types (no inferred `any`)
-- [ ] Export schemas before types
-- [ ] Use Result types for fallible functions (Effect-TS)
-- [ ] Have corresponding test file
-
-### 12.3 CI Pipeline
-
-```yaml
-# .github/workflows/ci.yml
-name: CI
-
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-
-jobs:
-  validate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: DeterminateSystems/nix-installer-action@main
-      - uses: DeterminateSystems/magic-nix-cache-action@main
-      - run: nix develop --command bun install
-      - run: nix develop --command bun run typecheck
-      - run: nix develop --command bun run lint
-      - run: nix develop --command bun run test
-
-  e2e:
-    runs-on: ubuntu-latest
-    needs: validate
-    steps:
-      - uses: actions/checkout@v4
-      - uses: DeterminateSystems/nix-installer-action@main
-      - uses: DeterminateSystems/magic-nix-cache-action@main
-      - run: nix develop --command bun install
-      - run: nix develop --command npx playwright install --with-deps
-      - run: nix develop --command bun run test:e2e
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: [validate, e2e]
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - uses: actions/checkout@v4
-      - uses: superfly/flyctl-actions/setup-flyctl@master
-      - run: flyctl deploy --remote-only
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-```
 
 ---
 
@@ -1576,98 +1620,28 @@ jobs:
 | Prisma | Drizzle ORM |
 | npm/yarn/pnpm | Bun |
 | Docker Compose (dev) | Process Compose |
-| Trigger.dev | Temporal |
-| Manual retries | Temporal automatic retries |
-| Inline SQL | Drizzle type-safe queries |
-| `null` | `undefined` |
-| Magic numbers | Named constants |
-| Commented-out code | Delete it |
-| `console.log` debugging | OpenTelemetry traces |
+| Multiple cloud vendors | Consolidate to GCP |
+| Self-managed databases | Cloud SQL |
+| Self-managed Redis | Memorystore |
+| Self-managed Kafka | Pub/Sub |
 
 ---
 
-## Appendix B: Quick Reference
+## Appendix B: Google Cloud Resource Summary
 
-### Effect-TS Cheatsheet
-
-```typescript
-// Create effects
-Effect.succeed(value)           // Success
-Effect.fail(error)              // Failure
-Effect.sync(() => value)        // Sync computation
-Effect.tryPromise({ try, catch }) // Promise with error handling
-Effect.gen(function* () { })    // Generator syntax
-
-// Compose effects
-Effect.map(effect, fn)          // Transform success
-Effect.flatMap(effect, fn)      // Chain effects
-Effect.catchTag("Tag", handler) // Handle specific error
-Effect.provide(layer)           // Inject dependencies
-Effect.withSpan("name")         // Add tracing
-
-// Run effects
-Effect.runSync(effect)          // Sync execution
-Effect.runPromise(effect)       // Async execution
-Effect.runPromiseExit(effect)   // Get Exit (success or failure)
-```
-
-### XState Cheatsheet
-
-```typescript
-// Create machine
-createMachine({ id, initial, context, states })
-
-// State definition
-{ on: { EVENT: "target" } }     // Simple transition
-{ on: { EVENT: { target, actions, guard } } } // Full transition
-{ invoke: { src, onDone, onError } } // Async invocation
-{ entry: [], exit: [] }         // Lifecycle actions
-
-// Actions
-assign({ key: value })          // Update context
-assign({ key: (ctx, event) => value }) // Dynamic update
-raise({ type: "EVENT" })        // Send event to self
-sendTo(actorRef, event)         // Send to another actor
-
-// React integration
-const [state, send] = useMachine(machine)
-state.matches("loading")        // Check current state
-state.context.data              // Access context
-send({ type: "FETCH" })         // Send event
-```
-
-### Temporal Cheatsheet
-
-```typescript
-// Workflow
-export async function myWorkflow(input: Input): Promise<Output> {
-  const result = await myActivity(input);
-  await sleep("1 hour");
-  return result;
-}
-
-// Activity
-export async function myActivity(input: Input): Promise<Output> {
-  // Side effects go here
-}
-
-// Signals
-export const mySignal = defineSignal<[string]>("mySignal");
-setHandler(mySignal, (value) => { /* handle */ });
-
-// Queries
-export const myQuery = defineQuery<string>("myQuery");
-setHandler(myQuery, () => currentState);
-
-// Client
-const handle = await client.workflow.start(myWorkflow, {
-  taskQueue: "my-queue",
-  workflowId: "unique-id",
-  args: [input],
-});
-await handle.signal(mySignal, "value");
-const result = await handle.result();
-```
+| Resource | Name | Purpose |
+|----------|------|---------|
+| **Cloud Run** | `ember-api` | API server |
+| **Cloud Run** | `ember-temporal-worker` | Temporal worker |
+| **Cloud SQL** | `ember-postgres` | PostgreSQL 16 |
+| **Memorystore** | `ember-redis` | Redis 7.2 cache |
+| **Pub/Sub Topic** | `user-events` | User domain events |
+| **Pub/Sub Topic** | `order-events` | Order domain events |
+| **Artifact Registry** | `ember` | Container images |
+| **Secret Manager** | `database-url` | DB connection string |
+| **Secret Manager** | `temporal-cert` | Temporal TLS cert |
+| **Secret Manager** | `temporal-key` | Temporal TLS key |
+| **VPC Connector** | `ember-vpc-connector` | Private network access |
 
 ---
 
