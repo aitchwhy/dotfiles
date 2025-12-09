@@ -37,6 +37,17 @@ const ALLOWED_KEY_VARS = [
 ] as const;
 
 // =============================================================================
+// TYPE GUARDS
+// =============================================================================
+
+/**
+ * Type guard for Record<string, unknown>
+ */
+function isRecord(obj: unknown): obj is Record<string, unknown> {
+  return typeof obj === 'object' && obj !== null;
+}
+
+// =============================================================================
 // HELPER FUNCTIONS
 // =============================================================================
 
@@ -238,12 +249,13 @@ export const effectPolicies = new PolicyPack('signet-effect', {
         for (const resource of args.resources) {
           if (!resource.type.startsWith('gcp:')) continue;
 
-          const props = resource.props as Record<string, unknown>;
-          const labels = (props['labels'] ?? props['userLabels']) as
-            | Record<string, string>
-            | undefined;
+          const props = resource.props;
+          if (!isRecord(props)) continue;
 
-          if (!labels?.['stack-version']) {
+          const labelsRaw = props['labels'] ?? props['userLabels'];
+          const labels = isRecord(labelsRaw) ? labelsRaw : undefined;
+
+          if (!labels || typeof labels['stack-version'] !== 'string') {
             // Only report for main resource types
             if (
               resource.type.includes('Service') ||

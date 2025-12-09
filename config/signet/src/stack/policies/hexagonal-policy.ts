@@ -26,6 +26,17 @@ const LABELED_RESOURCE_TYPES = [
 ] as const;
 
 // =============================================================================
+// TYPE GUARDS
+// =============================================================================
+
+/**
+ * Type guard for Record<string, unknown>
+ */
+function isRecord(obj: unknown): obj is Record<string, unknown> {
+  return typeof obj === 'object' && obj !== null;
+}
+
+// =============================================================================
 // POLICIES
 // =============================================================================
 
@@ -103,15 +114,16 @@ export const hexagonalPolicies = new PolicyPack('signet-hexagonal', {
           // Only check GCP resources
           if (!resource.type.startsWith('gcp:')) continue;
 
-          // Get labels from resource props
-          const props = resource.props as Record<string, unknown>;
-          const labels = (props['labels'] ?? props['userLabels']) as
-            | Record<string, string>
-            | undefined;
+          // Get labels from resource props with type guards
+          const props = resource.props;
+          if (!isRecord(props)) continue;
+
+          const labelsRaw = props['labels'] ?? props['userLabels'];
+          const labels = isRecord(labelsRaw) ? labelsRaw : undefined;
 
           // Check for required labels
           for (const requiredLabel of REQUIRED_LABELS) {
-            if (!labels || !labels[requiredLabel]) {
+            if (!labels || typeof labels[requiredLabel] !== 'string') {
               reportViolation(
                 `GCP resource "${resource.name}" (${resource.type}) ` +
                   `missing required label: "${requiredLabel}". ` +
@@ -131,14 +143,16 @@ export const hexagonalPolicies = new PolicyPack('signet-hexagonal', {
         for (const resource of args.resources) {
           if (!resource.type.startsWith('gcp:')) continue;
 
-          const props = resource.props as Record<string, unknown>;
-          const labels = (props['labels'] ?? props['userLabels']) as
-            | Record<string, string>
-            | undefined;
+          const props = resource.props;
+          if (!isRecord(props)) continue;
 
-          if (labels?.['managed-by'] && labels['managed-by'] !== 'signet') {
+          const labelsRaw = props['labels'] ?? props['userLabels'];
+          const labels = isRecord(labelsRaw) ? labelsRaw : undefined;
+
+          const managedBy = labels?.['managed-by'];
+          if (typeof managedBy === 'string' && managedBy !== 'signet') {
             reportViolation(
-              `Resource "${resource.name}" has managed-by="${labels['managed-by']}" ` +
+              `Resource "${resource.name}" has managed-by="${managedBy}" ` +
                 `but should be "signet" for consistency.`
             );
           }

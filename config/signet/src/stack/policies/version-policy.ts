@@ -29,6 +29,17 @@ const MIN_CLOUD_RUN_MEMORY_MB = 256;
 const MAX_CLOUD_RUN_MEMORY_MB = 8192;
 
 // =============================================================================
+// TYPE GUARDS
+// =============================================================================
+
+/**
+ * Type guard for Record<string, unknown>
+ */
+function isRecord(obj: unknown): obj is Record<string, unknown> {
+  return typeof obj === 'object' && obj !== null;
+}
+
+// =============================================================================
 // HELPER FUNCTIONS
 // =============================================================================
 
@@ -125,8 +136,9 @@ export const versionPolicies = new PolicyPack('signet-versions', {
         (service, _args, reportViolation) => {
           const containers = service.template?.containers ?? [];
           for (const container of containers) {
-            const limits = container.resources?.limits as Record<string, unknown> | undefined;
-            const memory = limits?.['memory'] as string | undefined;
+            const limits = container.resources?.limits;
+            if (!isRecord(limits)) continue;
+            const memory = typeof limits['memory'] === 'string' ? limits['memory'] : undefined;
             if (memory) {
               const memoryMb = parseMemoryToMb(memory);
               if (memoryMb < MIN_CLOUD_RUN_MEMORY_MB) {
