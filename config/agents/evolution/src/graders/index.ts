@@ -8,8 +8,6 @@ export * from './base';
 export { ConfigValidityGrader } from './config-validity';
 export { GitHygieneGrader } from './git-hygiene';
 export { NixHealthGrader } from './nix-health';
-export { PerformanceGrader } from './performance';
-export { SafetyGrader } from './safety';
 export * from './types';
 
 import { Err, Ok, type Result } from '../lib/result';
@@ -17,8 +15,6 @@ import type { BaseGrader } from './base';
 import { ConfigValidityGrader } from './config-validity';
 import { GitHygieneGrader } from './git-hygiene';
 import { NixHealthGrader } from './nix-health';
-import { PerformanceGrader } from './performance';
-import { SafetyGrader } from './safety';
 import { DEFAULT_GRADER_CONFIGS, type GraderConfig, type GraderOutput } from './types';
 
 // ============================================================================
@@ -33,10 +29,6 @@ export function createGrader(name: string, dotfilesPath?: string): BaseGrader | 
       return new ConfigValidityGrader(dotfilesPath);
     case 'git-hygiene':
       return new GitHygieneGrader(dotfilesPath);
-    case 'performance':
-      return new PerformanceGrader(dotfilesPath);
-    case 'safety':
-      return new SafetyGrader(dotfilesPath);
     default:
       return null;
   }
