@@ -128,44 +128,26 @@
     ]
   },
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run \"$HOME/dotfiles/config/claude-code/evolution/hooks/unified-guard.ts\"",
+            "timeout": 20
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
-        "matcher": "Write(*.ts)|Write(*.tsx)|Write(*.js)|Write(*.jsx)|Edit(*.ts)|Edit(*.tsx)|Edit(*.js)|Edit(*.jsx)",
+        "matcher": "Write|Edit|MultiEdit",
         "hooks": [
           {
             "type": "command",
-            "command": "bunx biome check --write \"$CLAUDE_FILE_PATHS\" 2>/dev/null || true",
-            "timeout": 15
-          }
-        ]
-      },
-      {
-        "matcher": "Write(*.py)|Edit(*.py)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "ruff format \"$CLAUDE_FILE_PATHS\" && ruff check --fix \"$CLAUDE_FILE_PATHS\" 2>/dev/null || true",
-            "timeout": 30
-          }
-        ]
-      },
-      {
-        "matcher": "Write(*.nix)|Edit(*.nix)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "alejandra --quiet \"$CLAUDE_FILE_PATHS\" 2>/dev/null || nixfmt \"$CLAUDE_FILE_PATHS\" 2>/dev/null || true",
-            "timeout": 15
-          }
-        ]
-      },
-      {
-        "matcher": "Write(*.json)|Edit(*.json)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bunx biome check --write \"$CLAUDE_FILE_PATHS\" 2>/dev/null || jq '.' \"$CLAUDE_FILE_PATHS\" > /tmp/jq_tmp && mv /tmp/jq_tmp \"$CLAUDE_FILE_PATHS\" 2>/dev/null || true",
-            "timeout": 15
+            "command": "bun run \"$HOME/dotfiles/config/claude-code/evolution/hooks/unified-polish.ts\"",
+            "timeout": 60
           }
         ]
       },
@@ -175,138 +157,6 @@
           {
             "type": "command",
             "command": "bun run \"$HOME/dotfiles/config/claude-code/evolution/hooks/enforce-versions.ts\"",
-            "timeout": 10
-          }
-        ]
-      },
-      {
-        "matcher": "Write(*.sh)|Write(*.bash)|Edit(*.sh)|Edit(*.bash)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "shfmt -w \"$CLAUDE_FILE_PATHS\" 2>/dev/null || true",
-            "timeout": 10
-          }
-        ]
-      },
-      {
-        "matcher": "Write(*.yaml)|Write(*.yml)|Write(*.toml)|Edit(*.yaml)|Edit(*.yml)|Edit(*.toml)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "npx prettier --write \"$CLAUDE_FILE_PATHS\" 2>/dev/null || true",
-            "timeout": 15
-          }
-        ]
-      },
-      {
-        "matcher": "Write(*.lua)|Edit(*.lua)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "stylua \"$CLAUDE_FILE_PATHS\" 2>/dev/null || true",
-            "timeout": 10
-          }
-        ]
-      },
-      {
-        "matcher": "Write(*.css)|Write(*.scss)|Edit(*.css)|Edit(*.scss)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "npx prettier --write \"$CLAUDE_FILE_PATHS\" 2>/dev/null || true",
-            "timeout": 15
-          }
-        ]
-      },
-      {
-        "matcher": "Write(*.sql)|Edit(*.sql)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "npx sql-formatter --fix \"$CLAUDE_FILE_PATHS\" 2>/dev/null || true",
-            "timeout": 10
-          }
-        ]
-      },
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"$HOME/dotfiles/config/claude-code/evolution/hooks/post-edit.sh\"",
-            "timeout": 10
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun run \"$HOME/dotfiles/config/claude-code/evolution/hooks/atomic-git-sentinel.ts\"",
-            "timeout": 30
-          }
-        ]
-      }
-    ],
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "if [[ \"$CLAUDE_TOOL_INPUT\" == *\"rm -rf /\"* ]] || [[ \"$CLAUDE_TOOL_INPUT\" == *\"rm -rf ~\"* ]]; then echo 'BLOCKED: Dangerous recursive delete' >&2; exit 1; fi",
-            "timeout": 5
-          }
-        ]
-      },
-      {
-        "matcher": "Bash(git commit:*)|Bash(git -C:*commit:*)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun run \"$HOME/dotfiles/config/claude-code/evolution/hooks/conventional-commit.ts\"",
-            "timeout": 10
-          }
-        ]
-      },
-      {
-        "matcher": "Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun run \"$HOME/dotfiles/config/claude-code/evolution/hooks/forbidden-files.ts\"",
-            "timeout": 5
-          }
-        ]
-      },
-      {
-        "matcher": "Write(*.ts)|Write(*.tsx)|Write(*.js)|Write(*.jsx)|Edit(*.ts)|Edit(*.tsx)|Edit(*.js)|Edit(*.jsx)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun run \"$HOME/dotfiles/config/claude-code/evolution/hooks/forbidden-imports.ts\"",
-            "timeout": 10
-          }
-        ]
-      },
-      {
-        "matcher": "Write(*.ts)|Write(*.tsx)|Edit(*.ts)|Edit(*.tsx)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun run \"$HOME/dotfiles/config/claude-code/evolution/hooks/any-type-detector.ts\"",
-            "timeout": 10
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun run \"$HOME/dotfiles/config/claude-code/evolution/hooks/tdd-enforcer.ts\"",
             "timeout": 10
           }
         ]
@@ -328,15 +178,6 @@
             "type": "command",
             "command": "bash \"$HOME/dotfiles/config/claude-code/evolution/hooks/session-start.sh\"",
             "timeout": 5
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun run \"$HOME/dotfiles/config/claude-code/evolution/hooks/version-enforcer.ts\"",
-            "timeout": 10
           }
         ]
       }
