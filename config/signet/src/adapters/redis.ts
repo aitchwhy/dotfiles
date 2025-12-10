@@ -4,23 +4,30 @@
  * Implements Cache and Queue ports using ioredis.
  * Provides caching and job queue functionality.
  */
-import { Effect, Layer } from 'effect'
-import { Cache, type CacheService, CacheError, type CacheOptions } from '@/ports/cache'
-import { Queue, type QueueService, QueueError, type Job, type JobOptions, type JobStatus } from '@/ports/queue'
+import { Effect, Layer } from 'effect';
+import { Cache, CacheError, type CacheOptions, type CacheService } from '@/ports/cache';
+import {
+  type Job,
+  type JobOptions,
+  type JobStatus,
+  Queue,
+  QueueError,
+  type QueueService,
+} from '@/ports/queue';
 
 // ============================================================================
 // CONFIG
 // ============================================================================
 
 export interface RedisCacheConfig {
-  readonly url: string
-  readonly keyPrefix?: string
-  readonly defaultTtl?: number
+  readonly url: string;
+  readonly keyPrefix?: string;
+  readonly defaultTtl?: number;
 }
 
 export interface RedisQueueConfig {
-  readonly url: string
-  readonly queuePrefix?: string
+  readonly url: string;
+  readonly queuePrefix?: string;
 }
 
 // ============================================================================
@@ -28,7 +35,7 @@ export interface RedisQueueConfig {
 // ============================================================================
 
 const makeCacheService = (config: RedisCacheConfig): CacheService => {
-  const prefix = config.keyPrefix ?? ''
+  const prefix = config.keyPrefix ?? '';
 
   return {
     get: <T>(key: string) =>
@@ -36,7 +43,7 @@ const makeCacheService = (config: RedisCacheConfig): CacheService => {
         try: async () => {
           // Redis GET with JSON parse
           // Placeholder - actual implementation would use ioredis
-          return null as T | null
+          return null as T | null;
         },
         catch: (error) =>
           new CacheError({
@@ -64,7 +71,7 @@ const makeCacheService = (config: RedisCacheConfig): CacheService => {
       Effect.tryPromise({
         try: async () => {
           // Redis DEL
-          return true
+          return true;
         },
         catch: (error) =>
           new CacheError({
@@ -78,7 +85,7 @@ const makeCacheService = (config: RedisCacheConfig): CacheService => {
       Effect.tryPromise({
         try: async () => {
           // Redis EXISTS
-          return false
+          return false;
         },
         catch: (error) =>
           new CacheError({
@@ -92,7 +99,7 @@ const makeCacheService = (config: RedisCacheConfig): CacheService => {
       Effect.tryPromise({
         try: async () => {
           // Redis MGET
-          return new Map<string, T>()
+          return new Map<string, T>();
         },
         catch: (error) =>
           new CacheError({
@@ -117,7 +124,7 @@ const makeCacheService = (config: RedisCacheConfig): CacheService => {
       Effect.tryPromise({
         try: async () => {
           // Redis DEL multiple
-          return keys.length
+          return keys.length;
         },
         catch: (error) =>
           new CacheError({
@@ -130,7 +137,7 @@ const makeCacheService = (config: RedisCacheConfig): CacheService => {
       Effect.tryPromise({
         try: async () => {
           // Redis SCAN + DEL for pattern
-          return 0
+          return 0;
         },
         catch: (error) =>
           new CacheError({
@@ -138,8 +145,8 @@ const makeCacheService = (config: RedisCacheConfig): CacheService => {
             message: error instanceof Error ? error.message : 'Unknown error',
           }),
       }),
-  }
-}
+  };
+};
 
 // ============================================================================
 // QUEUE ADAPTER IMPLEMENTATION
@@ -154,14 +161,14 @@ const makeQueueService = (_config: RedisQueueConfig): QueueService => {
     attempts: 0,
     maxAttempts: options?.attempts ?? 3,
     createdAt: new Date(),
-  })
+  });
 
   return {
     add: <T>(_queueName: string, jobName: string, data: T, options?: JobOptions) =>
       Effect.tryPromise({
         try: async () => {
-          const jobId = `job-${Date.now()}-${Math.random().toString(36).slice(2)}`
-          return createJob(jobId, jobName, data, options)
+          const jobId = `job-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+          return createJob(jobId, jobName, data, options);
         },
         catch: (error) =>
           new QueueError({
@@ -170,12 +177,13 @@ const makeQueueService = (_config: RedisQueueConfig): QueueService => {
           }),
       }),
 
-    addBulk: <T>(_queueName: string, jobs: readonly { name: string; data: T; options?: JobOptions }[]) =>
+    addBulk: <T>(
+      _queueName: string,
+      jobs: readonly { name: string; data: T; options?: JobOptions }[]
+    ) =>
       Effect.tryPromise({
         try: async () => {
-          return jobs.map((j, i) =>
-            createJob(`job-${Date.now()}-${i}`, j.name, j.data, j.options),
-          )
+          return jobs.map((j, i) => createJob(`job-${Date.now()}-${i}`, j.name, j.data, j.options));
         },
         catch: (error) =>
           new QueueError({
@@ -208,7 +216,7 @@ const makeQueueService = (_config: RedisQueueConfig): QueueService => {
     removeJob: (queueName: string, jobId: string) =>
       Effect.tryPromise({
         try: async () => {
-          void queueName // Placeholder - would use this in actual implementation
+          void queueName; // Placeholder - would use this in actual implementation
         },
         catch: (error) =>
           new QueueError({
@@ -237,15 +245,15 @@ const makeQueueService = (_config: RedisQueueConfig): QueueService => {
             message: error instanceof Error ? error.message : 'Unknown error',
           }),
       }),
-  }
-}
+  };
+};
 
 // ============================================================================
 // LAYER FACTORIES
 // ============================================================================
 
 export const makeRedisCacheLive = (config: RedisCacheConfig): Layer.Layer<Cache> =>
-  Layer.succeed(Cache, makeCacheService(config))
+  Layer.succeed(Cache, makeCacheService(config));
 
 export const makeRedisQueueLive = (config: RedisQueueConfig): Layer.Layer<Queue> =>
-  Layer.succeed(Queue, makeQueueService(config))
+  Layer.succeed(Queue, makeQueueService(config));

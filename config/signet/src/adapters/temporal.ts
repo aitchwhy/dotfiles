@@ -4,23 +4,23 @@
  * Implements the Workflow port using Temporal.io SDK.
  * Provides durable workflow execution with automatic retries.
  */
-import { Effect, Layer } from 'effect'
+import { Effect, Layer } from 'effect';
 import {
   Workflow,
-  type WorkflowService,
   WorkflowError,
   type WorkflowExecution,
   type WorkflowOptions,
-} from '@/ports/workflow'
+  type WorkflowService,
+} from '@/ports/workflow';
 
 // ============================================================================
 // CONFIG
 // ============================================================================
 
 export interface TemporalConfig {
-  readonly address: string
-  readonly namespace: string
-  readonly identity?: string
+  readonly address: string;
+  readonly namespace: string;
+  readonly identity?: string;
 }
 
 // ============================================================================
@@ -33,14 +33,14 @@ const makeWorkflowService = (_config: TemporalConfig): WorkflowService => ({
       try: async () => {
         // Temporal client workflow start logic
         // Placeholder - actual implementation would use @temporalio/client
-        const workflowId = options.workflowId ?? `${workflowType}-${Date.now()}`
+        const workflowId = options.workflowId ?? `${workflowType}-${Date.now()}`;
 
         return {
           workflowId,
           runId: `run-${Date.now()}`,
           status: 'running',
           startedAt: new Date(),
-        } as WorkflowExecution
+        } as WorkflowExecution;
       },
       catch: (error) =>
         new WorkflowError({
@@ -68,7 +68,7 @@ const makeWorkflowService = (_config: TemporalConfig): WorkflowService => ({
       try: async () => {
         // Query workflow state
         // Placeholder implementation
-        return {} as _T
+        return {} as _T;
       },
       catch: (error) =>
         new WorkflowError({
@@ -102,7 +102,7 @@ const makeWorkflowService = (_config: TemporalConfig): WorkflowService => ({
           runId: 'unknown',
           status: 'pending',
           startedAt: new Date(),
-        } as WorkflowExecution
+        } as WorkflowExecution;
       },
       catch: (error) =>
         new WorkflowError({
@@ -111,11 +111,11 @@ const makeWorkflowService = (_config: TemporalConfig): WorkflowService => ({
           workflowId,
         }),
     }),
-})
+});
 
 // ============================================================================
 // LAYER FACTORY
 // ============================================================================
 
 export const makeTemporalLive = (config: TemporalConfig): Layer.Layer<Workflow> =>
-  Layer.succeed(Workflow, makeWorkflowService(config))
+  Layer.succeed(Workflow, makeWorkflowService(config));
