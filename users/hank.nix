@@ -13,7 +13,7 @@
   home = {
     username = "hank";
     homeDirectory = "/Users/hank";
-    stateVersion = "24.11";
+    stateVersion = "26.05";
   };
 
   # Git configuration
@@ -49,14 +49,14 @@
     dive
 
     # Programming Languages & Tools
-    # Node.js - using latest LTS
-    nodejs_22
+    # Node.js - using latest current (not LTS)
+    nodejs
     nodePackages.pnpm
     yarn-berry
     bun
 
     # Python - using uv for fast package management
-    python312
+    python314
     uv
     ruff
     poetry
@@ -69,9 +69,8 @@
     # Rust - via rustup for toolchain management
     rustup
 
-    # Database Clients
-    postgresql_16
-    mysql84
+    # Database Clients (PostgreSQL 18+, SQLite/Turso - NO MySQL)
+    postgresql_18
     mongosh
     redis
     usql

@@ -1,7 +1,7 @@
 # Linux user configuration
 # This file adapts the macOS configuration for NixOS/Linux
 # Disables macOS-specific modules while keeping cross-platform tools
-{ pkgs, lib, ... }:
+{ pkgs, ... }:
 {
   # Import home modules
   imports = [ ../modules/home ];
@@ -10,7 +10,7 @@
   home = {
     username = "hank";
     homeDirectory = "/home/hank";
-    stateVersion = "24.11";
+    stateVersion = "26.05";
   };
 
   # Git configuration
@@ -63,13 +63,13 @@
     dive
 
     # Programming Languages & Tools
-    nodejs_22
+    nodejs
     nodePackages.pnpm
     yarn-berry
     bun
 
     # Python
-    python312
+    python314
     uv
     ruff
     poetry
@@ -82,9 +82,8 @@
     # Rust
     rustup
 
-    # Database Clients
-    postgresql_16
-    mysql84
+    # Database Clients (PostgreSQL 18+, SQLite/Turso - NO MySQL)
+    postgresql_18
     mongosh
     redis
     usql
