@@ -19,11 +19,6 @@ rev = "63f9650"
 hash = "30fc0b37f03a597b92d387268319450f"
 
 [[plugin.deps]]
-use = "yazi-rs/plugins:lsar"
-rev = "63f9650"
-hash = "24208b1d2144e2f91fd580c3f8e07326"
-
-[[plugin.deps]]
 use = "yazi-rs/plugins:mactag"
 rev = "63f9650"
 hash = "6e0cbddb97038ea95f04f9de0944c175"
@@ -122,11 +117,6 @@ hash = "b4040931f0d2f9670ddb4923e55cd881"
 use = "ficcdaf/ashen:ashen"
 rev = "514ed5a"
 hash = "a48aa4d7140c52cdd14552039b632800"
-
-[[flavor.deps]]
-use = "kmlupreti/ayu-dark"
-rev = "5f600aa"
-hash = "a05f94b9a20b64d814c7631074d65c4a"
 
 [[flavor.deps]]
 use = "BennyOe/tokyo-night"
