@@ -76,23 +76,10 @@
   # };
 
   # Firewall Rules
+  # NOTE: SSH access is via Tailscale only (no public SSH port)
+  # For initial nixos-anywhere deployment, temporarily add SSH rule via GCP Console
   resource.google_compute_firewall = {
-    # SSH access (for initial setup and emergencies)
-    allow-ssh = {
-      name = "allow-ssh";
-      network = "default";
-      description = "Allow SSH from anywhere";
-
-      allow = {
-        protocol = "tcp";
-        ports = [ "22" ];
-      };
-
-      source_ranges = [ "0.0.0.0/0" ];
-      target_tags = [ "ssh" ];
-    };
-
-    # Tailscale WireGuard (primary access method)
+    # Tailscale WireGuard (primary and only access method)
     allow-tailscale = {
       name = "allow-tailscale";
       network = "default";
@@ -170,7 +157,6 @@
     tags = [
       "nixos"
       "tailscale"
-      "ssh"
     ];
 
     # Labels for organization
