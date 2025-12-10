@@ -25,7 +25,7 @@ import { stackDefinitionSchema } from './schema';
 export const STACK = {
   meta: {
     frozen: '2025-12',
-    updated: '2025-12-09',
+    updated: '2025-12-10',
     ssotVersion: '3.0.0',
   },
 
@@ -84,17 +84,18 @@ export const STACK = {
   // PYTHON
   // ===========================================================================
   python: {
-    python: '3.13.1',
+    python: '3.14.0', // Minimum enforced - no 3.12/3.13
     pydantic: '2.10.0',
     ruff: '0.8.0',
   },
 
   // ===========================================================================
-  // DATABASE ADAPTERS
+  // DATABASE ADAPTERS (PostgreSQL 18+, SQLite/Turso 3.50+ - NO MySQL)
   // ===========================================================================
   databases: {
-    'libsql-client': '0.15.15', // Turso
-    postgres: '3.4.7',
+    'libsql-client': '0.15.15', // Turso (SQLite 3.50+)
+    postgres: '3.4.7', // pg driver for PostgreSQL 18+
+    // MySQL BANNED - use PostgreSQL or Turso instead
   },
 
   // ===========================================================================
@@ -117,13 +118,17 @@ export const STACK = {
   },
 
   // ===========================================================================
-  // NIX ECOSYSTEM (December 2025)
+  // NIX ECOSYSTEM (December 2025 - BLEEDING EDGE)
   // ===========================================================================
   nix: {
-    // Core flake inputs
+    // Core flake inputs - BLEEDING EDGE
     nixpkgs: 'nixos-unstable',
     'nix-darwin': 'github:LnL7/nix-darwin',
-    'home-manager': 'github:nix-community/home-manager',
+    'home-manager': 'github:nix-community/home-manager', // master for 26.05
+
+    // State versions - December 2025 bleeding edge
+    'home-manager-stateVersion': '26.05',
+    'nixos-stateVersion': '26.05',
 
     // Flake architecture (December 2025 standard)
     'flake-parts': 'github:hercules-ci/flake-parts',
