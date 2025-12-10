@@ -36,14 +36,13 @@ const pythonMinVersion = z
   .regex(versionPattern, 'Must be valid semver')
   .refine(
     (v) => {
-      const [major, minor] = v.split('.').map(Number);
+      const parts = v.split('.').map(Number);
+      const major = parts[0] ?? 0;
+      const minor = parts[1] ?? 0;
       return major > 3 || (major === 3 && minor >= 14);
     },
     'Python must be 3.14.0 or higher (no 3.12/3.13)'
   );
-
-/** PostgreSQL driver - validates semver format */
-const postgresDriverVersion = versionString;
 
 // =============================================================================
 // TYPESCRIPT TYPES (Source of Truth)

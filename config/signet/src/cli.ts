@@ -43,6 +43,7 @@ import {
   type PatternMatch,
 } from '@/layers/patterns'
 import { ProjectName, type ProjectSpec } from '@/schema/project-spec'
+import { createConfig, startDaemon, runReconcile } from '@/daemon'
 import { readdir } from 'node:fs/promises'
 import { join } from 'node:path'
 
@@ -667,6 +668,75 @@ export const verifyCommand = Command.make(
 )
 
 // =============================================================================
+// Daemon Command - Infrastructure Reconciliation Loop
+// =============================================================================
+
+const intervalOption = Options.text('interval').pipe(
+  Options.withDescription('Reconciliation interval (e.g., "30s", "1m", "5m")'),
+  Options.withDefault('30s')
+)
+const stackOption = Options.text('stack').pipe(
+  Options.withDescription('Pulumi stack name'),
+  Options.withDefault('dev')
+)
+const projectOption = Options.text('project').pipe(
+  Options.withDescription('Pulumi project name'),
+  Options.withDefault('signet')
+)
+const autoApplyOption = Options.boolean('auto-apply').pipe(
+  Options.withDescription('Automatically apply changes (dangerous!)'),
+  Options.withDefault(false)
+)
+const onceOption = Options.boolean('once').pipe(
+  Options.withDescription('Run once and exit (no loop)'),
+  Options.withDefault(false)
+)
+
+export const daemonCommand = Command.make(
+  'daemon',
+  {
+    path: pathArg,
+    interval: intervalOption,
+    stack: stackOption,
+    project: projectOption,
+    dryRun: dryRunOption,
+    autoApply: autoApplyOption,
+    once: onceOption,
+    verbose: verboseOption,
+  },
+  ({ path, interval, stack, project, dryRun, autoApply, once, verbose }) =>
+    Effect.gen(function* () {
+      const projectPath = Option.getOrElse(path, () => '.')
+
+      if (verbose) {
+        process.env['SIGNET_VERBOSE'] = 'true'
+      }
+
+      const config = createConfig({
+        interval,
+        stack,
+        project,
+        path: projectPath,
+        autoApply,
+        dryRun,
+      })
+
+      if (once) {
+        yield* Console.log('\n🔄 Running single reconciliation...\n')
+        const result = yield* runReconcile(config)
+        yield* Console.log(`\n✅ Reconciliation complete`)
+        yield* Console.log(`   Duration: ${result.durationMs}ms`)
+        yield* Console.log(`   Changes: +${result.preview.creates} ~${result.preview.updates} -${result.preview.deletes}`)
+        yield* Console.log(`   Applied: ${result.applied}`)
+      } else {
+        yield* Console.log('\n🔄 Starting infrastructure daemon...')
+        yield* Console.log('   Press Ctrl+C to stop\n')
+        yield* startDaemon(config)
+      }
+    })
+)
+
+// =============================================================================
 // Main Command
 // =============================================================================
 
@@ -684,6 +754,7 @@ Commands:
   signet validate [path]      Validate project against spec and patterns
   signet enforce [--fix]      Run architecture enforcers
   signet reconcile [path]     Detect and fix code drift via AST analysis
+  signet daemon [path]        🔄 Infrastructure reconciliation loop
   signet doctor               Check system health and dependencies
   signet comply [path]        Auto-fix architecture drift (reconcile --fix)
 
@@ -711,6 +782,14 @@ Reconcile Options:
   --verbose               Show detailed output
   --rules <dir>           Custom YAML rules directory (default: rules/)
 
+Daemon Options (Infrastructure):
+  --interval <time>       Reconciliation interval (default: 30s)
+  --stack <name>          Pulumi stack name (default: dev)
+  --project <name>        Pulumi project name (default: signet)
+  --auto-apply            Automatically apply changes (dangerous!)
+  --once                  Run once and exit (no loop)
+  --dry-run               Preview only, don't apply
+
 Examples:
   signet verify                             Run all 5 tiers
   signet verify --tiers execution           Run only execution tier
@@ -722,6 +801,8 @@ Examples:
   signet validate
   signet enforce --fix
   signet reconcile --dry-run --verbose
+  signet daemon ./infra/pulumi             Start infra daemon
+  signet daemon --once --stack prod         Single reconcile on prod
   signet doctor
   signet comply --verbose
 `)
@@ -732,6 +813,7 @@ Examples:
     validateCommand,
     enforceCommand,
     reconcileCommand,
+    daemonCommand,
     doctorCommand,
     complyCommand,
     verifyCommand,
