@@ -17,6 +17,7 @@ in
     ./services/sshd.nix
     ./services/tailscale.nix
     ./services/docker.nix
+    ./services/gcp-observability.nix
   ];
 
   config = {
