@@ -27,6 +27,25 @@ const flakeUrl = z.string().regex(flakeUrlPattern, 'Must be valid flake URL');
 const nixBranch = z.string().min(1);
 
 // =============================================================================
+// MINIMUM VERSION ENFORCEMENT (December 2025 Policy)
+// =============================================================================
+
+/** Python must be 3.14.0 or higher */
+const pythonMinVersion = z
+  .string()
+  .regex(versionPattern, 'Must be valid semver')
+  .refine(
+    (v) => {
+      const [major, minor] = v.split('.').map(Number);
+      return major > 3 || (major === 3 && minor >= 14);
+    },
+    'Python must be 3.14.0 or higher (no 3.12/3.13)'
+  );
+
+/** PostgreSQL driver - validates semver format */
+const postgresDriverVersion = versionString;
+
+// =============================================================================
 // TYPESCRIPT TYPES (Source of Truth)
 // =============================================================================
 
@@ -125,6 +144,10 @@ export type NixVersions = {
   readonly nixpkgs: string;
   readonly 'nix-darwin': string;
   readonly 'home-manager': string;
+
+  // State versions - December 2025 bleeding edge
+  readonly 'home-manager-stateVersion': string;
+  readonly 'nixos-stateVersion': string;
 
   // Flake architecture (December 2025 standard)
   readonly 'flake-parts': string;
@@ -295,7 +318,7 @@ export const testingVersionsSchema = z.object({
 }) satisfies z.ZodType<TestingVersions>;
 
 export const pythonVersionsSchema = z.object({
-  python: versionString,
+  python: pythonMinVersion, // Enforced minimum: 3.14.0+
   pydantic: versionString,
   ruff: versionString,
 }) satisfies z.ZodType<PythonVersions>;
@@ -324,11 +347,18 @@ export const stackMetaSchema = z.object({
   ssotVersion: versionString,
 }) satisfies z.ZodType<StackMeta>;
 
+/** State version string (e.g., "26.05") */
+const stateVersionString = z.string().regex(/^\d{2}\.\d{2}$/, 'Must be YY.MM format');
+
 export const nixVersionsSchema = z.object({
   // Core flake inputs
   nixpkgs: nixBranch,
   'nix-darwin': flakeUrl,
   'home-manager': flakeUrl,
+
+  // State versions - December 2025 bleeding edge
+  'home-manager-stateVersion': stateVersionString,
+  'nixos-stateVersion': stateVersionString,
 
   // Flake architecture
   'flake-parts': flakeUrl,
