@@ -50,7 +50,7 @@ in
     logs = {
       enable = mkOption {
         type = types.bool;
-        default = true;
+        default = false; # Disabled: requires Loki or GCP Ops Agent setup
         description = "Enable log shipping via Promtail";
       };
 
@@ -219,8 +219,12 @@ in
         # This config is for local aggregation
         clients = [
           {
-            # TODO: Configure GCP Cloud Logging endpoint
-            # For now, just log locally
+            # FIXME: Promtail cannot directly push to GCP Cloud Logging.
+            # Options to fix:
+            # 1. Install Google Cloud Ops Agent (recommended): https://cloud.google.com/logging/docs/agent/ops-agent
+            # 2. Run Loki locally and export to GCP: https://grafana.com/docs/loki/latest/
+            # 3. Use Vector instead of Promtail with GCP sink: https://vector.dev/
+            # For now, logs.enable defaults to false
             url = "http://localhost:3100/loki/api/v1/push";
           }
         ];
