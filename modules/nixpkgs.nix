@@ -1,5 +1,4 @@
 {
-  config,
   lib,
   pkgs,
   ...
@@ -26,9 +25,8 @@
       trusted-users = [ "@wheel" ] ++ (lib.optionals pkgs.stdenv.isDarwin [ "@admin" ]);
 
       # Binary caches - expanded for better coverage
-      # Personal cache first for fastest hits on own builds
+      # To add personal cache: cachix create hank-dotfiles && cachix use hank-dotfiles
       substituters = [
-        "https://hank-dotfiles.cachix.org" # Personal cache (push enabled)
         "https://cache.nixos.org"
         "https://nix-community.cachix.org"
         "https://devenv.cachix.org"
@@ -41,8 +39,7 @@
       ];
 
       trusted-public-keys = [
-        # TODO: Replace with your actual Cachix public key after running: cachix create hank-dotfiles
-        "hank-dotfiles.cachix.org-1:REPLACE_WITH_YOUR_PUBLIC_KEY"
+        # Personal cache: add key here after running `cachix create hank-dotfiles`
         "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
         "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
         "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
