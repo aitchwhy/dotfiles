@@ -31,6 +31,17 @@ const DEPRECATED_PACKAGES = new Set([
   'request', // Use fetch or undici
   'moment', // Use date-fns or dayjs
   'lodash', // Use native methods or es-toolkit
+  // MySQL BANNED - use PostgreSQL or Turso
+  'mysql',
+  'mysql2',
+  // Outdated Nix packages (December 2025 policy)
+  'mysql84', // MySQL banned
+  'python312', // Use python314
+  'python313', // Use python314
+  'postgresql_14', // Use postgresql_18
+  'postgresql_15', // Use postgresql_18
+  'postgresql_16', // Use postgresql_18
+  'postgresql_17', // Use postgresql_18
 ])
 
 const PREFER_BIOME_OVER = new Set([
@@ -198,6 +209,21 @@ function getDeprecatedSuggestion(pkg: string): string {
       return 'Use date-fns or dayjs'
     case 'lodash':
       return 'Use native methods or es-toolkit'
+    // MySQL BANNED
+    case 'mysql':
+    case 'mysql2':
+    case 'mysql84':
+      return 'MySQL is BANNED. Use postgres (pg driver) or @libsql/client (Turso)'
+    // Python policy: 3.14+ only
+    case 'python312':
+    case 'python313':
+      return 'Use python314 (Python 3.14+). Older versions are not allowed.'
+    // PostgreSQL policy: 18+ only
+    case 'postgresql_14':
+    case 'postgresql_15':
+    case 'postgresql_16':
+    case 'postgresql_17':
+      return 'Use postgresql_18. PostgreSQL 18+ is required.'
     default:
       return 'Check npm for alternatives'
   }
