@@ -52,6 +52,12 @@
       url = "github:terranix/terranix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # Deployment automation
+    colmena = {
+      url = "github:zhaofengli/colmena";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -63,6 +69,8 @@
         ./flake/nixos.nix
         ./flake/devshells.nix
         ./flake/checks.nix
+        ./flake/deploy.nix
+        ./flake/vm-tests.nix
       ];
 
       systems = [
