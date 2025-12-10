@@ -4,8 +4,6 @@
 #
 # Docs: https://nixos.org/manual/nixos/stable/#sec-nixos-tests
 {
-  self,
-  inputs,
   lib,
   ...
 }:
@@ -20,7 +18,7 @@
           name = "cloud-boot-test";
 
           nodes.cloud =
-            { config, pkgs, ... }:
+            { ... }:
             {
               # Import minimal cloud configuration for testing
               # Note: Can't import full config due to secrets/hardware deps
@@ -38,7 +36,7 @@
               };
 
               # Minimal config for testing
-              system.stateVersion = "24.11";
+              system.stateVersion = "26.05";
 
               # Mock user for testing
               users.users.hank = {
@@ -77,7 +75,7 @@
           name = "security-hardening-test";
 
           nodes.secure =
-            { config, pkgs, ... }:
+            { ... }:
             {
               imports = [
                 ../modules/nixos/security.nix
@@ -88,7 +86,7 @@
                 cores = 1;
               };
 
-              system.stateVersion = "24.11";
+              system.stateVersion = "26.05";
             };
 
           testScript = ''
@@ -114,7 +112,7 @@
           name = "service-dependencies-test";
 
           nodes.services =
-            { config, pkgs, ... }:
+            { ... }:
             {
               imports = [
                 ../modules/nixos/system.nix
@@ -125,7 +123,7 @@
                 cores = 1;
               };
 
-              system.stateVersion = "24.11";
+              system.stateVersion = "26.05";
 
               # Enable networking for dependency tests
               networking.useDHCP = true;

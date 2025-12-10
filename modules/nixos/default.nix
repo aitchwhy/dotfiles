@@ -1,7 +1,6 @@
 # NixOS module aggregator
 # Provides system configuration for cloud/remote Linux hosts
 {
-  config,
   lib,
   pkgs,
   ...
@@ -22,7 +21,7 @@ in
 
   config = {
     # System identification
-    system.stateVersion = mkDefault "24.11";
+    system.stateVersion = mkDefault "26.05";
 
     # Enable Nix flakes
     nix.settings = {

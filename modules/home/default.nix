@@ -1,6 +1,5 @@
 # Home Manager module aggregator
 {
-  config,
   lib,
   ...
 }:
@@ -55,7 +54,7 @@ in
 
   config = {
     programs.home-manager.enable = true;
-    home.stateVersion = mkDefault "25.05";
+    home.stateVersion = mkDefault "26.05"; # Bleeding edge
 
     # Disable manual generation to avoid builtins.toFile warning
     # See: https://github.com/nix-community/home-manager/issues/7935

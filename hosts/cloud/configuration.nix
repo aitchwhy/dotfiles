@@ -3,9 +3,7 @@
 # Project: cloud-infra-480717
 {
   config,
-  lib,
   pkgs,
-  inputs,
   ...
 }:
 {
@@ -70,5 +68,5 @@
   ];
 
   # System state version
-  system.stateVersion = "24.11";
+  system.stateVersion = "26.05";
 }
