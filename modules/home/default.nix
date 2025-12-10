@@ -18,7 +18,6 @@ in
     # Tools
     ./tools/git.nix
     ./tools/git-hooks.nix
-    ./tools/tmux.nix
     ./tools/development.nix
     ./tools/atuin.nix
     ./tools/direnv.nix
@@ -73,7 +72,6 @@ in
       tools = {
         git.enable = mkDefault true;
         git-hooks.enable = mkDefault true;
-        tmux.enable = mkDefault true;
         development.enable = mkDefault true;
         atuin.enable = mkDefault true;
         direnv.enable = mkDefault true;
