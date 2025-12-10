@@ -1,5 +1,6 @@
 # Cloud development server configuration
-# Target: Vultr/Hetzner/DigitalOcean VPS in US East
+# Target: Google Compute Engine e2-standard-4 (us-central1-a)
+# Project: cloud-infra-480717
 {
   config,
   lib,
@@ -30,7 +31,20 @@
         group = "users";
         mode = "0400";
       };
+      # GCP service account key for Cloud Monitoring/Logging
+      gcp-service-account-key = {
+        owner = "root";
+        group = "root";
+        mode = "0400";
+      };
     };
+  };
+
+  # GCP Cloud Monitoring and Logging
+  modules.nixos.services.gcp-observability = {
+    enable = true;
+    projectId = "cloud-infra-480717";
+    credentialsFile = config.sops.secrets.gcp-service-account-key.path;
   };
 
   # Tailscale configuration
