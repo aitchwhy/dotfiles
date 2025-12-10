@@ -14,7 +14,6 @@
 
   outputs =
     {
-      self,
       nixpkgs,
       devenv,
       ...
@@ -41,7 +40,6 @@
               (
                 {
                   pkgs,
-                  config,
                   ...
                 }:
                 {
@@ -52,7 +50,7 @@
                   packages = with pkgs; [
                     # Core runtime
                     bun
-                    nodejs_22
+                    nodejs # Latest current (not LTS)
 
                     # TypeScript tooling
                     typescript
