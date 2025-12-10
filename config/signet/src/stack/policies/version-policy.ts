@@ -15,12 +15,11 @@ import { STACK } from '../versions';
 // POLICY CONFIGURATION
 // =============================================================================
 
-/** Approved PostgreSQL versions */
-const APPROVED_POSTGRES_VERSIONS = [
-  'POSTGRES_14',
-  'POSTGRES_15',
-  'POSTGRES_16',
-] as const;
+/** Approved PostgreSQL versions - December 2025 policy: 18+ only */
+const APPROVED_POSTGRES_VERSIONS = ['POSTGRES_18'] as const;
+
+/** Banned database prefixes - MySQL is not allowed */
+const BANNED_DATABASE_PREFIXES = ['MYSQL'] as const;
 
 /** Minimum Cloud Run memory in MB */
 const MIN_CLOUD_RUN_MEMORY_MB = 256;
@@ -67,23 +66,43 @@ function parseMemoryToMb(memory: string): number {
 export const versionPolicies = new PolicyPack('signet-versions', {
   policies: [
     // =========================================================================
-    // DATABASE POLICIES
+    // DATABASE POLICIES (December 2025: PostgreSQL 18+ only, NO MySQL)
     // =========================================================================
     {
-      name: 'enforce-postgres-version',
-      description: `Cloud SQL must use approved PostgreSQL version: ${APPROVED_POSTGRES_VERSIONS.join(', ')}`,
+      name: 'ban-mysql-database',
+      description: 'MySQL is not approved. Use PostgreSQL 18+ or Turso (SQLite) instead.',
       enforcementLevel: 'mandatory',
       validateResource: validateResourceOfType(
         gcp.sql.DatabaseInstance,
         (instance, _args, reportViolation) => {
           const version = instance.databaseVersion;
-          // Widen array type for string comparison (avoids 'as any')
-          const approvedVersions: readonly string[] = APPROVED_POSTGRES_VERSIONS;
-          if (!approvedVersions.includes(version)) {
+          const bannedPrefixes: readonly string[] = BANNED_DATABASE_PREFIXES;
+          if (version && bannedPrefixes.some((p) => version.startsWith(p))) {
             reportViolation(
-              `PostgreSQL version "${version}" is not approved. ` +
-                `Use one of: ${APPROVED_POSTGRES_VERSIONS.join(', ')}`
+              `MySQL is BANNED. Use PostgreSQL 18+ or Turso (SQLite) instead. Got: ${version}`
             );
+          }
+        }
+      ),
+    },
+
+    {
+      name: 'enforce-postgres-version',
+      description: `Cloud SQL must use PostgreSQL 18+: ${APPROVED_POSTGRES_VERSIONS.join(', ')}`,
+      enforcementLevel: 'mandatory',
+      validateResource: validateResourceOfType(
+        gcp.sql.DatabaseInstance,
+        (instance, _args, reportViolation) => {
+          const version = instance.databaseVersion;
+          // Only check if it's a Postgres instance
+          if (version && version.startsWith('POSTGRES_')) {
+            const approvedVersions: readonly string[] = APPROVED_POSTGRES_VERSIONS;
+            if (!approvedVersions.includes(version)) {
+              reportViolation(
+                `PostgreSQL version "${version}" is not approved. ` +
+                  `Must use PostgreSQL 18+: ${APPROVED_POSTGRES_VERSIONS.join(', ')}`
+              );
+            }
           }
         }
       ),
