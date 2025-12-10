@@ -38,7 +38,9 @@
     kubernetes-helm
     k9s
     terraform
+    opentofu # Modern Terraform alternative
     terragrunt
+    terranix # Nix -> Terraform JSON
     pulumi
 
     # Container Tools
