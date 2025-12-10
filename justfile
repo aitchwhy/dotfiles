@@ -182,6 +182,71 @@ cloud-status:
         echo '=== Tailscale ===' && tailscale status || true"
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# COLMENA (Parallel NixOS Deployment)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Deploy cloud with Colmena (requires Tailscale connection)
+cloud-colmena:
+    nix run nixpkgs#colmena -- apply --on {{cloud_host}} --evaluator streaming
+
+# Evaluate Colmena config (dry-run, no deployment)
+cloud-colmena-eval:
+    nix run nixpkgs#colmena -- eval
+
+# Deploy all hosts with Colmena
+cloud-colmena-all:
+    nix run nixpkgs#colmena -- apply --evaluator streaming
+
+# Show Colmena deployment plan
+cloud-colmena-plan:
+    nix run nixpkgs#colmena -- build --on {{cloud_host}}
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# NIXBUILD.NET (Remote Builds)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Test nixbuild.net connectivity
+nixbuild-test:
+    @echo "Testing nixbuild.net connection..."
+    @ssh eu.nixbuild.net shell -- echo "Connected to nixbuild.net!"
+
+# Build Darwin config via nixbuild.net remote store
+nixbuild-darwin:
+    @echo "Building Darwin config via nixbuild.net..."
+    nix build .#darwinConfigurations.{{host}}.system \
+        --store ssh-ng://eu.nixbuild.net \
+        --eval-store auto \
+        --builders "" \
+        --no-link
+
+# Build NixOS config via nixbuild.net remote store
+nixbuild-nixos:
+    @echo "Building NixOS config via nixbuild.net..."
+    nix build .#nixosConfigurations.{{cloud_host}}.config.system.build.toplevel \
+        --store ssh-ng://eu.nixbuild.net \
+        --eval-store auto \
+        --builders "" \
+        --no-link
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# CACHIX (Binary Cache)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Push Darwin build to Cachix
+cache-push-darwin:
+    @echo "Building and pushing Darwin to Cachix..."
+    nix build .#darwinConfigurations.{{host}}.system -o darwin-result
+    cachix push hank-dotfiles darwin-result
+    rm darwin-result
+
+# Push NixOS build to Cachix
+cache-push-nixos:
+    @echo "Building and pushing NixOS to Cachix..."
+    nix build .#nixosConfigurations.{{cloud_host}}.config.system.build.toplevel -o nixos-result
+    cachix push hank-dotfiles nixos-result
+    rm nixos-result
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # SELF-EVOLUTION
 # ═══════════════════════════════════════════════════════════════════════════════
 
