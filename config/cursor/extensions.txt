@@ -1,94 +1,54 @@
-# Cursor IDE Extensions Reference
-# Install manually: cursor --install-extension <extension-id>
-# This file is tracked for reference, not auto-deployed
-
-# ============================================
-# Essential / Core
-# ============================================
-vscodevim.vim
-editorconfig.editorconfig
-vscode-icons-team.vscode-icons
-patbenatar.advanced-new-file
-
-# ============================================
-# Git & Version Control
-# ============================================
-eamodio.gitlens
-chaitanyashahare.lazygit
-github.vscode-pull-request-github
-
-# ============================================
-# JavaScript / TypeScript
-# ============================================
-esbenp.prettier-vscode
-bradlc.vscode-tailwindcss
-christian-kohler.npm-intellisense
-ms-vscode.vscode-typescript-next
-yoavbls.pretty-ts-errors
-pmneo.tsimporter
-stringham.move-ts
-biomejs.biome
-
-# ============================================
-# Python
-# ============================================
-ms-python.python
-ms-python.vscode-pylance
-ms-python.debugpy
-charliermarsh.ruff
-
-# ============================================
-# Go
-# ============================================
-golang.go
-
-# ============================================
-# Nix
-# ============================================
-bbenoist.nix
-jnoortheen.nix-ide
-arrterian.nix-env-selector
-mkhl.direnv
-pinage404.nix-extension-pack
-
-# ============================================
-# Lua
-# ============================================
-sumneko.lua
-yinfei.luahelper
-
-# ============================================
-# Other Languages
-# ============================================
-ms-vscode.cpptools
-zxh404.vscode-proto3
-nixon.env-cmd-file-syntax
-skellock.just
-
-# ============================================
-# Remote / Docker
-# ============================================
-ms-vscode-remote.remote-containers
-ms-vscode-remote.remote-ssh
-ms-azuretools.vscode-docker
-
-# ============================================
-# Utilities
-# ============================================
-alefragnani.project-manager
-oderwat.indent-rainbow
-richie5um2.vscode-sort-json
-bierner.markdown-mermaid
-george-alisson.html-preview-vscode
-ritwickdey.liveserver
-jithurjacob.nbpreviewer
+# Cursor IDE Extensions (Installed)
+# Generated from: cursor --list-extensions
+# To install: cursor --install-extension <extension-id>
 
 # ============================================
 # AI / Assistants
 # ============================================
-lastmile-ai.vscode-aiconfig
+anthropic.claude-code
+sourcegraph.amp
 
 # ============================================
-# API Testing
+# Code Formatting & Linting
 # ============================================
-postman.postman-for-vscode
+biomejs.biome
+editorconfig.editorconfig
+
+# ============================================
+# Git & Version Control
+# ============================================
+chaitanyashahare.lazygit
+
+# ============================================
+# Python
+# ============================================
+anysphere.cursorpyright
+charliermarsh.ruff
+ms-python.debugpy
+ms-python.python
+
+# ============================================
+# JavaScript / TypeScript
+# ============================================
+dbaeumer.vscode-eslint
+
+# ============================================
+# Nix
+# ============================================
+mkhl.direnv
+
+# ============================================
+# DevOps / CI
+# ============================================
+github.vscode-github-actions
+mikestead.dotenv
+
+# ============================================
+# Database / ORM
+# ============================================
+rphlmr.vscode-drizzle-orm
+
+# ============================================
+# Editor Navigation
+# ============================================
+vscodevim.vim
