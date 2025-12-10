@@ -103,12 +103,32 @@ return Effect.fail(new UserNotFoundError({ id }));
 | "should fix the bug" | "VERIFIED: [test_file]:[test_name]" |
 | "this fixes" | "UNVERIFIED: requires [test_name]" |
 
+## 5-Tier Quality System
+
+This system achieves >85% first-attempt correctness through layered verification.
+
+| Tier | Component | Purpose |
+|------|-----------|---------|
+| 1 | Pattern Knowledge | refactoring-catalog, distributed-systems-patterns, code-smells |
+| 2 | Formal Verification | formal-verification skill, contracts, property-based tests |
+| 3 | Execution Feedback | test-during-generation hook, iterative-repair |
+| 4 | Multi-Agent Review | critic, synthesizer agents, /debate command |
+| 5 | Codebase Context | semantic-codebase skill, ast-grep integration |
+
+### Mandatory Workflow
+
+1. **Before writing**: Check relevant pattern skills
+2. **During writing**: Hooks verify types and tests
+3. **After writing**: Run `/debate` for multi-agent review
+4. **Before commit**: Run `just verify-all` - all 5 tiers must pass
+
 ## Commands
 
 | Command | Purpose |
 |---------|---------|
 | `/tdd` | Test-driven development |
 | `/validate` | typecheck + lint + test |
+| `/debate` | Multi-agent code review |
 | `/commit` | Conventional commit |
 | `/pr` | Pull request creation |
 | `/fix` | Bug fixing |
@@ -116,24 +136,46 @@ return Effect.fail(new UserNotFoundError({ id }));
 
 ## Skills
 
+### Core Patterns
 | Skill | Purpose |
 |-------|---------|
 | `typescript-patterns` | Branded types, Result types, parse don't validate |
 | `zod-patterns` | TypeScript-first Zod (never use z.infer), Zod v4 features |
 | `effect-ts-patterns` | Effect<A,E,R>, Layers, Services, typed errors |
+| `result-patterns` | Error handling |
+
+### Quality System (5-Tier)
+| Skill | Purpose |
+|-------|---------|
+| `refactoring-catalog` | Fowler's 61 refactoring patterns |
+| `distributed-systems-patterns` | Consensus, replication, versioning |
+| `code-smells` | Clean Code heuristics as detection rules |
+| `formal-verification` | Contracts, preconditions, property-based testing |
+| `semantic-codebase` | Codebase navigation and context building |
+| `verification-first` | Test evidence over assumption |
+| `clean-code` | Code quality, Biome enforcement |
+
+### Architecture
+| Skill | Purpose |
+|-------|---------|
 | `signet-patterns` | Hexagonal architecture, Effect Schema |
 | `signet-generator-patterns` | Extend Signet with new generators |
-| `result-patterns` | Error handling |
 | `tdd-patterns` | Red-Green-Refactor |
+
+### Infrastructure
+| Skill | Purpose |
+|-------|---------|
 | `nix-darwin-patterns` | Nix flakes + home-manager |
 | `nix-flake-parts` | Modular flakes with flake-parts |
 | `terranix-patterns` | Nix → Terraform → OpenTofu |
+
+### Web/API
+| Skill | Purpose |
+|-------|---------|
 | `typespec-patterns` | API-first, OpenAPI codegen |
 | `hono-workers` | Cloudflare Workers APIs |
 | `tanstack-patterns` | Router + Query |
 | `ember-patterns` | Ember platform |
-| `verification-first` | Test evidence |
-| `clean-code` | Code quality, Biome enforcement |
 
 ## Pattern Quick Reference
 
