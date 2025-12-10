@@ -5,11 +5,13 @@ on:
     paths:
       - 'config/signet/**'
       - 'lib/versions.nix'
+      - '.github/workflows/signet.yml'
   push:
     branches: [main]
     paths:
       - 'config/signet/**'
       - 'lib/versions.nix'
+      - '.github/workflows/signet.yml'
 
 jobs:
   validate:
