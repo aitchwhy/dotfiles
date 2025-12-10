@@ -26,6 +26,7 @@ in
     ./tools/htop.nix
     ./tools/yazi.nix
     ./tools/zellij.nix
+    ./tools/nixbuild.nix
 
     # Editors
     ./editors/neovim.nix
@@ -80,6 +81,7 @@ in
         htop.enable = mkDefault true;
         yazi.enable = mkDefault true;
         zellij.enable = mkDefault true;
+        nixbuild.enable = mkDefault false; # Requires SSH key setup
       };
 
       editors = {
