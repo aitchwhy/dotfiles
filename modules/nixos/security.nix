@@ -1,9 +1,7 @@
 # NixOS security configuration
 # Firewall, fail2ban, and system hardening
 {
-  config,
   lib,
-  pkgs,
   ...
 }:
 let

@@ -26,9 +26,7 @@
     };
 
     # Default configuration applied to all hosts
-    defaults =
-      { pkgs, ... }:
-      {
+    defaults = {
         # Common settings for all deployed hosts
         deployment = {
           buildOnTarget = false; # Build locally or via nixbuild.net
@@ -37,14 +35,7 @@
       };
 
     # Cloud VM (Google Compute Engine)
-    cloud =
-      {
-        name,
-        nodes,
-        pkgs,
-        ...
-      }:
-      {
+    cloud = {
         deployment = {
           # Tailscale hostname - requires VPN connection
           targetHost = "cloud";

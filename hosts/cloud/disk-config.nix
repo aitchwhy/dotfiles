@@ -1,7 +1,6 @@
 # Disko disk configuration for cloud VMs
 # Supports both BIOS and UEFI boot
 {
-  config,
   lib,
   ...
 }:

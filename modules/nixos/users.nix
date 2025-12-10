@@ -1,7 +1,6 @@
 # NixOS user configuration
 # User accounts and groups
 {
-  config,
   lib,
   pkgs,
   ...
