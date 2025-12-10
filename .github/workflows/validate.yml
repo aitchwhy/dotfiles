@@ -8,8 +8,8 @@ on:
 
 jobs:
   nix-check:
-    name: Nix Flake Check
-    runs-on: macos-14
+    name: Nix Flake Check (nixbuild.net)
+    runs-on: ubuntu-24.04-arm # Free arm64 for public repos
 
     steps:
       - name: Checkout
@@ -24,8 +24,19 @@ jobs:
       - name: Setup Nix Cache
         uses: DeterminateSystems/magic-nix-cache-action@main
 
-      - name: Check Flake
-        run: nix flake check --no-build
+      - name: Setup nixbuild.net
+        uses: nixbuild/nixbuild-action@v21
+        with:
+          nixbuild_token: ${{ secrets.NIXBUILD_TOKEN }}
+
+      # Remote store mode: evaluate locally, build on nixbuild.net
+      # This provides 60x speedup over local builds
+      - name: Check Flake (Remote Build)
+        run: |
+          nix flake check \
+            --store ssh-ng://eu.nixbuild.net \
+            --eval-store auto \
+            --builders ""
 
   evolution-check:
     name: Evolution TypeScript
