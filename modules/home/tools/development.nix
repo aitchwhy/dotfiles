@@ -25,14 +25,8 @@ in
   };
 
   config = mkIf config.modules.home.tools.development.enable {
-    # Note: direnv, fzf, and bat have dedicated modules in tools/
-    # This module provides yazi, zoxide, eza, nix-index and dev packages
-
-    # Modern file manager
-    programs.yazi = {
-      enable = true;
-      enableZshIntegration = true;
-    };
+    # Note: direnv, fzf, bat, yazi, and htop have dedicated modules in tools/
+    # This module provides zoxide, eza, nix-index and dev packages
 
     # Smart directory jumping (standard z/zi behavior)
     programs.zoxide = {
@@ -82,8 +76,7 @@ in
       jq # JSON processor
       yq # YAML processor
 
-      # System monitoring
-      htop
+      # System monitoring (htop has dedicated module with custom settings)
       btop
       ncdu
       tree
