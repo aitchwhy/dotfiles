@@ -1,82 +1,49 @@
 /**
- * Signet Stack - Infrastructure as Code
+ * Signet Stack - Version Registry
  *
- * Pulumi TypeScript components for GCP infrastructure.
- * This is the single source of truth for stack versions and
- * composable infrastructure components.
+ * Single source of truth for all version numbers.
+ * Pulumi components are generated into projects, not bundled in CLI.
  *
  * @example
  * ```typescript
- * import { STACK, GcpProject, ApiService } from '@signet/stack';
+ * import { STACK, getNpmVersion } from '@signet/stack';
  *
  * // Access versions
  * console.log(STACK.npm.typescript); // "5.9.3"
- *
- * // Create infrastructure
- * const project = new GcpProject('my-project', {
- *   environment: 'dev',
- *   project: 'my-app',
- *   billingAccount: 'XXXXX-XXXXX-XXXXX',
- * });
- *
- * const api = new ApiService('api', {
- *   environment: 'dev',
- *   project: 'my-app',
- *   projectId: project.projectId,
- *   image: 'gcr.io/my-app/api:latest',
- * });
+ * console.log(getNpmVersion('effect')); // "3.19.9"
  * ```
  */
 
 // Schema - Types and validation
 export type {
+  BackendVersions,
+  CloudRunCpu,
+  CloudRunMemory,
+  DatabaseTier,
+  DatabaseVersions,
+  Environment,
+  FrontendVersions,
+  GcpRegion,
+  InfraVersions,
+  NpmVersions,
+  ObservabilityVersions,
+  PythonVersions,
+  RuntimeVersions,
+  ServiceVersions,
   StackDefinition,
   StackMeta,
-  RuntimeVersions,
-  FrontendVersions,
-  BackendVersions,
-  InfraVersions,
   TestingVersions,
-  PythonVersions,
-  DatabaseVersions,
-  ServiceVersions,
-  ObservabilityVersions,
-  NpmVersions,
-  Environment,
-  GcpRegion,
-  DatabaseTier,
-  CloudRunMemory,
-  CloudRunCpu,
 } from './schema';
 
 export { stackDefinitionSchema } from './schema';
 
 // Versions - SSOT
 export {
-  STACK,
-  validateStack,
-  versionsJson,
+  getDrift,
   getNpmVersion,
   getNpmVersions,
   isVersionMatch,
-  getDrift,
+  STACK,
+  validateStack,
+  versionsJson,
 } from './versions';
-
-// Components - GCP Infrastructure
-export {
-  SignetComponent,
-  type SignetComponentArgs,
-  GcpProject,
-  type GcpProjectArgs,
-  ApiService,
-  type ApiServiceArgs,
-  DatabaseService,
-  type DatabaseServiceArgs,
-  QueueService,
-  type QueueServiceArgs,
-  type SubscriptionConfig,
-} from './components';
-
-// Policies - Policy as Code (lazy-loaded to avoid process.exit in tests)
-// Use getPolicyPacks() when you need actual PolicyPack instances
-export { getPolicyPacks, type PolicyPack } from './policies';
