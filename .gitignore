@@ -38,3 +38,7 @@ lib/clients/api/specs/
 .envrc
 *.gpg
 .dev.vars
+
+# Security: PII and session data
+config/wispr-flow/
+config/httpie/sessions/
