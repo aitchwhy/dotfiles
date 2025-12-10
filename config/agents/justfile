@@ -55,3 +55,19 @@ grade:
 # Show evolution metrics
 metrics:
     cd ./evolution && bun run metrics
+
+# ============================================================================
+# 5-Tier Verification (via Signet CLI)
+# ============================================================================
+
+# Run all 5 tiers of verification (hard gate)
+verify path=".":
+    sig verify {{path}}
+
+# Run verification with auto-fix
+verify-fix path=".":
+    sig verify --fix {{path}}
+
+# Run only execution tier (typecheck + lint + test)
+verify-exec path=".":
+    sig verify --tiers execution {{path}}
