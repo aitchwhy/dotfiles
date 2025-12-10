@@ -26,7 +26,9 @@
       trusted-users = [ "@wheel" ] ++ (lib.optionals pkgs.stdenv.isDarwin [ "@admin" ]);
 
       # Binary caches - expanded for better coverage
+      # Personal cache first for fastest hits on own builds
       substituters = [
+        "https://hank-dotfiles.cachix.org" # Personal cache (push enabled)
         "https://cache.nixos.org"
         "https://nix-community.cachix.org"
         "https://devenv.cachix.org"
@@ -39,6 +41,8 @@
       ];
 
       trusted-public-keys = [
+        # TODO: Replace with your actual Cachix public key after running: cachix create hank-dotfiles
+        "hank-dotfiles.cachix.org-1:REPLACE_WITH_YOUR_PUBLIC_KEY"
         "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
         "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
         "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
@@ -102,28 +106,22 @@
       build-poll-interval = 1; # Check build status more frequently
     };
 
-    # Garbage collection - Managed by Determinate Nix installer
-    # gc = {
-    #   automatic = true;
-    #   options = "--delete-older-than 30d --max-freed $((100 * 1024**3))"; # 30 days or 100GB max
-    #   dates = lib.mkIf pkgs.stdenv.isLinux "weekly";
-    #   interval = lib.mkIf pkgs.stdenv.isDarwin {
-    #     Hour = 3;
-    #     Minute = 0;
-    #     Weekday = 0; # Sunday
-    #   };
-    # };
-
-    # Store optimization - Managed by Determinate Nix installer
-    # optimise = {
-    #   automatic = true;
-    #   dates = lib.mkIf pkgs.stdenv.isLinux [ "weekly" ];
-    #   interval = lib.mkIf pkgs.stdenv.isDarwin {
-    #     Hour = 4;
-    #     Minute = 0;
-    #     Weekday = 0; # Sunday
-    #   };
-    # };
+    # nixbuild.net distributed builder (x86_64-linux builds)
+    # Enable with: modules.home.tools.nixbuild.enable = true (for SSH config)
+    # Requires NIXBUILD_TOKEN secret in GitHub Actions
+    distributedBuilds = true;
+    buildMachines = [
+      {
+        hostName = "eu.nixbuild.net";
+        system = "x86_64-linux";
+        maxJobs = 100;
+        supportedFeatures = [
+          "benchmark"
+          "big-parallel"
+        ];
+        # SSH key configured via modules/home/tools/nixbuild.nix
+      }
+    ];
 
     # Extra Nix configuration
     extraOptions = ''
@@ -162,9 +160,6 @@
       plugin-files =
     '';
 
-    # Configure Nix daemon - Managed by Determinate Nix installer
-    # daemonIOLowPriority = true;
-    # daemonCPUSchedPolicy = lib.mkIf pkgs.stdenv.isLinux "idle";
   };
 
   # Nixpkgs configuration
