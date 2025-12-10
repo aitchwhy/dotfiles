@@ -287,4 +287,4 @@ tf-destroy:
 gen-context:
     @echo "Generating editor context rules..."
     @bun run scripts/gen-rules.ts
-    @echo "Generated .cursorrules and .windsurfrules"
+    @echo "Generated .cursorrules"

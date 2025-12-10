@@ -26,7 +26,6 @@ Run `just gen-context` to generate editor-specific rule files:
 | Target | File | Generated From |
 |--------|------|----------------|
 | Cursor | `.cursorrules` | AGENT.md + SKILL.md files |
-| Windsurf | `.windsurfrules` | AGENT.md + SKILL.md files |
 | Claude CLI | `~/.claude/CLAUDE.md` | Symlinked |
 
 ## Language Barrier

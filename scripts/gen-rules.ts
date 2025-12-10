@@ -2,7 +2,7 @@
 /**
  * gen-rules.ts - Generate editor-specific rule files from canonical sources
  *
- * Combines AGENT.md and SKILL.md files into .cursorrules and .windsurfrules
+ * Combines AGENT.md and SKILL.md files into .cursorrules
  *
  * Usage: bun run scripts/gen-rules.ts
  */
@@ -16,7 +16,6 @@ const DOTFILES = process.env.DOTFILES || `${process.env.HOME}/dotfiles`;
 const AGENT_MD = join(DOTFILES, "config/agents/AGENT.md");
 const SKILLS_DIR = join(DOTFILES, "config/agents/skills");
 const CURSOR_RULES = join(DOTFILES, ".cursorrules");
-const WINDSURF_RULES = join(DOTFILES, ".windsurfrules");
 
 type Skill = {
   name: string;
@@ -102,33 +101,6 @@ function generateCursorRules(agent: string, skills: Skill[]): string {
   return lines.join("\n");
 }
 
-function generateWindsurfRules(agent: string, skills: Skill[]): string {
-  const lines: string[] = [
-    "# Windsurf Rules",
-    "# Auto-generated from config/agents/ - DO NOT EDIT DIRECTLY",
-    "# Run: just gen-context",
-    "",
-    agent,
-  ];
-
-  if (skills.length > 0) {
-    lines.push("");
-    lines.push("## Available Skills");
-    lines.push("");
-
-    for (const skill of skills) {
-      const desc = extractDescription(skill.content);
-      lines.push(`- **${skill.name}**: ${desc}`);
-    }
-  }
-
-  lines.push("");
-  lines.push("---");
-  lines.push(`Generated: ${new Date().toISOString()}`);
-
-  return lines.join("\n");
-}
-
 async function main(): Promise<void> {
   console.log("Generating editor rules from canonical sources...");
 
@@ -141,11 +113,6 @@ async function main(): Promise<void> {
   const cursorContent = generateCursorRules(agent, skills);
   await writeFile(CURSOR_RULES, cursorContent, "utf-8");
   console.log(`Wrote ${CURSOR_RULES}`);
-
-  // Generate Windsurf rules
-  const windsurfContent = generateWindsurfRules(agent, skills);
-  await writeFile(WINDSURF_RULES, windsurfContent, "utf-8");
-  console.log(`Wrote ${WINDSURF_RULES}`);
 
   console.log("Done!");
 }
