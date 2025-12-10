@@ -6,16 +6,16 @@
  *
  * Run: bun run src/mcp-server.ts
  */
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
-import { Effect } from 'effect'
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { Effect } from 'effect';
 import {
-  runVerification,
-  formatVerificationResult,
   ALL_TIERS,
+  formatVerificationResult,
+  runVerification,
   type TierName,
   type VerificationResult,
-} from '@/verification/index'
+} from '@/verification/index';
 
 // =============================================================================
 // MCP Server Setup
@@ -24,7 +24,7 @@ import {
 const server = new McpServer({
   name: 'signet',
   version: '2.0.0',
-})
+});
 
 // =============================================================================
 // sig-verify Tool (using JSON Schema instead of Zod due to version conflict)
@@ -52,7 +52,8 @@ Exit codes:
     },
     tiers: {
       type: 'string',
-      description: 'Comma-separated tiers to run (default: all). Options: patterns,formal,execution,review,context',
+      description:
+        'Comma-separated tiers to run (default: all). Options: patterns,formal,execution,review,context',
     },
     fix: {
       type: 'boolean',
@@ -63,13 +64,25 @@ Exit codes:
       description: 'Show detailed output (default: false)',
     },
   },
-  async ({ path, tiers, fix, verbose }: { path?: string; tiers?: string; fix?: boolean; verbose?: boolean }) => {
-    const targetPath = path ?? '.'
+  async ({
+    path,
+    tiers,
+    fix,
+    verbose,
+  }: {
+    path?: string;
+    tiers?: string;
+    fix?: boolean;
+    verbose?: boolean;
+  }) => {
+    const targetPath = path ?? '.';
 
     // Parse tiers
     const selectedTiers: TierName[] = tiers
-      ? (tiers.split(',').map((s: string) => s.trim()) as TierName[]).filter((t) => ALL_TIERS.includes(t))
-      : [...ALL_TIERS]
+      ? (tiers.split(',').map((s: string) => s.trim()) as TierName[]).filter((t) =>
+          ALL_TIERS.includes(t)
+        )
+      : [...ALL_TIERS];
 
     // Run verification via Effect
     const program = runVerification({
@@ -77,7 +90,7 @@ Exit codes:
       tiers: selectedTiers,
       fix: fix ?? false,
       verbose: verbose ?? false,
-    })
+    });
 
     const result = await Effect.runPromise(program).catch(
       (error): VerificationResult => ({
@@ -90,19 +103,21 @@ Exit codes:
             passed: false,
             errors: 1,
             warnings: 0,
-            details: [`Verification failed: ${error instanceof Error ? error.message : String(error)}`],
+            details: [
+              `Verification failed: ${error instanceof Error ? error.message : String(error)}`,
+            ],
             duration: 0,
           },
         ],
         duration: 0,
       })
-    )
+    );
 
     // Format summary
-    const summary = formatVerificationResult(result)
+    const summary = formatVerificationResult(result);
 
     // Determine exit code
-    const exitCode = result.passed ? (result.totalWarnings > 0 ? 1 : 0) : 2
+    const exitCode = result.passed ? (result.totalWarnings > 0 ? 1 : 0) : 2;
 
     // Return text content for Claude
     return {
@@ -112,13 +127,13 @@ Exit codes:
           text: `${summary}\n\nExit code: ${exitCode}${exitCode === 2 ? ' (BLOCKING)' : ''}`,
         },
       ],
-    }
+    };
   }
-)
+);
 
 // =============================================================================
 // Start Server
 // =============================================================================
 
-const transport = new StdioServerTransport()
-await server.connect(transport)
+const transport = new StdioServerTransport();
+await server.connect(transport);

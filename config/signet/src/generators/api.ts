@@ -7,10 +7,10 @@
  * - Routes and middleware
  * - Cloudflare Workers deployment config
  */
-import { Effect } from 'effect'
-import type { FileTree } from '@/layers/file-system'
-import { renderTemplates, TemplateEngine } from '@/layers/template-engine'
-import type { ProjectSpec } from '@/schema/project-spec'
+import type { Effect } from 'effect';
+import type { FileTree } from '@/layers/file-system';
+import { renderTemplates, type TemplateEngine } from '@/layers/template-engine';
+import type { ProjectSpec } from '@/schema/project-spec';
 
 // =============================================================================
 // Templates - Server & Entry
@@ -57,7 +57,7 @@ for (const route of healthRoutes) {
 }
 
 export { app }
-`
+`;
 
 const INDEX_TS_TEMPLATE = `/**
  * {{name}} - Worker Entry
@@ -67,7 +67,7 @@ const INDEX_TS_TEMPLATE = `/**
 import { app } from './server'
 
 export default app
-`
+`;
 
 // =============================================================================
 // Templates - Ports (Interfaces)
@@ -87,7 +87,7 @@ export interface DatabaseService {
 }
 
 export class Database extends Context.Tag('Database')<Database, DatabaseService>() {}
-`
+`;
 
 // =============================================================================
 // Templates - Adapters (Implementations)
@@ -127,7 +127,7 @@ const makeTursoService = (url: string, authToken: string): DatabaseService => {
 
 export const TursoLive = (url: string, authToken: string) =>
   Layer.succeed(Database, makeTursoService(url, authToken))
-`
+`;
 
 const D1_ADAPTER_TEMPLATE = `/**
  * D1 Adapter
@@ -168,7 +168,7 @@ const makeD1Service = (db: D1Database): DatabaseService => ({
 })
 
 export const D1Live = (db: D1Database) => Layer.succeed(Database, makeD1Service(db))
-`
+`;
 
 // =============================================================================
 // Templates - Routes (Pure Effect Handlers - NO Hono imports)
@@ -211,7 +211,7 @@ export const healthRoutes = [
   { method: 'GET' as const, path: '/health', handler: livenessHandler },
   { method: 'GET' as const, path: '/health/ready', handler: readinessHandler },
 ] as const
-`
+`;
 
 // =============================================================================
 // Templates - Middleware
@@ -240,7 +240,7 @@ export const errorMiddleware: ErrorHandler = (err, c) => {
     status
   )
 }
-`
+`;
 
 // =============================================================================
 // Templates - Utilities
@@ -263,7 +263,7 @@ export const Err = <E>(error: E): Result<never, E> => ({ ok: false, error })
 export const isOk = <T, E>(result: Result<T, E>): result is { ok: true; data: T } => result.ok
 
 export const isErr = <T, E>(result: Result<T, E>): result is { ok: false; error: E } => !result.ok
-`
+`;
 
 // =============================================================================
 // Templates - Deployment
@@ -283,7 +283,7 @@ enabled = true
 # binding = "DB"
 # database_name = "{{name}}-db"
 # database_id = "YOUR_DATABASE_ID"
-`
+`;
 
 // =============================================================================
 // Generator
@@ -292,16 +292,14 @@ enabled = true
 /**
  * Generate hexagonal API project files from ProjectSpec
  */
-export const generateApi = (
-  spec: ProjectSpec
-): Effect.Effect<FileTree, Error, TemplateEngine> => {
+export const generateApi = (spec: ProjectSpec): Effect.Effect<FileTree, Error, TemplateEngine> => {
   const data = {
     name: spec.name,
     description: spec.description,
     hasDatabase: Boolean(spec.infra.database),
     isTurso: spec.infra.database === 'turso',
     isD1: spec.infra.database === 'd1',
-  }
+  };
 
   // Base templates (always generated)
   const templates: FileTree = {
@@ -311,18 +309,18 @@ export const generateApi = (
     'src/middleware/error.ts': ERROR_MIDDLEWARE_TEMPLATE,
     'src/lib/result.ts': RESULT_TS_TEMPLATE,
     'wrangler.toml': WRANGLER_TOML_TEMPLATE,
-  }
+  };
 
   // Conditional: Database port and adapter
   if (spec.infra.database) {
-    templates['src/ports/database.ts'] = DATABASE_PORT_TEMPLATE
+    templates['src/ports/database.ts'] = DATABASE_PORT_TEMPLATE;
 
     if (spec.infra.database === 'turso') {
-      templates['src/adapters/turso.ts'] = TURSO_ADAPTER_TEMPLATE
+      templates['src/adapters/turso.ts'] = TURSO_ADAPTER_TEMPLATE;
     } else if (spec.infra.database === 'd1') {
-      templates['src/adapters/d1.ts'] = D1_ADAPTER_TEMPLATE
+      templates['src/adapters/d1.ts'] = D1_ADAPTER_TEMPLATE;
     }
   }
 
-  return renderTemplates(templates, data)
-}
+  return renderTemplates(templates, data);
+};

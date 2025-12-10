@@ -6,7 +6,7 @@
  *
  * Pattern: TypeScript types are source of truth, schemas satisfy types.
  */
-import { Context, Effect, Schema } from 'effect';
+import { Context, type Effect, Schema } from 'effect';
 
 // ============================================================================
 // TYPESCRIPT TYPES (Source of Truth)

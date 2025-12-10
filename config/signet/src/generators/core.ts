@@ -12,18 +12,18 @@
  * - src/index.ts
  * - src/lib/result.ts
  */
-import { Effect } from 'effect'
-import type { FileTree } from '@/layers/file-system'
-import { renderTemplates, TemplateEngine } from '@/layers/template-engine'
-import type { ProjectSpec } from '@/schema/project-spec'
-import versions from '../../versions.json'
+import type { Effect } from 'effect';
+import type { FileTree } from '@/layers/file-system';
+import { renderTemplates, type TemplateEngine } from '@/layers/template-engine';
+import type { ProjectSpec } from '@/schema/project-spec';
+import versions from '../../versions.json';
 
 // =============================================================================
 // Types
 // =============================================================================
 
 export interface CoreGeneratorConfig {
-  readonly spec: ProjectSpec
+  readonly spec: ProjectSpec;
 }
 
 // =============================================================================
@@ -62,7 +62,7 @@ const PACKAGE_JSON_TEMPLATE = `{
     "node": ">={{nodeVersion}}"
 {{/if}}
   }
-}`
+}`;
 
 const TSCONFIG_JSON_TEMPLATE = `{
   "compilerOptions": {
@@ -94,7 +94,7 @@ const TSCONFIG_JSON_TEMPLATE = `{
   },
   "include": ["src/**/*.ts", "tests/**/*.ts"],
   "exclude": ["node_modules"]
-}`
+}`;
 
 const BIOME_JSON_TEMPLATE = `{
   "$schema": "https://biomejs.dev/schemas/2.0.0/schema.json",
@@ -138,7 +138,7 @@ const BIOME_JSON_TEMPLATE = `{
   "files": {
     "ignore": ["node_modules"]
   }
-}`
+}`;
 
 const FLAKE_NIX_TEMPLATE = `{
   description = "{{name}} - TypeScript/Bun project";
@@ -187,7 +187,7 @@ const FLAKE_NIX_TEMPLATE = `{
         formatter = pkgs.nixfmt-rfc-style;
       }
     );
-}`
+}`;
 
 const GITIGNORE_TEMPLATE = `# Dependencies
 node_modules/
@@ -225,7 +225,7 @@ result-*
 # Logs
 *.log
 npm-debug.log*
-`
+`;
 
 const ENVRC_TEMPLATE = `# Enable Nix flake dev shell
 if [ -f flake.nix ]; then
@@ -245,7 +245,7 @@ fi
 if [ -f .envrc.local ]; then
   source_env .envrc.local
 fi
-`
+`;
 
 const INDEX_TS_TEMPLATE = `/**
  * {{name}}
@@ -258,7 +258,7 @@ export const main = (): void => {
 }
 
 main()
-`
+`;
 
 const RESULT_TS_TEMPLATE = `/**
  * Result Type Utilities
@@ -305,7 +305,7 @@ export const tryCatchAsync = async <T>(fn: () => Promise<T>): Promise<Result<T, 
     return Err(e instanceof Error ? e : new Error(String(e)))
   }
 }
-`
+`;
 
 // =============================================================================
 // Generator
@@ -316,11 +316,9 @@ export const tryCatchAsync = async <T>(fn: () => Promise<T>): Promise<Result<T, 
  *
  * Uses versions from versions.json as single source of truth.
  */
-export const generateCore = (
-  spec: ProjectSpec
-): Effect.Effect<FileTree, Error, TemplateEngine> => {
-  const npmVersions = versions.npm as Record<string, string>
-  const runtimeVersions = versions.runtime as Record<string, string>
+export const generateCore = (spec: ProjectSpec): Effect.Effect<FileTree, Error, TemplateEngine> => {
+  const npmVersions = versions.npm as Record<string, string>;
+  const runtimeVersions = versions.runtime as Record<string, string>;
 
   const data = {
     name: spec.name,
@@ -334,7 +332,7 @@ export const generateCore = (
     bunTypesVersion: npmVersions['@types/bun'],
     bunVersion: runtimeVersions['bun'],
     nodeVersion: runtimeVersions['node'],
-  }
+  };
 
   const templates: FileTree = {
     'package.json': PACKAGE_JSON_TEMPLATE,
@@ -345,7 +343,7 @@ export const generateCore = (
     '.envrc': ENVRC_TEMPLATE,
     'src/index.ts': INDEX_TS_TEMPLATE,
     'src/lib/result.ts': RESULT_TS_TEMPLATE,
-  }
+  };
 
-  return renderTemplates(templates, data)
-}
+  return renderTemplates(templates, data);
+};

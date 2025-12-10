@@ -197,15 +197,9 @@ export const telemetryProviderSchema = Schema.Literal(
   'none'
 ) satisfies Schema.Schema<TelemetryProvider>;
 
-export const cacheTypeSchema = Schema.Literal(
-  'redis',
-  'none'
-) satisfies Schema.Schema<CacheType>;
+export const cacheTypeSchema = Schema.Literal('redis', 'none') satisfies Schema.Schema<CacheType>;
 
-export const runtimeTypeSchema = Schema.Literal(
-  'bun',
-  'node'
-) satisfies Schema.Schema<RuntimeType>;
+export const runtimeTypeSchema = Schema.Literal('bun', 'node') satisfies Schema.Schema<RuntimeType>;
 
 export const debuggerTypeSchema = Schema.Literal(
   'vscode',

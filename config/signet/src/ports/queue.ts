@@ -4,7 +4,7 @@
  * Defines the contract for async message queue operations.
  * Implemented by adapters like Redis (BullMQ pattern).
  */
-import { Context, Effect, Schema } from 'effect'
+import { Context, type Effect, Schema } from 'effect';
 
 // ============================================================================
 // SCHEMAS
@@ -16,10 +16,10 @@ export const JobStatus = Schema.Literal(
   'completed',
   'failed',
   'delayed',
-  'paused',
-)
+  'paused'
+);
 
-export type JobStatus = Schema.Schema.Type<typeof JobStatus>
+export type JobStatus = Schema.Schema.Type<typeof JobStatus>;
 
 export const Job = Schema.Struct({
   id: Schema.String,
@@ -32,9 +32,9 @@ export const Job = Schema.Struct({
   processedAt: Schema.optional(Schema.Date),
   completedAt: Schema.optional(Schema.Date),
   failedReason: Schema.optional(Schema.String),
-})
+});
 
-export type Job = Schema.Schema.Type<typeof Job>
+export type Job = Schema.Schema.Type<typeof Job>;
 
 export const JobOptions = Schema.Struct({
   delay: Schema.optional(Schema.Number),
@@ -43,14 +43,14 @@ export const JobOptions = Schema.Struct({
     Schema.Struct({
       type: Schema.Literal('fixed', 'exponential'),
       delay: Schema.Number,
-    }),
+    })
   ),
   priority: Schema.optional(Schema.Number),
   removeOnComplete: Schema.optional(Schema.Boolean),
   removeOnFail: Schema.optional(Schema.Boolean),
-})
+});
 
-export type JobOptions = Schema.Schema.Type<typeof JobOptions>
+export type JobOptions = Schema.Schema.Type<typeof JobOptions>;
 
 // ============================================================================
 // ERRORS
@@ -63,7 +63,7 @@ export class QueueError extends Schema.TaggedError<QueueError>()('QueueError', {
     'SERIALIZATION_ERROR',
     'CONNECTION_ERROR',
     'TIMEOUT',
-    'INTERNAL_ERROR',
+    'INTERNAL_ERROR'
   ),
   message: Schema.String,
   jobId: Schema.optional(Schema.String),
@@ -78,28 +78,28 @@ export interface QueueService {
     queueName: string,
     jobName: string,
     data: T,
-    options?: JobOptions,
-  ) => Effect.Effect<Job, QueueError>
+    options?: JobOptions
+  ) => Effect.Effect<Job, QueueError>;
 
   readonly addBulk: <T>(
     queueName: string,
-    jobs: readonly { name: string; data: T; options?: JobOptions }[],
-  ) => Effect.Effect<readonly Job[], QueueError>
+    jobs: readonly { name: string; data: T; options?: JobOptions }[]
+  ) => Effect.Effect<readonly Job[], QueueError>;
 
-  readonly getJob: (queueName: string, jobId: string) => Effect.Effect<Job | null, QueueError>
+  readonly getJob: (queueName: string, jobId: string) => Effect.Effect<Job | null, QueueError>;
 
   readonly getJobs: (
     queueName: string,
     status?: JobStatus,
     start?: number,
-    end?: number,
-  ) => Effect.Effect<readonly Job[], QueueError>
+    end?: number
+  ) => Effect.Effect<readonly Job[], QueueError>;
 
-  readonly removeJob: (queueName: string, jobId: string) => Effect.Effect<void, QueueError>
+  readonly removeJob: (queueName: string, jobId: string) => Effect.Effect<void, QueueError>;
 
-  readonly pauseQueue: (queueName: string) => Effect.Effect<void, QueueError>
+  readonly pauseQueue: (queueName: string) => Effect.Effect<void, QueueError>;
 
-  readonly resumeQueue: (queueName: string) => Effect.Effect<void, QueueError>
+  readonly resumeQueue: (queueName: string) => Effect.Effect<void, QueueError>;
 }
 
 export class Queue extends Context.Tag('Queue')<Queue, QueueService>() {}

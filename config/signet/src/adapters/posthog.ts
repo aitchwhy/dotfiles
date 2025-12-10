@@ -4,24 +4,24 @@
  * Implements the Telemetry port for analytics using PostHog.
  * Provides product analytics and event tracking.
  */
-import { Effect, Layer } from 'effect'
+import { Effect, Layer } from 'effect';
 import {
-  Telemetry,
-  type TelemetryService,
-  TelemetryError,
-  type SpanOptions,
   type AnalyticsEvent,
-} from '@/ports/telemetry'
+  type SpanOptions,
+  Telemetry,
+  TelemetryError,
+  type TelemetryService,
+} from '@/ports/telemetry';
 
 // ============================================================================
 // CONFIG
 // ============================================================================
 
 export interface PostHogConfig {
-  readonly apiKey: string
-  readonly host?: string
-  readonly flushAt?: number
-  readonly flushInterval?: number
+  readonly apiKey: string;
+  readonly host?: string;
+  readonly flushAt?: number;
+  readonly flushInterval?: number;
 }
 
 // ============================================================================
@@ -29,8 +29,8 @@ export interface PostHogConfig {
 // ============================================================================
 
 const makeTelemetryService = (config: PostHogConfig): TelemetryService => {
-  const pendingEvents: AnalyticsEvent[] = []
-  let identifiedUser: { distinctId: string; properties?: Record<string, unknown> } | null = null
+  const pendingEvents: AnalyticsEvent[] = [];
+  let identifiedUser: { distinctId: string; properties?: Record<string, unknown> } | null = null;
 
   return {
     // PostHog doesn't do tracing - these are no-ops
@@ -39,7 +39,7 @@ const makeTelemetryService = (config: PostHogConfig): TelemetryService => {
         new TelemetryError({
           code: 'INVALID_SPAN',
           message: 'PostHog adapter does not support tracing. Use OpenTelemetry.',
-        }),
+        })
       ),
 
     withSpan: <A, E, R>(_name: string, effect: Effect.Effect<A, E, R>, _options?: SpanOptions) =>
@@ -50,10 +50,10 @@ const makeTelemetryService = (config: PostHogConfig): TelemetryService => {
         try: async () => {
           // PostHog event capture
           // Placeholder - actual implementation would use posthog-node
-          pendingEvents.push(event)
+          pendingEvents.push(event);
 
           if (pendingEvents.length >= (config.flushAt ?? 20)) {
-            await flushEvents()
+            await flushEvents();
           }
         },
         catch: (error) =>
@@ -66,7 +66,7 @@ const makeTelemetryService = (config: PostHogConfig): TelemetryService => {
     identify: (distinctId: string, properties?: Record<string, unknown>) =>
       Effect.tryPromise({
         try: async () => {
-          identifiedUser = { distinctId, ...(properties && { properties }) }
+          identifiedUser = { distinctId, ...(properties && { properties }) };
           // PostHog identify call
           // Placeholder implementation
         },
@@ -86,17 +86,17 @@ const makeTelemetryService = (config: PostHogConfig): TelemetryService => {
             message: error instanceof Error ? error.message : 'Unknown error',
           }),
       }),
-  }
+  };
 
   async function flushEvents(): Promise<void> {
-    if (pendingEvents.length === 0) return
+    if (pendingEvents.length === 0) return;
 
-    const events = [...pendingEvents]
-    pendingEvents.length = 0
+    const events = [...pendingEvents];
+    pendingEvents.length = 0;
 
     // Send to PostHog API
     // Placeholder - actual implementation would batch send to PostHog
-    const host = config.host ?? 'https://app.posthog.com'
+    const host = config.host ?? 'https://app.posthog.com';
     await fetch(`${host}/batch`, {
       method: 'POST',
       headers: {
@@ -111,13 +111,13 @@ const makeTelemetryService = (config: PostHogConfig): TelemetryService => {
           timestamp: e.timestamp?.toISOString(),
         })),
       }),
-    })
+    });
   }
-}
+};
 
 // ============================================================================
 // LAYER FACTORY
 // ============================================================================
 
 export const makePostHogLive = (config: PostHogConfig): Layer.Layer<Telemetry> =>
-  Layer.succeed(Telemetry, makeTelemetryService(config))
+  Layer.succeed(Telemetry, makeTelemetryService(config));

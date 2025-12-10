@@ -7,10 +7,10 @@
  * - Tailwind CSS v4
  * - Vite build system
  */
-import { Effect } from 'effect'
-import type { FileTree } from '@/layers/file-system'
-import { renderTemplates, TemplateEngine } from '@/layers/template-engine'
-import type { ProjectSpec } from '@/schema/project-spec'
+import type { Effect } from 'effect';
+import type { FileTree } from '@/layers/file-system';
+import { renderTemplates, type TemplateEngine } from '@/layers/template-engine';
+import type { ProjectSpec } from '@/schema/project-spec';
 
 // =============================================================================
 // Templates - Entry Points
@@ -33,7 +33,7 @@ createRoot(root).render(
     <App />
   </StrictMode>
 )
-`
+`;
 
 const APP_TSX_TEMPLATE = `/**
  * {{name}} - Root Component
@@ -44,7 +44,7 @@ import { router } from './router'
 export const App = () => {
   return <RouterProvider router={router} />
 }
-`
+`;
 
 // =============================================================================
 // Templates - Router
@@ -63,7 +63,7 @@ declare module '@tanstack/react-router' {
     router: typeof router
   }
 }
-`
+`;
 
 const ROOT_ROUTE_TEMPLATE = `/**
  * Root Route Layout
@@ -84,7 +84,7 @@ export const Route = createRootRoute({
     </div>
   ),
 })
-`
+`;
 
 const INDEX_ROUTE_TEMPLATE = `/**
  * Index Route (/)
@@ -105,7 +105,7 @@ function IndexPage() {
     </div>
   )
 }
-`
+`;
 
 // =============================================================================
 // Templates - XState
@@ -152,7 +152,7 @@ export const counterMachine = createMachine({
     },
   },
 })
-`
+`;
 
 // =============================================================================
 // Templates - Styles
@@ -181,7 +181,7 @@ const GLOBALS_CSS_TEMPLATE = `@tailwind base;
 body {
   @apply bg-background text-foreground;
 }
-`
+`;
 
 const TAILWIND_CONFIG_TEMPLATE = `import type { Config } from 'tailwindcss'
 
@@ -202,7 +202,7 @@ export default {
   },
   plugins: [],
 } satisfies Config
-`
+`;
 
 // =============================================================================
 // Templates - Build
@@ -221,7 +221,7 @@ export default defineConfig({
     },
   },
 })
-`
+`;
 
 const INDEX_HTML_TEMPLATE = `<!DOCTYPE html>
 <html lang="en">
@@ -235,7 +235,7 @@ const INDEX_HTML_TEMPLATE = `<!DOCTYPE html>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-`
+`;
 
 // =============================================================================
 // Generator
@@ -244,13 +244,11 @@ const INDEX_HTML_TEMPLATE = `<!DOCTYPE html>
 /**
  * Generate React 19 + XState + TanStack Router project files
  */
-export const generateUi = (
-  spec: ProjectSpec
-): Effect.Effect<FileTree, Error, TemplateEngine> => {
+export const generateUi = (spec: ProjectSpec): Effect.Effect<FileTree, Error, TemplateEngine> => {
   const data = {
     name: spec.name,
     description: spec.description,
-  }
+  };
 
   const templates: FileTree = {
     // Entry points
@@ -272,7 +270,7 @@ export const generateUi = (
     // Build
     'vite.config.ts': VITE_CONFIG_TEMPLATE,
     'index.html': INDEX_HTML_TEMPLATE,
-  }
+  };
 
-  return renderTemplates(templates, data)
-}
+  return renderTemplates(templates, data);
+};

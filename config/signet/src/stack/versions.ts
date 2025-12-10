@@ -248,9 +248,7 @@ export const versionsJson = JSON.stringify(STACK, null, 2);
  * Get a specific npm package version
  * Type-safe access to npm versions
  */
-export function getNpmVersion<K extends keyof typeof STACK.npm>(
-  pkg: K
-): string {
+export function getNpmVersion<K extends keyof typeof STACK.npm>(pkg: K): string {
   return STACK.npm[pkg];
 }
 

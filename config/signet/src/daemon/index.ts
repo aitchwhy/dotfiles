@@ -4,31 +4,29 @@
  * @module daemon
  */
 
+// Reconcile loop
+export {
+  applyChanges,
+  logStatus,
+  observeState,
+  previewChanges,
+  reconcileOnce,
+  reconcileOnceSimple,
+} from './reconcile-loop';
 // Types
 export type {
-  DaemonConfig,
-  DaemonState,
-  DaemonErrorCode,
-  PreviewSummary,
-  UpSummary,
-  ReconcileResult,
-  ObservedState,
   CompiledInfra,
-} from './types'
-
+  DaemonConfig,
+  DaemonErrorCode,
+  DaemonState,
+  ObservedState,
+  PreviewSummary,
+  ReconcileResult,
+  UpSummary,
+} from './types';
 export {
   DaemonError,
   DEFAULT_CONFIG,
-  INITIAL_STATE,
   EMPTY_PREVIEW,
-} from './types'
-
-// Reconcile loop
-export {
-  observeState,
-  previewChanges,
-  applyChanges,
-  logStatus,
-  reconcileOnce,
-  reconcileOnceSimple,
-} from './reconcile-loop'
+  INITIAL_STATE,
+} from './types';

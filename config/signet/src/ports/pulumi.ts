@@ -6,8 +6,8 @@
  *
  * @module ports/pulumi
  */
-import { Context, Effect, Schema } from 'effect'
-import type { PreviewSummary, UpSummary } from '@/daemon/types'
+import { Context, type Effect, Schema } from 'effect';
+import type { PreviewSummary, UpSummary } from '@/daemon/types';
 
 // ============================================================================
 // SCHEMAS
@@ -18,53 +18,48 @@ export const StackInfo = Schema.Struct({
   project: Schema.String,
   lastUpdate: Schema.optional(Schema.Date),
   resourceCount: Schema.Number,
-})
+});
 
-export type StackInfo = Schema.Schema.Type<typeof StackInfo>
+export type StackInfo = Schema.Schema.Type<typeof StackInfo>;
 
 export const StackOutput = Schema.Struct({
   value: Schema.Unknown,
   secret: Schema.Boolean,
-})
+});
 
-export type StackOutput = Schema.Schema.Type<typeof StackOutput>
+export type StackOutput = Schema.Schema.Type<typeof StackOutput>;
 
 export const UpdateSummary = Schema.Struct({
   version: Schema.Number,
   startTime: Schema.Date,
   endTime: Schema.optional(Schema.Date),
   result: Schema.Literal('succeeded', 'failed', 'in-progress'),
-  resourceChanges: Schema.optional(
-    Schema.Record({ key: Schema.String, value: Schema.Number })
-  ),
-})
+  resourceChanges: Schema.optional(Schema.Record({ key: Schema.String, value: Schema.Number })),
+});
 
-export type UpdateSummary = Schema.Schema.Type<typeof UpdateSummary>
+export type UpdateSummary = Schema.Schema.Type<typeof UpdateSummary>;
 
 // ============================================================================
 // ERRORS
 // ============================================================================
 
-export class PulumiError extends Schema.TaggedError<PulumiError>()(
-  'PulumiError',
-  {
-    code: Schema.Literal(
-      'STACK_NOT_FOUND',
-      'WORKSPACE_ERROR',
-      'PREVIEW_FAILED',
-      'UP_FAILED',
-      'REFRESH_FAILED',
-      'DESTROY_FAILED',
-      'CONCURRENT_UPDATE',
-      'CONFIG_ERROR',
-      'POLICY_VIOLATION',
-      'INTERNAL_ERROR'
-    ),
-    message: Schema.String,
-    stack: Schema.optional(Schema.String),
-    cause: Schema.optional(Schema.Unknown),
-  }
-) {}
+export class PulumiError extends Schema.TaggedError<PulumiError>()('PulumiError', {
+  code: Schema.Literal(
+    'STACK_NOT_FOUND',
+    'WORKSPACE_ERROR',
+    'PREVIEW_FAILED',
+    'UP_FAILED',
+    'REFRESH_FAILED',
+    'DESTROY_FAILED',
+    'CONCURRENT_UPDATE',
+    'CONFIG_ERROR',
+    'POLICY_VIOLATION',
+    'INTERNAL_ERROR'
+  ),
+  message: Schema.String,
+  stack: Schema.optional(Schema.String),
+  cause: Schema.optional(Schema.Unknown),
+}) {}
 
 // ============================================================================
 // PORT INTERFACE
@@ -89,7 +84,7 @@ export interface PulumiService {
     project: string,
     projectPath: string,
     program?: () => Promise<Record<string, unknown>>
-  ) => Effect.Effect<StackInfo, PulumiError>
+  ) => Effect.Effect<StackInfo, PulumiError>;
 
   /**
    * Preview changes without applying them.
@@ -99,37 +94,28 @@ export interface PulumiService {
   readonly preview: (
     stackName: string,
     projectPath: string
-  ) => Effect.Effect<PreviewSummary, PulumiError>
+  ) => Effect.Effect<PreviewSummary, PulumiError>;
 
   /**
    * Apply changes to infrastructure.
    * @param stackName - Stack to update
    * @param projectPath - Path to the Pulumi project directory
    */
-  readonly up: (
-    stackName: string,
-    projectPath: string
-  ) => Effect.Effect<UpSummary, PulumiError>
+  readonly up: (stackName: string, projectPath: string) => Effect.Effect<UpSummary, PulumiError>;
 
   /**
    * Refresh state from actual infrastructure.
    * @param stackName - Stack to refresh
    * @param projectPath - Path to the Pulumi project directory
    */
-  readonly refresh: (
-    stackName: string,
-    projectPath: string
-  ) => Effect.Effect<void, PulumiError>
+  readonly refresh: (stackName: string, projectPath: string) => Effect.Effect<void, PulumiError>;
 
   /**
    * Destroy all resources in a stack.
    * @param stackName - Stack to destroy
    * @param projectPath - Path to the Pulumi project directory
    */
-  readonly destroy: (
-    stackName: string,
-    projectPath: string
-  ) => Effect.Effect<void, PulumiError>
+  readonly destroy: (stackName: string, projectPath: string) => Effect.Effect<void, PulumiError>;
 
   /**
    * Get stack outputs.
@@ -139,7 +125,7 @@ export interface PulumiService {
   readonly getOutputs: (
     stackName: string,
     projectPath: string
-  ) => Effect.Effect<Readonly<Record<string, unknown>>, PulumiError>
+  ) => Effect.Effect<Readonly<Record<string, unknown>>, PulumiError>;
 
   /**
    * Get stack update history.
@@ -151,7 +137,7 @@ export interface PulumiService {
     stackName: string,
     projectPath: string,
     limit?: number
-  ) => Effect.Effect<readonly UpdateSummary[], PulumiError>
+  ) => Effect.Effect<readonly UpdateSummary[], PulumiError>;
 
   /**
    * Set stack configuration value.
@@ -167,7 +153,7 @@ export interface PulumiService {
     key: string,
     value: string,
     secret?: boolean
-  ) => Effect.Effect<void, PulumiError>
+  ) => Effect.Effect<void, PulumiError>;
 
   /**
    * Get stack information.
@@ -177,7 +163,7 @@ export interface PulumiService {
   readonly getStackInfo: (
     stackName: string,
     projectPath: string
-  ) => Effect.Effect<StackInfo, PulumiError>
+  ) => Effect.Effect<StackInfo, PulumiError>;
 }
 
 // ============================================================================

@@ -4,23 +4,23 @@
  * Validates project structure, naming conventions, and dependency hygiene.
  * Acts as the first line of defense for code quality.
  */
-import { Effect } from 'effect'
+import { Effect } from 'effect';
 
 // =============================================================================
 // Types
 // =============================================================================
 
 export interface PoliceViolation {
-  readonly rule: string
-  readonly severity: 'error' | 'warning'
-  readonly message: string
-  readonly file?: string
-  readonly suggestion?: string
+  readonly rule: string;
+  readonly severity: 'error' | 'warning';
+  readonly message: string;
+  readonly file?: string;
+  readonly suggestion?: string;
 }
 
 export interface DependencyInfo {
-  readonly dependencies: Record<string, string>
-  readonly devDependencies: Record<string, string>
+  readonly dependencies: Record<string, string>;
+  readonly devDependencies: Record<string, string>;
 }
 
 // =============================================================================
@@ -42,16 +42,16 @@ const DEPRECATED_PACKAGES = new Set([
   'postgresql_15', // Use postgresql_18
   'postgresql_16', // Use postgresql_18
   'postgresql_17', // Use postgresql_18
-])
+]);
 
 const PREFER_BIOME_OVER = new Set([
   'eslint',
   'prettier',
   '@typescript-eslint/parser',
   '@typescript-eslint/eslint-plugin',
-])
+]);
 
-const PREFER_BUN_OVER = new Set(['jest', 'mocha', 'vitest'])
+const PREFER_BUN_OVER = new Set(['jest', 'mocha', 'vitest']);
 
 // =============================================================================
 // Structure Checks
@@ -65,8 +65,8 @@ export const checkStructure = (
   projectType: string
 ): Effect.Effect<readonly PoliceViolation[], never> =>
   Effect.succeed(() => {
-    const violations: PoliceViolation[] = []
-    const fileSet = new Set(files)
+    const violations: PoliceViolation[] = [];
+    const fileSet = new Set(files);
 
     // Required files for all project types
     if (!fileSet.has('package.json')) {
@@ -75,7 +75,7 @@ export const checkStructure = (
         severity: 'error',
         message: 'Missing package.json',
         suggestion: 'Run signet init to create project structure',
-      })
+      });
     }
 
     // src directory for most project types
@@ -85,7 +85,7 @@ export const checkStructure = (
         severity: 'error',
         message: 'Missing src/ directory',
         suggestion: 'Source code should be in src/ directory',
-      })
+      });
     }
 
     // TypeScript config
@@ -95,11 +95,11 @@ export const checkStructure = (
         severity: 'warning',
         message: 'Missing tsconfig.json',
         suggestion: 'Add TypeScript configuration',
-      })
+      });
     }
 
-    return violations
-  }).pipe(Effect.flatMap((fn) => Effect.succeed(fn())))
+    return violations;
+  }).pipe(Effect.flatMap((fn) => Effect.succeed(fn())));
 
 // =============================================================================
 // Naming Convention Checks
@@ -114,7 +114,7 @@ const VALID_FILE_PATTERNS = [
   /^index\.tsx?$/, // index files
   /^[a-z][a-z0-9-]*\.test\.tsx?$/, // test files
   /^[a-z][a-z0-9-]*\.spec\.tsx?$/, // spec files
-]
+];
 
 /**
  * Check file naming conventions
@@ -123,16 +123,16 @@ export const checkNamingConventions = (
   files: readonly string[]
 ): Effect.Effect<readonly PoliceViolation[], never> =>
   Effect.succeed(() => {
-    const violations: PoliceViolation[] = []
+    const violations: PoliceViolation[] = [];
 
     for (const file of files) {
       // Only check TypeScript files
-      if (!file.endsWith('.ts') && !file.endsWith('.tsx')) continue
+      if (!file.endsWith('.ts') && !file.endsWith('.tsx')) continue;
 
-      const fileName = file.split('/').pop() || file
+      const fileName = file.split('/').pop() || file;
 
       // Skip if matches any valid pattern
-      const isValid = VALID_FILE_PATTERNS.some((pattern) => pattern.test(fileName))
+      const isValid = VALID_FILE_PATTERNS.some((pattern) => pattern.test(fileName));
 
       if (!isValid) {
         violations.push({
@@ -141,12 +141,12 @@ export const checkNamingConventions = (
           message: `Invalid file name: ${fileName}`,
           file,
           suggestion: 'Use kebab-case (my-file.ts) or camelCase (myFile.ts)',
-        })
+        });
       }
     }
 
-    return violations
-  }).pipe(Effect.flatMap((fn) => Effect.succeed(fn())))
+    return violations;
+  }).pipe(Effect.flatMap((fn) => Effect.succeed(fn())));
 
 // =============================================================================
 // Dependency Hygiene Checks
@@ -159,8 +159,8 @@ export const checkDependencyHygiene = (
   deps: DependencyInfo
 ): Effect.Effect<readonly PoliceViolation[], never> =>
   Effect.succeed(() => {
-    const violations: PoliceViolation[] = []
-    const allDeps = { ...deps.dependencies, ...deps.devDependencies }
+    const violations: PoliceViolation[] = [];
+    const allDeps = { ...deps.dependencies, ...deps.devDependencies };
 
     for (const [pkg] of Object.entries(allDeps)) {
       // Check deprecated packages
@@ -170,7 +170,7 @@ export const checkDependencyHygiene = (
           severity: 'warning',
           message: `Deprecated package: ${pkg}`,
           suggestion: getDeprecatedSuggestion(pkg),
-        })
+        });
       }
 
       // Check ESLint/Prettier (prefer Biome)
@@ -180,7 +180,7 @@ export const checkDependencyHygiene = (
           severity: 'warning',
           message: `Consider Biome instead of ${pkg}`,
           suggestion: 'Biome provides faster linting and formatting',
-        })
+        });
       }
 
       // Check Jest/Mocha (prefer Bun test)
@@ -190,12 +190,12 @@ export const checkDependencyHygiene = (
           severity: 'warning',
           message: `Consider bun test instead of ${pkg}`,
           suggestion: 'Bun has a built-in test runner',
-        })
+        });
       }
     }
 
-    return violations
-  }).pipe(Effect.flatMap((fn) => Effect.succeed(fn())))
+    return violations;
+  }).pipe(Effect.flatMap((fn) => Effect.succeed(fn())));
 
 // =============================================================================
 // Helpers
@@ -204,27 +204,27 @@ export const checkDependencyHygiene = (
 function getDeprecatedSuggestion(pkg: string): string {
   switch (pkg) {
     case 'request':
-      return 'Use native fetch() or undici'
+      return 'Use native fetch() or undici';
     case 'moment':
-      return 'Use date-fns or dayjs'
+      return 'Use date-fns or dayjs';
     case 'lodash':
-      return 'Use native methods or es-toolkit'
+      return 'Use native methods or es-toolkit';
     // MySQL BANNED
     case 'mysql':
     case 'mysql2':
     case 'mysql84':
-      return 'MySQL is BANNED. Use postgres (pg driver) or @libsql/client (Turso)'
+      return 'MySQL is BANNED. Use postgres (pg driver) or @libsql/client (Turso)';
     // Python policy: 3.14+ only
     case 'python312':
     case 'python313':
-      return 'Use python314 (Python 3.14+). Older versions are not allowed.'
+      return 'Use python314 (Python 3.14+). Older versions are not allowed.';
     // PostgreSQL policy: 18+ only
     case 'postgresql_14':
     case 'postgresql_15':
     case 'postgresql_16':
     case 'postgresql_17':
-      return 'Use postgresql_18. PostgreSQL 18+ is required.'
+      return 'Use postgresql_18. PostgreSQL 18+ is required.';
     default:
-      return 'Check npm for alternatives'
+      return 'Check npm for alternatives';
   }
 }

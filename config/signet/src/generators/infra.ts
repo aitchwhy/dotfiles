@@ -8,11 +8,11 @@
  *
  * Uses STACK from @/stack for version-aware generation.
  */
-import { Effect } from 'effect'
-import type { FileTree } from '@/layers/file-system'
-import { renderTemplates, TemplateEngine } from '@/layers/template-engine'
-import type { ProjectSpec } from '@/schema/project-spec'
-import { STACK } from '@/stack'
+import type { Effect } from 'effect';
+import type { FileTree } from '@/layers/file-system';
+import { renderTemplates, type TemplateEngine } from '@/layers/template-engine';
+import type { ProjectSpec } from '@/schema/project-spec';
+import { STACK } from '@/stack';
 
 // =============================================================================
 // Templates - Process Compose
@@ -59,7 +59,7 @@ log_location: ./.logs
 
 # TUI configuration
 tui: true
-`
+`;
 
 // =============================================================================
 // Templates - Debug Configurations
@@ -108,7 +108,7 @@ const VSCODE_LAUNCH_TEMPLATE = `{
       "stopAll": true
     }
   ]
-}`
+}`;
 
 const NVIM_DAP_TEMPLATE = `-- {{name}} DAP Configuration
 -- Load with: require('.nvim.dap')
@@ -151,7 +151,7 @@ dap.configurations.typescript = {
 
 -- Also apply to JavaScript
 dap.configurations.javascript = dap.configurations.typescript
-`
+`;
 
 // =============================================================================
 // Templates - Pulumi
@@ -163,11 +163,11 @@ runtime:
   options:
     typescript: true
 description: {{name}} infrastructure
-`
+`;
 
 const PULUMI_DEV_YAML_TEMPLATE = `config:
   {{name}}:environment: dev
-`
+`;
 
 const PULUMI_INDEX_TEMPLATE = `/**
  * {{name}} - Infrastructure as Code
@@ -229,7 +229,7 @@ export const gcpRegion = region
 // })
 //
 // export const apiUrl = apiService.uri
-`
+`;
 
 // Pulumi package.json generated from STACK versions
 const PULUMI_PACKAGE_JSON_TEMPLATE = `{
@@ -252,7 +252,7 @@ const PULUMI_PACKAGE_JSON_TEMPLATE = `{
     "@types/node": "22.0.0",
     "typescript": "${STACK.npm.typescript}"
   }
-}`
+}`;
 
 const PULUMI_TSCONFIG_TEMPLATE = `{
   "compilerOptions": {
@@ -268,7 +268,7 @@ const PULUMI_TSCONFIG_TEMPLATE = `{
   },
   "include": ["*.ts"],
   "exclude": ["node_modules"]
-}`
+}`;
 
 // =============================================================================
 // Generator
@@ -285,7 +285,7 @@ export const generateInfra = (
     description: spec.description,
     isVscode: spec.observability.debugger === 'vscode',
     isNvimDap: spec.observability.debugger === 'nvim-dap',
-  }
+  };
 
   // Base templates
   const templates: FileTree = {
@@ -298,14 +298,14 @@ export const generateInfra = (
     'index.ts': PULUMI_INDEX_TEMPLATE,
     'package.json': PULUMI_PACKAGE_JSON_TEMPLATE,
     'tsconfig.json': PULUMI_TSCONFIG_TEMPLATE,
-  }
+  };
 
   // Conditional: Debug configuration based on editor
   if (spec.observability.debugger === 'vscode') {
-    templates['.vscode/launch.json'] = VSCODE_LAUNCH_TEMPLATE
+    templates['.vscode/launch.json'] = VSCODE_LAUNCH_TEMPLATE;
   } else if (spec.observability.debugger === 'nvim-dap') {
-    templates['.nvim/dap.lua'] = NVIM_DAP_TEMPLATE
+    templates['.nvim/dap.lua'] = NVIM_DAP_TEMPLATE;
   }
 
-  return renderTemplates(templates, data)
-}
+  return renderTemplates(templates, data);
+};

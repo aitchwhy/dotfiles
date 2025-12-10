@@ -34,15 +34,12 @@ const nixBranch = z.string().min(1);
 const pythonMinVersion = z
   .string()
   .regex(versionPattern, 'Must be valid semver')
-  .refine(
-    (v) => {
-      const parts = v.split('.').map(Number);
-      const major = parts[0] ?? 0;
-      const minor = parts[1] ?? 0;
-      return major > 3 || (major === 3 && minor >= 14);
-    },
-    'Python must be 3.14.0 or higher (no 3.12/3.13)'
-  );
+  .refine((v) => {
+    const parts = v.split('.').map(Number);
+    const major = parts[0] ?? 0;
+    const minor = parts[1] ?? 0;
+    return major > 3 || (major === 3 && minor >= 14);
+  }, 'Python must be 3.14.0 or higher (no 3.12/3.13)');
 
 // =============================================================================
 // TYPESCRIPT TYPES (Source of Truth)
@@ -478,12 +475,7 @@ export const stackDefinitionSchema = z.object({
 export type Environment = 'dev' | 'staging' | 'prod';
 
 /** GCP regions we support */
-export type GcpRegion =
-  | 'us-central1'
-  | 'us-east1'
-  | 'us-west1'
-  | 'europe-west1'
-  | 'asia-east1';
+export type GcpRegion = 'us-central1' | 'us-east1' | 'us-west1' | 'europe-west1' | 'asia-east1';
 
 /** Database tiers for Cloud SQL */
 export type DatabaseTier =
@@ -494,13 +486,7 @@ export type DatabaseTier =
   | 'db-custom-4-15360';
 
 /** Cloud Run memory options */
-export type CloudRunMemory =
-  | '256Mi'
-  | '512Mi'
-  | '1Gi'
-  | '2Gi'
-  | '4Gi'
-  | '8Gi';
+export type CloudRunMemory = '256Mi' | '512Mi' | '1Gi' | '2Gi' | '4Gi' | '8Gi';
 
 /** Cloud Run CPU options */
 export type CloudRunCpu = '1' | '2' | '4' | '8';

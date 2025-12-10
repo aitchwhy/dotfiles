@@ -7,11 +7,11 @@
  * - Biome linting at root
  * - Shared packages scaffold
  */
-import { Effect } from 'effect'
-import type { FileTree } from '@/layers/file-system'
-import { renderTemplates, TemplateEngine } from '@/layers/template-engine'
-import type { ProjectSpec } from '@/schema/project-spec'
-import versions from '../../versions.json'
+import type { Effect } from 'effect';
+import type { FileTree } from '@/layers/file-system';
+import { renderTemplates, type TemplateEngine } from '@/layers/template-engine';
+import type { ProjectSpec } from '@/schema/project-spec';
+import versions from '../../versions.json';
 
 // =============================================================================
 // Templates - Root Configuration
@@ -43,7 +43,7 @@ const ROOT_PACKAGE_JSON_TEMPLATE = `{
   "engines": {
     "bun": ">={{bunVersion}}"
   }
-}`
+}`;
 
 const ROOT_TSCONFIG_TEMPLATE = `{
   "extends": "./tsconfig.base.json",
@@ -55,7 +55,7 @@ const ROOT_TSCONFIG_TEMPLATE = `{
   ],
   "include": [],
   "exclude": ["node_modules"]
-}`
+}`;
 
 const TSCONFIG_BASE_TEMPLATE = `{
   "compilerOptions": {
@@ -81,7 +81,7 @@ const TSCONFIG_BASE_TEMPLATE = `{
     "declarationMap": true,
     "composite": true
   }
-}`
+}`;
 
 const BIOME_JSON_TEMPLATE = `{
   "$schema": "https://biomejs.dev/schemas/2.0.0/schema.json",
@@ -125,7 +125,7 @@ const BIOME_JSON_TEMPLATE = `{
   "files": {
     "ignore": ["node_modules", "dist", ".next", "coverage"]
   }
-}`
+}`;
 
 // =============================================================================
 // Templates - Shared Package
@@ -151,7 +151,7 @@ const SHARED_PACKAGE_JSON_TEMPLATE = `{
     "@types/bun": "^{{bunTypesVersion}}",
     "typescript": "^{{typescriptVersion}}"
   }
-}`
+}`;
 
 const SHARED_TSCONFIG_TEMPLATE = `{
   "extends": "../../tsconfig.base.json",
@@ -161,7 +161,7 @@ const SHARED_TSCONFIG_TEMPLATE = `{
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"]
-}`
+}`;
 
 const SHARED_INDEX_TS_TEMPLATE = `/**
  * @{{name}}/shared
@@ -177,7 +177,7 @@ export type Result<T, E = Error> =
 export const Ok = <T>(data: T): Result<T, never> => ({ ok: true, data })
 
 export const Err = <E>(error: E): Result<never, E> => ({ ok: false, error })
-`
+`;
 
 // =============================================================================
 // Templates - Infrastructure
@@ -220,7 +220,7 @@ result-*
 # Logs
 *.log
 npm-debug.log*
-`
+`;
 
 const ENVRC_TEMPLATE = `# Enable Nix flake dev shell
 if [ -f flake.nix ]; then
@@ -240,7 +240,7 @@ fi
 if [ -f .envrc.local ]; then
   source_env .envrc.local
 fi
-`
+`;
 
 const FLAKE_NIX_TEMPLATE = `{
   description = "{{name}} - Monorepo";
@@ -289,7 +289,7 @@ const FLAKE_NIX_TEMPLATE = `{
         formatter = pkgs.nixfmt-rfc-style;
       }
     );
-}`
+}`;
 
 const README_TEMPLATE = `# {{name}}
 
@@ -336,7 +336,7 @@ bun validate
 | \`bun build\` | Build all packages |
 | \`bun test\` | Run all tests |
 | \`bun validate\` | Typecheck + lint + test |
-`
+`;
 
 // =============================================================================
 // Generator
@@ -350,8 +350,8 @@ bun validate
 export const generateMonorepo = (
   spec: ProjectSpec
 ): Effect.Effect<FileTree, Error, TemplateEngine> => {
-  const npmVersions = versions.npm as Record<string, string>
-  const runtimeVersions = versions.runtime as Record<string, string>
+  const npmVersions = versions.npm as Record<string, string>;
+  const runtimeVersions = versions.runtime as Record<string, string>;
 
   const data = {
     name: spec.name,
@@ -362,7 +362,7 @@ export const generateMonorepo = (
     biomeVersion: npmVersions['@biomejs/biome'],
     bunTypesVersion: npmVersions['@types/bun'],
     bunVersion: runtimeVersions['bun'],
-  }
+  };
 
   const templates: FileTree = {
     // Root configuration
@@ -381,7 +381,7 @@ export const generateMonorepo = (
     '.envrc': ENVRC_TEMPLATE,
     'flake.nix': FLAKE_NIX_TEMPLATE,
     'README.md': README_TEMPLATE,
-  }
+  };
 
-  return renderTemplates(templates, data)
-}
+  return renderTemplates(templates, data);
+};

@@ -4,7 +4,7 @@
  * Defines the contract for durable workflow execution.
  * Implemented by adapters like Temporal or Restate.
  */
-import { Context, Effect, Schema } from 'effect'
+import { Context, type Effect, Schema } from 'effect';
 
 // ============================================================================
 // SCHEMAS
@@ -16,10 +16,10 @@ export const WorkflowStatus = Schema.Literal(
   'completed',
   'failed',
   'cancelled',
-  'timed_out',
-)
+  'timed_out'
+);
 
-export type WorkflowStatus = Schema.Schema.Type<typeof WorkflowStatus>
+export type WorkflowStatus = Schema.Schema.Type<typeof WorkflowStatus>;
 
 export const WorkflowExecution = Schema.Struct({
   workflowId: Schema.String,
@@ -29,9 +29,9 @@ export const WorkflowExecution = Schema.Struct({
   completedAt: Schema.optional(Schema.Date),
   result: Schema.optional(Schema.Unknown),
   error: Schema.optional(Schema.String),
-})
+});
 
-export type WorkflowExecution = Schema.Schema.Type<typeof WorkflowExecution>
+export type WorkflowExecution = Schema.Schema.Type<typeof WorkflowExecution>;
 
 export const WorkflowOptions = Schema.Struct({
   taskQueue: Schema.String,
@@ -42,11 +42,11 @@ export const WorkflowOptions = Schema.Struct({
       initialInterval: Schema.optional(Schema.String),
       maximumInterval: Schema.optional(Schema.String),
       backoffCoefficient: Schema.optional(Schema.Number),
-    }),
+    })
   ),
-})
+});
 
-export type WorkflowOptions = Schema.Schema.Type<typeof WorkflowOptions>
+export type WorkflowOptions = Schema.Schema.Type<typeof WorkflowOptions>;
 
 // ============================================================================
 // ERRORS
@@ -59,7 +59,7 @@ export class WorkflowError extends Schema.TaggedError<WorkflowError>()('Workflow
     'WORKFLOW_FAILED',
     'CONNECTION_ERROR',
     'TIMEOUT',
-    'INTERNAL_ERROR',
+    'INTERNAL_ERROR'
   ),
   message: Schema.String,
   workflowId: Schema.optional(Schema.String),
@@ -73,24 +73,24 @@ export interface WorkflowService {
   readonly start: <_T>(
     workflowType: string,
     args: unknown[],
-    options: WorkflowOptions,
-  ) => Effect.Effect<WorkflowExecution, WorkflowError>
+    options: WorkflowOptions
+  ) => Effect.Effect<WorkflowExecution, WorkflowError>;
 
   readonly signal: (
     workflowId: string,
     signalName: string,
-    args: unknown[],
-  ) => Effect.Effect<void, WorkflowError>
+    args: unknown[]
+  ) => Effect.Effect<void, WorkflowError>;
 
   readonly query: <T>(
     workflowId: string,
     queryType: string,
-    args: unknown[],
-  ) => Effect.Effect<T, WorkflowError>
+    args: unknown[]
+  ) => Effect.Effect<T, WorkflowError>;
 
-  readonly cancel: (workflowId: string) => Effect.Effect<void, WorkflowError>
+  readonly cancel: (workflowId: string) => Effect.Effect<void, WorkflowError>;
 
-  readonly getStatus: (workflowId: string) => Effect.Effect<WorkflowExecution, WorkflowError>
+  readonly getStatus: (workflowId: string) => Effect.Effect<WorkflowExecution, WorkflowError>;
 }
 
 export class Workflow extends Context.Tag('Workflow')<Workflow, WorkflowService>() {}
