@@ -1,20 +1,25 @@
-# Claude Desktop MCP server configuration
-# Uses /bin/sh wrapper to inject Nix PATH for Electron app compatibility
-# Electron apps don't inherit shell PATH, so we must explicitly inject Nix paths
+# Claude Desktop and Claude Code MCP server configuration
+# Single source of truth for all MCP servers
 #
-# NOTE: Keep MCP servers in sync with config/agents/mcp-servers.json
-# This module uses wrapNpxCommand for Electron PATH compatibility.
-# Claude Code CLI uses direct npx commands (see agents.nix).
+# This module generates:
+# 1. Claude Desktop config (~/Library/Application Support/Claude/claude_desktop_config.json)
+#    - Uses /bin/sh wrapper to inject Nix PATH for Electron app compatibility
+# 2. Claude Code CLI config (~/.claude.json via agents.nix)
+#    - Uses direct npx commands (shell PATH already available)
 {
   config,
   lib,
   ...
 }:
 let
-  inherit (lib) concatStringsSep mkEnableOption mkIf;
+  inherit (lib)
+    concatStringsSep
+    mapAttrs
+    mkEnableOption
+    mkIf
+    ;
+
   # Determinate Nix profile paths (in priority order)
-  # Primary: /etc/profiles/per-user/hank/bin (where npx actually lives)
-  # Fallbacks for different Nix setups
   nixPaths = [
     "/etc/profiles/per-user/hank/bin"
     "/run/current-system/sw/bin"
@@ -23,47 +28,127 @@ let
   ];
   pathString = concatStringsSep ":" nixPaths;
 
-  # Wrapper to inject PATH for Electron apps that can't find Nix binaries
-  wrapNpxCommand =
-    pkg: extraArgs:
-    let
-      argsString = if extraArgs == [ ] then "" else " " + (concatStringsSep " " extraArgs);
-    in
-    {
-      command = "/bin/sh";
+  # ═══════════════════════════════════════════════════════════════════════════
+  # SINGLE SOURCE OF TRUTH: MCP Server Definitions
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Add/remove servers here - both Desktop and CLI configs auto-generate
+  mcpServerDefs = {
+    memory = {
+      package = "@modelcontextprotocol/server-memory";
+      args = [ ];
+    };
+    filesystem = {
+      package = "@modelcontextprotocol/server-filesystem";
       args = [
-        "-c"
-        "PATH=${pathString}:$PATH exec npx -y ${pkg}${argsString}"
+        "$HOME/src"
+        "$HOME/dotfiles"
+        "$HOME/Documents"
       ];
     };
-
-  mcpServers = {
-    # Keep in sync with config/agents/mcp-servers.json
-    memory = wrapNpxCommand "@modelcontextprotocol/server-memory" [ ];
-    filesystem = wrapNpxCommand "@modelcontextprotocol/server-filesystem" [
-      "$HOME/src"
-      "$HOME/dotfiles"
-      "$HOME/Documents"
-    ];
-    git = wrapNpxCommand "@modelcontextprotocol/server-git" [ ];
-    "sequential-thinking" = wrapNpxCommand "@modelcontextprotocol/server-sequential-thinking" [ ];
-    context7 = wrapNpxCommand "@upstash/context7-mcp" [ ];
-    fetch = wrapNpxCommand "@modelcontextprotocol/server-fetch" [ ];
-    repomix = wrapNpxCommand "repomix" [ "--mcp" ];
+    git = {
+      package = "@modelcontextprotocol/server-git";
+      args = [ ];
+    };
+    sequential-thinking = {
+      package = "@modelcontextprotocol/server-sequential-thinking";
+      args = [ ];
+    };
+    context7 = {
+      package = "@upstash/context7-mcp";
+      args = [ ];
+    };
+    fetch = {
+      package = "@modelcontextprotocol/server-fetch";
+      args = [ ];
+    };
+    repomix = {
+      package = "repomix";
+      args = [ "--mcp" ];
+    };
+    signet = {
+      # Local MCP server for Signet code quality
+      command = "bun";
+      args = [
+        "run"
+        "/Users/hank/dotfiles/config/signet/src/mcp-server.ts"
+      ];
+      isLocal = true; # Not an npx package
+    };
   };
 
-  configJson = builtins.toJSON { inherit mcpServers; };
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Format Generators
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  # Claude Desktop format: wrap npx in /bin/sh to inject PATH
+  toDesktopFormat =
+    _name: def:
+    if def.isLocal or false then
+      {
+        command = def.command;
+        args = def.args;
+      }
+    else
+      let
+        argsString = if def.args == [ ] then "" else " " + (concatStringsSep " " def.args);
+      in
+      {
+        command = "/bin/sh";
+        args = [
+          "-c"
+          "PATH=${pathString}:$PATH exec npx -y ${def.package}${argsString}"
+        ];
+      };
+
+  # Claude Code CLI format: direct npx commands (shell has PATH)
+  toCliFormat =
+    _name: def:
+    if def.isLocal or false then
+      {
+        command = def.command;
+        args = def.args;
+        type = "stdio";
+      }
+    else
+      {
+        command = "npx";
+        args = [ "-y" def.package ] ++ def.args;
+        type = "stdio";
+      };
+
+  # Generate both formats
+  desktopMcpServers = mapAttrs toDesktopFormat mcpServerDefs;
+  cliMcpServers = mapAttrs toCliFormat mcpServerDefs;
+
+  # Config JSON for Claude Desktop
+  desktopConfigJson = builtins.toJSON { mcpServers = desktopMcpServers; };
+
+  # Config JSON for Claude Code CLI (used by agents.nix)
+  cliConfigJson = builtins.toJSON cliMcpServers;
 in
 {
   options.modules.home.apps.claude = {
-    enable = mkEnableOption "Claude Desktop MCP servers";
+    enable = mkEnableOption "Claude Desktop and Code MCP servers";
+
+    # Expose CLI config for agents.nix to use
+    cliMcpServersJson = lib.mkOption {
+      type = lib.types.str;
+      default = cliConfigJson;
+      readOnly = true;
+      description = "Generated MCP servers JSON for Claude Code CLI";
+    };
   };
 
   config = mkIf config.modules.home.apps.claude.enable {
     # Claude Desktop stores config in ~/Library/Application Support/Claude/
-    # This is a macOS-specific path, not XDG
     home.file."Library/Application Support/Claude/claude_desktop_config.json" = {
-      text = configJson;
+      text = desktopConfigJson;
+    };
+
+    # Generate mcp-servers.json for Claude Code CLI (used by agents.nix)
+    # This replaces the manually maintained config/agents/mcp-servers.json
+    xdg.configFile."claude/mcp-servers.json" = {
+      text = cliConfigJson;
     };
   };
 }
