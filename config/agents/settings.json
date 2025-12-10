@@ -212,15 +212,6 @@
             "timeout": 15
           }
         ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun run \"$HOME/dotfiles/config/agents/hooks/assumption-detector.ts\"",
-            "timeout": 15
-          }
-        ]
       }
     ]
   },
