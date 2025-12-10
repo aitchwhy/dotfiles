@@ -31,7 +31,6 @@ in
     ./services/evolution-agent.nix
 
     # Applications
-    ./safari.nix
     ./terminal.nix
     ./activity-monitor.nix
     ./xcode.nix
@@ -58,7 +57,6 @@ in
       kanata.enable = mkDefault true;
       tailscale.enable = mkDefault true;
       secrets.enable = mkDefault true;
-      safari.enable = mkDefault false; # Disabled: macOS sandboxing prevents writing to Safari container
       terminal.enable = mkDefault true;
       activityMonitor.enable = mkDefault true;
       xcode.enable = mkDefault true;
