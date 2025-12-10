@@ -252,6 +252,34 @@ sig-gen TYPE NAME:
     @signet gen {{ TYPE }} {{ NAME }}
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# INFRASTRUCTURE (Terranix + OpenTofu)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Generate Terraform JSON from Terranix (Nix -> Terraform)
+tf-gen:
+    @echo "Generating Terraform config from Nix..."
+    nix build .#terraform-config
+    @mkdir -p infra
+    cp result/config.tf.json infra/
+    @echo "Generated infra/config.tf.json"
+
+# Terraform/OpenTofu plan
+tf-plan: tf-gen
+    cd infra && tofu plan
+
+# Terraform/OpenTofu apply
+tf-apply: tf-gen
+    cd infra && tofu apply
+
+# Terraform/OpenTofu init
+tf-init:
+    cd infra && tofu init
+
+# Terraform/OpenTofu destroy (use with caution)
+tf-destroy:
+    cd infra && tofu destroy
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # CONTEXT GENERATION
 # ═══════════════════════════════════════════════════════════════════════════════
 
