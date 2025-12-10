@@ -45,9 +45,11 @@ Run `just gen-context` to generate editor-specific rule files:
 
 - **Runtime**: Bun 1.3+, Node 25+ (current, not LTS), UV 0.5+ (Python)
 - **TypeScript**: strict mode, Zod v4, Biome 2.3+
+- **Effects**: Effect-TS 3.x (typed errors, dependencies, retries)
 - **Frontend**: React 19, TanStack Router, XState 5, Tailwind v4
-- **Backend**: Hono 4.x, Drizzle ORM, Effect-TS
-- **Infra**: Nix Flakes + nix-darwin, Pulumi (GCP: Cloud Run, Cloud SQL, Pub/Sub)
+- **Backend**: Hono 4.x, Drizzle ORM, Effect-TS services
+- **APIs**: TypeSpec → OpenAPI → codegen
+- **Infra**: Nix Flakes + nix-darwin, Terranix → OpenTofu, Pulumi (GCP)
 
 ## Core Principles
 
@@ -118,12 +120,16 @@ return Effect.fail(new UserNotFoundError({ id }));
 | Skill | Purpose |
 |-------|---------|
 | `typescript-patterns` | Branded types, Result types, parse don't validate |
-| `zod-patterns` | TypeScript-first Zod (never use z.infer) |
+| `zod-patterns` | TypeScript-first Zod (never use z.infer), Zod v4 features |
+| `effect-ts-patterns` | Effect<A,E,R>, Layers, Services, typed errors |
 | `signet-patterns` | Hexagonal architecture, Effect Schema |
+| `signet-generator-patterns` | Extend Signet with new generators |
 | `result-patterns` | Error handling |
 | `tdd-patterns` | Red-Green-Refactor |
 | `nix-darwin-patterns` | Nix flakes + home-manager |
 | `nix-flake-parts` | Modular flakes with flake-parts |
+| `terranix-patterns` | Nix → Terraform → OpenTofu |
+| `typespec-patterns` | API-first, OpenAPI codegen |
 | `hono-workers` | Cloudflare Workers APIs |
 | `tanstack-patterns` | Router + Query |
 | `ember-patterns` | Ember platform |
