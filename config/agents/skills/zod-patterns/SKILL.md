@@ -278,3 +278,118 @@ export const createUser = (data: z.infer<typeof createUserSchema>) => { ... };
 // CORRECT - API contract is explicit in type
 export const createUser = (data: CreateUser) => { ... };
 ```
+
+---
+
+## Zod v4 New Features (December 2025)
+
+### Template Literal Types
+
+```typescript
+// CSS units - previously impossible
+const CSSLength = z.templateLiteral([z.number(), z.literal('px')]);
+// Type: `${number}px`
+
+const CSSUnit = z.templateLiteral([
+  z.number(),
+  z.union([z.literal('px'), z.literal('em'), z.literal('rem'), z.literal('%')]),
+]);
+// Type: `${number}px` | `${number}em` | `${number}rem` | `${number}%`
+```
+
+### Built-in JSON Schema Conversion
+
+```typescript
+import * as z from "zod/v4";
+
+const ApiResponseSchema = z.object({
+  data: z.array(userSchema),
+  pagination: z.object({
+    page: z.number().int().min(1),
+    pageSize: z.number().int().min(1).max(100),
+    total: z.number().int().min(0),
+  }),
+});
+
+// Direct conversion - no third-party library needed
+const jsonSchema = ApiResponseSchema.toJSONSchema();
+// Use for OpenAPI, form generation, etc.
+```
+
+### Zod Mini for Edge Functions
+
+```typescript
+import * as zm from "@zod/mini";
+
+// ~1.9KB gzipped - perfect for edge/serverless
+const LightweightSchema = zm.object({
+  id: zm.pipe(zm.string(), zm.check(zm.uuid())),
+  name: zm.pipe(zm.string(), zm.check(zm.minLength(1))),
+});
+```
+
+### Global Schema Registry
+
+```typescript
+// Register schemas for large apps
+z.globalRegistry.register("User", userSchema);
+z.globalRegistry.register("ApiResponse", apiResponseSchema);
+
+// Retrieve by name
+const retrieved = z.globalRegistry.get("User");
+
+// List all registered schemas
+for (const [key, schema] of z.globalRegistry.entries()) {
+  console.log(`${key}: ${schema.toJSONSchema()}`);
+}
+```
+
+### Pretty Error Messages
+
+```typescript
+const result = userSchema.safeParse(invalidData);
+if (!result.success) {
+  // Built-in pretty printing
+  const formatted = z.prettifyError(result.error);
+  console.error(formatted);
+  // Output:
+  // ✖ Invalid email at "email"
+  // ✖ Invalid enum value at "role". Expected 'admin' | 'user' | 'guest'
+}
+```
+
+### File Validation
+
+```typescript
+const UploadSchema = z.file()
+  .maxSize(5_000_000) // 5MB
+  .mimeType(["image/png", "image/jpeg", "application/pdf"]);
+
+// Use with FormData
+const formData = await request.formData();
+const file = formData.get("document");
+const result = UploadSchema.safeParse(file);
+```
+
+### Performance (Zod v4 vs v3)
+
+| Operation | Zod 3 | Zod 4 | Improvement |
+|-----------|-------|-------|-------------|
+| String parsing | 805 µs | 57 µs | **14x faster** |
+| Array parsing | 1200 µs | 171 µs | **7x faster** |
+| Object parsing | 805 µs | 124 µs | **6.5x faster** |
+| Type instantiations | 25,000 | ~175 | **143x fewer** |
+| Bundle size | 57KB | 24KB | **57% smaller** |
+
+### Import Migration
+
+```typescript
+// v3 import
+import { z } from "zod";
+
+// v4 import (same API, just faster)
+import * as z from "zod/v4";
+
+// v4 mini (for edge)
+import * as z from "@zod/mini";
+```
