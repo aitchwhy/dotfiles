@@ -1,4 +1,9 @@
 {
+  "signet": {
+    "command": "bun",
+    "args": ["run", "/Users/hank/dotfiles/config/signet/src/mcp-server.ts"],
+    "type": "stdio"
+  },
   "memory": {
     "command": "npx",
     "args": ["-y", "@modelcontextprotocol/server-memory"],
