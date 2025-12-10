@@ -17,7 +17,6 @@ in
     # Static configs (read-only symlinks)
     # Note: Cursor is handled separately in cursor.nix (macOS uses ~/Library/Application Support/)
     xdg.configFile = {
-      "aider".source = ../../../config/aider;
       "lazydocker".source = ../../../config/lazydocker;
       "httpie".source = ../../../config/httpie;
       "just".source = ../../../config/just;
