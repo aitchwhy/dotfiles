@@ -8,8 +8,8 @@
  *
  * For now, this tier is skipped and always passes.
  */
-import { Effect } from 'effect'
-import type { TierResult, VerificationOptions } from '../index.js'
+import { Effect } from 'effect';
+import type { TierResult, VerificationOptions } from '../index.js';
 
 // =============================================================================
 // Tier Implementation
@@ -22,8 +22,8 @@ import type { TierResult, VerificationOptions } from '../index.js'
  * Full implementation requires Claude API integration.
  */
 export const runReviewTier = (_opts: VerificationOptions): Effect.Effect<TierResult, Error> =>
-  Effect.gen(function* () {
-    const startTime = Date.now()
+  Effect.sync(() => {
+    const startTime = Date.now();
 
     // This tier is not yet implemented
     // Return success with informational message
@@ -37,5 +37,5 @@ export const runReviewTier = (_opts: VerificationOptions): Effect.Effect<TierRes
         'Future: Claude API integration for automated code review',
       ],
       duration: Date.now() - startTime,
-    }
-  })
+    };
+  });

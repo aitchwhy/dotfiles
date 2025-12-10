@@ -7,10 +7,11 @@
  * - Branded type verification
  * - Effect Schema conformance checks
  */
-import { Effect } from 'effect'
-import { readdir, readFile } from 'node:fs/promises'
-import { join, extname } from 'node:path'
-import type { TierResult, VerificationOptions } from '../index.js'
+
+import { readdir, readFile } from 'node:fs/promises';
+import { extname, join } from 'node:path';
+import { Effect } from 'effect';
+import type { TierResult, VerificationOptions } from '../index.js';
 
 // =============================================================================
 // Basic Checks (Placeholder)
@@ -20,60 +21,64 @@ import type { TierResult, VerificationOptions } from '../index.js'
  * Check for common formal verification patterns
  */
 const checkFormalPatterns = (content: string): { found: string[]; missing: string[] } => {
-  const found: string[] = []
-  const missing: string[] = []
+  const found: string[] = [];
+  const missing: string[] = [];
 
   // Check for branded types
   if (content.includes('Brand<') || content.includes('& { readonly __brand')) {
-    found.push('branded-types')
+    found.push('branded-types');
   }
 
   // Check for satisfies pattern (TypeScript-first Zod)
   if (content.includes('satisfies z.ZodType') || content.includes('satisfies Schema.Schema')) {
-    found.push('satisfies-pattern')
+    found.push('satisfies-pattern');
   }
 
   // Check for property-based tests
-  if (content.includes('test.prop') || content.includes('fc.assert') || content.includes('fc.property')) {
-    found.push('property-tests')
+  if (
+    content.includes('test.prop') ||
+    content.includes('fc.assert') ||
+    content.includes('fc.property')
+  ) {
+    found.push('property-tests');
   }
 
   // Check for Effect-TS error handling
   if (content.includes('Effect.fail(') || content.includes('Effect.catchAll(')) {
-    found.push('effect-errors')
+    found.push('effect-errors');
   }
 
   // Check for Result types
   if (content.includes('Result<') || content.includes(': Result')) {
-    found.push('result-types')
+    found.push('result-types');
   }
 
-  return { found, missing }
-}
+  return { found, missing };
+};
 
 /**
  * Find TypeScript files
  */
 const findTsFiles = async (dir: string): Promise<string[]> => {
-  const files: string[] = []
+  const files: string[] = [];
 
   try {
-    const entries = await readdir(dir, { withFileTypes: true })
+    const entries = await readdir(dir, { withFileTypes: true });
 
     for (const entry of entries) {
-      const name = entry.name
-      const fullPath = join(dir, name)
+      const name = entry.name;
+      const fullPath = join(dir, name);
 
       if (name.startsWith('.') || name === 'node_modules') {
-        continue
+        continue;
       }
 
       if (entry.isDirectory()) {
-        files.push(...(await findTsFiles(fullPath)))
+        files.push(...(await findTsFiles(fullPath)));
       } else {
-        const ext = extname(name)
+        const ext = extname(name);
         if (['.ts', '.tsx'].includes(ext)) {
-          files.push(fullPath)
+          files.push(fullPath);
         }
       }
     }
@@ -81,8 +86,8 @@ const findTsFiles = async (dir: string): Promise<string[]> => {
     // Directory doesn't exist
   }
 
-  return files
-}
+  return files;
+};
 
 // =============================================================================
 // Tier Implementation
@@ -96,18 +101,18 @@ const findTsFiles = async (dir: string): Promise<string[]> => {
  */
 export const runFormalTier = (opts: VerificationOptions): Effect.Effect<TierResult, Error> =>
   Effect.gen(function* () {
-    const startTime = Date.now()
-    const details: string[] = []
-    let totalWarnings = 0
+    const startTime = Date.now();
+    const details: string[] = [];
+    let totalWarnings = 0;
 
-    const srcPath = join(opts.path, 'src')
+    const srcPath = join(opts.path, 'src');
     const files = yield* Effect.tryPromise({
       try: () => findTsFiles(srcPath),
       catch: () => new Error('Failed to find files'),
-    }).pipe(Effect.catchAll(() => Effect.succeed([] as string[])))
+    }).pipe(Effect.catchAll(() => Effect.succeed([] as string[])));
 
     if (files.length === 0) {
-      details.push('No source files found')
+      details.push('No source files found');
       return {
         tier: 'formal' as const,
         passed: true,
@@ -115,32 +120,32 @@ export const runFormalTier = (opts: VerificationOptions): Effect.Effect<TierResu
         warnings: 0,
         details,
         duration: Date.now() - startTime,
-      }
+      };
     }
 
     // Aggregate pattern usage across codebase
-    const allFound = new Set<string>()
+    const allFound = new Set<string>();
 
     for (const file of files.slice(0, 100)) {
       // Limit for performance
       const content = yield* Effect.tryPromise({
         try: () => readFile(file, 'utf-8'),
         catch: () => new Error('Failed to read file'),
-      }).pipe(Effect.catchAll(() => Effect.succeed('')))
+      }).pipe(Effect.catchAll(() => Effect.succeed('')));
 
       if (content) {
-        const { found } = checkFormalPatterns(content)
-        found.forEach((p) => allFound.add(p))
+        const { found } = checkFormalPatterns(content);
+        found.forEach((p) => allFound.add(p));
       }
     }
 
     // Report what was found
     if (allFound.size > 0) {
-      details.push(`Formal patterns detected: ${Array.from(allFound).join(', ')}`)
+      details.push(`Formal patterns detected: ${Array.from(allFound).join(', ')}`);
     } else {
-      details.push('No formal verification patterns detected')
-      details.push('Consider adding: branded types, satisfies pattern, property tests')
-      totalWarnings = 1
+      details.push('No formal verification patterns detected');
+      details.push('Consider adding: branded types, satisfies pattern, property tests');
+      totalWarnings = 1;
     }
 
     // This tier is informational - doesn't block
@@ -151,5 +156,5 @@ export const runFormalTier = (opts: VerificationOptions): Effect.Effect<TierResu
       warnings: totalWarnings,
       details,
       duration: Date.now() - startTime,
-    }
-  })
+    };
+  });

@@ -4,7 +4,7 @@
  * Defines rules for automatic agent/skill activation based on context.
  * Replaces manual slash command invocation with intelligent triggering.
  */
-import { Schema } from 'effect'
+import { Schema } from 'effect';
 
 // =============================================================================
 // Trigger Types
@@ -16,23 +16,27 @@ export type ContextSignal =
   | { readonly type: 'file_pattern'; readonly patterns: readonly string[] }
   | { readonly type: 'output_pattern'; readonly patterns: readonly string[] }
   | { readonly type: 'git_state'; readonly states: readonly GitState[] }
-  | { readonly type: 'always' }
+  | { readonly type: 'always' };
 
-export type GitState = 'staged_changes' | 'unstaged_changes' | 'merge_conflict' | 'rebase_in_progress'
+export type GitState =
+  | 'staged_changes'
+  | 'unstaged_changes'
+  | 'merge_conflict'
+  | 'rebase_in_progress';
 
 /** Target to activate when triggered */
 export type TriggerTarget =
   | { readonly type: 'agent'; readonly name: string }
-  | { readonly type: 'skill'; readonly name: string }
+  | { readonly type: 'skill'; readonly name: string };
 
 /** Complete trigger rule */
 export type TriggerRule = {
-  readonly id: string
-  readonly description: string
-  readonly signals: readonly ContextSignal[]
-  readonly target: TriggerTarget
-  readonly priority: number // Higher = more important
-}
+  readonly id: string;
+  readonly description: string;
+  readonly signals: readonly ContextSignal[];
+  readonly target: TriggerTarget;
+  readonly priority: number; // Higher = more important
+};
 
 // =============================================================================
 // Trigger Registry Definition
@@ -194,7 +198,7 @@ export const TRIGGER_REGISTRY: readonly TriggerRule[] = [
     target: { type: 'skill', name: 'signet-patterns' },
     priority: 65,
   },
-] as const
+] as const;
 
 // =============================================================================
 // Schema Definitions
@@ -220,12 +224,12 @@ export const ContextSignalSchema = Schema.Union(
     ),
   }),
   Schema.Struct({ type: Schema.Literal('always') })
-)
+);
 
 export const TriggerTargetSchema = Schema.Union(
   Schema.Struct({ type: Schema.Literal('agent'), name: Schema.String }),
   Schema.Struct({ type: Schema.Literal('skill'), name: Schema.String })
-)
+);
 
 export const TriggerRuleSchema = Schema.Struct({
   id: Schema.String,
@@ -233,7 +237,7 @@ export const TriggerRuleSchema = Schema.Struct({
   signals: Schema.Array(ContextSignalSchema),
   target: TriggerTargetSchema,
   priority: Schema.Number,
-})
+});
 
 // =============================================================================
 // Utility Functions
@@ -241,12 +245,12 @@ export const TriggerRuleSchema = Schema.Struct({
 
 /** Get all rules sorted by priority (highest first) */
 export const getRulesByPriority = (): readonly TriggerRule[] =>
-  [...TRIGGER_REGISTRY].sort((a, b) => b.priority - a.priority)
+  [...TRIGGER_REGISTRY].sort((a, b) => b.priority - a.priority);
 
 /** Get rules for a specific target type */
 export const getRulesByTargetType = (type: 'agent' | 'skill'): readonly TriggerRule[] =>
-  TRIGGER_REGISTRY.filter((rule) => rule.target.type === type)
+  TRIGGER_REGISTRY.filter((rule) => rule.target.type === type);
 
 /** Get rule by ID */
 export const getRuleById = (id: string): TriggerRule | undefined =>
-  TRIGGER_REGISTRY.find((rule) => rule.id === id)
+  TRIGGER_REGISTRY.find((rule) => rule.id === id);
