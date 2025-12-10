@@ -30,6 +30,12 @@ import {
   type PatternConfig,
 } from '@/layers/ast-engine'
 import {
+  runVerification,
+  formatVerificationResult,
+  ALL_TIERS,
+  type TierName,
+} from '@/verification/index'
+import {
   PatternEngineLive,
   loadRulesFromDirectory,
   applyRules,
@@ -54,6 +60,10 @@ const fixOption = Options.boolean('fix').pipe(Options.withDefault(false))
 const dryRunOption = Options.boolean('dry-run').pipe(Options.withDefault(false))
 const verboseOption = Options.boolean('verbose').pipe(Options.withDefault(false))
 const rulesOption = Options.text('rules').pipe(Options.withDefault('rules'))
+const tiersOption = Options.text('tiers').pipe(
+  Options.withDescription('Comma-separated list of tiers to run (default: all)'),
+  Options.optional
+)
 
 const validateProjectType = (type: string): Effect.Effect<ProjectType, Error> => {
   if (PROJECT_TYPES.includes(type as ProjectType)) {
@@ -609,6 +619,54 @@ export const complyCommand = Command.make(
 )
 
 // =============================================================================
+// Verify Command - Unified 5-Tier Verification (Hard Gate)
+// =============================================================================
+
+export const verifyCommand = Command.make(
+  'verify',
+  { path: pathArg, fix: fixOption, verbose: verboseOption, tiers: tiersOption },
+  ({ path, fix, verbose, tiers }) =>
+    Effect.gen(function* () {
+      const targetPath = Option.getOrElse(path, () => '.')
+
+      // Parse tiers option
+      const selectedTiers: TierName[] = Option.match(tiers, {
+        onNone: () => [...ALL_TIERS],
+        onSome: (t) =>
+          t.split(',').map((s) => s.trim() as TierName).filter((t) => ALL_TIERS.includes(t)),
+      })
+
+      yield* Console.log(`\n🔏 Signet Verification (${selectedTiers.length} tiers)\n`)
+      yield* Console.log(`   Path: ${targetPath}`)
+      yield* Console.log(`   Tiers: ${selectedTiers.join(', ')}`)
+      if (fix) yield* Console.log(`   Mode: auto-fix enabled`)
+      yield* Console.log('')
+
+      // Run verification
+      const result = yield* runVerification({
+        path: targetPath,
+        tiers: selectedTiers,
+        fix,
+        verbose,
+      })
+
+      // Format and print results
+      const output = formatVerificationResult(result)
+      yield* Console.log(output)
+
+      // Exit with appropriate code (hard gate)
+      if (!result.passed) {
+        yield* Console.log('\n❌ Verification failed - blocking generation\n')
+        yield* Effect.fail(new Error(`Verification failed with ${result.totalErrors} error(s)`))
+      } else if (result.totalWarnings > 0) {
+        yield* Console.log('\n⚠️ Verification passed with warnings\n')
+      } else {
+        yield* Console.log('\n✅ All verification tiers passed\n')
+      }
+    })
+)
+
+// =============================================================================
 // Main Command
 // =============================================================================
 
@@ -622,6 +680,7 @@ Powered by Effect-TS, OXC, and ast-grep for high-performance AST analysis.
 Commands:
   signet init <type> <name>   Initialize a new project
   signet gen <type> <name>    Generate a workspace in existing project
+  signet verify [path]        🔏 Run 5-tier verification (hard gate)
   signet validate [path]      Validate project against spec and patterns
   signet enforce [--fix]      Run architecture enforcers
   signet reconcile [path]     Detect and fix code drift via AST analysis
@@ -635,12 +694,28 @@ Project Types:
   library     Standalone TypeScript library
   infra       Pulumi + process-compose infrastructure
 
+Verify Options (5-Tier Hard Gate):
+  --tiers <list>          Comma-separated tiers: patterns,formal,execution,review,context
+  --fix                   Auto-fix fixable issues
+  --verbose               Show detailed output
+
+Verification Tiers:
+  1. patterns   AST drift detection, code smells (any, ts-ignore, etc.)
+  2. formal     Branded types, satisfies patterns, property tests (info only)
+  3. execution  TypeScript check, Biome lint, test suite
+  4. review     Multi-agent code review (future: Claude API)
+  5. context    Hexagonal architecture, circular deps, layer violations
+
 Reconcile Options:
   --dry-run               Preview changes without applying
   --verbose               Show detailed output
   --rules <dir>           Custom YAML rules directory (default: rules/)
 
 Examples:
+  signet verify                             Run all 5 tiers
+  signet verify --tiers execution           Run only execution tier
+  signet verify --tiers patterns,execution  Run patterns + execution
+  signet verify --fix --verbose             Auto-fix with details
   signet init monorepo ember-platform
   signet gen api voice-service
   signet gen ui web-app
@@ -659,6 +734,7 @@ Examples:
     reconcileCommand,
     doctorCommand,
     complyCommand,
+    verifyCommand,
   ])
 )
 
