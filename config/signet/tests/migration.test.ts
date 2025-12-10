@@ -18,6 +18,7 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const SIGNET_SRC = join(__dirname, '..', 'src')
+const SIGNET_CLI = join(SIGNET_SRC, 'cli.ts')
 
 // =============================================================================
 // Helper Functions
@@ -49,9 +50,10 @@ function findTsFiles(dir: string): string[] {
 describe('Signet CLI', () => {
   describe('Help and Basic Commands', () => {
     test('signet --help renders help text', () => {
-      const result = spawnSync('signet', ['--help'], {
+      const result = spawnSync('bun', ['run', SIGNET_CLI, '--help'], {
         encoding: 'utf-8',
         timeout: 10000,
+        cwd: join(__dirname, '..'),
       })
 
       // CLI may exit with 0 or show help via different mechanism
@@ -59,9 +61,10 @@ describe('Signet CLI', () => {
     })
 
     test('signet --version shows version', () => {
-      const result = spawnSync('signet', ['--version'], {
+      const result = spawnSync('bun', ['run', SIGNET_CLI, '--version'], {
         encoding: 'utf-8',
         timeout: 10000,
+        cwd: join(__dirname, '..'),
       })
 
       // Should output some version info
@@ -236,9 +239,10 @@ describe('Hexagonal Architecture Generation', () => {
 
 describe('CLI Commands', () => {
   test('doctor command exists', () => {
-    const result = spawnSync('signet', ['doctor', '--help'], {
+    const result = spawnSync('bun', ['run', SIGNET_CLI, 'doctor', '--help'], {
       encoding: 'utf-8',
       timeout: 10000,
+      cwd: join(__dirname, '..'),
     })
 
     // Either shows help or indicates command exists
@@ -247,9 +251,10 @@ describe('CLI Commands', () => {
   })
 
   test('comply command exists', () => {
-    const result = spawnSync('signet', ['comply', '--help'], {
+    const result = spawnSync('bun', ['run', SIGNET_CLI, 'comply', '--help'], {
       encoding: 'utf-8',
       timeout: 10000,
+      cwd: join(__dirname, '..'),
     })
 
     // Either shows help or indicates command exists
