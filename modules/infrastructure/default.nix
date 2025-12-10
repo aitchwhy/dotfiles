@@ -1,8 +1,5 @@
 # Infrastructure modules
-# Terranix (Nix -> Terraform JSON -> OpenTofu)
-{ ... }:
-{
-  imports = [
-    ./terranix.nix
-  ];
+# NOTE: Terranix migrated to Pulumi (see infra/pulumi/)
+{...}: {
+  imports = [];
 }
