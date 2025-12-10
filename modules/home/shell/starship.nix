@@ -3,11 +3,9 @@
   config,
   lib,
   ...
-}:
-let
+}: let
   inherit (lib) mkEnableOption mkIf concatStrings;
-in
-{
+in {
   options.modules.home.shell.starship = {
     enable = mkEnableOption "starship prompt";
   };

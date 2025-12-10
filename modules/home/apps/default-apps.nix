@@ -5,20 +5,18 @@
   lib,
   pkgs,
   ...
-}:
-let
+}: let
   inherit (lib) mkEnableOption mkIf;
-in
-{
+in {
   options.modules.home.apps.defaultApps = {
     enable = mkEnableOption "default application handlers";
   };
 
   config = mkIf config.modules.home.apps.defaultApps.enable {
-    home.packages = [ pkgs.duti ];
+    home.packages = [pkgs.duti];
 
     # Set default apps after packages are installed
-    home.activation.setDefaultApps = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    home.activation.setDefaultApps = lib.hm.dag.entryAfter ["writeBoundary"] ''
       # PDF Expert for PDFs
       if [ -d "/Applications/PDF Expert.app" ]; then
         $DRY_RUN_CMD ${pkgs.duti}/bin/duti -s com.readdle.PDFExpert-Mac .pdf all

@@ -3,11 +3,9 @@
   config,
   lib,
   ...
-}:
-let
+}: let
   inherit (lib) mkEnableOption mkIf;
-in
-{
+in {
   options.modules.darwin.terminal = {
     enable = mkEnableOption "Terminal.app customization";
   };

@@ -5,16 +5,15 @@
   lib,
   pkgs,
   ...
-}:
-let
-  inherit (lib)
+}: let
+  inherit
+    (lib)
     mkDefault
     mkOption
     types
     mkIf
     ;
-in
-{
+in {
   options.modules.nixos.services.docker = {
     enable = mkOption {
       type = types.bool;
@@ -39,7 +38,7 @@ in
       autoPrune = {
         enable = true;
         dates = "weekly";
-        flags = [ "--all" ];
+        flags = ["--all"];
       };
 
       # Daemon configuration

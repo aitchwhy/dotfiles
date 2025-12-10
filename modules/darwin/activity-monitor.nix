@@ -3,9 +3,9 @@
   config,
   lib,
   ...
-}:
-let
-  inherit (lib)
+}: let
+  inherit
+    (lib)
     mkEnableOption
     mkOption
     mkIf
@@ -21,8 +21,7 @@ let
     cpu = 5; # CPU usage meter
     cpuHistory = 6; # CPU history graph
   };
-in
-{
+in {
   options.modules.darwin.activityMonitor = {
     enable = mkEnableOption "Activity Monitor customization";
 

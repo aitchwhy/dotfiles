@@ -13,9 +13,9 @@
   config,
   lib,
   ...
-}:
-let
-  inherit (lib)
+}: let
+  inherit
+    (lib)
     mkEnableOption
     mkOption
     mkIf
@@ -31,16 +31,20 @@ let
       medium = 1;
       firm = 2;
     }
-    .${cfg.clickPressure};
+    .${
+      cfg.clickPressure
+    };
 
   # Gesture value: 0=disabled, 2=enabled
-  gestureVal = enabled: if enabled then 2 else 0;
+  gestureVal = enabled:
+    if enabled
+    then 2
+    else 0;
 
   # Granular gesture values
   fourFingerHorizVal = gestureVal cfg.enableFourFingerHorizSwipe;
   swishConflictVal = gestureVal (!cfg.disableSwishConflicts);
-in
-{
+in {
   options.modules.darwin.trackpad = {
     enable = mkEnableOption "macOS trackpad customization";
 

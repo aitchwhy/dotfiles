@@ -12,17 +12,16 @@
   config,
   lib,
   ...
-}:
-let
-  inherit (lib)
+}: let
+  inherit
+    (lib)
     mkEnableOption
     mkOption
     mkIf
     types
     ;
   cfg = config.modules.home.apps.betterdisplay;
-in
-{
+in {
   options.modules.home.apps.betterdisplay = {
     enable = mkEnableOption "BetterDisplay configuration";
 

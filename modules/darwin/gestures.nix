@@ -17,17 +17,16 @@
   config,
   lib,
   ...
-}:
-let
-  inherit (lib)
+}: let
+  inherit
+    (lib)
     mkEnableOption
     mkOption
     mkIf
     types
     ;
   cfg = config.modules.darwin.gestures;
-in
-{
+in {
   options.modules.darwin.gestures = {
     enable = mkEnableOption "macOS gesture and hotkey customization";
 

@@ -12,12 +12,10 @@
   config,
   lib,
   ...
-}:
-let
+}: let
   inherit (lib) mkEnableOption mkIf;
   cfg = config.modules.home.apps.aerospace;
-in
-{
+in {
   options.modules.home.apps.aerospace = {
     enable = mkEnableOption "AeroSpace tiling window manager";
   };

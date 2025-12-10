@@ -13,17 +13,16 @@
   config,
   lib,
   ...
-}:
-let
-  inherit (lib)
+}: let
+  inherit
+    (lib)
     mkEnableOption
     mkOption
     mkIf
     types
     ;
   cfg = config.modules.home.apps.swish;
-in
-{
+in {
   options.modules.home.apps.swish = {
     enable = mkEnableOption "Swish trackpad window management";
 

@@ -1,7 +1,7 @@
 {
   "meta": {
     "frozen": "2025-12",
-    "updated": "2025-12-09",
+    "updated": "2025-12-10",
     "ssotVersion": "3.0.0"
   },
   "runtime": {
@@ -36,7 +36,7 @@
     "bruno-cli": "1.30.0"
   },
   "python": {
-    "python": "3.13.1",
+    "python": "3.14.0",
     "pydantic": "2.10.0",
     "ruff": "0.8.0"
   },
@@ -59,6 +59,8 @@
     "nixpkgs": "nixos-unstable",
     "nix-darwin": "github:LnL7/nix-darwin",
     "home-manager": "github:nix-community/home-manager",
+    "home-manager-stateVersion": "26.05",
+    "nixos-stateVersion": "26.05",
     "flake-parts": "github:hercules-ci/flake-parts",
     "git-hooks-nix": "github:cachix/git-hooks.nix",
     "nixfmt-rfc-style": "0.6.0",

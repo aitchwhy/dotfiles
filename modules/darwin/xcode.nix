@@ -3,16 +3,15 @@
   config,
   lib,
   ...
-}:
-let
-  inherit (lib)
+}: let
+  inherit
+    (lib)
     mkEnableOption
     mkOption
     mkIf
     types
     ;
-in
-{
+in {
   options.modules.darwin.xcode = {
     enable = mkEnableOption "Xcode customization";
 

@@ -12,9 +12,9 @@
   config,
   lib,
   ...
-}:
-let
-  inherit (lib)
+}: let
+  inherit
+    (lib)
     mkEnableOption
     mkIf
     mkDefault
@@ -23,8 +23,7 @@ let
   cfg = config.modules.darwin.secrets;
   secretsFile = ../../secrets/darwin.yaml;
   secretsExist = pathExists secretsFile;
-in
-{
+in {
   options.modules.darwin.secrets = {
     enable = mkEnableOption "sops-nix secrets for Darwin";
   };

@@ -3,16 +3,15 @@
   config,
   lib,
   ...
-}:
-let
-  inherit (lib)
+}: let
+  inherit
+    (lib)
     mkEnableOption
     mkIf
     mkOption
     types
     ;
-in
-{
+in {
   options.modules.home.tools.nixbuild = {
     enable = mkEnableOption "nixbuild.net remote builder SSH config";
 

@@ -12,11 +12,9 @@
   lib,
   pkgs,
   ...
-}:
-let
+}: let
   inherit (lib) mkEnableOption mkIf;
-in
-{
+in {
   options.modules.home.apps.signet = {
     enable = mkEnableOption "Signet (Code Quality & Generation Platform)";
   };
@@ -58,7 +56,7 @@ in
     };
 
     # Generate versions.json from src/stack/versions.ts on activation
-    home.activation.signetSetup = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    home.activation.signetSetup = lib.hm.dag.entryAfter ["writeBoundary"] ''
       SIGNET_DIR="${config.home.homeDirectory}/dotfiles/config/signet"
       VERSIONS_FILE="$SIGNET_DIR/versions.json"
 

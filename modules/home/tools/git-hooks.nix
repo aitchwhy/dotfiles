@@ -4,11 +4,9 @@
   config,
   lib,
   ...
-}:
-let
+}: let
   inherit (lib) mkEnableOption mkIf;
-in
-{
+in {
   options.modules.home.tools.git-hooks = {
     enable = mkEnableOption "global git hooks";
   };

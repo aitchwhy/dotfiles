@@ -3,11 +3,9 @@
   config,
   lib,
   ...
-}:
-let
+}: let
   inherit (lib) mkEnableOption mkIf;
-in
-{
+in {
   options.modules.home.tools.atuin = {
     enable = mkEnableOption "atuin shell history";
   };
@@ -60,7 +58,7 @@ in
           "yarn"
         ];
 
-        common_prefix = [ "sudo" ];
+        common_prefix = ["sudo"];
 
         sync.records = true;
         theme.name = "autumn";

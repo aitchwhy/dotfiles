@@ -5,17 +5,16 @@
   lib,
   pkgs,
   ...
-}:
-let
-  inherit (lib)
+}: let
+  inherit
+    (lib)
     mkEnableOption
     mkOption
     mkIf
     types
     ;
   cfg = config.modules.darwin.evolutionAgent;
-in
-{
+in {
   options.modules.darwin.evolutionAgent = {
     enable = mkEnableOption "Evolution health monitoring agent";
 

@@ -5,16 +5,15 @@
   lib,
   pkgs,
   ...
-}:
-let
-  inherit (lib)
+}: let
+  inherit
+    (lib)
     mkDefault
     mkOption
     types
     mkIf
     ;
-in
-{
+in {
   options.modules.nixos.services.tailscale = {
     enable = mkOption {
       type = types.bool;
@@ -51,16 +50,21 @@ in
       authKeyFile = config.modules.nixos.services.tailscale.authKeyFile;
 
       # Extra arguments
-      extraUpFlags = [
-        "--ssh"
-      ]
-      ++ (if config.modules.nixos.services.tailscale.exitNode then [ "--advertise-exit-node" ] else [ ]);
+      extraUpFlags =
+        [
+          "--ssh"
+        ]
+        ++ (
+          if config.modules.nixos.services.tailscale.exitNode
+          then ["--advertise-exit-node"]
+          else []
+        );
     };
 
     # Trust Tailscale interface in firewall
     networking.firewall = {
-      trustedInterfaces = [ "tailscale0" ];
-      allowedUDPPorts = [ 41641 ];
+      trustedInterfaces = ["tailscale0"];
+      allowedUDPPorts = [41641];
     };
 
     # Enable IP forwarding if acting as exit node
@@ -70,12 +74,12 @@ in
     };
 
     # Tailscale CLI
-    environment.systemPackages = [ pkgs.tailscale ];
+    environment.systemPackages = [pkgs.tailscale];
 
     # Systemd settings for Tailscale
     systemd.services.tailscaled = {
-      after = [ "network-online.target" ];
-      wants = [ "network-online.target" ];
+      after = ["network-online.target"];
+      wants = ["network-online.target"];
     };
   };
 }

@@ -4,16 +4,15 @@
   lib,
   pkgs,
   ...
-}:
-let
-  inherit (lib)
+}: let
+  inherit
+    (lib)
     mkEnableOption
     mkOption
     mkIf
     types
     ;
-in
-{
+in {
   options.modules.home.tools.development = {
     enable = mkEnableOption "development tools";
 
@@ -32,7 +31,7 @@ in
     programs.zoxide = {
       enable = true;
       enableZshIntegration = true;
-      options = [ ]; # Standard: z for jump, zi for interactive
+      options = []; # Standard: z for jump, zi for interactive
     };
 
     # Modern Unix replacements

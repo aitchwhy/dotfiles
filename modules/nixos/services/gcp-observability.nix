@@ -6,9 +6,9 @@
   lib,
   pkgs,
   ...
-}:
-let
-  inherit (lib)
+}: let
+  inherit
+    (lib)
     mkOption
     types
     mkIf
@@ -16,8 +16,7 @@ let
     ;
 
   cfg = config.modules.nixos.services.gcp-observability;
-in
-{
+in {
   options.modules.nixos.services.gcp-observability = {
     enable = mkEnableOption "Google Cloud observability agents";
 
@@ -107,9 +106,9 @@ in
     # Using a systemd service with the official binary instead
     systemd.services.otel-collector = mkIf cfg.metrics.enable {
       description = "OpenTelemetry Collector for GCP";
-      wantedBy = [ "multi-user.target" ];
-      after = [ "network-online.target" ];
-      wants = [ "network-online.target" ];
+      wantedBy = ["multi-user.target"];
+      after = ["network-online.target"];
+      wants = ["network-online.target"];
 
       environment = mkIf (cfg.credentialsFile != null) {
         GOOGLE_APPLICATION_CREDENTIALS = toString cfg.credentialsFile;
@@ -242,11 +241,11 @@ in
             };
             relabel_configs = [
               {
-                source_labels = [ "__journal__systemd_unit" ];
+                source_labels = ["__journal__systemd_unit"];
                 target_label = "unit";
               }
               {
-                source_labels = [ "__journal_priority_keyword" ];
+                source_labels = ["__journal_priority_keyword"];
                 target_label = "level";
               }
             ];
@@ -257,7 +256,7 @@ in
 
     # Firewall: Only expose metrics on Tailscale interface
     networking.firewall.interfaces.tailscale0 = mkIf cfg.nodeExporter.enable {
-      allowedTCPPorts = [ cfg.nodeExporter.port ];
+      allowedTCPPorts = [cfg.nodeExporter.port];
     };
 
     # Install additional observability tools

@@ -3,11 +3,9 @@
   config,
   lib,
   ...
-}:
-let
+}: let
   inherit (lib) mkEnableOption mkIf;
-in
-{
+in {
   options.modules.home.tools.fzf = {
     enable = mkEnableOption "fzf fuzzy finder";
   };
@@ -29,10 +27,10 @@ in
       ];
 
       fileWidgetCommand = "fd --type f --hidden --follow --exclude .git";
-      fileWidgetOptions = [ "--preview 'bat --style=numbers --color=always {}'" ];
+      fileWidgetOptions = ["--preview 'bat --style=numbers --color=always {}'"];
 
       changeDirWidgetCommand = "fd --type d --hidden --follow --exclude .git";
-      changeDirWidgetOptions = [ "--preview 'eza --tree --level=2 --icons {}'" ];
+      changeDirWidgetOptions = ["--preview 'eza --tree --level=2 --icons {}'"];
 
       historyWidgetOptions = [
         "--sort"

@@ -4,11 +4,9 @@
   lib,
   pkgs,
   ...
-}:
-let
+}: let
   inherit (lib) mkDefault;
-in
-{
+in {
   imports = [
     ./system.nix
     ./security.nix

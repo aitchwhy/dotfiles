@@ -9,11 +9,9 @@
   lib,
   pkgs,
   ...
-}:
-let
+}: let
   inherit (lib) mkEnableOption mkIf;
-in
-{
+in {
   options.modules.darwin.kanata = {
     enable = mkEnableOption "Kanata keyboard remapper daemon";
   };

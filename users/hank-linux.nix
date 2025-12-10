@@ -1,10 +1,9 @@
 # Linux user configuration
 # This file adapts the macOS configuration for NixOS/Linux
 # Disables macOS-specific modules while keeping cross-platform tools
-{ pkgs, ... }:
-{
+{pkgs, ...}: {
   # Import home modules
-  imports = [ ../modules/home ];
+  imports = [../modules/home];
 
   # User identity (Linux paths)
   home = {

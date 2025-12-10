@@ -1,12 +1,7 @@
 # Home Manager module aggregator
-{
-  lib,
-  ...
-}:
-let
+{lib, ...}: let
   inherit (lib) mkDefault;
-in
-{
+in {
   imports = [
     # Shell
     ./shell/zsh.nix

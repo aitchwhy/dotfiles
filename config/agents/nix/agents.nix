@@ -6,19 +6,17 @@
   lib,
   pkgs,
   ...
-}:
-let
+}: let
   inherit (lib) mkEnableOption mkIf;
   agentsDir = "${config.home.homeDirectory}/dotfiles/config/agents";
-in
-{
+in {
   options.modules.home.apps.agents = {
     enable = mkEnableOption "Unified AI agent configuration";
   };
 
   config = mkIf config.modules.home.apps.agents.enable {
     # jq required for JSON merging
-    home.packages = [ pkgs.jq ];
+    home.packages = [pkgs.jq];
 
     # Static configs (immutable - symlinked)
     home.file = {
@@ -88,7 +86,7 @@ in
     };
 
     # Mutable configs (merge/copy-on-init pattern with backup and validation)
-    home.activation.agentsConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    home.activation.agentsConfig = lib.hm.dag.entryAfter ["writeBoundary"] ''
       CLAUDE_DIR="$HOME/.claude"
       SETTINGS_FILE="$CLAUDE_DIR/settings.json"
       MCP_FILE="$HOME/.claude.json"

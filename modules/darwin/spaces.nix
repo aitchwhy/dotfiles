@@ -4,17 +4,16 @@
   config,
   lib,
   ...
-}:
-let
-  inherit (lib)
+}: let
+  inherit
+    (lib)
     mkEnableOption
     mkOption
     mkIf
     types
     ;
   cfg = config.modules.darwin.spaces;
-in
-{
+in {
   options.modules.darwin.spaces = {
     enable = mkEnableOption "macOS Spaces/Mission Control configuration";
 
@@ -58,7 +57,10 @@ in
 
     # Spaces-specific settings
     system.defaults.CustomUserPreferences."com.apple.spaces" = {
-      "spans-displays" = if cfg.separateSpacesPerDisplay then 0 else 1;
+      "spans-displays" =
+        if cfg.separateSpacesPerDisplay
+        then 0
+        else 1;
     };
 
     # Global space switching behavior

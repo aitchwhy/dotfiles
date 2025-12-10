@@ -20,7 +20,7 @@
     ];
 
     # CLI tools (most in home.packages via Nix)
-    brews = [ ];
+    brews = [];
 
     # GUI Applications (Homebrew Casks)
     casks = [

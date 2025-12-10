@@ -8,17 +8,16 @@
   lib,
   pkgs,
   ...
-}:
-let
-  inherit (lib)
+}: let
+  inherit
+    (lib)
     mkEnableOption
     mkOption
     mkIf
     types
     ;
   cfg = config.modules.darwin.tailscale;
-in
-{
+in {
   options.modules.darwin.tailscale = {
     enable = mkEnableOption "Tailscale VPN";
 

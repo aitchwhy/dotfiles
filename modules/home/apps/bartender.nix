@@ -10,17 +10,16 @@
   config,
   lib,
   ...
-}:
-let
-  inherit (lib)
+}: let
+  inherit
+    (lib)
     mkEnableOption
     mkOption
     mkIf
     types
     ;
   cfg = config.modules.home.apps.bartender;
-in
-{
+in {
   options.modules.home.apps.bartender = {
     enable = mkEnableOption "Bartender menu bar organizer";
 

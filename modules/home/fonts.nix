@@ -5,11 +5,9 @@
   lib,
   pkgs,
   ...
-}:
-let
+}: let
   inherit (lib) mkEnableOption mkIf;
-in
-{
+in {
   options.modules.home.fonts = {
     enable = mkEnableOption "nerd fonts for terminal/editor";
   };

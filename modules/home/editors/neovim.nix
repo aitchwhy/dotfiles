@@ -3,16 +3,15 @@
   config,
   lib,
   ...
-}:
-let
-  inherit (lib)
+}: let
+  inherit
+    (lib)
     mkEnableOption
     mkOption
     mkIf
     types
     ;
-in
-{
+in {
   options.modules.home.editors.neovim = {
     enable = mkEnableOption "Neovim editor";
 

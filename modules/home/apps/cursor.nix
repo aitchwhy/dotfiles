@@ -4,11 +4,9 @@
   config,
   lib,
   ...
-}:
-let
+}: let
   inherit (lib) mkEnableOption mkIf;
-in
-{
+in {
   options.modules.home.apps.cursor = {
     enable = mkEnableOption "Cursor IDE configuration";
   };
@@ -16,7 +14,7 @@ in
   config = mkIf config.modules.home.apps.cursor.enable {
     # Cursor on macOS stores config in ~/Library/Application Support/Cursor/User/
     # We use copy-on-init to allow runtime changes while providing a baseline from dotfiles
-    home.activation.cursorConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    home.activation.cursorConfig = lib.hm.dag.entryAfter ["writeBoundary"] ''
       CONFIG_DIR="$HOME/Library/Application Support/Cursor/User"
       SOURCE_DIR="${../../../config/cursor}"
 

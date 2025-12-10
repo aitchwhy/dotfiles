@@ -5,11 +5,9 @@
   config,
   lib,
   ...
-}:
-let
+}: let
   inherit (lib) mkEnableOption mkIf;
-in
-{
+in {
   options.modules.home.apps.homerow = {
     enable = mkEnableOption "Homerow keyboard navigation";
   };
