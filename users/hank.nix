@@ -4,9 +4,10 @@
 # - Cloud platform CLIs and infrastructure tools
 # - User-specific Git configuration
 # - Personal productivity tools
-{pkgs, ...}: {
+{ pkgs, ... }:
+{
   # Import home modules
-  imports = [../modules/home];
+  imports = [ ../modules/home ];
 
   # User identity
   home = {
@@ -40,7 +41,7 @@
     opentofu # Modern Terraform alternative
     terragrunt
     pulumi
-    pulumiPackages.pulumi-language-nodejs
+    pulumiPackages.pulumi-nodejs
 
     # Container Tools
     docker-client
