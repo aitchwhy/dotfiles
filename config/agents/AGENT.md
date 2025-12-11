@@ -50,6 +50,57 @@ Run `just gen-context` to generate editor-specific rule files:
 - **APIs**: TypeSpec → OpenAPI → codegen
 - **Infra**: Nix Flakes + nix-darwin, Terranix → OpenTofu, Pulumi (GCP)
 
+## Universal Project Factory
+
+This dotfiles repository implements a **Universal Project Factory** - a self-enforcing framework that automatically applies STACK conventions to any project Claude Code touches.
+
+### Automatic Enforcement Pipeline
+
+```
+SessionStart
+    │
+    └─► auto-migrate.ts (detect drift, suggest migration)
+
+PreToolUse (blocking)
+    │
+    ├─► unified-guard.ts (8 pattern guards)
+    ├─► devops-enforcer.ts (Docker/npm blocked)
+    └─► validate-flake.ts (Nix validation)
+
+PostToolUse (auto-fix)
+    │
+    ├─► unified-polish.ts (format all languages)
+    └─► enforce-versions.ts (fix package.json)
+
+Stop (session end)
+    │
+    ├─► verification-gate.ts (unverified claims)
+    └─► stack-enforcer.ts (compliance report)
+```
+
+### Quick Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/migrate` | Transform project to STACK compliance |
+| `/enforce` | Run 5-tier verification |
+| `/context` | Generate repomix context |
+| `signet doctor` | Check version alignment |
+| `just verify-factory` | Check factory health |
+
+### Migration Workflow
+
+```bash
+# Preview migration
+signet migrate --dry-run
+
+# Execute migration
+signet migrate
+
+# Verify compliance
+signet verify
+```
+
 ## Core Principles
 
 ### Environment Parity
