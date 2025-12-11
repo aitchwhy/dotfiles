@@ -1,0 +1,26 @@
+{
+  "$schema": "https://repomix.com/schemas/latest/schema.json",
+  "output": {
+    "filePath": "repomix-signet.xml",
+    "style": "xml",
+    "parsableStyle": true,
+    "compress": true,
+    "showLineNumbers": false,
+    "headerText": "# Signet CLI Context\n\nCode generation platform with hexagonal architecture.\nStack: Bun + Effect-TS + ast-grep + OXC"
+  },
+  "include": [
+    "config/signet/src/**/*.ts",
+    "config/signet/package.json",
+    "config/signet/tsconfig.json",
+    "config/signet/biome.json",
+    "config/signet/versions.json"
+  ],
+  "ignore": {
+    "customPatterns": [
+      "**/node_modules/**",
+      "**/*.d.ts",
+      "**/__tests__/**",
+      "**/tests/**"
+    ]
+  }
+}

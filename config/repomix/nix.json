@@ -1,0 +1,26 @@
+{
+  "$schema": "https://repomix.com/schemas/latest/schema.json",
+  "output": {
+    "filePath": "repomix-nix.xml",
+    "style": "xml",
+    "parsableStyle": true,
+    "compress": true,
+    "showLineNumbers": false,
+    "headerText": "# Nix Infrastructure Context\n\nStack: Nix Flakes + flake-parts + nix-darwin + home-manager\nVersion: nixos-unstable / 26.05"
+  },
+  "include": [
+    "flake.nix",
+    "flake.lock",
+    "modules/**/*.nix",
+    "users/**/*.nix",
+    "hosts/**/*.nix",
+    "flake/**/*.nix"
+  ],
+  "ignore": {
+    "customPatterns": [
+      "**/result",
+      "**/.direnv/**",
+      "**/node_modules/**"
+    ]
+  }
+}

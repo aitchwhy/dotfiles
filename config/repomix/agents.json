@@ -1,0 +1,23 @@
+{
+  "$schema": "https://repomix.com/schemas/latest/schema.json",
+  "output": {
+    "filePath": "repomix-agents.xml",
+    "style": "xml",
+    "parsableStyle": true,
+    "compress": true,
+    "showLineNumbers": false,
+    "headerText": "# Agent System Context\n\nClaude Code configuration: hooks, skills, commands, agents.\nEnforces December 2025 patterns across all projects."
+  },
+  "include": [
+    "config/agents/**/*.ts",
+    "config/agents/**/*.md",
+    "config/agents/**/*.json",
+    "config/agents/**/*.sh"
+  ],
+  "ignore": {
+    "customPatterns": [
+      "**/*.test.ts",
+      "**/node_modules/**"
+    ]
+  }
+}
