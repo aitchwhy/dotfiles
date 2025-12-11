@@ -3,6 +3,9 @@
   inherit (lib) mkDefault;
 in {
   imports = [
+    # Packages (platform-aware, DRY)
+    ./packages
+
     # Shell
     ./shell/zsh.nix
     ./shell/bash.nix
