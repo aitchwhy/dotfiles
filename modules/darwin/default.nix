@@ -45,7 +45,6 @@ in {
       system.enable = mkDefault true;
       keyboard.enable = mkDefault true;
       trackpad.enable = mkDefault true;
-      trackpad.disableSwishConflicts = mkDefault true; # Disable native gestures for Swish
       gestures.enable = mkDefault true;
       screenshots.enable = mkDefault true;
       screenshots.disableSystemHotkeys = mkDefault true; # Free Cmd+Shift+3/4/5 for CleanShot X
