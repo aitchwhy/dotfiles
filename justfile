@@ -342,6 +342,16 @@ sig-migrate PATH="." *ARGS:
 sig-verify PATH="." *ARGS:
     @signet verify {{ PATH }} {{ ARGS }}
 
+# Run signet tests (unit + integration)
+test-signet:
+    @echo "Running signet tests..."
+    cd config/signet && bun test
+
+# Run factory smoke tests (validates signet init output)
+test-factory:
+    @echo "Running factory smoke tests..."
+    cd config/signet && bun test tests/e2e/factory-smoke.test.ts
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # INFRASTRUCTURE (Terranix + OpenTofu)
 # ═══════════════════════════════════════════════════════════════════════════════
