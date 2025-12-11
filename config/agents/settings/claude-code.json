@@ -48,6 +48,16 @@
             "timeout": 5
           }
         ]
+      },
+      {
+        "matcher": "Write|Edit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run \"$HOME/dotfiles/config/agents/hooks/devops-enforcer.ts\"",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "SessionStart": [

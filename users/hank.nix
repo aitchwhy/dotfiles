@@ -44,7 +44,6 @@
 
     # Container Tools
     docker-client
-    docker-compose
     dive
 
     # Programming Languages & Tools

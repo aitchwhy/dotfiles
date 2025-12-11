@@ -198,6 +198,7 @@ This system achieves >85% first-attempt correctness through layered verification
 ### Infrastructure
 | Skill | Purpose |
 |-------|---------|
+| `devops-patterns` | Nix-first DevOps: process-compose, nix2container, GHA |
 | `nix-darwin-patterns` | Nix flakes + home-manager |
 | `nix-flake-parts` | Modular flakes with flake-parts |
 | `terranix-patterns` | Nix → Terraform → OpenTofu |

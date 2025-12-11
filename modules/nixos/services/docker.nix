@@ -73,7 +73,6 @@ in {
 
     # Docker CLI tools
     environment.systemPackages = with pkgs; [
-      docker-compose
       docker-buildx
       dive # Docker image explorer
       lazydocker # TUI for Docker

@@ -56,7 +56,6 @@
     pulumi
 
     # Container Tools (docker-client not needed on NixOS - use system Docker)
-    docker-compose
     dive
 
     # Programming Languages & Tools
