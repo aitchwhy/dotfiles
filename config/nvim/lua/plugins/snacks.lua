@@ -393,10 +393,4 @@ return {
       },
     },
   },
-
-  -- Disable neo-tree since we're using snacks.explorer
-  {
-    "nvim-neo-tree/neo-tree.nvim",
-    enabled = false,
-  },
 }
