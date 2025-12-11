@@ -108,7 +108,7 @@
 
     # Yazi flavors (themes)
     yazi-flavor-ashen = {
-      url = "github:ficcdaf/ashen.yazi/514ed5a";
+      url = "github:ficcdaf/ashen/514ed5a";
       flake = false;
     };
     yazi-flavor-tokyo-night = {
