@@ -45,6 +45,15 @@ in
         # Permissions: root-readable (needed by launchd daemon)
         mode = "0400";
       };
+
+      # GitHub Personal Access Token for MCP server
+      # Generate at: https://github.com/settings/tokens
+      # Scopes needed: repo, read:org, read:user
+      github-token = {
+        mode = "0400";
+        owner = config.system.primaryUser;
+        path = "/Users/${config.system.primaryUser}/.config/claude/github-token";
+      };
     };
   };
 }
