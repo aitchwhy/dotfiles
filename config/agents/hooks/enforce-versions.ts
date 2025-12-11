@@ -62,37 +62,8 @@ interface HookOutput {
 // Configuration
 // =============================================================================
 
-// Packages to enforce (only correct these - don't interfere with user choices)
-// Synced with signet/src/stack/versions.ts npm section
-const ENFORCED_PACKAGES = [
-  // Core
-  'zod',
-  'typescript',
-  '@biomejs/biome',
-  '@types/bun',
-  // Effect ecosystem
-  'effect',
-  '@effect/cli',
-  '@effect/platform',
-  '@effect/platform-node',
-  // Backend
-  'hono',
-  'drizzle-orm',
-  'drizzle-kit',
-  // Frontend
-  'react',
-  'react-dom',
-  '@tanstack/react-router',
-  'tailwindcss',
-  'xstate',
-  '@xstate/react',
-  // Testing
-  'vitest',
-  '@playwright/test',
-  // Pulumi
-  '@pulumi/pulumi',
-  '@pulumi/gcp',
-] as const
+// All packages in STACK.npm are enforced dynamically (no hardcoded list)
+// STACK.npm is the single source of truth from signet/src/stack/versions.ts
 
 // =============================================================================
 // Main Logic
@@ -141,10 +112,10 @@ async function main(): Promise<void> {
     return output({ continue: true })
   }
 
-  // Check and correct versions for enforced packages only
+  // Check and correct versions for all packages in STACK.npm
   const corrections: string[] = []
 
-  for (const name of ENFORCED_PACKAGES) {
+  for (const name of Object.keys(npmVersions)) {
     const canonicalVersion = npmVersions[name]
     if (!canonicalVersion) continue
 
