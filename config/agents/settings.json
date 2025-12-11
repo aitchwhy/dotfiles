@@ -1,4 +1,5 @@
 {
+  "$comment": "Global Claude Code settings for ALL projects. See settings/claude-code.json for dotfiles-specific enforcement hooks.",
   "cleanupPeriodDays": 90,
   "includeCoAuthoredBy": false,
   "permissions": {

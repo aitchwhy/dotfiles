@@ -1,4 +1,5 @@
 {
+  "$comment": "Dotfiles-specific Claude Code settings. Adds enforcement hooks (validate-flake, devops-enforcer, auto-migrate, stack-enforcer) on top of global settings.",
   "cleanupPeriodDays": 90,
   "includeCoAuthoredBy": false,
   "permissions": {
