@@ -122,13 +122,22 @@ export type ServiceVersions = {
 };
 
 /**
- * Observability tool versions
+ * Observability tool versions (Datadog + OTEL 2.x)
  */
 export type ObservabilityVersions = {
   readonly 'opentelemetry-api': string;
-  readonly 'opentelemetry-sdk': string;
+  readonly 'opentelemetry-sdk-node': string;
+  readonly 'opentelemetry-sdk-trace-node': string;
+  readonly 'opentelemetry-sdk-metrics': string;
+  readonly 'opentelemetry-resources': string;
+  readonly 'opentelemetry-semantic-conventions': string;
+  readonly 'opentelemetry-exporter-trace-otlp-proto': string;
+  readonly 'opentelemetry-exporter-metrics-otlp-proto': string;
+  readonly 'opentelemetry-auto-instrumentations-node': string;
   readonly 'posthog-js': string;
   readonly 'posthog-node': string;
+  readonly 'devcycle-server-sdk': string;
+  readonly 'devcycle-client-sdk': string;
   readonly 'datadog-agent': string;
 };
 
@@ -218,12 +227,20 @@ export type NpmVersions = {
   readonly '@temporalio/activity': string;
   readonly '@restatedev/restate-sdk': string;
 
-  // Observability
+  // Observability (Datadog + OTEL 2.x)
   readonly '@opentelemetry/api': string;
+  readonly '@opentelemetry/sdk-node': string;
   readonly '@opentelemetry/sdk-trace-node': string;
-  readonly '@opentelemetry/exporter-trace-otlp-http': string;
+  readonly '@opentelemetry/sdk-metrics': string;
+  readonly '@opentelemetry/resources': string;
+  readonly '@opentelemetry/semantic-conventions': string;
+  readonly '@opentelemetry/exporter-trace-otlp-proto': string;
+  readonly '@opentelemetry/exporter-metrics-otlp-proto': string;
+  readonly '@opentelemetry/auto-instrumentations-node': string;
   readonly 'posthog-js': string;
   readonly 'posthog-node': string;
+  readonly '@devcycle/nodejs-server-sdk': string;
+  readonly '@devcycle/js-client-sdk': string;
 
   // Cache & Queue
   readonly ioredis: string;
@@ -331,9 +348,18 @@ export const serviceVersionsSchema = z.object({
 
 export const observabilityVersionsSchema = z.object({
   'opentelemetry-api': versionString,
-  'opentelemetry-sdk': versionString,
+  'opentelemetry-sdk-node': versionString,
+  'opentelemetry-sdk-trace-node': versionString,
+  'opentelemetry-sdk-metrics': versionString,
+  'opentelemetry-resources': versionString,
+  'opentelemetry-semantic-conventions': versionString,
+  'opentelemetry-exporter-trace-otlp-proto': versionString,
+  'opentelemetry-exporter-metrics-otlp-proto': versionString,
+  'opentelemetry-auto-instrumentations-node': versionString,
   'posthog-js': versionString,
   'posthog-node': versionString,
+  'devcycle-server-sdk': versionString,
+  'devcycle-client-sdk': versionString,
   'datadog-agent': versionString,
 }) satisfies z.ZodType<ObservabilityVersions>;
 
@@ -416,12 +442,20 @@ export const npmVersionsSchema = z.object({
   '@temporalio/activity': versionString,
   '@restatedev/restate-sdk': versionString,
 
-  // Observability
+  // Observability (Datadog + OTEL 2.x)
   '@opentelemetry/api': versionString,
+  '@opentelemetry/sdk-node': versionString,
   '@opentelemetry/sdk-trace-node': versionString,
-  '@opentelemetry/exporter-trace-otlp-http': versionString,
+  '@opentelemetry/sdk-metrics': versionString,
+  '@opentelemetry/resources': versionString,
+  '@opentelemetry/semantic-conventions': versionString,
+  '@opentelemetry/exporter-trace-otlp-proto': versionString,
+  '@opentelemetry/exporter-metrics-otlp-proto': versionString,
+  '@opentelemetry/auto-instrumentations-node': versionString,
   'posthog-js': versionString,
   'posthog-node': versionString,
+  '@devcycle/nodejs-server-sdk': versionString,
+  '@devcycle/js-client-sdk': versionString,
 
   // Cache & Queue
   ioredis: versionString,
