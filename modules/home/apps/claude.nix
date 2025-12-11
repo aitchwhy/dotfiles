@@ -73,6 +73,23 @@ let
       ];
       isLocal = true; # Not an npx package
     };
+    git = {
+      # Local git operations (commits, diffs, logs, etc.)
+      package = "@modelcontextprotocol/server-git";
+      args = [ ];
+    };
+    github = {
+      # GitHub API: repos, issues, PRs, code search
+      # Token sourced from sops-nix secret file
+      package = "@modelcontextprotocol/server-github";
+      args = [ ];
+      hasEnvFile = true; # Signal to wrapper to source GITHUB_PERSONAL_ACCESS_TOKEN
+    };
+    playwright = {
+      # Browser automation for testing and web interactions
+      package = "@playwright/mcp";
+      args = [ ];
+    };
   };
 
   # ═══════════════════════════════════════════════════════════════════════════
@@ -85,6 +102,11 @@ let
     _name: def:
     let
       argsString = if def.args == [ ] then "" else " " + (concatStringsSep " " def.args);
+      # Source GitHub token from sops-nix decrypted file if hasEnvFile is set
+      envSource =
+        if def.hasEnvFile or false
+        then "[ -f $HOME/.config/claude/github-token ] && export GITHUB_PERSONAL_ACCESS_TOKEN=$(cat $HOME/.config/claude/github-token); "
+        else "";
     in
     if def.isLocal or false then
       {
@@ -92,7 +114,7 @@ let
         command = "/bin/sh";
         args = [
           "-c"
-          "PATH=${pathString}:$PATH exec ${def.command}${argsString}"
+          "${envSource}PATH=${pathString}:$PATH exec ${def.command}${argsString}"
         ];
       }
     else if def.isPython or false then
@@ -101,7 +123,7 @@ let
         command = "/bin/sh";
         args = [
           "-c"
-          "PATH=${pathString}:$PATH exec uvx ${def.package}${argsString}"
+          "${envSource}PATH=${pathString}:$PATH exec uvx ${def.package}${argsString}"
         ];
       }
     else
@@ -110,13 +132,21 @@ let
         command = "/bin/sh";
         args = [
           "-c"
-          "PATH=${pathString}:$PATH exec npx -y ${def.package}${argsString}"
+          "${envSource}PATH=${pathString}:$PATH exec npx -y ${def.package}${argsString}"
         ];
       };
 
   # Claude Code CLI format: direct commands (shell has PATH)
+  # For servers needing env vars (like GitHub), we wrap in sh to source the token
   toCliFormat =
     _name: def:
+    let
+      envSource =
+        if def.hasEnvFile or false
+        then "[ -f $HOME/.config/claude/github-token ] && export GITHUB_PERSONAL_ACCESS_TOKEN=$(cat $HOME/.config/claude/github-token); "
+        else "";
+      needsWrapper = def.hasEnvFile or false;
+    in
     if def.isLocal or false then
       {
         command = def.command;
@@ -128,6 +158,16 @@ let
         # Python packages via uvx
         command = "uvx";
         args = [ def.package ] ++ def.args;
+        type = "stdio";
+      }
+    else if needsWrapper then
+      {
+        # npm packages that need env vars - wrap in shell
+        command = "/bin/sh";
+        args = [
+          "-c"
+          "${envSource}exec npx -y ${def.package}${if def.args == [ ] then "" else " " + (concatStringsSep " " def.args)}"
+        ];
         type = "stdio";
       }
     else
