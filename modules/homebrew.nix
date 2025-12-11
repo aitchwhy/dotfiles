@@ -15,10 +15,10 @@
     };
 
     # Taps (formula repositories)
-    taps = [];
+    taps = [ ];
 
     # CLI tools (most in home.packages via Nix)
-    brews = [];
+    brews = [ ];
 
     # GUI Applications (Homebrew Casks)
     casks = [
@@ -109,6 +109,7 @@
       "karabiner-elements" # DriverKit driver for Kanata
       "homerow" # Keyboard shortcuts for screen elements
       "betterdisplay" # Display management: HiDPI, DDC brightness, resolution scaling
+      "swish" # Trackpad gesture control
 
       # ─────────────────────────────────────────────────────────────
       # QuickLook Plugins

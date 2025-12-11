@@ -1,44 +1,49 @@
-# macOS keyboard configuration
+# macOS keyboard shortcut configuration
+# Disables Spotlight shortcuts to allow Raycast to use Cmd+Space
+#
+# Trackpad gestures are managed by Swish app (installed via homebrew casks)
+#
+# Symbolic Hotkey IDs:
+#   64 = Spotlight Search (Cmd+Space)
+#   65 = Spotlight Finder Search (Cmd+Opt+Space)
 {
   config,
   lib,
   ...
-}: let
-  inherit
-    (lib)
+}:
+let
+  inherit (lib)
     mkEnableOption
     mkOption
     mkIf
     types
     ;
-in {
+  cfg = config.modules.darwin.keyboard;
+in
+{
   options.modules.darwin.keyboard = {
-    enable = mkEnableOption "macOS keyboard customization";
+    enable = mkEnableOption "macOS keyboard shortcut customization";
 
-    remapCapsLock = mkOption {
-      type = types.enum [
-        "none"
-        "escape"
-        "control"
-      ];
-      # Set to "none" - Kanata handles CapsLock with tap-hold:
-      #   Tap = Escape, Hold = Hyper (Ctrl+Alt+Cmd)
-      # See: modules/home/apps/kanata.nix
-      default = "none";
-      description = "Remap Caps Lock key (set to 'none' when using Kanata)";
+    disableSpotlight = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Disable Spotlight shortcuts (Cmd+Space) to allow Raycast";
     };
   };
 
-  config = mkIf config.modules.darwin.keyboard.enable {
-    system.keyboard = {
-      enableKeyMapping = true;
-      remapCapsLockToEscape = config.modules.darwin.keyboard.remapCapsLock == "escape";
-      remapCapsLockToControl = config.modules.darwin.keyboard.remapCapsLock == "control";
+  config = mkIf cfg.enable {
+    # Disable symbolic hotkeys via com.apple.symbolichotkeys
+    system.defaults.CustomUserPreferences."com.apple.symbolichotkeys" = {
+      AppleSymbolicHotKeys = {
+        # Spotlight Search (Cmd+Space) - let Raycast handle it
+        "64" = {
+          enabled = !cfg.disableSpotlight;
+        };
+        # Spotlight Finder Search (Cmd+Opt+Space)
+        "65" = {
+          enabled = !cfg.disableSpotlight;
+        };
+      };
     };
-
-    # Function keys act as media keys by default (brightness, volume, etc.)
-    # F12 = Volume Up, F11 = Volume Down, F10 = Mute, etc.
-    # Press Fn + F1-F12 for actual function keys
-    system.defaults.NSGlobalDomain."com.apple.keyboard.fnState" = false;
   };
 }
