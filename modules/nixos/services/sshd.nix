@@ -1,13 +1,7 @@
 # NixOS SSH server configuration
 # Hardened OpenSSH settings
+{ ... }:
 {
-  config,
-  lib,
-  pkgs,
-  ...
-}: let
-  inherit (lib) mkDefault;
-in {
   config = {
     services.openssh = {
       enable = true;
@@ -66,7 +60,7 @@ in {
       '';
 
       # Listen on all interfaces (Tailscale will handle security)
-      ports = [22];
+      ports = [ 22 ];
       openFirewall = true;
     };
 
