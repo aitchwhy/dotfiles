@@ -20,10 +20,7 @@ in {
     stageManager = mkOption {
       type = types.bool;
       default = false;
-      description = ''
-        Enable Stage Manager.
-        Usually disabled when using tiling WMs like AeroSpace.
-      '';
+      description = "Enable Stage Manager for window organization.";
     };
 
     clickToShowDesktop = mkOption {

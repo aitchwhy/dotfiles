@@ -3,7 +3,7 @@
 <!--
   US No Special - A US keyboard layout with no special characters on Option keys
   Option key acts purely as a modifier (no dead keys, no special characters)
-  Created for use with Karabiner/Hammerspoon where Option is used as a modifier
+  Created for use with Kanata where Option is used as a modifier
 -->
 <keyboard group="126" id="-19341" name="US No Special" maxout="1">
 	<layouts>

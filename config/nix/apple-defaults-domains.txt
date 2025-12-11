@@ -501,7 +501,6 @@ net.pornel.ImageOptim
 net.publicspace.abfr12
 notion.id
 org.cups.PrintingPrefs
-org.hammerspoon.Hammerspoon
 org.pqrs.Karabiner-Elements.Settings
 org.pqrs.Karabiner-Menu
 org.sbarex.QLMarkdown

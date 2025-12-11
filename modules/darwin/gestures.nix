@@ -1,5 +1,4 @@
 # macOS gesture and symbolic hotkey configuration
-# Disables system gestures to allow Swish to intercept trackpad input
 # Disables Spotlight shortcuts to allow Raycast to use Cmd+Space
 #
 # Symbolic Hotkey IDs:

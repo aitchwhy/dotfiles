@@ -1,5 +1,5 @@
 # Custom keyboard layout without dead keys or special characters
-# Option key acts purely as a modifier (for Karabiner/Hammerspoon)
+# Option key acts purely as a modifier (for Kanata keyboard remapping)
 {
   config,
   lib,
