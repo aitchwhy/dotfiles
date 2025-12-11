@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "bun run --watch src/index.ts",
-    "start": "bun run src/index.ts",
+    "dev": "bun run --watch src/server.ts",
+    "start": "bun run src/server.ts",
     "test": "bun test",
     "typecheck": "tsc --noEmit",
     "lint": "bunx biome check .",
@@ -13,7 +13,17 @@
     "validate": "bun run typecheck && bun run lint && bun test"
   },
   "dependencies": {
-    "zod": "4.1.13"
+    "zod": "4.1.13",
+    "hono": "4.10.7",
+    "@opentelemetry/api": "1.9.0",
+    "@opentelemetry/sdk-node": "0.200.0",
+    "@opentelemetry/sdk-trace-node": "2.0.0",
+    "@opentelemetry/sdk-metrics": "2.0.0",
+    "@opentelemetry/resources": "2.0.0",
+    "@opentelemetry/semantic-conventions": "1.30.0",
+    "@opentelemetry/exporter-trace-otlp-proto": "0.200.0",
+    "@opentelemetry/exporter-metrics-otlp-proto": "0.200.0",
+    "@opentelemetry/auto-instrumentations-node": "0.56.0"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.8",
