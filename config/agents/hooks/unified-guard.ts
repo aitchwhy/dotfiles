@@ -2,15 +2,16 @@
 /**
  * Unified Guard - Consolidated PreToolUse gatekeeper
  *
- * REPLACES:
- * - tdd-enforcer.ts
- * - forbidden-files.ts
- * - forbidden-imports.ts
- * - any-type-detector.ts
- * - conventional-commit.ts
- * - Bash safety inline check
+ * Guards (7 total):
+ * 1. Bash safety - blocks dangerous rm -rf commands
+ * 2. Conventional commits - validates git commit messages
+ * 3. Forbidden files - blocks package-lock.json, eslint config, etc.
+ * 4. Forbidden imports - blocks express, prisma, zod/v3
+ * 5. Any type detector - blocks TypeScript `any` usage
+ * 6. No-mock enforcer - blocks jest.mock, vi.mock, Mock*Live patterns
+ * 7. TDD enforcer - requires test file before source code
  *
- * This consolidation reduces shell spawns from 6 → 1 per Write/Edit operation.
+ * This consolidation reduces shell spawns from 7 → 1 per Write/Edit operation.
  */
 
 import { z } from 'zod';
@@ -285,7 +286,55 @@ Zero \`any\` policy - see CLAUDE.md TypeScript Standards.`;
 }
 
 // ============================================================================
-// 6. TDD ENFORCER
+// 6. NO-MOCK ENFORCER
+// ============================================================================
+
+const MOCK_PATTERNS: { pattern: RegExp; description: string }[] = [
+  { pattern: /Mock[A-Z][a-zA-Z]*Live/, description: 'Mock*Live class' },
+  { pattern: /jest\.mock\s*\(/, description: 'jest.mock()' },
+  { pattern: /vi\.mock\s*\(/, description: 'vi.mock()' },
+  { pattern: /sinon\.(stub|mock|spy|fake)\s*\(/, description: 'sinon.*()' },
+  { pattern: /\.mockImplementation\s*\(/, description: '.mockImplementation()' },
+  { pattern: /\.mockResolvedValue\s*\(/, description: '.mockResolvedValue()' },
+  { pattern: /\.mockReturnValue\s*\(/, description: '.mockReturnValue()' },
+  { pattern: /__mocks__\//, description: '__mocks__/ directory' },
+  { pattern: /class\s+Fake[A-Z]/, description: 'Fake* class' },
+  { pattern: /class\s+Stub[A-Z]/, description: 'Stub* class' },
+];
+
+function checkNoMocks(content: string, filePath: string): string | null {
+  // Only check TS/JS files
+  if (!/\.[jt]sx?$/.test(filePath)) return null;
+  if (filePath.endsWith('.d.ts')) return null;
+  if (filePath.includes('/node_modules/')) return null;
+
+  const cleanContent = stripCommentsAndStrings(content);
+
+  for (const { pattern, description } of MOCK_PATTERNS) {
+    if (pattern.test(cleanContent)) {
+      return `NO-MOCK VIOLATION: ${description} detected
+
+Use real adapters with service containers instead:
+
+  // ❌ BLOCKED
+  const mockStorage = new MockStorageLive();
+  jest.mock('@/adapters/storage');
+
+  // ✅ ALLOWED - Factory returns real MinIO in tests
+  const storage = createStorageAdapter(); // Auto-detects MINIO_ENDPOINT
+
+  // ✅ ALLOWED - Effect-TS Layer DI (not mocking)
+  const TestLayer = Layer.succeed(Database, testDbService);
+
+See: hexagonal-architecture skill for service container patterns.
+Run: process-compose up (local) or use GitHub Actions services (CI).`;
+    }
+  }
+  return null;
+}
+
+// ============================================================================
+// 7. TDD ENFORCER
 // ============================================================================
 
 interface LanguageConfig {
@@ -548,7 +597,18 @@ async function main(): Promise<void> {
   }
 
   // ─────────────────────────────────────────────────────────────────────────
-  // 5. TDD ENFORCER (for Write/Edit/MultiEdit on source files)
+  // 5. NO-MOCK ENFORCER (for Write/Edit on TS/JS)
+  // ─────────────────────────────────────────────────────────────────────────
+  if ((tool_name === 'Write' || tool_name === 'Edit') && content && filePath) {
+    const mockError = checkNoMocks(content, filePath);
+    if (mockError) {
+      block(mockError);
+      return;
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // 6. TDD ENFORCER (for Write/Edit/MultiEdit on source files)
   // ─────────────────────────────────────────────────────────────────────────
   if (['Write', 'Edit', 'MultiEdit'].includes(tool_name) && filePath) {
     const tddError = await checkTDD(filePath);

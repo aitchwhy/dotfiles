@@ -84,6 +84,39 @@ return Effect.fail(new UserNotFoundError({ id }));
 | Finite State Machines | XState | Impossible states, state explosion |
 | TypeScript-First Validation | Zod + `satisfies` | Type drift |
 
+### Hexagonal Architecture (Ports & Adapters)
+
+```
+┌────────────────────────────────────────┐
+│              Domain                     │
+│   (Pure logic, no I/O, no framework)   │
+└────────────────────────────────────────┘
+         ▲                      ▲
+         │                      │
+┌────────┴────────┐  ┌─────────┴─────────┐
+│  Inbound Ports  │  │  Outbound Ports   │
+│  (API contract) │  │ (StoragePort etc) │
+└────────┬────────┘  └─────────┬─────────┘
+         │                      │
+┌────────┴────────┐  ┌─────────┴─────────┐
+│ Inbound Adapter │  │ Outbound Adapters │
+│ (Hono handlers) │  │ (GCS, PostgreSQL) │
+└─────────────────┘  └───────────────────┘
+```
+
+### No-Mock Testing Policy
+
+**NEVER mock infrastructure.** Tests run against real services:
+
+| Environment | Infrastructure |
+|-------------|---------------|
+| Local | Docker via process-compose |
+| CI | GitHub Actions services |
+| Staging | Real GCP (Cloud SQL, GCS) |
+
+**Blocked**: `Mock*Live`, `jest.mock()`, `vi.mock()`, `sinon.*`
+**Allowed**: `Layer.succeed()` (DI), factory functions with real adapters
+
 ## Principles
 
 - TypeScript-first: TS types are source of truth, schemas satisfy types
@@ -158,7 +191,8 @@ This system achieves >85% first-attempt correctness through layered verification
 ### Architecture
 | Skill | Purpose |
 |-------|---------|
-| `signet-patterns` | Hexagonal architecture, Effect Schema |
+| `hexagonal-architecture` | No-mock testing, service containers, ports/adapters |
+| `signet-patterns` | Hexagonal code generation, Effect Schema |
 | `signet-generator-patterns` | Extend Signet with new generators |
 | `tdd-patterns` | Red-Green-Refactor |
 
