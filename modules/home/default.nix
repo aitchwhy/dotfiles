@@ -127,6 +127,9 @@ in {
       LG_CONFIG_FILE = "$HOME/dotfiles/config/git/lazygit.yml";
       ATUIN_CONFIG_DIR = "$HOME/dotfiles/config/atuin";
       YAZI_CONFIG_DIR = "$HOME/dotfiles/config/yazi";
+
+      # Secrets management (sops-nix)
+      SOPS_AGE_KEY_FILE = "$HOME/.config/sops/age/keys.txt";
       ZELLIJ_CONFIG_DIR = "$HOME/dotfiles/config/zellij";
 
       # FZF options are set in modules/home/tools/fzf.nix
