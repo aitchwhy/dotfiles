@@ -318,9 +318,9 @@ sig *ARGS:
 sig-validate PATH=".":
     @signet validate {{ PATH }}
 
-# Check system health and version alignment
+# Check version alignment against SSOT (versions.json)
 sig-doctor:
-    @signet doctor
+    @cd config/signet && bun run src/doctor.ts
 
 # Auto-fix architecture drift
 sig-comply PATH=".":
