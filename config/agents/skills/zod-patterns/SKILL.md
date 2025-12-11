@@ -185,6 +185,8 @@ export const env = envSchema.parse(process.env);
 
 ## Result Type Integration
 
+> See `result-patterns` skill for comprehensive Result utilities including type guards and chaining.
+
 ```typescript
 type ValidationError = {
   readonly code: 'VALIDATION_ERROR';

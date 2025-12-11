@@ -38,6 +38,8 @@ const Ok = <T>(data: T): Result<T, never> => ({ ok: true, data });
 const Err = <E>(error: E): Result<never, E> => ({ ok: false, error });
 ```
 
+> See `result-patterns` skill for comprehensive Result utilities including type guards and chaining.
+
 ## Discriminated Unions for State Machines
 
 ### Make Invalid States Unrepresentable

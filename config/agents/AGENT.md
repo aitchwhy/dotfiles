@@ -142,7 +142,7 @@ This system achieves >85% first-attempt correctness through layered verification
 
 | Tier | Component | Purpose |
 |------|-----------|---------|
-| 1 | Pattern Knowledge | refactoring-catalog, distributed-systems-patterns, code-smells |
+| 1 | Pattern Knowledge | refactoring-catalog, distributed-systems-patterns, clean-code |
 | 2 | Formal Verification | formal-verification skill, contracts, property-based tests |
 | 3 | Execution Feedback | test-during-generation hook, iterative-repair |
 | 4 | Multi-Agent Review | critic, synthesizer agents, /debate command |
@@ -182,7 +182,6 @@ This system achieves >85% first-attempt correctness through layered verification
 |-------|---------|
 | `refactoring-catalog` | Fowler's 61 refactoring patterns |
 | `distributed-systems-patterns` | Consensus, replication, versioning |
-| `code-smells` | Clean Code heuristics as detection rules |
 | `formal-verification` | Contracts, preconditions, property-based testing |
 | `semantic-codebase` | Codebase navigation and context building |
 | `verification-first` | Test evidence over assumption |
