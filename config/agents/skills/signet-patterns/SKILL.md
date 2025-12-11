@@ -4,225 +4,199 @@ description: Patterns for using Signet to generate formally consistent software 
 allowed-tools: Read, Write, Edit, Bash
 ---
 
-## When to Use This Skill
+## Signet CLI
 
-- Creating new projects with `signet init`
-- Adding workspaces to existing monorepos with `signet gen`
-- Understanding hexagonal architecture patterns
-- Working with Effect-TS layers and ports/adapters
+### Commands
 
-## Hexagonal Architecture (Ports and Adapters)
+| Command | Purpose |
+|---------|---------|
+| `signet init monorepo <name>` | New workspace |
+| `signet gen api <name>` | Hexagonal Hono API |
+| `signet gen ui <name>` | React 19 + XState frontend |
+| `signet gen library <name>` | TypeScript package |
+| `signet gen infra <name>` | Pulumi + process-compose |
+| `signet validate` | Check structure |
+| `signet enforce` | Architecture rules |
+| `just sig-doctor` | Version alignment |
+
+### Examples
+
+```bash
+# Initialize monorepo
+signet init monorepo ember-platform
+cd ember-platform
+
+# Add services
+signet gen api voice-service
+signet gen ui web-app
+signet gen library auth
+
+# Validate
+signet validate
+signet enforce
+bun validate
+```
+
+## SSOT Version Integration
+
+All versions come from `config/signet/src/stack/versions.ts`:
+
+```typescript
+export const STACK = {
+  npm: {
+    typescript: '5.9.3',
+    effect: '3.19.9',
+    zod: '4.1.13',
+    hono: '4.10.7',
+    react: '19.2.1',
+  },
+} as const;
+```
+
+Generated `package.json` uses exact versions (no `^` or `~`).
+
+Run `just sig-doctor` to check alignment.
+
+## Hexagonal Architecture
 
 ### Directory Structure
 
 ```
 src/
 ├── types/           # TypeScript types (SOURCE OF TRUTH)
-│   ├── user.ts      # User, UserId, CreateUserInput
-│   ├── order.ts     # Order domain types
-│   └── events.ts    # Event types
 ├── schemas/         # Zod/Effect schemas (satisfies TS types)
-│   ├── user.ts      # userSchema, createUserInputSchema
-│   └── events.ts    # Event validation schemas
-├── domain/          # Domain layer
-│   └── errors/      # Tagged errors (Data.TaggedError)
+├── domain/errors/   # Tagged errors (Data.TaggedError)
 ├── ports/           # Port interfaces (Context.Tag)
-│   └── database.ts  # Context.Tag<Database, DatabaseService>
-├── services/        # Use cases / application services
-│   └── user.ts      # Effect.gen functions composing ports
-├── adapters/        # Adapter implementations (Layers)
-│   ├── inbound/
-│   │   ├── http/    # Hono routes
-│   │   ├── trpc/    # tRPC procedures
-│   │   └── pubsub/  # Event handlers
-│   └── outbound/
-│       ├── turso.ts # Layer.succeed(Database, TursoService)
-│       └── d1.ts    # Layer.succeed(Database, D1Service)
-├── db/              # Database schema and migrations
-│   ├── schema.ts    # Drizzle schema
-│   └── migrations/  # Migration files
-├── lib/             # Infrastructure utilities
-└── index.ts         # Application entry point
+├── services/        # Effect.gen business logic
+├── adapters/
+│   ├── inbound/     # Hono routes, tRPC, pubsub
+│   └── outbound/    # Turso, D1, external APIs
+├── db/              # Drizzle schema + migrations
+└── index.ts
 ```
 
-## Effect Layer Pattern
-
-### Port and Adapter
+### Layer Pattern
 
 ```typescript
 // Port (Interface)
-export class Database extends Context.Tag('Database')<
-  Database,
-  DatabaseService
->() {}
+export class Database extends Context.Tag('Database')<Database, DatabaseService>() {}
 
 // Adapter (Implementation)
-const makeService = (client: LibsqlClient): DatabaseService => ({
-  query: (sql) => Effect.tryPromise(() => client.execute(sql)),
-})
-
 export const TursoLive = (url: string, token: string) =>
   Layer.succeed(Database, makeService(createClient({ url, authToken: token })))
 
-// Usage - inject adapter at composition root
-const program = myBusinessLogic.pipe(
-  Effect.provide(TursoLive(process.env.DATABASE_URL, process.env.DATABASE_TOKEN))
-)
+// Usage - inject at composition root
+const program = myBusinessLogic.pipe(Effect.provide(TursoLive(url, token)))
 ```
 
-## TypeScript-First Effect Schema
+### Types → Schemas Pattern
 
-Same philosophy as `zod-patterns`: TypeScript types are source of truth.
-Effect Schema validates runtime data matches the type contract.
+```typescript
+// 1. TypeScript type is SOURCE OF TRUTH
+type User = {
+  readonly id: UserId;
+  readonly email: string;
+  readonly name: string;
+};
 
-### Naming Convention
+// 2. Zod schema SATISFIES the type (NEVER use z.infer)
+const userSchema = z.object({
+  id: userIdSchema,
+  email: z.string().email(),
+  name: z.string().min(1),
+}) satisfies z.ZodType<User>;
+```
 
-- TypeScript type: `Thing` (PascalCase)
-- Effect Schema: `thingSchema` (camelCase)
+### Branded Types
 
-### Core Pattern
+```typescript
+// TypeScript branded type
+type UserId = string & { readonly __brand: 'UserId' };
+
+// Schema with brand
+const userIdSchema = z.string().uuid()
+  .transform((id) => id as UserId) satisfies z.ZodType<UserId, z.ZodTypeDef, string>;
+```
+
+### Effect Schema (Alternative)
 
 ```typescript
 import { Schema } from 'effect';
 
-// 1. TypeScript type is source of truth
+// TypeScript type
 type Session = {
   readonly id: string;
   readonly userId: string;
   readonly expiresAt: Date;
-  readonly createdAt: Date;
 };
 
-// 2. Effect Schema satisfies the TS type
+// Effect Schema satisfies type
 const sessionSchema = Schema.Struct({
   id: Schema.String,
   userId: Schema.String,
   expiresAt: Schema.Date,
-  createdAt: Schema.Date,
 }) satisfies Schema.Schema<Session>;
-
-// BANNED - never derive types from schemas
-type Session = Schema.Schema.Type<typeof sessionSchema>; // NEVER DO THIS
 ```
 
-### Branded Types (TS-First)
+## Extending Signet
+
+### Add New Generator
 
 ```typescript
-import { Schema } from 'effect';
+// config/signet/src/generators/workflow.ts
+export const workflowGenerator: GeneratorConfig = {
+  name: 'workflow',
+  description: 'Generate Temporal workflow',
+  schema: z.object({
+    name: z.string().min(1),
+    activities: z.array(z.string()).default([]),
+  }),
 
-// 1. TypeScript branded type
-declare const __brand: unique symbol;
-type Brand<T, B extends string> = T & { readonly [__brand]: B };
-type ProjectName = Brand<string, 'ProjectName'>;
-
-// 2. Constructor function
-const ProjectName = (name: string): ProjectName => name as ProjectName;
-
-// 3. Effect Schema with brand
-const projectNameSchema = Schema.String.pipe(
-  Schema.pattern(/^[a-z][a-z0-9-]*$/),
-  Schema.transform(
-    Schema.String as Schema.Schema<ProjectName>,
-    { decode: (s) => s as ProjectName, encode: (s) => s }
-  )
-);
-```
-
-### Port Data Contracts
-
-```typescript
-import { Schema, Context, Effect, Layer } from 'effect';
-
-// 1. TypeScript types for data contracts
-type User = {
-  readonly id: string;
-  readonly email: string;
-  readonly name: string | undefined;
-  readonly emailVerified: boolean;
-  readonly createdAt: Date;
-  readonly updatedAt: Date;
+  async generate(config) {
+    return [
+      { path: `src/workflows/${config.name}.workflow.ts`, content: ... },
+      { path: `src/workflows/${config.name}.activities.ts`, content: ... },
+      { path: `tests/${config.name}.workflow.test.ts`, content: ... },
+    ];
+  },
 };
-
-type AuthErrorCode =
-  | 'INVALID_CREDENTIALS'
-  | 'SESSION_EXPIRED'
-  | 'SESSION_NOT_FOUND'
-  | 'USER_NOT_FOUND'
-  | 'RATE_LIMITED'
-  | 'INTERNAL_ERROR';
-
-// 2. Effect Schemas satisfy the types
-const userSchema = Schema.Struct({
-  id: Schema.String,
-  email: Schema.String,
-  name: Schema.optional(Schema.String),
-  emailVerified: Schema.Boolean,
-  createdAt: Schema.Date,
-  updatedAt: Schema.Date,
-}) satisfies Schema.Schema<User>;
-
-// 3. Tagged Error with TS-first pattern
-type AuthError = {
-  readonly _tag: 'AuthError';
-  readonly code: AuthErrorCode;
-  readonly message: string;
-};
-
-class AuthError extends Schema.TaggedError<AuthError>()('AuthError', {
-  code: Schema.Literal(
-    'INVALID_CREDENTIALS',
-    'SESSION_EXPIRED',
-    'SESSION_NOT_FOUND',
-    'USER_NOT_FOUND',
-    'RATE_LIMITED',
-    'INTERNAL_ERROR',
-  ),
-  message: Schema.String,
-}) {}
 ```
 
-### Decode/Encode Helpers
+### Register in `generators/index.ts`
 
 ```typescript
-// Parse unknown data with Result-like API
-const decodeUser = Schema.decodeUnknown(userSchema);
-const encodeUser = Schema.encode(userSchema);
-const isUser = Schema.is(userSchema);
-
-// Usage in Effect pipeline
-const program = Effect.gen(function* () {
-  const rawData = yield* fetchUserData();
-  const user = yield* decodeUser(rawData);
-  return user; // Fully typed as User
-});
+import { workflowGenerator } from './workflow';
+export const generators = { ...existing, workflow: workflowGenerator };
 ```
 
-## Generator Selection
+### Use: `signet gen workflow payment`
 
-| Need | Command | What You Get |
-|------|---------|--------------|
-| New platform | `signet init monorepo <name>` | Workspace + shared pkg |
-| Backend API | `signet gen api <name>` | Hexagonal Hono |
-| Frontend | `signet gen ui <name>` | React 19 + XState |
-| Library | `signet gen library <name>` | TypeScript package |
-| Deployment | `signet gen infra <name>` | Pulumi + process-compose |
+## Architecture Rules Enforced
 
-> **Version Matrix**: See `lib/versions.nix` for exact pinned versions (Bun, TypeScript, Effect, React, Hono, etc.)
+| Rule | What It Checks |
+|------|----------------|
+| No cross-layer imports | Services don't import adapters |
+| Types are source of truth | No `z.infer<>` |
+| Ports use Context.Tag | All deps via Effect services |
+| Schemas satisfy types | All have `satisfies z.ZodType<T>` |
+| Versions from SSOT | package.json matches versions.ts |
 
-## Anti-Patterns to Avoid
-
-1. **App importing adapters directly** - Use ports
-2. **Circular dependencies** - Extract shared code
-3. **Mixed layer imports** - Follow layer ordering
-4. **Skipping process-compose** - Always include for observability
-5. **Manual project setup** - Use Signet generators
-
-## Validation
-
-### Always Validate
+## Anti-Patterns (BANNED)
 
 ```bash
-signet validate     # Check structure
-signet enforce      # Check architecture
-bun validate        # Typecheck + lint + test
+# Manual project setup
+mkdir my-api && npm init -y  # WRONG
+signet gen api my-api        # CORRECT
+```
+
+```typescript
+// Import adapters in services
+import { TursoClient } from '../adapters/outbound/turso';  // WRONG
+import { UserRepository } from '../ports/user-repository'; // CORRECT
+```
+
+```json
+// Random versions
+{ "effect": "^3.0.0" }  // WRONG - not pinned
+{ "effect": "3.19.9" }  // CORRECT - exact from SSOT
 ```
