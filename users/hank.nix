@@ -104,9 +104,8 @@
     shellcheck
     shfmt
 
-    # Nix (nixfmt-rfc-style is the new standard, nixpkgs-fmt is deprecated)
+    # Nix (nixfmt-rfc-style is the December 2025 standard)
     nixfmt-rfc-style
-    alejandra
     deadnix
     statix
 

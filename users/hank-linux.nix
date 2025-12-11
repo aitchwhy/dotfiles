@@ -22,8 +22,6 @@
   modules.home.apps = {
     ghostty.enable = false; # Uses macOS-specific binary
     kanata.enable = false; # Keyboard remapper (macOS DriverKit)
-    swish.enable = false; # macOS trackpad gestures
-    aerospace.enable = false; # macOS tiling window manager
     bartender.enable = false; # macOS menu bar organizer
     raycast.enable = false; # macOS launcher
     homerow.enable = false; # macOS keyboard shortcuts
@@ -111,7 +109,6 @@
     shellcheck
     shfmt
     nixfmt-rfc-style
-    alejandra
     deadnix
     statix
     dprint
