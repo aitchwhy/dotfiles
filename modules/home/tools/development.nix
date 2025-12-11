@@ -63,7 +63,6 @@ in {
       # Modern Unix replacements
       ripgrep # Better grep
       fd # Better find
-      delta # Better diff
       sd # Better sed
       dust # Better du
       procs # Better ps
