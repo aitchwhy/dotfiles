@@ -2,8 +2,75 @@
   "cleanupPeriodDays": 90,
   "includeCoAuthoredBy": false,
   "permissions": {
-    "allow": [],
-    "deny": []
+    "allow": [
+      "WebSearch",
+      "Bash(git:*)",
+      "Bash(GIT_PAGER=cat git:*)",
+      "Bash(gh:*)",
+      "Bash(nix:*)",
+      "Bash(nixfmt:*)",
+      "Bash(nixd:*)",
+      "Bash(just:*)",
+      "Bash(brew:*)",
+      "Bash(mas:*)",
+      "Bash(ls:*)",
+      "Bash(tree:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(cat:*)",
+      "Bash(bat:*)",
+      "Bash(mkdir:*)",
+      "Bash(open:*)",
+      "Bash(readlink:*)",
+      "Bash(xargs:*)",
+      "Bash(curl:*)",
+      "Bash(sh:*)",
+      "Bash(pgrep:*)",
+      "Bash(killall:*)",
+      "Bash(launchctl:*)",
+      "Bash(sudo launchctl:*)",
+      "Bash(defaults read:*)",
+      "Bash(osascript:*)",
+      "Bash(sw_vers:*)",
+      "Bash(kextstat:*)",
+      "Bash(systemextensionsctl:*)",
+      "Bash(mdfind:*)",
+      "Bash(infocmp:*)",
+      "Bash(python3:*)",
+      "Bash(bun:*)",
+      "Bash(nvim:*)",
+      "Bash(ghostty:*)",
+      "Bash(zellij:*)",
+      "Bash(sqlite3:*)",
+      "Bash(tree-sitter:*)",
+      "Bash(tldr:*)",
+      "Bash(fc-list:*)",
+      "Bash(claude:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:gist.github.com)",
+      "WebFetch(domain:gist.githubusercontent.com)",
+      "WebFetch(domain:ghostty.org)",
+      "WebFetch(domain:zellij.dev)",
+      "WebFetch(domain:www.lazyvim.org)",
+      "WebFetch(domain:macos-defaults.com)",
+      "WebFetch(domain:apps.apple.com)",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs"
+    ],
+    "deny": [
+      "Read(**/.env*)",
+      "Read(**/secrets*)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Read(**/.ssh/*)",
+      "Read(**/.gnupg/*)",
+      "Write(**/.git/*)",
+      "Bash(rm -rf /)",
+      "Bash(rm -rf ~)",
+      "Bash(git push --force)",
+      "Bash(git reset --hard)"
+    ]
   },
   "hooks": {
     "PostToolUse": [
@@ -104,15 +171,6 @@
           {
             "type": "command",
             "command": "bun run \"$HOME/dotfiles/config/agents/hooks/verification-gate.ts\"",
-            "timeout": 15
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun run \"$HOME/dotfiles/config/agents/hooks/assumption-detector.ts\"",
             "timeout": 15
           }
         ]

@@ -201,7 +201,6 @@ This system achieves >85% first-attempt correctness through layered verification
 | `devops-patterns` | Nix-first DevOps: process-compose, nix2container, GHA |
 | `nix-darwin-patterns` | Nix flakes + home-manager |
 | `nix-flake-parts` | Modular flakes with flake-parts |
-| `terranix-patterns` | Nix → Terraform → OpenTofu |
 
 ### Web/API
 | Skill | Purpose |
@@ -209,7 +208,6 @@ This system achieves >85% first-attempt correctness through layered verification
 | `typespec-patterns` | API-first, OpenAPI codegen |
 | `hono-workers` | Cloudflare Workers APIs |
 | `tanstack-patterns` | Router + Query |
-| `ember-patterns` | Ember platform |
 
 ## Pattern Quick Reference
 
