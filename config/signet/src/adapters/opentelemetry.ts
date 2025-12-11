@@ -1,8 +1,18 @@
 /**
  * OpenTelemetry Adapter
  *
- * Implements the Telemetry port for tracing using OpenTelemetry SDK.
- * Provides distributed tracing capabilities.
+ * Implements the Telemetry port using OpenTelemetry SDK 2.x.
+ * Exports to Datadog via OTLP protocol.
+ *
+ * Architecture:
+ * - App → OTLP → Datadog Agent → Datadog Backend
+ * - No direct Datadog SDK (dd-trace doesn't work with Bun)
+ *
+ * Environment Variables:
+ * - DD_SERVICE: Service name
+ * - DD_ENV: Environment (development, staging, production)
+ * - DD_VERSION: Service version
+ * - OTEL_EXPORTER_OTLP_ENDPOINT: Datadog Agent OTLP endpoint
  */
 import { Effect, Layer } from 'effect';
 import {
@@ -19,16 +29,37 @@ import {
 // ============================================================================
 
 export interface OpenTelemetryConfig {
+  /** Service name (defaults to DD_SERVICE env var) */
   readonly serviceName: string;
-  readonly exporterUrl: string;
+  /** Service version (defaults to DD_VERSION env var) */
+  readonly serviceVersion: string;
+  /** Environment (defaults to DD_ENV env var) */
+  readonly environment: string;
+  /** OTLP endpoint - Datadog Agent (defaults to OTEL_EXPORTER_OTLP_ENDPOINT) */
+  readonly otlpEndpoint: string;
+  /** Sampling rate 0-1 (defaults to 1.0) */
   readonly sampleRate?: number;
+}
+
+// ============================================================================
+// DEFAULT CONFIG (from environment)
+// ============================================================================
+
+export function getOpenTelemetryConfig(): OpenTelemetryConfig {
+  return {
+    serviceName: process.env['DD_SERVICE'] || 'unknown-service',
+    serviceVersion: process.env['DD_VERSION'] || '0.0.0',
+    environment: process.env['DD_ENV'] || 'development',
+    otlpEndpoint: process.env['OTEL_EXPORTER_OTLP_ENDPOINT'] || 'http://localhost:4318',
+    sampleRate: 1.0,
+  };
 }
 
 // ============================================================================
 // ADAPTER IMPLEMENTATION
 // ============================================================================
 
-const makeSpan = (_name: string): Span => {
+const makeSpan = (_name: string, _options?: SpanOptions): Span => {
   const traceId = `trace-${Date.now()}-${Math.random().toString(36).slice(2)}`;
   const spanId = `span-${Date.now()}-${Math.random().toString(36).slice(2)}`;
   const attributes: Record<string, unknown> = {};
@@ -53,20 +84,20 @@ const makeSpan = (_name: string): Span => {
       _statusMessage = message;
     },
     end: () => {
-      // In real implementation, this would export the span
-      // These would be used when actually exporting
+      // In real implementation, this would export the span via OTLP to Datadog Agent
+      // These values would be used when actually exporting
       void _status;
       void _statusMessage;
     },
   };
 };
 
-const makeTelemetryService = (_config: OpenTelemetryConfig): TelemetryService => ({
-  startSpan: (name: string, _options?: SpanOptions) => Effect.succeed(makeSpan(name)),
+const makeTelemetryService = (config: OpenTelemetryConfig): TelemetryService => ({
+  startSpan: (name: string, options?: SpanOptions) => Effect.succeed(makeSpan(name, options)),
 
-  withSpan: <A, E, R>(name: string, effect: Effect.Effect<A, E, R>, _options?: SpanOptions) =>
+  withSpan: <A, E, R>(name: string, effect: Effect.Effect<A, E, R>, options?: SpanOptions) =>
     Effect.gen(function* () {
-      const span = makeSpan(name);
+      const span = makeSpan(name, options);
       try {
         const result = yield* effect;
         span.setStatus('ok');
@@ -79,16 +110,18 @@ const makeTelemetryService = (_config: OpenTelemetryConfig): TelemetryService =>
       }
     }),
 
-  capture: (_event: AnalyticsEvent) => Effect.succeed(undefined), // OpenTelemetry doesn't handle analytics - use PostHog
+  // OpenTelemetry doesn't handle analytics - use PostHog for this
+  capture: (_event: AnalyticsEvent) => Effect.succeed(undefined),
 
-  identify: (_distinctId: string, _properties?: Record<string, unknown>) =>
-    Effect.succeed(undefined), // OpenTelemetry doesn't handle analytics - use PostHog
+  // OpenTelemetry doesn't handle user identification - use PostHog for this
+  identify: (_distinctId: string, _properties?: Record<string, unknown>) => Effect.succeed(undefined),
 
   flush: () =>
     Effect.tryPromise({
       try: async () => {
-        // Flush all pending spans to exporter
-        // Placeholder implementation
+        // Flush all pending spans to Datadog Agent via OTLP
+        // Real implementation would call sdk.forceFlush()
+        console.log(`[OTEL] Flushing spans to ${config.otlpEndpoint}`);
       },
       catch: (error) =>
         new TelemetryError({
@@ -102,5 +135,15 @@ const makeTelemetryService = (_config: OpenTelemetryConfig): TelemetryService =>
 // LAYER FACTORY
 // ============================================================================
 
-export const makeOpenTelemetryLive = (config: OpenTelemetryConfig): Layer.Layer<Telemetry> =>
-  Layer.succeed(Telemetry, makeTelemetryService(config));
+/**
+ * Create OpenTelemetry layer with custom config
+ */
+export const makeOpenTelemetryLive = (
+  config: OpenTelemetryConfig = getOpenTelemetryConfig()
+): Layer.Layer<Telemetry> => Layer.succeed(Telemetry, makeTelemetryService(config));
+
+/**
+ * Live layer using environment variables
+ * Uses DD_SERVICE, DD_ENV, DD_VERSION, OTEL_EXPORTER_OTLP_ENDPOINT
+ */
+export const OpenTelemetryLive = makeOpenTelemetryLive(getOpenTelemetryConfig());

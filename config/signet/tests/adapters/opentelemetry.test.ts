@@ -18,7 +18,9 @@ describe('OpenTelemetry Adapter', () => {
       const { makeOpenTelemetryLive } = await import('@/adapters/opentelemetry');
       const layer = makeOpenTelemetryLive({
         serviceName: 'test-service',
-        exporterUrl: 'http://localhost:4318/v1/traces',
+        serviceVersion: '1.0.0',
+        environment: 'test',
+        otlpEndpoint: 'http://localhost:4318',
       });
       expect(Layer.isLayer(layer)).toBe(true);
     });
@@ -31,7 +33,9 @@ describe('OpenTelemetry Adapter', () => {
 
       const layer = makeOpenTelemetryLive({
         serviceName: 'test-service',
-        exporterUrl: 'http://localhost:4318/v1/traces',
+        serviceVersion: '1.0.0',
+        environment: 'test',
+        otlpEndpoint: 'http://localhost:4318',
       });
 
       const program = Effect.gen(function* () {
