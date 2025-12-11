@@ -289,7 +289,21 @@
         "nix-darwin": "nix-darwin",
         "nix-homebrew": "nix-homebrew",
         "nixpkgs": "nixpkgs",
-        "sops-nix": "sops-nix"
+        "sops-nix": "sops-nix",
+        "yazi-bunny": "yazi-bunny",
+        "yazi-copy-file-contents": "yazi-copy-file-contents",
+        "yazi-flavor-ashen": "yazi-flavor-ashen",
+        "yazi-flavor-tokyo-night": "yazi-flavor-tokyo-night",
+        "yazi-glow": "yazi-glow",
+        "yazi-lazygit": "yazi-lazygit",
+        "yazi-open-with-cmd": "yazi-open-with-cmd",
+        "yazi-ouch": "yazi-ouch",
+        "yazi-plugins": "yazi-plugins",
+        "yazi-projects": "yazi-projects",
+        "yazi-relative-motions": "yazi-relative-motions",
+        "yazi-rich-preview": "yazi-rich-preview",
+        "yazi-starship": "yazi-starship",
+        "yazi-what-size": "yazi-what-size"
       }
     },
     "sops-nix": {
@@ -325,6 +339,244 @@
         "owner": "NixOS",
         "ref": "nixos-25.05",
         "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "yazi-bunny": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1748706531,
+        "narHash": "sha256-SQjibFiqMK4eauA1Ep2ttAFeiAs/I1GdK7Udjbb+7dY=",
+        "owner": "stelcodes",
+        "repo": "bunny.yazi",
+        "rev": "059fe22dda4281885869d8bfc229da3f5bd3b3f9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "stelcodes",
+        "ref": "059fe22",
+        "repo": "bunny.yazi",
+        "type": "github"
+      }
+    },
+    "yazi-copy-file-contents": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1748695377,
+        "narHash": "sha256-DmdEcmBdMNNVte++UlQacz+ITYC1l55q2tJWKZjXHBc=",
+        "owner": "AnirudhG07",
+        "repo": "plugins-yazi",
+        "rev": "907e292401d764c571ca3acdeaa294a4b6dd8036",
+        "type": "github"
+      },
+      "original": {
+        "owner": "AnirudhG07",
+        "ref": "907e292",
+        "repo": "plugins-yazi",
+        "type": "github"
+      }
+    },
+    "yazi-flavor-ashen": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1746996554,
+        "narHash": "sha256-OlR1ejZOkbStCOosrYSdvJqGCEiZpd11r7saEdmYjTw=",
+        "owner": "ficcdaf",
+        "repo": "ashen",
+        "rev": "514ed5a2b6b1ac8c4dda35f79483de2e61a895ac",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ficcdaf",
+        "ref": "514ed5a",
+        "repo": "ashen",
+        "type": "github"
+      }
+    },
+    "yazi-flavor-tokyo-night": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1746473472,
+        "narHash": "sha256-WtOjzk7ATA4Ue6Lu6IgiweOIHk/BK01Khio6ESF201k=",
+        "owner": "BennyOe",
+        "repo": "tokyo-night.yazi",
+        "rev": "b3950bf0f51f13ab5e22b61267298554d798c63b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "BennyOe",
+        "ref": "b3950bf",
+        "repo": "tokyo-night.yazi",
+        "type": "github"
+      }
+    },
+    "yazi-glow": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1744719787,
+        "narHash": "sha256-4krck4U/KWmnl32HWRsblYW/biuqzDPysrEn76buRck=",
+        "owner": "Reledia",
+        "repo": "glow.yazi",
+        "rev": "2da96e3ffd9cd9d4dd53e0b2636f83ff69fe9af0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Reledia",
+        "ref": "2da96e3",
+        "repo": "glow.yazi",
+        "type": "github"
+      }
+    },
+    "yazi-lazygit": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1743429988,
+        "narHash": "sha256-OJJPgpSaUHYz8a9opVLCds+VZsK1B6T+pSRJyVgYNy8=",
+        "owner": "Lil-Dank",
+        "repo": "lazygit.yazi",
+        "rev": "7a08a0988c2b7481d3f267f3bdc58080e6047e7d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Lil-Dank",
+        "ref": "7a08a09",
+        "repo": "lazygit.yazi",
+        "type": "github"
+      }
+    },
+    "yazi-open-with-cmd": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1739095756,
+        "narHash": "sha256-QazKfNEPFdkHwMrH4D+VMwj8fGXM8KHDdSvm1tik3dQ=",
+        "owner": "Ape",
+        "repo": "open-with-cmd.yazi",
+        "rev": "433cf301c36882c31032d3280ab0c94825fc5e9f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Ape",
+        "ref": "433cf30",
+        "repo": "open-with-cmd.yazi",
+        "type": "github"
+      }
+    },
+    "yazi-ouch": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1748797893,
+        "narHash": "sha256-mtXl76a54Deg4cyrD0wr++sD/5b/kCsnJ+ngM6OokTc=",
+        "owner": "ndtoan96",
+        "repo": "ouch.yazi",
+        "rev": "10b462765f37502065555e83c68a72bb26870fe2",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ndtoan96",
+        "ref": "10b4627",
+        "repo": "ouch.yazi",
+        "type": "github"
+      }
+    },
+    "yazi-plugins": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1748701279,
+        "narHash": "sha256-ZCLJ6BjMAj64/zM606qxnmzl2la4dvO/F5QFicBEYfU=",
+        "owner": "yazi-rs",
+        "repo": "plugins",
+        "rev": "63f9650e522336e0010261dcd0ffb0bf114cf912",
+        "type": "github"
+      },
+      "original": {
+        "owner": "yazi-rs",
+        "ref": "63f9650",
+        "repo": "plugins",
+        "type": "github"
+      }
+    },
+    "yazi-projects": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1748912007,
+        "narHash": "sha256-Lc0MeiAuPgJTq4ojNw9hwxqPJ74S4ymn4uPTkxGeZGc=",
+        "owner": "MasouShizuka",
+        "repo": "projects.yazi",
+        "rev": "7037dd5eee184ccb7725bdc9f7ea6faa188420d5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "MasouShizuka",
+        "ref": "7037dd5",
+        "repo": "projects.yazi",
+        "type": "github"
+      }
+    },
+    "yazi-relative-motions": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1744796841,
+        "narHash": "sha256-Ijz1wYt+L+24Fb/rzHcDR8JBv84z2UxdCIPqTdzbD14=",
+        "owner": "dedukun",
+        "repo": "relative-motions.yazi",
+        "rev": "ce2e890227269cc15cdc71d23b35a58fae6d2c27",
+        "type": "github"
+      },
+      "original": {
+        "owner": "dedukun",
+        "ref": "ce2e890",
+        "repo": "relative-motions.yazi",
+        "type": "github"
+      }
+    },
+    "yazi-rich-preview": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1748695275,
+        "narHash": "sha256-celObHo9Y3pFCd1mTx1Lz77Tc22SJTleRblAkbH/RqY=",
+        "owner": "AnirudhG07",
+        "repo": "rich-preview.yazi",
+        "rev": "843c3faf0a99f5ce31d02372c868d8dae92ca29d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "AnirudhG07",
+        "ref": "843c3fa",
+        "repo": "rich-preview.yazi",
+        "type": "github"
+      }
+    },
+    "yazi-starship": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1748798679,
+        "narHash": "sha256-q1G0Y4JAuAv8+zckImzbRvozVn489qiYVGFQbdCxC98=",
+        "owner": "Rolv-Apneseth",
+        "repo": "starship.yazi",
+        "rev": "6a0f3f788971b155cbc7cec47f6f11aebbc148c9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Rolv-Apneseth",
+        "ref": "6a0f3f7",
+        "repo": "starship.yazi",
+        "type": "github"
+      }
+    },
+    "yazi-what-size": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1748452520,
+        "narHash": "sha256-3prRpFuz1ZjPkpl1h4WCL7HY7XhIWGU5hg1E8bG/8f0=",
+        "owner": "pirafrank",
+        "repo": "what-size.yazi",
+        "rev": "0a4904cf4f8f14d36fe72976d9b6b7597cd303ee",
+        "type": "github"
+      },
+      "original": {
+        "owner": "pirafrank",
+        "ref": "0a4904c",
+        "repo": "what-size.yazi",
         "type": "github"
       }
     }
