@@ -41,6 +41,7 @@ import {
 } from '@/layers/patterns';
 import { TemplateEngineLive } from '@/layers/template-engine';
 import { ProjectName, type ProjectSpec } from '@/schema/project-spec';
+import { STACK } from '@/stack';
 import {
   ALL_TIERS,
   formatVerificationResult,
@@ -467,8 +468,208 @@ export const reconcileCommand = Command.make(
 );
 
 // =============================================================================
-// Main Command
+// Migrate Command - Migrate Project to STACK Compliance
 // =============================================================================
+
+// Files that should be deleted during migration
+const FORBIDDEN_MIGRATION_FILES = [
+  'package-lock.json',
+  'yarn.lock',
+  'pnpm-lock.yaml',
+  'Dockerfile',
+  'docker-compose.yml',
+  'docker-compose.yaml',
+  '.dockerignore',
+  '.eslintrc',
+  '.eslintrc.js',
+  '.eslintrc.json',
+  '.eslintrc.yaml',
+  '.eslintrc.yml',
+  'eslint.config.js',
+  'eslint.config.mjs',
+  '.prettierrc',
+  '.prettierrc.js',
+  '.prettierrc.json',
+  'prettier.config.js',
+  'jest.config.js',
+  'jest.config.ts',
+  '.env.local',
+  '.env.development',
+] as const;
+
+// Dependencies that should be removed during migration
+const BANNED_DEPENDENCIES = [
+  'express',
+  'fastify',
+  'koa',
+  'prisma',
+  '@prisma/client',
+  'mongoose',
+  'mysql',
+  'mysql2',
+  'typeorm',
+  'sequelize',
+  'knex',
+  'dotenv',
+  'eslint',
+  'prettier',
+  'jest',
+  'mocha',
+  'chai',
+  'sinon',
+  'nock',
+  'axios',
+  'lodash',
+  'moment',
+  'request',
+] as const;
+
+export const migrateCommand = Command.make(
+  'migrate',
+  { path: pathArg, dryRun: dryRunOption, verbose: verboseOption },
+  ({ path, dryRun, verbose }) =>
+    Effect.gen(function* () {
+      const targetPath = Option.getOrElse(path, () => '.');
+      yield* Console.log(
+        `\n🔄 Migrating project to STACK compliance${dryRun ? ' (dry-run)' : ''}\n`
+      );
+      yield* Console.log(`   Path: ${targetPath}`);
+      yield* Console.log(`   STACK version: ${STACK.meta.ssotVersion}`);
+      yield* Console.log('');
+
+      const results = {
+        deleted: [] as string[],
+        removedDeps: [] as string[],
+        updatedVersions: [] as string[],
+        warnings: [] as string[],
+      };
+
+      // Phase 1: Delete forbidden files
+      yield* Console.log('📁 Phase 1: Checking forbidden files...');
+      for (const file of FORBIDDEN_MIGRATION_FILES) {
+        const filePath = join(targetPath, file);
+        const exists = yield* Effect.tryPromise({
+          try: async () => {
+            const f = Bun.file(filePath);
+            return f.exists();
+          },
+          catch: () => false,
+        });
+
+        if (exists) {
+          if (!dryRun) {
+            yield* Effect.tryPromise({
+              try: () => Bun.write(filePath, '').then(() => require('fs').unlinkSync(filePath)),
+              catch: (e) => new Error(`Failed to delete ${file}: ${e}`),
+            }).pipe(Effect.catchAll(() => Effect.void));
+          }
+          results.deleted.push(file);
+          yield* Console.log(`   ${dryRun ? '⚠️ Would delete' : '❌ Deleted'}: ${file}`);
+        }
+      }
+
+      // Phase 2: Update package.json
+      const pkgPath = join(targetPath, 'package.json');
+      const pkgExists = yield* Effect.tryPromise({
+        try: async () => Bun.file(pkgPath).exists(),
+        catch: () => false,
+      });
+
+      if (pkgExists) {
+        yield* Console.log('\n📦 Phase 2: Updating package.json...');
+
+        const pkgContent = yield* Effect.tryPromise({
+          try: () => Bun.file(pkgPath).text(),
+          catch: (e) => new Error(`Failed to read package.json: ${e}`),
+        });
+
+        let pkg: {
+          dependencies?: Record<string, string>;
+          devDependencies?: Record<string, string>;
+          scripts?: Record<string, string>;
+        };
+        try {
+          pkg = JSON.parse(pkgContent);
+        } catch {
+          yield* Console.log('   ⚠️ Could not parse package.json');
+          pkg = {};
+        }
+
+        let modified = false;
+
+        // Remove banned dependencies
+        for (const dep of BANNED_DEPENDENCIES) {
+          if (pkg.dependencies?.[dep]) {
+            delete pkg.dependencies[dep];
+            results.removedDeps.push(`dependencies.${dep}`);
+            modified = true;
+            yield* Console.log(`   ${dryRun ? '⚠️ Would remove' : '🗑️ Removed'}: ${dep}`);
+          }
+          if (pkg.devDependencies?.[dep]) {
+            delete pkg.devDependencies[dep];
+            results.removedDeps.push(`devDependencies.${dep}`);
+            modified = true;
+            yield* Console.log(`   ${dryRun ? '⚠️ Would remove' : '🗑️ Removed'}: ${dep} (dev)`);
+          }
+        }
+
+        // Update versions to match STACK
+        const npmVersions = STACK.npm;
+        for (const [name, targetVersion] of Object.entries(npmVersions)) {
+          if (pkg.dependencies?.[name]) {
+            const current = pkg.dependencies[name];
+            if (!current.includes(targetVersion)) {
+              const newVersion = `^${targetVersion}`;
+              if (!dryRun) pkg.dependencies[name] = newVersion;
+              results.updatedVersions.push(`${name}: ${current} → ${newVersion}`);
+              modified = true;
+              if (verbose) {
+                yield* Console.log(`   📌 ${name}: ${current} → ${newVersion}`);
+              }
+            }
+          }
+          if (pkg.devDependencies?.[name]) {
+            const current = pkg.devDependencies[name];
+            if (!current.includes(targetVersion)) {
+              const newVersion = `^${targetVersion}`;
+              if (!dryRun) pkg.devDependencies[name] = newVersion;
+              results.updatedVersions.push(`${name}: ${current} → ${newVersion}`);
+              modified = true;
+              if (verbose) {
+                yield* Console.log(`   📌 ${name}: ${current} → ${newVersion}`);
+              }
+            }
+          }
+        }
+
+        // Write updated package.json
+        if (modified && !dryRun) {
+          yield* Effect.tryPromise({
+            try: () => Bun.write(pkgPath, JSON.stringify(pkg, null, 2) + '\n'),
+            catch: (e) => new Error(`Failed to write package.json: ${e}`),
+          });
+        }
+
+        if (!verbose && results.updatedVersions.length > 0) {
+          yield* Console.log(`   📌 Updated ${results.updatedVersions.length} version(s)`);
+        }
+      }
+
+      // Phase 3: Summary
+      yield* Console.log('\n' + '─'.repeat(50));
+      yield* Console.log('📊 Migration Summary:');
+      yield* Console.log(`   Files deleted: ${results.deleted.length}`);
+      yield* Console.log(`   Dependencies removed: ${results.removedDeps.length}`);
+      yield* Console.log(`   Versions updated: ${results.updatedVersions.length}`);
+
+      if (dryRun) {
+        yield* Console.log('\n⚠️ Dry run - no changes made. Run without --dry-run to apply.\n');
+      } else {
+        yield* Console.log('\n✅ Migration complete!');
+        yield* Console.log('   Next: Run `bun install` to update lockfile\n');
+      }
+    })
+);
 
 // =============================================================================
 // Doctor Command - System Health Check
@@ -766,6 +967,7 @@ Powered by Effect-TS, OXC, and ast-grep for high-performance AST analysis.
 Commands:
   signet init <type> <name>   Initialize a new project
   signet gen <type> <name>    Generate a workspace in existing project
+  signet migrate [path]       🔄 Migrate project to STACK compliance
   signet verify [path]        🔏 Run 5-tier verification (hard gate)
   signet validate [path]      Validate project against spec and patterns
   signet enforce [--fix]      Run architecture enforcers
@@ -793,6 +995,10 @@ Verification Tiers:
   4. review     Multi-agent code review (future: Claude API)
   5. context    Hexagonal architecture, circular deps, layer violations
 
+Migrate Options:
+  --dry-run               Preview changes without applying
+  --verbose               Show detailed version updates
+
 Reconcile Options:
   --dry-run               Preview changes without applying
   --verbose               Show detailed output
@@ -807,6 +1013,8 @@ Daemon Options (Infrastructure):
   --dry-run               Preview only, don't apply
 
 Examples:
+  signet migrate --dry-run                  Preview migration changes
+  signet migrate /path/to/project           Migrate project to STACK
   signet verify                             Run all 5 tiers
   signet verify --tiers execution           Run only execution tier
   signet verify --tiers patterns,execution  Run patterns + execution
@@ -826,6 +1034,7 @@ Examples:
   Command.withSubcommands([
     initCommand,
     genCommand,
+    migrateCommand,
     validateCommand,
     enforceCommand,
     reconcileCommand,
