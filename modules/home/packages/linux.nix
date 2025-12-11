@@ -5,10 +5,12 @@
   lib,
   pkgs,
   ...
-}: let
+}:
+let
   inherit (lib) mkIf;
   cfg = config.modules.home.packages;
-in {
+in
+{
   config = mkIf (cfg.enable && pkgs.stdenv.isLinux) {
     home.packages = with pkgs; [
       # Clipboard support

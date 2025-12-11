@@ -4,9 +4,11 @@
   config,
   lib,
   ...
-}: let
+}:
+let
   inherit (lib) mkDefault mkOption types;
-in {
+in
+{
   options.modules.nixos.system = {
     hostname = mkOption {
       type = types.str;
@@ -93,7 +95,7 @@ in {
       # Automatic store optimization
       optimise = {
         automatic = true;
-        dates = ["weekly"];
+        dates = [ "weekly" ];
       };
     };
   };

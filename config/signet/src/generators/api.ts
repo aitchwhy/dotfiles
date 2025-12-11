@@ -11,6 +11,43 @@ import type { Effect } from 'effect';
 import type { FileTree } from '@/layers/file-system';
 import { renderTemplates, type TemplateEngine } from '@/layers/template-engine';
 import type { ProjectSpec } from '@/schema/project-spec';
+import versions from '../../versions.json';
+
+// =============================================================================
+// Templates - Package.json (API-specific dependencies)
+// =============================================================================
+
+const API_PACKAGE_JSON_TEMPLATE = `{
+  "name": "{{name}}",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "{{#if description}}{{description}}{{else}}{{name}} API{{/if}}",
+  "scripts": {
+    "dev": "wrangler dev",
+    "start": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit",
+    "lint": "bunx biome check .",
+    "lint:fix": "bunx biome check --write .",
+    "format": "bunx biome format --write .",
+    "validate": "bun run typecheck && bun run lint && bun test"
+  },
+  "dependencies": {
+    "hono": "^{{honoVersion}}",
+    "effect": "^{{effectVersion}}",
+    "zod": "^{{zodVersion}}"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^{{biomeVersion}}",
+    "@types/bun": "^{{bunTypesVersion}}",
+    "typescript": "^{{typescriptVersion}}",
+    "wrangler": "^3.99.0"
+  },
+  "engines": {
+    "bun": ">={{bunVersion}}"
+  }
+}`;
 
 // =============================================================================
 // Templates - Server & Entry
@@ -223,11 +260,12 @@ const ERROR_MIDDLEWARE_TEMPLATE = `/**
  * Global error handler for Hono.
  */
 import type { ErrorHandler } from 'hono'
+import type { ContentfulStatusCode } from 'hono/utils/http-status'
 
 export const errorMiddleware: ErrorHandler = (err, c) => {
   console.error('Unhandled error:', err)
 
-  const status = 'status' in err && typeof err.status === 'number' ? err.status : 500
+  const status = ('status' in err && typeof err.status === 'number' ? err.status : 500) as ContentfulStatusCode
   const message = err.message || 'Internal Server Error'
 
   return c.json(
@@ -293,19 +331,30 @@ enabled = true
  * Generate hexagonal API project files from ProjectSpec
  */
 export const generateApi = (spec: ProjectSpec): Effect.Effect<FileTree, Error, TemplateEngine> => {
+  const npmVersions = versions.npm as Record<string, string>;
+  const runtimeVersions = versions.runtime as Record<string, string>;
+
   const data = {
     name: spec.name,
     description: spec.description,
     hasDatabase: Boolean(spec.infra.database),
     isTurso: spec.infra.database === 'turso',
     isD1: spec.infra.database === 'd1',
+    honoVersion: npmVersions['hono'],
+    effectVersion: npmVersions['effect'],
+    zodVersion: npmVersions['zod'],
+    typescriptVersion: npmVersions['typescript'],
+    biomeVersion: npmVersions['@biomejs/biome'],
+    bunTypesVersion: npmVersions['@types/bun'],
+    bunVersion: runtimeVersions['bun'],
   };
 
   // Base templates (always generated)
   const templates: FileTree = {
+    'package.json': API_PACKAGE_JSON_TEMPLATE,
     'src/server.ts': SERVER_TS_TEMPLATE,
     'src/index.ts': INDEX_TS_TEMPLATE,
-    'src/handlers/health.ts': HEALTH_HANDLER_TEMPLATE, // Pure Effect handlers (no Hono)
+    'src/handlers/health.ts': HEALTH_HANDLER_TEMPLATE,
     'src/middleware/error.ts': ERROR_MIDDLEWARE_TEMPLATE,
     'src/lib/result.ts': RESULT_TS_TEMPLATE,
     'wrangler.toml': WRANGLER_TOML_TEMPLATE,

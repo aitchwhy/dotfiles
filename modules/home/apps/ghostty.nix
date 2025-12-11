@@ -5,9 +5,11 @@
   lib,
   pkgs,
   ...
-}: let
+}:
+let
   inherit (lib) mkEnableOption mkIf;
-in {
+in
+{
   options.modules.home.apps.ghostty = {
     enable = mkEnableOption "ghostty terminal";
   };

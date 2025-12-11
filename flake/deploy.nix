@@ -9,7 +9,8 @@
   self,
   inputs,
   ...
-}: {
+}:
+{
   flake.colmena = {
     meta = {
       # Use nixpkgs from flake for consistency
@@ -18,7 +19,7 @@
       };
 
       # Pass inputs and self to all hosts
-      specialArgs = {inherit inputs self;};
+      specialArgs = { inherit inputs self; };
 
       # Optional: Speed up evaluation with this
       # machinesFile = "/etc/nix/machines";
@@ -66,7 +67,7 @@
           home-manager = {
             useGlobalPkgs = true;
             useUserPackages = true;
-            extraSpecialArgs = {inherit inputs self;};
+            extraSpecialArgs = { inherit inputs self; };
             users.hank = import ../users/hank-linux.nix;
             backupFileExtension = "backup";
           };

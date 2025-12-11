@@ -4,9 +4,11 @@
   config,
   lib,
   ...
-}: let
+}:
+let
   inherit (lib) mkEnableOption mkIf;
-in {
+in
+{
   options.modules.home.apps.raycast = {
     enable = mkEnableOption "Raycast launcher settings";
   };

@@ -25,7 +25,7 @@ async function run(
     cwd,
     stdout: 'pipe',
     stderr: 'pipe',
-    env: { ...process.env, PATH: process.env.PATH },
+    env: { ...process.env, PATH: process.env['PATH'] },
   });
 
   const stdout = await new Response(proc.stdout).text();

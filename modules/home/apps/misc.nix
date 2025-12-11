@@ -4,9 +4,11 @@
   config,
   lib,
   ...
-}: let
+}:
+let
   inherit (lib) mkEnableOption mkIf;
-in {
+in
+{
   options.modules.home.apps.misc = {
     enable = mkEnableOption "miscellaneous app configs";
   };

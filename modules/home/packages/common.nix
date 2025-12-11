@@ -5,12 +5,15 @@
   lib,
   pkgs,
   ...
-}: let
+}:
+let
   inherit (lib) mkIf optionals;
   cfg = config.modules.home.packages;
-in {
+in
+{
   config = mkIf cfg.enable {
-    home.packages = with pkgs;
+    home.packages =
+      with pkgs;
       # Cloud Platforms
       (optionals cfg.enableCloudPlatforms [
         awscli2

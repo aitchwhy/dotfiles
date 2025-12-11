@@ -9,10 +9,12 @@
   config,
   lib,
   ...
-}: let
+}:
+let
   inherit (lib) mkEnableOption mkIf;
   cfg = config.modules.home.apps.paste;
-in {
+in
+{
   options.modules.home.apps.paste = {
     enable = mkEnableOption "Paste clipboard manager tracking";
   };

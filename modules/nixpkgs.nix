@@ -2,7 +2,8 @@
   lib,
   pkgs,
   ...
-}: {
+}:
+{
   # System-level Nix configuration
   nix = {
     # On Darwin: Determinate Nix installer manages the daemon externally
@@ -21,7 +22,7 @@
       ];
 
       # Trust settings
-      trusted-users = ["@wheel"] ++ (lib.optionals pkgs.stdenv.isDarwin ["@admin"]);
+      trusted-users = [ "@wheel" ] ++ (lib.optionals pkgs.stdenv.isDarwin [ "@admin" ]);
 
       # Binary caches - expanded for better coverage
       # To add personal cache: cachix create hank-dotfiles && cachix use hank-dotfiles
@@ -84,7 +85,7 @@
       http2 = true; # Enable HTTP/2 for better performance
 
       # Security
-      allowed-users = ["*"]; # All users can use Nix
+      allowed-users = [ "*" ]; # All users can use Nix
       require-sigs = true; # Require signatures on substitutes
 
       # Build user settings (Darwin)

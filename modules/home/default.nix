@@ -1,7 +1,9 @@
 # Home Manager module aggregator
-{lib, ...}: let
+{ lib, ... }:
+let
   inherit (lib) mkDefault;
-in {
+in
+{
   imports = [
     # Packages (platform-aware, DRY)
     ./packages

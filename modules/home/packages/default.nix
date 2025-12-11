@@ -5,9 +5,16 @@
   config,
   lib,
   ...
-}: let
-  inherit (lib) mkDefault mkEnableOption mkOption types;
-in {
+}:
+let
+  inherit (lib)
+    mkDefault
+    mkEnableOption
+    mkOption
+    types
+    ;
+in
+{
   imports = [
     ./common.nix
     ./darwin.nix

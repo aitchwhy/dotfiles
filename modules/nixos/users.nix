@@ -4,9 +4,11 @@
   lib,
   pkgs,
   ...
-}: let
+}:
+let
   inherit (lib) mkDefault;
-in {
+in
+{
   config = {
     # User accounts
     users.users.hank = {
@@ -37,7 +39,7 @@ in {
 
     # Groups
     users.groups = {
-      docker = {};
+      docker = { };
     };
 
     # Home directory permissions

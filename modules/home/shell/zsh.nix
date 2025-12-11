@@ -3,9 +3,11 @@
   config,
   lib,
   ...
-}: let
+}:
+let
   inherit (lib) mkEnableOption mkIf;
-in {
+in
+{
   options.modules.home.shell.zsh = {
     enable = mkEnableOption "Zsh shell configuration";
   };

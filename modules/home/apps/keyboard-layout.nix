@@ -4,9 +4,11 @@
   config,
   lib,
   ...
-}: let
+}:
+let
   inherit (lib) mkEnableOption mkIf;
-in {
+in
+{
   options.modules.home.apps.keyboardLayout = {
     enable = mkEnableOption "US keyboard layout without special characters on Option";
   };

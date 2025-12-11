@@ -104,9 +104,10 @@ let
       argsString = if def.args == [ ] then "" else " " + (concatStringsSep " " def.args);
       # Source GitHub token from sops-nix decrypted file if hasEnvFile is set
       envSource =
-        if def.hasEnvFile or false
-        then "[ -f $HOME/.config/claude/github-token ] && export GITHUB_PERSONAL_ACCESS_TOKEN=$(cat $HOME/.config/claude/github-token); "
-        else "";
+        if def.hasEnvFile or false then
+          "[ -f $HOME/.config/claude/github-token ] && export GITHUB_PERSONAL_ACCESS_TOKEN=$(cat $HOME/.config/claude/github-token); "
+        else
+          "";
     in
     if def.isLocal or false then
       {
@@ -142,9 +143,10 @@ let
     _name: def:
     let
       envSource =
-        if def.hasEnvFile or false
-        then "[ -f $HOME/.config/claude/github-token ] && export GITHUB_PERSONAL_ACCESS_TOKEN=$(cat $HOME/.config/claude/github-token); "
-        else "";
+        if def.hasEnvFile or false then
+          "[ -f $HOME/.config/claude/github-token ] && export GITHUB_PERSONAL_ACCESS_TOKEN=$(cat $HOME/.config/claude/github-token); "
+        else
+          "";
       needsWrapper = def.hasEnvFile or false;
     in
     if def.isLocal or false then
@@ -166,7 +168,9 @@ let
         command = "/bin/sh";
         args = [
           "-c"
-          "${envSource}exec npx -y ${def.package}${if def.args == [ ] then "" else " " + (concatStringsSep " " def.args)}"
+          "${envSource}exec npx -y ${def.package}${
+            if def.args == [ ] then "" else " " + (concatStringsSep " " def.args)
+          }"
         ];
         type = "stdio";
       }

@@ -8,10 +8,12 @@
   lib,
   pkgs,
   ...
-}: let
+}:
+let
   inherit (lib) mkIf;
   cfg = config.modules.home.packages;
-in {
+in
+{
   config = mkIf (cfg.enable && pkgs.stdenv.isDarwin) {
     home.packages = with pkgs; [
       # Container Tools (not needed on NixOS - use system Docker)

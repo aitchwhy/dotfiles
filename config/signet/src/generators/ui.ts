@@ -11,6 +11,52 @@ import type { Effect } from 'effect';
 import type { FileTree } from '@/layers/file-system';
 import { renderTemplates, type TemplateEngine } from '@/layers/template-engine';
 import type { ProjectSpec } from '@/schema/project-spec';
+import versions from '../../versions.json';
+
+// =============================================================================
+// Templates - Package.json (UI-specific dependencies)
+// =============================================================================
+
+const UI_PACKAGE_JSON_TEMPLATE = `{
+  "name": "{{name}}",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "{{#if description}}{{description}}{{else}}{{name}} UI{{/if}}",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest",
+    "typecheck": "tsc --noEmit",
+    "lint": "bunx biome check .",
+    "lint:fix": "bunx biome check --write .",
+    "format": "bunx biome format --write .",
+    "validate": "bun run typecheck && bun run lint && bun test"
+  },
+  "dependencies": {
+    "react": "^{{reactVersion}}",
+    "react-dom": "^{{reactVersion}}",
+    "@tanstack/react-router": "^{{tanstackRouterVersion}}",
+    "xstate": "^{{xstateVersion}}",
+    "@xstate/react": "^{{xstateReactVersion}}",
+    "zod": "^{{zodVersion}}"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^{{biomeVersion}}",
+    "@types/bun": "^{{bunTypesVersion}}",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^{{typescriptVersion}}",
+    "vite": "^{{viteVersion}}",
+    "vitest": "^{{vitestVersion}}",
+    "@vitejs/plugin-react": "^4.3.0",
+    "tailwindcss": "^{{tailwindVersion}}",
+    "@tanstack/router-plugin": "^{{tanstackRouterVersion}}"
+  },
+  "engines": {
+    "bun": ">={{bunVersion}}"
+  }
+}`;
 
 // =============================================================================
 // Templates - Entry Points
@@ -116,37 +162,37 @@ const COUNTER_MACHINE_TEMPLATE = `/**
  *
  * Example XState v5 state machine.
  */
-import { createMachine, assign } from 'xstate'
+import { setup, assign } from 'xstate'
 
 type CounterContext = {
   count: number
 }
 
-type CounterEvent = { type: 'increment' } | { type: 'decrement' } | { type: 'reset' }
+type CounterEvents =
+  | { type: 'increment' }
+  | { type: 'decrement' }
+  | { type: 'reset' }
 
-export const counterMachine = createMachine({
+export const counterMachine = setup({
+  types: {
+    context: {} as CounterContext,
+    events: {} as CounterEvents,
+  },
+}).createMachine({
   id: 'counter',
   initial: 'active',
-  context: {
-    count: 0,
-  } satisfies CounterContext,
+  context: { count: 0 },
   states: {
     active: {
       on: {
         increment: {
-          actions: assign({
-            count: ({ context }) => context.count + 1,
-          }),
+          actions: assign({ count: ({ context }) => context.count + 1 }),
         },
         decrement: {
-          actions: assign({
-            count: ({ context }) => context.count - 1,
-          }),
+          actions: assign({ count: ({ context }) => context.count - 1 }),
         },
         reset: {
-          actions: assign({
-            count: 0,
-          }),
+          actions: assign({ count: 0 }),
         },
       },
     },
@@ -245,12 +291,30 @@ const INDEX_HTML_TEMPLATE = `<!DOCTYPE html>
  * Generate React 19 + XState + TanStack Router project files
  */
 export const generateUi = (spec: ProjectSpec): Effect.Effect<FileTree, Error, TemplateEngine> => {
+  const npmVersions = versions.npm as Record<string, string>;
+  const runtimeVersions = versions.runtime as Record<string, string>;
+  const frontendVersions = versions.frontend as Record<string, string>;
+
   const data = {
     name: spec.name,
     description: spec.description,
+    reactVersion: npmVersions['react'],
+    tanstackRouterVersion: npmVersions['@tanstack/react-router'],
+    xstateVersion: npmVersions['xstate'],
+    xstateReactVersion: npmVersions['@xstate/react'],
+    zodVersion: npmVersions['zod'],
+    typescriptVersion: npmVersions['typescript'],
+    biomeVersion: npmVersions['@biomejs/biome'],
+    bunTypesVersion: npmVersions['@types/bun'],
+    viteVersion: npmVersions['vite'],
+    vitestVersion: npmVersions['vitest'],
+    tailwindVersion: frontendVersions['tailwindcss'],
+    bunVersion: runtimeVersions['bun'],
   };
 
   const templates: FileTree = {
+    'package.json': UI_PACKAGE_JSON_TEMPLATE,
+
     // Entry points
     'src/main.tsx': MAIN_TSX_TEMPLATE,
     'src/App.tsx': APP_TSX_TEMPLATE,

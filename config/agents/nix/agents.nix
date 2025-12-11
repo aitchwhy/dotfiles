@@ -6,17 +6,19 @@
   lib,
   pkgs,
   ...
-}: let
+}:
+let
   inherit (lib) mkEnableOption mkIf;
   agentsDir = "${config.home.homeDirectory}/dotfiles/config/agents";
-in {
+in
+{
   options.modules.home.apps.agents = {
     enable = mkEnableOption "Unified AI agent configuration";
   };
 
   config = mkIf config.modules.home.apps.agents.enable {
     # jq required for JSON merging
-    home.packages = [pkgs.jq];
+    home.packages = [ pkgs.jq ];
 
     # Static configs (immutable - symlinked)
     home.file = {
@@ -52,10 +54,10 @@ in {
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/observability-patterns";
       ".claude/skills/clean-code".source =
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/clean-code";
-      ".claude/skills/twelve-factor".source =
-        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/twelve-factor";
       ".claude/skills/verification-first".source =
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/verification-first";
+      ".claude/skills/project-bootstrap".source =
+        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/project-bootstrap";
       ".claude/skills/signet-patterns".source =
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/signet-patterns";
       ".claude/skills/repomix-patterns".source =
@@ -73,19 +75,10 @@ in {
       ".claude/skills/nix-flake-parts".source =
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/nix-flake-parts";
 
-      # Skills - API patterns
       ".claude/skills/typespec-patterns".source =
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/typespec-patterns";
-      ".claude/skills/signet-generator-patterns".source =
-        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/signet-generator-patterns";
-
-      # Skills - quality patterns
       ".claude/skills/refactoring-catalog".source =
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/refactoring-catalog";
-      ".claude/skills/distributed-systems-patterns".source =
-        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/distributed-systems-patterns";
-      ".claude/skills/code-smells".source =
-        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/code-smells";
       ".claude/skills/formal-verification".source =
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/formal-verification";
       ".claude/skills/semantic-codebase".source =
@@ -122,7 +115,7 @@ in {
     };
 
     # Mutable configs (merge/copy-on-init pattern with backup and validation)
-    home.activation.agentsConfig = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    home.activation.agentsConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       CLAUDE_DIR="$HOME/.claude"
       SETTINGS_FILE="$CLAUDE_DIR/settings.json"
       MCP_FILE="$HOME/.claude.json"

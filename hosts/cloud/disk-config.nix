@@ -1,6 +1,7 @@
 # Disko disk configuration for cloud VMs
 # Supports both BIOS and UEFI boot
-{lib, ...}: {
+{ lib, ... }:
+{
   disko.devices = {
     disk = {
       main = {

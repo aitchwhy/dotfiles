@@ -2,7 +2,8 @@
 # This file contains:
 # - Machine-specific network configuration
 # - Hardware-specific tools and optimizations
-{pkgs, ...}: {
+{ pkgs, ... }:
+{
   networking.hostName = "hank-mbp-m4";
   networking.computerName = "Hank's MacBook Pro";
   networking.localHostName = "hank-mbp-m4";

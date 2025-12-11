@@ -131,8 +131,9 @@
     };
   };
 
-  outputs = inputs @ {flake-parts, ...}:
-    flake-parts.lib.mkFlake {inherit inputs;} {
+  outputs =
+    inputs@{ flake-parts, ... }:
+    flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [
         inputs.git-hooks-nix.flakeModule
         ./flake/darwin.nix
@@ -150,9 +151,11 @@
       ];
 
       # Per-system configuration
-      perSystem = {pkgs, ...}: {
-        # Formatter (nixfmt-rfc-style is December 2025 standard)
-        formatter = pkgs.nixfmt-rfc-style;
-      };
+      perSystem =
+        { pkgs, ... }:
+        {
+          # Formatter (nixfmt-rfc-style is December 2025 standard)
+          formatter = pkgs.nixfmt-rfc-style;
+        };
     };
 }

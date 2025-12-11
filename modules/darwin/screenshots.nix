@@ -4,9 +4,9 @@
   config,
   lib,
   ...
-}: let
-  inherit
-    (lib)
+}:
+let
+  inherit (lib)
     mkEnableOption
     mkOption
     mkIf
@@ -18,7 +18,8 @@
   disabledHotkey = {
     enabled = false;
   };
-in {
+in
+{
   options.modules.darwin.screenshots = {
     enable = mkEnableOption "macOS screenshot customization";
 

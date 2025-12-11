@@ -1,8 +1,10 @@
 # NixOS security configuration
 # Firewall, fail2ban, and system hardening
-{lib, ...}: let
+{ lib, ... }:
+let
   inherit (lib) mkDefault;
-in {
+in
+{
   config = {
     # Firewall configuration
     networking.firewall = {
@@ -10,13 +12,13 @@ in {
       allowPing = true;
 
       # Only allow SSH (Tailscale handles secure access)
-      allowedTCPPorts = [22];
+      allowedTCPPorts = [ 22 ];
       allowedUDPPorts = [
         41641 # Tailscale
       ];
 
       # Trust Tailscale interface
-      trustedInterfaces = ["tailscale0"];
+      trustedInterfaces = [ "tailscale0" ];
 
       # Log dropped packets (useful for debugging)
       logRefusedConnections = mkDefault false;
@@ -58,15 +60,15 @@ in {
         wheelNeedsPassword = true;
         extraRules = [
           {
-            groups = ["wheel"];
+            groups = [ "wheel" ];
             commands = [
               {
                 command = "/run/current-system/sw/bin/nixos-rebuild";
-                options = ["NOPASSWD"];
+                options = [ "NOPASSWD" ];
               }
               {
                 command = "/run/current-system/sw/bin/systemctl";
-                options = ["NOPASSWD"];
+                options = [ "NOPASSWD" ];
               }
             ];
           }
@@ -83,8 +85,8 @@ in {
     # Boot security
     boot = {
       # Disable kernel module loading after boot
-      kernelModules = [];
-      extraModulePackages = [];
+      kernelModules = [ ];
+      extraModulePackages = [ ];
 
       # Kernel hardening
       kernel.sysctl = {
