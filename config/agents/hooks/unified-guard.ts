@@ -2,26 +2,40 @@
 /**
  * Unified Guard - Consolidated PreToolUse gatekeeper
  *
- * Guards (7 total):
+ * Guards (8 total):
  * 1. Bash safety - blocks dangerous rm -rf commands
  * 2. Conventional commits - validates git commit messages
  * 3. Forbidden files - blocks package-lock.json, eslint config, etc.
  * 4. Forbidden imports - blocks express, prisma, zod/v3, GCP OTEL exporters, dd-trace
  * 5. Any type detector - blocks TypeScript `any` usage
- * 6. No-mock enforcer - blocks jest.mock, vi.mock, Mock*Live patterns
- * 7. TDD enforcer - requires test file before source code
+ * 6. z.infer detector - blocks z.infer<>, z.input<>, z.output<> (use satisfies pattern)
+ * 7. No-mock enforcer - blocks jest.mock, vi.mock, Mock*Live patterns
+ * 8. TDD enforcer - requires test file before source code
  *
  * Observability standard: Datadog + OTEL 2.x via OTLP proto exporters.
  * See: observability-patterns skill for approved patterns.
  *
- * This consolidation reduces shell spawns from 7 → 1 per Write/Edit operation.
+ * This consolidation reduces shell spawns from 8 → 1 per Write/Edit operation.
  */
 
 import { z } from 'zod';
 
 // ============================================================================
-// Input Schema
+// Input Types (TypeScript first, schema satisfies type)
 // ============================================================================
+
+type HookInput = {
+  readonly hook_event_name: 'PreToolUse';
+  readonly session_id: string;
+  readonly tool_name: string;
+  readonly tool_input: {
+    readonly file_path?: string;
+    readonly content?: string;
+    readonly new_string?: string;
+    readonly command?: string;
+    readonly [key: string]: unknown;
+  };
+};
 
 const HookInputSchema = z.object({
   hook_event_name: z.literal('PreToolUse'),
@@ -30,14 +44,12 @@ const HookInputSchema = z.object({
   tool_input: z
     .object({
       file_path: z.string().optional(),
-      content: z.string().optional(), // Write
-      new_string: z.string().optional(), // Edit
-      command: z.string().optional(), // Bash
+      content: z.string().optional(),
+      new_string: z.string().optional(),
+      command: z.string().optional(),
     })
     .passthrough(),
-});
-
-type HookInput = z.infer<typeof HookInputSchema>;
+}) satisfies z.ZodType<HookInput>;
 
 // ============================================================================
 // Output Helpers
@@ -323,7 +335,44 @@ Zero \`any\` policy - see CLAUDE.md TypeScript Standards.`;
 }
 
 // ============================================================================
-// 6. NO-MOCK ENFORCER
+// 6. Z.INFER DETECTOR
+// ============================================================================
+
+const ZINFER_PATTERNS = [
+  /z\.infer\s*</,
+  /z\.input\s*</,
+  /z\.output\s*</,
+];
+
+function checkZodInfer(content: string, filePath: string): string | null {
+  if (!/\.tsx?$/.test(filePath)) return null;
+  if (filePath.endsWith('.d.ts')) return null;
+  if (filePath.includes('/node_modules/')) return null;
+
+  const cleanContent = stripCommentsAndStrings(content);
+
+  for (const pattern of ZINFER_PATTERNS) {
+    if (pattern.test(cleanContent)) {
+      return `ZOD INFER VIOLATION: z.infer<> detected
+
+TypeScript type MUST be source of truth. Never derive types from schemas.
+
+  // ❌ BLOCKED
+  const schema = z.object({ name: z.string() });
+  type User = z.infer<typeof schema>;
+
+  // ✅ CORRECT - Type first, schema satisfies
+  type User = { readonly name: string };
+  const schema = z.object({ name: z.string() }) satisfies z.ZodType<User>;
+
+See: zod-patterns skill for TypeScript-first Zod patterns.`;
+    }
+  }
+  return null;
+}
+
+// ============================================================================
+// 7. NO-MOCK ENFORCER (renumbered from 6)
 // ============================================================================
 
 const MOCK_PATTERNS: { pattern: RegExp; description: string }[] = [
@@ -371,7 +420,7 @@ Run: process-compose up (local) or use GitHub Actions services (CI).`;
 }
 
 // ============================================================================
-// 7. TDD ENFORCER
+// 8. TDD ENFORCER
 // ============================================================================
 
 interface LanguageConfig {
@@ -634,7 +683,18 @@ async function main(): Promise<void> {
   }
 
   // ─────────────────────────────────────────────────────────────────────────
-  // 5. NO-MOCK ENFORCER (for Write/Edit on TS/JS)
+  // 5. Z.INFER DETECTOR (for Write/Edit on TypeScript)
+  // ─────────────────────────────────────────────────────────────────────────
+  if ((tool_name === 'Write' || tool_name === 'Edit') && content && filePath) {
+    const zodError = checkZodInfer(content, filePath);
+    if (zodError) {
+      block(zodError);
+      return;
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // 6. NO-MOCK ENFORCER (for Write/Edit on TS/JS)
   // ─────────────────────────────────────────────────────────────────────────
   if ((tool_name === 'Write' || tool_name === 'Edit') && content && filePath) {
     const mockError = checkNoMocks(content, filePath);
@@ -645,7 +705,7 @@ async function main(): Promise<void> {
   }
 
   // ─────────────────────────────────────────────────────────────────────────
-  // 6. TDD ENFORCER (for Write/Edit/MultiEdit on source files)
+  // 8. TDD ENFORCER (for Write/Edit/MultiEdit on source files)
   // ─────────────────────────────────────────────────────────────────────────
   if (['Write', 'Edit', 'MultiEdit'].includes(tool_name) && filePath) {
     const tddError = await checkTDD(filePath);
