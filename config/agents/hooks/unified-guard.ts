@@ -6,10 +6,13 @@
  * 1. Bash safety - blocks dangerous rm -rf commands
  * 2. Conventional commits - validates git commit messages
  * 3. Forbidden files - blocks package-lock.json, eslint config, etc.
- * 4. Forbidden imports - blocks express, prisma, zod/v3
+ * 4. Forbidden imports - blocks express, prisma, zod/v3, GCP OTEL exporters, dd-trace
  * 5. Any type detector - blocks TypeScript `any` usage
  * 6. No-mock enforcer - blocks jest.mock, vi.mock, Mock*Live patterns
  * 7. TDD enforcer - requires test file before source code
+ *
+ * Observability standard: Datadog + OTEL 2.x via OTLP proto exporters.
+ * See: observability-patterns skill for approved patterns.
  *
  * This consolidation reduces shell spawns from 7 → 1 per Write/Edit operation.
  */
@@ -173,6 +176,9 @@ interface ForbiddenImport {
 }
 
 const FORBIDDEN_IMPORTS: ForbiddenImport[] = [
+  // ===========================================================================
+  // FRAMEWORK BANS
+  // ===========================================================================
   {
     patterns: [/from\s+['"]express['"]/, /require\s*\(\s*['"]express['"]\s*\)/],
     package: 'express',
@@ -196,6 +202,37 @@ const FORBIDDEN_IMPORTS: ForbiddenImport[] = [
     package: 'zod/v3',
     alternative: 'zod (v4 is the default now)',
     docs: 'https://zod.dev',
+  },
+  // ===========================================================================
+  // OBSERVABILITY BANS (Datadog + OTEL 2.x standard)
+  // ===========================================================================
+  {
+    patterns: [/@google-cloud\/opentelemetry-cloud-trace-exporter/],
+    package: '@google-cloud/opentelemetry-cloud-trace-exporter',
+    alternative: '@opentelemetry/exporter-trace-otlp-proto → Datadog',
+    docs: 'GCP-specific exporter causes split-brain observability',
+  },
+  {
+    patterns: [/@google-cloud\/opentelemetry-cloud-monitoring-exporter/],
+    package: '@google-cloud/opentelemetry-cloud-monitoring-exporter',
+    alternative: '@opentelemetry/exporter-metrics-otlp-proto → Datadog',
+    docs: 'GCP-specific exporter causes split-brain observability',
+  },
+  {
+    patterns: [/["']dd-trace["']/],
+    package: 'dd-trace',
+    alternative: 'OpenTelemetry SDK with OTLP → Datadog Agent',
+    docs: 'dd-trace does not work with Bun runtime',
+  },
+  {
+    patterns: [/@opentelemetry\/exporter-trace-otlp-http/],
+    package: '@opentelemetry/exporter-trace-otlp-http',
+    alternative: '@opentelemetry/exporter-trace-otlp-proto (better performance)',
+  },
+  {
+    patterns: [/@opentelemetry\/exporter-metrics-otlp-http/],
+    package: '@opentelemetry/exporter-metrics-otlp-http',
+    alternative: '@opentelemetry/exporter-metrics-otlp-proto (better performance)',
   },
 ];
 
