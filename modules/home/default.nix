@@ -31,8 +31,6 @@ in {
     # Apps (xdg.configFile based)
     ./apps/ghostty.nix
     ./apps/kanata.nix
-    ./apps/swish.nix
-    ./apps/aerospace.nix
     ./apps/bartender.nix
     ./apps/raycast.nix
     ./apps/claude.nix
@@ -87,8 +85,6 @@ in {
       apps = {
         ghostty.enable = mkDefault true;
         kanata.enable = mkDefault true;
-        swish.enable = mkDefault true;
-        aerospace.enable = mkDefault true;
         bartender.enable = mkDefault true;
         raycast.enable = mkDefault true;
         claude.enable = mkDefault true;

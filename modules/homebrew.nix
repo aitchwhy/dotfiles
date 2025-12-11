@@ -15,9 +15,7 @@
     };
 
     # Taps (formula repositories)
-    taps = [
-      "nikitabobko/tap" # AeroSpace tiling window manager
-    ];
+    taps = [];
 
     # CLI tools (most in home.packages via Nix)
     brews = [];
@@ -111,12 +109,6 @@
       "karabiner-elements" # DriverKit driver for Kanata
       "homerow" # Keyboard shortcuts for screen elements
       "betterdisplay" # Display management: HiDPI, DDC brightness, resolution scaling
-
-      # ─────────────────────────────────────────────────────────────
-      # Window Management (replaces Hammerspoon)
-      # ─────────────────────────────────────────────────────────────
-      "swish" # Trackpad gestures for window management
-      "aerospace" # Tiling window manager (from nikitabobko/tap)
 
       # ─────────────────────────────────────────────────────────────
       # QuickLook Plugins
