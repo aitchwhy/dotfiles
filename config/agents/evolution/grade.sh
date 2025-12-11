@@ -53,7 +53,7 @@ check_typescript() {
     message="package.json missing"
   else
     pushd "$SIGNET_DIR" >/dev/null
-    if ! bun run typecheck 2>/dev/null; then
+    if ! bun run typecheck >/dev/null 2>&1; then
       score=30
       message="type errors detected"
     fi
