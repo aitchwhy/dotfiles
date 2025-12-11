@@ -1,0 +1,153 @@
+# Stack Constraints
+
+> **Version Authority**: `config/signet/src/stack/versions.ts` is the SSOT.
+> Run `just sig-doctor` to check alignment.
+> Import: `import { STACK } from '@/stack'`
+
+## Runtime
+
+- **Bun**: 1.3+
+- **Node**: 25+ (current, not LTS)
+- **UV**: 0.5+ (Python)
+
+## TypeScript
+
+- strict mode, Zod v4, Biome 2.3+
+- TypeScript type is ALWAYS source of truth
+- NEVER use `z.infer<>` - define type explicitly first
+- Schemas MUST use `satisfies z.ZodType<T>`
+- No `any` - use `unknown` + type guards
+
+## Effects
+
+- Effect-TS 3.x (typed errors, dependencies, retries)
+- Return `Effect.fail()` for expected failures, never throw
+
+## Frontend
+
+- React 19, TanStack Router, XState 5, Tailwind v4
+
+## Backend
+
+- Hono 4.x, Drizzle ORM, Effect-TS services
+
+## APIs
+
+- TypeSpec -> OpenAPI -> codegen pipeline
+
+## Infrastructure
+
+- Nix Flakes + nix-darwin
+- Terranix -> OpenTofu
+- Pulumi (GCP)
+
+## Core Principles
+
+### Environment Parity
+
+```
+localhost === CI === production
+```
+
+Achieved via: Nix Flakes (hermetic), Process Compose (orchestration), Cloud Build (identical images).
+
+### Type Safety Hierarchy
+
+```
+TypeScript Type (source of truth) -> Zod Schema (runtime validation via satisfies)
+```
+
+### Error Handling
+
+```typescript
+// NEVER: throw for expected failures
+if (!user) throw new Error("Not found");
+
+// ALWAYS: typed errors with Effect-TS or Result types
+return Effect.fail(new UserNotFoundError({ id }));
+```
+
+### Result Type Pattern
+
+```typescript
+type Result<T, E = Error> =
+  | { readonly ok: true; readonly data: T }
+  | { readonly ok: false; readonly error: E };
+
+const Ok = <T>(data: T): Result<T, never> => ({ ok: true, data });
+const Err = <E>(error: E): Result<never, E> => ({ ok: false, error });
+```
+
+### TypeScript-First Zod
+
+```typescript
+// 1. TypeScript type is source of truth
+type User = {
+  readonly id: string;
+  readonly email: string;
+  readonly role: 'admin' | 'user' | 'guest';
+};
+
+// 2. Schema satisfies the type (NEVER use z.infer)
+const userSchema = z.object({
+  id: z.string().uuid(),
+  email: z.string().email(),
+  role: z.enum(['admin', 'user', 'guest']),
+}) satisfies z.ZodType<User>;
+```
+
+## Architecture
+
+### Hexagonal (Ports & Adapters)
+
+```
++----------------------------------------+
+|              Domain                     |
+|   (Pure logic, no I/O, no framework)   |
++----------------------------------------+
+         ^                      ^
+         |                      |
++--------+--------+  +---------+---------+
+|  Inbound Ports  |  |  Outbound Ports   |
+|  (API contract) |  | (StoragePort etc) |
++--------+--------+  +---------+---------+
+         |                      |
++--------+--------+  +---------+---------+
+| Inbound Adapter |  | Outbound Adapters |
+| (Hono handlers) |  | (GCS, PostgreSQL) |
++-----------------+  +-------------------+
+```
+
+### No-Mock Testing
+
+**NEVER mock infrastructure.** Tests run against real services:
+
+| Environment | Infrastructure |
+|-------------|---------------|
+| Local | Docker via process-compose |
+| CI | GitHub Actions services |
+| Staging | Real GCP (Cloud SQL, GCS) |
+
+**Blocked**: `Mock*Live`, `jest.mock()`, `vi.mock()`, `sinon.*`
+**Allowed**: `Layer.succeed()` (DI), factory functions with real adapters
+
+## Language Barrier
+
+**Ban assumption language. Replace with evidence.**
+
+| BANNED | REQUIRED |
+|--------|----------|
+| "should work" | "verified via [test/output]" |
+| "probably" | "error output shows" |
+| "likely" | "confirmed by running" |
+| "I think" | Evidence-based statements only |
+| "might" | "UNVERIFIED: requires [test_name]" |
+
+## Biome Enforcement
+
+After writing/modifying TypeScript code, always run:
+
+```bash
+biome check --write .  # Format + lint + fix
+bun typecheck          # Type check
+```
