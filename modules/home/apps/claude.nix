@@ -25,6 +25,7 @@
     "/run/current-system/sw/bin"
     "/nix/var/nix/profiles/default/bin"
     "$HOME/.nix-profile/bin"
+    "$HOME/.local/bin" # For uvx (Python MCP servers)
   ];
   pathString = concatStringsSep ":" nixPaths;
 
@@ -45,10 +46,7 @@
         "$HOME/Documents"
       ];
     };
-    git = {
-      package = "@modelcontextprotocol/server-git";
-      args = [];
-    };
+    # git server removed - GitHub MCP server provides richer functionality
     sequential-thinking = {
       package = "@modelcontextprotocol/server-sequential-thinking";
       args = [];
@@ -58,8 +56,9 @@
       args = [];
     };
     fetch = {
-      package = "@modelcontextprotocol/server-fetch";
+      package = "mcp-server-fetch"; # Python package via uvx
       args = [];
+      isPython = true;
     };
     repomix = {
       package = "repomix";
@@ -80,19 +79,34 @@
   # Format Generators
   # ═══════════════════════════════════════════════════════════════════════════
 
-  # Claude Desktop format: wrap npx in /bin/sh to inject PATH
-  toDesktopFormat = _name: def:
+  # Claude Desktop format: wrap commands in /bin/sh to inject Nix PATH
+  # Electron apps don't inherit shell PATH, so we must inject it
+  toDesktopFormat = _name: def: let
+    argsString =
+      if def.args == []
+      then ""
+      else " " + (concatStringsSep " " def.args);
+  in
     if def.isLocal or false
     then {
-      command = def.command;
-      args = def.args;
+      # Local servers (e.g., bun scripts) - wrap with PATH injection
+      command = "/bin/sh";
+      args = [
+        "-c"
+        "PATH=${pathString}:$PATH exec ${def.command}${argsString}"
+      ];
     }
-    else let
-      argsString =
-        if def.args == []
-        then ""
-        else " " + (concatStringsSep " " def.args);
-    in {
+    else if def.isPython or false
+    then {
+      # Python packages via uvx
+      command = "/bin/sh";
+      args = [
+        "-c"
+        "PATH=${pathString}:$PATH exec uvx ${def.package}${argsString}"
+      ];
+    }
+    else {
+      # npm packages via npx
       command = "/bin/sh";
       args = [
         "-c"
@@ -100,7 +114,7 @@
       ];
     };
 
-  # Claude Code CLI format: direct npx commands (shell has PATH)
+  # Claude Code CLI format: direct commands (shell has PATH)
   toCliFormat = _name: def:
     if def.isLocal or false
     then {
@@ -108,7 +122,15 @@
       args = def.args;
       type = "stdio";
     }
+    else if def.isPython or false
+    then {
+      # Python packages via uvx
+      command = "uvx";
+      args = [def.package] ++ def.args;
+      type = "stdio";
+    }
     else {
+      # npm packages via npx
       command = "npx";
       args = ["-y" def.package] ++ def.args;
       type = "stdio";
