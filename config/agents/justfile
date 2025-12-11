@@ -3,9 +3,8 @@ agents_dir := env_var("HOME") + "/dotfiles/config/agents"
 default:
     @just --list
 
-# Run setup script to create symlinks
-install:
-    bash ./setup.sh
+# NOTE: Setup is now handled by Nix (modules/home/apps/agents.nix)
+# Run `just switch` from dotfiles root to configure
 
 # Link AGENT.md as CLAUDE.md and GEMINI.md in current project
 setup-project:
@@ -38,7 +37,7 @@ status:
 validate:
     @jq empty ./settings/claude-code.json && echo "✓ claude-code.json"
     @jq empty ./settings/gemini.json && echo "✓ gemini.json"
-    @jq empty ./mcp-servers.json && echo "✓ mcp-servers.json"
+    @echo "✓ mcp-servers.json (managed by Nix - see ~/.config/claude/)"
 
 # Open AGENT.md in editor
 edit:
