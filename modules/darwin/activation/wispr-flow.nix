@@ -3,11 +3,12 @@
 {
   config,
   lib,
-  pkgs,
   ...
-}: let
+}:
+let
   inherit (lib) mkEnableOption mkIf;
-in {
+in
+{
   options.modules.darwin.apps.wisprFlow = {
     enable = mkEnableOption "Wispr Flow voice dictation";
   };

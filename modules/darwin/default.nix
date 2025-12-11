@@ -1,6 +1,5 @@
 # macOS (Darwin) system configuration module aggregator
 {
-  config,
   lib,
   pkgs,
   ...

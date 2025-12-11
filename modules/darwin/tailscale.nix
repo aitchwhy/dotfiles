@@ -8,16 +8,17 @@
   lib,
   pkgs,
   ...
-}: let
-  inherit
-    (lib)
+}:
+let
+  inherit (lib)
     mkEnableOption
     mkOption
     mkIf
     types
     ;
   cfg = config.modules.darwin.tailscale;
-in {
+in
+{
   options.modules.darwin.tailscale = {
     enable = mkEnableOption "Tailscale VPN";
 
@@ -47,9 +48,9 @@ in {
       enable = true;
       overrideLocalDns = cfg.overrideLocalDns;
       # Skip tests to avoid socket path length issues on macOS
-      package = pkgs.tailscale.overrideAttrs (old: {
+      package = pkgs.tailscale.overrideAttrs {
         doCheck = false;
-      });
+      };
     };
 
     # Note: Automatic authentication via sops-nix auth key is handled by
