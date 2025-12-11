@@ -1,4 +1,14 @@
-# Agent Instructions
+# DEPRECATED - Use AGENTS.md Instead
+
+> **This file is deprecated.** The bootloader architecture uses `AGENTS.md` as the single source of truth.
+> Content has been split into:
+> - `AGENTS.md` - Compact bootloader (~350 tokens)
+> - `rules/stack.md` - Stack constraints and patterns
+> - `memory/lessons.md` - Persistent learnings
+
+---
+
+# Agent Instructions (Legacy)
 
 Senior software engineer. macOS Apple Silicon, zsh, Nix Flakes.
 
