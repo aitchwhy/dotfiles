@@ -28,8 +28,6 @@ in {
       ".claude/agents".source = config.lib.file.mkOutOfStoreSymlink "${agentsDir}/agents";
 
       # Skills - project-specific patterns
-      ".claude/skills/ember-patterns".source =
-        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/ember-patterns";
       ".claude/skills/hono-workers".source =
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/hono-workers";
       ".claude/skills/tanstack-patterns".source =
@@ -60,6 +58,40 @@ in {
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/signet-patterns";
       ".claude/skills/repomix-patterns".source =
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/repomix-patterns";
+
+      # Skills - architecture patterns
+      ".claude/skills/effect-ts-patterns".source =
+        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/effect-ts-patterns";
+      ".claude/skills/hexagonal-architecture".source =
+        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/hexagonal-architecture";
+      ".claude/skills/devops-patterns".source =
+        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/devops-patterns";
+
+      # Skills - Nix patterns
+      ".claude/skills/nix-flake-parts".source =
+        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/nix-flake-parts";
+
+      # Skills - API patterns
+      ".claude/skills/typespec-patterns".source =
+        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/typespec-patterns";
+      ".claude/skills/signet-generator-patterns".source =
+        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/signet-generator-patterns";
+
+      # Skills - quality patterns
+      ".claude/skills/refactoring-catalog".source =
+        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/refactoring-catalog";
+      ".claude/skills/distributed-systems-patterns".source =
+        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/distributed-systems-patterns";
+      ".claude/skills/code-smells".source =
+        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/code-smells";
+      ".claude/skills/formal-verification".source =
+        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/formal-verification";
+      ".claude/skills/semantic-codebase".source =
+        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/semantic-codebase";
+      ".claude/skills/commit-patterns".source =
+        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/commit-patterns";
+      ".claude/skills/planning-patterns".source =
+        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/planning-patterns";
 
       # ========================================
       # Gemini CLI
@@ -137,6 +169,23 @@ in {
       # ========================================
       # Claude Code: ~/.claude.json - merge MCP servers with backup
       # ========================================
+      # Clean up stale MCP servers that were removed from source.
+      # This prevents leftover servers from previous configs that may
+      # no longer be valid or desired. Only keeps servers that exist
+      # in the current source configuration.
+      if [ -f "$MCP_FILE" ] && [ -f "$SOURCE_MCP" ]; then
+        # Remove servers not in source (stale entries from previous configs)
+        CLEANED=$(${pkgs.jq}/bin/jq --argjson source "$(cat "$SOURCE_MCP")" '
+          .mcpServers = (.mcpServers // {} | to_entries | map(select(.key as $k | $source | has($k))) | from_entries)
+        ' "$MCP_FILE" 2>/dev/null)
+        if [ -n "$CLEANED" ] && echo "$CLEANED" | ${pkgs.jq}/bin/jq empty 2>/dev/null; then
+          echo "$CLEANED" > "$MCP_FILE"
+          echo "Cleaned stale MCP servers"
+        else
+          echo "WARNING: MCP cleanup failed, keeping existing ~/.claude.json"
+        fi
+      fi
+
       if [ -f "$MCP_FILE" ] && [ -f "$SOURCE_MCP" ]; then
         # Backup before merge
         $DRY_RUN_CMD cp "$MCP_FILE" "$BACKUP_DIR/claude.$(date +%Y%m%d%H%M%S).json"
