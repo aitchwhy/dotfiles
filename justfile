@@ -316,6 +316,14 @@ sig-init TYPE NAME:
 sig-gen TYPE NAME:
     @signet gen {{ TYPE }} {{ NAME }}
 
+# Migrate project to STACK compliance
+sig-migrate PATH="." *ARGS:
+    @signet migrate {{ PATH }} {{ ARGS }}
+
+# Run 5-tier verification
+sig-verify PATH="." *ARGS:
+    @signet verify {{ PATH }} {{ ARGS }}
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # INFRASTRUCTURE (Terranix + OpenTofu)
 # ═══════════════════════════════════════════════════════════════════════════════
