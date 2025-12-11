@@ -3,27 +3,45 @@
 Single source of truth for AI coding assistants:
 - **Claude Code CLI** (`~/.claude/`)
 - **Gemini CLI** (`~/.gemini/`)
+- **Cursor IDE** (`.cursorrules`)
 - **Antigravity IDE** (`~/.gemini/antigravity/`)
 
-## Structure
+## Bootloader Architecture
+
+The system uses a **pull-based context** pattern with a tiny bootloader (~350 tokens) that routes to modular content:
 
 ```
 config/agents/
-├── AGENT.md                    # Canonical context (symlinked as CLAUDE.md/GEMINI.md)
-├── mcp-servers.json            # Shared MCP server config
+├── AGENTS.md                   # Bootloader - routes to content below
+├── rules/
+│   └── stack.md                # Stack constraints and patterns
+├── memory/
+│   └── lessons.md              # Persistent learnings across sessions
+├── skills/                     # Skill pattern libraries (24 total)
+├── agents/                     # Agent personas for multi-agent review
+├── commands/                   # Slash commands
+├── hooks/                      # Pre/Post tool-use hooks
+├── evolution/
+│   └── grade.sh                # Health grader script
 ├── settings/
 │   ├── claude-code.json        # Claude Code settings (hooks, permissions)
 │   └── gemini.json             # Gemini CLI settings
-├── commands/                   # Slash commands (16 total)
-├── skills/                     # Skill pattern libraries (15 total)
-├── agents/                     # Agent persona definitions (5 total)
-├── hooks/                      # Pre/Post tool-use hooks
-├── evolution/                  # Self-evolving system (graders, lessons, metrics)
 ├── nix/
 │   └── agents.nix              # Home Manager module
-├── setup.sh                    # Manual installation script
-└── justfile                    # Task runner
+└── AGENT.md                    # DEPRECATED - legacy monolithic config
 ```
+
+## Symlink Management
+
+All symlinks managed declaratively via Nix Home Manager:
+
+| Target | Symlink Location |
+|--------|------------------|
+| `AGENTS.md` | `~/.claude/CLAUDE.md` |
+| `AGENTS.md` | `~/.gemini/GEMINI.md` |
+| `AGENTS.md` | `.cursorrules` (repo root) |
+| `rules/` | `~/.claude/rules/`, `~/.gemini/rules/` |
+| `memory/` | `~/.claude/memory/`, `~/.gemini/memory/` |
 
 ## Installation
 
@@ -49,25 +67,47 @@ cd ~/dotfiles/config/agents
 ### Per-project context
 ```bash
 # In any project directory
-just setup-project  # Creates ./CLAUDE.md and ./GEMINI.md symlinks
-
-# Or using shell alias
-agent-setup
-agent-clean
+agent-setup  # Creates ./CLAUDE.md and ./GEMINI.md symlinks
+agent-clean  # Removes agent context
 ```
 
-### Justfile commands
+### Health monitoring
 ```bash
-just              # List all commands
-just validate     # Validate JSON configs
-just status       # Show symlink status
-just grade        # Run evolution graders
-just metrics      # Show evolution metrics
+# Run grader directly
+./config/agents/evolution/grade.sh | jq .
+
+# Run via health monitor (one-shot)
+ONESHOT=true ./scripts/health-monitor.sh
+
+# Check latest metrics
+cat ~/.claude-metrics/latest.json | jq .
 ```
+
+### Verification
+```bash
+# Verify symlinks after nix switch
+readlink ~/.claude/CLAUDE.md     # -> .../AGENTS.md
+readlink ~/.gemini/GEMINI.md     # -> .../AGENTS.md
+readlink ~/dotfiles/.cursorrules # -> config/agents/AGENTS.md
+```
+
+## Evolution System
+
+Self-improving configuration with 5-check health grader:
+
+| Check | Weight | Purpose |
+|-------|--------|---------|
+| nix_flake | 25% | Flake validity |
+| typescript | 20% | Type checking (signet) |
+| hooks | 20% | Hook file integrity |
+| skills | 15% | SKILL.md presence |
+| versions | 20% | SSOT alignment |
+
+Thresholds: `ok` >= 0.80, `warning` 0.50-0.79, `urgent` < 0.50
 
 ## MCP Servers
 
-Shared across Claude Code CLI, Gemini CLI, and Antigravity:
+Shared across all AI tools:
 - `memory` - Persistent memory
 - `filesystem` - File access (~/src, ~/dotfiles, ~/Documents)
 - `git` - Git operations
@@ -75,19 +115,3 @@ Shared across Claude Code CLI, Gemini CLI, and Antigravity:
 - `context7` - Documentation fetcher
 - `fetch` - HTTP requests
 - `repomix` - Codebase packaging
-
-**Note:** Claude Desktop uses separate config with PATH wrapper for Electron compatibility.
-See `modules/home/apps/claude.nix`.
-
-## Evolution System
-
-Self-improving configuration with:
-- **Graders**: Automated quality scoring (config validity, git hygiene, nix health)
-- **Lessons**: SQLite-backed learning from sessions
-- **Hooks**: Pre/Post tool-use validation and formatting
-
-```bash
-cd ~/dotfiles/config/agents
-just grade        # Run all graders
-just metrics      # Show DORA-style metrics
-```
