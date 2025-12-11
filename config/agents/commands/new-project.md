@@ -4,71 +4,59 @@ description: Create a new TypeScript/Bun project from template
 
 # New TypeScript/Bun Project
 
-Create a project using the December 2025 TypeScript/Bun template.
+Create a project using Signet, the Single Source of Truth for project generation.
 
-## Template Location
+## Quick Start
 
-```
-~/dotfiles/config/templates/typescript-bun/
-```
-
-## What's Included
-
-- `tsconfig.json` - Strict TypeScript with Bun types
-- `biome.json` - Linting + formatting (noExplicitAny enforced)
-- `package.json` - Bun scripts and dependencies
-- `flake.nix` - Nix development shell
-- `src/lib/result.ts` - Result type implementation
-- `src/schemas/example.ts` - Zod schema examples with branded types
-- Test files for both modules
-
-## Usage Steps
-
-1. **Copy template to target location**:
-   ```bash
-   cp -r ~/dotfiles/config/templates/typescript-bun ~/src/PROJECT_NAME
-   cd ~/src/PROJECT_NAME
-   ```
-
-2. **Replace placeholders**:
-   ```bash
-   sed -i '' 's/PROJECT_NAME/actual-name/g' package.json src/index.ts flake.nix
-   ```
-
-3. **Initialize**:
-   ```bash
-   git init
-   bun install
-   direnv allow  # If using Nix
-   ```
-
-4. **Verify**:
-   ```bash
-   bun validate  # typecheck + lint + test
-   ```
-
-## Optional: Adding Features
-
-### Hono Backend
 ```bash
-bun add hono @hono/zod-validator
+# Initialize a standalone library/service
+signet init library my-project
+cd ~/src/my-project
+
+# Or initialize a monorepo platform
+signet init monorepo my-platform
 ```
 
-### Drizzle ORM
+## Project Types
+
+| Type | Use Case |
+|------|----------|
+| `library` | Standalone TypeScript package |
+| `api` | Hexagonal Hono backend (Ports/Adapters, Effect Layers) |
+| `ui` | React 19 frontend (XState, TanStack Router) |
+| `monorepo` | Multi-package workspace (Bun workspaces) |
+| `infra` | Infrastructure (Pulumi, process-compose) |
+
+## Adding to Existing Projects
+
 ```bash
-bun add drizzle-orm
-bun add -d drizzle-kit
+cd my-platform
+signet gen api voice-service
+signet gen ui web-app
 ```
 
-### React + TanStack
+## Verification
+
 ```bash
-bun add react react-dom @tanstack/react-router @tanstack/react-query
-bun add -d @types/react @types/react-dom
+signet validate       # Check project structure
+signet enforce --fix  # Run architecture enforcers
+bun validate          # typecheck + lint + test
 ```
+
+## Version Authority
+
+All generated projects use versions from the SSOT:
+`config/signet/src/stack/versions.ts`
+
+Run `just sig-doctor` to check version alignment.
 
 ## Conventions
 
-- Schema-first: Zod schemas are source of truth
+- TypeScript-first: TS types are source of truth, Zod satisfies types
 - Result types: Use `Ok`/`Err`, don't throw for expected failures
 - Branded types: `UserId` not `string`
 - TDD: Write tests first
+
+## See Also
+
+- `/signet` - Full Signet command reference
