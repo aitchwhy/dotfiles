@@ -374,8 +374,8 @@ tf-destroy:
 # CONTEXT GENERATION
 # ═══════════════════════════════════════════════════════════════════════════════
 
-# Generate editor rules from canonical AGENT.md and SKILL.md files
+# Show editor context status (now using bootloader symlinks)
 gen-context:
-    @echo "Generating editor context rules..."
-    @bun run scripts/gen-rules.ts
-    @echo "Generated .cursorrules"
+    @echo "Editor context is now managed via symlinks (bootloader architecture)"
+    @echo ".cursorrules -> config/agents/AGENTS.md"
+    @ls -la .cursorrules 2>/dev/null || echo ".cursorrules symlink not found"
