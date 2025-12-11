@@ -34,16 +34,20 @@ try {
 }
 
 // =============================================================================
-// Types
+// Types (TypeScript first, schema satisfies type)
 // =============================================================================
+
+type HookInput = {
+  readonly hook_event_name: 'Stop';
+  readonly session_id: string;
+  readonly cwd?: string;
+};
 
 const HookInputSchema = z.object({
   hook_event_name: z.literal('Stop'),
   session_id: z.string(),
   cwd: z.string().optional(),
-});
-
-type HookInput = z.infer<typeof HookInputSchema>;
+}) satisfies z.ZodType<HookInput>;
 
 interface Violation {
   file: string;

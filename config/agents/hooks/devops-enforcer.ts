@@ -21,8 +21,21 @@
 import { z } from 'zod';
 
 // ============================================================================
-// Input Schema (matches unified-guard.ts exactly)
+// Input Types (TypeScript first, schema satisfies type)
 // ============================================================================
+
+type HookInput = {
+  readonly hook_event_name: 'PreToolUse';
+  readonly session_id: string;
+  readonly tool_name: string;
+  readonly tool_input: {
+    readonly file_path?: string;
+    readonly content?: string;
+    readonly new_string?: string;
+    readonly command?: string;
+    readonly [key: string]: unknown;
+  };
+};
 
 const HookInputSchema = z.object({
   hook_event_name: z.literal('PreToolUse'),
@@ -31,14 +44,12 @@ const HookInputSchema = z.object({
   tool_input: z
     .object({
       file_path: z.string().optional(),
-      content: z.string().optional(), // Write
-      new_string: z.string().optional(), // Edit
-      command: z.string().optional(), // Bash
+      content: z.string().optional(),
+      new_string: z.string().optional(),
+      command: z.string().optional(),
     })
     .passthrough(),
-});
-
-type HookInput = z.infer<typeof HookInputSchema>;
+}) satisfies z.ZodType<HookInput>;
 
 // ============================================================================
 // Output Helpers

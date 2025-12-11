@@ -14,11 +14,16 @@ import { Database } from 'bun:sqlite';
 import { existsSync } from 'node:fs';
 import { z } from 'zod';
 
-// Hook input schema matching Claude Code's Stop event
+// Input types (TypeScript first, schema satisfies type)
+type HookInput = {
+  readonly hook_event_name: string;
+  readonly session_id: string;
+};
+
 const HookInputSchema = z.object({
   hook_event_name: z.string(),
   session_id: z.string(),
-});
+}) satisfies z.ZodType<HookInput>;
 
 const DB_PATH = `${process.env.HOME}/.claude-metrics/evolution.db`;
 
@@ -74,7 +79,7 @@ async function main() {
     return;
   }
 
-  let input: z.infer<typeof HookInputSchema>;
+  let input: HookInput;
   try {
     input = HookInputSchema.parse(JSON.parse(rawInput));
   } catch {
