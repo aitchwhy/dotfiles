@@ -288,6 +288,24 @@ rx-remote REPO *ARGS:
 rx-config:
     @~/.local/bin/rx config
 
+# Concern-specific context generation (Universal Project Factory)
+rx-nix:
+    @repomix -c config/repomix/nix.json
+
+rx-signet:
+    @repomix -c config/repomix/signet.json
+
+rx-agents:
+    @repomix -c config/repomix/agents.json
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# UNIVERSAL PROJECT FACTORY
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Verify factory health
+verify-factory:
+    @bash scripts/verify-factory.sh
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # SIGNET (Code Quality & Generation Platform)
 # ═══════════════════════════════════════════════════════════════════════════════
