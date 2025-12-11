@@ -10,8 +10,8 @@
     # Note: deadnix and statix disabled in CI due to existing code warnings
     # Run manually: deadnix -e . && statix check .
     pre-commit.settings.hooks = {
-      # Nix formatting with alejandra (consistent with just fmt)
-      alejandra.enable = true;
+      # Nix formatting with nixfmt-rfc-style (December 2025 standard)
+      nixfmt-rfc-style.enable = true;
     };
 
     # Development shell with pre-commit hooks integrated
@@ -28,7 +28,7 @@
         echo "  just fmt     - Format Nix files"
         echo "  just lint    - Run pre-commit hooks"
         echo ""
-        echo "Pre-commit hooks: alejandra"
+        echo "Pre-commit hooks: nixfmt-rfc-style"
         echo "Manual linting: deadnix -e . && statix check ."
         echo ""
       '';

@@ -92,27 +92,10 @@ if (pyFiles.length > 0) {
   );
 }
 
-// Nix → Alejandra (fallback to nixfmt)
+// Nix → nixfmt-rfc-style (December 2025 standard)
 const nixFiles = filesByExt.get('nix') || [];
 if (nixFiles.length > 0) {
-  tasks.push(
-    (async () => {
-      try {
-        const proc = spawn(['alejandra', '--quiet', ...nixFiles], {
-          stderr: 'ignore',
-          stdout: 'ignore',
-        });
-        const exitCode = await proc.exited;
-        if (exitCode !== 0) {
-          // Fallback to nixfmt
-          await runFormatter(['nixfmt'], nixFiles);
-        }
-      } catch {
-        // Try nixfmt as fallback
-        await runFormatter(['nixfmt'], nixFiles);
-      }
-    })()
-  );
+  tasks.push(runFormatter(['nixfmt'], nixFiles));
 }
 
 // Shell → shfmt
