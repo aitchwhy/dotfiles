@@ -9,9 +9,11 @@
   lib,
   pkgs,
   ...
-}: let
+}:
+let
   inherit (lib) mkEnableOption mkIf;
-in {
+in
+{
   options.modules.darwin.kanata = {
     enable = mkEnableOption "Kanata keyboard remapper daemon";
   };
@@ -24,7 +26,7 @@ in {
         ProgramArguments = [
           "${pkgs.kanata}/bin/kanata"
           "--cfg"
-          "/Users/hank/.config/kanata/kanata.kbd"
+          "/Users/${config.system.primaryUser}/.config/kanata/kanata.kbd"
         ];
         RunAtLoad = true;
         KeepAlive = true;

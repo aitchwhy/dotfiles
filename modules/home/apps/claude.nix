@@ -10,9 +10,9 @@
   config,
   lib,
   ...
-}: let
-  inherit
-    (lib)
+}:
+let
+  inherit (lib)
     concatStringsSep
     mapAttrs
     mkEnableOption
@@ -36,7 +36,7 @@
   mcpServerDefs = {
     memory = {
       package = "@modelcontextprotocol/server-memory";
-      args = [];
+      args = [ ];
     };
     filesystem = {
       package = "@modelcontextprotocol/server-filesystem";
@@ -49,27 +49,27 @@
     # git server removed - GitHub MCP server provides richer functionality
     sequential-thinking = {
       package = "@modelcontextprotocol/server-sequential-thinking";
-      args = [];
+      args = [ ];
     };
     context7 = {
       package = "@upstash/context7-mcp";
-      args = [];
+      args = [ ];
     };
     fetch = {
       package = "mcp-server-fetch"; # Python package via uvx
-      args = [];
+      args = [ ];
       isPython = true;
     };
     repomix = {
       package = "repomix";
-      args = ["--mcp"];
+      args = [ "--mcp" ];
     };
     signet = {
       # Local MCP server for Signet code quality
       command = "bun";
       args = [
         "run"
-        "/Users/hank/dotfiles/config/signet/src/mcp-server.ts"
+        "${config.home.homeDirectory}/dotfiles/config/signet/src/mcp-server.ts"
       ];
       isLocal = true; # Not an npx package
     };
@@ -81,71 +81,78 @@
 
   # Claude Desktop format: wrap commands in /bin/sh to inject Nix PATH
   # Electron apps don't inherit shell PATH, so we must inject it
-  toDesktopFormat = _name: def: let
-    argsString =
-      if def.args == []
-      then ""
-      else " " + (concatStringsSep " " def.args);
-  in
-    if def.isLocal or false
-    then {
-      # Local servers (e.g., bun scripts) - wrap with PATH injection
-      command = "/bin/sh";
-      args = [
-        "-c"
-        "PATH=${pathString}:$PATH exec ${def.command}${argsString}"
-      ];
-    }
-    else if def.isPython or false
-    then {
-      # Python packages via uvx
-      command = "/bin/sh";
-      args = [
-        "-c"
-        "PATH=${pathString}:$PATH exec uvx ${def.package}${argsString}"
-      ];
-    }
-    else {
-      # npm packages via npx
-      command = "/bin/sh";
-      args = [
-        "-c"
-        "PATH=${pathString}:$PATH exec npx -y ${def.package}${argsString}"
-      ];
-    };
+  toDesktopFormat =
+    _name: def:
+    let
+      argsString = if def.args == [ ] then "" else " " + (concatStringsSep " " def.args);
+    in
+    if def.isLocal or false then
+      {
+        # Local servers (e.g., bun scripts) - wrap with PATH injection
+        command = "/bin/sh";
+        args = [
+          "-c"
+          "PATH=${pathString}:$PATH exec ${def.command}${argsString}"
+        ];
+      }
+    else if def.isPython or false then
+      {
+        # Python packages via uvx
+        command = "/bin/sh";
+        args = [
+          "-c"
+          "PATH=${pathString}:$PATH exec uvx ${def.package}${argsString}"
+        ];
+      }
+    else
+      {
+        # npm packages via npx
+        command = "/bin/sh";
+        args = [
+          "-c"
+          "PATH=${pathString}:$PATH exec npx -y ${def.package}${argsString}"
+        ];
+      };
 
   # Claude Code CLI format: direct commands (shell has PATH)
-  toCliFormat = _name: def:
-    if def.isLocal or false
-    then {
-      command = def.command;
-      args = def.args;
-      type = "stdio";
-    }
-    else if def.isPython or false
-    then {
-      # Python packages via uvx
-      command = "uvx";
-      args = [def.package] ++ def.args;
-      type = "stdio";
-    }
-    else {
-      # npm packages via npx
-      command = "npx";
-      args = ["-y" def.package] ++ def.args;
-      type = "stdio";
-    };
+  toCliFormat =
+    _name: def:
+    if def.isLocal or false then
+      {
+        command = def.command;
+        args = def.args;
+        type = "stdio";
+      }
+    else if def.isPython or false then
+      {
+        # Python packages via uvx
+        command = "uvx";
+        args = [ def.package ] ++ def.args;
+        type = "stdio";
+      }
+    else
+      {
+        # npm packages via npx
+        command = "npx";
+        args = [
+          "-y"
+          def.package
+        ]
+        ++ def.args;
+        type = "stdio";
+      };
 
   # Generate both formats
   desktopMcpServers = mapAttrs toDesktopFormat mcpServerDefs;
   cliMcpServers = mapAttrs toCliFormat mcpServerDefs;
 
   # Config JSON for Claude Desktop
-  desktopConfigJson = builtins.toJSON {mcpServers = desktopMcpServers;};
+  desktopConfigJson = builtins.toJSON { mcpServers = desktopMcpServers; };
 
   # Config JSON for Claude Code CLI (used by agents.nix)
   cliConfigJson = builtins.toJSON cliMcpServers;
-in {
+in
+{
   options.modules.home.apps.claude = {
     enable = mkEnableOption "Claude Desktop and Code MCP servers";
 

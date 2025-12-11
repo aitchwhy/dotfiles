@@ -3,15 +3,16 @@
   config,
   lib,
   ...
-}: let
-  inherit
-    (lib)
+}:
+let
+  inherit (lib)
     mkEnableOption
     mkOption
     mkIf
     types
     ;
-in {
+in
+{
   options.modules.darwin.finder = {
     enable = mkEnableOption "macOS Finder customization";
 
@@ -56,13 +57,11 @@ in {
           column = "clmv";
           gallery = "glyv";
         }
-        .${
-          config.modules.darwin.finder.defaultView
-        };
+        .${config.modules.darwin.finder.defaultView};
 
       # New window settings
       NewWindowTarget = "Other";
-      NewWindowTargetPath = "file:///Users/hank/";
+      NewWindowTargetPath = "file:///Users/${config.system.primaryUser}/";
     };
 
     # Additional Finder settings via CustomUserPreferences

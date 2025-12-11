@@ -5,16 +5,17 @@
   lib,
   pkgs,
   ...
-}: let
-  inherit
-    (lib)
+}:
+let
+  inherit (lib)
     mkEnableOption
     mkOption
     mkIf
     types
     ;
   cfg = config.modules.darwin.evolutionAgent;
-in {
+in
+{
   options.modules.darwin.evolutionAgent = {
     enable = mkEnableOption "Evolution health monitoring agent";
 
@@ -46,8 +47,8 @@ in {
         StandardOutPath = "/tmp/evolution-health.log";
         StandardErrorPath = "/tmp/evolution-health.err";
         EnvironmentVariables = {
-          HOME = "/Users/hank";
-          DOTFILES = "/Users/hank/dotfiles";
+          HOME = "/Users/${config.system.primaryUser}";
+          DOTFILES = "/Users/${config.system.primaryUser}/dotfiles";
         };
       };
     };

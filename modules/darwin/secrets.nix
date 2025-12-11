@@ -12,9 +12,9 @@
   config,
   lib,
   ...
-}: let
-  inherit
-    (lib)
+}:
+let
+  inherit (lib)
     mkEnableOption
     mkIf
     mkDefault
@@ -23,14 +23,15 @@
   cfg = config.modules.darwin.secrets;
   secretsFile = ../../secrets/darwin.yaml;
   secretsExist = pathExists secretsFile;
-in {
+in
+{
   options.modules.darwin.secrets = {
     enable = mkEnableOption "sops-nix secrets for Darwin";
   };
 
   config = mkIf (cfg.enable && secretsExist) {
     # Age key location (standard macOS path)
-    sops.age.keyFile = mkDefault "/Users/hank/.config/sops/age/keys.txt";
+    sops.age.keyFile = mkDefault "/Users/${config.system.primaryUser}/.config/sops/age/keys.txt";
 
     # Default secrets file
     sops.defaultSopsFile = mkDefault secretsFile;
