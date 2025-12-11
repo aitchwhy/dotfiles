@@ -107,13 +107,22 @@ export const STACK = {
   },
 
   // ===========================================================================
-  // OBSERVABILITY
+  // OBSERVABILITY (December 2025 - Datadog + OTEL 2.x)
   // ===========================================================================
   observability: {
     'opentelemetry-api': '1.9.0',
-    'opentelemetry-sdk': '2.2.0', // Major SDK upgrade Dec 2025
-    'posthog-js': '1.298.0',
+    'opentelemetry-sdk-node': '0.200.0',
+    'opentelemetry-sdk-trace-node': '2.0.0',
+    'opentelemetry-sdk-metrics': '2.0.0',
+    'opentelemetry-resources': '2.0.0',
+    'opentelemetry-semantic-conventions': '1.30.0',
+    'opentelemetry-exporter-trace-otlp-proto': '0.200.0',
+    'opentelemetry-exporter-metrics-otlp-proto': '0.200.0',
+    'opentelemetry-auto-instrumentations-node': '0.56.0',
+    'posthog-js': '1.200.0',
     'posthog-node': '5.14.1',
+    'devcycle-server-sdk': '2.0.0',
+    'devcycle-client-sdk': '1.30.0',
     'datadog-agent': '7.60.0', // Reference only (not npm)
   },
 
@@ -193,12 +202,20 @@ export const STACK = {
     '@temporalio/activity': '1.13.0',
     '@restatedev/restate-sdk': '1.9.1',
 
-    // Observability
+    // Observability (Datadog + OTEL 2.x)
     '@opentelemetry/api': '1.9.0',
-    '@opentelemetry/sdk-trace-node': '2.2.0',
-    '@opentelemetry/exporter-trace-otlp-http': '0.57.0',
-    'posthog-js': '1.298.0',
+    '@opentelemetry/sdk-node': '0.200.0',
+    '@opentelemetry/sdk-trace-node': '2.0.0',
+    '@opentelemetry/sdk-metrics': '2.0.0',
+    '@opentelemetry/resources': '2.0.0',
+    '@opentelemetry/semantic-conventions': '1.30.0',
+    '@opentelemetry/exporter-trace-otlp-proto': '0.200.0',
+    '@opentelemetry/exporter-metrics-otlp-proto': '0.200.0',
+    '@opentelemetry/auto-instrumentations-node': '0.56.0',
+    'posthog-js': '1.200.0',
     'posthog-node': '5.14.1',
+    '@devcycle/nodejs-server-sdk': '2.0.0',
+    '@devcycle/js-client-sdk': '1.30.0',
 
     // Cache & Queue
     ioredis: '5.8.2',
