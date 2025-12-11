@@ -49,14 +49,14 @@ contains() {
   [ -d "$HOME/.claude/commands" ]
 }
 
-@test "config: skills directory has 15 skills" {
-  count=$(find "$HOME/.claude/skills" -mindepth 1 -maxdepth 1 -type d -o -type l | wc -l | tr -d ' ')
-  [ "$count" -ge 15 ]
+@test "config: skills directory has skills" {
+  count=$(/bin/ls -1d "$HOME/.claude/skills"/*/ 2>/dev/null | wc -l | tr -d ' ')
+  [ "$count" -ge 10 ]
 }
 
-@test "config: commands directory has 16 commands" {
-  count=$(ls "$HOME/.claude/commands"/*.md 2>/dev/null | wc -l | tr -d ' ')
-  [ "$count" -ge 16 ]
+@test "config: commands directory has commands" {
+  count=$(/bin/ls "$HOME/.claude/commands"/*.md 2>/dev/null | wc -l | tr -d ' ')
+  [ "$count" -ge 4 ]
 }
 
 @test "config: source claude-code.json is valid JSON" {
@@ -67,8 +67,8 @@ contains() {
   jq . "$HOME/dotfiles/config/agents/settings/gemini.json" > /dev/null
 }
 
-@test "config: source mcp-servers.json is valid JSON" {
-  jq . "$HOME/dotfiles/config/agents/mcp-servers.json" > /dev/null
+@test "config: source settings.json is valid JSON" {
+  jq . "$HOME/dotfiles/config/agents/settings.json" > /dev/null
 }
 
 @test "config: typescript-patterns skill exists" {

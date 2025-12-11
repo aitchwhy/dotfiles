@@ -86,39 +86,39 @@ normalize_bool() {
   [ "$result" = "1" ]
 }
 
-@test "trackpad: TrackpadThreeFingerDrag = 0 (disabled for Swish)" {
+@test "trackpad: TrackpadThreeFingerDrag = 0 (disabled)" {
   result=$(normalize_bool "$(read_default com.apple.AppleMultitouchTrackpad TrackpadThreeFingerDrag)")
   [ "$result" = "0" ]
 }
 
-@test "trackpad: TrackpadFourFingerPinchGesture = 0 (Launchpad DISABLED for Swish)" {
+@test "trackpad: TrackpadFourFingerPinchGesture = 2 (Launchpad enabled)" {
   result=$(read_default com.apple.AppleMultitouchTrackpad TrackpadFourFingerPinchGesture)
-  [ "$result" = "0" ]
+  [ "$result" = "2" ]
 }
 
-@test "trackpad: TrackpadFourFingerVertSwipeGesture = 0 (Mission Control DISABLED)" {
+@test "trackpad: TrackpadFourFingerVertSwipeGesture = 2 (Mission Control enabled)" {
   result=$(read_default com.apple.AppleMultitouchTrackpad TrackpadFourFingerVertSwipeGesture)
-  [ "$result" = "0" ]
+  [ "$result" = "2" ]
 }
 
-@test "trackpad: TrackpadFourFingerHorizSwipeGesture = 0 (App Switch DISABLED)" {
+@test "trackpad: TrackpadFourFingerHorizSwipeGesture = 2 (App Switch enabled)" {
   result=$(read_default com.apple.AppleMultitouchTrackpad TrackpadFourFingerHorizSwipeGesture)
-  [ "$result" = "0" ]
+  [ "$result" = "2" ]
 }
 
-@test "trackpad: TrackpadFiveFingerPinchGesture = 0" {
+@test "trackpad: TrackpadFiveFingerPinchGesture = 2" {
   result=$(read_default com.apple.AppleMultitouchTrackpad TrackpadFiveFingerPinchGesture)
-  [ "$result" = "0" ]
+  [ "$result" = "2" ]
 }
 
-@test "trackpad: TrackpadThreeFingerHorizSwipeGesture = 0" {
+@test "trackpad: TrackpadThreeFingerHorizSwipeGesture = 2" {
   result=$(read_default com.apple.AppleMultitouchTrackpad TrackpadThreeFingerHorizSwipeGesture)
-  [ "$result" = "0" ]
+  [ "$result" = "2" ]
 }
 
-@test "trackpad: TrackpadThreeFingerVertSwipeGesture = 0" {
+@test "trackpad: TrackpadThreeFingerVertSwipeGesture = 2" {
   result=$(read_default com.apple.AppleMultitouchTrackpad TrackpadThreeFingerVertSwipeGesture)
-  [ "$result" = "0" ]
+  [ "$result" = "2" ]
 }
 
 # ============================================================================
@@ -210,43 +210,27 @@ normalize_bool() {
 # Application Installation Tests
 # ============================================================================
 
-@test "app: AeroSpace is installed" {
-  [ -d "/Applications/AeroSpace.app" ] || [ -d "$HOME/Applications/AeroSpace.app" ]
-}
-
-@test "app: Swish is installed" {
-  [ -d "/Applications/Swish.app" ] || [ -d "$HOME/Applications/Swish.app" ]
-}
-
 @test "app: Raycast is installed" {
   [ -d "/Applications/Raycast.app" ]
-}
-
-@test "app: Hammerspoon is NOT installed (replaced by Swish+AeroSpace)" {
-  ! [ -d "/Applications/Hammerspoon.app" ]
 }
 
 # ============================================================================
 # Config File Tests
 # ============================================================================
 
-@test "config: aerospace.toml exists" {
-  [ -f "$HOME/.config/aerospace/aerospace.toml" ]
-}
-
-@test "config: aerospace.toml contains start-at-login" {
-  grep -q "start-at-login = true" "$HOME/.config/aerospace/aerospace.toml"
+@test "config: ghostty config exists" {
+  [ -f "$HOME/.config/ghostty/config" ]
 }
 
 # ============================================================================
 # Quick Verification Summary
 # ============================================================================
 
-@test "SUMMARY: Critical trackpad gesture test - 4-finger pinch should NOT trigger Launchpad" {
-  # This is the key acceptance criteria
+@test "SUMMARY: Multi-finger gestures enabled (native macOS)" {
+  # With Swish removed, native gestures should be enabled
   pinch=$(read_default com.apple.AppleMultitouchTrackpad TrackpadFourFingerPinchGesture)
   swipe=$(read_default com.apple.AppleMultitouchTrackpad TrackpadFourFingerVertSwipeGesture)
-  [ "$pinch" = "0" ] && [ "$swipe" = "0" ]
+  [ "$pinch" = "2" ] && [ "$swipe" = "2" ]
 }
 
 @test "SUMMARY: F12 key test - fnState should be false (media keys by default)" {
