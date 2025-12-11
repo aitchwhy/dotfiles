@@ -7,6 +7,10 @@
 # - Hexagonal architecture enforcement
 # - Effect-TS based with OXC + ast-grep AST analysis
 # - Pulumi components for GCP infrastructure
+#
+# Packaging options:
+# - Default: Shell wrapper (fast, uses local bun install)
+# - Optional: Hermetic bun2nix package (nix build .#signet)
 {
   config,
   lib,
@@ -21,6 +25,7 @@ in {
 
   config = mkIf config.modules.home.apps.signet.enable {
     # Signet CLI wrapper - runs TypeScript via Bun
+    # For hermetic version, use: nix build .#signet
     home.packages = [
       (pkgs.writeShellScriptBin "signet" ''
         # Signet CLI - Code Quality & Generation Platform
@@ -44,7 +49,6 @@ in {
       # Short alias 's' for quick access
       (pkgs.writeShellScriptBin "s" ''
         # s - Signet CLI shorthand
-        # Delegates to signet command
         exec signet "$@"
       '')
     ];

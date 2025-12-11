@@ -11,18 +11,20 @@
   };
 
   inputs = {
+    # ═══════════════════════════════════════════════════════════════════════════
+    # CORE INFRASTRUCTURE
+    # ═══════════════════════════════════════════════════════════════════════════
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-
-    # Flake architecture (December 2025 standard)
     flake-parts.url = "github:hercules-ci/flake-parts";
 
-    # Pre-commit hooks (formerly pre-commit-hooks.nix)
     git-hooks-nix = {
       url = "github:cachix/git-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Darwin & Home Manager
+    # ═══════════════════════════════════════════════════════════════════════════
+    # DARWIN & HOME MANAGER
+    # ═══════════════════════════════════════════════════════════════════════════
     nix-darwin = {
       url = "github:LnL7/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -33,10 +35,19 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Homebrew integration (no nixpkgs input to follow)
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
 
-    # NixOS remote deployment
+    # ═══════════════════════════════════════════════════════════════════════════
+    # BUN PACKAGING
+    # ═══════════════════════════════════════════════════════════════════════════
+    bun2nix = {
+      url = "github:nix-community/bun2nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # NIXOS DEPLOYMENT
+    # ═══════════════════════════════════════════════════════════════════════════
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -47,14 +58,17 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Deployment automation
     colmena = {
       url = "github:zhaofengli/colmena";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Yazi plugins (de-vendored, December 2025)
-    # Official yazi-rs plugins (single repo with all plugins)
+    # ═══════════════════════════════════════════════════════════════════════════
+    # YAZI ECOSYSTEM
+    # See: modules/home/tools/yazi.nix for usage
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    # Official plugins (single repo)
     yazi-plugins = {
       url = "github:yazi-rs/plugins/63f9650";
       flake = false;
@@ -106,7 +120,7 @@
       flake = false;
     };
 
-    # Yazi flavors (themes)
+    # Flavors (themes)
     yazi-flavor-ashen = {
       url = "github:ficcdaf/ashen/514ed5a";
       flake = false;
@@ -127,6 +141,7 @@
         ./flake/checks.nix
         ./flake/deploy.nix
         ./flake/vm-tests.nix
+        ./flake/packages.nix
       ];
 
       systems = [

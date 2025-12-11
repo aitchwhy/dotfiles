@@ -4,6 +4,7 @@
   "type": "module",
   "description": "Signet - Generate formally consistent software systems with hexagonal architecture (SSOT Dec 2025)",
   "scripts": {
+    "postinstall": "command -v bun2nix >/dev/null && bun2nix -o bun.nix || true",
     "dev": "bun run --watch src/cli.ts",
     "start": "bun run src/cli.ts",
     "mcp": "bun run src/mcp-server.ts",
