@@ -138,8 +138,7 @@
       # Flake UX improvements
       bash-prompt-prefix = (nix:$name)\040
 
-      # Cache warming hooks
-      pre-build-hook =
+      # Post-build logging hook
       post-build-hook = ${pkgs.writeScript "nix-post-build-hook" ''
         #!/bin/sh
         set -euf
@@ -151,37 +150,15 @@
           echo "Built: $OUT_PATHS" >> "$LOG_DIR/nix-builds.log" 2>/dev/null || true
         fi
       ''}
-
-      # Additional experimental features
-      plugin-files =
     '';
   };
 
   # Nixpkgs configuration
-  nixpkgs = {
-    config = {
-      allowUnfree = true;
-      allowBroken = false;
-
-      # Package overrides for better defaults
-      packageOverrides = _pkgs: {
-        # Add any global package overrides here
-      };
-
-      # Permit specific insecure packages if needed
-      permittedInsecurePackages = [
-        # "package-name-version"
-      ];
-
-      # Additional config
-      contentAddressedByDefault = false; # Not ready for prime time
-      checkMeta = true; # Check package metadata
-    };
-
-    # System features
-    overlays = [
-      # Add any global overlays here
-    ];
+  nixpkgs.config = {
+    allowUnfree = true;
+    allowBroken = false;
+    contentAddressedByDefault = false;
+    checkMeta = true;
   };
 
   # Darwin-specific settings
