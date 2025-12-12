@@ -1,6 +1,9 @@
 # NixOS SSH server configuration
 # Hardened OpenSSH settings
 { ... }:
+let
+  ports = import ../../../lib/ports.nix;
+in
 {
   config = {
     services.openssh = {
@@ -60,7 +63,7 @@
       '';
 
       # Listen on all interfaces (Tailscale will handle security)
-      ports = [ 22 ];
+      ports = [ ports.infrastructure.ssh ];
       openFirewall = true;
     };
 

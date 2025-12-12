@@ -15,6 +15,7 @@ let
     mkEnableOption
     ;
 
+  ports = import ../../../lib/ports.nix;
   cfg = config.modules.nixos.services.gcp-observability;
 in
 {
@@ -70,8 +71,8 @@ in
 
       port = mkOption {
         type = types.port;
-        default = 9100;
-        description = "Port for Node Exporter";
+        default = ports.infrastructure.nodeExporter;
+        description = "Port for Node Exporter (from lib/ports.nix)";
       };
     };
   };
@@ -206,7 +207,7 @@ in
       enable = true;
       configuration = {
         server = {
-          http_listen_port = 9080;
+          http_listen_port = ports.infrastructure.promtail;
           grpc_listen_port = 0;
         };
 

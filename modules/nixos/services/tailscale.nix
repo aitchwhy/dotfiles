@@ -12,6 +12,7 @@ let
     types
     mkIf
     ;
+  ports = import ../../../lib/ports.nix;
 in
 {
   options.modules.nixos.services.tailscale = {
@@ -59,7 +60,7 @@ in
     # Trust Tailscale interface in firewall
     networking.firewall = {
       trustedInterfaces = [ "tailscale0" ];
-      allowedUDPPorts = [ 41641 ];
+      allowedUDPPorts = [ ports.infrastructure.tailscale ];
     };
 
     # Enable IP forwarding if acting as exit node
