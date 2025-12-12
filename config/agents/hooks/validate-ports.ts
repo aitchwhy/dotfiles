@@ -11,7 +11,7 @@
  * - Port conflict prevention
  * - Easy service discovery
  *
- * Trigger: Write|Edit(**/modules/**/*.nix)|Write|Edit(**/process-compose.yaml)
+ * Trigger: Write|Edit on modules/*.nix or process-compose.yaml
  */
 
 import { z } from 'zod';
