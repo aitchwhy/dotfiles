@@ -26,9 +26,8 @@ config/agents/
 ├── settings/
 │   ├── claude-code.json        # Claude Code settings (hooks, permissions)
 │   └── gemini.json             # Gemini CLI settings
-├── nix/
-│   └── agents.nix              # Home Manager module
-└── AGENT.md                    # DEPRECATED - legacy monolithic config
+└── nix/
+    └── agents.nix              # Home Manager module
 ```
 
 ## Symlink Management
