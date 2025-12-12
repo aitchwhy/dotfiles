@@ -16,6 +16,7 @@ Senior software engineer. macOS Apple Silicon, zsh, Nix Flakes.
 
 ## Available Skills
 
+### Pattern Skills
 typescript-patterns, zod-patterns, effect-ts-patterns, result-patterns,
 tdd-patterns, clean-code, verification-first, hexagonal-architecture,
 devops-patterns, nix-darwin-patterns, nix-flake-parts, typespec-patterns,
@@ -23,9 +24,13 @@ hono-workers, tanstack-patterns, signet-patterns, commit-patterns,
 planning-patterns, observability-patterns, refactoring-catalog,
 formal-verification, semantic-codebase, repomix-patterns, livekit-agents
 
+### MCP Reference Skills
+repomix-mcp, context7-mcp
+
 ## Agent Personas
 
-critic, synthesizer, code-reviewer, debugger, doc-writer, refactorer, test-writer
+critic, synthesizer, code-reviewer, debugger, doc-writer, refactorer, test-writer,
+effect-ts-expert, nix-darwin-expert
 
 ## Commands
 

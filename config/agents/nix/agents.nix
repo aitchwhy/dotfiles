@@ -88,6 +88,12 @@ in
       ".claude/skills/planning-patterns".source =
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/planning-patterns";
 
+      # Skills - MCP server references
+      ".claude/skills/repomix-mcp".source =
+        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/repomix-mcp";
+      ".claude/skills/context7-mcp".source =
+        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/context7-mcp";
+
       # ========================================
       # Gemini CLI
       # ========================================

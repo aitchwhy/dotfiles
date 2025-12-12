@@ -1,0 +1,10 @@
+{
+  "$schema": "https://claude.ai/schemas/mcp.json",
+  "mcpServers": {
+    "signet": {
+      "command": "bun",
+      "args": ["run", "./config/signet/src/mcp-server.ts"],
+      "type": "stdio"
+    }
+  }
+}

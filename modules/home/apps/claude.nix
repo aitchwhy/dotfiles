@@ -41,9 +41,9 @@ let
     filesystem = {
       package = "@modelcontextprotocol/server-filesystem";
       args = [
-        "$HOME/src"
-        "$HOME/dotfiles"
-        "$HOME/Documents"
+        "${config.home.homeDirectory}/src"
+        "${config.home.homeDirectory}/dotfiles"
+        "${config.home.homeDirectory}/Documents"
       ];
     };
     # git server removed - GitHub MCP server provides richer functionality
@@ -73,11 +73,6 @@ let
       ];
       isLocal = true; # Not an npx package
     };
-    git = {
-      # Local git operations (commits, diffs, logs, etc.)
-      package = "@modelcontextprotocol/server-git";
-      args = [ ];
-    };
     github = {
       # GitHub API: repos, issues, PRs, code search
       # Token sourced from sops-nix secret file
@@ -88,6 +83,11 @@ let
     playwright = {
       # Browser automation for testing and web interactions
       package = "@playwright/mcp";
+      args = [ ];
+    };
+    ast-grep = {
+      # AST-based structural code search across 20+ languages
+      package = "@notprolands/ast-grep-mcp";
       args = [ ];
     };
   };
