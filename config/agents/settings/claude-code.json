@@ -126,6 +126,16 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "matcher": "Write(**/modules/**/*.nix)|Edit(**/modules/**/*.nix)|Write(**/process-compose.yaml)|Edit(**/process-compose.yaml)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run \"$HOME/dotfiles/config/agents/hooks/validate-ports.ts\"",
+            "timeout": 5
+          }
+        ]
       }
     ],
     "SessionStart": [

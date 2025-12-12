@@ -74,6 +74,8 @@ in
       # Skills - Nix patterns
       ".claude/skills/nix-flake-parts".source =
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/nix-flake-parts";
+      ".claude/skills/nix-infrastructure".source =
+        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/nix-infrastructure";
 
       ".claude/skills/typespec-patterns".source =
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/typespec-patterns";
