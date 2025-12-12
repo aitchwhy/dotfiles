@@ -48,6 +48,35 @@ if (content.includes('nix-darwin') && !content.includes('inputs.nixpkgs.follows'
   warnings.push('nix-darwin should follow nixpkgs to avoid version drift');
 }
 
+// Check for process-compose-flake when process-compose is mentioned
+if (
+  (content.includes('process-compose') || content.includes('process.compose')) &&
+  !content.includes('process-compose-flake')
+) {
+  warnings.push(
+    'Consider process-compose-flake for Nix-native service orchestration (see nix-infrastructure skill)'
+  );
+}
+
+// Check for lib/ports.nix usage when services are defined
+if (
+  (content.includes('services') || content.includes('networking.firewall')) &&
+  !content.includes('lib/ports') &&
+  !content.includes('ports.')
+) {
+  warnings.push(
+    'Consider lib/ports.nix for centralized port registry (see nix-infrastructure skill)'
+  );
+}
+
+// Check for nix2container when container-related patterns are found
+if (
+  (content.includes('container') || content.includes('oci') || content.includes('docker')) &&
+  !content.includes('nix2container')
+) {
+  warnings.push('Consider nix2container for OCI image generation (see nix-infrastructure skill)');
+}
+
 // Always approve - we only provide guidance, never block
 const result = {
   decision: 'approve' as const,
