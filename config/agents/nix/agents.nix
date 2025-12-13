@@ -106,6 +106,8 @@ in
       ".claude/skills/port-registry".source =
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/port-registry";
       ".claude/skills/paragon".source = config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/paragon";
+      ".claude/skills/codebase-exposure".source =
+        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/codebase-exposure";
 
       # ========================================
       # Gemini CLI
