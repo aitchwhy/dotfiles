@@ -76,40 +76,44 @@ jobs:
   test-e2e:
     name: E2E Tests
     runs-on: ubuntu-latest
-    env:
-      DVC_REMOTE_R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-      DVC_REMOTE_R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+      - uses: google-github-actions/setup-gcloud@v2
       - uses: astral-sh/setup-uv@v4
         with:
           version: ${{ env.UV_VERSION }}
       - run: uv python install ${{ env.PYTHON_VERSION }}
       - run: uv sync --dev
-      - name: Configure DVC
-        run: |
-          uv run dvc remote modify --local r2 access_key_id $DVC_REMOTE_R2_ACCESS_KEY_ID
-          uv run dvc remote modify --local r2 secret_access_key $DVC_REMOTE_R2_SECRET_ACCESS_KEY
       - run: uv run dvc pull
       - run: uv run pytest tests/e2e/ -v -m "e2e"
 
   pipeline-smoke:
     name: Pipeline Smoke Test
     runs-on: ubuntu-latest
-    env:
-      DVC_REMOTE_R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-      DVC_REMOTE_R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+      - uses: google-github-actions/setup-gcloud@v2
       - uses: astral-sh/setup-uv@v4
         with:
           version: ${{ env.UV_VERSION }}
       - run: uv python install ${{ env.PYTHON_VERSION }}
       - run: uv sync --dev
-      - name: Configure DVC
-        run: |
-          uv run dvc remote modify --local r2 access_key_id $DVC_REMOTE_R2_ACCESS_KEY_ID
-          uv run dvc remote modify --local r2 secret_access_key $DVC_REMOTE_R2_SECRET_ACCESS_KEY
       - run: uv run dvc pull
       - run: uv run python -m pipeline.main --force
       - name: Verify outputs

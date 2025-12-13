@@ -9,7 +9,7 @@ A deterministic, reproducible health data analysis pipeline for wearable device 
 - **Incremental context**: Each analysis considers previous analysis for trend comparison
 - **Multi-person**: Analyzes data for multiple family members
 - **Medical benchmarks**: Compares metrics against 2024-2025 clinical guidelines
-- **DVC-managed**: Large data files tracked with DVC and stored in Cloudflare R2
+- **DVC-managed**: Large data files tracked with DVC and stored in Google Cloud Storage
 
 ## Quick Start
 
@@ -18,9 +18,9 @@ A deterministic, reproducible health data analysis pipeline for wearable device 
 uv sync
 
 # Install DVC for large file management (optional)
-uv pip install "dvc[s3]>=3.58"
+uv pip install "dvc[gs]>=3.58"
 
-# Pull data from R2 (if configured)
+# Pull data from GCS (if configured)
 dvc pull
 
 # Run the analysis pipeline
@@ -100,7 +100,7 @@ dvc add data/apple-health/
 git add data/apple-health.dvc .gitignore
 git commit -m "data: add Apple Health export"
 
-# 4. Push to R2
+# 4. Push to GCS
 dvc push
 git push
 ```
@@ -134,6 +134,6 @@ individuals:
 See `docs/SPEC.md` for the full technical specification including:
 
 - Complete architecture and data flow
-- DVC and Cloudflare R2 configuration
+- DVC and Google Cloud Storage configuration
 - CI/CD workflows
 - Security and privacy considerations

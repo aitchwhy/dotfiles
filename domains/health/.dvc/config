@@ -1,6 +1,5 @@
 [core]
-    remote = r2
+    remote = gcs
     autostage = true
-['remote "r2"']
-    url = s3://health-analysis-data
-    endpointurl = https://ACCOUNT_ID.r2.cloudflarestorage.com
+['remote "gcs"']
+    url = gs://hank-systems-data/health
