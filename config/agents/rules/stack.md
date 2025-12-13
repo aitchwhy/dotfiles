@@ -4,6 +4,40 @@
 > Run `just sig-doctor` to check alignment.
 > Import: `import { STACK } from '@/stack'`
 
+## Signet MCP Tools
+
+Use these MCP tools for stack compliance:
+
+| Tool | Purpose | When to Use |
+|------|---------|-------------|
+| `mcp__signet__sig-stack` | Check/fix versions, forbidden deps | After modifying package.json |
+| `mcp__signet__sig-guard` | Pre-write AST validation | Before writing TypeScript files |
+| `mcp__signet__sig-migrate` | Project drift detection | At session start for new projects |
+| `mcp__signet__sig-verify` | Full 5-tier verification | Before commits or when requested |
+
+### sig-stack
+```
+mcp__signet__sig-stack(path: ".", fix: true)
+```
+- Checks forbidden deps (lodash, express, prisma, etc.)
+- Checks version drift against STACK.npm
+- With `fix: true`, auto-corrects versions in package.json
+
+### sig-guard
+```
+mcp__signet__sig-guard(content: "...", filePath: "src/foo.ts")
+```
+- Runs AST-grep rules: no-any, no-zod-infer, no-mock, no-throw, no-should-work
+- Returns violations with line numbers
+- Use BEFORE writing files to catch violations early
+
+### sig-migrate
+```
+mcp__signet__sig-migrate(path: ".", fix: true)
+```
+- Detects missing CLAUDE.md, forbidden files, version drift
+- With `fix: true`, creates CLAUDE.md symlink, removes forbidden files
+
 ## Runtime
 
 - **Bun**: 1.3+

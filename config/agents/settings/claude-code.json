@@ -1,5 +1,5 @@
 {
-  "$comment": "Dotfiles-specific Claude Code settings. Adds enforcement hooks (validate-flake, devops-enforcer, auto-migrate, stack-enforcer) on top of global settings.",
+  "$comment": "Dotfiles-specific Claude Code settings. Uses Signet MCP tools for stack enforcement. Hooks handle formatting and session tracking.",
   "cleanupPeriodDays": 90,
   "includeCoAuthoredBy": false,
   "permissions": {
@@ -84,16 +84,6 @@
             "timeout": 60
           }
         ]
-      },
-      {
-        "matcher": "Write(**/package.json)|Edit(**/package.json)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun run \"$HOME/dotfiles/config/agents/hooks/enforce-versions.ts\"",
-            "timeout": 10
-          }
-        ]
       }
     ],
     "PreToolUse": [
@@ -135,15 +125,6 @@
             "timeout": 5
           }
         ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun run \"$HOME/dotfiles/config/agents/hooks/auto-migrate.ts\"",
-            "timeout": 10
-          }
-        ]
       }
     ],
     "Stop": [
@@ -180,15 +161,6 @@
             "type": "command",
             "command": "bun run \"$HOME/dotfiles/config/agents/hooks/verification-gate.ts\"",
             "timeout": 15
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun run \"$HOME/dotfiles/config/agents/hooks/stack-enforcer.ts\"",
-            "timeout": 20
           }
         ]
       }
