@@ -389,3 +389,33 @@ gen-context:
     @echo "Editor context is now managed via symlinks (bootloader architecture)"
     @echo ".cursorrules -> config/agents/AGENTS.md"
     @ls -la .cursorrules 2>/dev/null || echo ".cursorrules symlink not found"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# NIX BUILD OPTIMIZATION
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Verify Nix build follows optimization patterns
+nix-check:
+    @./scripts/verify-nix-optimization.sh
+
+# Push nodeModules to Cachix (run after lockfile changes)
+nix-cache-deps cache="hank-dotfiles":
+    @echo "Pushing nodeModules to Cachix..."
+    nix build .#nodeModules -v
+    cachix push {{cache}} $(nix path-info .#nodeModules)
+    @echo "nodeModules cached"
+
+# Benchmark Nix build times
+nix-bench:
+    @echo "Cold build (first run)..."
+    rm -rf result
+    time nix build .#api 2>&1 | tail -5
+    @echo ""
+    @echo "Warm build (source change only)..."
+    touch apps/api/src/index.ts 2>/dev/null || touch src/index.ts 2>/dev/null || true
+    time nix build .#api 2>&1 | tail -5
+
+# Show Nix closure sizes
+nix-sizes:
+    @echo "Closure sizes (largest first):"
+    nix path-info -rsSh .#api 2>/dev/null | sort -k2 -h | tail -15 || echo "Build .#api first"
