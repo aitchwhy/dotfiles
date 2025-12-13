@@ -92,7 +92,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bun run \"$HOME/dotfiles/config/agents/hooks/unified-guard.ts\"",
+            "command": "bun run \"$HOME/dotfiles/config/agents/hooks/paragon-guard.ts\"",
             "timeout": 20
           }
         ]
