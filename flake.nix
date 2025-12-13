@@ -22,6 +22,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # ═══════════════════════════════════════════════════════════════════════════
     # DARWIN & HOME MANAGER
     # ═══════════════════════════════════════════════════════════════════════════
@@ -136,6 +141,7 @@
     flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [
         inputs.git-hooks-nix.flakeModule
+        ./flake/treefmt.nix
         ./flake/darwin.nix
         ./flake/nixos.nix
         ./flake/devshells.nix
@@ -150,12 +156,9 @@
         "x86_64-linux"
       ];
 
-      # Per-system configuration
-      perSystem =
-        { pkgs, ... }:
-        {
-          # Formatter (nixfmt-rfc-style is December 2025 standard)
-          formatter = pkgs.nixfmt-rfc-style;
-        };
+      # Per-system configuration handled by imported modules:
+      # - treefmt.nix: formatter via treefmt-nix
+      # - devshells.nix: development shell
+      # - checks.nix: flake checks
     };
 }
