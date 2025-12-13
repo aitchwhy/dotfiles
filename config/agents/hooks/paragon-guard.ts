@@ -1,11 +1,11 @@
 #!/usr/bin/env bun
 /**
- * Unified Guard - Consolidated PreToolUse gatekeeper
+ * PARAGON Guard - Enforcement System PreToolUse gatekeeper
  *
- * Guards (12 total):
+ * Guards (14 total):
  * 1. Bash safety - blocks dangerous rm -rf commands
  * 2. Conventional commits - validates git commit messages
- * 3. Forbidden files - blocks package-lock.json, eslint config, etc.
+ * 3. Forbidden files - blocks package-lock.json, eslint config, Docker files, etc.
  * 4. Forbidden imports - blocks express, prisma, zod/v3, GCP OTEL exporters, dd-trace
  * 5. Any type detector - blocks TypeScript `any` usage
  * 6. z.infer detector - blocks z.infer<>, z.input<>, z.output<> (use satisfies pattern)
@@ -15,11 +15,13 @@
  * 10. DevOps commands - blocks docker-compose, docker build, npm run dev
  * 11. Flake patterns - advisory warnings for flake.nix best practices
  * 12. Port registry - advisory warnings for undeclared ports
+ * 13. Assumption language - blocks "should work", "probably", "I think", etc.
+ * 14. Throw detector - advisory warnings for throw in non-invariant contexts
  *
  * Observability standard: Datadog + OTEL 2.x via OTLP proto exporters.
- * See: observability-patterns skill for approved patterns.
+ * See: paragon skill for full guard matrix.
  *
- * This consolidation reduces shell spawns from 12 → 1 per Write/Edit operation.
+ * This consolidation reduces shell spawns from 14 → 1 per Write/Edit operation.
  */
 
 import { z } from 'zod';
@@ -761,6 +763,83 @@ function checkPortRegistry(content: string, filePath: string): string[] {
 }
 
 // ============================================================================
+// 13. ASSUMPTION LANGUAGE DETECTOR
+// ============================================================================
+
+const ASSUMPTION_PATTERNS: { pattern: RegExp; phrase: string }[] = [
+  { pattern: /\bshould\s+(now\s+)?work/i, phrase: 'should work' },
+  { pattern: /\bshould\s+fix/i, phrase: 'should fix' },
+  { pattern: /\bthis\s+fixes/i, phrase: 'this fixes' },
+  { pattern: /\bprobably\s+(works|fixed|correct)/i, phrase: 'probably' },
+  { pattern: /\bI\s+think\s+(this|it)/i, phrase: 'I think' },
+  { pattern: /\bmight\s+(work|fix|solve)/i, phrase: 'might' },
+  { pattern: /\blikely\s+(fixed|works|correct)/i, phrase: 'likely' },
+];
+
+function checkAssumptionLanguage(content: string, filePath: string): string | null {
+  if (!/\.[jt]sx?$/.test(filePath)) return null;
+  if (filePath.endsWith('.d.ts')) return null;
+  if (filePath.includes('/node_modules/')) return null;
+
+  // Check comments and strings where assumption language typically appears
+  const commentMatches = content.match(/\/\/.*$|\/\*[\s\S]*?\*\/|`[^`]*`|"[^"]*"|'[^']*'/gm);
+  const textToCheck = commentMatches?.join(' ') || '';
+
+  for (const { pattern, phrase } of ASSUMPTION_PATTERNS) {
+    if (pattern.test(textToCheck)) {
+      return `ASSUMPTION LANGUAGE VIOLATION: "${phrase}" detected
+
+Ban assumption language. Replace with evidence:
+
+| BANNED | REQUIRED |
+|--------|----------|
+| "should work" | "verified via test" |
+| "probably" | "confirmed by running" |
+| "I think" | Evidence-based statements only |
+| "might fix" | "UNVERIFIED: requires [test]" |
+
+See: verification-first skill for evidence patterns.`;
+    }
+  }
+  return null;
+}
+
+// ============================================================================
+// 14. THROW DETECTOR (Advisory)
+// ============================================================================
+
+const THROW_PATTERNS = [/\bthrow\s+new\s+(Error|\w+Error)\s*\(/];
+
+const INVARIANT_CONTEXTS = [/invariant/i, /unreachable/i, /assert/i, /exhaustive/i, /impossible/i];
+
+function checkThrowPatterns(content: string, filePath: string): string[] {
+  const warnings: string[] = [];
+
+  if (!/\.tsx?$/.test(filePath)) return warnings;
+  if (filePath.endsWith('.d.ts')) return warnings;
+  if (filePath.includes('/node_modules/')) return warnings;
+
+  const lines = content.split('\n');
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i] || '';
+    const hasThrow = THROW_PATTERNS.some((p) => p.test(line));
+    if (!hasThrow) continue;
+
+    const prevLine = lines[i - 1] || '';
+    const nextLine = lines[i + 1] || '';
+    const context = `${prevLine} ${line} ${nextLine}`;
+
+    const isInvariant = INVARIANT_CONTEXTS.some((p) => p.test(context));
+    if (!isInvariant) {
+      warnings.push(`Line ${i + 1}: Consider Result/Effect for expected errors. throw is for invariants only.`);
+    }
+  }
+
+  return warnings;
+}
+
+// ============================================================================
 // Main Hook Logic
 // ============================================================================
 
@@ -893,6 +972,25 @@ async function main(): Promise<void> {
   if ((tool_name === 'Write' || tool_name === 'Edit') && content && filePath) {
     const portWarnings = checkPortRegistry(content, filePath);
     advisoryWarnings.push(...portWarnings);
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // 13. ASSUMPTION LANGUAGE (Blocking - for Write/Edit on TS/JS)
+  // ─────────────────────────────────────────────────────────────────────────
+  if ((tool_name === 'Write' || tool_name === 'Edit') && content && filePath) {
+    const assumptionError = checkAssumptionLanguage(content, filePath);
+    if (assumptionError) {
+      block(assumptionError);
+      return;
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // 14. THROW DETECTOR (Advisory - for Write/Edit on TypeScript)
+  // ─────────────────────────────────────────────────────────────────────────
+  if ((tool_name === 'Write' || tool_name === 'Edit') && content && filePath) {
+    const throwWarnings = checkThrowPatterns(content, filePath);
+    advisoryWarnings.push(...throwWarnings);
   }
 
   // All checks passed - include advisory warnings if any
