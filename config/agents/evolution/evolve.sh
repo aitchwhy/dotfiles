@@ -1,223 +1,27 @@
 #!/usr/bin/env bash
 # evolve.sh - Unified evolution system
-# Single command for health checks, trends, alerts, and reports
+# Single command: just evolve [--json]
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOTFILES="${DOTFILES:-$HOME/dotfiles}"
 METRICS_DIR="${HOME}/.claude-metrics"
 DB_FILE="${METRICS_DIR}/evolution.db"
-REPORTS_DIR="${METRICS_DIR}/reports"
 
 # Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+CYAN='\033[0;36m'
 DIM='\033[2m'
+BOLD='\033[1m'
 NC='\033[0m'
 
 # Auto-initialize on first run
 auto_init() {
-  mkdir -p "$METRICS_DIR" "$REPORTS_DIR"
+  mkdir -p "$METRICS_DIR"
   chmod +x "$SCRIPT_DIR"/*.sh 2>/dev/null || true
-}
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# UNIFIED DASHBOARD (default command)
-# ═══════════════════════════════════════════════════════════════════════════════
-
-do_dashboard() {
-  auto_init
-
-  echo ""
-  echo -e "${BLUE}╔══════════════════════════════════════════════════════════════╗${NC}"
-  echo -e "${BLUE}║${NC}             ${GREEN}EVOLUTION SYSTEM DASHBOARD${NC}                       ${BLUE}║${NC}"
-  echo -e "${BLUE}╚══════════════════════════════════════════════════════════════╝${NC}"
-  echo ""
-
-  # Run grade and capture result
-  local grade_result
-  grade_result=$("$SCRIPT_DIR/grade.sh" 2>/dev/null) || grade_result='{"overall_score":0,"recommendation":"error"}'
-
-  local score rec
-  score=$(echo "$grade_result" | jq -r '.overall_score // 0')
-  rec=$(echo "$grade_result" | jq -r '.recommendation // "error"')
-  local score_pct
-  score_pct=$(printf "%.0f" "$(echo "$score * 100" | bc)")
-
-  # Score with color
-  echo -n "  Health Score: "
-  case "$rec" in
-    ok)     echo -e "${GREEN}█████████████████████ ${score_pct}%${NC}" ;;
-    warning) echo -e "${YELLOW}████████████████░░░░░ ${score_pct}%${NC}" ;;
-    urgent) echo -e "${RED}████████░░░░░░░░░░░░░ ${score_pct}%${NC}" ;;
-    *)      echo -e "${RED}░░░░░░░░░░░░░░░░░░░░░ ${score_pct}%${NC}" ;;
-  esac
-  echo ""
-
-  # Component breakdown (compact)
-  echo -e "  ${DIM}Components:${NC}"
-  echo "$grade_result" | jq -r '.details | to_entries[] | "    \(.key): \(.value.score)%"' 2>/dev/null | head -7
-
-  # Trend (if we have history)
-  if [[ -f "$DB_FILE" ]]; then
-    echo ""
-    local trend_data
-    trend_data=$(sqlite3 "$DB_FILE" "
-      SELECT
-        (SELECT overall_score FROM grades ORDER BY id DESC LIMIT 1) as current,
-        (SELECT overall_score FROM grades ORDER BY id DESC LIMIT 1 OFFSET 1) as previous,
-        (SELECT AVG(overall_score) FROM grades WHERE timestamp > datetime('now', '-7 days')) as week_avg
-    " 2>/dev/null)
-
-    if [[ -n "$trend_data" ]]; then
-      local current prev week_avg
-      IFS='|' read -r current prev week_avg <<< "$trend_data"
-
-      if [[ -n "$prev" && -n "$current" ]]; then
-        local diff
-        diff=$(echo "scale=0; ($current - $prev) * 100" | bc 2>/dev/null || echo "0")
-        diff=${diff:-0}
-
-        echo -n "  Trend: "
-        if (( diff > 5 )); then
-          echo -e "${GREEN}↑ Improving (+${diff}%)${NC}"
-        elif (( diff < -5 )); then
-          echo -e "${RED}↓ Declining (${diff}%)${NC}"
-        else
-          echo -e "${BLUE}→ Stable${NC}"
-        fi
-      fi
-
-      if [[ -n "$week_avg" ]]; then
-        local week_pct
-        week_pct=$(printf "%.0f" "$(echo "$week_avg * 100" | bc)")
-        echo -e "  ${DIM}7-day average: ${week_pct}%${NC}"
-      fi
-    fi
-
-    # Recent alerts (last 3)
-    if [[ -f "$METRICS_DIR/alerts.log" ]]; then
-      local recent_alerts
-      recent_alerts=$(tail -3 "$METRICS_DIR/alerts.log" 2>/dev/null | grep -v "^$" || true)
-
-      if [[ -n "$recent_alerts" ]]; then
-        echo ""
-        echo -e "  ${YELLOW}Recent Alerts:${NC}"
-        echo "$recent_alerts" | while IFS='|' read -r ts severity msg; do
-          case "$severity" in
-            urgent)  echo -e "    ${RED}⚠${NC} $msg" ;;
-            warning) echo -e "    ${YELLOW}!${NC} $msg" ;;
-            *)       echo -e "    ${DIM}·${NC} $msg" ;;
-          esac
-        done
-      fi
-    fi
-
-    # Quick recommendations
-    echo ""
-    echo -e "  ${DIM}Actions:${NC}"
-    local weak_areas
-    weak_areas=$(echo "$grade_result" | jq -r '.details | to_entries[] | select(.value.score < 80) | .key' 2>/dev/null)
-
-    if [[ -z "$weak_areas" ]]; then
-      echo -e "    ${GREEN}✓ All systems healthy${NC}"
-    else
-      echo "$weak_areas" | head -3 | while read -r area; do
-        case "$area" in
-          nix_flake)  echo "    → Run: nix flake check" ;;
-          typescript) echo "    → Run: cd config/signet && bun typecheck" ;;
-          hooks)      echo "    → Check: config/agents/hooks/" ;;
-          paragon)    echo "    → Run: just paragon" ;;
-          lessons)    echo "    → Add lessons: just evolve lesson" ;;
-          *)          echo "    → Review: $area" ;;
-        esac
-      done
-    fi
-  fi
-
-  echo ""
-  echo -e "${DIM}  Commands: just evolve report | just evolve lesson | just evolve history${NC}"
-  echo ""
-}
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# REPORT GENERATION
-# ═══════════════════════════════════════════════════════════════════════════════
-
-do_report() {
-  auto_init
-
-  if [[ ! -f "$DB_FILE" ]]; then
-    echo "No metrics yet. Run 'just evolve' first."
-    exit 1
-  fi
-
-  # Generate report
-  "$SCRIPT_DIR/weekly-report.sh" generate
-
-  # Display it
-  echo ""
-  "$SCRIPT_DIR/weekly-report.sh" view
-}
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# LESSON RECORDING
-# ═══════════════════════════════════════════════════════════════════════════════
-
-do_lesson() {
-  auto_init
-
-  echo -e "${BLUE}Record Lesson Learned${NC}"
-  echo ""
-
-  read -rp "Category (bug/pattern/optimization/gotcha): " category
-  read -rp "Lesson: " lesson
-  read -rp "Evidence: " evidence
-
-  local date
-  date=$(date +%Y-%m-%d)
-
-  # Ensure DB exists
-  if [[ ! -f "$DB_FILE" ]]; then
-    "$SCRIPT_DIR/grade.sh" init >/dev/null 2>&1
-  fi
-
-  # Escape quotes for SQLite
-  lesson="${lesson//\'/\'\'}"
-  evidence="${evidence//\'/\'\'}"
-
-  sqlite3 "$DB_FILE" "INSERT INTO lessons (date, category, lesson, evidence, source) VALUES ('$date', '$category', '$lesson', '$evidence', 'manual');"
-
-  echo ""
-  echo -e "${GREEN}✓ Lesson recorded${NC}"
-}
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# HISTORY VIEW
-# ═══════════════════════════════════════════════════════════════════════════════
-
-do_history() {
-  auto_init
-
-  if [[ ! -f "$DB_FILE" ]]; then
-    echo "No metrics yet. Run 'just evolve' first."
-    exit 1
-  fi
-
-  echo -e "${BLUE}Grade History${NC}"
-  echo ""
-
-  sqlite3 -header -column "$DB_FILE" "
-    SELECT
-      datetime(timestamp) as time,
-      printf('%.0f%%', overall_score * 100) as score,
-      recommendation as status
-    FROM grades
-    ORDER BY id DESC
-    LIMIT 15;
-  "
 }
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -258,6 +62,32 @@ do_json() {
     fi
   fi
 
+  # Get weekly stats
+  local week_sessions=0 week_lessons=0 week_avg=0
+  if [[ -f "$DB_FILE" ]]; then
+    week_sessions=$(sqlite3 "$DB_FILE" "SELECT COUNT(*) FROM grades WHERE timestamp > datetime('now', '-7 days');" 2>/dev/null || echo "0")
+    week_lessons=$(sqlite3 "$DB_FILE" "SELECT COUNT(*) FROM lessons WHERE date > date('now', '-7 days');" 2>/dev/null || echo "0")
+    week_avg=$(sqlite3 "$DB_FILE" "SELECT printf('%.0f', AVG(overall_score) * 100) FROM grades WHERE timestamp > datetime('now', '-7 days');" 2>/dev/null || echo "0")
+  fi
+
+  # Get active lessons
+  local lessons_json="[]"
+  if [[ -f "$DB_FILE" ]]; then
+    lessons_json=$(sqlite3 -json "$DB_FILE" "
+      SELECT category, lesson as text, occurrence_count as count, printf('%.2f', decay_score) as decay
+      FROM lessons
+      ORDER BY decay_score DESC
+      LIMIT 10;
+    " 2>/dev/null || echo "[]")
+  fi
+
+  # Get memory stats
+  local active_count=0 archived_count=0 last_gc="never"
+  if [[ -f "$DB_FILE" ]]; then
+    active_count=$(sqlite3 "$DB_FILE" "SELECT COUNT(*) FROM lessons;" 2>/dev/null || echo "0")
+    archived_count=$(sqlite3 "$DB_FILE" "SELECT COUNT(*) FROM lessons_archive;" 2>/dev/null || echo "0")
+  fi
+
   # Build action items
   local action_items
   action_items=$(echo "$grade_result" | jq -c '[.details | to_entries[] | select(.value.score < 80) | .key]' 2>/dev/null || echo "[]")
@@ -270,6 +100,12 @@ do_json() {
     --argjson alert_count "$alert_count" \
     --argjson action_items "$action_items" \
     --argjson details "$(echo "$grade_result" | jq '.details // {}')" \
+    --argjson week_sessions "$week_sessions" \
+    --argjson week_lessons "$week_lessons" \
+    --argjson week_avg "${week_avg:-0}" \
+    --argjson lessons "$lessons_json" \
+    --argjson active "$active_count" \
+    --argjson archived "$archived_count" \
     '{
       score: $score,
       score_percent: ($score * 100 | floor),
@@ -277,8 +113,195 @@ do_json() {
       trend: $trend,
       alert_count: $alert_count,
       action_items: $action_items,
-      details: $details
+      details: $details,
+      week: {
+        sessions: $week_sessions,
+        lessons: $week_lessons,
+        avg_score: $week_avg
+      },
+      lessons: $lessons,
+      memory: {
+        active: $active,
+        archived: $archived
+      }
     }'
+}
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# UNIFIED DASHBOARD (default command)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+do_dashboard() {
+  auto_init
+
+  echo ""
+  echo -e "${BLUE}╔══════════════════════════════════════════════════════════════╗${NC}"
+  echo -e "${BLUE}║${NC}                  ${BOLD}EVOLUTION SYSTEM${NC}                            ${BLUE}║${NC}"
+  echo -e "${BLUE}╚══════════════════════════════════════════════════════════════╝${NC}"
+  echo ""
+
+  # Run grade and capture result
+  local grade_result
+  grade_result=$("$SCRIPT_DIR/grade.sh" 2>/dev/null) || grade_result='{"overall_score":0,"recommendation":"error"}'
+
+  local score rec
+  score=$(echo "$grade_result" | jq -r '.overall_score // 0')
+  rec=$(echo "$grade_result" | jq -r '.recommendation // "error"')
+  local score_pct
+  score_pct=$(printf "%.0f" "$(echo "$score * 100" | bc)")
+
+  # Get trend
+  local trend_text="→ Stable"
+  local trend_color="$BLUE"
+  if [[ -f "$DB_FILE" ]]; then
+    local current prev
+    current=$(sqlite3 "$DB_FILE" "SELECT overall_score FROM grades ORDER BY id DESC LIMIT 1;" 2>/dev/null || echo "0")
+    prev=$(sqlite3 "$DB_FILE" "SELECT overall_score FROM grades ORDER BY id DESC LIMIT 1 OFFSET 1;" 2>/dev/null || echo "$current")
+
+    if [[ -n "$prev" && -n "$current" ]]; then
+      local diff
+      diff=$(printf "%.0f" "$(echo "scale=0; ($current - $prev) * 100" | bc 2>/dev/null || echo "0")")
+      if (( diff > 5 )); then
+        trend_text="↑ Improving (+${diff}%)"
+        trend_color="$GREEN"
+      elif (( diff < -5 )); then
+        trend_text="↓ Declining (${diff}%)"
+        trend_color="$RED"
+      fi
+    fi
+  fi
+
+  # Health score with bar
+  local bar=""
+  local filled=$((score_pct / 5))
+  local empty=$((20 - filled))
+  for ((i=0; i<filled; i++)); do bar+="█"; done
+  for ((i=0; i<empty; i++)); do bar+="░"; done
+
+  local score_color="$GREEN"
+  case "$rec" in
+    warning) score_color="$YELLOW" ;;
+    urgent|error) score_color="$RED" ;;
+  esac
+
+  echo -e "  ${BOLD}HEALTH${NC}  ${score_color}${bar} ${score_pct}%${NC}  ${trend_color}${trend_text}${NC}"
+  echo ""
+
+  # Components box
+  echo -e "  ${DIM}┌─ Components ──────────────────────────────────────────────┐${NC}"
+  local components
+  components=$(echo "$grade_result" | jq -r '.details | to_entries[] | "\(.key): \(.value.score)%"' 2>/dev/null | head -6 | tr '\n' '  ')
+  echo -e "  ${DIM}│${NC}  ${components}${DIM}│${NC}"
+  echo -e "  ${DIM}└────────────────────────────────────────────────────────────┘${NC}"
+  echo ""
+
+  # Weekly stats box
+  if [[ -f "$DB_FILE" ]]; then
+    local week_sessions week_lessons week_avg best_day
+    week_sessions=$(sqlite3 "$DB_FILE" "SELECT COUNT(*) FROM grades WHERE timestamp > datetime('now', '-7 days');" 2>/dev/null || echo "0")
+    week_lessons=$(sqlite3 "$DB_FILE" "SELECT COUNT(*) FROM lessons WHERE date > date('now', '-7 days');" 2>/dev/null || echo "0")
+    week_avg=$(sqlite3 "$DB_FILE" "SELECT printf('%.0f', AVG(overall_score) * 100) FROM grades WHERE timestamp > datetime('now', '-7 days');" 2>/dev/null || echo "N/A")
+    best_day=$(sqlite3 "$DB_FILE" "SELECT strftime('%a', timestamp) FROM grades WHERE timestamp > datetime('now', '-7 days') ORDER BY overall_score DESC LIMIT 1;" 2>/dev/null || echo "N/A")
+
+    echo -e "  ${DIM}┌─ This Week ────────────────────────────────────────────────┐${NC}"
+    echo -e "  ${DIM}│${NC}  Sessions: ${CYAN}${week_sessions}${NC}  |  Lessons: ${CYAN}${week_lessons}${NC}  |  Avg Score: ${CYAN}${week_avg}%${NC}      ${DIM}│${NC}"
+    echo -e "  ${DIM}│${NC}  Best day: ${best_day}  |  Trend: ${trend_text}                      ${DIM}│${NC}"
+    echo -e "  ${DIM}└────────────────────────────────────────────────────────────┘${NC}"
+    echo ""
+  fi
+
+  # Active lessons box
+  if [[ -f "$DB_FILE" ]]; then
+    local lessons_count
+    lessons_count=$(sqlite3 "$DB_FILE" "SELECT COUNT(*) FROM lessons;" 2>/dev/null || echo "0")
+
+    if [[ "$lessons_count" -gt 0 ]]; then
+      echo -e "  ${DIM}┌─ Active Lessons (by decay score) ─────────────────────────┐${NC}"
+
+      sqlite3 "$DB_FILE" "
+        SELECT category, lesson, occurrence_count, decay_score
+        FROM lessons
+        ORDER BY decay_score DESC
+        LIMIT 4;
+      " 2>/dev/null | while IFS='|' read -r cat lesson count decay; do
+        # Truncate lesson to fit
+        local short_lesson
+        short_lesson=$(echo "$lesson" | cut -c1-40)
+        [[ ${#lesson} -gt 40 ]] && short_lesson="${short_lesson}..."
+
+        # Decay bar (3 chars)
+        local decay_pct decay_bar=""
+        decay_pct=$(printf "%.0f" "$(echo "$decay * 100" | bc)")
+        if (( decay_pct >= 66 )); then decay_bar="▓▓▓"
+        elif (( decay_pct >= 33 )); then decay_bar="▓▓░"
+        else decay_bar="▓░░"
+        fi
+
+        printf "  ${DIM}│${NC}  [${CYAN}%-11s${NC}] %-40s (${count}x) ${decay_bar}${DIM}│${NC}\n" "$cat" "$short_lesson"
+      done
+
+      echo -e "  ${DIM}└────────────────────────────────────────────────────────────┘${NC}"
+      echo ""
+    fi
+  fi
+
+  # Memory stats box
+  if [[ -f "$DB_FILE" ]]; then
+    local active_count archived_count
+    active_count=$(sqlite3 "$DB_FILE" "SELECT COUNT(*) FROM lessons;" 2>/dev/null || echo "0")
+    archived_count=$(sqlite3 "$DB_FILE" "SELECT COUNT(*) FROM lessons_archive;" 2>/dev/null || echo "0")
+
+    echo -e "  ${DIM}┌─ Memory Stats ─────────────────────────────────────────────┐${NC}"
+    echo -e "  ${DIM}│${NC}  Active: ${GREEN}${active_count}${NC} lessons  |  Archived: ${DIM}${archived_count}${NC}                       ${DIM}│${NC}"
+    echo -e "  ${DIM}└────────────────────────────────────────────────────────────┘${NC}"
+    echo ""
+  fi
+
+  # Alerts
+  if [[ -f "$METRICS_DIR/alerts.log" ]]; then
+    local recent_alerts
+    recent_alerts=$(tail -3 "$METRICS_DIR/alerts.log" 2>/dev/null | grep -v "^$" || true)
+
+    if [[ -n "$recent_alerts" ]]; then
+      echo -e "  ${YELLOW}Alerts:${NC}"
+      echo "$recent_alerts" | while IFS='|' read -r ts severity msg; do
+        case "$severity" in
+          urgent)  echo -e "    ${RED}⚠${NC} $msg" ;;
+          warning) echo -e "    ${YELLOW}!${NC} $msg" ;;
+          *)       echo -e "    ${DIM}·${NC} $msg" ;;
+        esac
+      done
+      echo ""
+    else
+      echo -e "  ${DIM}Alerts: None${NC}"
+      echo ""
+    fi
+  else
+    echo -e "  ${DIM}Alerts: None${NC}"
+    echo ""
+  fi
+
+  # Actions
+  local weak_areas
+  weak_areas=$(echo "$grade_result" | jq -r '.details | to_entries[] | select(.value.score < 80) | .key' 2>/dev/null)
+
+  if [[ -z "$weak_areas" ]]; then
+    echo -e "  ${GREEN}✓ All systems healthy${NC}"
+  else
+    echo -e "  ${DIM}Actions:${NC}"
+    echo "$weak_areas" | head -3 | while read -r area; do
+      case "$area" in
+        nix_flake)  echo "    → Run: nix flake check" ;;
+        typescript) echo "    → Run: bun typecheck" ;;
+        hooks)      echo "    → Check: config/agents/hooks/" ;;
+        paragon)    echo "    → Run: just paragon" ;;
+        lessons)    echo "    → Lessons will be captured automatically" ;;
+        *)          echo "    → Review: $area" ;;
+      esac
+    done
+  fi
+
+  echo ""
 }
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -287,21 +310,20 @@ do_json() {
 
 show_help() {
   cat << EOF
-Usage: evolve [command]
+Usage: just evolve [--json]
 
-Commands:
-  (none)    Show unified dashboard (grade + trends + alerts)
-  report    Generate and display weekly report
-  lesson    Record a lesson learned
-  history   Show grade history
-  json      Output JSON for programmatic access
+Unified evolution system dashboard.
+
+Options:
+  --json    Output machine-readable JSON (for MCP tools)
+  -h        Show this help
 
 Examples:
-  just evolve              # Full dashboard
-  just evolve report       # Weekly report
-  just evolve lesson       # Add lesson
-  just evolve json         # Machine-readable output
+  just evolve          # Show unified dashboard
+  just evolve --json   # JSON output for programmatic access
 
+Automatic lesson learning runs via session hooks.
+Memory consolidation happens automatically after each session.
 EOF
 }
 
@@ -310,39 +332,24 @@ EOF
 # ═══════════════════════════════════════════════════════════════════════════════
 
 main() {
-  local cmd="${1:-}"
+  local arg="${1:-}"
 
-  case "$cmd" in
-    ""|dashboard)
-      do_dashboard
-      ;;
-    report)
-      do_report
-      ;;
-    lesson)
-      do_lesson
-      ;;
-    history)
-      do_history
-      ;;
-    json)
+  case "$arg" in
+    --json|json)
       do_json
-      ;;
-    # Hidden commands for backward compatibility
-    grade)
-      "$SCRIPT_DIR/grade.sh"
-      ;;
-    status)
-      do_dashboard
-      ;;
-    reflect)
-      do_dashboard
       ;;
     -h|--help|help)
       show_help
       ;;
+    ""|dashboard)
+      do_dashboard
+      ;;
+    # Hidden backward compatibility
+    report|history|lesson|grade|status|reflect)
+      do_dashboard
+      ;;
     *)
-      echo "Unknown command: $cmd"
+      echo "Unknown option: $arg"
       show_help
       exit 1
       ;;
