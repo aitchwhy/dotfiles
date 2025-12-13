@@ -58,8 +58,9 @@
       http-connections = 128; # Concurrent HTTP connections
 
       # Build settings
-      sandbox = true;
-      sandbox-fallback = false; # Fail rather than disable sandbox
+      # Sandbox is Linux-only; macOS uses App Sandbox/DriverKit, not Nix sandbox
+      sandbox = lib.mkIf pkgs.stdenv.isLinux true;
+      sandbox-fallback = lib.mkIf pkgs.stdenv.isLinux false; # Fail rather than disable sandbox
       # auto-optimise-store removed - use nix.optimise.automatic instead
       min-free = 5368709120; # 5GB minimum free space
       max-free = 10737418240; # 10GB to free when running GC
