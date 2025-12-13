@@ -13,6 +13,7 @@ in
     ./system.nix
     ./security.nix
     ./users.nix
+    ./domains.nix
     ./services/sshd.nix
     ./services/tailscale.nix
     ./services/docker.nix
