@@ -44,10 +44,6 @@ dots-edit:
 # Global justfile for common tasks
 # Usage: j <recipe>
 
-# Default recipe to show available recipes
-default:
-    @just --list
-
 # Update all package managers and tools
 update:
     @echo "Updating system packages and tools..."
