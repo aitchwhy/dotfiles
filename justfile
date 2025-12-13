@@ -254,46 +254,12 @@ cache-push-nixos:
     rm nixos-result
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# SELF-EVOLUTION
+# SELF-EVOLUTION (unified command)
 # ═══════════════════════════════════════════════════════════════════════════════
 
-# Full evolution cycle (grade + reflect)
+# Evolution system: just evolve [report|lesson|history|json]
 evolve *ARGS:
     @bash config/agents/evolution/evolve.sh {{ ARGS }}
-
-# Quick status dashboard
-evolve-status:
-    @bash config/agents/evolution/evolve.sh status
-
-# Initialize evolution system
-evolve-init:
-    @mkdir -p .claude-metrics config/agents/evolution/lessons
-    @chmod +x config/agents/evolution/*.sh config/agents/evolution/**/*.sh 2>/dev/null || true
-    @echo "✓ Evolution system initialized"
-
-# Trend analysis and alerting
-evolve-trends:
-    @bash config/agents/evolution/trend-alert.sh analyze
-
-# Check for degradation patterns
-evolve-degradation:
-    @bash config/agents/evolution/trend-alert.sh degradation
-
-# Show recent alerts
-evolve-alerts:
-    @bash config/agents/evolution/trend-alert.sh alerts
-
-# Generate weekly report
-evolve-report:
-    @bash config/agents/evolution/weekly-report.sh generate
-
-# View latest weekly report
-evolve-report-view:
-    @bash config/agents/evolution/weekly-report.sh view
-
-# List all weekly reports
-evolve-report-list:
-    @bash config/agents/evolution/weekly-report.sh list
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # REPOMIX (Codebase Snapshots) - Delegates to ~/.local/bin/rx

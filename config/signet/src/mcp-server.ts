@@ -167,6 +167,84 @@ server.tool(
 );
 
 // =============================================================================
+// sig-evolve Tool (Evolution system health check)
+// =============================================================================
+
+server.tool(
+  'sig-evolve',
+  `Check evolution system health. Returns score, trends, and action items.
+
+Use this proactively at session start to understand codebase health.
+
+Returns:
+- score: 0-1 overall health score
+- recommendation: ok | warning | urgent
+- trend: stable | improving | declining
+- action_items: Array of areas needing attention
+
+Example response:
+{
+  "score": 0.85,
+  "score_percent": 85,
+  "recommendation": "ok",
+  "trend": "stable",
+  "alert_count": 0,
+  "action_items": []
+}`,
+  {},
+  async () => {
+    const { exec } = await import('node:child_process');
+    const { promisify } = await import('node:util');
+    const execAsync = promisify(exec);
+
+    try {
+      const { stdout } = await execAsync(
+        'bash ~/dotfiles/config/agents/evolution/evolve.sh json',
+        { timeout: 30000 }
+      );
+
+      const result = JSON.parse(stdout.trim());
+
+      // Build human-readable summary
+      const lines: string[] = [
+        `Health Score: ${result.score_percent}% (${result.recommendation})`,
+        `Trend: ${result.trend}`,
+      ];
+
+      if (result.alert_count > 0) {
+        lines.push(`Alerts: ${result.alert_count}`);
+      }
+
+      if (result.action_items && result.action_items.length > 0) {
+        lines.push('');
+        lines.push('Action Items:');
+        for (const item of result.action_items) {
+          lines.push(`  - ${item}`);
+        }
+      }
+
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: lines.join('\n'),
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Evolution check failed: ${error instanceof Error ? error.message : String(error)}`,
+          },
+        ],
+      };
+    }
+  }
+);
+
+// =============================================================================
 // Start Server
 // =============================================================================
 
