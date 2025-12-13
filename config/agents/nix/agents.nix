@@ -96,6 +96,14 @@ in
       ".claude/skills/context7-mcp".source =
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/context7-mcp";
 
+      # Skills - additional patterns
+      ".claude/skills/state-machine-patterns".source =
+        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/state-machine-patterns";
+      ".claude/skills/secrets-management".source =
+        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/secrets-management";
+      ".claude/skills/port-registry".source =
+        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/port-registry";
+
       # ========================================
       # Gemini CLI
       # ========================================
