@@ -7,6 +7,7 @@ set -euo pipefail
 DOTFILES="${DOTFILES:-$HOME/dotfiles}"
 METRICS="$HOME/.claude-metrics"
 GRADE_SCRIPT="$DOTFILES/config/agents/evolution/grade.sh"
+TREND_ALERT="$DOTFILES/config/agents/evolution/trend-alert.sh"
 LESSON_WRITER="$DOTFILES/config/agents/hooks/lesson-writer.ts"
 CONSOLIDATE="$DOTFILES/config/agents/evolution/consolidate.ts"
 
@@ -54,9 +55,15 @@ if [[ -x "$CONSOLIDATE" || -f "$CONSOLIDATE" ]]; then
   bun run "$CONSOLIDATE" >/dev/null 2>&1 || true
 fi
 
-# Trigger grading in background (non-blocking)
+# Trigger grading and trend analysis in background (non-blocking)
 if [[ -x "$GRADE_SCRIPT" ]]; then
-  nohup "$GRADE_SCRIPT" > "$METRICS/last-grade.log" 2>&1 &
+  (
+    "$GRADE_SCRIPT" > "$METRICS/last-grade.log" 2>&1
+    # Run trend analysis after grading completes
+    if [[ -x "$TREND_ALERT" ]]; then
+      "$TREND_ALERT" >> "$METRICS/last-grade.log" 2>&1
+    fi
+  ) &
 fi
 
 # Output valid JSON for Claude Code
