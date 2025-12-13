@@ -76,6 +76,8 @@ in
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/nix-flake-parts";
       ".claude/skills/nix-infrastructure".source =
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/nix-infrastructure";
+      ".claude/skills/nix-build-optimization".source =
+        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/nix-build-optimization";
 
       ".claude/skills/typespec-patterns".source =
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/typespec-patterns";
