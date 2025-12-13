@@ -31,9 +31,10 @@
 
   # Allow DVC to work with GCS via ADC (Application Default Credentials)
   # The VM's service account provides access to GCS buckets
+  # Note: gcp-observability.nix may override with explicit credentials path
   environment.variables = {
     # DVC will use ADC automatically when running on GCP
-    GOOGLE_APPLICATION_CREDENTIALS = "";
+    GOOGLE_APPLICATION_CREDENTIALS = lib.mkDefault "";
   };
 
   # Create domains directory structure
