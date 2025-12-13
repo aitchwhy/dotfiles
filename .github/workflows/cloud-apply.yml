@@ -1,0 +1,69 @@
+name: Pulumi Apply
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'cloud/**'
+      - '.github/workflows/cloud-*.yml'
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "apply" to confirm manual deployment'
+        required: true
+
+jobs:
+  apply:
+    name: Apply Infrastructure Changes
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    # Only run on push OR when manual apply is confirmed
+    if: |
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.confirm == 'apply')
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install Dependencies
+        run: bun install
+        working-directory: cloud
+
+      - id: auth
+        name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Pulumi Up
+        uses: pulumi/actions@v6
+        with:
+          command: up
+          stack-name: prod
+          work-dir: cloud
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+          PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
+
+      - name: Report Success
+        if: success()
+        run: |
+          echo "## Infrastructure Updated" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Stack:** prod" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          cd cloud && pulumi stack output --json >> $GITHUB_STEP_SUMMARY || true
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+          PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
