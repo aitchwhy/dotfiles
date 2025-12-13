@@ -42,3 +42,4 @@ lib/clients/api/specs/
 # Security: PII and session data
 config/wispr-flow/
 config/httpie/sessions/
+.pre-commit-config.yaml
