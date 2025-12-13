@@ -16,11 +16,16 @@
       packages = {
         # Signet - Code Quality & Generation Platform
         # Hermetically packaged with bun2nix v2
+        # Uses writeBunApplication for CLI tools that run via `bun run`
         signet = bun2nix.writeBunApplication {
           pname = "signet";
           version = "2.0.0";
 
           src = ../config/signet;
+
+          # Skip bun build - this is a CLI that runs via `bun run`, not compiled
+          # The hook only uses bunBuildPhase if both dontUseBunBuild and buildPhase are unset
+          dontUseBunBuild = true;
 
           # Entry point script (runs: bun run src/cli.ts "$@")
           startScript = ''
