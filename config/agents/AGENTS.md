@@ -37,22 +37,30 @@ Read `paragon` skill for full guard matrix.
 | Skill | Purpose |
 |-------|---------|
 | `nix-build-optimization` | **Critical** - Derivation splitting, Cachix, CI/CD |
+| `nix-patterns` | flake-parts, nix-darwin, Home Manager |
 | `nix-infrastructure` | Port registry, nix2container, deployment |
-| `nix-flake-parts` | Modular flake composition |
-| `nix-darwin-patterns` | macOS system configuration |
+| `secrets-management` | sops-nix patterns |
 
 **Rule**: Before ANY Nix changes to TypeScript projects, read `nix-build-optimization`.
 
-### Pattern Skills
-typescript-patterns, zod-patterns, effect-ts-patterns, result-patterns,
-tdd-patterns, clean-code, verification-first, hexagonal-architecture,
-devops-patterns, nix-darwin-patterns, nix-flake-parts, nix-build-optimization,
-typespec-patterns, hono-workers, tanstack-patterns, signet-patterns,
-commit-patterns, planning-patterns, observability-patterns, refactoring-catalog,
-formal-verification, semantic-codebase, repomix-patterns, livekit-agents
+### Core Pattern Skills
+typescript-patterns, zod-patterns, effect-ts-patterns, quality-patterns,
+hexagonal-architecture, formal-verification, tdd-patterns
 
-### MCP Reference Skills
-repomix-mcp, context7-mcp
+### Nix Skills
+nix-patterns, nix-build-optimization, nix-infrastructure, secrets-management
+
+### Framework Skills
+hono-workers, tanstack-patterns, state-machine-patterns, observability-patterns
+
+### DevOps/Workflow Skills
+devops-patterns, planning-patterns, signet-patterns, typespec-patterns
+
+### Reference Skills
+repomix, context7-mcp
+
+### Specialized Skills
+livekit-agents, refactoring-catalog, semantic-codebase
 
 ## Agent Personas
 

@@ -1,7 +1,8 @@
 ---
 name: planning-patterns
-description: Implementation planning methodology. Research before coding. Identify risks before implementation.
+description: Implementation planning, conventional commits, and project bootstrap workflows. Research before coding.
 allowed-tools: Read, Grep, Glob, Bash
+token-budget: 800
 ---
 
 ## Planning Philosophy
@@ -205,3 +206,79 @@ grep -r "import.*from.*module" src/
 # Find configuration patterns
 grep -r "config\." --include="*.ts" | head -20
 ```
+
+## Conventional Commits
+
+```
+type(scope): description
+
+[optional body]
+
+[optional footer]
+```
+
+### Commit Types
+
+| Type | Description | Example |
+|------|-------------|---------|
+| `feat` | New feature | `feat(auth): add OAuth2 login` |
+| `fix` | Bug fix | `fix(api): handle null response` |
+| `refactor` | Code change (no fix/feat) | `refactor(db): extract query builder` |
+| `test` | Adding/updating tests | `test(user): add login tests` |
+| `docs` | Documentation only | `docs(readme): update install steps` |
+| `chore` | Build/dependencies | `chore(deps): update Effect to 3.20` |
+
+### Rules
+
+1. **Imperative mood**: "add" not "added" or "adds"
+2. **No period** at end of subject line
+3. **Max 72 characters** for subject line
+4. **Body**: Explain *why*, not *what*
+
+### Breaking Changes
+
+```
+feat(api)!: change auth endpoint response format
+
+BREAKING CHANGE: /api/auth now returns { user, token }
+instead of { data: { user, token } }
+```
+
+## Project Bootstrap
+
+### New Project
+
+```bash
+# API project (Hono + Drizzle + Effect)
+signet init api my-service
+
+# UI project (React 19 + TanStack + XState)
+signet init ui my-app
+
+# Full monorepo (Bun workspaces)
+signet init monorepo my-platform
+```
+
+### Migration Workflow
+
+```bash
+# 1. Preview changes
+signet migrate --dry-run --verbose
+
+# 2. Execute migration
+signet migrate
+
+# 3. Refresh dependencies
+bun install
+
+# 4. Verify compliance
+signet verify
+```
+
+### Quick Reference
+
+| Command | Purpose |
+|---------|---------|
+| `signet init <type> <name>` | Create new project |
+| `signet migrate` | Migrate existing project |
+| `signet verify` | Validate compliance |
