@@ -7,7 +7,6 @@ host := env_var_or_default("HOST", "hank-mbp-m4")
 
 # Import namespaced modules
 mod cloud "config/just/cloud.just"
-mod infra "config/just/infra.just"
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # TOP-LEVEL COMMANDS (8)
@@ -35,8 +34,7 @@ default:
     echo "  just evolve        Evolution system dashboard"
     echo ""
     echo "Modules:"
-    echo "  just cloud <cmd>   Cloud/remote ops (ssh, deploy, colmena, cache)"
-    echo "  just infra <cmd>   Infrastructure as Code (Pulumi)"
+    echo "  just cloud <cmd>   Cloud ops: ssh, colmena, pulumi, cache"
 
 # The one command: fmt → lint → test → switch → auto-gc [alias: s]
 sync: _preflight _fmt _lint _test

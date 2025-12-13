@@ -116,3 +116,75 @@ nixbuild TARGET="test":
                 --store ssh-ng://eu.nixbuild.net --eval-store auto --builders "" --no-link ;; \
         *) echo "Usage: just cloud nixbuild [test|darwin|nixos]" ;; \
     esac
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# PULUMI IaC (secrets injected via sops)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+pulumi_dir := "cloud"
+pulumi_stack := env_var_or_default("PULUMI_STACK", "prod")
+root := `git rev-parse --show-toplevel`
+secrets_file := root / "secrets/secrets.yaml"
+
+# Helper: Run command with sops-injected secrets
+[private]
+_pulumi CMD:
+    @sops exec-env {{ secrets_file }} 'export PULUMI_CONFIG_PASSPHRASE="$$pulumi_passphrase" && {{ CMD }}'
+
+# Preview infrastructure changes
+preview:
+    @just cloud _pulumi "cd {{ root }}/{{ pulumi_dir }} && pulumi preview --stack {{ pulumi_stack }}"
+
+# Deploy infrastructure changes
+up:
+    @just cloud _pulumi "cd {{ root }}/{{ pulumi_dir }} && pulumi up --stack {{ pulumi_stack }} --yes"
+
+# Show current stack outputs
+outputs:
+    @just cloud _pulumi "cd {{ root }}/{{ pulumi_dir }} && pulumi stack output --stack {{ pulumi_stack }}"
+
+# Refresh state from cloud provider
+refresh:
+    @just cloud _pulumi "cd {{ root }}/{{ pulumi_dir }} && pulumi refresh --stack {{ pulumi_stack }} --yes"
+
+# Destroy infrastructure (DANGEROUS)
+destroy:
+    @echo "This will DESTROY all infrastructure in stack '{{ pulumi_stack }}'!"
+    @read -p "Are you sure? (yes/no): " confirm; \
+    if [ "$$confirm" = "yes" ]; then \
+        just cloud _pulumi "cd {{ root }}/{{ pulumi_dir }} && pulumi destroy --stack {{ pulumi_stack }}"; \
+    else echo "Aborted."; fi
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECRETS MANAGEMENT
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Edit secrets (opens in $EDITOR)
+secrets-edit:
+    sops {{ secrets_file }}
+
+# Show decrypted secrets (careful!)
+secrets-show:
+    @echo "WARNING: This will show decrypted secrets!"
+    @read -p "Continue? (yes/no): " confirm; \
+    if [ "$$confirm" = "yes" ]; then sops -d {{ secrets_file }}; fi
+
+# Sync secrets to GitHub (one-time setup)
+secrets-sync-github:
+    @echo "Syncing secrets to GitHub..."
+    @sops exec-env {{ secrets_file }} 'gh secret set PULUMI_CONFIG_PASSPHRASE --body "$$pulumi_passphrase"'
+    @sops exec-env {{ secrets_file }} 'gh secret set TAILSCALE_AUTH --body "$$tailscale_auth"'
+    @sops exec-env {{ secrets_file }} 'gh secret set ANTHROPIC_API_KEY --body "$$anthropic_api_key"'
+    @sops exec-env {{ secrets_file }} 'gh secret set CACHIX_AUTH_TOKEN --body "$$cachix_auth_token"'
+    @echo "Secrets synced to GitHub repository."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# DATA MIGRATION
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Sync data from R2 to GCS (one-time migration)
+migrate-r2-to-gcs:
+    @echo "Syncing health data from R2 to GCS..."
+    @echo "Prerequisites: rclone configured with r2 and gcs remotes"
+    rclone sync r2:health-analysis-data gs:hank-systems-data/health --progress
+    @echo "Migration complete. Update DVC remote and test with 'dvc pull'."
