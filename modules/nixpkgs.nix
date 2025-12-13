@@ -103,20 +103,17 @@
       build-poll-interval = 1; # Check build status more frequently
     };
 
-    # Automatic garbage collection
-    # Runs weekly on Sundays at 3 AM, deletes paths older than 7 days
-    gc = {
+    # Automatic garbage collection and optimization
+    # Darwin: Managed by Determinate Nix installer (nix.enable = false)
+    # NixOS: Configured here and in modules/nixos/system.nix
+    gc = lib.mkIf pkgs.stdenv.isLinux {
       automatic = true;
-      interval = {
-        Weekday = 0;
-        Hour = 3;
-        Minute = 0;
-      };
-      options = "--delete-older-than 7d";
+      options = lib.mkDefault "--delete-older-than 7d";
     };
 
     # Automatic store optimization (hardlinks identical files)
-    optimise.automatic = true;
+    # Only on NixOS - Darwin uses Determinate Nix daemon
+    optimise.automatic = lib.mkIf pkgs.stdenv.isLinux true;
 
     # nixbuild.net distributed builder (x86_64-linux builds)
     # Enable with: modules.home.tools.nixbuild.enable = true (for SSH config)
