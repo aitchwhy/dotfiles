@@ -64,12 +64,13 @@ update:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 # Deploy with Colmena [--eval for dry-run, --all for all hosts]
+# Note: Use github:zhaofengli/colmena for version compatibility with makeHive
 colmena *FLAGS:
     @case "{{ FLAGS }}" in \
-        --eval|eval) nix run nixpkgs#colmena -- eval ;; \
-        --all|all) nix run nixpkgs#colmena -- apply --evaluator streaming ;; \
-        --plan|plan) nix run nixpkgs#colmena -- build --on {{ host }} ;; \
-        *) nix run nixpkgs#colmena -- apply --on {{ host }} --evaluator streaming {{ FLAGS }} ;; \
+        --eval|eval) nix run github:zhaofengli/colmena -- eval ;; \
+        --all|all) nix run github:zhaofengli/colmena -- apply --evaluator streaming ;; \
+        --plan|plan) nix run github:zhaofengli/colmena -- build --on {{ host }} ;; \
+        *) nix run github:zhaofengli/colmena -- apply --on {{ host }} --evaluator streaming {{ FLAGS }} ;; \
     esac
 
 # ═══════════════════════════════════════════════════════════════════════════════
