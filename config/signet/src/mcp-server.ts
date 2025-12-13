@@ -261,6 +261,224 @@ Example response:
 );
 
 // =============================================================================
+// sig-gc Tool (Nix Garbage Collection)
+// =============================================================================
+
+server.tool(
+  'sig-gc',
+  `Trigger Nix garbage collection manually.
+
+Cleans up old generations and optimizes the Nix store.
+
+Actions:
+- Deletes paths older than 7 days
+- Optimizes store (hardlinks identical files)
+
+Use when:
+- Disk space is low
+- After many darwin-rebuild cycles
+- Before major updates
+
+Returns: Space freed and generations removed.`,
+  {
+    dryRun: {
+      type: 'boolean',
+      description: 'Show what would be deleted without actually deleting (default: false)',
+    },
+  },
+  async ({ dryRun }: { dryRun?: boolean }) => {
+    const { exec } = await import('node:child_process');
+    const { promisify } = await import('node:util');
+    const execAsync = promisify(exec);
+
+    try {
+      const lines: string[] = [];
+
+      // Get current generation count
+      const { stdout: genBefore } = await execAsync(
+        'darwin-rebuild --list-generations 2>/dev/null | wc -l',
+        { timeout: 10000 }
+      );
+      const genCountBefore = parseInt(genBefore.trim(), 10) || 0;
+
+      // Get store size before (approximate)
+      const { stdout: sizeBefore } = await execAsync(
+        'df -h /nix/store | tail -1 | awk \'{print $3}\'',
+        { timeout: 10000 }
+      );
+
+      if (dryRun) {
+        lines.push('Dry run mode - showing what would be deleted:');
+        const { stdout: dryRunOutput } = await execAsync(
+          'nix-collect-garbage --delete-older-than 7d --dry-run 2>&1 | tail -20',
+          { timeout: 60000 }
+        );
+        lines.push(dryRunOutput.trim());
+      } else {
+        lines.push('Running garbage collection...');
+
+        // Run GC
+        const { stdout: gcOutput } = await execAsync(
+          'sudo nix-collect-garbage --delete-older-than 7d 2>&1 | tail -10',
+          { timeout: 120000 }
+        );
+        lines.push(gcOutput.trim());
+
+        // Optimize store
+        lines.push('');
+        lines.push('Optimizing store...');
+        await execAsync('nix store optimise 2>&1', { timeout: 120000 });
+        lines.push('Store optimized.');
+
+        // Get final stats
+        const { stdout: genAfter } = await execAsync(
+          'darwin-rebuild --list-generations 2>/dev/null | wc -l',
+          { timeout: 10000 }
+        );
+        const genCountAfter = parseInt(genAfter.trim(), 10) || 0;
+
+        const { stdout: sizeAfter } = await execAsync(
+          'df -h /nix/store | tail -1 | awk \'{print $3}\'',
+          { timeout: 10000 }
+        );
+
+        lines.push('');
+        lines.push(`Generations: ${genCountBefore} → ${genCountAfter} (${genCountBefore - genCountAfter} removed)`);
+        lines.push(`Store size: ${sizeBefore.trim()} → ${sizeAfter.trim()}`);
+      }
+
+      return {
+        content: [{ type: 'text' as const, text: lines.join('\n') }],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `GC failed: ${error instanceof Error ? error.message : String(error)}`,
+          },
+        ],
+      };
+    }
+  }
+);
+
+// =============================================================================
+// sig-metrics Tool (Hook Performance Metrics)
+// =============================================================================
+
+server.tool(
+  'sig-metrics',
+  `Show PARAGON hook performance metrics.
+
+Displays:
+- Total checks performed
+- Average latency by tool type
+- Block rate (blocked vs approved)
+- Slowest checks (>50ms)
+
+Use to:
+- Identify slow guards
+- Monitor enforcement effectiveness
+- Debug performance issues`,
+  {},
+  async () => {
+    const { readFile } = await import('node:fs/promises');
+    const { homedir } = await import('node:os');
+
+    try {
+      const metricsPath = `${homedir()}/.claude-metrics/perf.jsonl`;
+      const content = await readFile(metricsPath, 'utf-8').catch(() => '');
+
+      if (!content.trim()) {
+        return {
+          content: [
+            { type: 'text' as const, text: 'No metrics recorded yet. Run some Claude Code sessions first.' },
+          ],
+        };
+      }
+
+      const lines = content.trim().split('\n');
+      const metrics = lines.map((line) => {
+        try {
+          return JSON.parse(line);
+        } catch {
+          return null;
+        }
+      }).filter(Boolean);
+
+      if (metrics.length === 0) {
+        return {
+          content: [{ type: 'text' as const, text: 'No valid metrics found.' }],
+        };
+      }
+
+      // Analyze metrics
+      const totalChecks = metrics.length;
+      const blocked = metrics.filter((m) => m.result === 'block').length;
+      const approved = metrics.filter((m) => m.result === 'approve').length;
+
+      // Group by tool
+      const byTool: Record<string, { count: number; totalMs: number }> = {};
+      for (const m of metrics) {
+        const tool = m.tool || 'unknown';
+        if (!byTool[tool]) byTool[tool] = { count: 0, totalMs: 0 };
+        byTool[tool].count++;
+        byTool[tool].totalMs += m.duration_ms || 0;
+      }
+
+      // Find slow checks
+      const slowChecks = metrics
+        .filter((m) => (m.duration_ms || 0) > 50)
+        .sort((a, b) => (b.duration_ms || 0) - (a.duration_ms || 0))
+        .slice(0, 5);
+
+      // Build report
+      const report: string[] = [
+        'PARAGON Guard Performance Report',
+        '═════════════════════════════════',
+        '',
+        `Total checks: ${totalChecks}`,
+        '',
+        'Block rate:',
+        `  Blocked: ${blocked} (${((blocked / totalChecks) * 100).toFixed(1)}%)`,
+        `  Approved: ${approved} (${((approved / totalChecks) * 100).toFixed(1)}%)`,
+        '',
+        'Average latency by tool:',
+      ];
+
+      const sortedTools = Object.entries(byTool).sort((a, b) => b[1].count - a[1].count);
+      for (const [tool, stats] of sortedTools) {
+        const avgMs = (stats.totalMs / stats.count).toFixed(1);
+        report.push(`  ${tool}: ${avgMs}ms avg (${stats.count} checks)`);
+      }
+
+      if (slowChecks.length > 0) {
+        report.push('');
+        report.push('Slowest checks (>50ms):');
+        for (const check of slowChecks) {
+          const file = (check.file || '').slice(-40);
+          report.push(`  ${check.duration_ms}ms - ${check.tool} - ${file}`);
+        }
+      }
+
+      return {
+        content: [{ type: 'text' as const, text: report.join('\n') }],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Metrics retrieval failed: ${error instanceof Error ? error.message : String(error)}`,
+          },
+        ],
+      };
+    }
+  }
+);
+
+// =============================================================================
 // Start Server
 // =============================================================================
 
