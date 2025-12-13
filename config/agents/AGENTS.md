@@ -2,12 +2,28 @@
 
 Senior software engineer. macOS Apple Silicon, zsh, Nix Flakes.
 
+## PARAGON Enforcement
+
+All code changes are enforced by PARAGON (14 guards).
+Read `paragon` skill for full guard matrix.
+
+| Layer | Mechanism |
+|-------|-----------|
+| Claude | PreToolUse hooks (`paragon-guard.ts`) |
+| Git | pre-commit hooks (`git-hooks.nix`) |
+| CI | GitHub Actions (`paragon-check.yml`) |
+
+**Blocking guards**: bash safety, conventional commits, forbidden files/imports, any type, z.infer, no-mock, TDD, DevOps files/commands, assumption language
+
+**Advisory guards**: flake patterns, port registry, throw detector
+
 ## Protocol
 
 **Pull-based context** - dynamically read files, never rely on static dumps.
 
 | Need | Action |
 |------|--------|
+| **PARAGON guards** | Read `config/agents/skills/paragon/SKILL.md` |
 | Stack versions | Read `config/signet/src/stack/versions.ts` |
 | Stack rules | Read `config/agents/rules/stack.md` |
 | Pattern skills | Read `config/agents/skills/{skill}/SKILL.md` |
