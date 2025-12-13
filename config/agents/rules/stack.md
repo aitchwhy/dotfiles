@@ -72,8 +72,7 @@ mcp__signet__sig-migrate(path: ".", fix: true)
 ## Infrastructure
 
 - Nix Flakes + nix-darwin
-- Terranix -> OpenTofu
-- Pulumi (GCP)
+- Pulumi (GCP, TypeScript-native IaC)
 
 ## Core Principles
 
