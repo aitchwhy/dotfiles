@@ -25,7 +25,8 @@ default:
     echo "═══════════════════════════════════════════════════════════════"
     echo ""
     echo "Commands:"
-    echo "  just sync     (s)  The one command: fmt → lint → test → switch → gc"
+    echo "  just sync     (s)  Local: fmt → lint → test → switch → gc"
+    echo "  just full     (f)  Full: sync + cloud + data (the everything command)"
     echo "  just check    (c)  Quick validation without switching"
     echo "  just dev      (d)  Development shell with pre-commit"
     echo "  just info     (i)  System status and health"
@@ -52,6 +53,13 @@ sync: _preflight _fmt _lint _test
     @echo "✓ System synchronized"
 
 alias s := sync
+
+# Full sync: local + cloud + data [alias: f]
+full: sync _sync-cloud _sync-data
+    @echo ""
+    @echo "✓ Full sync complete (darwin + cloud + data)"
+
+alias f := full
 
 # Quick validation without switching [alias: c]
 check: _preflight
@@ -113,6 +121,21 @@ evolve *ARGS:
 # ═══════════════════════════════════════════════════════════════════════════════
 # HIDDEN HELPERS (prefixed with _ to hide from default listing)
 # ═══════════════════════════════════════════════════════════════════════════════
+
+# Sync secrets and deploy cloud infrastructure
+[private]
+_sync-cloud:
+    @echo ""
+    @echo "Syncing cloud infrastructure..."
+    @just cloud secrets-sync-github
+    @just cloud up
+
+# Sync DVC data to GCS
+[private]
+_sync-data:
+    @echo ""
+    @echo "Syncing data to GCS..."
+    @cd domains/health && uv run dvc push
 
 # Check for untracked nix/config files (flakes won't see them)
 [private]
