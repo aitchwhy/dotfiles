@@ -1,58 +1,62 @@
 #!/usr/bin/env bash
-# Session Stop Hook - Extracts learnings and triggers background grading
+# Session Stop Hook - Extracts learnings and triggers consolidation
 # Runs when Claude session ends
+# Input: JSON with transcript_path from Claude Code Stop hook
 set -euo pipefail
 
 DOTFILES="${DOTFILES:-$HOME/dotfiles}"
-METRICS="$DOTFILES/.claude-metrics"
+METRICS="$HOME/.claude-metrics"
 GRADE_SCRIPT="$DOTFILES/config/agents/evolution/grade.sh"
-EVOLUTION_CLI="$DOTFILES/config/agents/evolution/src/index.ts"
+LESSON_WRITER="$DOTFILES/config/agents/hooks/lesson-writer.ts"
+CONSOLIDATE="$DOTFILES/config/agents/evolution/consolidate.ts"
 
 mkdir -p "$METRICS"
 
-# Try to find session transcripts (fallback gracefully if not found)
-# Claude Code stores sessions in ~/.claude/projects/<project-hash>/
-SESSION_DIRS=(
-    "$HOME/.claude/projects"
-    "$HOME/.claude/sessions"
-)
-
-LATEST_SESSION=""
-for dir in "${SESSION_DIRS[@]}"; do
-    if [[ -d "$dir" ]]; then
-        # Find most recently modified .jsonl file in last 10 minutes
-        FOUND=$(find "$dir" -name "*.jsonl" -mmin -10 -type f 2>/dev/null | head -1)
-        if [[ -n "$FOUND" ]]; then
-            LATEST_SESSION="$FOUND"
-            break
-        fi
-    fi
-done
-
-# Extract insights if we found a session
-if [[ -n "$LATEST_SESSION" && -f "$LATEST_SESSION" ]]; then
-    # Look for patterns that indicate lessons/insights
-    PATTERNS="lesson|learned|remember|important|always|never|mistake|insight|note to self"
-
-    # Extract text from assistant messages, then filter for insight patterns
-    # FIX: jq first to extract text from valid JSONL, then grep for patterns
-    INSIGHTS=$(jq -r 'select(.type == "assistant") | .message.content // empty' "$LATEST_SESSION" 2>/dev/null |
-        grep -iE "$PATTERNS" |
-        head -3 || echo "")
-
-    # Save any insights found to SQLite via CLI
-    if [[ -n "$INSIGHTS" ]]; then
-        while IFS= read -r insight; do
-            if [[ -n "$insight" && ${#insight} -gt 10 ]]; then
-                bun run "$EVOLUTION_CLI" lesson add "$insight" --source session >/dev/null 2>&1 || true
-            fi
-        done <<< "$INSIGHTS"
-    fi
+# Parse JSON input from stdin
+INPUT=""
+if ! [ -t 0 ]; then
+  INPUT=$(cat)
 fi
 
-# Trigger graders in background (non-blocking)
+# Extract transcript_path from hook input
+TRANSCRIPT_PATH=""
+if [[ -n "$INPUT" ]]; then
+  TRANSCRIPT_PATH=$(echo "$INPUT" | jq -r '.transcript_path // empty' 2>/dev/null || true)
+fi
+
+# Fallback: find recent session files if no transcript_path provided
+if [[ -z "$TRANSCRIPT_PATH" || ! -f "$TRANSCRIPT_PATH" ]]; then
+  SESSION_DIRS=(
+    "$HOME/.claude/projects"
+    "$HOME/.claude/sessions"
+  )
+
+  for dir in "${SESSION_DIRS[@]}"; do
+    if [[ -d "$dir" ]]; then
+      # Find most recently modified .jsonl file in last 10 minutes
+      FOUND=$(find "$dir" -name "*.jsonl" -mmin -10 -type f 2>/dev/null | head -1)
+      if [[ -n "$FOUND" ]]; then
+        TRANSCRIPT_PATH="$FOUND"
+        break
+      fi
+    fi
+  done
+fi
+
+# Extract lessons from transcript
+if [[ -n "$TRANSCRIPT_PATH" && -f "$TRANSCRIPT_PATH" ]]; then
+  # Pass transcript path to lesson-writer
+  bun run "$LESSON_WRITER" "$TRANSCRIPT_PATH" 2>/dev/null || true
+fi
+
+# Run consolidation (dedup, decay, archive, git dump)
+if [[ -x "$CONSOLIDATE" || -f "$CONSOLIDATE" ]]; then
+  bun run "$CONSOLIDATE" >/dev/null 2>&1 || true
+fi
+
+# Trigger grading in background (non-blocking)
 if [[ -x "$GRADE_SCRIPT" ]]; then
-    nohup "$GRADE_SCRIPT" > "$METRICS/last-grade.log" 2>&1 &
+  nohup "$GRADE_SCRIPT" > "$METRICS/last-grade.log" 2>&1 &
 fi
 
 # Output valid JSON for Claude Code
