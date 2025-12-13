@@ -79,7 +79,7 @@ deploy: switch
 # Validate configuration without applying
 check: _preflight
     @echo "Running validation..."
-    nix fmt -- --check .
+    nix fmt -- --fail-on-change .
     nix flake check --no-build
     nix build .#darwinConfigurations.{{ host }}.system --no-link --print-out-paths > /dev/null
     @echo "✓ All checks passed"
