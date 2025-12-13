@@ -9,7 +9,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { Effect } from 'effect';
-import { sigGuardTool, sigMigrateTool, sigStackTool } from '@/tools';
+import { sigGuardTool, sigMigrateTool, sigParagonTool, sigStackTool } from '@/tools';
 import {
   ALL_TIERS,
   formatVerificationResult,
@@ -153,6 +153,17 @@ server.tool(
   sigMigrateTool.description,
   sigMigrateTool.params,
   sigMigrateTool.handler
+);
+
+// =============================================================================
+// sig-paragon Tool (PARAGON-branded alias for patterns tier)
+// =============================================================================
+
+server.tool(
+  sigParagonTool.name,
+  sigParagonTool.description,
+  sigParagonTool.params,
+  sigParagonTool.handler
 );
 
 // =============================================================================
