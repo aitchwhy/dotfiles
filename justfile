@@ -46,18 +46,20 @@ default:
 
 # Rebuild and switch local system configuration
 switch: _preflight _fmt _lint _test
-    @echo "Switching configuration..."
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "Switching configuration..."
     sudo darwin-rebuild switch --flake .#{{ host }}
-    @# Auto-GC if > 10 generations
-    @gen_count=$$(darwin-rebuild --list-generations 2>/dev/null | wc -l | tr -d ' '); \
-    if [ "$$gen_count" -gt 10 ]; then \
-        echo ""; \
-        echo "Auto-cleaning old generations ($$gen_count > 10)..."; \
-        sudo nix-collect-garbage --delete-older-than 7d; \
-        nix store optimise; \
+    # Auto-GC if > 10 generations (non-critical, don't fail on errors)
+    gen_count=$(sudo darwin-rebuild --list-generations 2>/dev/null | wc -l | tr -d ' ' || echo "0")
+    if [ "$gen_count" -gt 10 ]; then
+        echo ""
+        echo "Auto-cleaning old generations ($gen_count > 10)..."
+        sudo nix-collect-garbage --delete-older-than 7d || true
+        nix store optimise || true
     fi
-    @echo ""
-    @echo "✓ System switched"
+    echo ""
+    echo "✓ System switched"
 
 # Deploy everything: system + cloud infrastructure + data
 deploy: switch
@@ -74,7 +76,7 @@ deploy: switch
 # Validate configuration without applying
 check: _preflight
     @echo "Running validation..."
-    nix fmt -- --check
+    nix fmt -- --check .
     nix flake check --no-build
     nix build .#darwinConfigurations.{{ host }}.system --no-link --print-out-paths > /dev/null
     @echo "✓ All checks passed"
@@ -129,22 +131,24 @@ evolve *ARGS:
 # Check for untracked nix/config files
 [private]
 _preflight:
-    @untracked=$$(git ls-files --others --exclude-standard modules/ config/ | head -20); \
-    if [ -n "$$untracked" ]; then \
-        echo "Error: Untracked files in modules/ or config/:"; \
-        echo "$$untracked" | sed 's/^/  /'; \
-        echo ""; \
-        echo "Flakes only see tracked files. Run: git add <files>"; \
-        exit 1; \
+    #!/usr/bin/env bash
+    set -euo pipefail
+    untracked=$(git ls-files --others --exclude-standard modules/ config/ | head -20)
+    if [ -n "$untracked" ]; then
+        echo "Error: Untracked files in modules/ or config/:"
+        echo "$untracked" | sed 's/^/  /'
+        echo ""
+        echo "Flakes only see tracked files. Run: git add <files>"
+        exit 1
     fi
 
 [private]
 _fmt:
-    @nix fmt
+    @nix fmt .
 
 [private]
 _lint:
-    @nix fmt -- --check
+    @nix fmt -- --check .
     @nix flake check --no-build
 
 [private]
