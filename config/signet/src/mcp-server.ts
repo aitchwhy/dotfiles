@@ -9,6 +9,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { Effect } from 'effect';
+import { sigGuardTool, sigMigrateTool, sigStackTool } from '@/tools';
 import {
   ALL_TIERS,
   formatVerificationResult,
@@ -129,6 +130,29 @@ Exit codes:
       ],
     };
   }
+);
+
+// =============================================================================
+// sig-stack Tool
+// =============================================================================
+
+server.tool(sigStackTool.name, sigStackTool.description, sigStackTool.params, sigStackTool.handler);
+
+// =============================================================================
+// sig-guard Tool
+// =============================================================================
+
+server.tool(sigGuardTool.name, sigGuardTool.description, sigGuardTool.params, sigGuardTool.handler);
+
+// =============================================================================
+// sig-migrate Tool
+// =============================================================================
+
+server.tool(
+  sigMigrateTool.name,
+  sigMigrateTool.description,
+  sigMigrateTool.params,
+  sigMigrateTool.handler
 );
 
 // =============================================================================
