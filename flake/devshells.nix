@@ -36,20 +36,23 @@
         '';
 
         # Packages available in the shell
-        packages = with pkgs; [
-          nixd
-          nixfmt-rfc-style
-          deadnix
-          statix
-          just
-          git
-          fd
-          nix-tree
-          nix-diff
-          nix-output-monitor
-          biome
-          bun
-        ];
+        packages =
+          (with pkgs; [
+            nixd
+            nixfmt-rfc-style
+            deadnix
+            statix
+            just
+            git
+            fd
+            nix-tree
+            nix-diff
+            nix-output-monitor
+            biome
+            bun
+          ])
+          # Include pre-commit hook tools in PATH for manual use
+          ++ config.pre-commit.settings.enabledPackages;
       };
     };
 }
