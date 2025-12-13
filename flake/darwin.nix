@@ -21,6 +21,8 @@
 
         # User configuration
         {
+          # nix-darwin state version for reproducibility
+          system.stateVersion = 5;
           system.primaryUser = "hank";
           users.users.hank = {
             uid = 501;
