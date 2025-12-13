@@ -199,7 +199,7 @@ Example response:
 
     try {
       const { stdout } = await execAsync(
-        'bash ~/dotfiles/config/agents/evolution/evolve.sh json',
+        'bash ~/dotfiles/config/agents/evolution/evolve.sh --json',
         { timeout: 30000 }
       );
 
@@ -211,6 +211,14 @@ Example response:
         `Trend: ${result.trend}`,
       ];
 
+      if (result.week) {
+        lines.push(`This Week: ${result.week.sessions} sessions, ${result.week.lessons} lessons, ${result.week.avg_score}% avg`);
+      }
+
+      if (result.memory) {
+        lines.push(`Memory: ${result.memory.active} active, ${result.memory.archived} archived`);
+      }
+
       if (result.alert_count > 0) {
         lines.push(`Alerts: ${result.alert_count}`);
       }
@@ -220,6 +228,14 @@ Example response:
         lines.push('Action Items:');
         for (const item of result.action_items) {
           lines.push(`  - ${item}`);
+        }
+      }
+
+      if (result.lessons && result.lessons.length > 0) {
+        lines.push('');
+        lines.push('Recent Lessons:');
+        for (const lesson of result.lessons.slice(0, 3)) {
+          lines.push(`  [${lesson.category}] ${lesson.text.slice(0, 60)}...`);
         }
       }
 
