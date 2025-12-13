@@ -1,5 +1,0 @@
-config:
-  gcp:project: cloud-infra-480717
-  gcp:region: us-central1
-  gcp:zone: us-central1-a
-encryptionsalt: v1:HVE2kkL6HJs=:v1:LSLdKL9rA9l+nmDy:iErrEY/hDceonQ+DkRMqvx8jtXvqdg==

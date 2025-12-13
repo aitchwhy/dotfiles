@@ -1,3 +1,0 @@
-name: dotfiles-gcp
-runtime: nodejs
-description: GCP infrastructure for cloud-nixos VM (migrated from Terranix)

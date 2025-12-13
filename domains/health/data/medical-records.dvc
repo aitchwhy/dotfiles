@@ -1,0 +1,6 @@
+outs:
+- md5: abfc8b5937e3f096d792d6637688d74e.dir
+  size: 39083671
+  nfiles: 110
+  hash: md5
+  path: medical-records

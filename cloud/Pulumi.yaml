@@ -1,0 +1,3 @@
+name: cloud
+runtime: nodejs
+description: Unified GCP infrastructure - VM, storage, secrets (100% IaC)
