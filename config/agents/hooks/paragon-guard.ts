@@ -25,6 +25,37 @@
  */
 
 import { z } from 'zod';
+import { appendFileSync, mkdirSync, existsSync } from 'fs';
+import { homedir } from 'os';
+import { join } from 'path';
+
+// ============================================================================
+// Performance Metrics
+// ============================================================================
+
+type PerfMetric = {
+  readonly timestamp: string;
+  readonly hook: 'paragon-guard';
+  readonly tool: string;
+  readonly file: string;
+  readonly duration_ms: number;
+  readonly result: 'approve' | 'block';
+  readonly guards_checked: number;
+};
+
+const METRICS_DIR = join(homedir(), '.claude-metrics');
+const PERF_LOG = join(METRICS_DIR, 'perf.jsonl');
+
+function logPerf(metric: PerfMetric): void {
+  try {
+    if (!existsSync(METRICS_DIR)) {
+      mkdirSync(METRICS_DIR, { recursive: true });
+    }
+    appendFileSync(PERF_LOG, JSON.stringify(metric) + '\n');
+  } catch {
+    // Fail silently - don't block on metrics
+  }
+}
 
 // ============================================================================
 // Input Types (TypeScript first, schema satisfies type)
@@ -262,10 +293,37 @@ const FORBIDDEN_IMPORTS: ForbiddenImport[] = [
   },
 ];
 
+// ============================================================================
+// Content Preprocessing Cache
+// ============================================================================
+
+// Cache preprocessed content to avoid repeated processing
+const contentCache = new Map<string, { stripped: string; strippedWithStrings: string }>();
+
+function getPreprocessedContent(content: string): { stripped: string; strippedWithStrings: string } {
+  const cached = contentCache.get(content);
+  if (cached) return cached;
+
+  const stripped = content.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
+  const strippedWithStrings = stripped
+    .replace(/'(?:[^'\\]|\\.)*'/g, "''")
+    .replace(/"(?:[^"\\]|\\.)*"/g, '""')
+    .replace(/`(?:[^`\\]|\\.)*`/g, '``');
+
+  const result = { stripped, strippedWithStrings };
+  contentCache.set(content, result);
+
+  // Limit cache size to prevent memory growth
+  if (contentCache.size > 10) {
+    const firstKey = contentCache.keys().next().value;
+    if (firstKey) contentCache.delete(firstKey);
+  }
+
+  return result;
+}
+
 function stripComments(code: string): string {
-  code = code.replace(/\/\/.*$/gm, '');
-  code = code.replace(/\/\*[\s\S]*?\*\//g, '');
-  return code;
+  return getPreprocessedContent(code).stripped;
 }
 
 function checkForbiddenImports(content: string, filePath: string): string | null {
@@ -305,12 +363,7 @@ const ANY_TYPE_PATTERNS = [
 ];
 
 function stripCommentsAndStrings(code: string): string {
-  code = code.replace(/\/\/.*$/gm, '');
-  code = code.replace(/\/\*[\s\S]*?\*\//g, '');
-  code = code.replace(/'(?:[^'\\]|\\.)*'/g, "''");
-  code = code.replace(/"(?:[^"\\]|\\.)*"/g, '""');
-  code = code.replace(/`(?:[^`\\]|\\.)*`/g, '``');
-  return code;
+  return getPreprocessedContent(code).strippedWithStrings;
 }
 
 function checkAnyType(content: string, filePath: string): string | null {
@@ -805,19 +858,17 @@ See: verification-first skill for evidence patterns.`;
 }
 
 // ============================================================================
-// 14. THROW DETECTOR (Advisory)
+// 14. THROW DETECTOR (BLOCKING - Promoted from Advisory)
 // ============================================================================
 
 const THROW_PATTERNS = [/\bthrow\s+new\s+(Error|\w+Error)\s*\(/];
 
-const INVARIANT_CONTEXTS = [/invariant/i, /unreachable/i, /assert/i, /exhaustive/i, /impossible/i];
+const INVARIANT_CONTEXTS = [/invariant/i, /unreachable/i, /assert/i, /exhaustive/i, /impossible/i, /never/i, /panic/i];
 
-function checkThrowPatterns(content: string, filePath: string): string[] {
-  const warnings: string[] = [];
-
-  if (!/\.tsx?$/.test(filePath)) return warnings;
-  if (filePath.endsWith('.d.ts')) return warnings;
-  if (filePath.includes('/node_modules/')) return warnings;
+function checkThrowPatterns(content: string, filePath: string): string | null {
+  if (!/\.tsx?$/.test(filePath)) return null;
+  if (filePath.endsWith('.d.ts')) return null;
+  if (filePath.includes('/node_modules/')) return null;
 
   const lines = content.split('\n');
 
@@ -832,11 +883,27 @@ function checkThrowPatterns(content: string, filePath: string): string[] {
 
     const isInvariant = INVARIANT_CONTEXTS.some((p) => p.test(context));
     if (!isInvariant) {
-      warnings.push(`Line ${i + 1}: Consider Result/Effect for expected errors. throw is for invariants only.`);
+      return `THROW VIOLATION: throw statement detected (line ${i + 1})
+
+Use Result types or Effect for expected failures:
+
+  // ❌ BLOCKED - throw for expected errors
+  if (!user) throw new Error("User not found");
+
+  // ✅ CORRECT - Result type
+  if (!user) return Err(notFound("User"));
+
+  // ✅ CORRECT - Effect
+  if (!user) return Effect.fail(new UserNotFoundError({ id }));
+
+  // ✅ ALLOWED - Invariant contexts (exhaustive, unreachable, assert)
+  throw new Error("unreachable: exhaustive switch");
+
+See: result-patterns or effect-ts-patterns skill for error handling.`;
     }
   }
 
-  return warnings;
+  return null;
 }
 
 // ============================================================================
@@ -844,6 +911,10 @@ function checkThrowPatterns(content: string, filePath: string): string[] {
 // ============================================================================
 
 async function main(): Promise<void> {
+  const startTime = performance.now();
+  let guardsChecked = 0;
+  let result: 'approve' | 'block' = 'approve';
+
   let rawInput: string;
   try {
     rawInput = await Bun.stdin.text();
@@ -865,26 +936,47 @@ async function main(): Promise<void> {
   const content = tool_input.content || tool_input.new_string || '';
   const command = tool_input.command || '';
 
+  // Track and log performance on exit
+  const logAndExit = (decision: 'approve' | 'block') => {
+    result = decision;
+    const duration = performance.now() - startTime;
+    logPerf({
+      timestamp: new Date().toISOString(),
+      hook: 'paragon-guard',
+      tool: tool_name,
+      file: filePath || command.substring(0, 50),
+      duration_ms: Math.round(duration * 100) / 100,
+      result,
+      guards_checked: guardsChecked,
+    });
+  };
+
   // ─────────────────────────────────────────────────────────────────────────
   // 1. BASH SAFETY (for Bash commands)
   // ─────────────────────────────────────────────────────────────────────────
   if (tool_name === 'Bash' && command) {
+    guardsChecked++;
     const bashError = checkBashSafety(command);
     if (bashError) {
+      logAndExit('block');
       block(bashError);
       return;
     }
 
     // Check conventional commit
+    guardsChecked++;
     const commitError = checkConventionalCommit(command);
     if (commitError) {
+      logAndExit('block');
       block(commitError);
       return;
     }
 
     // Check DevOps commands (Guard 10)
+    guardsChecked++;
     const devOpsError = checkDevOpsCommands(command);
     if (devOpsError) {
+      logAndExit('block');
       block(devOpsError);
       return;
     }
@@ -894,8 +986,10 @@ async function main(): Promise<void> {
   // 2. FORBIDDEN FILES (for Write commands)
   // ─────────────────────────────────────────────────────────────────────────
   if (tool_name === 'Write' && filePath) {
+    guardsChecked++;
     const fileError = checkForbiddenFiles(filePath);
     if (fileError) {
+      logAndExit('block');
       block(fileError);
       return;
     }
@@ -905,8 +999,10 @@ async function main(): Promise<void> {
   // 3. FORBIDDEN IMPORTS (for Write/Edit on TS/JS)
   // ─────────────────────────────────────────────────────────────────────────
   if ((tool_name === 'Write' || tool_name === 'Edit') && content && filePath) {
+    guardsChecked++;
     const importError = checkForbiddenImports(content, filePath);
     if (importError) {
+      logAndExit('block');
       block(importError);
       return;
     }
@@ -916,8 +1012,10 @@ async function main(): Promise<void> {
   // 4. ANY TYPE DETECTOR (for Write/Edit on TypeScript)
   // ─────────────────────────────────────────────────────────────────────────
   if ((tool_name === 'Write' || tool_name === 'Edit') && content && filePath) {
+    guardsChecked++;
     const anyError = checkAnyType(content, filePath);
     if (anyError) {
+      logAndExit('block');
       block(anyError);
       return;
     }
@@ -927,8 +1025,10 @@ async function main(): Promise<void> {
   // 5. Z.INFER DETECTOR (for Write/Edit on TypeScript)
   // ─────────────────────────────────────────────────────────────────────────
   if ((tool_name === 'Write' || tool_name === 'Edit') && content && filePath) {
+    guardsChecked++;
     const zodError = checkZodInfer(content, filePath);
     if (zodError) {
+      logAndExit('block');
       block(zodError);
       return;
     }
@@ -938,8 +1038,10 @@ async function main(): Promise<void> {
   // 6. NO-MOCK ENFORCER (for Write/Edit on TS/JS)
   // ─────────────────────────────────────────────────────────────────────────
   if ((tool_name === 'Write' || tool_name === 'Edit') && content && filePath) {
+    guardsChecked++;
     const mockError = checkNoMocks(content, filePath);
     if (mockError) {
+      logAndExit('block');
       block(mockError);
       return;
     }
@@ -949,8 +1051,10 @@ async function main(): Promise<void> {
   // 8. TDD ENFORCER (for Write/Edit/MultiEdit on source files)
   // ─────────────────────────────────────────────────────────────────────────
   if (['Write', 'Edit', 'MultiEdit'].includes(tool_name) && filePath) {
+    guardsChecked++;
     const tddError = await checkTDD(filePath);
     if (tddError) {
+      logAndExit('block');
       block(tddError);
       return;
     }
@@ -962,6 +1066,7 @@ async function main(): Promise<void> {
   const advisoryWarnings: string[] = [];
 
   if ((tool_name === 'Write' || tool_name === 'Edit') && content && filePath) {
+    guardsChecked++;
     const flakeWarnings = checkFlakePatterns(content, filePath);
     advisoryWarnings.push(...flakeWarnings);
   }
@@ -970,6 +1075,7 @@ async function main(): Promise<void> {
   // 12. PORT REGISTRY (Advisory - for Write/Edit on modules/*.nix)
   // ─────────────────────────────────────────────────────────────────────────
   if ((tool_name === 'Write' || tool_name === 'Edit') && content && filePath) {
+    guardsChecked++;
     const portWarnings = checkPortRegistry(content, filePath);
     advisoryWarnings.push(...portWarnings);
   }
@@ -978,22 +1084,30 @@ async function main(): Promise<void> {
   // 13. ASSUMPTION LANGUAGE (Blocking - for Write/Edit on TS/JS)
   // ─────────────────────────────────────────────────────────────────────────
   if ((tool_name === 'Write' || tool_name === 'Edit') && content && filePath) {
+    guardsChecked++;
     const assumptionError = checkAssumptionLanguage(content, filePath);
     if (assumptionError) {
+      logAndExit('block');
       block(assumptionError);
       return;
     }
   }
 
   // ─────────────────────────────────────────────────────────────────────────
-  // 14. THROW DETECTOR (Advisory - for Write/Edit on TypeScript)
+  // 14. THROW DETECTOR (BLOCKING - for Write/Edit on TypeScript)
   // ─────────────────────────────────────────────────────────────────────────
   if ((tool_name === 'Write' || tool_name === 'Edit') && content && filePath) {
-    const throwWarnings = checkThrowPatterns(content, filePath);
-    advisoryWarnings.push(...throwWarnings);
+    guardsChecked++;
+    const throwError = checkThrowPatterns(content, filePath);
+    if (throwError) {
+      logAndExit('block');
+      block(throwError);
+      return;
+    }
   }
 
-  // All checks passed - include advisory warnings if any
+  // All checks passed - log performance and include advisory warnings if any
+  logAndExit('approve');
   if (advisoryWarnings.length > 0) {
     console.log(JSON.stringify({ decision: 'approve', reason: advisoryWarnings.join(' | ') }));
   } else {

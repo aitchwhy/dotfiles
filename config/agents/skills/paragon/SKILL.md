@@ -20,7 +20,7 @@ PARAGON is the unified enforcement layer ensuring all code changes comply with e
 
 ## Guard Matrix (14 Guards)
 
-### Blocking Guards (11)
+### Blocking Guards (12)
 
 | # | Guard | Trigger | Blocks |
 |---|-------|---------|--------|
@@ -35,14 +35,14 @@ PARAGON is the unified enforcement layer ensuring all code changes comply with e
 | 9 | DevOps Files | Write | Dockerfile, docker-compose.yml, .dockerignore |
 | 10 | DevOps Commands | Bash | docker-compose up, docker build, npm run dev |
 | 13 | Assumption Language | Write/Edit TS | "should work", "probably", "I think", "might" |
+| 14 | Throw Detector | Write/Edit TS | `throw` for expected errors (invariants allowed) |
 
-### Advisory Guards (3)
+### Advisory Guards (2)
 
 | # | Guard | Trigger | Warns |
 |---|-------|---------|-------|
 | 11 | Flake Patterns | Write flake.nix | Missing flake-parts, forAllSystems |
 | 12 | Port Registry | Write modules/*.nix | Undeclared ports |
-| 14 | Throw Detector | Write/Edit TS | `throw` for expected errors |
 
 ## Verification-First Philosophy
 

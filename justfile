@@ -426,3 +426,37 @@ nix-bench:
 nix-sizes:
     @echo "Closure sizes (largest first):"
     nix path-info -rsSh .#api 2>/dev/null | sort -k2 -h | tail -15 || echo "Build .#api first"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# PERFORMANCE METRICS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Show hook performance report
+perf-report:
+    @echo "PARAGON Guard Performance Report"
+    @echo "================================="
+    @if [ ! -f ~/.claude-metrics/perf.jsonl ]; then \
+        echo "No metrics yet. Run some Claude Code sessions first."; \
+        exit 0; \
+    fi
+    @echo ""
+    @echo "Total checks: $(wc -l < ~/.claude-metrics/perf.jsonl | tr -d ' ')"
+    @echo ""
+    @echo "Average latency by tool:"
+    @cat ~/.claude-metrics/perf.jsonl | jq -s 'group_by(.tool) | map({tool: .[0].tool, count: length, avg_ms: ([.[].duration_ms] | add / length | . * 100 | round / 100)}) | sort_by(.count) | reverse | .[]' 2>/dev/null || echo "  (jq required for detailed analysis)"
+    @echo ""
+    @echo "Block rate:"
+    @echo "  Blocked: $(grep -c '"result":"block"' ~/.claude-metrics/perf.jsonl 2>/dev/null || echo 0)"
+    @echo "  Approved: $(grep -c '"result":"approve"' ~/.claude-metrics/perf.jsonl 2>/dev/null || echo 0)"
+    @echo ""
+    @echo "Slowest checks (>50ms):"
+    @cat ~/.claude-metrics/perf.jsonl | jq -s '[.[] | select(.duration_ms > 50)] | sort_by(.duration_ms) | reverse | .[:10] | .[] | "\(.duration_ms)ms - \(.tool) - \(.file[:40])"' -r 2>/dev/null || echo "  (jq required)"
+
+# Clear performance metrics
+perf-clear:
+    @rm -f ~/.claude-metrics/perf.jsonl
+    @echo "Performance metrics cleared"
+
+# Show recent performance (last 50)
+perf-recent:
+    @tail -50 ~/.claude-metrics/perf.jsonl 2>/dev/null | jq '.' 2>/dev/null || echo "No recent metrics or jq not available"
