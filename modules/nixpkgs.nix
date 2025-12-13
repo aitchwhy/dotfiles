@@ -103,6 +103,21 @@
       build-poll-interval = 1; # Check build status more frequently
     };
 
+    # Automatic garbage collection
+    # Runs weekly on Sundays at 3 AM, deletes paths older than 7 days
+    gc = {
+      automatic = true;
+      interval = {
+        Weekday = 0;
+        Hour = 3;
+        Minute = 0;
+      };
+      options = "--delete-older-than 7d";
+    };
+
+    # Automatic store optimization (hardlinks identical files)
+    optimise.automatic = true;
+
     # nixbuild.net distributed builder (x86_64-linux builds)
     # Enable with: modules.home.tools.nixbuild.enable = true (for SSH config)
     # Requires NIXBUILD_TOKEN secret in GitHub Actions
