@@ -257,7 +257,8 @@ cache-push-nixos:
 # SELF-EVOLUTION (unified command)
 # ═══════════════════════════════════════════════════════════════════════════════
 
-# Evolution system: just evolve [report|lesson|history|json]
+# Evolution system: unified dashboard with automatic learning
+# Usage: just evolve [--json]
 evolve *ARGS:
     @bash config/agents/evolution/evolve.sh {{ ARGS }}
 
