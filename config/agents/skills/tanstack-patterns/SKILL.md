@@ -2,6 +2,7 @@
 name: tanstack-patterns
 description: TanStack Router and Query patterns including file-based routing, data fetching, and optimistic updates. Use when working with React frontends.
 allowed-tools: Read, Write
+token-budget: 400
 ---
 
 ## File-Based Routing

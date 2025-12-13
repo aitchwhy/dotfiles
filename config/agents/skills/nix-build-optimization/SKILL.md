@@ -3,6 +3,7 @@ name: nix-build-optimization
 description: Fundamental knowledge of Nix builds, Cachix, derivation splitting, nix2container, and CI/CD optimization. Use for ANY TypeScript/Nix project.
 allowed-tools: Read, Write, Edit, Bash, Grep
 globs: ["**/flake.nix", "**/flake.lock", "**/*.nix", ".github/workflows/*.yml"]
+token-budget: 1300
 ---
 
 # Nix Build Optimization (December 2025)

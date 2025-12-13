@@ -2,6 +2,7 @@
 name: hono-workers
 description: Hono on Cloudflare Workers patterns including environment access, typed bindings, and middleware. Use when working with Hono APIs on Workers.
 allowed-tools: Read, Write
+token-budget: 400
 ---
 
 ## Environment Access

@@ -2,6 +2,7 @@
 name: devops-patterns
 description: Nix-first DevOps - process-compose for local dev, Nix builds, nix2container for deployment. This is THE way.
 allowed-tools: Read, Write, Edit, Bash
+token-budget: 1000
 ---
 
 # Nix-First DevOps

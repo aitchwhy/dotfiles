@@ -2,6 +2,7 @@
 name: typespec-patterns
 description: TypeSpec API-first patterns. TypeSpec to OpenAPI to TypeScript codegen pipeline.
 allowed-tools: Read, Write, Edit, Bash
+token-budget: 1800
 ---
 
 ## Philosophy: API-First Design

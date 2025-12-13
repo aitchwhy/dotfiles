@@ -2,6 +2,7 @@
 name: nix-infrastructure
 description: Production-grade Nix infrastructure patterns. Port registry, process-compose-flake, nix2container, CI/CD with GHA + Cachix + Colmena.
 allowed-tools: Read, Write, Edit, Bash, Grep
+token-budget: 1500
 ---
 
 # Nix Infrastructure Patterns (December 2025)

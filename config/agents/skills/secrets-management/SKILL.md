@@ -2,6 +2,7 @@
 name: secrets-management
 description: sops-nix patterns for encrypted secrets in nix-darwin and NixOS.
 allowed-tools: Read, Write, Edit, Bash
+token-budget: 1300
 ---
 
 # Secrets Management (sops-nix)

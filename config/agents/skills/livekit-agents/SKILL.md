@@ -2,6 +2,7 @@
 name: livekit-agents
 description: LiveKit Agents patterns for Python voice agents including STT/TTS integration and async patterns. Use when working on the voice agent.
 allowed-tools: Read, Write, Bash(python:*), Bash(uv:*)
+token-budget: 400
 ---
 
 ## Agent Structure

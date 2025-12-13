@@ -2,6 +2,7 @@
 name: state-machine-patterns
 description: XState v5 patterns for finite state machines, actors, and React integration.
 allowed-tools: Read, Write, Edit
+token-budget: 2000
 ---
 
 # State Machine Patterns (XState v5)

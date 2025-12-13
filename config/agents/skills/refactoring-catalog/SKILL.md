@@ -2,6 +2,7 @@
 name: refactoring-catalog
 description: Fowler's refactoring patterns with mechanical transformation steps. Use when restructuring code without changing behavior.
 allowed-tools: Read, Write, Edit, Grep, Glob
+token-budget: 1700
 ---
 
 ## Refactoring Philosophy

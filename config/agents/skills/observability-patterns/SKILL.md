@@ -2,6 +2,7 @@
 name: observability-patterns
 description: Datadog + OpenTelemetry SDK 2.x patterns for traces, metrics, logs. PostHog for analytics. DevCycle for feature flags.
 allowed-tools: Read, Write, Edit
+token-budget: 1300
 ---
 
 # Observability Patterns (December 2025)

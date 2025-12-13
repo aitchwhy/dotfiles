@@ -2,6 +2,7 @@
 name: formal-verification
 description: Formal contract generation and verification patterns. Preconditions, postconditions, invariants, and property-based testing.
 allowed-tools: Read, Write, Edit, Bash
+token-budget: 1500
 ---
 
 ## Philosophy: Prove Before Ship

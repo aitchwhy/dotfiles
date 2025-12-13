@@ -2,6 +2,7 @@
 name: context7-mcp
 description: Context7 MCP server for fetching up-to-date library documentation.
 allowed-tools: mcp__context7__*
+token-budget: 500
 ---
 
 # Context7 MCP Server (37.1k stars)

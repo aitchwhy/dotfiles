@@ -2,6 +2,7 @@
 name: zod-patterns
 description: TypeScript-first Zod patterns. TS types are source of truth. Never use z.infer. Use satisfies z.ZodType<T>.
 allowed-tools: Read, Write, Edit
+token-budget: 1500
 ---
 
 ## Philosophy: TypeScript Types as Source of Truth

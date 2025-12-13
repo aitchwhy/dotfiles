@@ -2,6 +2,7 @@
 name: semantic-codebase
 description: Patterns for understanding and navigating codebases semantically. Dependency graphs, semantic search, project-specific context.
 allowed-tools: Read, Bash, Grep, Glob
+token-budget: 1200
 ---
 
 ## Codebase Navigation Philosophy

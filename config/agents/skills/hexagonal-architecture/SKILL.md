@@ -3,6 +3,7 @@ name: hexagonal-architecture
 description: No-mock testing with service containers. Ports & Adapters for infrastructure isolation.
 globs: ["**/ports/**", "**/adapters/**", "**/*.test.ts", "**/*.spec.ts", "**/factory.ts"]
 alwaysApply: false
+token-budget: 1500
 ---
 
 # Hexagonal Architecture Testing Strategy

@@ -2,6 +2,7 @@
 name: paragon
 description: PARAGON Enforcement System - 14 guards for code quality, stack compliance, and evidence-based development.
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
+token-budget: 600
 ---
 
 # PARAGON Enforcement System

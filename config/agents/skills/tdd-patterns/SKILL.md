@@ -2,6 +2,7 @@
 name: tdd-patterns
 description: Test-Driven Development patterns for Bun test runner. Red-Green-Refactor. E2E to Integration to Unit hierarchy.
 allowed-tools: Read, Write, Edit, Bash
+token-budget: 400
 ---
 
 ## Testing Hierarchy

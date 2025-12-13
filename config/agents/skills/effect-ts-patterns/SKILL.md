@@ -2,6 +2,7 @@
 name: effect-ts-patterns
 description: Effect-TS patterns for typed effects, errors, and dependencies. Effect<A,E,R> type system, Layers, Services.
 allowed-tools: Read, Write, Edit
+token-budget: 1500
 ---
 
 ## Philosophy: Make Effects Explicit

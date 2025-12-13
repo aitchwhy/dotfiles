@@ -2,6 +2,7 @@
 name: signet-patterns
 description: Patterns for using Signet to generate formally consistent software systems with hexagonal architecture.
 allowed-tools: Read, Write, Edit, Bash
+token-budget: 800
 ---
 
 ## Signet CLI
