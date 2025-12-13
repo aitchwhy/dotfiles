@@ -16,12 +16,23 @@ Senior software engineer. macOS Apple Silicon, zsh, Nix Flakes.
 
 ## Available Skills
 
+### Nix Build Skills (Critical for TypeScript/Nix projects)
+
+| Skill | Purpose |
+|-------|---------|
+| `nix-build-optimization` | **Critical** - Derivation splitting, Cachix, CI/CD |
+| `nix-infrastructure` | Port registry, nix2container, deployment |
+| `nix-flake-parts` | Modular flake composition |
+| `nix-darwin-patterns` | macOS system configuration |
+
+**Rule**: Before ANY Nix changes to TypeScript projects, read `nix-build-optimization`.
+
 ### Pattern Skills
 typescript-patterns, zod-patterns, effect-ts-patterns, result-patterns,
 tdd-patterns, clean-code, verification-first, hexagonal-architecture,
-devops-patterns, nix-darwin-patterns, nix-flake-parts, typespec-patterns,
-hono-workers, tanstack-patterns, signet-patterns, commit-patterns,
-planning-patterns, observability-patterns, refactoring-catalog,
+devops-patterns, nix-darwin-patterns, nix-flake-parts, nix-build-optimization,
+typespec-patterns, hono-workers, tanstack-patterns, signet-patterns,
+commit-patterns, planning-patterns, observability-patterns, refactoring-catalog,
 formal-verification, semantic-codebase, repomix-patterns, livekit-agents
 
 ### MCP Reference Skills
