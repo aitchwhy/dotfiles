@@ -1,17 +1,18 @@
 # Colmena deployment configuration
 # Docs: https://colmena.cli.rs/unstable/
 #
-# Usage:
-#   nix run nixpkgs#colmena -- apply --on cloud
-#   nix run nixpkgs#colmena -- eval
-#   nix run nixpkgs#colmena -- apply --on cloud --evaluator streaming
+# Usage (use colmena from flake input, not nixpkgs - version compatibility):
+#   nix run github:zhaofengli/colmena -- apply --on cloud
+#   nix run github:zhaofengli/colmena -- eval
+#   nix run github:zhaofengli/colmena -- apply --on cloud --evaluator streaming
 {
   self,
   inputs,
   ...
 }:
 {
-  flake.colmena = {
+  # Use colmena.lib.makeHive for proper flake integration (silences "unknown output" warning)
+  flake.colmenaHive = inputs.colmena.lib.makeHive {
     meta = {
       # Use nixpkgs from flake for consistency
       nixpkgs = import inputs.nixpkgs {
