@@ -479,6 +479,205 @@ Use to:
 );
 
 // =============================================================================
+// sig-claims Tool (Verification Claims)
+// =============================================================================
+
+server.tool(
+  'sig-claims',
+  `Query and manage verification claims from sessions.
+
+Claims are statements made during coding that require evidence.
+The verification gate blocks session completion if pending claims exist.
+
+Actions:
+- list: Show all pending claims (default)
+- verify <id>: Mark claim as verified
+- reject <id>: Mark claim as invalid/rejected
+- history: Show recent claim activity
+
+Use to:
+- Review pending claims before session end
+- Verify claims with test evidence
+- Track verification patterns`,
+  {
+    action: {
+      type: 'string',
+      description: 'Action: list (default), verify, reject, or history',
+    },
+    id: {
+      type: 'number',
+      description: 'Claim ID (required for verify/reject)',
+    },
+    evidence: {
+      type: 'string',
+      description: 'Evidence for verification (test file, output, etc.)',
+    },
+  },
+  async ({
+    action,
+    id,
+    evidence,
+  }: {
+    action?: string;
+    id?: number;
+    evidence?: string;
+  }) => {
+    const { existsSync } = await import('node:fs');
+    const { Database } = await import('bun:sqlite');
+
+    const DB_PATH = `${process.env['HOME']}/.claude-metrics/evolution.db`;
+
+    if (!existsSync(DB_PATH)) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: 'No claims database found. Claims are recorded during sessions.',
+          },
+        ],
+      };
+    }
+
+    try {
+      const db = new Database(DB_PATH);
+
+      // Ensure table exists
+      const tableCheck = db
+        .query("SELECT name FROM sqlite_master WHERE type='table' AND name='verification_claims'")
+        .get();
+
+      if (!tableCheck) {
+        db.close();
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: 'No claims table found. Claims are recorded during sessions.',
+            },
+          ],
+        };
+      }
+
+      const selectedAction = action || 'list';
+      const lines: string[] = [];
+
+      switch (selectedAction) {
+        case 'list': {
+          const claims = db
+            .query(
+              `SELECT id, claim_text, claim_type, session_id, created_at
+               FROM verification_claims
+               WHERE verification_status = 'pending'
+               ORDER BY created_at DESC
+               LIMIT 20`
+            )
+            .all() as Array<{
+            id: number;
+            claim_text: string;
+            claim_type: string;
+            session_id: string;
+            created_at: string;
+          }>;
+
+          if (claims.length === 0) {
+            lines.push('No pending claims. All claims verified!');
+          } else {
+            lines.push(`Pending Claims (${claims.length}):`);
+            lines.push('─'.repeat(50));
+            for (const c of claims) {
+              lines.push(`[${c.id}] ${c.claim_type}`);
+              lines.push(`    ${c.claim_text}`);
+              lines.push(`    Session: ${c.session_id.slice(0, 8)}... | ${c.created_at}`);
+              lines.push('');
+            }
+          }
+          break;
+        }
+
+        case 'verify': {
+          if (!id) {
+            lines.push('Error: claim ID required for verify action');
+            break;
+          }
+          db.query(
+            `UPDATE verification_claims
+             SET verification_status = 'verified', evidence = ?, verified_at = datetime('now')
+             WHERE id = ?`
+          ).run(evidence || 'Manually verified via sig-claims', id);
+          lines.push(`Claim ${id} marked as verified.`);
+          break;
+        }
+
+        case 'reject': {
+          if (!id) {
+            lines.push('Error: claim ID required for reject action');
+            break;
+          }
+          db.query(
+            `UPDATE verification_claims
+             SET verification_status = 'rejected', evidence = ?, verified_at = datetime('now')
+             WHERE id = ?`
+          ).run(evidence || 'Manually rejected via sig-claims', id);
+          lines.push(`Claim ${id} marked as rejected.`);
+          break;
+        }
+
+        case 'history': {
+          const history = db
+            .query(
+              `SELECT id, claim_text, claim_type, verification_status, verified_at
+               FROM verification_claims
+               WHERE verification_status != 'pending'
+               ORDER BY verified_at DESC
+               LIMIT 20`
+            )
+            .all() as Array<{
+            id: number;
+            claim_text: string;
+            claim_type: string;
+            verification_status: string;
+            verified_at: string;
+          }>;
+
+          if (history.length === 0) {
+            lines.push('No claim history yet.');
+          } else {
+            lines.push(`Recent Claim History (${history.length}):`);
+            lines.push('─'.repeat(50));
+            for (const h of history) {
+              const icon = h.verification_status === 'verified' ? '✅' : '❌';
+              lines.push(`${icon} [${h.id}] ${h.claim_type}`);
+              lines.push(`    ${h.claim_text.slice(0, 60)}...`);
+              lines.push(`    ${h.verified_at}`);
+              lines.push('');
+            }
+          }
+          break;
+        }
+
+        default:
+          lines.push(`Unknown action: ${selectedAction}`);
+          lines.push('Valid actions: list, verify, reject, history');
+      }
+
+      db.close();
+      return {
+        content: [{ type: 'text' as const, text: lines.join('\n') }],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Claims query failed: ${error instanceof Error ? error.message : String(error)}`,
+          },
+        ],
+      };
+    }
+  }
+);
+
+// =============================================================================
 // Start Server
 // =============================================================================
 
