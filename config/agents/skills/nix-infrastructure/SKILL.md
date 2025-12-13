@@ -367,8 +367,21 @@ nix run nixpkgs#colmena -- apply --evaluator streaming
 }
 ```
 
+## Build Optimization (Critical)
+
+**Before any nix2container work, read `nix-build-optimization` skill.**
+
+Key principles:
+1. **Never put `bun install` in app derivation** - Split into nodeModules
+2. **Pin nixpkgs to stable** - Use `nixos-24.11`, not unstable
+3. **Use magic-nix-cache in CI** - After nix-installer, before cachix
+4. **Layer nix2container images** - Runtime in layer, app in copyToRoot
+
+See `config/agents/skills/nix-build-optimization/SKILL.md` for full patterns.
+
 ## Related Skills
 
+- `nix-build-optimization` - **Critical** - Derivation splitting, Cachix, CI/CD
 - `devops-patterns` - Philosophy and blocked files/commands
 - `nix-flake-parts` - Modular flake composition
 - `nix-darwin-patterns` - macOS system configuration
