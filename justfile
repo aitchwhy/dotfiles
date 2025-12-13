@@ -1,60 +1,102 @@
-# Quick commands for Nix Darwin - Run 'just' to see all
+# Nix Darwin Configuration Manager
+# 8 top-level commands. Run 'just' to see status and available commands.
 set shell := ["bash", "-uc"]
 
-# Auto-detect host or use default
+# Auto-detect host
 host := env_var_or_default("HOST", "hank-mbp-m4")
 
-# Show available commands
+# Import namespaced modules
+mod cloud "config/just/cloud.just"
+mod infra "config/just/infra.just"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# TOP-LEVEL COMMANDS (8)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Show system status and available commands
 default:
-    @just --list
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "═══════════════════════════════════════════════════════════════"
+    gen=$(darwin-rebuild --list-generations 2>/dev/null | tail -1 | awk '{print $1}' || echo '?')
+    health=$(bash config/agents/evolution/evolve.sh --json 2>/dev/null | jq -r '.score_percent // empty' 2>/dev/null || true)
+    printf "  Darwin: {{ host }} | Gen: %s" "$gen"
+    if [ -n "$health" ]; then printf " | Health: %s%%" "$health"; fi
+    echo ""
+    echo "═══════════════════════════════════════════════════════════════"
+    echo ""
+    echo "Commands:"
+    echo "  just sync     (s)  The one command: fmt → lint → test → switch → gc"
+    echo "  just check    (c)  Quick validation without switching"
+    echo "  just dev      (d)  Development shell with pre-commit"
+    echo "  just info     (i)  System status and health"
+    echo "  just update   (u)  Update flake inputs"
+    echo "  just rollback      Rollback to previous generation"
+    echo "  just evolve        Evolution system dashboard"
+    echo ""
+    echo "Modules:"
+    echo "  just cloud <cmd>   Cloud/remote ops (ssh, deploy, colmena, cache)"
+    echo "  just infra <cmd>   Infrastructure as Code (Pulumi)"
 
-# Check for untracked nix/config files (flakes won't see them)
-preflight:
-    @untracked=$(git ls-files --others --exclude-standard modules/ config/ | head -20); \
-    if [ -n "$untracked" ]; then \
-        echo "Error: Untracked files in modules/ or config/:"; \
-        echo "$untracked" | sed 's/^/  /'; \
+# The one command: fmt → lint → test → switch → auto-gc [alias: s]
+sync: _preflight _fmt _lint _test
+    @echo "Switching configuration..."
+    sudo darwin-rebuild switch --flake .#{{ host }}
+    @# Auto-GC if > 10 generations
+    @gen_count=$$(darwin-rebuild --list-generations 2>/dev/null | wc -l | tr -d ' '); \
+    if [ "$$gen_count" -gt 10 ]; then \
         echo ""; \
-        echo "Flakes only see tracked files. Run: git add <files>"; \
-        exit 1; \
+        echo "Auto-cleaning old generations ($$gen_count > 10)..."; \
+        sudo nix-collect-garbage --delete-older-than 7d; \
+        nix store optimise; \
     fi
+    @echo ""
+    @echo "✓ System synchronized"
 
-# Switch configuration (rebuild + activate) [alias: s]
-switch: preflight
-    sudo darwin-rebuild switch --flake .#{{host}}
+alias s := sync
 
-alias s := switch
-
-# Build without switching [alias: b]
-build: preflight
-    darwin-rebuild build --flake .#{{host}}
-
-alias b := build
-
-# Run all checks
-check: lint test
-    @echo "✓ All checks passed"
-
-# Lint and format check
-lint:
+# Quick validation without switching [alias: c]
+check: _preflight
+    @echo "Running validation..."
     nix fmt -- --check
     nix flake check --no-build
+    nix build .#darwinConfigurations.{{ host }}.system --no-link --print-out-paths > /dev/null
+    @echo "✓ All checks passed"
 
-# Run pre-commit hooks on all files
-lint-all:
-    nix develop -c pre-commit run --all-files
+alias c := check
 
-# Run pre-commit hooks on staged files only
-lint-staged:
-    nix develop -c pre-commit run
+# Development shell with pre-commit hooks [alias: d]
+dev:
+    nix develop -c $SHELL
 
-# Test the build
-test:
-    nix build .#darwinConfigurations.{{host}}.system --no-link --print-out-paths
+alias d := dev
 
-# Format all nix files
-fmt:
-    nix fmt
+# System status and health [alias: i]
+info:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "═══════════════════════════════════════════════════════════════"
+    echo "  System Information"
+    echo "═══════════════════════════════════════════════════════════════"
+    echo ""
+    echo "Host:       {{ host }}"
+    echo "Generation: $(darwin-rebuild --list-generations 2>/dev/null | tail -1 || echo 'N/A')"
+    echo "Flake:      $(nix flake metadata --json 2>/dev/null | jq -r '.url' || echo 'git+file://.')"
+    echo ""
+    echo "Health Checks:"
+    which nix > /dev/null && echo "  ✓ Nix" || echo "  ✗ Nix"
+    which darwin-rebuild > /dev/null && echo "  ✓ darwin-rebuild" || echo "  ✗ darwin-rebuild"
+    test -f flake.nix && echo "  ✓ flake.nix" || echo "  ✗ flake.nix"
+    dirty=$(git status --porcelain 2>/dev/null | wc -l | tr -d ' ')
+    [ "$dirty" -eq 0 ] && echo "  ✓ Git clean" || echo "  ! Git dirty ($dirty files)"
+    untracked=$(git ls-files --others --exclude-standard modules/ config/ 2>/dev/null | wc -l | tr -d ' ')
+    [ "$untracked" -eq 0 ] && echo "  ✓ No untracked modules/config" || echo "  ! Untracked files ($untracked)"
+    nix flake check --no-build > /dev/null 2>&1 && echo "  ✓ Flake valid" || echo "  ✗ Flake check failed"
+    echo ""
+    echo "Evolution:"
+    bash config/agents/evolution/evolve.sh --json 2>/dev/null | jq -r '"  Score: \(.score_percent)% | Trend: \(.trend) | Recommendation: \(.recommendation)"' 2>/dev/null || echo "  Run: just evolve"
+
+alias i := info
 
 # Update flake inputs [alias: u]
 update:
@@ -62,349 +104,129 @@ update:
 
 alias u := update
 
-# Garbage collect (keep 7 days) [alias: gc]
-clean:
-    sudo nix-collect-garbage --delete-older-than 7d
-    nix store optimise
-
-alias gc := clean
-
-# Show system info [alias: i]
-info:
-    @echo "Host: {{host}}"
-    @echo "Generation:"
-    @darwin-rebuild --list-generations 2>/dev/null | tail -n 1 || echo "  (no access to system profile)"
-    @echo "Flake:"
-    @nix flake metadata --json | jq -r '.url' 2>/dev/null || echo "  git+file://$(pwd)"
-
-alias i := info
-
-# Development shell (with pre-commit hooks)
-dev:
-    nix develop -c $SHELL
-
-# Quick health check
-doctor:
-    @echo "System Health Check:"
-    @echo "==================="
-    @which nix > /dev/null && echo "✓ Nix installed" || echo "✗ Nix not found"
-    @which darwin-rebuild > /dev/null && echo "✓ Darwin-rebuild installed" || echo "✗ Darwin-rebuild not found"
-    @test -f flake.nix && echo "✓ Flake found" || echo "✗ No flake.nix"
-    @git status --porcelain | wc -l | xargs -I {} test {} -eq 0 && echo "✓ Git clean" || echo "! Git dirty"
-    @git ls-files --others --exclude-standard modules/ config/ | wc -l | xargs -I {} test {} -eq 0 && echo "✓ No untracked modules/config" || echo "! Untracked files in modules/ or config/"
-    @nix flake check --no-build > /dev/null 2>&1 && echo "✓ Flake valid" || echo "✗ Flake check failed"
-    @darwin-rebuild --list-generations 2>/dev/null | tail -n 1 | grep -q . && echo "✓ System generations accessible" || echo "! No system profile access"
-
-# NeoVim startup health check (no Lua errors)
-nvim-test:
-    @bash tests/nvim-health.sh
-
-# AI CLI smoke tests (tests Claude config and knowledge)
-test-ai:
-    @echo "Running AI CLI smoke tests..."
-    @bats tests/ai-cli.bats
-
-# AI CLI smoke tests (static only, no API calls)
-test-ai-static:
-    @echo "Running static AI CLI tests only..."
-    @bats tests/ai-cli.bats --filter-tags '!live'
-
-# Repomix configuration tests
-test-rx:
-    @echo "Running Repomix tests..."
-    @bats tests/repomix.bats
-
-# Full validation pipeline (format check + flake check + build test)
-validate: lint test
-    @echo "✓ All validation passed"
-
-# PARAGON compliance verification (14 guards)
-verify-paragon:
-    @./scripts/verify-paragon.sh
-
-# Alias for PARAGON verification
-paragon: verify-paragon
-
-# Quick rebuild with validation
-rebuild: fmt check switch
-    @echo "✓ Configuration rebuilt successfully"
-
-# Preview changes before applying
-diff:
-    darwin-rebuild build --flake .#{{host}} && \
-    nix store diff-closures /run/current-system ./result
-
 # Rollback to previous generation
 rollback:
     sudo darwin-rebuild switch --rollback
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# CLOUD (NixOS Remote Deployment)
-# ═══════════════════════════════════════════════════════════════════════════════
-
-# Cloud host for deployment
-cloud_host := env_var_or_default("CLOUD_HOST", "cloud")
-
-# Build cloud configuration locally
-cloud-build:
-    nix build .#nixosConfigurations.{{cloud_host}}.config.system.build.toplevel --no-link --print-out-paths
-
-# Deploy NixOS to a new server (initial install)
-cloud-deploy IP:
-    @echo "Deploying NixOS to {{IP}}..."
-    @echo "This will ERASE ALL DATA on the target server!"
-    @read -p "Are you sure? (yes/no): " confirm; \
-    if [ "$$confirm" = "yes" ]; then \
-        nix run github:nix-community/nixos-anywhere -- \
-            --flake .#{{cloud_host}} \
-            --build-on-remote \
-            root@{{IP}}; \
-    else \
-        echo "Aborted."; \
-    fi
-
-# Update existing cloud server
-cloud-update:
-    @echo "Updating {{cloud_host}} via SSH..."
-    ssh {{cloud_host}} "cd /etc/nixos && sudo nixos-rebuild switch --flake .#{{cloud_host}}"
-
-# SSH to cloud server
-cloud-ssh:
-    ssh {{cloud_host}}
-
-# SSH with mosh (resilient connection)
-cloud-mosh:
-    mosh {{cloud_host}}
-
-# Attach to Zellij session on cloud
-cloud-attach:
-    ssh -t {{cloud_host}} "zellij attach dev || zellij -s dev"
-
-# Show cloud server status
-cloud-status:
-    @ssh {{cloud_host}} "echo '=== System ===' && uname -a && echo && \
-        echo '=== Uptime ===' && uptime && echo && \
-        echo '=== Memory ===' && free -h && echo && \
-        echo '=== Disk ===' && df -h / && echo && \
-        echo '=== Tailscale ===' && tailscale status || true"
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# COLMENA (Parallel NixOS Deployment)
-# ═══════════════════════════════════════════════════════════════════════════════
-
-# Deploy cloud with Colmena (requires Tailscale connection)
-cloud-colmena:
-    nix run nixpkgs#colmena -- apply --on {{cloud_host}} --evaluator streaming
-
-# Evaluate Colmena config (dry-run, no deployment)
-cloud-colmena-eval:
-    nix run nixpkgs#colmena -- eval
-
-# Deploy all hosts with Colmena
-cloud-colmena-all:
-    nix run nixpkgs#colmena -- apply --evaluator streaming
-
-# Show Colmena deployment plan
-cloud-colmena-plan:
-    nix run nixpkgs#colmena -- build --on {{cloud_host}}
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# NIXBUILD.NET (Remote Builds)
-# ═══════════════════════════════════════════════════════════════════════════════
-
-# Test nixbuild.net connectivity
-nixbuild-test:
-    @echo "Testing nixbuild.net connection..."
-    @ssh eu.nixbuild.net shell -- echo "Connected to nixbuild.net!"
-
-# Build Darwin config via nixbuild.net remote store
-nixbuild-darwin:
-    @echo "Building Darwin config via nixbuild.net..."
-    nix build .#darwinConfigurations.{{host}}.system \
-        --store ssh-ng://eu.nixbuild.net \
-        --eval-store auto \
-        --builders "" \
-        --no-link
-
-# Build NixOS config via nixbuild.net remote store
-nixbuild-nixos:
-    @echo "Building NixOS config via nixbuild.net..."
-    nix build .#nixosConfigurations.{{cloud_host}}.config.system.build.toplevel \
-        --store ssh-ng://eu.nixbuild.net \
-        --eval-store auto \
-        --builders "" \
-        --no-link
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# CACHIX (Binary Cache)
-# ═══════════════════════════════════════════════════════════════════════════════
-
-# Push Darwin build to Cachix
-cache-push-darwin:
-    @echo "Building and pushing Darwin to Cachix..."
-    nix build .#darwinConfigurations.{{host}}.system -o darwin-result
-    cachix push hank-dotfiles darwin-result
-    rm darwin-result
-
-# Push NixOS build to Cachix
-cache-push-nixos:
-    @echo "Building and pushing NixOS to Cachix..."
-    nix build .#nixosConfigurations.{{cloud_host}}.config.system.build.toplevel -o nixos-result
-    cachix push hank-dotfiles nixos-result
-    rm nixos-result
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# SELF-EVOLUTION (unified command)
-# ═══════════════════════════════════════════════════════════════════════════════
-
-# Evolution system: unified dashboard with automatic learning
-# Usage: just evolve [--json]
+# Evolution system dashboard
 evolve *ARGS:
     @bash config/agents/evolution/evolve.sh {{ ARGS }}
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# REPOMIX (Codebase Snapshots) - Delegates to ~/.local/bin/rx
+# HIDDEN HELPERS (prefixed with _ to hide from default listing)
 # ═══════════════════════════════════════════════════════════════════════════════
 
-# Repomix CLI - show help or run subcommand
-rx *ARGS:
-    @~/.local/bin/rx {{ ARGS }}
+# Check for untracked nix/config files (flakes won't see them)
+[private]
+_preflight:
+    @untracked=$$(git ls-files --others --exclude-standard modules/ config/ | head -20); \
+    if [ -n "$$untracked" ]; then \
+        echo "Error: Untracked files in modules/ or config/:"; \
+        echo "$$untracked" | sed 's/^/  /'; \
+        echo ""; \
+        echo "Flakes only see tracked files. Run: git add <files>"; \
+        exit 1; \
+    fi
 
-# Aliases for common operations
-rx-copy *ARGS:
-    @~/.local/bin/rx copy {{ ARGS }}
+# Format all nix files
+[private]
+_fmt:
+    @nix fmt
 
-rx-dots *ARGS:
-    @~/.local/bin/rx dots {{ ARGS }}
+# Lint check (format + flake)
+[private]
+_lint:
+    @nix fmt -- --check
+    @nix flake check --no-build
 
-rx-ember *ARGS:
-    @~/.local/bin/rx ember {{ ARGS }}
+# Build test
+[private]
+_test:
+    @nix build .#darwinConfigurations.{{ host }}.system --no-link --print-out-paths > /dev/null
 
-rx-remote REPO *ARGS:
-    @~/.local/bin/rx remote {{ REPO }} {{ ARGS }}
+# Run pre-commit on all files
+[private]
+_lint-all:
+    nix develop -c pre-commit run --all-files
 
-rx-config:
-    @~/.local/bin/rx config
+# Run pre-commit on staged files only
+[private]
+_lint-staged:
+    nix develop -c pre-commit run
 
-# Concern-specific context generation (Universal Project Factory)
-rx-nix:
-    @repomix -c config/repomix/nix.json
+# Build without switching
+[private]
+_build: _preflight
+    darwin-rebuild build --flake .#{{ host }}
 
-rx-signet:
-    @repomix -c config/repomix/signet.json
+# Preview changes before applying
+[private]
+_diff:
+    darwin-rebuild build --flake .#{{ host }} && \
+    nix store diff-closures /run/current-system ./result
 
-rx-agents:
-    @repomix -c config/repomix/agents.json
+# Manual garbage collection
+[private]
+_gc:
+    sudo nix-collect-garbage --delete-older-than 7d
+    nix store optimise
+
+# NeoVim startup health check
+[private]
+_nvim-test:
+    @bash tests/nvim-health.sh
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# UNIVERSAL PROJECT FACTORY
+# TEST SUITES (hidden - use directly when needed)
 # ═══════════════════════════════════════════════════════════════════════════════
 
-# Verify factory health
-verify-factory:
-    @bash scripts/verify-factory.sh
+# AI CLI smoke tests
+[private]
+_test-ai:
+    @bats tests/ai-cli.bats
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# SIGNET (Code Quality & Generation Platform)
-# ═══════════════════════════════════════════════════════════════════════════════
+# AI CLI static tests (no API calls)
+[private]
+_test-ai-static:
+    @bats tests/ai-cli.bats --filter-tags '!live'
 
-# Signet CLI - run any command
-sig *ARGS:
-    @signet {{ ARGS }}
+# Repomix tests
+[private]
+_test-rx:
+    @bats tests/repomix.bats
 
-# Validate project structure against spec
-sig-validate PATH=".":
-    @signet validate {{ PATH }}
-
-# Check version alignment against SSOT (versions.json)
-sig-doctor:
-    @cd config/signet && bun run src/doctor.ts
-
-# Auto-fix architecture drift
-sig-comply PATH=".":
-    @signet comply {{ PATH }}
-
-# Initialize new project (types: monorepo, api, ui, library, infra)
-sig-init TYPE NAME:
-    @signet init {{ TYPE }} {{ NAME }}
-
-# Generate workspace in existing project
-sig-gen TYPE NAME:
-    @signet gen {{ TYPE }} {{ NAME }}
-
-# Migrate project to STACK compliance
-sig-migrate PATH="." *ARGS:
-    @signet migrate {{ PATH }} {{ ARGS }}
-
-# Run 5-tier verification
-sig-verify PATH="." *ARGS:
-    @signet verify {{ PATH }} {{ ARGS }}
-
-# Run signet tests (unit + integration)
-test-signet:
-    @echo "Running signet tests..."
+# Signet tests
+[private]
+_test-signet:
     cd config/signet && bun test
 
-# Run factory smoke tests (validates signet init output)
-test-factory:
-    @echo "Running factory smoke tests..."
+# Factory smoke tests
+[private]
+_test-factory:
     cd config/signet && bun test tests/e2e/factory-smoke.test.ts
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# INFRASTRUCTURE (Terranix + OpenTofu)
-# ═══════════════════════════════════════════════════════════════════════════════
+# Verify factory health
+[private]
+_verify-factory:
+    @bash scripts/verify-factory.sh
 
-# Generate Terraform JSON from Terranix (Nix -> Terraform)
-tf-gen:
-    @echo "Generating Terraform config from Nix..."
-    nix build .#terraform-config
-    @mkdir -p infra
-    cp result/config.tf.json infra/
-    @echo "Generated infra/config.tf.json"
-
-# Terraform/OpenTofu plan
-tf-plan: tf-gen
-    cd infra && tofu plan
-
-# Terraform/OpenTofu apply
-tf-apply: tf-gen
-    cd infra && tofu apply
-
-# Terraform/OpenTofu init
-tf-init:
-    cd infra && tofu init
-
-# Terraform/OpenTofu destroy (use with caution)
-tf-destroy:
-    cd infra && tofu destroy
+# PARAGON compliance verification
+[private]
+_verify-paragon:
+    @./scripts/verify-paragon.sh
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# CONTEXT GENERATION
+# NIX DEBUG UTILITIES (hidden - use directly when needed)
 # ═══════════════════════════════════════════════════════════════════════════════
 
-# Show editor context status (now using bootloader symlinks)
-gen-context:
-    @echo "Editor context is now managed via symlinks (bootloader architecture)"
-    @echo ".cursorrules -> config/agents/AGENTS.md"
-    @ls -la .cursorrules 2>/dev/null || echo ".cursorrules symlink not found"
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# NIX BUILD OPTIMIZATION
-# ═══════════════════════════════════════════════════════════════════════════════
-
-# Verify Nix build follows optimization patterns
-nix-check:
+# Verify Nix build optimization patterns
+[private]
+_nix-check:
     @./scripts/verify-nix-optimization.sh
 
-# Push nodeModules to Cachix (run after lockfile changes)
-nix-cache-deps cache="hank-dotfiles":
-    @echo "Pushing nodeModules to Cachix..."
-    nix build .#nodeModules -v
-    cachix push {{cache}} $(nix path-info .#nodeModules)
-    @echo "nodeModules cached"
-
 # Benchmark Nix build times
-nix-bench:
+[private]
+_nix-bench:
     @echo "Cold build (first run)..."
     rm -rf result
     time nix build .#api 2>&1 | tail -5
@@ -414,16 +236,18 @@ nix-bench:
     time nix build .#api 2>&1 | tail -5
 
 # Show Nix closure sizes
-nix-sizes:
+[private]
+_nix-sizes:
     @echo "Closure sizes (largest first):"
     nix path-info -rsSh .#api 2>/dev/null | sort -k2 -h | tail -15 || echo "Build .#api first"
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# PERFORMANCE METRICS
+# PERFORMANCE METRICS (hidden - use directly when needed)
 # ═══════════════════════════════════════════════════════════════════════════════
 
 # Show hook performance report
-perf-report:
+[private]
+_perf-report:
     @echo "PARAGON Guard Performance Report"
     @echo "================================="
     @if [ ! -f ~/.claude-metrics/perf.jsonl ]; then \
@@ -431,23 +255,22 @@ perf-report:
         exit 0; \
     fi
     @echo ""
-    @echo "Total checks: $(wc -l < ~/.claude-metrics/perf.jsonl | tr -d ' ')"
+    @echo "Total checks: $$(wc -l < ~/.claude-metrics/perf.jsonl | tr -d ' ')"
     @echo ""
     @echo "Average latency by tool:"
-    @cat ~/.claude-metrics/perf.jsonl | jq -s 'group_by(.tool) | map({tool: .[0].tool, count: length, avg_ms: ([.[].duration_ms] | add / length | . * 100 | round / 100)}) | sort_by(.count) | reverse | .[]' 2>/dev/null || echo "  (jq required for detailed analysis)"
+    @cat ~/.claude-metrics/perf.jsonl | jq -s 'group_by(.tool) | map({tool: .[0].tool, count: length, avg_ms: ([.[].duration_ms] | add / length | . * 100 | round / 100)}) | sort_by(.count) | reverse | .[]' 2>/dev/null || echo "  (jq required)"
     @echo ""
     @echo "Block rate:"
-    @echo "  Blocked: $(grep -c '"result":"block"' ~/.claude-metrics/perf.jsonl 2>/dev/null || echo 0)"
-    @echo "  Approved: $(grep -c '"result":"approve"' ~/.claude-metrics/perf.jsonl 2>/dev/null || echo 0)"
-    @echo ""
-    @echo "Slowest checks (>50ms):"
-    @cat ~/.claude-metrics/perf.jsonl | jq -s '[.[] | select(.duration_ms > 50)] | sort_by(.duration_ms) | reverse | .[:10] | .[] | "\(.duration_ms)ms - \(.tool) - \(.file[:40])"' -r 2>/dev/null || echo "  (jq required)"
+    @echo "  Blocked: $$(grep -c '"result":"block"' ~/.claude-metrics/perf.jsonl 2>/dev/null || echo 0)"
+    @echo "  Approved: $$(grep -c '"result":"approve"' ~/.claude-metrics/perf.jsonl 2>/dev/null || echo 0)"
 
 # Clear performance metrics
-perf-clear:
+[private]
+_perf-clear:
     @rm -f ~/.claude-metrics/perf.jsonl
     @echo "Performance metrics cleared"
 
 # Show recent performance (last 50)
-perf-recent:
-    @tail -50 ~/.claude-metrics/perf.jsonl 2>/dev/null | jq '.' 2>/dev/null || echo "No recent metrics or jq not available"
+[private]
+_perf-recent:
+    @tail -50 ~/.claude-metrics/perf.jsonl 2>/dev/null | jq '.' 2>/dev/null || echo "No recent metrics"
