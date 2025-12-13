@@ -1,0 +1,35 @@
+individuals:
+  hank:
+    folder: "hank-jonghyunlee"
+    name: "Hank (Jong-Hyun Lee)"
+    birth_year: 1993
+    gender: "male"
+    color: "#3498db"
+
+  dad:
+    folder: "dad-ilkeunlee"
+    name: "Dad (Il-Keun Lee)"
+    birth_year: 1963
+    gender: "male"
+    color: "#e74c3c"
+
+  mom:
+    folder: "mom-mihyangpark"
+    name: "Mom (Mi-Hyang Park)"
+    birth_year: 1965
+    gender: "female"
+    color: "#9b59b6"
+
+  ayae:
+    folder: "ayae-yoshimoto"
+    name: "Ayae Yoshimoto"
+    birth_year: 1994
+    gender: "female"
+    color: "#2ecc71"
+
+  phillip:
+    folder: "phillip-jongminlee"
+    name: "Phillip (Jong-Min Lee)"
+    birth_year: 1997
+    gender: "male"
+    color: "#f39c12"

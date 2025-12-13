@@ -1,0 +1,72 @@
+{
+  "version": "1.0.0",
+  "snapshot_id": "20251129_f33dd31f",
+  "created_at": "2025-11-29T23:26:30.630261",
+  "data_hash": "f33dd31f0d36559055357fd7224ee9ac8c950ea1e9817a5701f10a430e392aea",
+  "input": {
+    "individuals": [
+      "hank",
+      "dad",
+      "mom",
+      "ayae",
+      "phillip"
+    ],
+    "data_files": {
+      "hank": [
+        "journal_entries.csv",
+        "physiological_cycles.csv",
+        "sleeps.csv",
+        "workouts.csv"
+      ],
+      "dad": [
+        "journal_entries.csv",
+        "physiological_cycles.csv",
+        "sleeps.csv",
+        "workouts.csv"
+      ],
+      "mom": [
+        "journal_entries.csv",
+        "physiological_cycles.csv",
+        "sleeps.csv",
+        "workouts.csv"
+      ],
+      "ayae": [
+        "journal_entries.csv",
+        "physiological_cycles.csv",
+        "sleeps.csv",
+        "workouts.csv"
+      ],
+      "phillip": [
+        "journal_entries.csv",
+        "physiological_cycles.csv",
+        "sleeps.csv",
+        "workouts.csv"
+      ]
+    },
+    "total_records": 11580,
+    "previous_snapshot": "20251125_e9092910"
+  },
+  "output": {
+    "files": [
+      "report_hank.pdf",
+      "report_dad.pdf",
+      "report_mom.pdf",
+      "report_ayae.pdf",
+      "report_phillip.pdf",
+      "summary_report.pdf",
+      "health_profiles.json",
+      "context_for_next.json"
+    ]
+  },
+  "pipeline": {
+    "version": "1.0.0",
+    "modules": [
+      "extract",
+      "consolidate",
+      "analyze",
+      "visualize",
+      "report"
+    ],
+    "duration_seconds": 7.42
+  }
+}

@@ -1,0 +1,5 @@
+---
+tags:
+  - genres
+---
+![[Genre.base]]

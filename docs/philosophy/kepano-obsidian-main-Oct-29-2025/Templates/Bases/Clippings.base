@@ -1,0 +1,39 @@
+filters:
+  and:
+    - note.categories.contains(link("Clippings"))
+    - '!file.name.contains("Template")'
+properties:
+  file.name:
+    displayName: Title
+  note.author:
+    displayName: Author
+  note.created:
+    displayName: Clipped
+  note.published:
+    displayName: Published
+views:
+  - type: table
+    name: Clippings
+    order:
+      - file.name
+      - author
+      - created
+      - published
+    sort:
+      - property: created
+        direction: DESC
+    columnSize:
+      note.author: 140
+  - type: table
+    name: Author
+    filters:
+      and:
+        - list(author).contains(this)
+    order:
+      - file.name
+      - author
+      - created
+      - published
+    sort:
+      - property: clipped
+        direction: DESC

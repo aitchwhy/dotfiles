@@ -1,0 +1,124 @@
+# Medical reference standards for health metrics
+# Based on 2024-2025 clinical guidelines
+
+version: "1.0.0"
+last_updated: "2025-11-25"
+
+resting_heart_rate:
+  # Adults at rest (bpm)
+  excellent: [40, 54]
+  good: [55, 64]
+  average: [65, 74]
+  below_average: [75, 84]
+  poor: [85, 100]
+  source: "American Heart Association 2024"
+
+hrv_by_age:
+  # Heart Rate Variability (ms RMSSD) - decreases with age
+  "20-29":
+    excellent: [60, 200]
+    good: [45, 59]
+    average: [30, 44]
+    below_average: [20, 29]
+    poor: [0, 19]
+  "30-39":
+    excellent: [55, 200]
+    good: [40, 54]
+    average: [25, 39]
+    below_average: [15, 24]
+    poor: [0, 14]
+  "40-49":
+    excellent: [50, 200]
+    good: [35, 49]
+    average: [20, 34]
+    below_average: [10, 19]
+    poor: [0, 9]
+  "50-59":
+    excellent: [45, 200]
+    good: [30, 44]
+    average: [15, 29]
+    below_average: [8, 14]
+    poor: [0, 7]
+  "60-69":
+    excellent: [40, 200]
+    good: [25, 39]
+    average: [12, 24]
+    below_average: [6, 11]
+    poor: [0, 5]
+  "70+":
+    excellent: [35, 200]
+    good: [20, 34]
+    average: [10, 19]
+    below_average: [5, 9]
+    poor: [0, 4]
+  source: "Shaffer & Ginsberg 2024, WHOOP normative data"
+
+blood_oxygen:
+  # SpO2 percentage
+  normal: [95, 100]
+  low_normal: [92, 94.9]
+  concerning: [88, 91.9]
+  critical: [0, 87.9]
+  source: "ATS/ERS nocturnal oximetry standards"
+
+respiratory_rate:
+  # Breaths per minute during sleep
+  optimal: [12, 16]
+  normal: [16.1, 20]
+  elevated: [20.1, 24]
+  concerning: [24.1, 30]
+  source: "Sleep medicine clinical guidelines 2024"
+
+sleep_duration:
+  # Minutes per night
+  optimal: [420, 540]        # 7-9 hours
+  acceptable: [360, 419.9]   # 6-7 hours
+  short: [300, 359.9]        # 5-6 hours
+  very_short: [0, 299.9]     # <5 hours
+  source: "National Sleep Foundation 2024"
+
+deep_sleep_percentage:
+  # Percentage of total sleep
+  excellent: [20, 100]
+  good: [15, 19.9]
+  average: [10, 14.9]
+  below_average: [0, 9.9]
+  source: "Sleep architecture research 2024"
+
+rem_sleep_percentage:
+  # Percentage of total sleep
+  excellent: [20, 25]
+  good: [15, 19.9]
+  average: [10, 14.9]
+  below_average: [0, 9.9]
+  source: "Sleep architecture research 2024"
+
+sleep_efficiency:
+  # Percentage of time in bed spent asleep
+  excellent: [90, 100]
+  good: [85, 89.9]
+  average: [75, 84.9]
+  poor: [0, 74.9]
+  source: "AASM clinical guidelines"
+
+recovery_score:
+  # WHOOP recovery algorithm
+  green: [67, 100]
+  yellow: [34, 66]
+  red: [0, 33]
+  source: "WHOOP algorithm"
+
+strain:
+  # WHOOP strain scale (0-21)
+  light: [0, 9.9]
+  moderate: [10, 13.9]
+  high: [14, 17.9]
+  all_out: [18, 21]
+  source: "WHOOP algorithm"
+
+activity_recommendations:
+  # WHO 2024 Physical Activity Guidelines
+  moderate_minutes_per_week: 150
+  vigorous_minutes_per_week: 75
+  strength_sessions_per_week: 2
+  source: "WHO Physical Activity Guidelines 2024"

@@ -1,0 +1,25 @@
+domain: finance
+version: "1.0"
+
+data_sources:
+  - name: monarch
+    type: csv
+    path: data/monarch/
+  - name: copilot
+    type: csv
+    path: data/copilot/
+
+individuals:
+  - id: hank
+    name: "Hank Lee"
+
+analysis:
+  periods:
+    - monthly
+    - quarterly
+    - yearly
+
+  categories:
+    exclude:
+      - "Transfer"
+      - "Payment"

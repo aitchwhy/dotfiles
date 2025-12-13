@@ -1,0 +1,27 @@
+#!/bin/bash
+# Pre-commit hook: Run linting and check file naming conventions
+
+# Add tools to PATH
+export PATH="$HOME/.local/bin:/opt/homebrew/bin:$PATH"
+
+# Check if any .dvc files are modified but not staged
+dvc_files=$(git diff --name-only | grep -E '\.dvc$|\.dvcignore$' || true)
+
+if [ -n "$dvc_files" ]; then
+    echo "Auto-staging DVC pointer files..."
+    echo "$dvc_files" | xargs git add
+fi
+
+# Check file naming conventions (skip in hook, run via just check)
+# ls-lint check is handled by 'just check' command
+
+# Check if data directory has changes that need dvc add
+if [ -d "data/apple-health" ]; then
+    dvc_status=$(uv run dvc status 2>/dev/null | grep -v "Data and pipelines are up to date" || true)
+    if [ -n "$dvc_status" ]; then
+        echo "Warning: DVC data has uncommitted changes. Run 'just data-add' first."
+        echo "$dvc_status"
+    fi
+fi
+
+exit 0

@@ -1,0 +1,975 @@
+{
+  "hank": {
+    "individual": {
+      "key": "hank",
+      "name": "Hank (Jong-Hyun Lee)",
+      "age": 32
+    },
+    "data_range": {
+      "start": "2022-12-20",
+      "end": "2025-11-27",
+      "days": 1025
+    },
+    "health_scores": {
+      "overall": 78.0,
+      "cardiovascular": 70.0,
+      "respiratory": 90,
+      "sleep": 92.0,
+      "recovery": 48.0,
+      "activity": 88.0
+    },
+    "cardiovascular": {
+      "rhr_mean": 65.6,
+      "rhr_std": 8.0,
+      "rhr_min": 49.0,
+      "rhr_max": 120.0,
+      "rhr_category": "average",
+      "rhr_trend": "stable",
+      "rhr_30day_avg": 57.3,
+      "hrv_mean": 45.4,
+      "hrv_std": 19.8,
+      "hrv_min": 10.0,
+      "hrv_max": 129.0,
+      "hrv_category": "good",
+      "hrv_trend": "stable",
+      "hrv_30day_avg": 54.1,
+      "hrv_age_bracket": "30-39"
+    },
+    "respiratory": {
+      "spo2_mean": 96.82,
+      "spo2_std": 1.41,
+      "spo2_min": 86.68,
+      "spo2_max": 100.0,
+      "spo2_category": "normal",
+      "low_readings_count": 76,
+      "low_readings_pct": 8.2,
+      "rr_mean": 15.3,
+      "rr_std": 0.8,
+      "rr_category": "optimal"
+    },
+    "sleep": {
+      "duration_hours": 6.4,
+      "duration_min": 383.0,
+      "duration_category": "acceptable",
+      "deep_sleep_min": 91.0,
+      "deep_sleep_pct": 23.7,
+      "deep_sleep_category": "excellent",
+      "rem_sleep_min": 124.0,
+      "rem_sleep_pct": 32.3,
+      "rem_sleep_category": "unknown",
+      "light_sleep_min": 169.0,
+      "awake_min": 39.0,
+      "efficiency": 91.1,
+      "efficiency_category": "excellent",
+      "performance": 69.2,
+      "sleep_debt_min": 69.0,
+      "chronic_debt": 1
+    },
+    "recovery": {
+      "recovery_mean": 48.2,
+      "recovery_std": 26.9,
+      "green_days": 250,
+      "green_pct": 26.1,
+      "yellow_days": 403,
+      "yellow_pct": 42.0,
+      "red_days": 306,
+      "red_pct": 31.9,
+      "recovery_7day_avg": 56.4,
+      "strain_mean": 11.8,
+      "strain_std": 4.4,
+      "light_pct": 33.5,
+      "moderate_pct": 31.7,
+      "high_pct": 28.7,
+      "all_out_pct": 6.2
+    },
+    "recommendations": [
+      {
+        "id": "hank_spo2_fc383b20",
+        "category": "Respiratory",
+        "priority": "HIGH",
+        "finding": "8.2% of nights with SpO2 < 95%",
+        "action": "Screen for sleep apnea. Consider sleep study (polysomnography). Review sleeping position and nasal breathing.",
+        "medical_note": "Frequent desaturations during sleep warrant medical evaluation for OSA.",
+        "status": "open",
+        "created": "2025-11-28"
+      },
+      {
+        "id": "hank_sleep_duration_edfe22a8",
+        "category": "Sleep",
+        "priority": "HIGH",
+        "finding": "Insufficient sleep duration (6.4 hours avg)",
+        "action": "Aim for 7-9 hours. Establish consistent sleep/wake times. Create sleep-conducive environment (dark, cool, quiet).",
+        "medical_note": "Chronic sleep deprivation increases risk of obesity, diabetes, and CVD.",
+        "status": "open",
+        "created": "2025-11-28"
+      },
+      {
+        "id": "hank_sleep_debt_7b85e2c9",
+        "category": "Sleep Debt",
+        "priority": "HIGH",
+        "finding": "Chronic sleep debt (69.0 min average)",
+        "action": "Prioritize sleep extension. Consider 20-min naps if needed. Address root causes of sleep restriction.",
+        "medical_note": "Sleep debt accumulates and cannot be fully repaid with catch-up nights.",
+        "status": "open",
+        "created": "2025-11-28"
+      },
+      {
+        "id": "hank_recovery_eeb73b96",
+        "category": "Recovery",
+        "priority": "HIGH",
+        "finding": "High percentage of poor recovery days (31.9%)",
+        "action": "Review training load vs recovery balance. Consider deload weeks. Optimize nutrition, hydration, and stress management.",
+        "medical_note": "Chronic under-recovery increases injury risk and may indicate overtraining.",
+        "status": "open",
+        "created": "2025-11-28"
+      }
+    ],
+    "alerts": [
+      {
+        "id": "hank_recovery_poor_a0d30702",
+        "type": "poor_recovery",
+        "severity": "warning",
+        "message": "High proportion of poor recovery days: 31.9%",
+        "value": 31.9,
+        "threshold": 30
+      }
+    ],
+    "lifestyle_patterns": {
+      "Travelled in a car or train?": {
+        "yes_count": 2,
+        "total": 6,
+        "yes_pct": 33.3
+      },
+      "Consumed caffeine?": {
+        "yes_count": 15,
+        "total": 21,
+        "yes_pct": 71.4
+      },
+      "Saw artificial light upon waking up?": {
+        "yes_count": 2,
+        "total": 2,
+        "yes_pct": 100.0
+      },
+      "Worked late?": {
+        "yes_count": 2,
+        "total": 6,
+        "yes_pct": 33.3
+      },
+      "Engaged in sexual activity?": {
+        "yes_count": 1,
+        "total": 4,
+        "yes_pct": 25.0
+      },
+      "Tracked your calories?": {
+        "yes_count": 4,
+        "total": 4,
+        "yes_pct": 100.0
+      },
+      "Spent time stretching?": {
+        "yes_count": 11,
+        "total": 13,
+        "yes_pct": 84.6
+      },
+      "Consumed protein?": {
+        "yes_count": 1,
+        "total": 1,
+        "yes_pct": 100.0
+      },
+      "Consumed carbohydrates?": {
+        "yes_count": 1,
+        "total": 1,
+        "yes_pct": 100.0
+      },
+      "Experienced brain fog?": {
+        "yes_count": 0,
+        "total": 3,
+        "yes_pct": 0.0
+      },
+      "Felt dizzy or lightheaded today?": {
+        "yes_count": 2,
+        "total": 3,
+        "yes_pct": 66.7
+      },
+      "Experienced stress in a relationship?": {
+        "yes_count": 1,
+        "total": 2,
+        "yes_pct": 50.0
+      },
+      "Consumed calcium?": {
+        "yes_count": 0,
+        "total": 1,
+        "yes_pct": 0.0
+      },
+      "Felt depressed or down?": {
+        "yes_count": 3,
+        "total": 4,
+        "yes_pct": 75.0
+      },
+      "Have any alcoholic drinks?": {
+        "yes_count": 2,
+        "total": 4,
+        "yes_pct": 50.0
+      },
+      "Felt you had control over your life?": {
+        "yes_count": 1,
+        "total": 2,
+        "yes_pct": 50.0
+      },
+      "Took a cold shower?": {
+        "yes_count": 4,
+        "total": 18,
+        "yes_pct": 22.2
+      },
+      "Experienced bloating?": {
+        "yes_count": 5,
+        "total": 6,
+        "yes_pct": 83.3
+      },
+      "Viewed a screen device in bed?": {
+        "yes_count": 6,
+        "total": 21,
+        "yes_pct": 28.6
+      },
+      "Slept in the same bed as usual?": {
+        "yes_count": 28,
+        "total": 49,
+        "yes_pct": 57.1
+      },
+      "Took anti-anxiety medication?": {
+        "yes_count": 0,
+        "total": 1,
+        "yes_pct": 0.0
+      },
+      "Used tobacco in any form?": {
+        "yes_count": 14,
+        "total": 295,
+        "yes_pct": 4.7
+      },
+      "Practiced breathwork?": {
+        "yes_count": 1,
+        "total": 4,
+        "yes_pct": 25.0
+      },
+      "Used marijuana?": {
+        "yes_count": 3,
+        "total": 5,
+        "yes_pct": 60.0
+      },
+      "Consumed sodium?": {
+        "yes_count": 0,
+        "total": 2,
+        "yes_pct": 0.0
+      },
+      "Had a cat in the room while sleeping?": {
+        "yes_count": 0,
+        "total": 9,
+        "yes_pct": 0.0
+      },
+      "Shared your bed?": {
+        "yes_count": 6,
+        "total": 6,
+        "yes_pct": 100.0
+      },
+      "Feel generally positive about the future?": {
+        "yes_count": 4,
+        "total": 6,
+        "yes_pct": 66.7
+      },
+      "Took a melatonin supplement?": {
+        "yes_count": 5,
+        "total": 5,
+        "yes_pct": 100.0
+      },
+      "Took AD(H)D medication?": {
+        "yes_count": 6,
+        "total": 7,
+        "yes_pct": 85.7
+      },
+      "Ate food close to bedtime?": {
+        "yes_count": 6,
+        "total": 16,
+        "yes_pct": 37.5
+      },
+      "Ate all your meals during daylight hours?": {
+        "yes_count": 0,
+        "total": 4,
+        "yes_pct": 0.0
+      },
+      "Saw direct sunlight upon waking up?": {
+        "yes_count": 0,
+        "total": 1,
+        "yes_pct": 0.0
+      },
+      "Felt recovered?": {
+        "yes_count": 11,
+        "total": 18,
+        "yes_pct": 61.1
+      }
+    }
+  },
+  "dad": {
+    "individual": {
+      "key": "dad",
+      "name": "Dad (Il-Keun Lee)",
+      "age": 62
+    },
+    "data_range": {
+      "start": "2023-01-21",
+      "end": "2025-11-27",
+      "days": 1030
+    },
+    "health_scores": {
+      "overall": 69.0,
+      "cardiovascular": 80.0,
+      "respiratory": 40,
+      "sleep": 77.0,
+      "recovery": 51.0,
+      "activity": 97.0
+    },
+    "cardiovascular": {
+      "rhr_mean": 62.0,
+      "rhr_std": 5.5,
+      "rhr_min": 53.0,
+      "rhr_max": 90.0,
+      "rhr_category": "good",
+      "rhr_trend": "improving",
+      "rhr_30day_avg": 62.5,
+      "hrv_mean": 29.1,
+      "hrv_std": 7.9,
+      "hrv_min": 7.0,
+      "hrv_max": 59.0,
+      "hrv_category": "good",
+      "hrv_trend": "improving",
+      "hrv_30day_avg": 28.1,
+      "hrv_age_bracket": "60-69"
+    },
+    "respiratory": {
+      "spo2_mean": 91.47,
+      "spo2_std": 2.8,
+      "spo2_min": 77.2,
+      "spo2_max": 99.33,
+      "spo2_category": "concerning",
+      "low_readings_count": 920,
+      "low_readings_pct": 92.6,
+      "rr_mean": 14.7,
+      "rr_std": 0.5,
+      "rr_category": "optimal"
+    },
+    "sleep": {
+      "duration_hours": 5.9,
+      "duration_min": 356.0,
+      "duration_category": "short",
+      "deep_sleep_min": 86.0,
+      "deep_sleep_pct": 24.2,
+      "deep_sleep_category": "excellent",
+      "rem_sleep_min": 86.0,
+      "rem_sleep_pct": 24.2,
+      "rem_sleep_category": "excellent",
+      "light_sleep_min": 184.0,
+      "awake_min": 44.0,
+      "efficiency": 89.2,
+      "efficiency_category": "good",
+      "performance": 62.7,
+      "sleep_debt_min": 109.0,
+      "chronic_debt": 1
+    },
+    "recovery": {
+      "recovery_mean": 51.2,
+      "recovery_std": 22.3,
+      "green_days": 284,
+      "green_pct": 28.1,
+      "yellow_days": 483,
+      "yellow_pct": 47.8,
+      "red_days": 244,
+      "red_pct": 24.1,
+      "recovery_7day_avg": 56.6,
+      "strain_mean": 14.5,
+      "strain_std": 3.9,
+      "light_pct": 15.7,
+      "moderate_pct": 21.6,
+      "high_pct": 43.6,
+      "all_out_pct": 19.2
+    },
+    "recommendations": [
+      {
+        "id": "dad_spo2_1152737b",
+        "category": "Respiratory",
+        "priority": "HIGH",
+        "finding": "92.6% of nights with SpO2 < 95%",
+        "action": "Screen for sleep apnea. Consider sleep study (polysomnography). Review sleeping position and nasal breathing.",
+        "medical_note": "Frequent desaturations during sleep warrant medical evaluation for OSA.",
+        "status": "open",
+        "created": "2025-11-28"
+      },
+      {
+        "id": "dad_sleep_duration_bb84c556",
+        "category": "Sleep",
+        "priority": "HIGH",
+        "finding": "Insufficient sleep duration (5.9 hours avg)",
+        "action": "Aim for 7-9 hours. Establish consistent sleep/wake times. Create sleep-conducive environment (dark, cool, quiet).",
+        "medical_note": "Chronic sleep deprivation increases risk of obesity, diabetes, and CVD.",
+        "status": "open",
+        "created": "2025-11-28"
+      },
+      {
+        "id": "dad_sleep_debt_777d0857",
+        "category": "Sleep Debt",
+        "priority": "HIGH",
+        "finding": "Chronic sleep debt (109.0 min average)",
+        "action": "Prioritize sleep extension. Consider 20-min naps if needed. Address root causes of sleep restriction.",
+        "medical_note": "Sleep debt accumulates and cannot be fully repaid with catch-up nights.",
+        "status": "open",
+        "created": "2025-11-28"
+      },
+      {
+        "id": "dad_recovery_cf17f062",
+        "category": "Recovery",
+        "priority": "HIGH",
+        "finding": "High percentage of poor recovery days (24.1%)",
+        "action": "Review training load vs recovery balance. Consider deload weeks. Optimize nutrition, hydration, and stress management.",
+        "medical_note": "Chronic under-recovery increases injury risk and may indicate overtraining.",
+        "status": "open",
+        "created": "2025-11-28"
+      }
+    ],
+    "alerts": [
+      {
+        "id": "dad_spo2_critical_cb29ff85",
+        "type": "low_spo2",
+        "severity": "critical",
+        "message": "Critical: 92.6% of nights with low SpO2",
+        "value": 92.6,
+        "threshold": 50
+      },
+      {
+        "id": "dad_sleep_debt_severe_6b4d3692",
+        "type": "chronic_sleep_debt",
+        "severity": "warning",
+        "message": "Severe sleep debt: 109.0 min average",
+        "value": 109.0,
+        "threshold": 90
+      }
+    ],
+    "lifestyle_patterns": {
+      "Felt recovered?": {
+        "yes_count": 3,
+        "total": 3,
+        "yes_pct": 100.0
+      }
+    }
+  },
+  "mom": {
+    "individual": {
+      "key": "mom",
+      "name": "Mom (Mi-Hyang Park)",
+      "age": 60
+    },
+    "data_range": {
+      "start": "2023-06-16",
+      "end": "2025-10-31",
+      "days": 839
+    },
+    "health_scores": {
+      "overall": 77.0,
+      "cardiovascular": 80.0,
+      "respiratory": 75,
+      "sleep": 77.0,
+      "recovery": 56.0,
+      "activity": 100.0
+    },
+    "cardiovascular": {
+      "rhr_mean": 56.0,
+      "rhr_std": 3.6,
+      "rhr_min": 49.0,
+      "rhr_max": 70.0,
+      "rhr_category": "good",
+      "rhr_trend": "stable",
+      "rhr_30day_avg": 59.8,
+      "hrv_mean": 36.5,
+      "hrv_std": 6.4,
+      "hrv_min": 18.0,
+      "hrv_max": 65.0,
+      "hrv_category": "good",
+      "hrv_trend": "stable",
+      "hrv_30day_avg": 34.1,
+      "hrv_age_bracket": "60-69"
+    },
+    "respiratory": {
+      "spo2_mean": 92.72,
+      "spo2_std": 2.61,
+      "spo2_min": 82.0,
+      "spo2_max": 99.0,
+      "spo2_category": "low_normal",
+      "low_readings_count": 627,
+      "low_readings_pct": 81.3,
+      "rr_mean": 14.6,
+      "rr_std": 0.5,
+      "rr_category": "optimal"
+    },
+    "sleep": {
+      "duration_hours": 5.9,
+      "duration_min": 351.0,
+      "duration_category": "short",
+      "deep_sleep_min": 98.0,
+      "deep_sleep_pct": 27.9,
+      "deep_sleep_category": "excellent",
+      "rem_sleep_min": 92.0,
+      "rem_sleep_pct": 26.1,
+      "rem_sleep_category": "unknown",
+      "light_sleep_min": 162.0,
+      "awake_min": 51.0,
+      "efficiency": 88.0,
+      "efficiency_category": "good",
+      "performance": 62.6,
+      "sleep_debt_min": 104.0,
+      "chronic_debt": 1
+    },
+    "recovery": {
+      "recovery_mean": 55.5,
+      "recovery_std": 21.6,
+      "green_days": 255,
+      "green_pct": 32.6,
+      "yellow_days": 416,
+      "yellow_pct": 53.2,
+      "red_days": 111,
+      "red_pct": 14.2,
+      "recovery_7day_avg": 50.6,
+      "strain_mean": 15.0,
+      "strain_std": 3.9,
+      "light_pct": 11.5,
+      "moderate_pct": 18.6,
+      "high_pct": 48.1,
+      "all_out_pct": 21.8
+    },
+    "recommendations": [
+      {
+        "id": "mom_spo2_bb736ec1",
+        "category": "Respiratory",
+        "priority": "HIGH",
+        "finding": "81.3% of nights with SpO2 < 95%",
+        "action": "Screen for sleep apnea. Consider sleep study (polysomnography). Review sleeping position and nasal breathing.",
+        "medical_note": "Frequent desaturations during sleep warrant medical evaluation for OSA.",
+        "status": "open",
+        "created": "2025-11-28"
+      },
+      {
+        "id": "mom_sleep_duration_1975d084",
+        "category": "Sleep",
+        "priority": "HIGH",
+        "finding": "Insufficient sleep duration (5.9 hours avg)",
+        "action": "Aim for 7-9 hours. Establish consistent sleep/wake times. Create sleep-conducive environment (dark, cool, quiet).",
+        "medical_note": "Chronic sleep deprivation increases risk of obesity, diabetes, and CVD.",
+        "status": "open",
+        "created": "2025-11-28"
+      },
+      {
+        "id": "mom_sleep_debt_ac2475c8",
+        "category": "Sleep Debt",
+        "priority": "HIGH",
+        "finding": "Chronic sleep debt (104.0 min average)",
+        "action": "Prioritize sleep extension. Consider 20-min naps if needed. Address root causes of sleep restriction.",
+        "medical_note": "Sleep debt accumulates and cannot be fully repaid with catch-up nights.",
+        "status": "open",
+        "created": "2025-11-28"
+      }
+    ],
+    "alerts": [
+      {
+        "id": "mom_spo2_critical_180f6c73",
+        "type": "low_spo2",
+        "severity": "critical",
+        "message": "Critical: 81.3% of nights with low SpO2",
+        "value": 81.3,
+        "threshold": 50
+      },
+      {
+        "id": "mom_sleep_debt_severe_713e4b03",
+        "type": "chronic_sleep_debt",
+        "severity": "warning",
+        "message": "Severe sleep debt: 104.0 min average",
+        "value": 104.0,
+        "threshold": 90
+      }
+    ],
+    "lifestyle_patterns": {
+      "Have any alcoholic drinks?": {
+        "yes_count": 4,
+        "total": 31,
+        "yes_pct": 12.9
+      },
+      "Consumed caffeine?": {
+        "yes_count": 27,
+        "total": 31,
+        "yes_pct": 87.1
+      },
+      "Viewed a screen device in bed?": {
+        "yes_count": 0,
+        "total": 31,
+        "yes_pct": 0.0
+      },
+      "Have an injury or wound?": {
+        "yes_count": 0,
+        "total": 31,
+        "yes_pct": 0.0
+      },
+      "Took prescription sleep medication?": {
+        "yes_count": 0,
+        "total": 31,
+        "yes_pct": 0.0
+      },
+      "Read (non-screened device) while in bed?": {
+        "yes_count": 0,
+        "total": 31,
+        "yes_pct": 0.0
+      },
+      "Shared your bed?": {
+        "yes_count": 1,
+        "total": 31,
+        "yes_pct": 3.2
+      },
+      "Feeling sick or ill?": {
+        "yes_count": 0,
+        "total": 31,
+        "yes_pct": 0.0
+      }
+    }
+  },
+  "ayae": {
+    "individual": {
+      "key": "ayae",
+      "name": "Ayae Yoshimoto",
+      "age": 31
+    },
+    "data_range": {
+      "start": "2023-09-29",
+      "end": "2025-11-28",
+      "days": 228
+    },
+    "health_scores": {
+      "overall": 63.0,
+      "cardiovascular": 60.0,
+      "respiratory": 50,
+      "sleep": 92.0,
+      "recovery": 60.0,
+      "activity": 54.0
+    },
+    "cardiovascular": {
+      "rhr_mean": 70.5,
+      "rhr_std": 4.6,
+      "rhr_min": 62.0,
+      "rhr_max": 96.0,
+      "rhr_category": "average",
+      "rhr_trend": "improving",
+      "rhr_30day_avg": 68.5,
+      "hrv_mean": 30.4,
+      "hrv_std": 5.8,
+      "hrv_min": 9.0,
+      "hrv_max": 44.0,
+      "hrv_category": "average",
+      "hrv_trend": "improving",
+      "hrv_30day_avg": 33.6,
+      "hrv_age_bracket": "30-39"
+    },
+    "respiratory": {
+      "spo2_mean": 94.93,
+      "spo2_std": 2.15,
+      "spo2_min": 87.0,
+      "spo2_max": 99.0,
+      "spo2_category": "unknown",
+      "low_readings_count": 89,
+      "low_readings_pct": 47.3,
+      "rr_mean": 16.2,
+      "rr_std": 0.7,
+      "rr_category": "normal"
+    },
+    "sleep": {
+      "duration_hours": 6.4,
+      "duration_min": 381.0,
+      "duration_category": "acceptable",
+      "deep_sleep_min": 82.0,
+      "deep_sleep_pct": 21.5,
+      "deep_sleep_category": "excellent",
+      "rem_sleep_min": 112.0,
+      "rem_sleep_pct": 29.4,
+      "rem_sleep_category": "unknown",
+      "light_sleep_min": 187.0,
+      "awake_min": 42.0,
+      "efficiency": 90.0,
+      "efficiency_category": "excellent",
+      "performance": 75.4,
+      "sleep_debt_min": 53.0,
+      "chronic_debt": 0
+    },
+    "recovery": {
+      "recovery_mean": 60.4,
+      "recovery_std": 22.6,
+      "green_days": 77,
+      "green_pct": 40.7,
+      "yellow_days": 86,
+      "yellow_pct": 45.5,
+      "red_days": 26,
+      "red_pct": 13.8,
+      "recovery_7day_avg": 73.4,
+      "strain_mean": 5.7,
+      "strain_std": 2.9,
+      "light_pct": 92.9,
+      "moderate_pct": 5.8,
+      "high_pct": 1.3,
+      "all_out_pct": 0.0
+    },
+    "recommendations": [
+      {
+        "id": "ayae_spo2_da3019f8",
+        "category": "Respiratory",
+        "priority": "HIGH",
+        "finding": "47.3% of nights with SpO2 < 95%",
+        "action": "Screen for sleep apnea. Consider sleep study (polysomnography). Review sleeping position and nasal breathing.",
+        "medical_note": "Frequent desaturations during sleep warrant medical evaluation for OSA.",
+        "status": "open",
+        "created": "2025-11-28"
+      },
+      {
+        "id": "ayae_sleep_duration_a292c67a",
+        "category": "Sleep",
+        "priority": "HIGH",
+        "finding": "Insufficient sleep duration (6.4 hours avg)",
+        "action": "Aim for 7-9 hours. Establish consistent sleep/wake times. Create sleep-conducive environment (dark, cool, quiet).",
+        "medical_note": "Chronic sleep deprivation increases risk of obesity, diabetes, and CVD.",
+        "status": "open",
+        "created": "2025-11-28"
+      },
+      {
+        "id": "ayae_activity_6e491c85",
+        "category": "Activity",
+        "priority": "MEDIUM",
+        "finding": "Low activity levels (92.9% light strain days)",
+        "action": "Increase physical activity. Aim for 150 min moderate or 75 min vigorous exercise weekly. Include strength training 2x/week.",
+        "medical_note": "Physical inactivity is a leading risk factor for chronic disease.",
+        "status": "open",
+        "created": "2025-11-28"
+      }
+    ],
+    "alerts": [],
+    "lifestyle_patterns": {
+      "Experienced jet lag?": {
+        "yes_count": 0,
+        "total": 1,
+        "yes_pct": 0.0
+      },
+      "Avoided processed foods?": {
+        "yes_count": 2,
+        "total": 2,
+        "yes_pct": 100.0
+      },
+      "Experienced stress?": {
+        "yes_count": 1,
+        "total": 1,
+        "yes_pct": 100.0
+      },
+      "Traveled on a plane?": {
+        "yes_count": 0,
+        "total": 5,
+        "yes_pct": 0.0
+      },
+      "Consumed added sugar?": {
+        "yes_count": 9,
+        "total": 21,
+        "yes_pct": 42.9
+      },
+      "Have any alcoholic drinks?": {
+        "yes_count": 0,
+        "total": 12,
+        "yes_pct": 0.0
+      },
+      "Engaged in sexual activity?": {
+        "yes_count": 0,
+        "total": 1,
+        "yes_pct": 0.0
+      },
+      "Shared your bed?": {
+        "yes_count": 2,
+        "total": 3,
+        "yes_pct": 66.7
+      },
+      "Felt nervous or anxious?": {
+        "yes_count": 1,
+        "total": 4,
+        "yes_pct": 25.0
+      },
+      "Consumed caffeine?": {
+        "yes_count": 3,
+        "total": 3,
+        "yes_pct": 100.0
+      },
+      "Took prescription sleep medication?": {
+        "yes_count": 0,
+        "total": 2,
+        "yes_pct": 0.0
+      },
+      "Experienced bloating?": {
+        "yes_count": 0,
+        "total": 2,
+        "yes_pct": 0.0
+      },
+      "Feeling sick or ill?": {
+        "yes_count": 3,
+        "total": 28,
+        "yes_pct": 10.7
+      },
+      "Viewed a screen device in bed?": {
+        "yes_count": 1,
+        "total": 2,
+        "yes_pct": 50.0
+      },
+      "Menstruating?": {
+        "yes_count": 1,
+        "total": 1,
+        "yes_pct": 100.0
+      }
+    }
+  },
+  "phillip": {
+    "individual": {
+      "key": "phillip",
+      "name": "Phillip (Jong-Min Lee)",
+      "age": 28
+    },
+    "data_range": {
+      "start": "2023-02-01",
+      "end": "2025-11-20",
+      "days": 948
+    },
+    "health_scores": {
+      "overall": 76.0,
+      "cardiovascular": 75.0,
+      "respiratory": 90,
+      "sleep": 92.0,
+      "recovery": 57.0,
+      "activity": 68.0
+    },
+    "cardiovascular": {
+      "rhr_mean": 54.4,
+      "rhr_std": 5.4,
+      "rhr_min": 44.0,
+      "rhr_max": 120.0,
+      "rhr_category": "unknown",
+      "rhr_trend": "stable",
+      "rhr_30day_avg": 54.6,
+      "hrv_mean": 86.2,
+      "hrv_std": 21.7,
+      "hrv_min": 19.0,
+      "hrv_max": 163.0,
+      "hrv_category": "excellent",
+      "hrv_trend": "stable",
+      "hrv_30day_avg": 88.2,
+      "hrv_age_bracket": "20-29"
+    },
+    "respiratory": {
+      "spo2_mean": 95.23,
+      "spo2_std": 1.79,
+      "spo2_min": 86.28,
+      "spo2_max": 100.0,
+      "spo2_category": "normal",
+      "low_readings_count": 314,
+      "low_readings_pct": 34.8,
+      "rr_mean": 15.0,
+      "rr_std": 0.9,
+      "rr_category": "optimal"
+    },
+    "sleep": {
+      "duration_hours": 6.7,
+      "duration_min": 401.0,
+      "duration_category": "acceptable",
+      "deep_sleep_min": 94.0,
+      "deep_sleep_pct": 23.4,
+      "deep_sleep_category": "excellent",
+      "rem_sleep_min": 106.0,
+      "rem_sleep_pct": 26.3,
+      "rem_sleep_category": "unknown",
+      "light_sleep_min": 202.0,
+      "awake_min": 44.0,
+      "efficiency": 90.1,
+      "efficiency_category": "excellent",
+      "performance": 76.1,
+      "sleep_debt_min": 57.0,
+      "chronic_debt": 0
+    },
+    "recovery": {
+      "recovery_mean": 57.0,
+      "recovery_std": 24.3,
+      "green_days": 364,
+      "green_pct": 39.9,
+      "yellow_days": 404,
+      "yellow_pct": 44.2,
+      "red_days": 145,
+      "red_pct": 15.9,
+      "recovery_7day_avg": 67.4,
+      "strain_mean": 8.8,
+      "strain_std": 3.8,
+      "light_pct": 65.3,
+      "moderate_pct": 25.7,
+      "high_pct": 6.3,
+      "all_out_pct": 2.7
+    },
+    "recommendations": [
+      {
+        "id": "phillip_spo2_95bc09c1",
+        "category": "Respiratory",
+        "priority": "HIGH",
+        "finding": "34.8% of nights with SpO2 < 95%",
+        "action": "Screen for sleep apnea. Consider sleep study (polysomnography). Review sleeping position and nasal breathing.",
+        "medical_note": "Frequent desaturations during sleep warrant medical evaluation for OSA.",
+        "status": "open",
+        "created": "2025-11-28"
+      },
+      {
+        "id": "phillip_sleep_duration_2090b915",
+        "category": "Sleep",
+        "priority": "HIGH",
+        "finding": "Insufficient sleep duration (6.7 hours avg)",
+        "action": "Aim for 7-9 hours. Establish consistent sleep/wake times. Create sleep-conducive environment (dark, cool, quiet).",
+        "medical_note": "Chronic sleep deprivation increases risk of obesity, diabetes, and CVD.",
+        "status": "open",
+        "created": "2025-11-28"
+      },
+      {
+        "id": "phillip_activity_d18633fa",
+        "category": "Activity",
+        "priority": "MEDIUM",
+        "finding": "Low activity levels (65.3% light strain days)",
+        "action": "Increase physical activity. Aim for 150 min moderate or 75 min vigorous exercise weekly. Include strength training 2x/week.",
+        "medical_note": "Physical inactivity is a leading risk factor for chronic disease.",
+        "status": "open",
+        "created": "2025-11-28"
+      }
+    ],
+    "alerts": [],
+    "lifestyle_patterns": {
+      "Experiencing COVID-19 symptoms?": {
+        "yes_count": 0,
+        "total": 547,
+        "yes_pct": 0.0
+      },
+      "Felt recovered?": {
+        "yes_count": 272,
+        "total": 547,
+        "yes_pct": 49.7
+      },
+      "Received booster of COVID-19 vaccination?": {
+        "yes_count": 0,
+        "total": 404,
+        "yes_pct": 0.0
+      },
+      "Received dose #2 of COVID-19 vaccination?": {
+        "yes_count": 0,
+        "total": 404,
+        "yes_pct": 0.0
+      },
+      "Received dose #1 of COVID-19 vaccination?": {
+        "yes_count": 1,
+        "total": 143,
+        "yes_pct": 0.7
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+#!/bin/bash
+# Post-checkout hook: Automatically sync DVC data after checkout
+
+# Add tools to PATH
+export PATH="$HOME/.local/bin:/opt/homebrew/bin:$PATH"
+
+# Only run on branch checkout (flag 1), not file checkout (flag 0)
+if [ "$3" = "1" ]; then
+    echo "Syncing DVC data for branch..."
+    uv run dvc checkout 2>/dev/null || echo "Note: Run 'just pull' if data is not cached locally"
+fi

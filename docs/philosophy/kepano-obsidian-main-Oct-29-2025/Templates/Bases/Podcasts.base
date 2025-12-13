@@ -1,0 +1,15 @@
+filters:
+  and:
+    - note.categories.contains(link("Podcasts"))
+    - '!file.name.contains("Template")'
+properties:
+  file.name:
+    displayName: Podcast
+  note.host:
+    displayName: Host
+views:
+  - type: table
+    name: Table
+    order:
+      - file.name
+      - host
