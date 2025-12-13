@@ -1,0 +1,25 @@
+id: no-throw-expected
+language: typescript
+severity: warning
+rule:
+  any:
+    - pattern: "throw new Error($MSG)"
+    - pattern: "throw new $ErrorType($MSG)"
+    - pattern: "throw $EXPR"
+message: |
+  RESULT TYPE VIOLATION: throw detected.
+
+  Use Result type or Effect.fail() for expected failures instead of throwing:
+
+    // BAD - Throws for expected failure
+    if (!user) throw new Error("Not found");
+
+    // GOOD - Result type
+    if (!user) return Err(new UserNotFoundError({ id }));
+
+    // GOOD - Effect-TS
+    if (!user) return Effect.fail(new UserNotFoundError({ id }));
+
+  Throwing is only acceptable for truly unexpected errors (bugs).
+  See result-patterns and effect-ts-patterns skills.
+note: "See: config/agents/skills/result-patterns/SKILL.md"

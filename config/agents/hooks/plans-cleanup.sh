@@ -4,7 +4,7 @@
 set -euo pipefail
 
 PLANS_DIR="$HOME/.claude/plans"
-MAX_AGE_DAYS=3
+MAX_AGE_DAYS=7
 
 # Skip if plans directory doesn't exist
 if [[ ! -d "$PLANS_DIR" ]]; then

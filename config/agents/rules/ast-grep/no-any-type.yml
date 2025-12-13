@@ -1,0 +1,24 @@
+id: no-any-type
+language: typescript
+severity: error
+rule:
+  any:
+    - pattern: ": any"
+    - pattern: "as any"
+    - pattern: "<any>"
+    - pattern: "<any,"
+    - pattern: ", any>"
+message: |
+  ANY TYPE VIOLATION detected.
+
+  Use `unknown` + type guards instead of `any`:
+
+    // BAD
+    const data: any = await fetch(...)
+
+    // GOOD
+    const data: unknown = await fetch(...)
+    const parsed = MySchema.parse(data)
+
+  Zero `any` policy - see typescript-patterns skill.
+note: "See: config/agents/skills/typescript-patterns/SKILL.md"

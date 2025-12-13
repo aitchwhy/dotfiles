@@ -2,7 +2,7 @@
 /**
  * Unified Guard - Consolidated PreToolUse gatekeeper
  *
- * Guards (8 total):
+ * Guards (12 total):
  * 1. Bash safety - blocks dangerous rm -rf commands
  * 2. Conventional commits - validates git commit messages
  * 3. Forbidden files - blocks package-lock.json, eslint config, etc.
@@ -11,11 +11,15 @@
  * 6. z.infer detector - blocks z.infer<>, z.input<>, z.output<> (use satisfies pattern)
  * 7. No-mock enforcer - blocks jest.mock, vi.mock, Mock*Live patterns
  * 8. TDD enforcer - requires test file before source code
+ * 9. DevOps files - blocks docker-compose.yml, Dockerfile, .dockerignore
+ * 10. DevOps commands - blocks docker-compose, docker build, npm run dev
+ * 11. Flake patterns - advisory warnings for flake.nix best practices
+ * 12. Port registry - advisory warnings for undeclared ports
  *
  * Observability standard: Datadog + OTEL 2.x via OTLP proto exporters.
  * See: observability-patterns skill for approved patterns.
  *
- * This consolidation reduces shell spawns from 8 → 1 per Write/Edit operation.
+ * This consolidation reduces shell spawns from 12 → 1 per Write/Edit operation.
  */
 
 import { z } from 'zod';
@@ -138,15 +142,23 @@ interface ForbiddenFile {
 }
 
 const FORBIDDEN_FILES: ForbiddenFile[] = [
+  // Package manager lockfiles - use Bun
   { pattern: 'package-lock.json', reason: 'Use Bun', alternative: 'bun install' },
   { pattern: 'yarn.lock', reason: 'Use Bun', alternative: 'bun install' },
   { pattern: 'pnpm-lock.yaml', reason: 'Use Bun', alternative: 'bun install' },
+  // Linting - use Biome
   { pattern: /\.eslintrc(\.(js|cjs|mjs|json|yaml|yml))?$/, reason: 'Use Biome', alternative: 'biome.json' },
   { pattern: /eslint\.config\.(js|cjs|mjs|ts)$/, reason: 'Use Biome', alternative: 'biome.json' },
   { pattern: /\.prettierrc(\.(js|cjs|mjs|json|yaml|yml))?$/, reason: 'Use Biome', alternative: 'biome.json' },
   { pattern: /prettier\.config\.(js|cjs|mjs|ts)$/, reason: 'Use Biome', alternative: 'biome.json' },
+  // Testing - use Bun test
   { pattern: /jest\.config\.(js|cjs|mjs|ts|json)$/, reason: 'Use Bun test', alternative: 'bun test' },
+  // ORM - use Drizzle
   { pattern: /prisma\/schema\.prisma$/, reason: 'Use Drizzle', alternative: 'drizzle.config.ts' },
+  // DevOps - use process-compose and nix2container (Guard 9)
+  { pattern: /^docker-compose\.(ya?ml)$/, reason: 'Use process-compose for local orchestration', alternative: 'process-compose.yaml' },
+  { pattern: /^Dockerfile(\..*)?$/, reason: 'Use nix2container for OCI images', alternative: 'nix build .#container-<name>' },
+  { pattern: '.dockerignore', reason: 'Not needed with nix2container', alternative: 'Nix handles build context automatically' },
 ];
 
 function checkForbiddenFiles(filePath: string): string | null {
@@ -606,6 +618,149 @@ To bypass TDD temporarily: touch .tdd-skip`;
 }
 
 // ============================================================================
+// 10. DEVOPS COMMANDS (Guard 10)
+// ============================================================================
+
+interface ForbiddenCommand {
+  pattern: RegExp;
+  description: string;
+  alternative: string;
+}
+
+const FORBIDDEN_COMMANDS: ForbiddenCommand[] = [
+  // Docker Compose commands
+  { pattern: /\bdocker-compose\s+(up|start|run|exec|build)\b/, description: 'docker-compose', alternative: 'process-compose up' },
+  { pattern: /\bdocker\s+compose\s+(up|start|run|exec|build)\b/, description: 'docker compose', alternative: 'process-compose up' },
+  // Docker build
+  { pattern: /\bdocker\s+build\b/, description: 'docker build', alternative: 'nix build .#container-<name>' },
+  // npm/bun/yarn/pnpm run dev|start|serve
+  { pattern: /\b(npm|bun|yarn|pnpm)\s+run\s+(dev|start|serve)\b/, description: 'npm/bun/yarn/pnpm run dev|start|serve', alternative: 'process-compose up' },
+  { pattern: /\bnpm\s+start\b/, description: 'npm start', alternative: 'process-compose up' },
+];
+
+function checkDevOpsCommands(command: string): string | null {
+  for (const forbidden of FORBIDDEN_COMMANDS) {
+    if (forbidden.pattern.test(command)) {
+      return `DEVOPS VIOLATION: ${forbidden.description} detected
+
+Alternative: ${forbidden.alternative}
+
+Philosophy: localhost === CI === production
+- Use process-compose for local development orchestration
+- All services defined in process-compose.yaml
+- Run: process-compose up (all) or process-compose up <service>
+
+See: devops-patterns skill for correct approach.`;
+    }
+  }
+  return null;
+}
+
+// ============================================================================
+// 11. FLAKE PATTERNS (Guard 11 - Advisory)
+// ============================================================================
+
+function checkFlakePatterns(content: string, filePath: string): string[] {
+  if (!filePath.endsWith('flake.nix')) return [];
+
+  const warnings: string[] = [];
+
+  // Check for flake-parts pattern (December 2025 standard)
+  if (!content.includes('flake-parts')) {
+    warnings.push('Consider flake-parts for modular composition (see nix-flake-parts skill)');
+  }
+
+  // Check for forAllSystems anti-pattern
+  if (content.includes('forAllSystems') || content.includes('lib.genAttrs')) {
+    warnings.push('forAllSystems is deprecated - use flake-parts perSystem instead');
+  }
+
+  // Check for legacy mkShell without hooks
+  if (content.includes('mkShell') && !content.includes('pre-commit') && !content.includes('git-hooks')) {
+    warnings.push('Consider git-hooks.nix for pre-commit integration');
+  }
+
+  // Check for missing follows
+  if (content.includes('nix-darwin') && !content.includes('inputs.nixpkgs.follows')) {
+    warnings.push('nix-darwin should follow nixpkgs to avoid version drift');
+  }
+
+  // Check for process-compose-flake
+  if ((content.includes('process-compose') || content.includes('process.compose')) && !content.includes('process-compose-flake')) {
+    warnings.push('Consider process-compose-flake for Nix-native service orchestration');
+  }
+
+  // Check for nix2container
+  if ((content.includes('container') || content.includes('oci') || content.includes('docker')) && !content.includes('nix2container')) {
+    warnings.push('Consider nix2container for OCI image generation');
+  }
+
+  return warnings;
+}
+
+// ============================================================================
+// 12. PORT REGISTRY (Guard 12 - Advisory)
+// ============================================================================
+
+// Known ports from lib/ports.nix
+const KNOWN_PORTS = new Set([
+  22, 41641, 9100, 9080, // infrastructure
+  6379, 5432, 7233, // databases
+  3000, 3001, 8233, // development
+  4317, 4318, // otel
+  9090, 3100, 3200, // observability
+]);
+
+const NIX_PORT_PATTERNS = [
+  /\bport\s*=\s*(\d{2,5})\b/gi,
+  /\blistenPort\s*=\s*(\d+)\b/gi,
+  /allowedTCPPorts\s*=\s*\[\s*([^\]]+)\]/gi,
+];
+
+function extractPorts(content: string): number[] {
+  const ports: number[] = [];
+  for (const pattern of NIX_PORT_PATTERNS) {
+    const regex = new RegExp(pattern.source, pattern.flags);
+    let match: RegExpExecArray | null;
+    while ((match = regex.exec(content)) !== null) {
+      if (match[1]) {
+        const portStrings = match[1].split(/[\s,]+/);
+        for (const ps of portStrings) {
+          const port = parseInt(ps.trim(), 10);
+          if (!isNaN(port) && port >= 1 && port <= 65535) {
+            ports.push(port);
+          }
+        }
+      }
+    }
+  }
+  return [...new Set(ports)];
+}
+
+function checkPortRegistry(content: string, filePath: string): string[] {
+  const warnings: string[] = [];
+  const isModuleFile = filePath.includes('/modules/') || filePath.includes('/services/');
+  const isProcessCompose = filePath.includes('process-compose');
+  const isNix = filePath.endsWith('.nix');
+
+  if (!isModuleFile && !isProcessCompose) return warnings;
+  if (!isNix) return warnings;
+
+  const foundPorts = extractPorts(content);
+  const unknownPorts = foundPorts.filter((p) => !KNOWN_PORTS.has(p));
+
+  if (unknownPorts.length > 0) {
+    warnings.push(`Port(s) ${unknownPorts.join(', ')} not in lib/ports.nix. Add to registry or use ports.* reference.`);
+  }
+
+  if (isNix && foundPorts.length > 0 && !content.includes('ports.') && !content.includes('lib/ports')) {
+    warnings.push('Consider: let ports = import ../../../lib/ports.nix; in { ... } for type-safe port references.');
+  }
+
+  return warnings;
+}
+
+// ============================================================================
 // Main Hook Logic
 // ============================================================================
 
@@ -645,6 +800,13 @@ async function main(): Promise<void> {
     const commitError = checkConventionalCommit(command);
     if (commitError) {
       block(commitError);
+      return;
+    }
+
+    // Check DevOps commands (Guard 10)
+    const devOpsError = checkDevOpsCommands(command);
+    if (devOpsError) {
+      block(devOpsError);
       return;
     }
   }
@@ -715,8 +877,30 @@ async function main(): Promise<void> {
     }
   }
 
-  // All checks passed
-  allow();
+  // ─────────────────────────────────────────────────────────────────────────
+  // 11. FLAKE PATTERNS (Advisory - for Write/Edit on flake.nix)
+  // ─────────────────────────────────────────────────────────────────────────
+  const advisoryWarnings: string[] = [];
+
+  if ((tool_name === 'Write' || tool_name === 'Edit') && content && filePath) {
+    const flakeWarnings = checkFlakePatterns(content, filePath);
+    advisoryWarnings.push(...flakeWarnings);
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // 12. PORT REGISTRY (Advisory - for Write/Edit on modules/*.nix)
+  // ─────────────────────────────────────────────────────────────────────────
+  if ((tool_name === 'Write' || tool_name === 'Edit') && content && filePath) {
+    const portWarnings = checkPortRegistry(content, filePath);
+    advisoryWarnings.push(...portWarnings);
+  }
+
+  // All checks passed - include advisory warnings if any
+  if (advisoryWarnings.length > 0) {
+    console.log(JSON.stringify({ decision: 'approve', reason: advisoryWarnings.join(' | ') }));
+  } else {
+    allow();
+  }
 }
 
 main().catch((e) => {

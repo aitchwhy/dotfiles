@@ -106,36 +106,6 @@
             "timeout": 20
           }
         ]
-      },
-      {
-        "matcher": "Write(**/flake.nix)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun run \"$HOME/dotfiles/config/agents/hooks/validate-flake.ts\"",
-            "timeout": 5
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit|Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun run \"$HOME/dotfiles/config/agents/hooks/devops-enforcer.ts\"",
-            "timeout": 10
-          }
-        ]
-      },
-      {
-        "matcher": "Write(**/modules/**/*.nix)|Edit(**/modules/**/*.nix)|Write(**/process-compose.yaml)|Edit(**/process-compose.yaml)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun run \"$HOME/dotfiles/config/agents/hooks/validate-ports.ts\"",
-            "timeout": 5
-          }
-        ]
       }
     ],
     "SessionStart": [
@@ -145,6 +115,15 @@
           {
             "type": "command",
             "command": "echo \"[$(date '+%Y-%m-%d %H:%M:%S')] Session: $(pwd)\" >> ~/.claude/session.log"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/dotfiles/config/agents/hooks/plans-cleanup.sh\"",
+            "timeout": 5
           }
         ]
       },
@@ -183,6 +162,15 @@
             "type": "command",
             "command": "bash \"$HOME/dotfiles/config/agents/hooks/session-stop.sh\"",
             "timeout": 30
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run \"$HOME/dotfiles/config/agents/hooks/session-polish.ts\"",
+            "timeout": 120
           }
         ]
       },

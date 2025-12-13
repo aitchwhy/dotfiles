@@ -1,0 +1,26 @@
+id: no-should-work
+language: typescript
+severity: error
+rule:
+  kind: comment
+  regex: "should\\s+(work|be\\s+fine|be\\s+ok)|probably|likely|I\\s+think|might\\s+work"
+message: |
+  ASSUMPTION LANGUAGE VIOLATION detected.
+
+  Ban assumption language. Replace with evidence:
+
+    // BAD
+    // This should work
+    // It's probably fine
+    // I think this is correct
+
+    // GOOD
+    // Verified via test: auth.test.ts:42
+    // Error output shows: [actual output]
+    // Confirmed by running: bun test
+
+  UNVERIFIED claims must be marked explicitly:
+    // UNVERIFIED: requires test_name
+
+  See verification-first skill.
+note: "See: config/agents/skills/verification-first/SKILL.md"

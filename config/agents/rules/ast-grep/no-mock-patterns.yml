@@ -1,0 +1,30 @@
+id: no-mock-patterns
+language: typescript
+severity: error
+rule:
+  any:
+    - pattern: "jest.mock($PATH)"
+    - pattern: "jest.mock($PATH, $IMPL)"
+    - pattern: "vi.mock($PATH)"
+    - pattern: "vi.mock($PATH, $IMPL)"
+    - pattern: ".mockImplementation($IMPL)"
+    - pattern: ".mockResolvedValue($VALUE)"
+    - pattern: ".mockReturnValue($VALUE)"
+message: |
+  NO-MOCK VIOLATION detected.
+
+  Use real adapters with service containers instead of mocks:
+
+    // BAD
+    jest.mock('@/adapters/storage');
+    const mockStorage = new MockStorageLive();
+
+    // GOOD - Factory returns real MinIO in tests
+    const storage = createStorageAdapter(); // Auto-detects MINIO_ENDPOINT
+
+    // GOOD - Effect-TS Layer DI (not mocking)
+    const TestLayer = Layer.succeed(Database, testDbService);
+
+  See hexagonal-architecture skill for service container patterns.
+  Run: process-compose up (local) or use GitHub Actions services (CI).
+note: "See: config/agents/skills/hexagonal-architecture/SKILL.md"
