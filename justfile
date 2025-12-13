@@ -118,6 +118,13 @@ test-rx:
 validate: lint test
     @echo "✓ All validation passed"
 
+# PARAGON compliance verification (14 guards)
+verify-paragon:
+    @./scripts/verify-paragon.sh
+
+# Alias for PARAGON verification
+paragon: verify-paragon
+
 # Quick rebuild with validation
 rebuild: fmt check switch
     @echo "✓ Configuration rebuilt successfully"
