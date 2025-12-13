@@ -9,6 +9,9 @@ host := env_var_or_default("HOST", "hank-mbp-m4")
 mod cloud "config/just/cloud.just"
 mod data "config/just/data.just"
 
+# Aliases
+alias s := switch
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # COMMANDS
 # ═══════════════════════════════════════════════════════════════════════════════
