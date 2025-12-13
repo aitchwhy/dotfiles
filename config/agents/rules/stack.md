@@ -151,3 +151,55 @@ After writing/modifying TypeScript code, always run:
 biome check --write .  # Format + lint + fix
 bun typecheck          # Type check
 ```
+
+## Nix Build Rules
+
+### Derivation Splitting (Mandatory)
+
+For ANY TypeScript project with Nix builds:
+
+1. **nodeModules derivation** - Contains ONLY `bun install`
+   - Hash based on `bun.lock` only
+   - Uses `__noChroot = true` for network access
+
+2. **App derivation** - Contains ONLY `bun build`
+   - Symlinks to nodeModules: `ln -s ${nodeModules}/node_modules ./`
+   - No network access needed
+
+### CI Cache Stack (Mandatory Order)
+
+```yaml
+- uses: DeterminateSystems/nix-installer-action@v14
+- uses: DeterminateSystems/magic-nix-cache-action@v8  # MUST be after installer
+- uses: cachix/cachix-action@v15                      # MUST be after magic-cache
+```
+
+### Prohibited Patterns
+
+```nix
+# NEVER: bun install in app derivation
+api = mkDerivation {
+  buildPhase = ''
+    bun install  # WRONG - kills cache
+    bun build
+  '';
+};
+
+# ALWAYS: Split derivations
+nodeModules = mkDerivation { buildPhase = "bun install"; };
+api = mkDerivation {
+  buildPhase = ''
+    ln -s ${nodeModules}/node_modules ./
+    bun build
+  '';
+};
+```
+
+### Version Pins
+
+| Input | Required Version |
+|-------|------------------|
+| nixpkgs | `nixos-24.11` (stable) |
+| nix-installer-action | `@v14` |
+| magic-nix-cache-action | `@v8` |
+| cachix-action | `@v15` |
