@@ -27,7 +27,7 @@
                   continue
                 fi
                 if [[ "$file" == *.ts ]] || [[ "$file" == *.tsx ]]; then
-                  if [[ "$file" != *.d.ts ]] && ${pkgs.gnugrep}/bin/grep -E ':\s*any\b|as\s+any\b|<any\s*>' "$file" >/dev/null 2>&1; then
+                  if [[ "$file" != *.d.ts ]] && ${pkgs.ripgrep}/bin/rg -q ':\s*any\b|as\s+any\b|<any\s*>' "$file" 2>/dev/null; then
                     echo "PARAGON Guard 5: 'any' type detected in $file"
                     exit 1
                   fi
@@ -52,7 +52,7 @@
                   continue
                 fi
                 if [[ "$file" == *.ts ]] || [[ "$file" == *.tsx ]]; then
-                  if ${pkgs.gnugrep}/bin/grep -E 'z\.infer\s*<|z\.input\s*<|z\.output\s*<' "$file" >/dev/null 2>&1; then
+                  if ${pkgs.ripgrep}/bin/rg -q 'z\.infer\s*<|z\.input\s*<|z\.output\s*<' "$file" 2>/dev/null; then
                     echo "PARAGON Guard 6: z.infer detected in $file"
                     exit 1
                   fi
@@ -77,7 +77,7 @@
                   continue
                 fi
                 if [[ "$file" == *.ts ]] || [[ "$file" == *.tsx ]] || [[ "$file" == *.js ]]; then
-                  if ${pkgs.gnugrep}/bin/grep -E 'jest\.mock\s*\(|vi\.mock\s*\(|Mock[A-Z][a-zA-Z]*Live' "$file" >/dev/null 2>&1; then
+                  if ${pkgs.ripgrep}/bin/rg -q 'jest\.mock\s*\(|vi\.mock\s*\(|Mock[A-Z][a-zA-Z]*Live' "$file" 2>/dev/null; then
                     echo "PARAGON Guard 7: Mock pattern detected in $file"
                     exit 1
                   fi
@@ -102,8 +102,36 @@
                   continue
                 fi
                 if [[ "$file" == *.ts ]] || [[ "$file" == *.tsx ]]; then
-                  if ${pkgs.gnugrep}/bin/grep -Ei 'should (now )?work|should fix|this fixes|probably (works|fixed)|I think (this|it)|might (work|fix)|likely (fixed|works)' "$file" >/dev/null 2>&1; then
+                  if ${pkgs.ripgrep}/bin/rg -qi 'should (now )?work|should fix|this fixes|probably (works|fixed)|I think (this|it)|might (work|fix)|likely (fixed|works)' "$file" 2>/dev/null; then
                     echo "PARAGON Guard 13: Assumption language detected in $file"
+                    exit 1
+                  fi
+                fi
+              done
+            ''
+          );
+          files = "\\.(ts|tsx)$";
+          language = "system";
+        };
+
+        # Guard 26: No console.* methods (use Effect logging)
+        paragon-no-console = {
+          enable = true;
+          name = "paragon-no-console";
+          description = "PARAGON Guard 26: Block console.* methods in TypeScript";
+          entry = toString (
+            pkgs.writeShellScript "check-no-console" ''
+              for file in "$@"; do
+                # Skip test files and guard/tool files
+                if [[ "$file" == *.test.ts ]] || [[ "$file" == *.spec.ts ]]; then
+                  continue
+                fi
+                if [[ "$file" == *-guard.ts ]] || [[ "$file" == */sig-*.ts ]]; then
+                  continue
+                fi
+                if [[ "$file" == *.ts ]] || [[ "$file" == *.tsx ]]; then
+                  if ${pkgs.ripgrep}/bin/rg -q 'console\.(log|error|warn|debug|info)\s*\(' "$file" 2>/dev/null; then
+                    echo "PARAGON Guard 26: console.* detected in $file - use Effect logging"
                     exit 1
                   fi
                 fi
