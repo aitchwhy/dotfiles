@@ -212,7 +212,9 @@ Example response:
       ];
 
       if (result.week) {
-        lines.push(`This Week: ${result.week.sessions} sessions, ${result.week.lessons} lessons, ${result.week.avg_score}% avg`);
+        lines.push(
+          `This Week: ${result.week.sessions} sessions, ${result.week.lessons} lessons, ${result.week.avg_score}% avg`
+        );
       }
 
       if (result.memory) {
@@ -303,7 +305,7 @@ Returns: Space freed and generations removed.`,
 
       // Get store size before (approximate)
       const { stdout: sizeBefore } = await execAsync(
-        'df -h /nix/store | tail -1 | awk \'{print $3}\'',
+        "df -h /nix/store | tail -1 | awk '{print $3}'",
         { timeout: 10000 }
       );
 
@@ -338,12 +340,14 @@ Returns: Space freed and generations removed.`,
         const genCountAfter = parseInt(genAfter.trim(), 10) || 0;
 
         const { stdout: sizeAfter } = await execAsync(
-          'df -h /nix/store | tail -1 | awk \'{print $3}\'',
+          "df -h /nix/store | tail -1 | awk '{print $3}'",
           { timeout: 10000 }
         );
 
         lines.push('');
-        lines.push(`Generations: ${genCountBefore} → ${genCountAfter} (${genCountBefore - genCountAfter} removed)`);
+        lines.push(
+          `Generations: ${genCountBefore} → ${genCountAfter} (${genCountBefore - genCountAfter} removed)`
+        );
         lines.push(`Store size: ${sizeBefore.trim()} → ${sizeAfter.trim()}`);
       }
 
@@ -393,19 +397,24 @@ Use to:
       if (!content.trim()) {
         return {
           content: [
-            { type: 'text' as const, text: 'No metrics recorded yet. Run some Claude Code sessions first.' },
+            {
+              type: 'text' as const,
+              text: 'No metrics recorded yet. Run some Claude Code sessions first.',
+            },
           ],
         };
       }
 
       const lines = content.trim().split('\n');
-      const metrics = lines.map((line) => {
-        try {
-          return JSON.parse(line);
-        } catch {
-          return null;
-        }
-      }).filter(Boolean);
+      const metrics = lines
+        .map((line) => {
+          try {
+            return JSON.parse(line);
+          } catch {
+            return null;
+          }
+        })
+        .filter(Boolean);
 
       if (metrics.length === 0) {
         return {
@@ -513,15 +522,7 @@ Use to:
       description: 'Evidence for verification (test file, output, etc.)',
     },
   },
-  async ({
-    action,
-    id,
-    evidence,
-  }: {
-    action?: string;
-    id?: number;
-    evidence?: string;
-  }) => {
+  async ({ action, id, evidence }: { action?: string; id?: number; evidence?: string }) => {
     const { existsSync } = await import('node:fs');
     const { Database } = await import('bun:sqlite');
 

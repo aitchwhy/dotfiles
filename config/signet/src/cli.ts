@@ -559,7 +559,8 @@ export const migrateCommand = Command.make(
         if (exists) {
           if (!dryRun) {
             yield* Effect.tryPromise({
-              try: () => Bun.write(filePath, '').then(() => require('fs').unlinkSync(filePath)),
+              try: () =>
+                Bun.write(filePath, '').then(() => require('node:fs').unlinkSync(filePath)),
               catch: (e) => new Error(`Failed to delete ${file}: ${e}`),
             }).pipe(Effect.catchAll(() => Effect.void));
           }
@@ -645,7 +646,7 @@ export const migrateCommand = Command.make(
         // Write updated package.json
         if (modified && !dryRun) {
           yield* Effect.tryPromise({
-            try: () => Bun.write(pkgPath, JSON.stringify(pkg, null, 2) + '\n'),
+            try: () => Bun.write(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`),
             catch: (e) => new Error(`Failed to write package.json: ${e}`),
           });
         }
@@ -656,7 +657,7 @@ export const migrateCommand = Command.make(
       }
 
       // Phase 3: Summary
-      yield* Console.log('\n' + '─'.repeat(50));
+      yield* Console.log(`\n${'─'.repeat(50)}`);
       yield* Console.log('📊 Migration Summary:');
       yield* Console.log(`   Files deleted: ${results.deleted.length}`);
       yield* Console.log(`   Dependencies removed: ${results.removedDeps.length}`);
@@ -726,7 +727,7 @@ export const doctorCommand = Command.make('doctor', {}, () =>
     }
 
     // Summary
-    yield* Console.log('\n' + '─'.repeat(50));
+    yield* Console.log(`\n${'─'.repeat(50)}`);
     if (issues === 0) {
       yield* Console.log('✅ All checks passed! Signet is healthy.\n');
     } else {

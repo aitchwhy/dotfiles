@@ -14,10 +14,15 @@
 
 import { readdir, readFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
+import { Effect, Logger } from 'effect';
 
 // SSOT location
 const VERSIONS_PATH = join(import.meta.dir, '../versions.json');
 const DOTFILES_ROOT = join(import.meta.dir, '../../..');
+
+// =============================================================================
+// Types
+// =============================================================================
 
 type VersionsJson = {
   meta: { frozen: string; updated: string; ssotVersion: string };
@@ -40,42 +45,50 @@ type Mismatch = {
   section: 'dependencies' | 'devDependencies' | 'peerDependencies';
 };
 
+// =============================================================================
+// Helper Functions
+// =============================================================================
+
 /**
  * Recursively find all package.json files, excluding node_modules
  */
-async function findPackageJsonFiles(dir: string): Promise<string[]> {
-  const results: string[] = [];
+const findPackageJsonFiles = (dir: string): Effect.Effect<string[], Error> =>
+  Effect.tryPromise({
+    try: async () => {
+      const results: string[] = [];
 
-  async function walk(currentDir: string): Promise<void> {
-    const entries = await readdir(currentDir, { withFileTypes: true });
+      async function walk(currentDir: string): Promise<void> {
+        const entries = await readdir(currentDir, { withFileTypes: true });
 
-    for (const entry of entries) {
-      const fullPath = join(currentDir, entry.name);
+        for (const entry of entries) {
+          const fullPath = join(currentDir, entry.name);
 
-      // Skip node_modules and hidden directories
-      if (entry.isDirectory()) {
-        if (entry.name === 'node_modules' || entry.name.startsWith('.')) {
-          continue;
+          // Skip node_modules and hidden directories
+          if (entry.isDirectory()) {
+            if (entry.name === 'node_modules' || entry.name.startsWith('.')) {
+              continue;
+            }
+            await walk(fullPath);
+          } else if (entry.name === 'package.json') {
+            results.push(fullPath);
+          }
         }
-        await walk(fullPath);
-      } else if (entry.name === 'package.json') {
-        results.push(fullPath);
       }
-    }
-  }
 
-  await walk(dir);
-  return results;
-}
+      await walk(dir);
+      return results;
+    },
+    catch: (e) => new Error(`Failed to find package.json files: ${e}`),
+  });
 
 /**
  * Check a package.json against the SSOT versions
  */
-function checkPackageJson(
+const checkPackageJson = (
   filePath: string,
   pkg: PackageJson,
   versions: Record<string, string>
-): Mismatch[] {
+): Mismatch[] => {
   const mismatches: Mismatch[] = [];
   const sections = ['dependencies', 'devDependencies', 'peerDependencies'] as const;
 
@@ -113,44 +126,62 @@ function checkPackageJson(
   }
 
   return mismatches;
-}
+};
 
-async function main(): Promise<void> {
-  console.log('Signet Doctor - Version Alignment Check');
-  console.log('=======================================\n');
+// =============================================================================
+// Main Program
+// =============================================================================
+
+const program = Effect.gen(function* () {
+  yield* Effect.log('Signet Doctor - Version Alignment Check');
+  yield* Effect.log('=======================================\n');
 
   // Load SSOT
-  const versionsContent = await readFile(VERSIONS_PATH, 'utf-8');
+  const versionsContent = yield* Effect.tryPromise({
+    try: () => readFile(VERSIONS_PATH, 'utf-8'),
+    catch: (e) => new Error(`Failed to read versions.json: ${e}`),
+  });
   const versions: VersionsJson = JSON.parse(versionsContent);
 
-  console.log(`SSOT: versions.json (frozen: ${versions.meta.frozen}, updated: ${versions.meta.updated})`);
-  console.log(`SSOT Version: ${versions.meta.ssotVersion}\n`);
+  yield* Effect.log(
+    `SSOT: versions.json (frozen: ${versions.meta.frozen}, updated: ${versions.meta.updated})`
+  );
+  yield* Effect.log(`SSOT Version: ${versions.meta.ssotVersion}\n`);
 
   // Find all package.json files
-  const packageJsonFiles = await findPackageJsonFiles(DOTFILES_ROOT);
-  console.log(`Found ${packageJsonFiles.length} package.json file(s)\n`);
+  const packageJsonFiles = yield* findPackageJsonFiles(DOTFILES_ROOT);
+  yield* Effect.log(`Found ${packageJsonFiles.length} package.json file(s)\n`);
 
   // Check each file
   const allMismatches: Mismatch[] = [];
 
   for (const filePath of packageJsonFiles) {
-    try {
-      const content = await readFile(filePath, 'utf-8');
-      const pkg: PackageJson = JSON.parse(content);
-      const mismatches = checkPackageJson(filePath, pkg, versions.npm);
-      allMismatches.push(...mismatches);
-    } catch (error) {
-      console.error(`Error reading ${relative(DOTFILES_ROOT, filePath)}: ${error}`);
+    const result = yield* Effect.either(
+      Effect.tryPromise({
+        try: () => readFile(filePath, 'utf-8'),
+        catch: (e) => new Error(`Failed to read ${filePath}: ${e}`),
+      })
+    );
+
+    if (result._tag === 'Left') {
+      yield* Effect.logError(
+        `Error reading ${relative(DOTFILES_ROOT, filePath)}: ${result.left.message}`
+      );
+      continue;
     }
+
+    const pkg: PackageJson = JSON.parse(result.right);
+    const mismatches = checkPackageJson(filePath, pkg, versions.npm);
+    allMismatches.push(...mismatches);
   }
 
   // Report results
   if (allMismatches.length === 0) {
-    console.log('✓ All versions aligned with SSOT\n');
-    process.exit(0);
+    yield* Effect.log('✓ All versions aligned with SSOT\n');
+    return 0;
   }
 
-  console.log(`✗ Found ${allMismatches.length} version mismatch(es):\n`);
+  yield* Effect.log(`✗ Found ${allMismatches.length} version mismatch(es):\n`);
 
   // Group by file
   const byFile = new Map<string, Mismatch[]>();
@@ -161,18 +192,31 @@ async function main(): Promise<void> {
   }
 
   for (const [file, mismatches] of byFile) {
-    console.log(`  ${file}:`);
+    yield* Effect.log(`  ${file}:`);
     for (const m of mismatches) {
-      console.log(`    ${m.package}: "${m.actual}" → should be "${m.expected}"`);
+      yield* Effect.log(`    ${m.package}: "${m.actual}" → should be "${m.expected}"`);
     }
-    console.log('');
+    yield* Effect.log('');
   }
 
-  console.log('Run enforce-versions.ts hook or manually fix these mismatches.\n');
-  process.exit(1);
-}
+  yield* Effect.log('Run enforce-versions.ts hook or manually fix these mismatches.\n');
+  return 1;
+});
 
-main().catch((error) => {
-  console.error('Doctor failed:', error);
-  process.exit(1);
+// =============================================================================
+// Entry Point
+// =============================================================================
+
+Effect.runPromise(
+  program.pipe(
+    Effect.provide(Logger.pretty),
+    Effect.catchAll((error) =>
+      Effect.gen(function* () {
+        yield* Effect.logError('Doctor failed', { error: error.message });
+        return 1;
+      })
+    )
+  )
+).then((exitCode) => {
+  process.exit(exitCode);
 });
