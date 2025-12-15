@@ -42,24 +42,14 @@ in
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/typescript-patterns";
       ".claude/skills/zod-patterns".source =
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/zod-patterns";
-      ".claude/skills/result-patterns".source =
-        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/result-patterns";
       ".claude/skills/tdd-patterns".source =
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/tdd-patterns";
-      ".claude/skills/nix-darwin-patterns".source =
-        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/nix-darwin-patterns";
       ".claude/skills/observability-patterns".source =
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/observability-patterns";
-      ".claude/skills/clean-code".source =
-        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/clean-code";
-      ".claude/skills/verification-first".source =
-        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/verification-first";
-      ".claude/skills/project-bootstrap".source =
-        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/project-bootstrap";
+      ".claude/skills/quality-patterns".source =
+        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/quality-patterns";
       ".claude/skills/signet-patterns".source =
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/signet-patterns";
-      ".claude/skills/repomix-patterns".source =
-        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/repomix-patterns";
 
       # Skills - architecture patterns
       ".claude/skills/effect-ts-patterns".source =
@@ -70,12 +60,14 @@ in
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/devops-patterns";
 
       # Skills - Nix patterns
-      ".claude/skills/nix-flake-parts".source =
-        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/nix-flake-parts";
+      ".claude/skills/nix-patterns".source =
+        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/nix-patterns";
       ".claude/skills/nix-infrastructure".source =
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/nix-infrastructure";
       ".claude/skills/nix-build-optimization".source =
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/nix-build-optimization";
+      ".claude/skills/nix-configuration-centralization".source =
+        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/nix-configuration-centralization";
 
       ".claude/skills/typespec-patterns".source =
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/typespec-patterns";
@@ -85,24 +77,21 @@ in
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/formal-verification";
       ".claude/skills/semantic-codebase".source =
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/semantic-codebase";
-      ".claude/skills/commit-patterns".source =
-        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/commit-patterns";
       ".claude/skills/planning-patterns".source =
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/planning-patterns";
 
       # Skills - MCP server references
-      ".claude/skills/repomix-mcp".source =
-        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/repomix-mcp";
+      ".claude/skills/repomix".source = config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/repomix";
       ".claude/skills/context7-mcp".source =
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/context7-mcp";
+      ".claude/skills/mcp-optimization".source =
+        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/mcp-optimization";
 
       # Skills - additional patterns
       ".claude/skills/state-machine-patterns".source =
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/state-machine-patterns";
       ".claude/skills/secrets-management".source =
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/secrets-management";
-      ".claude/skills/port-registry".source =
-        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/port-registry";
       ".claude/skills/paragon".source = config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/paragon";
       ".claude/skills/codebase-exposure".source =
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/codebase-exposure";
