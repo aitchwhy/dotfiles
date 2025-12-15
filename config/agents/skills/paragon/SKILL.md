@@ -1,12 +1,12 @@
 ---
 name: paragon
-description: PARAGON Enforcement System v3.1 - 31 guards for Clean Code, SOLID, configuration centralization, stack compliance, and evidence-based development.
+description: PARAGON Enforcement System v3.2 - 36 guards for Clean Code, SOLID, configuration centralization, stack compliance, parse-at-boundary, and evidence-based development.
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 token-budget: 900
-version: 3.1.0
+version: 3.2.0
 ---
 
-# PARAGON Enforcement System v3.1
+# PARAGON Enforcement System v3.2
 
 > **P**rotocol for **A**utomated **R**ules, **A**nalysis, **G**uards, **O**bservance, and **N**orms
 >
@@ -26,7 +26,7 @@ PARAGON is the unified enforcement layer ensuring all code changes comply with:
 | Git | pre-commit hooks (`git-hooks.nix`) | Every commit |
 | CI | GitHub Actions (`paragon-check.yml`) | Every PR/push |
 
-## Guard Matrix (31 Guards)
+## Guard Matrix (36 Guards)
 
 ### Tier 1: Original Guards (1-14)
 
@@ -174,6 +174,58 @@ url = cfg.services.loki.pushUrl;
 ```
 
 See `config/signet/src/stack/versions.ts` for the full approved version registry.
+
+### Tier 7: Parse-at-Boundary Guards (32-36)
+
+| # | Guard | Trigger | Blocks |
+|---|-------|---------|--------|
+| 32 | Optional Chaining in Non-Boundary | Write/Edit TS | `x?.y` chains in domain code |
+| 33 | Nullish Coalescing in Non-Boundary | Write/Edit TS | `x ?? y` in domain code |
+| 34 | Null Check Then Assert | Write/Edit TS | `if (x === null) ... x!` |
+| 35 | Type Assertions | Write/Edit TS | `x as Type` (warning only) |
+| 36 | Non-Null Assert Without Narrowing | Write/Edit TS | `x!` without type guard |
+
+**Philosophy**: Parse at boundary, typed internally. If you need `?.` or `??` in domain code, the architecture is wrong.
+
+**Boundary files** (where optional chaining IS allowed):
+- `*/api/*.ts` - API route handlers
+- `*/lib/*-client.ts` - API clients
+- `*.schema.ts` - Schema definitions
+- `*/schemas/*`, `*/parsers/*` - Schema/parser directories
+- `*.test.ts`, `*.spec.ts` - Test files
+
+**Guard 32-33 Rationale**: Optional chaining and nullish coalescing in domain code indicates unparsed data:
+```typescript
+// BAD - data wasn't parsed at boundary
+const phone = context.phone?.trim();
+const host = config.host ?? "localhost";
+
+// GOOD - parse at boundary with defaults
+const ConfigSchema = Schema.Struct({
+  host: Schema.optional(Schema.String, { default: () => "localhost" }),
+});
+const config = Schema.decodeUnknownSync(ConfigSchema)(raw);
+// Now: config.host is string (not string | undefined)
+```
+
+**Guard 34-36 Rationale**: Type assertions indicate data wasn't properly parsed:
+```typescript
+// BAD - asserting instead of parsing
+const user = response.data as User;
+if (input.phone === null) throw new Error();
+const trimmed = input.phone!.trim();
+
+// GOOD - discriminated union
+type Input =
+  | { phase: "initial" }
+  | { phase: "validated"; phone: string };
+
+if (input.phase === "validated") {
+  input.phone.trim();  // TypeScript knows phone exists
+}
+```
+
+See `parse-boundary-patterns` skill for comprehensive patterns.
 
 ## Infinite Loop Prevention
 
