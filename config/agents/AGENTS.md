@@ -45,7 +45,7 @@ Read `paragon` skill for full guard matrix.
 
 ### Core Pattern Skills
 typescript-patterns, zod-patterns, effect-ts-patterns, quality-patterns,
-hexagonal-architecture, formal-verification, tdd-patterns
+hexagonal-architecture, formal-verification, tdd-patterns, parse-boundary-patterns
 
 ### Nix Skills
 nix-patterns, nix-build-optimization, nix-infrastructure, secrets-management
