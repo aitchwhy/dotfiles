@@ -73,8 +73,7 @@
       # ─────────────────────────────────────────────────────────────
       "notion" # Workspace for notes, docs, wikis
       "raycast" # Launcher (Spotlight replacement)
-      "1password" # Password manager
-      "bitwarden" # Password manager (backup)
+      "bitwarden" # Password manager (primary)
       "bartender" # Menu bar organizer
       "setapp" # App subscription (manages: Clop, LookAway, Downie, Base, SnapMotion)
       "fantastical" # Calendar (Flexibits)
