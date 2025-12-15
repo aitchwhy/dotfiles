@@ -2,13 +2,9 @@
 # Exposes custom packages built from this repository
 #
 # Signet Package Architecture (Dec 2025):
-#   1. signetBunDeps - Cached by bun.lock hash (content-addressed bun cache)
-#   2. signet - Installs deps from cache, bundles TypeScript, creates wrappers
-#
-# Why bundling instead of standalone binary:
-#   Native modules (@ast-grep/napi, oxc-parser) cannot be compiled
-#   into standalone binaries. We bundle TypeScript to JavaScript
-#   for faster startup while keeping native modules in node_modules.
+#   Uses bun2nix.hook for automated cache setup and dependency installation.
+#   Custom bundling preserves native modules (@ast-grep/napi, oxc-parser)
+#   that cannot be compiled into standalone binaries.
 { inputs, ... }:
 {
   perSystem =
@@ -20,12 +16,6 @@
     let
       # bun2nix v2 API: functions are on the package, not lib
       bun2nix = inputs.bun2nix.packages.${system}.default;
-
-      # Fetch dependencies - content-addressed by bun.lock hash
-      # This is the expensive derivation that gets cached
-      signetBunDeps = bun2nix.fetchBunDeps {
-        bunNix = ../config/signet/bun.nix;
-      };
     in
     {
       packages = {
@@ -40,34 +30,22 @@
           nativeBuildInputs = [
             pkgs.bun
             pkgs.makeWrapper
+            bun2nix.hook # Handles cache setup and bun install automatically
           ];
 
-          # No network access needed - deps come from signetBunDeps cache
+          # bun2nix.hook requires bunDeps - the pre-fetched dependency cache
+          bunDeps = bun2nix.fetchBunDeps {
+            bunNix = ../config/signet/bun.nix;
+          };
+
+          # Disable default bun phases - we do custom TypeScript bundling
+          dontUseBunBuild = true;
+          dontUseBunCheck = true;
+          dontUseBunInstall = true;
           dontPatchELF = true;
 
-          # Following bun2nix hook.sh pattern:
-          # 1. Copy bun-cache to BUN_INSTALL_CACHE_DIR
-          # 2. Run bun install (which creates node_modules from cache)
-          # 3. Bundle TypeScript
           buildPhase = ''
             runHook preBuild
-
-            # Set up bun's install cache from pre-fetched deps
-            export BUN_INSTALL_CACHE_DIR=$(mktemp -d)
-            cp -r ${signetBunDeps}/share/bun-cache/. "$BUN_INSTALL_CACHE_DIR"
-
-            # Need writable HOME for bun
-            export HOME=$(mktemp -d)
-
-            # Install dependencies from cache (offline, no network)
-            # Use bun2nix's recommended flags for Darwin: --linker=isolated --backend=symlink
-            bun install --linker=isolated --backend=symlink --ignore-scripts
-
-            # Make node_modules writable for lifecycle scripts
-            chmod -R u+rwx ./node_modules
-
-            # Run lifecycle scripts (native module builds)
-            bun install --linker=isolated --backend=symlink
 
             # Bundle TypeScript to JavaScript
             # External: native modules that must be loaded from node_modules at runtime
@@ -121,9 +99,6 @@
             mainProgram = "signet";
           };
         };
-
-        # Also expose the bun deps derivation for debugging
-        inherit signetBunDeps;
       };
     };
 }
