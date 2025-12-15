@@ -16,6 +16,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, writeFileSync, realpathSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join, resolve } from 'node:path';
+import { logError } from '../hooks/lib/hook-logging';
 
 // Configuration (can be overridden via environment)
 const CONFIG = {
@@ -127,14 +128,14 @@ function openDatabase(): Database | null {
 
   // Validate path is within expected location
   if (!validatePath(DB_FILE, [HOME])) {
-    console.error('[consolidate] Invalid database path');
+    logError('consolidate', 'Invalid database path');
     return null;
   }
 
   try {
     return new Database(DB_FILE);
   } catch (error) {
-    console.error(`[consolidate] Failed to open database: ${error}`);
+    logError('consolidate', error);
     return null;
   }
 }
@@ -147,7 +148,7 @@ function getActiveLessons(db: Database): Lesson[] {
     const stmt = db.query<Lesson, []>('SELECT * FROM lessons ORDER BY decay_score DESC');
     return stmt.all();
   } catch (error) {
-    console.error(`[consolidate] Failed to get lessons: ${error}`);
+    logError('consolidate', error);
     return [];
   }
 }
@@ -224,7 +225,7 @@ function mergeDuplicates(db: Database, duplicates: Map<number, number[]>): numbe
       }
     }
   } catch (error) {
-    console.error(`[consolidate] Merge failed: ${error}`);
+    logError('consolidate', error);
   }
 
   return merged;
@@ -250,7 +251,7 @@ function updateDecayScores(db: Database): number {
       }
     }
   } catch (error) {
-    console.error(`[consolidate] Decay update failed: ${error}`);
+    logError('consolidate', error);
   }
 
   return updated;
@@ -280,7 +281,7 @@ function archiveLowValueLessons(db: Database): number {
 
     return archived;
   } catch (error) {
-    console.error(`[consolidate] Archive failed: ${error}`);
+    logError('consolidate', error);
     return 0;
   }
 }
@@ -297,7 +298,7 @@ function exportToSql(db: Database): string | null {
 
   // Validate dump path is within dotfiles
   if (!validatePath(DOTFILES, [HOME])) {
-    console.error('[consolidate] Invalid dump path');
+    logError('consolidate', 'Invalid dump path');
     return null;
   }
 
@@ -329,7 +330,7 @@ function exportToSql(db: Database): string | null {
     writeFileSync(SQL_DUMP_PATH, content);
     return SQL_DUMP_PATH;
   } catch (error) {
-    console.error(`[consolidate] Failed to write SQL dump: ${error}`);
+    logError('consolidate', error);
     return null;
   }
 }
@@ -340,7 +341,7 @@ function exportToSql(db: Database): string | null {
 function gitCommitDump(dumpPath: string): boolean {
   // Validate paths before git operations
   if (!validatePath(dumpPath, [DOTFILES]) || !validatePath(DOTFILES, [HOME])) {
-    console.error('[consolidate] Invalid path for git commit');
+    logError('consolidate', 'Invalid path for git commit');
     return false;
   }
 
@@ -378,7 +379,7 @@ function gitCommitDump(dumpPath: string): boolean {
 
     return commitResult.status === 0;
   } catch (error) {
-    console.error(`[consolidate] Git commit failed: ${error}`);
+    logError('consolidate', error);
     return false;
   }
 }
@@ -470,7 +471,7 @@ function consolidate(): ConsolidationResult {
  */
 function main(): void {
   if (!existsSync(DB_FILE)) {
-    console.error('[consolidate] No database found');
+    logError('consolidate', 'No database found');
     process.exit(1);
   }
 
@@ -478,11 +479,11 @@ function main(): void {
 
   // Log errors if any
   for (const error of result.errors) {
-    console.error(`[consolidate] ${error}`);
+    logError('consolidate', error);
   }
 
   // Output JSON for programmatic use
-  console.log(JSON.stringify(result, null, 2));
+  process.stdout.write(JSON.stringify(result, null, 2) + '\n');
 }
 
 // Run if called directly
