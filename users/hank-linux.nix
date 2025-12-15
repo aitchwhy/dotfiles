@@ -31,6 +31,16 @@
     defaultApps.enable = false; # macOS default app associations
     cursor.enable = false; # macOS GUI editor (use remote SSH instead)
     claude.enable = false; # Claude Desktop (macOS GUI app)
+    paste.enable = false; # macOS clipboard manager
+    signet.enable = false; # macOS code quality agent
+
+    # Third-party apps (macOS only)
+    fantastical.enable = false;
+    zoom.enable = false;
+    spotify.enable = false;
+    chrome.enable = false;
+    slack.enable = false;
+    obsidian.enable = false;
 
     # Keep cross-platform modules
     agents.enable = true; # AI agent configs (Claude Code, Gemini CLI)

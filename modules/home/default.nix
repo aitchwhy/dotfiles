@@ -48,6 +48,14 @@ in
     ./apps/default-apps.nix
     ./apps/paste.nix
     ./apps/signet.nix
+
+    # Third-party apps (targets.darwin.defaults)
+    ./apps/fantastical.nix
+    ./apps/zoom.nix
+    ./apps/spotify.nix
+    ./apps/chrome.nix
+    ./apps/slack.nix
+    ./apps/obsidian.nix
   ];
 
   config = {
@@ -102,6 +110,14 @@ in
         defaultApps.enable = mkDefault true;
         paste.enable = mkDefault true;
         signet.enable = mkDefault true;
+
+        # Third-party apps
+        fantastical.enable = mkDefault true;
+        zoom.enable = mkDefault true;
+        spotify.enable = mkDefault true;
+        chrome.enable = mkDefault true;
+        slack.enable = mkDefault true;
+        obsidian.enable = mkDefault true;
       };
     };
 
