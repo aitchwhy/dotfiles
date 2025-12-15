@@ -9,7 +9,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { Effect } from 'effect';
-import { sigGuardTool, sigMigrateTool, sigParagonTool, sigStackTool } from '@/tools';
+import { sigConfigTool, sigGuardTool, sigMigrateTool, sigParagonTool, sigStackTool } from '@/tools';
 import {
   ALL_TIERS,
   formatVerificationResult,
@@ -164,6 +164,17 @@ server.tool(
   sigParagonTool.description,
   sigParagonTool.params,
   sigParagonTool.handler
+);
+
+// =============================================================================
+// sig-config Tool (Configuration centralization check)
+// =============================================================================
+
+server.tool(
+  sigConfigTool.name,
+  sigConfigTool.description,
+  sigConfigTool.params,
+  sigConfigTool.handler
 );
 
 // =============================================================================

@@ -8,3 +8,4 @@ export * from './sig-guard';
 export * from './sig-migrate';
 export * from './sig-paragon';
 export * from './sig-stack';
+export * from './sig-config';
