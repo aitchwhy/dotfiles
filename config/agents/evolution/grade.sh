@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # grade.sh - Evolution system health grader with SQLite persistence
 # Outputs JSON: {overall_score: 0-1, recommendation: "ok"|"warning"|"urgent", details: {...}}
+# Uses modern CLI tools: rg (ripgrep)
 set -euo pipefail
 
 DOTFILES="${DOTFILES:-$HOME/dotfiles}"
@@ -106,9 +107,9 @@ check_nix_flake() {
     score=50
     message="flake check failed"
   else
-    # Check for derivation splitting pattern
-    if grep -q "nodeModules" "$DOTFILES/flake.nix" 2>/dev/null || \
-       grep -rq "nodeModules" "$DOTFILES/flake/" 2>/dev/null; then
+    # Check for derivation splitting pattern (using rg instead of grep)
+    if rg -q "nodeModules" "$DOTFILES/flake.nix" 2>/dev/null || \
+       rg -q "nodeModules" "$DOTFILES/flake/" 2>/dev/null; then
       has_derivation_split=true
     fi
   fi
@@ -136,9 +137,9 @@ check_typescript() {
       message="type errors detected"
     fi
 
-    # Count violations
-    any_count=$(grep -rE ': any\b|as any\b' src/ 2>/dev/null | wc -l | tr -d ' ') || any_count=0
-    zinfer_count=$(grep -rE 'z\.infer<|z\.input<|z\.output<' src/ 2>/dev/null | wc -l | tr -d ' ') || zinfer_count=0
+    # Count violations (using rg instead of grep)
+    any_count=$(rg ': any\b|as any\b' src/ 2>/dev/null | wc -l | tr -d ' ') || any_count=0
+    zinfer_count=$(rg 'z\.infer<|z\.input<|z\.output<' src/ 2>/dev/null | wc -l | tr -d ' ') || zinfer_count=0
 
     if [[ $any_count -gt 0 || $zinfer_count -gt 0 ]]; then
       score=$((score - any_count * 5 - zinfer_count * 10))
@@ -173,9 +174,9 @@ check_hooks() {
     if [[ ! -f "$AGENTS_DIR/hooks/$hook" ]]; then
       missing=$((missing + 1))
     elif [[ "$hook" == *.ts ]]; then
-      # Check if TypeScript hooks have valid structure
-      if grep -q "export default" "$AGENTS_DIR/hooks/$hook" 2>/dev/null || \
-         grep -q "process.stdin" "$AGENTS_DIR/hooks/$hook" 2>/dev/null; then
+      # Check if TypeScript hooks have valid structure (using rg instead of grep)
+      if rg -q "export default" "$AGENTS_DIR/hooks/$hook" 2>/dev/null || \
+         rg -q "process.stdin" "$AGENTS_DIR/hooks/$hook" 2>/dev/null; then
         valid_json=$((valid_json + 1))
       fi
     fi
@@ -202,8 +203,8 @@ check_skills() {
         if [[ ! -f "$skill/SKILL.md" ]]; then
           missing_md=$((missing_md + 1))
         else
-          # Check for valid cross-references
-          if grep -q "## " "$skill/SKILL.md" 2>/dev/null; then
+          # Check for valid cross-references (using rg instead of grep)
+          if rg -q "## " "$skill/SKILL.md" 2>/dev/null; then
             valid_refs=$((valid_refs + 1))
           fi
         fi
@@ -232,9 +233,9 @@ check_versions() {
     score=0
     message="versions.ts missing (SSOT)"
   elif [[ -f "$versions_json" ]]; then
-    # Extract ssotVersion from both files
+    # Extract ssotVersion from both files (using rg instead of grep)
     local ts_version json_version
-    ts_version=$(grep -oP "ssotVersion['\"]?\s*[:=]\s*['\"]?\K[0-9]+\.[0-9]+\.[0-9]+" "$versions_ts" 2>/dev/null | head -1 || echo "")
+    ts_version=$(rg -o "ssotVersion['\"]?\s*[:=]\s*['\"]?([0-9]+\.[0-9]+\.[0-9]+)" -r '$1' "$versions_ts" 2>/dev/null | head -1 || echo "")
     json_version=$(jq -r '.meta.ssotVersion // empty' "$versions_json" 2>/dev/null || echo "")
 
     if [[ -n "$ts_version" && -n "$json_version" && "$ts_version" != "$json_version" ]]; then
@@ -260,8 +261,8 @@ check_paragon() {
     score=0
     message="paragon-guard.ts missing"
   else
-    # Count active guard implementations
-    active_guards=$(grep -cE "function check[A-Z]|const check[A-Z]" "$paragon_guard" 2>/dev/null || echo 0)
+    # Count active guard implementations (using rg instead of grep)
+    active_guards=$(rg -c "function check[A-Z]|const check[A-Z]" "$paragon_guard" 2>/dev/null || echo 0)
 
     if [[ $active_guards -lt 10 ]]; then
       score=70
@@ -285,8 +286,8 @@ check_lessons() {
     score=50
     lesson_count=0
   else
-    # Count lesson entries (## headers or numbered items)
-    lesson_count=$(grep -cE "^##|^\d+\." "$lessons_file" 2>/dev/null || echo 0)
+    # Count lesson entries (## headers or numbered items) - using rg instead of grep
+    lesson_count=$(rg -c "^##|^\d+\." "$lessons_file" 2>/dev/null || echo 0)
 
     # Check file modification time
     # Use GNU stat -c if available (Nix), otherwise macOS stat -f

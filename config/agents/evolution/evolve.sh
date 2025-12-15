@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # evolve.sh - Unified evolution system
 # Single command: just evolve [--json]
+# Uses modern CLI tools: rg (ripgrep)
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -260,7 +261,7 @@ do_dashboard() {
   # Alerts
   if [[ -f "$METRICS_DIR/alerts.log" ]]; then
     local recent_alerts
-    recent_alerts=$(tail -3 "$METRICS_DIR/alerts.log" 2>/dev/null | grep -v "^$" || true)
+    recent_alerts=$(tail -3 "$METRICS_DIR/alerts.log" 2>/dev/null | rg -v "^$" || true)
 
     if [[ -n "$recent_alerts" ]]; then
       echo -e "  ${YELLOW}Alerts:${NC}"
