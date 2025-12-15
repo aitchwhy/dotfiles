@@ -15,7 +15,11 @@ let
     mkEnableOption
     ;
 
-  ports = import ../../../lib/ports.nix;
+  # Centralized configuration - see lib/config/
+  cfg' = import ../../../lib/config { inherit lib; };
+  ports = cfg'.ports;
+  services = cfg'.services;
+
   cfg = config.modules.nixos.services.gcp-observability;
 in
 {
@@ -226,7 +230,7 @@ in
             # 2. Run Loki locally and export to GCP: https://grafana.com/docs/loki/latest/
             # 3. Use Vector instead of Promtail with GCP sink: https://vector.dev/
             # For now, logs.enable defaults to false
-            url = "http://localhost:3100/loki/api/v1/push";
+            url = services.loki.pushUrl;
           }
         ];
 

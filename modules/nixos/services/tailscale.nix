@@ -12,7 +12,9 @@ let
     types
     mkIf
     ;
-  ports = import ../../../lib/ports.nix;
+  # Centralized configuration - see lib/config/
+  cfg' = import ../../../lib/config { inherit lib; };
+  ports = cfg'.ports;
 in
 {
   options.modules.nixos.services.tailscale = {

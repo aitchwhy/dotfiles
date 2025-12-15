@@ -1,8 +1,10 @@
 # NixOS SSH server configuration
 # Hardened OpenSSH settings
-{ ... }:
+{ lib, ... }:
 let
-  ports = import ../../../lib/ports.nix;
+  # Centralized configuration - see lib/config/
+  cfg' = import ../../../lib/config { inherit lib; };
+  ports = cfg'.ports;
 in
 {
   config = {
