@@ -114,6 +114,16 @@
         "hooks": [
           {
             "type": "command",
+            "command": "bun run \"$HOME/dotfiles/config/agents/hooks/secrets-audit.ts\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
             "command": "echo \"[$(date '+%Y-%m-%d %H:%M:%S')] Session: $(pwd)\" >> ~/.claude/session.log"
           }
         ]
@@ -161,15 +171,6 @@
           {
             "type": "command",
             "command": "bun run \"$HOME/dotfiles/config/agents/hooks/session-polish.ts\"",
-            "timeout": 120
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun run \"$HOME/dotfiles/config/agents/hooks/paragon-cleanup.ts\" --mode full",
             "timeout": 60
           }
         ]
