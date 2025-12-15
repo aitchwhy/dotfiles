@@ -241,7 +241,7 @@ eza --oneline            # One file per line (like ls -1)
 
 **Installation**: All tools provided via Nix (`pkgs.ripgrep`, `pkgs.fd`, `pkgs.eza`, `pkgs.dust`)
 
-## Parse-at-Boundary Architecture (Guards 32-36)
+## Parse-at-Boundary Architecture (Guards 32-39)
 
 ### Core Principle
 
@@ -268,6 +268,9 @@ Parse ONCE at boundary, typed internally. No optional chaining or null checks in
 | Null check then assert | 34 | `if (x === null) ... x!` |
 | Type assertions | 35 | `as Type` (warning) |
 | Non-null assert | 36 | `x!` without narrowing |
+| Nullable union in context | 37 | `string \| null` in Context/State types |
+| Truthiness check | 38 | `if (value)` implicit checks (warning) |
+| Undefined check | 39 | `=== undefined` in domain code |
 
 ### XState Pattern
 
@@ -284,7 +287,7 @@ if (context.phase === "active") {
 }
 ```
 
-### Boundary Files (Guards 32-36 Skip These)
+### Boundary Files (Guards 32-39 Skip These)
 
 - `*/api/*.ts` - API route handlers
 - `*/lib/*-client.ts` - API clients

@@ -1,9 +1,9 @@
 ---
 name: parse-boundary-patterns
-description: "Parse don't validate" enforcement. Parse ONCE at boundaries, typed internally. No optional chaining or null checks in domain code.
+description: "Parse don't validate" enforcement. Parse ONCE at boundaries, typed internally. No optional chaining or null checks in domain code. Guards 32-39.
 allowed-tools: Read, Write, Edit
 token-budget: 2500
-version: 1.0.0
+version: 1.1.0
 ---
 
 # Parse-at-Boundary Patterns
@@ -257,6 +257,9 @@ if (ctx.phase === "b") {
 | 34 | Null check then access | `if (x === null) ... x!` |
 | 35 | Type assertions | `x as Type` without parsing (warning) |
 | 36 | Non-null assertion | `x!` without type narrowing |
+| 37 | Nullable union in context | `string \| null` in Context/State types |
+| 38 | Truthiness check | `if (value)` implicit checks (warning) |
+| 39 | Undefined check in domain | `=== undefined` in domain code |
 
 ## Boundary Files (Guards Skip These)
 

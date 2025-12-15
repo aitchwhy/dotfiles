@@ -1,12 +1,12 @@
 ---
 name: paragon
-description: PARAGON Enforcement System v3.2 - 36 guards for Clean Code, SOLID, configuration centralization, stack compliance, parse-at-boundary, and evidence-based development.
+description: PARAGON Enforcement System v3.3 - 39 guards for Clean Code, SOLID, configuration centralization, stack compliance, parse-at-boundary, and evidence-based development.
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 token-budget: 900
-version: 3.2.0
+version: 3.3.0
 ---
 
-# PARAGON Enforcement System v3.2
+# PARAGON Enforcement System v3.3
 
 > **P**rotocol for **A**utomated **R**ules, **A**nalysis, **G**uards, **O**bservance, and **N**orms
 >
@@ -26,7 +26,7 @@ PARAGON is the unified enforcement layer ensuring all code changes comply with:
 | Git | pre-commit hooks (`git-hooks.nix`) | Every commit |
 | CI | GitHub Actions (`paragon-check.yml`) | Every PR/push |
 
-## Guard Matrix (36 Guards)
+## Guard Matrix (39 Guards)
 
 ### Tier 1: Original Guards (1-14)
 
@@ -175,7 +175,7 @@ url = cfg.services.loki.pushUrl;
 
 See `config/signet/src/stack/versions.ts` for the full approved version registry.
 
-### Tier 7: Parse-at-Boundary Guards (32-36)
+### Tier 7: Parse-at-Boundary Guards (32-39)
 
 | # | Guard | Trigger | Blocks |
 |---|-------|---------|--------|
@@ -184,6 +184,9 @@ See `config/signet/src/stack/versions.ts` for the full approved version registry
 | 34 | Null Check Then Assert | Write/Edit TS | `if (x === null) ... x!` |
 | 35 | Type Assertions | Write/Edit TS | `x as Type` (warning only) |
 | 36 | Non-Null Assert Without Narrowing | Write/Edit TS | `x!` without type guard |
+| 37 | Nullable Union in Context | Write/Edit TS | `string \| null` in Context/State types |
+| 38 | Truthiness Check | Write/Edit TS | `if (value)` implicit checks (warning only) |
+| 39 | Undefined Check in Domain | Write/Edit TS | `=== undefined` in domain code |
 
 **Philosophy**: Parse at boundary, typed internally. If you need `?.` or `??` in domain code, the architecture is wrong.
 
@@ -223,6 +226,42 @@ type Input =
 if (input.phase === "validated") {
   input.phone.trim();  // TypeScript knows phone exists
 }
+```
+
+**Guard 37 Rationale**: Context/State types should use discriminated unions, not nullable fields:
+```typescript
+// BAD - nullable fields require optional chaining throughout
+type Context = { phone: string | null; user: User | undefined }
+
+// GOOD - discriminated union by phase
+type Context =
+  | { phase: "idle" }
+  | { phase: "active"; phone: string }
+  | { phase: "authenticated"; phone: string; user: User }
+```
+
+**Guard 38 Rationale** (Advisory): Implicit truthiness conflates null, undefined, "", 0, and false:
+```typescript
+// WARNING - ambiguous semantics
+if (value) { ... }
+if (!data) { return }
+
+// BETTER - explicit narrowing
+if (value !== undefined) { ... }
+if (data === null) { return }
+```
+
+**Guard 39 Rationale**: Undefined checks indicate data wasn't parsed with defaults at boundary:
+```typescript
+// BAD - checking undefined means data wasn't fully parsed
+if (config.port === undefined) { port = 3000 }
+
+// GOOD - parse at boundary with Schema.optional default
+const ConfigSchema = Schema.Struct({
+  port: Schema.optional(Schema.Number, { default: () => 3000 }),
+});
+const config = Schema.decodeUnknownSync(ConfigSchema)(raw);
+// config.port is number (never undefined)
 ```
 
 See `parse-boundary-patterns` skill for comprehensive patterns.
