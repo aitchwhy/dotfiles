@@ -19,35 +19,9 @@ alias s := switch
 # COMMANDS
 # ═══════════════════════════════════════════════════════════════════════════════
 
-# Show system status and available commands
+# List available commands
 default:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    echo "═══════════════════════════════════════════════════════════════"
-    gen=$(darwin-rebuild --list-generations 2>/dev/null | tail -1 | awk '{print $1}' || echo '?')
-    health=$(bash config/agents/evolution/evolve.sh --json 2>/dev/null | jq -r '.score_percent // empty' 2>/dev/null || true)
-    printf "  Darwin: {{ host }} | Gen: %s" "$gen"
-    if [ -n "$health" ]; then printf " | Health: %s%%" "$health"; fi
-    echo ""
-    echo "═══════════════════════════════════════════════════════════════"
-    echo ""
-    echo "System:"
-    echo "  just switch       Rebuild local system (darwin-rebuild switch)"
-    echo "  just deploy       Deploy all: system + cloud + data"
-    echo "  just check        Validate without applying changes"
-    echo "  just rollback     Revert to previous generation"
-    echo ""
-    echo "Development:"
-    echo "  just dev          Enter development shell"
-    echo "  just update       Update flake inputs"
-    echo "  just status       System status and health"
-    echo ""
-    echo "Modules:"
-    echo "  just cloud <cmd>   Infrastructure: ssh, pulumi, secrets, colmena"
-    echo "  just data <cmd>    Data ops: push, pull, status (DVC → GCS)"
-    echo "  just nvim <cmd>    Neovim: update, health, sync, plugins"
-    echo "  just yazi <cmd>    Yazi: edit, plugins, update"
-    echo "  just agents <cmd>  AI: setup-project, verify, evolve"
+    @just --list
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # SYSTEM
