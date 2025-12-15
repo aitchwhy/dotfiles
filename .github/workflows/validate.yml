@@ -46,10 +46,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install Modern CLI Tools
+        run: |
+          # Install ripgrep, fd-find (modern Rust alternatives)
+          sudo apt-get update
+          sudo apt-get install -y ripgrep fd-find
+
       - name: Validate JSON Files
         run: |
           echo "Validating JSON files..."
-          find . -name '*.json' -not -path './node_modules/*' -not -path './.git/*' | while read file; do
+          # Use fd (fdfind on Ubuntu) instead of find
+          fdfind -e json --exclude node_modules --exclude .git | while read file; do
             # Skip JSONC files in cursor/vscode directories
             if [[ "$file" == *cursor* ]] || [[ "$file" == *vscode* ]]; then
               echo "Skipping JSONC: $file"
@@ -63,7 +70,8 @@ jobs:
         run: |
           echo "Validating YAML files..."
           pip install pyyaml
-          find . -name '*.yaml' -o -name '*.yml' | while read file; do
+          # Use fd (fdfind on Ubuntu) instead of find
+          fdfind -e yaml -e yml | while read file; do
             echo "Checking: $file"
             python3 -c "import yaml; yaml.safe_load(open('$file'))" || { echo "Invalid YAML: $file"; exit 1; }
           done
@@ -76,16 +84,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install Modern CLI Tools
+        run: |
+          # Install ripgrep, fd-find, eza (modern Rust alternatives)
+          sudo apt-get update
+          sudo apt-get install -y ripgrep fd-find
+          wget -qO- https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz | sudo tar xz -C /usr/local/bin
+
       - name: Skills Cross-Reference Validation
         run: |
           echo "═══ Test 1: Skills Cross-Reference ═══"
 
-          # Get skills defined in directory
-          SKILLS_DIR=$(ls -1 config/agents/skills/ | sort)
+          # Get skills defined in directory (modern: eza)
+          SKILLS_DIR=$(eza --oneline config/agents/skills/ | sort)
           SKILLS_DIR_COUNT=$(echo "$SKILLS_DIR" | wc -l | tr -d ' ')
 
-          # Get skills symlinked in agents.nix (portable sed)
-          SKILLS_NIX=$(grep '\.claude/skills/' config/agents/nix/agents.nix | \
+          # Get skills symlinked in agents.nix (modern: rg)
+          SKILLS_NIX=$(rg '\.claude/skills/' config/agents/nix/agents.nix | \
             sed -E 's/.*\.claude\/skills\/([a-z0-9-]+)".*/\1/' | sort | uniq)
           SKILLS_NIX_COUNT=$(echo "$SKILLS_NIX" | wc -l | tr -d ' ')
 
@@ -131,7 +146,8 @@ jobs:
 
           # Validate required servers exist
           for server in memory context7 fetch repomix signet; do
-            if echo "$MCP_SERVERS" | grep -q "^$server$"; then
+            # Use rg instead of grep
+            if echo "$MCP_SERVERS" | rg -q "^$server$"; then
               echo "✓ Required server: $server"
             else
               echo "ERROR: Required MCP server MISSING: $server"
@@ -197,8 +213,9 @@ jobs:
           # Validate agents have required frontmatter
           for agent in config/agents/agents/*.md; do
             if [ -f "$agent" ]; then
-              grep -q "^name:" "$agent" || { echo "ERROR: Missing 'name:' in $agent"; exit 1; }
-              grep -q "^description:" "$agent" || { echo "ERROR: Missing 'description:' in $agent"; exit 1; }
+              # Use rg instead of grep
+              rg -q "^name:" "$agent" || { echo "ERROR: Missing 'name:' in $agent"; exit 1; }
+              rg -q "^description:" "$agent" || { echo "ERROR: Missing 'description:' in $agent"; exit 1; }
               echo "✓ $agent"
             fi
           done
@@ -214,9 +231,10 @@ jobs:
       - name: Summary
         run: |
           echo "═══ Summary ═══"
-          echo "Skills:   $(ls -1 config/agents/skills/ | wc -l | tr -d ' ') defined"
-          echo "Agents:   $(ls config/agents/agents/*.md 2>/dev/null | wc -l | tr -d ' ') definitions"
-          echo "Commands: $(ls config/agents/commands/*.md 2>/dev/null | wc -l | tr -d ' ') commands"
-          echo "Hooks:    $(ls config/agents/hooks/*.ts config/agents/hooks/*.sh 2>/dev/null | wc -l | tr -d ' ') files"
+          # Use eza instead of ls
+          echo "Skills:   $(eza --oneline config/agents/skills/ | wc -l | tr -d ' ') defined"
+          echo "Agents:   $(eza config/agents/agents/*.md 2>/dev/null | wc -l | tr -d ' ') definitions"
+          echo "Commands: $(eza config/agents/commands/*.md 2>/dev/null | wc -l | tr -d ' ') commands"
+          echo "Hooks:    $(eza config/agents/hooks/*.ts config/agents/hooks/*.sh 2>/dev/null | wc -l | tr -d ' ') files"
           echo ""
           echo "All Claude config checks passed"
