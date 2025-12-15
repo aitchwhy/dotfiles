@@ -1,12 +1,12 @@
 ---
 name: paragon
-description: PARAGON Enforcement System v2.2 - 27 guards for Clean Code, SOLID, and evidence-based development.
+description: PARAGON Enforcement System v2.3 - 30 guards for Clean Code, SOLID, configuration centralization, and evidence-based development.
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
-token-budget: 800
-version: 2.2.0
+token-budget: 900
+version: 2.3.0
 ---
 
-# PARAGON Enforcement System v2.2
+# PARAGON Enforcement System v2.3
 
 > **P**rotocol for **A**utomated **R**ules, **A**nalysis, **G**uards, **O**bservance, and **N**orms
 >
@@ -26,7 +26,7 @@ PARAGON is the unified enforcement layer ensuring all code changes comply with:
 | Git | pre-commit hooks (`git-hooks.nix`) | Every commit |
 | CI | GitHub Actions (`paragon-check.yml`) | Every PR/push |
 
-## Guard Matrix (27 Guards)
+## Guard Matrix (30 Guards)
 
 ### Tier 1: Original Guards (1-14)
 
@@ -104,6 +104,45 @@ rg "pattern" .       # ripgrep
 fd -e ts            # fd
 eza -la             # eza
 dust                # dust
+```
+
+### Tier 5: Configuration Guards (28-30)
+
+| # | Guard | Trigger | Blocks |
+|---|-------|---------|--------|
+| 28 | No Hardcoded Ports | Write .nix | Port numbers outside lib/config/ |
+| 29 | No Split-Brain Config | sig-config | Same value in 2+ .nix files |
+| 30 | Config Reference Required | Write .nix | localhost URLs outside lib/config/ |
+
+**Guard 28 Rationale**: All port numbers must be defined in `lib/config/ports.nix`:
+```nix
+# BAD - blocked
+services.foo.port = 3000;
+
+# GOOD - use lib/config reference
+let cfg = import ../../../lib/config { inherit lib; }; in
+services.foo.port = cfg.ports.development.api;
+```
+
+**Guard 29 Rationale**: Values appearing in multiple files indicate split-brain:
+```nix
+# Split-brain detected: port 9100 in 2 files
+# modules/foo.nix: port = 9100;
+# modules/bar.nix: port = 9100;
+
+# Fix: Both should reference lib/config/ports.nix
+let cfg = import ../../../lib/config { inherit lib; }; in
+port = cfg.ports.infrastructure.nodeExporter;
+```
+
+**Guard 30 Rationale**: Localhost URLs must use service definitions:
+```nix
+# BAD - blocked
+url = "http://localhost:3100/loki/api/v1/push";
+
+# GOOD - use lib/config/services.nix
+let cfg = import ../../../lib/config { inherit lib; }; in
+url = cfg.services.loki.pushUrl;
 ```
 
 ## Infinite Loop Prevention
