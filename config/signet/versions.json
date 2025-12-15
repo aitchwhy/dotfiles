@@ -18,10 +18,7 @@
     "tailwindcss": "4.1.17"
   },
   "backend": {
-    "hono": "4.10.7",
-    "drizzle-orm": "0.45.0",
-    "temporal": "1.13.0",
-    "restate": "1.9.1"
+    "drizzle-orm": "0.45.0"
   },
   "infra": {
     "pulumi": "3.210.0",
@@ -100,16 +97,9 @@
     "@xstate/react": "5.0.0",
     "@tanstack/react-router": "1.140.0",
     "tailwindcss": "4.1.17",
-    "hono": "4.10.7",
-    "@hono/zod-openapi": "0.18.0",
     "drizzle-orm": "0.45.0",
     "drizzle-kit": "0.30.0",
     "better-auth": "1.4.6",
-    "@temporalio/client": "1.13.0",
-    "@temporalio/worker": "1.13.0",
-    "@temporalio/workflow": "1.13.0",
-    "@temporalio/activity": "1.13.0",
-    "@restatedev/restate-sdk": "1.9.1",
     "@opentelemetry/api": "1.9.0",
     "@opentelemetry/sdk-node": "0.200.0",
     "@opentelemetry/sdk-trace-node": "2.0.0",

@@ -67,12 +67,10 @@ export type FrontendVersions = {
 };
 
 /**
- * Backend framework versions (Effect Platform HTTP + Drizzle + Durable Workflows)
+ * Backend framework versions (Effect Platform HTTP + Drizzle)
  */
 export type BackendVersions = {
   readonly 'drizzle-orm': string;
-  readonly temporal: string;
-  readonly restate: string;
 };
 
 /**
@@ -217,13 +215,6 @@ export type NpmVersions = {
   // Auth
   readonly 'better-auth': string;
 
-  // Durable Workflows
-  readonly '@temporalio/client': string;
-  readonly '@temporalio/worker': string;
-  readonly '@temporalio/workflow': string;
-  readonly '@temporalio/activity': string;
-  readonly '@restatedev/restate-sdk': string;
-
   // Observability (Datadog + OTEL 2.x)
   readonly '@opentelemetry/api': string;
   readonly '@opentelemetry/sdk-node': string;
@@ -308,8 +299,6 @@ export const frontendVersionsSchema = z.object({
 
 export const backendVersionsSchema = z.object({
   'drizzle-orm': versionString,
-  temporal: versionString,
-  restate: versionString,
 }) satisfies z.ZodType<BackendVersions>;
 
 export const infraVersionsSchema = z.object({
@@ -428,13 +417,6 @@ export const npmVersionsSchema = z.object({
 
   // Auth
   'better-auth': versionString,
-
-  // Durable Workflows
-  '@temporalio/client': versionString,
-  '@temporalio/worker': versionString,
-  '@temporalio/workflow': versionString,
-  '@temporalio/activity': versionString,
-  '@restatedev/restate-sdk': versionString,
 
   // Observability (Datadog + OTEL 2.x)
   '@opentelemetry/api': versionString,

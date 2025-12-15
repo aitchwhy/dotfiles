@@ -51,12 +51,10 @@ export const STACK = {
   },
 
   // ===========================================================================
-  // BACKEND (Effect Platform HTTP + Drizzle + Durable Workflows)
+  // BACKEND (Effect Platform HTTP + Drizzle)
   // ===========================================================================
   backend: {
     'drizzle-orm': '0.45.0',
-    temporal: '1.13.0', // Durable workflows (SDK version)
-    restate: '1.9.1', // Alternative durable execution
   },
 
   // ===========================================================================
@@ -191,13 +189,6 @@ export const STACK = {
 
     // Auth
     'better-auth': '1.4.6',
-
-    // Durable Workflows
-    '@temporalio/client': '1.13.0',
-    '@temporalio/worker': '1.13.0',
-    '@temporalio/workflow': '1.13.0',
-    '@temporalio/activity': '1.13.0',
-    '@restatedev/restate-sdk': '1.9.1',
 
     // Observability (Datadog + OTEL 2.x)
     '@opentelemetry/api': '1.9.0',
