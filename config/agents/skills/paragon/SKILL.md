@@ -1,12 +1,12 @@
 ---
 name: paragon
-description: PARAGON Enforcement System v2.0 - 25 guards for Clean Code, SOLID, and evidence-based development.
+description: PARAGON Enforcement System v2.2 - 27 guards for Clean Code, SOLID, and evidence-based development.
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 token-budget: 800
-version: 2.0.0
+version: 2.2.0
 ---
 
-# PARAGON Enforcement System v2.0
+# PARAGON Enforcement System v2.2
 
 > **P**rotocol for **A**utomated **R**ules, **A**nalysis, **G**uards, **O**bservance, and **N**orms
 >
@@ -26,7 +26,7 @@ PARAGON is the unified enforcement layer ensuring all code changes comply with:
 | Git | pre-commit hooks (`git-hooks.nix`) | Every commit |
 | CI | GitHub Actions (`paragon-check.yml`) | Every PR/push |
 
-## Guard Matrix (25 Guards)
+## Guard Matrix (27 Guards)
 
 ### Tier 1: Original Guards (1-14)
 
@@ -73,9 +73,42 @@ PARAGON is the unified enforcement layer ensuring all code changes comply with:
 | 24 | Interface Segregation | SOLID | Interfaces >7 members |
 | 25 | Deep Nesting | Ch. 3 | >3 indent levels |
 
+### Tier 4: Tooling Guards (26-27)
+
+| # | Guard | Trigger | Blocks |
+|---|-------|---------|--------|
+| 26 | No Console | Write/Edit TS | `console.log`, `console.error`, `console.warn`, `console.debug`, `console.info` |
+| 27 | Modern CLI Tools | Bash/Write | `grep`, `find`, `ls`, `du` (use rg, fd, eza, dust) |
+
+**Guard 26 Rationale**: Use Effect-TS logging for structured, typed logging:
+```typescript
+// BAD - blocked
+console.log('Processing', data);
+console.error('Failed:', error);
+
+// GOOD - Effect-TS logging
+yield* Effect.log('Processing', data);
+yield* Effect.logError('Failed', error);
+```
+
+**Guard 27 Rationale**: Use modern Rust CLI tools for speed, safety, and readability:
+```bash
+# BAD - blocked
+grep -r "pattern" .
+find . -name "*.ts"
+ls -la
+du -sh
+
+# GOOD - Modern tools
+rg "pattern" .       # ripgrep
+fd -e ts            # fd
+eza -la             # eza
+dust                # dust
+```
+
 ## Infinite Loop Prevention
 
-Guards 18-25 include protection against refactoring loops:
+Guards 18-26 include protection against refactoring loops:
 
 | Mechanism | Description |
 |-----------|-------------|
@@ -141,7 +174,8 @@ touch .tdd-skip
 
 | File | Purpose |
 |------|---------|
-| `config/agents/hooks/paragon-guard.ts` | PreToolUse enforcement (25 guards) |
+| `config/agents/hooks/paragon-guard.ts` | PreToolUse enforcement (27 guards) |
+| `config/agents/rules/ast-grep/no-legacy-tools.yml` | Guard 27 AST-grep rule |
 | `flake/hooks.nix` | git-hooks.nix pre-commit |
 | `.github/workflows/paragon-check.yml` | CI enforcement |
 | `scripts/verify-paragon.sh` | Manual verification |

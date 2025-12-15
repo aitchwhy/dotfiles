@@ -27,7 +27,7 @@ mcp__signet__sig-stack(path: ".", fix: true)
 ```
 mcp__signet__sig-guard(content: "...", filePath: "src/foo.ts")
 ```
-- Runs AST-grep rules: no-any, no-zod-infer, no-mock, no-throw, no-should-work
+- Runs AST-grep rules: no-any, no-zod-infer, no-mock, no-throw, no-should-work, no-console, no-legacy-tools
 - Returns violations with line numbers
 - Use BEFORE writing files to catch violations early
 
@@ -56,6 +56,29 @@ mcp__signet__sig-migrate(path: ".", fix: true)
 
 - Effect-TS 3.x (typed errors, dependencies, retries)
 - Return `Effect.fail()` for expected failures, never throw
+
+## Logging
+
+All logging MUST use Effect-TS. Console methods are blocked by Guard 26.
+
+```typescript
+// BAD - blocked by PARAGON Guard 26
+console.log('Processing');
+console.error('Failed:', error);
+
+// GOOD - Effect-TS logging
+yield* Effect.log('Processing');
+yield* Effect.logError('Failed', { error });
+yield* Effect.logWarning('Deprecated API');
+yield* Effect.logDebug('Verbose info');
+
+// Logger layers for different contexts
+Effect.provide(Logger.pretty);        // CLI tools
+Effect.provide(Logger.json);          // Services/APIs
+Effect.provide(HookLoggerLive);       // Claude Code hooks
+```
+
+**Blocked**: `console.log`, `console.error`, `console.warn`, `console.debug`, `console.info`, `pino`
 
 ## Frontend
 
@@ -184,6 +207,39 @@ After writing/modifying TypeScript code, always run:
 biome check --write .  # Format + lint + fix
 bun typecheck          # Type check
 ```
+
+## Modern CLI Tools (Guard 27)
+
+Use modern Rust CLI tools exclusively. Legacy tools are blocked by PARAGON Guard 27.
+
+| Legacy | Modern | Purpose |
+|--------|--------|---------|
+| `grep` | `rg` (ripgrep) | Pattern search |
+| `find` | `fd` | File discovery |
+| `ls` | `eza` | Directory listing |
+| `du` | `dust` | Disk usage |
+
+```bash
+# BAD - blocked by Guard 27
+grep -r "pattern" .
+find . -name "*.ts"
+ls -la
+du -sh
+
+# GOOD - Modern Rust tools
+rg "pattern" .           # ripgrep: faster, .gitignore aware
+fd -e ts                 # fd: simpler syntax, parallel
+eza -la                  # eza: colors, git status
+dust                     # dust: visual tree view
+
+# Common patterns
+rg -t ts "Effect"        # Search TypeScript files only
+rg -q "pattern"          # Quiet mode (exit code only)
+fd -e md --changed-within 7d  # Files modified in last 7 days
+eza --oneline            # One file per line (like ls -1)
+```
+
+**Installation**: All tools provided via Nix (`pkgs.ripgrep`, `pkgs.fd`, `pkgs.eza`, `pkgs.dust`)
 
 ## Nix Build Rules
 
