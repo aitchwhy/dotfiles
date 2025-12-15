@@ -1,0 +1,28 @@
+id: no-nullish-coalescing-domain
+language: typescript
+severity: error
+rule:
+  pattern: "$EXPR ?? $DEFAULT"
+  not:
+    inside:
+      any:
+        - kind: catch_clause
+message: |
+  PARSE-AT-BOUNDARY VIOLATION (Guard 33): Nullish coalescing in domain code.
+
+  Use Schema.optional with default at parse time:
+
+    // BAD - default at use site
+    const port = config.port ?? 3000;
+    const host = options.host ?? "localhost";
+
+    // GOOD - default at parse time
+    const ConfigSchema = Schema.Struct({
+      port: Schema.optional(Schema.Number, { default: () => 3000 }),
+      host: Schema.optional(Schema.String, { default: () => "localhost" }),
+    });
+    const config = Schema.decodeUnknownSync(ConfigSchema)(raw);
+    // Now: config.port is number (not number | undefined)
+
+  See: parse-boundary-patterns skill.
+note: "See: config/agents/skills/parse-boundary-patterns/SKILL.md"

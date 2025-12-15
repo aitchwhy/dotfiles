@@ -1,0 +1,27 @@
+id: no-optional-chain-domain
+language: typescript
+severity: warning
+rule:
+  kind: member_expression
+  has:
+    kind: optional_chain
+message: |
+  PARSE-AT-BOUNDARY VIOLATION (Guard 32): Optional chaining in domain code.
+
+  Parse data at boundary instead of checking nulls throughout:
+
+    // BAD - unparsed data
+    const name = user?.profile?.name;
+    const phone = context.phone?.trim();
+
+    // GOOD - parse once at boundary
+    const user = Schema.decodeUnknownSync(UserSchema)(raw);
+    const name = user.profile.name;
+
+    // GOOD - discriminated union for state
+    type Context =
+      | { phase: "idle" }
+      | { phase: "active"; phone: string };
+
+  See: parse-boundary-patterns skill.
+note: "See: config/agents/skills/parse-boundary-patterns/SKILL.md"

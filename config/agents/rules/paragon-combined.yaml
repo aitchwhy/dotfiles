@@ -1,6 +1,6 @@
 # PARAGON Combined Pre-Commit Rules
-# Single ast-grep invocation replaces 5 sequential hooks
-# Expected speedup: ~5x (5 sequential → 1 parallel)
+# Single ast-grep invocation replaces multiple sequential hooks
+# Expected speedup: ~7x (7 sequential → 1 parallel)
 
 ---
 id: paragon-no-any
@@ -95,3 +95,38 @@ note: |
   // ✅ CORRECT
   yield* Effect.log('Processing');
   yield* Effect.logError('Failed', { error });
+
+---
+id: paragon-no-optional-chain-domain
+language: TypeScript
+severity: warning
+message: "PARAGON Guard 32: Optional chaining in domain code. Parse at boundary instead."
+rule:
+  kind: member_expression
+  has:
+    kind: optional_chain
+note: |
+  // ❌ BLOCKED
+  const name = user?.profile?.name;
+  const phone = context.phone?.trim();
+
+  // ✅ CORRECT
+  const user = Schema.decodeUnknownSync(UserSchema)(raw);
+  const name = user.profile.name;
+
+---
+id: paragon-no-nullish-coalescing-domain
+language: TypeScript
+severity: warning
+message: "PARAGON Guard 33: Nullish coalescing in domain code. Use Schema.optional with default."
+rule:
+  pattern: "$EXPR ?? $DEFAULT"
+note: |
+  // ❌ BLOCKED
+  const port = config.port ?? 3000;
+
+  // ✅ CORRECT
+  const ConfigSchema = Schema.Struct({
+    port: Schema.optional(Schema.Number, { default: () => 3000 }),
+  });
+  const config = parseConfig(raw);  // port is now number, not number | undefined
