@@ -352,14 +352,20 @@ const FORBIDDEN_IMPORTS: ForbiddenImport[] = [
   {
     patterns: [/from\s+['"]express['"]/, /require\s*\(\s*['"]express['"]\s*\)/],
     package: 'express',
-    alternative: 'hono',
-    docs: 'https://hono.dev',
+    alternative: '@effect/platform (Effect Platform HTTP)',
+    docs: 'https://effect.website/docs/platform/http-server',
   },
   {
     patterns: [/from\s+['"]fastify['"]/, /require\s*\(\s*['"]fastify['"]\s*\)/],
     package: 'fastify',
-    alternative: 'hono',
-    docs: 'https://hono.dev',
+    alternative: '@effect/platform (Effect Platform HTTP)',
+    docs: 'https://effect.website/docs/platform/http-server',
+  },
+  {
+    patterns: [/from\s+['"]hono['"]/, /require\s*\(\s*['"]hono['"]\s*\)/],
+    package: 'hono',
+    alternative: '@effect/platform (Effect Platform HTTP)',
+    docs: 'https://effect.website/docs/platform/http-server',
   },
   {
     patterns: [/from\s+['"]@prisma\/client['"]/, /require\s*\(\s*['"]@prisma\/client['"]\s*\)/],
