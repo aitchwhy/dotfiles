@@ -1,8 +1,8 @@
 #!/usr/bin/env bun
 /**
- * PARAGON Guard v3.1 - Enforcement System PreToolUse gatekeeper
+ * PARAGON Guard v3.2 - Enforcement System PreToolUse gatekeeper
  *
- * Guards (31 total - all blocking except 11, 12):
+ * Guards (36 total - all blocking except 11, 12, 35):
  *
  * Tier 1: Original Guards (1-14)
  * 1. Bash safety - blocks dangerous rm -rf commands
@@ -43,6 +43,13 @@
  *
  * Tier 6: Stack Compliance (31) - package.json
  * 31. Stack compliance - blocks forbidden deps (lodash, express, prisma, etc.)
+ *
+ * Tier 7: Parse-at-Boundary (32-36) - TypeScript files
+ * 32. Optional chaining in non-boundary - blocks x?.y chains in domain code
+ * 33. Nullish coalescing in non-boundary - blocks x ?? y in domain code
+ * 34. Null check then assert - blocks if (x === null) ... x! pattern
+ * 35. Type assertions (advisory) - warns on 'as Type' usage
+ * 36. Non-null assert without narrowing - blocks x! without type guard
  *
  * Infinite Loop Prevention:
  * - Violation batching: all issues reported at once
@@ -1861,6 +1868,308 @@ Bypass: Create .paragon-skip-31 file to skip this check.`;
 }
 
 // ============================================================================
+// 32-36. PARSE-AT-BOUNDARY GUARDS (Tier 7)
+// ============================================================================
+
+/** Boundary files where optional chaining/nullish coalescing IS allowed */
+const BOUNDARY_FILE_PATTERNS = [
+  /\/api\/.*\.ts$/,           // API routes
+  /\/lib\/.*-client\.ts$/,    // API clients
+  /\.schema\.ts$/,            // Schema files
+  /\/schemas?\//,             // Schema directories
+  /\/parsers?\//,             // Parser directories
+  /\.test\.ts$/,              // Test files
+  /\.spec\.ts$/,              // Spec files
+  /\/hooks\//,                // Hook files (like paragon-guard.ts)
+];
+
+function isBoundaryFile(path: string): boolean {
+  return BOUNDARY_FILE_PATTERNS.some((p) => p.test(path));
+}
+
+/**
+ * Guard 32: Optional Chaining in Non-Boundary Code
+ * Detects optional chaining chains (x?.y?.z) in domain code
+ */
+function checkOptionalChainingDomain(content: string, filePath: string): string | null {
+  if (!/\.tsx?$/.test(filePath)) return null;
+  if (filePath.endsWith('.d.ts')) return null;
+  if (filePath.includes('/node_modules/')) return null;
+  if (isBoundaryFile(filePath)) return null;
+
+  const cleanContent = stripCommentsAndStrings(content);
+  const lines = cleanContent.split('\n');
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (!line) continue;
+    if (line.trim().startsWith('import')) continue;
+    if (line.trim().startsWith('export')) continue;
+
+    // Detect optional chaining chains (x?.y?.z)
+    const chainMatch = line.match(/(\w+)\?\.\w+\?\./);
+    if (chainMatch) {
+      return `GUARD 32: PARSE-AT-BOUNDARY VIOLATION - Optional Chaining Chain
+
+File: ${filePath}:${i + 1}
+Match: ${chainMatch[0]}
+
+Optional chaining chain '${chainMatch[0]}' indicates unparsed data.
+Parse at boundary instead.
+
+  // ❌ BLOCKED - scattered null checks
+  const name = context.user?.profile?.name?.trim();
+
+  // ✅ CORRECT - parse at boundary, typed internally
+  type Context = { user: { profile: { name: string } } };
+  const parsed = Schema.decodeUnknownSync(ContextSchema)(raw);
+  const name = parsed.user.profile.name.trim();
+
+See: parse-boundary-patterns skill.
+Bypass: Create .paragon-skip-32 file to skip this check.`;
+    }
+
+    // Detect domain context/input/data optional access
+    const domainMatch = line.match(/(context|input|data)\.(\w+)\?\./);
+    if (domainMatch) {
+      return `GUARD 32: PARSE-AT-BOUNDARY VIOLATION - Domain Optional Access
+
+File: ${filePath}:${i + 1}
+Match: ${domainMatch[0]}
+
+'${domainMatch[1]}.${domainMatch[2]}?.' indicates unparsed data.
+Data should be fully typed after boundary parsing.
+
+  // ❌ BLOCKED - nullable in domain code
+  const phone = context.phone?.trim();
+
+  // ✅ CORRECT - discriminated union
+  type Context =
+    | { phase: "idle" }
+    | { phase: "active"; phone: string };
+
+  if (context.phase === "active") {
+    const phone = context.phone.trim();
+  }
+
+See: parse-boundary-patterns skill.
+Bypass: Create .paragon-skip-32 file to skip this check.`;
+    }
+  }
+  return null;
+}
+
+/**
+ * Guard 33: Nullish Coalescing in Non-Boundary Code
+ * Detects ?? usage in domain code (should use Schema defaults)
+ */
+function checkNullishCoalescingDomain(content: string, filePath: string): string | null {
+  if (!/\.tsx?$/.test(filePath)) return null;
+  if (filePath.endsWith('.d.ts')) return null;
+  if (filePath.includes('/node_modules/')) return null;
+  if (isBoundaryFile(filePath)) return null;
+
+  const cleanContent = stripCommentsAndStrings(content);
+  const lines = cleanContent.split('\n');
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (!line) continue;
+    if (line.trim().startsWith('import')) continue;
+    if (line.trim().startsWith('export')) continue;
+
+    // Skip error message contexts and catch blocks
+    if (line.includes('error') || line.includes('Error')) continue;
+    if (line.includes('message')) continue;
+    if (line.includes('catch')) continue;
+
+    // Detect nullish coalescing on config/context/input
+    const coalescingMatch = line.match(/(config|context|input|options|props|params)\.(\w+)\s*\?\?/);
+    if (coalescingMatch) {
+      return `GUARD 33: PARSE-AT-BOUNDARY VIOLATION - Nullish Coalescing
+
+File: ${filePath}:${i + 1}
+Match: ${coalescingMatch[0]}
+
+'${coalescingMatch[1]}.${coalescingMatch[2]} ??' should have default at parse time.
+
+  // ❌ BLOCKED - default at use site
+  const port = config.port ?? 3000;
+
+  // ✅ CORRECT - default at parse time
+  const ConfigSchema = Schema.Struct({
+    port: Schema.optional(Schema.Number, { default: () => 3000 }),
+  });
+  const config = parseConfig(raw);
+  // Now: config.port is number (not number | undefined)
+
+See: parse-boundary-patterns skill.
+Bypass: Create .paragon-skip-33 file to skip this check.`;
+    }
+  }
+  return null;
+}
+
+/**
+ * Guard 34: Null Check Then Non-Null Assert
+ * Detects if (x === null) followed by x! (indicates validation not parsing)
+ */
+function checkNullCheckThenAssert(content: string, filePath: string): string | null {
+  if (!/\.tsx?$/.test(filePath)) return null;
+  if (filePath.endsWith('.d.ts')) return null;
+  if (filePath.includes('/node_modules/')) return null;
+
+  const cleanContent = stripCommentsAndStrings(content);
+
+  // Pattern: if (x === null) within 10 lines of x!
+  const nullCheckPattern = /if\s*\(\s*(\w+(?:\.\w+)*)\s*===?\s*null\s*\)/g;
+  let match;
+
+  while ((match = nullCheckPattern.exec(cleanContent)) !== null) {
+    const varName = match[1];
+    const afterCheck = cleanContent.substring(match.index, match.index + 500);
+
+    // Look for x! usage after null check
+    const assertPattern = new RegExp(`\\b${varName.replace(/\./g, '\\.')}!`, 'g');
+    if (assertPattern.test(afterCheck)) {
+      const lineNum = cleanContent.substring(0, match.index).split('\n').length;
+      return `GUARD 34: PARSE-AT-BOUNDARY VIOLATION - Null Check Then Assert
+
+File: ${filePath}:${lineNum}
+Variable: ${varName}
+
+Null check followed by non-null assertion indicates validation not parsing.
+
+  // ❌ BLOCKED - validation pattern
+  if (context.phone === null) throw new Error("Phone required");
+  const trimmed = context.phone!.trim();
+
+  // ✅ CORRECT - discriminated union
+  type Context =
+    | { phase: "initial" }
+    | { phase: "validated"; phone: string };
+
+  if (context.phase === "validated") {
+    const trimmed = context.phone.trim();  // TS knows phone exists
+  }
+
+See: parse-boundary-patterns skill.
+Bypass: Create .paragon-skip-34 file to skip this check.`;
+    }
+  }
+  return null;
+}
+
+/**
+ * Guard 35: Type Assertions (Warning Only)
+ * Detects 'as Type' assertions (should parse instead)
+ */
+function checkTypeAssertions(content: string, filePath: string): string[] {
+  const warnings: string[] = [];
+
+  if (!/\.tsx?$/.test(filePath)) return warnings;
+  if (filePath.endsWith('.d.ts')) return warnings;
+  if (filePath.includes('/node_modules/')) return warnings;
+  if (isBoundaryFile(filePath)) return warnings;
+
+  const cleanContent = stripCommentsAndStrings(content);
+  const lines = cleanContent.split('\n');
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (!line) continue;
+    if (line.trim().startsWith('import')) continue;
+
+    // Detect 'as Type' but not 'as const'
+    const asMatch = line.match(/\s+as\s+(?!const\b)([A-Z]\w*)/);
+    if (asMatch) {
+      warnings.push(
+        `Guard 35 (Advisory): Type assertion 'as ${asMatch[1]}' at ${filePath}:${i + 1}. ` +
+          `Consider parsing instead of asserting.`
+      );
+    }
+  }
+  return warnings;
+}
+
+/**
+ * Guard 36: Non-Null Assertion Without Type Narrowing
+ * Detects x! without preceding type guard
+ */
+function checkNonNullAssertWithoutNarrowing(content: string, filePath: string): string | null {
+  if (!/\.tsx?$/.test(filePath)) return null;
+  if (filePath.endsWith('.d.ts')) return null;
+  if (filePath.includes('/node_modules/')) return null;
+
+  const cleanContent = stripCommentsAndStrings(content);
+  const lines = cleanContent.split('\n');
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (!line) continue;
+    if (line.trim().startsWith('import')) continue;
+    if (line.trim().startsWith('export')) continue;
+
+    // Detect x! usage (not in strings since we stripped those)
+    const assertMatch = line.match(/(\w+(?:\.\w+)*)!/);
+    if (!assertMatch) continue;
+
+    const varName = assertMatch[1];
+    if (!varName) continue;
+
+    // Skip common safe patterns
+    if (varName === 'match') continue;  // Array.match()!
+    if (varName.includes('getElementById')) continue;
+    if (line.includes('.get(')) continue;  // Map.get()!
+    if (line.includes('.find(')) continue; // Array.find()!
+
+    // Check if there's a type guard on previous 5 lines
+    const prevLines = lines.slice(Math.max(0, i - 5), i).join('\n');
+    const baseVar = varName.split('.')[0];
+
+    // Look for narrowing patterns
+    const hasNarrowing =
+      prevLines.includes(`${baseVar} !==`) ||
+      prevLines.includes(`${baseVar} ===`) ||
+      prevLines.includes(`typeof ${baseVar}`) ||
+      prevLines.includes(`instanceof`) ||
+      prevLines.includes(`.phase ===`) ||
+      prevLines.includes(`.phase !==`) ||
+      prevLines.includes(`.type ===`) ||
+      prevLines.includes(`.type !==`) ||
+      prevLines.includes(`.kind ===`) ||
+      prevLines.includes(`.kind !==`) ||
+      prevLines.includes(`"${baseVar}" in`);
+
+    if (!hasNarrowing) {
+      return `GUARD 36: PARSE-AT-BOUNDARY VIOLATION - Non-Null Assert Without Narrowing
+
+File: ${filePath}:${i + 1}
+Match: ${varName}!
+
+Non-null assertion without type narrowing indicates unparsed data.
+
+  // ❌ BLOCKED - asserting without narrowing
+  const name = user.profile!.name;
+
+  // ✅ CORRECT - type narrowing via discriminated union
+  if (context.phase === "active") {
+    const name = context.profile.name;  // TS knows it exists
+  }
+
+  // ✅ CORRECT - explicit check before assertion
+  if (user.profile !== null) {
+    const name = user.profile.name;  // TS narrowed via check
+  }
+
+See: parse-boundary-patterns skill.
+Bypass: Create .paragon-skip-36 file to skip this check.`;
+    }
+  }
+  return null;
+}
+
+// ============================================================================
 // Main Hook Logic
 // ============================================================================
 
@@ -2253,6 +2562,62 @@ async function main(): Promise<void> {
       if (stackError) {
         logAndExit('block');
         block(stackError);
+        return;
+      }
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // GUARDS 32-36: Parse-at-Boundary (Tier 7)
+  // ─────────────────────────────────────────────────────────────────────────
+  if ((tool_name === 'Write' || tool_name === 'Edit') && content && filePath) {
+    // Guard 32: Optional Chaining in Non-Boundary Code
+    if (!checkBypassFiles(32)) {
+      guardsChecked++;
+      const optChainError = checkOptionalChainingDomain(content, filePath);
+      if (optChainError) {
+        logAndExit('block');
+        block(optChainError);
+        return;
+      }
+    }
+
+    // Guard 33: Nullish Coalescing in Non-Boundary Code
+    if (!checkBypassFiles(33)) {
+      guardsChecked++;
+      const nullishError = checkNullishCoalescingDomain(content, filePath);
+      if (nullishError) {
+        logAndExit('block');
+        block(nullishError);
+        return;
+      }
+    }
+
+    // Guard 34: Null Check Then Non-Null Assert
+    if (!checkBypassFiles(34)) {
+      guardsChecked++;
+      const nullAssertError = checkNullCheckThenAssert(content, filePath);
+      if (nullAssertError) {
+        logAndExit('block');
+        block(nullAssertError);
+        return;
+      }
+    }
+
+    // Guard 35: Type Assertions (Advisory - warnings only)
+    if (!checkBypassFiles(35)) {
+      guardsChecked++;
+      const typeAssertWarnings = checkTypeAssertions(content, filePath);
+      advisoryWarnings.push(...typeAssertWarnings);
+    }
+
+    // Guard 36: Non-Null Assertion Without Narrowing
+    if (!checkBypassFiles(36)) {
+      guardsChecked++;
+      const nonNullError = checkNonNullAssertWithoutNarrowing(content, filePath);
+      if (nonNullError) {
+        logAndExit('block');
+        block(nonNullError);
         return;
       }
     }
