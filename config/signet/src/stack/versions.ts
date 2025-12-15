@@ -51,10 +51,9 @@ export const STACK = {
   },
 
   // ===========================================================================
-  // BACKEND
+  // BACKEND (Effect Platform HTTP + Drizzle + Durable Workflows)
   // ===========================================================================
   backend: {
-    hono: '4.10.7', // Standards-based server (latest Dec 8, 2025)
     'drizzle-orm': '0.45.0',
     temporal: '1.13.0', // Durable workflows (SDK version)
     restate: '1.9.1', // Alternative durable execution
@@ -186,9 +185,7 @@ export const STACK = {
     '@tanstack/react-router': '1.140.0',
     tailwindcss: '4.1.17',
 
-    // Backend
-    hono: '4.10.7',
-    '@hono/zod-openapi': '0.18.0',
+    // Backend (Effect Platform HTTP - uses @effect/platform versions above)
     'drizzle-orm': '0.45.0',
     'drizzle-kit': '0.30.0',
 
