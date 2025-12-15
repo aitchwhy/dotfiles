@@ -3,6 +3,7 @@
 # verify-factory.sh - Universal Project Factory Health Check
 #
 # Validates that all components of the Universal Project Factory are healthy.
+# Uses modern CLI tools: rg (ripgrep), fd
 #
 set -euo pipefail
 
@@ -79,14 +80,14 @@ echo "Claude Code Integration:"
 if [[ -f "$DOTFILES/config/agents/settings/claude-code.json" ]]; then
   check_pass "claude-code.json exists"
 
-  # Check if hooks are registered
-  if grep -q "unified-guard" "$DOTFILES/config/agents/settings/claude-code.json"; then
+  # Check if hooks are registered (using rg instead of grep)
+  if rg -q "unified-guard" "$DOTFILES/config/agents/settings/claude-code.json"; then
     check_pass "unified-guard registered"
   else
     check_warn "unified-guard not registered"
   fi
 
-  if grep -q "auto-migrate" "$DOTFILES/config/agents/settings/claude-code.json"; then
+  if rg -q "auto-migrate" "$DOTFILES/config/agents/settings/claude-code.json"; then
     check_pass "auto-migrate registered"
   else
     check_warn "auto-migrate not registered"
@@ -114,15 +115,15 @@ fi
 
 echo ""
 
-# 5. Skills & Commands
+# 5. Skills & Commands (using fd instead of find)
 echo "Agent Resources:"
-SKILL_COUNT=$(find "$DOTFILES/config/agents/skills" -name "SKILL.md" 2>/dev/null | wc -l | tr -d ' ')
+SKILL_COUNT=$(fd -t f "SKILL.md" "$DOTFILES/config/agents/skills" 2>/dev/null | wc -l | tr -d ' ')
 check_pass "$SKILL_COUNT skills available"
 
-CMD_COUNT=$(find "$DOTFILES/config/agents/commands" -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
+CMD_COUNT=$(fd -e md "$DOTFILES/config/agents/commands" 2>/dev/null | wc -l | tr -d ' ')
 check_pass "$CMD_COUNT slash commands available"
 
-AGENT_COUNT=$(find "$DOTFILES/config/agents/agents" -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
+AGENT_COUNT=$(fd -e md "$DOTFILES/config/agents/agents" 2>/dev/null | wc -l | tr -d ' ')
 check_pass "$AGENT_COUNT agent personas available"
 
 echo ""

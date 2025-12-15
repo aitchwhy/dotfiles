@@ -2,6 +2,7 @@
 # validate-claude-config.sh
 # Comprehensive validation of Claude Code configuration
 # Catches symlink mismatches, missing references, and config errors
+# Uses modern CLI tools: rg (ripgrep), fd, eza
 #
 # Usage: ./scripts/validate-claude-config.sh
 # Exit codes: 0=pass, 1=fail
@@ -47,13 +48,13 @@ section() {
 # ═══════════════════════════════════════════════════════════════════════════
 section "Test 1: Skills Cross-Reference"
 
-# Get skills defined in directory
-SKILLS_DIR=$(ls -1 "$AGENTS_DIR/skills/" | sort)
+# Get skills defined in directory (using eza instead of ls)
+SKILLS_DIR=$(eza --oneline "$AGENTS_DIR/skills/" | sort)
 SKILLS_DIR_COUNT=$(echo "$SKILLS_DIR" | wc -l | tr -d ' ')
 
-# Get skills symlinked in agents.nix
+# Get skills symlinked in agents.nix (using rg instead of grep)
 # Extract patterns like: ".claude/skills/XXX".source =
-SKILLS_NIX=$(grep '\.claude/skills/' "$AGENTS_NIX" | \
+SKILLS_NIX=$(rg '\.claude/skills/' "$AGENTS_NIX" | \
   sed -E 's/.*\.claude\/skills\/([a-z0-9-]+)".*/\1/' | sort | uniq)
 SKILLS_NIX_COUNT=$(echo "$SKILLS_NIX" | wc -l | tr -d ' ')
 
@@ -105,10 +106,10 @@ echo "$MCP_SERVERS" | while read server; do
   echo "  - $server"
 done
 
-# Validate expected servers exist
+# Validate expected servers exist (using rg instead of grep)
 REQUIRED_SERVERS="memory filesystem context7 fetch repomix signet"
 for server in $REQUIRED_SERVERS; do
-  if echo "$MCP_SERVERS" | grep -q "^${server}$"; then
+  if echo "$MCP_SERVERS" | rg -q "^${server}$"; then
     pass "Required server present: $server"
   else
     error "Required server MISSING: $server"
@@ -141,10 +142,10 @@ if [ -f "$SETTINGS_JSON" ]; then
     error "permissions field missing"
   fi
 
-  # Check hook types defined
+  # Check hook types defined (using rg instead of grep)
   HOOK_TYPES=$(jq -r '.hooks | keys[]' "$SETTINGS_JSON" 2>/dev/null || echo "")
   for hook_type in PreToolUse PostToolUse SessionStart Stop; do
-    if echo "$HOOK_TYPES" | grep -q "^${hook_type}$"; then
+    if echo "$HOOK_TYPES" | rg -q "^${hook_type}$"; then
       pass "Hook type defined: $hook_type"
     else
       warn "Hook type not defined: $hook_type"
@@ -161,9 +162,9 @@ section "Test 4: Hook Files Validation"
 
 HOOKS_DIR="$AGENTS_DIR/hooks"
 
-# Extract hook files referenced in settings
+# Extract hook files referenced in settings (using rg instead of grep)
 REFERENCED_HOOKS=$(jq -r '.. | .command? // empty' "$SETTINGS_JSON" 2>/dev/null | \
-  grep -E 'hooks/[a-zA-Z0-9_-]+\.(ts|sh)' | sed -E 's/.*hooks\/([a-zA-Z0-9_-]+\.(ts|sh)).*/\1/' | sort | uniq)
+  rg -o 'hooks/[a-zA-Z0-9_-]+\.(ts|sh)' | sed -E 's/hooks\/([a-zA-Z0-9_-]+\.(ts|sh))/\1/' | sort | uniq)
 
 if [ -n "$REFERENCED_HOOKS" ]; then
   echo "$REFERENCED_HOOKS" | while read hook; do
@@ -183,19 +184,20 @@ fi
 section "Test 5: Agent Definitions"
 
 AGENTS_MD_DIR="$AGENTS_DIR/agents"
-AGENT_COUNT=$(ls -1 "$AGENTS_MD_DIR"/*.md 2>/dev/null | wc -l | tr -d ' ')
+# Using fd instead of ls
+AGENT_COUNT=$(fd -e md . "$AGENTS_MD_DIR" 2>/dev/null | wc -l | tr -d ' ')
 echo "Agent definitions found: $AGENT_COUNT"
 
 for agent in "$AGENTS_MD_DIR"/*.md; do
   if [ -f "$agent" ]; then
     name=$(basename "$agent")
-    # Check for required frontmatter
-    if grep -q "^name:" "$agent"; then
+    # Check for required frontmatter (using rg instead of grep)
+    if rg -q "^name:" "$agent"; then
       pass "$name has 'name:' field"
     else
       error "$name missing 'name:' field"
     fi
-    if grep -q "^description:" "$agent"; then
+    if rg -q "^description:" "$agent"; then
       pass "$name has 'description:' field"
     else
       error "$name missing 'description:' field"
@@ -209,7 +211,8 @@ done
 section "Test 6: Commands Validation"
 
 COMMANDS_DIR="$AGENTS_DIR/commands"
-COMMAND_COUNT=$(ls -1 "$COMMANDS_DIR"/*.md 2>/dev/null | wc -l | tr -d ' ')
+# Using fd instead of ls
+COMMAND_COUNT=$(fd -e md . "$COMMANDS_DIR" 2>/dev/null | wc -l | tr -d ' ')
 echo "Commands found: $COMMAND_COUNT"
 
 for cmd in "$COMMANDS_DIR"/*.md; do
@@ -232,9 +235,9 @@ section "Test 7: AGENT.md Cross-References"
 AGENT_MD="$AGENTS_DIR/AGENT.md"
 
 if [ -f "$AGENT_MD" ]; then
-  # Extract skill references from AGENT.md (skills have hyphens, unlike tool names)
+  # Extract skill references from AGENT.md (using rg instead of grep)
   # Match pattern: | `skill-name` | (single backticked name with hyphen)
-  AGENT_MD_SKILLS=$(grep -E '\| `[a-z]+-[a-z0-9-]+` \|' "$AGENT_MD" | \
+  AGENT_MD_SKILLS=$(rg -o '\| `[a-z]+-[a-z0-9-]+` \|' "$AGENT_MD" | \
     sed -E 's/.*`([a-z]+-[a-z0-9-]+)`.*/\1/' | sort | uniq || true)
 
   if [ -n "$AGENT_MD_SKILLS" ]; then

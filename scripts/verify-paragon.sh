@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# PARAGON Compliance Verification Script v2.0
+# PARAGON Compliance Verification Script v2.1
 # Run: just verify-paragon
 # Verifies 25 guards for Clean Code, SOLID, and evidence-based development
+# Uses modern CLI tools: rg (ripgrep), fd
 
 set -euo pipefail
 
@@ -14,15 +15,15 @@ ERRORS=0
 WARNINGS=0
 
 echo "=============================================="
-echo "  PARAGON Compliance Verification v2.0"
+echo "  PARAGON Compliance Verification v2.1"
 echo "=============================================="
 echo ""
 
-# Guard 3: Forbidden Files (exclude all node_modules and .git)
+# Guard 3: Forbidden Files (using fd instead of find)
 echo -n "Guard 3 (Forbidden Files): "
 forbidden_found=0
 for pattern in package-lock.json yarn.lock pnpm-lock.yaml .eslintrc .prettierrc jest.config Dockerfile docker-compose.yml docker-compose.yaml .dockerignore; do
-  if find . -name "*$pattern*" -not -path "*/.git/*" -not -path "*/node_modules/*" 2>/dev/null | grep -q .; then
+  if fd --hidden --exclude .git --exclude node_modules "$pattern" 2>/dev/null | rg -q .; then
     forbidden_found=1
     break
   fi
@@ -34,63 +35,77 @@ else
   echo -e "${GREEN}PASS${NC}"
 fi
 
-# Guard 5: No Any Types (exclude tests, comments, guard/tool files)
+# Guard 5: No Any Types (using rg instead of grep)
 echo -n "Guard 5 (No Any Types): "
-if grep -rE ':\s*any\b|as\s+any\b|<any\s*>' --include="*.ts" --include="*.tsx" --exclude-dir=node_modules --exclude="*.d.ts" --exclude="*.test.ts" --exclude="*.spec.ts" --exclude="*-guard.ts" --exclude="sig-*.ts" . 2>/dev/null | grep -vE ':\s*(\*|//)' | grep -vE "'\s*:\s*any\s*'" | grep -q .; then
+if rg ':\s*any\b|as\s+any\b|<any\s*>' -t ts \
+  --glob '!*.d.ts' --glob '!*.test.ts' --glob '!*.spec.ts' \
+  --glob '!*-guard.ts' --glob '!sig-*.ts' --glob '!node_modules/**' 2>/dev/null | \
+  rg -v ':\s*(\*|//)' | rg -v "'\s*:\s*any\s*'" | rg -q .; then
   echo -e "${RED}FAIL${NC}"
   ERRORS=$((ERRORS + 1))
 else
   echo -e "${GREEN}PASS${NC}"
 fi
 
-# Guard 6: No z.infer (exclude guard/tool files that document these patterns)
+# Guard 6: No z.infer (using rg instead of grep)
 echo -n "Guard 6 (No z.infer): "
-if grep -rE 'z\.infer\s*<|z\.input\s*<|z\.output\s*<' --include="*.ts" --include="*.tsx" --exclude-dir=node_modules --exclude="*-guard.ts" --exclude="sig-*.ts" --exclude="ast-engine.ts" . 2>/dev/null | grep -q .; then
+if rg 'z\.infer\s*<|z\.input\s*<|z\.output\s*<' -t ts \
+  --glob '!*-guard.ts' --glob '!sig-*.ts' --glob '!ast-engine.ts' \
+  --glob '!node_modules/**' 2>/dev/null | rg -q .; then
   echo -e "${RED}FAIL${NC}"
   ERRORS=$((ERRORS + 1))
 else
   echo -e "${GREEN}PASS${NC}"
 fi
 
-# Guard 7: No Mocks (exclude guard/tool files that document these patterns)
+# Guard 7: No Mocks (using rg instead of grep)
 echo -n "Guard 7 (No Mocks): "
-if grep -rE 'jest\.mock\s*\(|vi\.mock\s*\(|Mock[A-Z][a-zA-Z]*Live' --include="*.ts" --include="*.tsx" --include="*.js" --exclude-dir=node_modules --exclude="*-guard.ts" --exclude="sig-*.ts" . 2>/dev/null | grep -q .; then
+if rg 'jest\.mock\s*\(|vi\.mock\s*\(|Mock[A-Z][a-zA-Z]*Live' -t ts -t js \
+  --glob '!*-guard.ts' --glob '!sig-*.ts' --glob '!node_modules/**' 2>/dev/null | rg -q .; then
   echo -e "${RED}FAIL${NC}"
   ERRORS=$((ERRORS + 1))
 else
   echo -e "${GREEN}PASS${NC}"
 fi
 
-# Guard 13: No Assumption Language
+# Guard 13: No Assumption Language (using rg instead of grep)
 echo -n "Guard 13 (No Assumptions): "
-if grep -rEi 'should (now )?work|should fix|this fixes|probably (works|fixed)|I think (this|it)|might (work|fix)|likely (fixed|works)' --include="*.ts" --include="*.tsx" --exclude="*.test.ts" --exclude="*.spec.ts" --exclude-dir=node_modules . 2>/dev/null | grep -q .; then
+if rg -i 'should (now )?work|should fix|this fixes|probably (works|fixed)|I think (this|it)|might (work|fix)|likely (fixed|works)' -t ts \
+  --glob '!*.test.ts' --glob '!*.spec.ts' --glob '!node_modules/**' 2>/dev/null | rg -q .; then
   echo -e "${YELLOW}WARN${NC}"
   WARNINGS=$((WARNINGS + 1))
 else
   echo -e "${GREEN}PASS${NC}"
 fi
 
-# Guard 18: Function Arguments (>3 params) - Check for obvious violations
+# Guard 18: Function Arguments (>3 params) - using rg instead of grep
 echo -n "Guard 18 (Function Args): "
-if grep -rE 'function\s+\w+\s*\([^)]*,[^)]*,[^)]*,[^)]*,' --include="*.ts" --include="*.tsx" --exclude="*.test.ts" --exclude="*.spec.ts" --exclude="*.d.ts" --exclude-dir=node_modules . 2>/dev/null | grep -q .; then
+if rg 'function\s+\w+\s*\([^)]*,[^)]*,[^)]*,[^)]*,' -t ts \
+  --glob '!*.test.ts' --glob '!*.spec.ts' --glob '!*.d.ts' \
+  --glob '!node_modules/**' 2>/dev/null | rg -q .; then
   echo -e "${YELLOW}WARN${NC}"
   WARNINGS=$((WARNINGS + 1))
 else
   echo -e "${GREEN}PASS${NC}"
 fi
 
-# Guard 19: Law of Demeter (method chain violations)
+# Guard 19: Law of Demeter (method chain violations) - using rg instead of grep
 echo -n "Guard 19 (Law of Demeter): "
-if grep -rE '\.\w+\([^)]*\)\.\w+\([^)]*\)\.\w+\(' --include="*.ts" --include="*.tsx" --exclude="*.test.ts" --exclude="*.spec.ts" --exclude="*.d.ts" --exclude-dir=node_modules . 2>/dev/null | grep -vE '(pipe|then|catch|Effect|Layer|Stream|filter|map|flatMap)' | grep -q .; then
+if rg '\.\w+\([^)]*\)\.\w+\([^)]*\)\.\w+\(' -t ts \
+  --glob '!*.test.ts' --glob '!*.spec.ts' --glob '!*.d.ts' \
+  --glob '!node_modules/**' 2>/dev/null | \
+  rg -v '(pipe|then|catch|Effect|Layer|Stream|filter|map|flatMap)' | rg -q .; then
   echo -e "${YELLOW}WARN${NC}"
   WARNINGS=$((WARNINGS + 1))
 else
   echo -e "${GREEN}PASS${NC}"
 fi
 
-# Guard 23: Null Returns
+# Guard 23: Null Returns - using rg instead of grep
 echo -n "Guard 23 (No Null Returns): "
-if grep -rE 'return\s+null\s*;' --include="*.ts" --include="*.tsx" --exclude="*.test.ts" --exclude="*.spec.ts" --exclude="*.d.ts" --exclude-dir=node_modules . 2>/dev/null | grep -q .; then
+if rg 'return\s+null\s*;' -t ts \
+  --glob '!*.test.ts' --glob '!*.spec.ts' --glob '!*.d.ts' \
+  --glob '!node_modules/**' 2>/dev/null | rg -q .; then
   echo -e "${YELLOW}WARN${NC}"
   WARNINGS=$((WARNINGS + 1))
 else
