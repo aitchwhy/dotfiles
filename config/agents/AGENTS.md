@@ -51,7 +51,7 @@ hexagonal-architecture, formal-verification, tdd-patterns
 nix-patterns, nix-build-optimization, nix-infrastructure, secrets-management
 
 ### Framework Skills
-hono-workers, tanstack-patterns, state-machine-patterns, observability-patterns
+tanstack-patterns, state-machine-patterns, observability-patterns
 
 ### DevOps/Workflow Skills
 devops-patterns, planning-patterns, signet-patterns, typespec-patterns

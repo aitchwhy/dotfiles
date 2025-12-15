@@ -32,8 +32,6 @@ in
       ".claude/memory".source = config.lib.file.mkOutOfStoreSymlink "${agentsDir}/memory";
 
       # Skills - project-specific patterns
-      ".claude/skills/hono-workers".source =
-        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/hono-workers";
       ".claude/skills/tanstack-patterns".source =
         config.lib.file.mkOutOfStoreSymlink "${agentsDir}/skills/tanstack-patterns";
       ".claude/skills/livekit-agents".source =
