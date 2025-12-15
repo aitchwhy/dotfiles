@@ -907,6 +907,163 @@ See: result-patterns or effect-ts-patterns skill for error handling.`;
 }
 
 // ============================================================================
+// 15. NO COMMENTS (Uncle Bob's Clean Code)
+// ============================================================================
+
+function checkNoComments(content: string, filePath: string): string | null {
+  if (!/\.tsx?$/.test(filePath)) return null;
+  if (filePath.endsWith('.d.ts')) return null;
+  if (filePath.includes('/node_modules/')) return null;
+
+  const lines = content.split('\n');
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i] || '';
+    const trimmed = line.trim();
+
+    if (!trimmed) continue;
+
+    const inlineCommentMatch = line.match(/\/\/(.*)$/);
+    if (inlineCommentMatch) {
+      const commentText = inlineCommentMatch[1]?.trim() || '';
+
+      if (/^(TODO|FIXME|NOTE|HACK|XXX|BUG|OPTIMIZE|REVIEW)[\s:]/i.test(commentText)) continue;
+      if (/^(eslint-|@ts-|prettier-|biome-|tslint:)/.test(commentText)) continue;
+      if (/as\s+\w/.test(line) && commentText.length < 40) continue;
+      if (i === 0 && trimmed.startsWith('#!')) continue;
+
+      return `CLEAN CODE VIOLATION: Unnecessary comment detected (line ${i + 1})
+
+"${commentText.substring(0, 50)}${commentText.length > 50 ? '...' : ''}"
+
+Uncle Bob's Clean Code: Comments are a failure to express yourself in code.
+Code should be self-documenting through:
+  - Meaningful variable names
+  - Well-named functions that do one thing
+  - Clear code structure
+
+ALLOWED: TODO/FIXME/NOTE, JSDoc for exports, eslint/ts directives
+
+See: Clean Code by Robert C. Martin, Chapter 4: Comments`;
+    }
+
+    if (trimmed.startsWith('/*') && !trimmed.startsWith('/**')) {
+      if (i < 10 && /license|copyright|author|\(c\)/i.test(trimmed)) continue;
+
+      return `CLEAN CODE VIOLATION: Block comment detected (line ${i + 1})
+
+Uncle Bob's Clean Code: Don't use comments to explain bad code - rewrite it.
+
+See: Clean Code by Robert C. Martin, Chapter 4: Comments`;
+    }
+  }
+
+  return null;
+}
+
+// ============================================================================
+// 16. MEANINGFUL NAMES (Uncle Bob's Clean Code)
+// ============================================================================
+
+const CRYPTIC_PATTERNS: { pattern: RegExp; description: string; suggestion: string }[] = [
+  { pattern: /\b(const|let|var)\s+([a-hln-wA-Z])\s*[=:]/, description: 'Single-letter variable', suggestion: 'Use descriptive name' },
+  { pattern: /\b(const|let|var)\s+(tmp|temp|ret|res|val|obj|arr|str|num|cnt|idx|ptr|buf|len|sz)\s*[=:]/, description: 'Cryptic abbreviation', suggestion: 'Use full descriptive name' },
+  { pattern: /\b(const|let|var)\s+[a-z]*[ymd]{4,}[a-z]*\s*[=:]/, description: 'Date format variable name', suggestion: 'Use currentDate, formattedDate, etc.' },
+  { pattern: /\b(const|let|var)\s+(str|int|bool|arr|obj|num|fn)[A-Z][a-zA-Z]*\s*[=:]/, description: 'Hungarian notation', suggestion: 'Drop type prefix' },
+];
+
+function checkMeaningfulNames(content: string, filePath: string): string | null {
+  if (!/\.tsx?$/.test(filePath)) return null;
+  if (filePath.endsWith('.d.ts')) return null;
+  if (filePath.includes('/node_modules/')) return null;
+  if (/\.(test|spec)\.[tj]sx?$/.test(filePath)) return null;
+
+  const cleanContent = stripCommentsAndStrings(content);
+  const lines = cleanContent.split('\n');
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i] || '';
+
+    for (const { pattern, description, suggestion } of CRYPTIC_PATTERNS) {
+      const match = line.match(pattern);
+      if (match) {
+        const varName = match[2] || '';
+        if (/^[ijkxyz_e]$/.test(varName)) continue;
+
+        return `CLEAN CODE VIOLATION: ${description} '${varName}' (line ${i + 1})
+
+Uncle Bob's Clean Code: Use Intention-Revealing Names
+
+  const d = new Date();  ->  const createdAt = new Date();
+  const tmp = ...        ->  const activeUsers = ...
+
+${suggestion}
+
+See: Clean Code by Robert C. Martin, Chapter 2: Meaningful Names`;
+      }
+    }
+  }
+
+  return null;
+}
+
+// ============================================================================
+// 17. NO COMMENTED-OUT CODE (Uncle Bob's Clean Code)
+// ============================================================================
+
+const COMMENTED_CODE_PATTERNS = [
+  /\/\/\s*(function|class|interface|type|const|let|var|import|export|return|if|for|while)\s+/,
+  /\/\/\s*\w+\.\w+\s*\(/,
+  /\/\/\s*\w+\s*=\s*[^=]/,
+  /\/\/\s*<\w+/,
+];
+
+function checkCommentedOutCode(content: string, filePath: string): string | null {
+  if (!/\.tsx?$/.test(filePath)) return null;
+  if (filePath.endsWith('.d.ts')) return null;
+  if (filePath.includes('/node_modules/')) return null;
+
+  const lines = content.split('\n');
+  let consecutiveCommentedCode = 0;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i] || '';
+    const trimmed = line.trim();
+
+    const looksLikeCode = COMMENTED_CODE_PATTERNS.some(p => p.test(trimmed));
+
+    if (looksLikeCode) {
+      consecutiveCommentedCode++;
+
+      if (COMMENTED_CODE_PATTERNS[0]?.test(trimmed) || COMMENTED_CODE_PATTERNS[3]?.test(trimmed)) {
+        return `CLEAN CODE VIOLATION: Commented-out code detected (line ${i + 1})
+
+"${trimmed.substring(0, 60)}${trimmed.length > 60 ? '...' : ''}"
+
+Uncle Bob's Clean Code: Delete commented-out code. Git remembers.
+
+  git log -p --all -S 'function_name'
+  git show <commit>:<file>
+
+See: Clean Code by Robert C. Martin, Chapter 4: Comments`;
+      }
+
+      if (consecutiveCommentedCode >= 2) {
+        return `CLEAN CODE VIOLATION: Multiple lines of commented-out code (lines ${i - consecutiveCommentedCode + 2}-${i + 1})
+
+Uncle Bob: Commented-out code is an abomination. DELETE IT.
+
+See: Clean Code by Robert C. Martin, Chapter 4: Comments`;
+      }
+    } else {
+      consecutiveCommentedCode = 0;
+    }
+  }
+
+  return null;
+}
+
+// ============================================================================
 // Main Hook Logic
 // ============================================================================
 
@@ -1102,6 +1259,45 @@ async function main(): Promise<void> {
     if (throwError) {
       logAndExit('block');
       block(throwError);
+      return;
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // 15. NO COMMENTS - Uncle Bob's Clean Code (BLOCKING)
+  // ─────────────────────────────────────────────────────────────────────────
+  if ((tool_name === 'Write' || tool_name === 'Edit') && content && filePath) {
+    guardsChecked++;
+    const commentError = checkNoComments(content, filePath);
+    if (commentError) {
+      logAndExit('block');
+      block(commentError);
+      return;
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // 16. MEANINGFUL NAMES - Uncle Bob's Clean Code (BLOCKING)
+  // ─────────────────────────────────────────────────────────────────────────
+  if ((tool_name === 'Write' || tool_name === 'Edit') && content && filePath) {
+    guardsChecked++;
+    const nameError = checkMeaningfulNames(content, filePath);
+    if (nameError) {
+      logAndExit('block');
+      block(nameError);
+      return;
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // 17. NO COMMENTED-OUT CODE - Uncle Bob's Clean Code (BLOCKING)
+  // ─────────────────────────────────────────────────────────────────────────
+  if ((tool_name === 'Write' || tool_name === 'Edit') && content && filePath) {
+    guardsChecked++;
+    const deadCodeError = checkCommentedOutCode(content, filePath);
+    if (deadCodeError) {
+      logAndExit('block');
+      block(deadCodeError);
       return;
     }
   }
