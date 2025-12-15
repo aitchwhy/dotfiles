@@ -1,0 +1,45 @@
+id: no-nullable-union-context
+language: typescript
+severity: error
+rule:
+  kind: union_type
+  any:
+    - has:
+        kind: literal_type
+        has:
+          kind: "null"
+    - has:
+        kind: predefined_type
+        regex: "^undefined$"
+  inside:
+    any:
+      - kind: type_alias_declaration
+        has:
+          kind: type_identifier
+          regex: "(Context|State|Machine|Store)"
+      - kind: interface_declaration
+        has:
+          kind: type_identifier
+          regex: "(Context|State|Machine|Store)"
+message: |
+  PARSE-AT-BOUNDARY VIOLATION (Guard 37): Nullable union in context/state type.
+
+  Context/State types should use discriminated unions, not nullable fields:
+
+    // BAD - nullable field in context
+    type Context = { phone: string | null; user: User | undefined }
+    interface AppState { data: Data | null }
+
+    // GOOD - discriminated union by phase
+    type Context =
+      | { phase: "idle" }
+      | { phase: "active"; phone: string }
+      | { phase: "authenticated"; phone: string; user: User }
+
+  Benefits:
+  - TypeScript narrows types via phase check
+  - No optional chaining needed in domain code
+  - Impossible states become unrepresentable
+
+  See: parse-boundary-patterns skill.
+note: "See: config/agents/skills/parse-boundary-patterns/SKILL.md"

@@ -1,0 +1,49 @@
+id: no-undefined-check-domain
+language: typescript
+severity: error
+rule:
+  any:
+    - kind: binary_expression
+      pattern: "$VAR === undefined"
+    - kind: binary_expression
+      pattern: "$VAR !== undefined"
+    - kind: binary_expression
+      pattern: 'typeof $VAR === "undefined"'
+    - kind: binary_expression
+      pattern: "typeof $VAR !== \"undefined\""
+  not:
+    inside:
+      any:
+        - kind: catch_clause
+        - kind: arrow_function
+          inside:
+            kind: call_expression
+            has:
+              kind: member_expression
+              regex: "\\.(filter|find|some|every|map)$"
+message: |
+  PARSE-AT-BOUNDARY VIOLATION (Guard 39): Undefined check in domain code.
+
+  Undefined checks indicate unparsed data. Parse at boundary with defaults:
+
+    // BAD - checking undefined in domain code
+    if (config.port === undefined) { port = 3000 }
+    if (user.email !== undefined) { sendEmail(user.email) }
+    if (typeof value === "undefined") { return }
+
+    // GOOD - parse at boundary with defaults
+    const ConfigSchema = Schema.Struct({
+      port: Schema.optional(Schema.Number, { default: () => 3000 }),
+      email: Schema.optional(Schema.String, { default: () => "" }),
+    });
+    const config = Schema.decodeUnknownSync(ConfigSchema)(raw);
+    // Now: config.port is number (never undefined)
+    // Now: config.email is string (never undefined)
+
+    // GOOD - discriminated union for optional presence
+    type User =
+      | { hasEmail: false }
+      | { hasEmail: true; email: string }
+
+  See: parse-boundary-patterns skill.
+note: "See: config/agents/skills/parse-boundary-patterns/SKILL.md"
