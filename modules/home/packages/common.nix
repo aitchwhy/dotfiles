@@ -14,11 +14,10 @@ in
   config = mkIf cfg.enable {
     home.packages =
       with pkgs;
-      # Cloud Platforms
+      # Cloud Platforms (Google Cloud primary - no Cloudflare/Fly.io)
       (optionals cfg.enableCloudPlatforms [
         awscli2
         azure-cli
-        flyctl
         (google-cloud-sdk.withExtraComponents [
           google-cloud-sdk.components.gke-gcloud-auth-plugin
         ])
