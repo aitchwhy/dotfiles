@@ -54,6 +54,7 @@ const DEFAULT_RULES = [
   'no-mock-patterns',
   'no-throw-expected',
   'no-should-work',
+  'no-console',
 ];
 
 // =============================================================================

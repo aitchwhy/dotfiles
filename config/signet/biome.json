@@ -12,7 +12,8 @@
       "suspicious": {
         "noExplicitAny": "error",
         "noAssignInExpressions": "warn",
-        "useIterableCallbackReturn": "warn"
+        "useIterableCallbackReturn": "warn",
+        "noConsole": "error"
       },
       "complexity": {
         "useLiteralKeys": "off"
