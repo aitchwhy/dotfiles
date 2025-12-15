@@ -8,6 +8,9 @@ host := env_var_or_default("HOST", "hank-mbp-m4")
 # Import namespaced modules
 mod cloud "config/just/cloud.just"
 mod data "config/just/data.just"
+mod nvim "config/just/nvim.just"
+mod yazi "config/just/yazi.just"
+mod agents "config/just/agents.just"
 
 # Aliases
 alias s := switch
@@ -40,8 +43,11 @@ default:
     echo "  just status       System status and health"
     echo ""
     echo "Modules:"
-    echo "  just cloud <cmd>  Infrastructure: ssh, pulumi, secrets, colmena"
-    echo "  just data <cmd>   Data ops: push, pull, status (DVC → GCS)"
+    echo "  just cloud <cmd>   Infrastructure: ssh, pulumi, secrets, colmena"
+    echo "  just data <cmd>    Data ops: push, pull, status (DVC → GCS)"
+    echo "  just nvim <cmd>    Neovim: update, health, sync, plugins"
+    echo "  just yazi <cmd>    Yazi: edit, plugins, update"
+    echo "  just agents <cmd>  AI: setup-project, verify, evolve"
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # SYSTEM
