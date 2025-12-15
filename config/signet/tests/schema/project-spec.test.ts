@@ -197,7 +197,6 @@ describe('ProjectSpec Schema', () => {
         infra: {
           runtime: 'bun',
           database: 'turso',
-          workflow: 'temporal',
         },
         observability: {
           processCompose: true,

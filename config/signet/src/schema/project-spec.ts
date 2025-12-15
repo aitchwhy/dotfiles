@@ -57,7 +57,7 @@ export type AuthType = 'better-auth' | 'none';
 /**
  * Workflow/Durable Execution types
  */
-export type WorkflowType = 'temporal' | 'restate' | 'none';
+export type WorkflowType = 'none';
 
 /**
  * Telemetry provider types
@@ -184,11 +184,7 @@ export const authTypeSchema = Schema.Literal(
   'none'
 ) satisfies Schema.Schema<AuthType>;
 
-export const workflowTypeSchema = Schema.Literal(
-  'temporal',
-  'restate',
-  'none'
-) satisfies Schema.Schema<WorkflowType>;
+export const workflowTypeSchema = Schema.Literal('none') satisfies Schema.Schema<WorkflowType>;
 
 export const telemetryProviderSchema = Schema.Literal(
   'opentelemetry',
