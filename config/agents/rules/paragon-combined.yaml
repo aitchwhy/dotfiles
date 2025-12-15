@@ -1,0 +1,97 @@
+# PARAGON Combined Pre-Commit Rules
+# Single ast-grep invocation replaces 5 sequential hooks
+# Expected speedup: ~5x (5 sequential → 1 parallel)
+
+---
+id: paragon-no-any
+language: TypeScript
+severity: error
+message: "PARAGON Guard 5: 'any' type detected. Use 'unknown' with type guards instead."
+rule:
+  any:
+    - pattern: ": any"
+    - pattern: "as any"
+    - pattern: "<any>"
+    - pattern: "<any,"
+note: |
+  // ❌ BLOCKED
+  function foo(x: any) {}
+  const y = bar as any;
+
+  // ✅ CORRECT
+  function foo(x: unknown) { if (typeof x === 'string') ... }
+
+---
+id: paragon-no-zinfer
+language: TypeScript
+severity: error
+message: "PARAGON Guard 6: z.infer detected. Define TypeScript type first, use 'satisfies z.ZodType<T>'."
+rule:
+  any:
+    - pattern: "z.infer<$_>"
+    - pattern: "z.input<$_>"
+    - pattern: "z.output<$_>"
+note: |
+  // ❌ BLOCKED
+  type User = z.infer<typeof userSchema>;
+
+  // ✅ CORRECT
+  type User = { readonly id: string; readonly name: string };
+  const userSchema = z.object({ id: z.string(), name: z.string() }) satisfies z.ZodType<User>;
+
+---
+id: paragon-no-mock
+language: TypeScript
+severity: error
+message: "PARAGON Guard 7: Mock pattern detected. Use real adapters with Layer.succeed() for DI."
+rule:
+  any:
+    - pattern: "jest.mock($$$)"
+    - pattern: "vi.mock($$$)"
+    - regex: "Mock[A-Z][a-zA-Z]*Live"
+note: |
+  // ❌ BLOCKED
+  jest.mock('./service');
+  vi.mock('axios');
+  const MockStorageLive = ...
+
+  // ✅ CORRECT
+  const TestStorageLive = Layer.succeed(Storage, { ... });
+
+---
+id: paragon-no-assumptions
+language: TypeScript
+severity: error
+message: "PARAGON Guard 13: Assumption language detected. Replace with evidence-based statements."
+rule:
+  kind: comment
+  regex: "should (now )?work|should fix|this fixes|probably (works|fixed)|I think|might (work|fix)|likely (fixed|works)"
+note: |
+  // ❌ BLOCKED
+  // This should work now
+  // I think this fixes the issue
+
+  // ✅ CORRECT
+  // Verified via test: UserService.test.ts
+  // Confirmed by running: bun test
+
+---
+id: paragon-no-console
+language: TypeScript
+severity: error
+message: "PARAGON Guard 26: console.* detected. Use Effect logging instead."
+rule:
+  any:
+    - pattern: "console.log($$$)"
+    - pattern: "console.error($$$)"
+    - pattern: "console.warn($$$)"
+    - pattern: "console.debug($$$)"
+    - pattern: "console.info($$$)"
+note: |
+  // ❌ BLOCKED
+  console.log('Processing');
+  console.error('Failed:', error);
+
+  // ✅ CORRECT
+  yield* Effect.log('Processing');
+  yield* Effect.logError('Failed', { error });
