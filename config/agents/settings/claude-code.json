@@ -84,6 +84,16 @@
             "timeout": 60
           }
         ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run \"$HOME/dotfiles/config/agents/hooks/paragon-cleanup.ts\" --mode incremental",
+            "timeout": 30
+          }
+        ]
       }
     ],
     "PreToolUse": [
@@ -152,6 +162,15 @@
             "type": "command",
             "command": "bun run \"$HOME/dotfiles/config/agents/hooks/session-polish.ts\"",
             "timeout": 120
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run \"$HOME/dotfiles/config/agents/hooks/paragon-cleanup.ts\" --mode full",
+            "timeout": 60
           }
         ]
       },
