@@ -16,6 +16,7 @@ import { appendFileSync, mkdirSync, existsSync, readFileSync, readdirSync, statS
 import { homedir } from "node:os";
 import { join, relative } from "node:path";
 import { spawnSync } from "node:child_process";
+import { logError } from "./lib/hook-logging";
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -494,7 +495,7 @@ async function cleanup(mode: "incremental" | "full"): Promise<CleanupResult> {
   }
 
   // Print report
-  console.log(formatReport(allSmells, mode));
+  process.stdout.write(formatReport(allSmells, mode) + '\n');
 
   const duration = Date.now() - startTime;
   const result: CleanupResult = {
@@ -529,16 +530,16 @@ const isJson = args.includes("--json");
 cleanup(mode)
   .then((result) => {
     if (isJson) {
-      console.log(JSON.stringify(result, null, 2));
+      process.stdout.write(JSON.stringify(result, null, 2) + '\n');
     }
 
     // In CI mode, exit with error if critical smells found
     if (isCI && result.bySeverity.critical > 0) {
-      console.error(`\n❌ Found ${result.bySeverity.critical} critical code smells`);
+      logError('paragon-cleanup', `Found ${result.bySeverity.critical} critical code smells`);
       process.exit(2);
     }
   })
   .catch((error) => {
-    console.error("Cleanup error:", error);
+    logError('paragon-cleanup', error);
     process.exit(1);
   });

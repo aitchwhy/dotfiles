@@ -15,6 +15,7 @@ import { spawn } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, realpathSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { homedir } from 'node:os';
+import { logError, logWarning } from './lib/hook-logging';
 
 // Configuration
 const HOME = homedir();
@@ -129,7 +130,7 @@ function initDb(): Database | null {
 
     return db;
   } catch (error) {
-    console.error(`[lesson-writer] Failed to initialize database: ${error}`);
+    logError('lesson-writer', error);
     return null;
   }
 }
@@ -147,7 +148,7 @@ function storeLesson(db: Database, lesson: Lesson): boolean {
     stmt.run(lesson.date, lesson.category, lesson.lesson, lesson.evidence, lesson.source);
     return true;
   } catch (error) {
-    console.error(`[lesson-writer] Failed to store lesson: ${error}`);
+    logError('lesson-writer', error);
     return false;
   }
 }
@@ -172,7 +173,7 @@ function detectCategory(text: string): LessonCategory | null {
 function parseTranscript(filePath: string): string[] {
   // Validate path is within expected locations
   if (!validatePath(filePath, [HOME])) {
-    console.error('[lesson-writer] Invalid transcript path');
+    logWarning('lesson-writer', 'Invalid transcript path');
     return [];
   }
 
@@ -204,7 +205,7 @@ function parseTranscript(filePath: string): string[] {
 
     return assistantMessages;
   } catch (error) {
-    console.error(`[lesson-writer] Failed to parse transcript: ${error}`);
+    logError('lesson-writer', error);
     return [];
   }
 }
@@ -261,13 +262,13 @@ function extractLessons(messages: readonly string[]): Lesson[] {
  */
 function triggerConsolidation(): void {
   if (!existsSync(CONSOLIDATE_SCRIPT)) {
-    console.error('[lesson-writer] Consolidation script not found');
+    logWarning('lesson-writer', 'Consolidation script not found');
     return;
   }
 
   // Validate path
   if (!validatePath(CONSOLIDATE_SCRIPT, [HOME])) {
-    console.error('[lesson-writer] Invalid consolidation script path');
+    logWarning('lesson-writer', 'Invalid consolidation script path');
     return;
   }
 
@@ -281,17 +282,17 @@ function triggerConsolidation(): void {
     // Log any errors from the spawned process
     if (child.stderr) {
       child.stderr.on('data', (data: Buffer) => {
-        console.error(`[consolidate] ${data.toString().trim()}`);
+        logWarning('consolidate', data.toString().trim());
       });
     }
 
     child.on('error', (err) => {
-      console.error(`[lesson-writer] Failed to spawn consolidation: ${err}`);
+      logError('lesson-writer', err);
     });
 
     child.unref();
   } catch (error) {
-    console.error(`[lesson-writer] Consolidation trigger failed: ${error}`);
+    logError('lesson-writer', error);
   }
 }
 
@@ -333,12 +334,12 @@ async function main(): Promise<void> {
     for (const lesson of lessons) {
       if (storeLesson(db, lesson)) {
         stored++;
-        console.error(`[lesson-writer] Captured: ${lesson.category} - ${lesson.lesson.slice(0, 50)}...`);
+        logWarning('lesson-writer', `Captured: ${lesson.category} - ${lesson.lesson.slice(0, 50)}...`);
       }
     }
 
     if (stored > 0) {
-      console.error(`[lesson-writer] Captured ${stored} lesson(s)`);
+      logWarning('lesson-writer', `Captured ${stored} lesson(s)`);
       // Trigger consolidation
       triggerConsolidation();
     }
@@ -348,6 +349,6 @@ async function main(): Promise<void> {
 }
 
 main().catch((error) => {
-  console.error(`[lesson-writer] Error: ${error}`);
+  logError('lesson-writer', error);
   process.exit(1);
 });

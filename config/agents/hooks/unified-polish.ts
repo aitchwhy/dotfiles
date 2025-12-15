@@ -18,6 +18,7 @@
  */
 
 import { spawn } from 'bun';
+import { emitContinue } from './lib/hook-logging';
 
 // ============================================================================
 // Configuration
@@ -146,4 +147,4 @@ if (sqlFiles.length > 0) {
 await Promise.all(tasks);
 
 // Output success for PostToolUse
-console.log(JSON.stringify({ continue: true }));
+emitContinue();

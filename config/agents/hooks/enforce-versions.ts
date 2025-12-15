@@ -10,6 +10,7 @@
  */
 
 import { readFileSync } from 'node:fs';
+import { emitContinue, emitHalt } from './lib/hook-logging';
 
 // =============================================================================
 // Types
@@ -59,7 +60,7 @@ const filePaths = (process.env.CLAUDE_FILE_PATHS || '').split(',').filter(Boolea
 const packageJsonFiles = filePaths.filter((p) => p.endsWith('package.json'));
 
 if (packageJsonFiles.length === 0) {
-  console.log(JSON.stringify({ continue: true }));
+  emitContinue();
   process.exit(0);
 }
 
@@ -97,14 +98,11 @@ for (const pkgPath of packageJsonFiles) {
 const forbidden = allViolations.filter((v) => v.severity === 'high');
 if (forbidden.length > 0) {
   const errors = forbidden.map((v) => `  - ${v.message}`).join('\n');
-  console.log(
-    JSON.stringify({
-      continue: false,
-      error: `STACK VIOLATION: Forbidden dependencies detected:\n${errors}\n\nRemove these before continuing.`,
-    })
-  );
+  emitHalt({
+    error: `STACK VIOLATION: Forbidden dependencies detected:\n${errors}\n\nRemove these before continuing.`,
+  });
   process.exit(0);
 }
 
 // Allow to continue
-console.log(JSON.stringify({ continue: true }));
+emitContinue();
