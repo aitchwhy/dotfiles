@@ -17,24 +17,6 @@ processes:
       max_restarts: 3
 
   # ============================================================================
-  # TEMPORAL (Durable Workflows) - DISABLED BY DEFAULT
-  # ============================================================================
-  temporal-server:
-    command: temporal server start-dev --db-filename /tmp/temporal.db
-    ready_log_line: "temporal server is running"
-    disabled: true
-    availability:
-      restart: on_failure
-    depends_on: {}
-
-  temporal-ui:
-    command: echo "Temporal UI available at http://localhost:8233"
-    disabled: true
-    depends_on:
-      temporal-server:
-        condition: process_healthy
-
-  # ============================================================================
   # REDIS (Cache + Queue) - DISABLED BY DEFAULT
   # ============================================================================
   redis:
@@ -87,11 +69,9 @@ groups:
   full:
     processes:
       - signet-dev
-      - temporal-server
       - redis
       - test-watch
 
   infra:
     processes:
-      - temporal-server
       - redis
