@@ -71,6 +71,9 @@ in
       hexyl # Binary hex viewer (for Yazi previews)
       ouch # Archive tool (for Yazi previews)
 
+      # AST-based code search (required by ast-grep MCP server)
+      ast-grep
+
       # Data processing
       jq # JSON processor
       yq # YAML processor
