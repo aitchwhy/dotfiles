@@ -156,6 +156,49 @@ touch .tdd-skip
 | `hexagonal-architecture` | No-mock testing |
 | `quality-patterns` | Additional code quality |
 
+## Fowler Refactoring Catalog Integration
+
+PARAGON cleanup maps code smells to [Fowler's Refactoring Catalog](https://refactoring.com/catalog/).
+
+### Code Smell → Refactoring Mapping
+
+| Code Smell | Category | Refactoring |
+|------------|----------|-------------|
+| Long Method | Bloaters | ExtractFunction |
+| Long Parameter List | Bloaters | IntroduceParameterObject |
+| Primitive Obsession | Bloaters | ReplacePrimitiveWithObject |
+| Data Clumps | Bloaters | ExtractClass |
+| Switch Statements | OO-Abusers | ReplaceConditionalWithPolymorphism |
+| Temporary Field | OO-Abusers | ExtractClass |
+| Feature Envy | Couplers | MoveFunction |
+| Message Chains | Couplers | HideDelegate |
+| Comments | Dispensables | ExtractFunction, RenameVariable |
+| Dead Code | Dispensables | RemoveDeadCode |
+| Duplicate Code | Dispensables | ExtractFunction |
+| Deep Nesting | Change-Preventers | ReplaceNestedConditionalWithGuardClauses |
+
+### Core Refactorings (Most Used)
+
+1. **Extract Function** - Any code fragment with semantic meaning
+2. **Replace Nested Conditional with Guard Clauses** - Deep nesting → early returns
+3. **Introduce Parameter Object** - >3 parameters → single object
+4. **Replace Conditional with Polymorphism** - switch on type → handler map
+5. **Replace Loop with Pipeline** - for loops → filter/map/reduce
+
+### Cleanup Hook
+
+The `paragon-cleanup.ts` hook runs automatically:
+- **PostToolUse**: Incremental analysis on changed files
+- **Stop**: Full codebase analysis at session end
+
+```bash
+# Run cleanup manually
+just agents paragon-clean
+
+# View cleanup statistics
+just agents paragon-stats
+```
+
 ## Quick Reference
 
 ```bash
@@ -167,4 +210,10 @@ just lint-staged
 
 # Check specific guard
 ./scripts/verify-paragon.sh
+
+# Run cleanup manually
+just agents paragon-clean
+
+# View cleanup metrics
+just agents paragon-stats
 ```
