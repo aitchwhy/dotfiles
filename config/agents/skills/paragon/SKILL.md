@@ -1,12 +1,12 @@
 ---
 name: paragon
-description: PARAGON Enforcement System v2.3 - 30 guards for Clean Code, SOLID, configuration centralization, and evidence-based development.
+description: PARAGON Enforcement System v3.1 - 31 guards for Clean Code, SOLID, configuration centralization, stack compliance, and evidence-based development.
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 token-budget: 900
-version: 2.3.0
+version: 3.1.0
 ---
 
-# PARAGON Enforcement System v2.3
+# PARAGON Enforcement System v3.1
 
 > **P**rotocol for **A**utomated **R**ules, **A**nalysis, **G**uards, **O**bservance, and **N**orms
 >
@@ -26,7 +26,7 @@ PARAGON is the unified enforcement layer ensuring all code changes comply with:
 | Git | pre-commit hooks (`git-hooks.nix`) | Every commit |
 | CI | GitHub Actions (`paragon-check.yml`) | Every PR/push |
 
-## Guard Matrix (30 Guards)
+## Guard Matrix (31 Guards)
 
 ### Tier 1: Original Guards (1-14)
 
@@ -145,6 +145,36 @@ let cfg = import ../../../lib/config { inherit lib; }; in
 url = cfg.services.loki.pushUrl;
 ```
 
+### Tier 6: Stack Compliance (31)
+
+| # | Guard | Trigger | Blocks |
+|---|-------|---------|--------|
+| 31 | Stack Compliance | Write package.json | lodash, express, prisma, webpack, jest, eslint, etc. |
+
+**Guard 31 Rationale**: Enforce stack standards in package.json:
+```json
+// BAD - blocked (forbidden deps)
+{
+  "dependencies": {
+    "lodash": "^4.17.0",    // Use native methods or Effect
+    "express": "^4.18.0",   // Use Hono instead
+    "prisma": "^5.0.0",     // Use Drizzle instead
+    "axios": "^1.6.0"       // Use native fetch
+  }
+}
+
+// GOOD - approved stack
+{
+  "dependencies": {
+    "effect": "^3.19.9",
+    "hono": "^4.7.0",
+    "drizzle-orm": "^0.45.0"
+  }
+}
+```
+
+See `config/signet/src/stack/versions.ts` for the full approved version registry.
+
 ## Infinite Loop Prevention
 
 Guards 18-26 include protection against refactoring loops:
@@ -213,11 +243,11 @@ touch .tdd-skip
 
 | File | Purpose |
 |------|---------|
-| `config/agents/hooks/paragon-guard.ts` | PreToolUse enforcement (27 guards) |
-| `config/agents/rules/ast-grep/no-legacy-tools.yml` | Guard 27 AST-grep rule |
-| `flake/hooks.nix` | git-hooks.nix pre-commit |
+| `config/agents/hooks/paragon-guard.ts` | PreToolUse enforcement (31 guards) |
+| `config/agents/rules/paragon-combined.yaml` | Combined ast-grep rules for pre-commit |
+| `config/signet/src/stack/versions.ts` | SSOT for stack versions (Guard 31) |
+| `flake/hooks.nix` | git-hooks.nix pre-commit (single ast-grep) |
 | `.github/workflows/paragon-check.yml` | CI enforcement |
-| `scripts/verify-paragon.sh` | Manual verification |
 
 ## Related Skills
 
@@ -258,18 +288,15 @@ PARAGON cleanup maps code smells to [Fowler's Refactoring Catalog](https://refac
 4. **Replace Conditional with Polymorphism** - switch on type → handler map
 5. **Replace Loop with Pipeline** - for loops → filter/map/reduce
 
-### Cleanup Hook
+### Session Hooks
 
-The `paragon-cleanup.ts` hook runs automatically:
-- **PostToolUse**: Incremental analysis on changed files
-- **Stop**: Full codebase analysis at session end
+The enforcement hooks run automatically:
+- **PostToolUse**: `unified-polish.ts` formats files, `paragon-cleanup.ts` runs incremental analysis
+- **Stop**: `session-polish.ts` validates with ast-grep (formatting done on PostToolUse)
 
 ```bash
-# Run cleanup manually
-just agents paragon-clean
-
-# View cleanup statistics
-just agents paragon-stats
+# Run verification manually
+bun run config/agents/hooks/paragon-guard.ts < test-input.json
 ```
 
 ## Quick Reference
@@ -281,12 +308,9 @@ just verify-paragon
 # Run pre-commit manually
 just lint-staged
 
-# Check specific guard
-./scripts/verify-paragon.sh
+# Run ast-grep validation
+sg scan --rule config/agents/rules/paragon-combined.yaml .
 
-# Run cleanup manually
-just agents paragon-clean
-
-# View cleanup metrics
-just agents paragon-stats
+# Bypass specific guard
+touch .paragon-skip-31  # Skip stack compliance guard
 ```
