@@ -1,8 +1,8 @@
 #!/usr/bin/env bun
 /**
- * PARAGON Guard v3.2 - Enforcement System PreToolUse gatekeeper
+ * PARAGON Guard v3.3 - Enforcement System PreToolUse gatekeeper
  *
- * Guards (36 total - all blocking except 11, 12, 35):
+ * Guards (39 total - all blocking except 11, 12, 35, 38):
  *
  * Tier 1: Original Guards (1-14)
  * 1. Bash safety - blocks dangerous rm -rf commands
@@ -44,12 +44,15 @@
  * Tier 6: Stack Compliance (31) - package.json
  * 31. Stack compliance - blocks forbidden deps (lodash, express, prisma, etc.)
  *
- * Tier 7: Parse-at-Boundary (32-36) - TypeScript files
+ * Tier 7: Parse-at-Boundary (32-39) - TypeScript files
  * 32. Optional chaining in non-boundary - blocks x?.y chains in domain code
  * 33. Nullish coalescing in non-boundary - blocks x ?? y in domain code
  * 34. Null check then assert - blocks if (x === null) ... x! pattern
  * 35. Type assertions (advisory) - warns on 'as Type' usage
  * 36. Non-null assert without narrowing - blocks x! without type guard
+ * 37. Nullable union in context - blocks string | null in Context/State types
+ * 38. Truthiness check (advisory) - warns on if (value) implicit checks
+ * 39. Undefined check in domain - blocks === undefined in domain code
  *
  * Infinite Loop Prevention:
  * - Violation batching: all issues reported at once
@@ -2170,6 +2173,257 @@ Bypass: Create .paragon-skip-36 file to skip this check.`;
 }
 
 // ============================================================================
+// 37. NULLABLE UNION IN CONTEXT TYPES
+// ============================================================================
+
+/**
+ * Guard 37: Nullable Union in Context Types
+ * Detects type definitions with | null or | undefined in Context/State types
+ */
+const NULLABLE_UNION_PATTERNS = [
+  /:\s*\w+\s*\|\s*null\b/,              // : Type | null
+  /:\s*\w+\s*\|\s*undefined\b/,         // : Type | undefined
+  /:\s*null\s*\|\s*\w+/,                // : null | Type
+  /:\s*undefined\s*\|\s*\w+/,           // : undefined | Type
+  /:\s*\w+<[^>]+>\s*\|\s*null\b/,       // : Generic<T> | null
+  /:\s*\w+<[^>]+>\s*\|\s*undefined\b/,  // : Generic<T> | undefined
+];
+
+function checkNullableUnionContext(content: string, filePath: string): string | null {
+  if (!/\.tsx?$/.test(filePath)) return null;
+  if (filePath.endsWith('.d.ts')) return null;
+  if (filePath.includes('/node_modules/')) return null;
+  if (isBoundaryFile(filePath)) return null;
+
+  const cleanContent = stripCommentsAndStrings(content);
+  const lines = cleanContent.split('\n');
+
+  let inContextType = false;
+  let contextTypeName = '';
+  let braceDepth = 0;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (!line) continue;
+
+    // Check for type/interface declaration with Context/State/Machine/Store name
+    const typeMatch = line.match(/\b(type|interface)\s+((\w*)(Context|State|Machine|Store)(\w*))\s*[={]/);
+    if (typeMatch) {
+      inContextType = true;
+      contextTypeName = typeMatch[2];
+      braceDepth = (line.match(/\{/g) || []).length - (line.match(/\}/g) || []).length;
+
+      // Check the same line for nullable union
+      for (const pattern of NULLABLE_UNION_PATTERNS) {
+        if (pattern.test(line)) {
+          const match = line.match(pattern);
+          return `GUARD 37: PARSE-AT-BOUNDARY VIOLATION - Nullable Union in Context Type
+
+File: ${filePath}:${i + 1}
+Type: ${contextTypeName}
+Match: ${match?.[0]}
+
+Context/State types should use discriminated unions, not nullable fields.
+
+  // ❌ BLOCKED - nullable field in context
+  type Context = { phone: string | null; user: User | undefined }
+
+  // ✅ CORRECT - discriminated union by phase
+  type Context =
+    | { phase: "idle" }
+    | { phase: "active"; phone: string }
+    | { phase: "authenticated"; phone: string; user: User }
+
+See: parse-boundary-patterns skill.
+Bypass: Create .paragon-skip-37 file to skip this check.`;
+        }
+      }
+      continue;
+    }
+
+    if (inContextType) {
+      braceDepth += (line.match(/\{/g) || []).length;
+      braceDepth -= (line.match(/\}/g) || []).length;
+
+      for (const pattern of NULLABLE_UNION_PATTERNS) {
+        if (pattern.test(line)) {
+          const match = line.match(pattern);
+          return `GUARD 37: PARSE-AT-BOUNDARY VIOLATION - Nullable Union in Context Type
+
+File: ${filePath}:${i + 1}
+Type: ${contextTypeName}
+Match: ${match?.[0]}
+
+Context/State types should use discriminated unions, not nullable fields.
+
+  // ❌ BLOCKED - nullable field in context
+  type Context = { phone: string | null; user: User | undefined }
+
+  // ✅ CORRECT - discriminated union by phase
+  type Context =
+    | { phase: "idle" }
+    | { phase: "active"; phone: string }
+    | { phase: "authenticated"; phone: string; user: User }
+
+See: parse-boundary-patterns skill.
+Bypass: Create .paragon-skip-37 file to skip this check.`;
+        }
+      }
+
+      if (braceDepth <= 0) {
+        inContextType = false;
+        contextTypeName = '';
+      }
+    }
+  }
+  return null;
+}
+
+// ============================================================================
+// 38. TRUTHINESS CHECK (Advisory - Warning Only)
+// ============================================================================
+
+/**
+ * Guard 38: Implicit Truthiness Check (WARNING)
+ * Detects if (value) instead of explicit type narrowing
+ */
+const BOOLEAN_PREFIXES = /^(is|has|should|can|will|does|did|was|were|are|ok|success|valid|enabled|disabled|active|loading|error|exists|found|done|ready|open|closed|visible|hidden|empty|selected|checked|focused|mounted|pending|resolved|rejected|completed|failed|running|stopped|paused|finished|initialized|authenticated|authorized|connected|disconnected|online|offline)/;
+
+function checkTruthinessCheck(content: string, filePath: string): string[] {
+  const warnings: string[] = [];
+
+  if (!/\.tsx?$/.test(filePath)) return warnings;
+  if (filePath.endsWith('.d.ts')) return warnings;
+  if (filePath.includes('/node_modules/')) return warnings;
+  if (isBoundaryFile(filePath)) return warnings;
+  if (/\.(test|spec)\.[tj]sx?$/.test(filePath)) return warnings;
+
+  const cleanContent = stripCommentsAndStrings(content);
+  const lines = cleanContent.split('\n');
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (!line) continue;
+
+    // Skip JSX conditional rendering
+    if (line.includes('&&') && line.includes('<')) continue;
+    if (line.includes('{') && line.includes('}') && line.includes('<')) continue;
+
+    // Skip ternary expressions
+    if (line.includes('?') && line.includes(':')) continue;
+
+    // Check if (value) or if (!value)
+    const ifMatch = line.match(/if\s*\(\s*(!?)([a-zA-Z_]\w*)\s*\)/);
+    if (ifMatch) {
+      const negation = ifMatch[1];
+      const varName = ifMatch[2];
+      if (!varName) continue;
+      if (BOOLEAN_PREFIXES.test(varName)) continue;
+
+      warnings.push(
+        `Guard 38 (Advisory): Implicit truthiness check 'if (${negation}${varName})' at ${filePath}:${i + 1}. ` +
+        `Consider explicit narrowing: if (${varName} ${negation ? '===' : '!=='} undefined)`
+      );
+    }
+  }
+
+  return warnings;
+}
+
+// ============================================================================
+// 39. UNDEFINED CHECK IN DOMAIN CODE
+// ============================================================================
+
+/**
+ * Guard 39: Undefined Check Pattern in Domain Code
+ * Detects === undefined / !== undefined checks (indicates unparsed data)
+ */
+function checkUndefinedCheckDomain(content: string, filePath: string): string | null {
+  if (!/\.tsx?$/.test(filePath)) return null;
+  if (filePath.endsWith('.d.ts')) return null;
+  if (filePath.includes('/node_modules/')) return null;
+  if (isBoundaryFile(filePath)) return null;
+  if (/\.(test|spec)\.[tj]sx?$/.test(filePath)) return null;
+
+  const cleanContent = stripCommentsAndStrings(content);
+  const lines = cleanContent.split('\n');
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (!line) continue;
+    if (line.trim().startsWith('import')) continue;
+    if (line.trim().startsWith('export type')) continue;
+    if (line.trim().startsWith('export interface')) continue;
+
+    // Skip error handling contexts
+    if (line.includes('error') || line.includes('Error')) continue;
+    if (line.includes('catch')) continue;
+
+    // Skip type definitions
+    if (line.includes('type ') && line.includes('=')) continue;
+    if (line.includes('interface ')) continue;
+
+    // Detect === undefined or !== undefined
+    const undefinedMatch = line.match(/([\w.]+)\s*(===|!==)\s*undefined/);
+    if (undefinedMatch) {
+      const varName = undefinedMatch[1];
+      const operator = undefinedMatch[2];
+      if (!varName) continue;
+
+      // Skip common safe patterns (function parameters, options objects)
+      if (varName.includes('options.') || varName.includes('opts.')) continue;
+      if (varName.includes('arg') || varName.includes('param')) continue;
+      if (varName.includes('config.') || varName.includes('Config.')) continue;
+
+      // Skip array method callbacks
+      if (line.includes('.filter(') || line.includes('.find(') ||
+          line.includes('.some(') || line.includes('.every(')) continue;
+
+      return `GUARD 39: PARSE-AT-BOUNDARY VIOLATION - Undefined Check in Domain Code
+
+File: ${filePath}:${i + 1}
+Match: ${varName} ${operator} undefined
+
+Undefined check indicates unparsed data. Parse at boundary with defaults:
+
+  // ❌ BLOCKED - checking undefined in domain code
+  if (config.port === undefined) { port = 3000 }
+  if (user.email !== undefined) { sendEmail(user.email) }
+
+  // ✅ CORRECT - parse at boundary with defaults
+  const ConfigSchema = Schema.Struct({
+    port: Schema.optional(Schema.Number, { default: () => 3000 }),
+  });
+  const config = Schema.decodeUnknownSync(ConfigSchema)(raw);
+  // config.port is number (never undefined)
+
+See: parse-boundary-patterns skill.
+Bypass: Create .paragon-skip-39 file to skip this check.`;
+    }
+
+    // Detect typeof x === "undefined"
+    const typeofMatch = line.match(/typeof\s+([\w.]+)\s*(===|!==)\s*["']undefined["']/);
+    if (typeofMatch) {
+      const varName = typeofMatch[1];
+      const operator = typeofMatch[2];
+      if (!varName) continue;
+
+      return `GUARD 39: PARSE-AT-BOUNDARY VIOLATION - Typeof Undefined Check
+
+File: ${filePath}:${i + 1}
+Match: typeof ${varName} ${operator} "undefined"
+
+Typeof undefined check indicates unparsed data. Parse at boundary instead.
+
+See: parse-boundary-patterns skill.
+Bypass: Create .paragon-skip-39 file to skip this check.`;
+    }
+  }
+
+  return null;
+}
+
+// ============================================================================
 // Main Hook Logic
 // ============================================================================
 
@@ -2618,6 +2872,35 @@ async function main(): Promise<void> {
       if (nonNullError) {
         logAndExit('block');
         block(nonNullError);
+        return;
+      }
+    }
+
+    // Guard 37: Nullable Union in Context Types
+    if (!checkBypassFiles(37)) {
+      guardsChecked++;
+      const nullableContextError = checkNullableUnionContext(content, filePath);
+      if (nullableContextError) {
+        logAndExit('block');
+        block(nullableContextError);
+        return;
+      }
+    }
+
+    // Guard 38: Implicit Truthiness Check (Advisory - warnings only)
+    if (!checkBypassFiles(38)) {
+      guardsChecked++;
+      const truthinessWarnings = checkTruthinessCheck(content, filePath);
+      advisoryWarnings.push(...truthinessWarnings);
+    }
+
+    // Guard 39: Undefined Check in Domain Code
+    if (!checkBypassFiles(39)) {
+      guardsChecked++;
+      const undefinedCheckError = checkUndefinedCheckDomain(content, filePath);
+      if (undefinedCheckError) {
+        logAndExit('block');
+        block(undefinedCheckError);
         return;
       }
     }
