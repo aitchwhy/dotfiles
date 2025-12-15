@@ -556,7 +556,7 @@ const makePatternService = (): PatternService => ({
         if (result._tag === 'Right') {
           rules.push(result.right);
         } else {
-          console.warn(`Warning: Could not load rule from ${file}: ${result.left.message}`);
+          yield* Effect.logWarning(`Could not load rule from ${file}: ${result.left.message}`);
         }
       }
 

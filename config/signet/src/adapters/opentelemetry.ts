@@ -20,7 +20,6 @@ import {
   type Span,
   type SpanOptions,
   Telemetry,
-  TelemetryError,
   type TelemetryService,
 } from '@/ports/telemetry';
 
@@ -114,20 +113,14 @@ const makeTelemetryService = (config: OpenTelemetryConfig): TelemetryService => 
   capture: (_event: AnalyticsEvent) => Effect.succeed(undefined),
 
   // OpenTelemetry doesn't handle user identification - use PostHog for this
-  identify: (_distinctId: string, _properties?: Record<string, unknown>) => Effect.succeed(undefined),
+  identify: (_distinctId: string, _properties?: Record<string, unknown>) =>
+    Effect.succeed(undefined),
 
   flush: () =>
-    Effect.tryPromise({
-      try: async () => {
-        // Flush all pending spans to Datadog Agent via OTLP
-        // Real implementation would call sdk.forceFlush()
-        console.log(`[OTEL] Flushing spans to ${config.otlpEndpoint}`);
-      },
-      catch: (error) =>
-        new TelemetryError({
-          code: 'EXPORT_FAILED',
-          message: error instanceof Error ? error.message : 'Unknown error',
-        }),
+    Effect.gen(function* () {
+      // Flush all pending spans to Datadog Agent via OTLP
+      // Real implementation would call sdk.forceFlush()
+      yield* Effect.logDebug(`[OTEL] Flushing spans to ${config.otlpEndpoint}`);
     }),
 });
 

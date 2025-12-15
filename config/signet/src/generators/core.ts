@@ -252,12 +252,13 @@ const INDEX_TS_TEMPLATE = `/**
  *
  * {{#if description}}{{description}}{{else}}Main entry point{{/if}}
  */
+import { Effect } from 'effect'
 
-export const main = (): void => {
-  console.log('Hello from {{name}}!')
-}
+export const main = Effect.gen(function* () {
+  yield* Effect.log('Hello from {{name}}!')
+})
 
-main()
+Effect.runPromise(main)
 `;
 
 const RESULT_TS_TEMPLATE = `/**

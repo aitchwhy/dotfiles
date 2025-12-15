@@ -262,12 +262,15 @@ const ERROR_MIDDLEWARE_TEMPLATE = `/**
  * Error Middleware
  *
  * Global error handler for Hono.
+ * Uses Effect.logError for structured error logging.
  */
 import type { ErrorHandler } from 'hono'
 import type { ContentfulStatusCode } from 'hono/utils/http-status'
+import { Effect } from 'effect'
 
 export const errorMiddleware: ErrorHandler = (err, c) => {
-  console.error('Unhandled error:', err)
+  // Log error using Effect-TS (sync execution for middleware)
+  Effect.runSync(Effect.logError('Unhandled error', { error: err.message, stack: err.stack }))
 
   const status = ('status' in err && typeof err.status === 'number' ? err.status : 500) as ContentfulStatusCode
   const message = err.message || 'Internal Server Error'
