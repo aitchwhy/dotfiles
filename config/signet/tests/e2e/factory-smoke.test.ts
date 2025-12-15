@@ -19,7 +19,7 @@ const PROJECT_NAME = 'smoke-test-lib';
  */
 async function run(
   args: string[],
-  cwd: string = TEMP_BASE,
+  cwd: string = TEMP_BASE
 ): Promise<{ exitCode: number; stdout: string; stderr: string }> {
   const proc = Bun.spawn(args, {
     cwd,
@@ -126,10 +126,7 @@ describe('Factory Smoke Test', () => {
     await run(['bun', 'run', signetPath, 'init', 'library', PROJECT_NAME]);
 
     // Validate Nix syntax using nix-instantiate --parse
-    const nixCheckResult = await run(
-      ['nix-instantiate', '--parse', 'flake.nix'],
-      projectPath,
-    );
+    const nixCheckResult = await run(['nix-instantiate', '--parse', 'flake.nix'], projectPath);
     expect(nixCheckResult.exitCode).toBe(0);
   });
 });

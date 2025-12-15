@@ -148,9 +148,7 @@ describe('Effect-TS Compliance', () => {
 
     // Log violations for debugging
     if (violations.length > 0) {
-      console.log('\nEffect compliance violations:');
-      for (const v of violations) {
-        console.log(`  ${v.file}:${v.line} - ${v.content}`);
+      for (const _v of violations) {
       }
     }
 
@@ -222,7 +220,6 @@ describe('Hexagonal Architecture Generation', () => {
     const projectDir = join(tempDir, 'test-api');
 
     if (!existsSync(projectDir)) {
-      console.log('Skipping: project directory not created');
       return;
     }
 

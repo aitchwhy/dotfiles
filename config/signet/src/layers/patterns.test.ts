@@ -122,9 +122,9 @@ describe('applyRule', () => {
     const matches = await runWithEngine(applyRule(root, rule));
 
     expect(matches.length).toBe(1);
-    expect(matches[0]!.rule).toBe('xstate-require-setup');
-    expect(matches[0]!.severity).toBe('error');
-    expect(matches[0]!.node.text).toContain('createMachine');
+    expect(matches[0]?.rule).toBe('xstate-require-setup');
+    expect(matches[0]?.severity).toBe('error');
+    expect(matches[0]?.node.text).toContain('createMachine');
   });
 
   test('includes fix when rule has fix template', async () => {
@@ -145,8 +145,8 @@ describe('applyRule', () => {
     const matches = await runWithEngine(applyRule(root, rule));
 
     expect(matches.length).toBe(1);
-    expect(matches[0]!.fix).toBeDefined();
-    expect(matches[0]!.fix?.replacement).toContain('logger.debug');
+    expect(matches[0]?.fix).toBeDefined();
+    expect(matches[0]?.fix?.replacement).toContain('logger.debug');
   });
 
   test('returns empty array when rule does not match', async () => {
@@ -228,7 +228,7 @@ describe('applyRules', () => {
 
     // Only TypeScript rule should match
     expect(result.matches.length).toBe(1);
-    expect(result.matches[0]!.rule).toBe('ts-rule');
+    expect(result.matches[0]?.rule).toBe('ts-rule');
   });
 });
 
@@ -364,7 +364,7 @@ describe('PatternEngine Integration', () => {
 
     expect(result.hasErrors).toBe(true);
     expect(result.matches.length).toBe(1);
-    expect(result.matches[0]!.fix?.replacement).toContain('setup({})');
+    expect(result.matches[0]?.fix?.replacement).toContain('setup({})');
   });
 
   test('detects Hono routes without zValidator', async () => {
@@ -388,6 +388,6 @@ describe('PatternEngine Integration', () => {
     const result = await runWithEngine(applyRules(source, 'TypeScript', rules));
 
     expect(result.hasErrors).toBe(true);
-    expect(result.matches[0]!.rule).toBe('hono-require-zvalidator');
+    expect(result.matches[0]?.rule).toBe('hono-require-zvalidator');
   });
 });

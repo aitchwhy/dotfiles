@@ -61,7 +61,7 @@ describe('Max Rigor: Version Unity', () => {
     const npmVersions = versions.npm as Record<string, string>;
     const zodVersion = npmVersions['zod'];
     expect(zodVersion).toBeDefined();
-    const major = parseInt(zodVersion!.split('.')[0]!, 10);
+    const major = parseInt(zodVersion?.split('.')[0]!, 10);
     expect(major).toBeGreaterThanOrEqual(4);
   });
 
@@ -69,7 +69,7 @@ describe('Max Rigor: Version Unity', () => {
     const npmVersions = versions.npm as Record<string, string>;
     const effectVersion = npmVersions['effect'];
     expect(effectVersion).toBeDefined();
-    const [major, minor] = effectVersion!.split('.').map(Number);
+    const [major, minor] = effectVersion?.split('.').map(Number);
     expect(major).toBeGreaterThanOrEqual(3);
     if (major === 3) {
       expect(minor).toBeGreaterThanOrEqual(19);
