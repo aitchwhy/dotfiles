@@ -1,0 +1,81 @@
+# Guard 27: Block legacy Unix tools in shell scripts
+# Use modern Rust alternatives: rg (ripgrep), fd, eza, dust
+#
+# Migration guide:
+#   grep → rg (ripgrep)
+#   find → fd
+#   ls → eza
+#   du → dust
+#
+# Note: This rule detects patterns in TypeScript/shell strings.
+# For shell scripts, enforcement is via git-hooks and CI.
+#
+# @see config/agents/skills/paragon/SKILL.md
+
+id: no-legacy-tools
+language: typescript
+severity: warning
+rule:
+  any:
+    # grep patterns in strings/template literals
+    - pattern: "'$$$grep$$$'"
+      constraints:
+        grep:
+          regex: '\bgrep\s+'
+    - pattern: '"$$$grep$$$"'
+      constraints:
+        grep:
+          regex: '\bgrep\s+'
+    - pattern: '`$$$grep$$$`'
+      constraints:
+        grep:
+          regex: '\bgrep\s+'
+    # find patterns in strings (be careful not to match JS .find())
+    - pattern: "'$$$find$$$'"
+      constraints:
+        find:
+          regex: '\bfind\s+\.'
+    - pattern: '"$$$find$$$"'
+      constraints:
+        find:
+          regex: '\bfind\s+\.'
+    - pattern: '`$$$find$$$`'
+      constraints:
+        find:
+          regex: '\bfind\s+\.'
+    # ls -la patterns (avoid matching js-style usage)
+    - pattern: "'$$$ls$$$'"
+      constraints:
+        ls:
+          regex: '\bls\s+-'
+    - pattern: '"$$$ls$$$"'
+      constraints:
+        ls:
+          regex: '\bls\s+-'
+    - pattern: '`$$$ls$$$`'
+      constraints:
+        ls:
+          regex: '\bls\s+-'
+message: |
+  LEGACY TOOL detected in string.
+
+  Use modern Rust CLI tools instead:
+
+    grep → rg (ripgrep)
+      # OLD: grep -E 'pattern' file
+      # NEW: rg 'pattern' file
+
+    find → fd
+      # OLD: find . -name "*.ts" -type f
+      # NEW: fd -e ts
+
+    ls → eza
+      # OLD: ls -la
+      # NEW: eza -la --git --icons
+
+    du → dust
+      # OLD: du -sh *
+      # NEW: dust
+
+  See: config/agents/rules/stack.md
+note: "PARAGON Guard 27: Modern CLI tools"
