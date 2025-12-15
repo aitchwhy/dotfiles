@@ -50,8 +50,10 @@ const DEFAULT_CONFIG: ReviewConfig = {
  * Check if Claude API review is available
  */
 const isClaudeApiAvailable = (): boolean => {
-  return typeof process.env['ANTHROPIC_API_KEY'] === 'string' &&
-         process.env['ANTHROPIC_API_KEY'].length > 0;
+  return (
+    typeof process.env['ANTHROPIC_API_KEY'] === 'string' &&
+    process.env['ANTHROPIC_API_KEY'].length > 0
+  );
 };
 
 // =============================================================================
@@ -195,7 +197,8 @@ const architectReview = (content: string, filePath: string): readonly ReviewFind
   const fileContent = content;
 
   // Check for god objects (too many methods/exports)
-  const exportCount = (fileContent.match(/^export\s+(const|function|class|type|interface)/gm) || []).length;
+  const exportCount = (fileContent.match(/^export\s+(const|function|class|type|interface)/gm) || [])
+    .length;
   if (exportCount > 15) {
     findings.push({
       category: 'architecture',
@@ -534,11 +537,7 @@ export const runReviewTier = (opts: VerificationOptions): Effect.Effect<TierResu
     const { files, skipped } = yield* Effect.tryPromise({
       try: () => findFilesToReview(srcPath, config),
       catch: () => new Error('Failed to find files'),
-    }).pipe(
-      Effect.catchAll(() =>
-        Effect.succeed({ files: [] as string[], skipped: 0 })
-      )
-    );
+    }).pipe(Effect.catchAll(() => Effect.succeed({ files: [] as string[], skipped: 0 })));
 
     if (files.length === 0) {
       details.push('No source files found for review');
@@ -565,12 +564,12 @@ export const runReviewTier = (opts: VerificationOptions): Effect.Effect<TierResu
 
       // Skip large files
       if (content.length > config.maxFileSize) {
-        details.push(`Skipped ${file.replace(opts.path + '/', '')}: exceeds size limit`);
+        details.push(`Skipped ${file.replace(`${opts.path}/`, '')}: exceeds size limit`);
         continue;
       }
 
       if (content) {
-        const relativePath = file.replace(opts.path + '/', '');
+        const relativePath = file.replace(`${opts.path}/`, '');
         const findings = runLocalReview(content, relativePath, config.enabledReviewers);
         allFindings.push(...findings);
       }
@@ -586,7 +585,9 @@ export const runReviewTier = (opts: VerificationOptions): Effect.Effect<TierResu
       details.push('No issues found by reviewers');
     } else {
       details.push('');
-      details.push(`Found: ${errors.length} errors, ${warnings.length} warnings, ${suggestions.length} suggestions`);
+      details.push(
+        `Found: ${errors.length} errors, ${warnings.length} warnings, ${suggestions.length} suggestions`
+      );
       details.push('');
 
       // Group by category
@@ -602,7 +603,8 @@ export const runReviewTier = (opts: VerificationOptions): Effect.Effect<TierResu
         details.push(`[${category.toUpperCase()}]`);
         for (const finding of findings.slice(0, 3)) {
           const loc = finding.line ? `:${finding.line}` : '';
-          const icon = finding.severity === 'error' ? '✗' : finding.severity === 'warning' ? '⚠' : '💡';
+          const icon =
+            finding.severity === 'error' ? '✗' : finding.severity === 'warning' ? '⚠' : '💡';
           details.push(`  ${icon} ${finding.file}${loc}`);
           details.push(`    ${finding.message}`);
           if (opts.verbose) {

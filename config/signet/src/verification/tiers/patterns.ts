@@ -175,7 +175,7 @@ export const runPatternsTier = (opts: VerificationOptions): Effect.Effect<TierRe
       }).pipe(Effect.catchAll(() => Effect.succeed('')));
 
       if (content) {
-        const result = runQuickChecks(content, file.replace(opts.path + '/', ''));
+        const result = runQuickChecks(content, file.replace(`${opts.path}/`, ''));
         totalErrors += result.errors;
         totalWarnings += result.warnings;
         details.push(...result.details);

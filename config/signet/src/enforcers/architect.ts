@@ -101,7 +101,7 @@ export const checkCircularDependencies = (
     const graph = new Map<string, Set<string>>();
     for (const { from, to } of imports) {
       if (!graph.has(from)) graph.set(from, new Set());
-      graph.get(from)!.add(to);
+      graph.get(from)?.add(to);
     }
 
     // DFS to detect cycles
