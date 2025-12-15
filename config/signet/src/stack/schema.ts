@@ -67,10 +67,9 @@ export type FrontendVersions = {
 };
 
 /**
- * Backend framework versions
+ * Backend framework versions (Effect Platform HTTP + Drizzle + Durable Workflows)
  */
 export type BackendVersions = {
-  readonly hono: string;
   readonly 'drizzle-orm': string;
   readonly temporal: string;
   readonly restate: string;
@@ -211,9 +210,7 @@ export type NpmVersions = {
   readonly '@tanstack/react-router': string;
   readonly tailwindcss: string;
 
-  // Backend
-  readonly hono: string;
-  readonly '@hono/zod-openapi': string;
+  // Backend (Effect Platform HTTP - uses @effect/platform)
   readonly 'drizzle-orm': string;
   readonly 'drizzle-kit': string;
 
@@ -310,7 +307,6 @@ export const frontendVersionsSchema = z.object({
 }) satisfies z.ZodType<FrontendVersions>;
 
 export const backendVersionsSchema = z.object({
-  hono: versionString,
   'drizzle-orm': versionString,
   temporal: versionString,
   restate: versionString,
@@ -426,9 +422,7 @@ export const npmVersionsSchema = z.object({
   '@tanstack/react-router': versionString,
   tailwindcss: versionString,
 
-  // Backend
-  hono: versionString,
-  '@hono/zod-openapi': versionString,
+  // Backend (Effect Platform HTTP - uses @effect/platform)
   'drizzle-orm': versionString,
   'drizzle-kit': versionString,
 
