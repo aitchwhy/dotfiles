@@ -1,11 +1,15 @@
 /**
  * API Generator
  *
- * Generates hexagonal Hono API projects with:
+ * TODO: MIGRATION REQUIRED - Update to Effect Platform HTTP on Cloud Run
+ * This generator currently creates Hono + Cloudflare Workers projects.
+ * Stack change (Dec 2025): Now using Effect Platform HTTP + Google Cloud Run.
+ *
+ * Target architecture:
+ * - Effect Platform HTTP (@effect/platform)
+ * - Cloud Run deployment (containerized)
  * - Ports (Context.Tag interfaces)
  * - Adapters (Layer implementations)
- * - Routes and middleware
- * - Cloudflare Workers deployment config
  */
 import type { Effect } from 'effect';
 import type { FileTree } from '@/layers/file-system';
@@ -334,14 +338,15 @@ export const generateApi = (spec: ProjectSpec): Effect.Effect<FileTree, Error, T
   const npmVersions = versions.npm as Record<string, string>;
   const runtimeVersions = versions.runtime as Record<string, string>;
 
+  // TODO: Update templates for Effect Platform HTTP (stack migration Dec 2025)
   const data = {
     name: spec.name,
     description: spec.description,
     hasDatabase: Boolean(spec.infra.database),
     isTurso: spec.infra.database === 'turso',
     isD1: spec.infra.database === 'd1',
-    honoVersion: npmVersions['hono'],
     effectVersion: npmVersions['effect'],
+    effectPlatformVersion: npmVersions['@effect/platform'],
     zodVersion: npmVersions['zod'],
     typescriptVersion: npmVersions['typescript'],
     biomeVersion: npmVersions['@biomejs/biome'],
