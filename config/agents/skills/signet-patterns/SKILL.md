@@ -144,20 +144,20 @@ const sessionSchema = Schema.Struct({
 ### Add New Generator
 
 ```typescript
-// config/signet/src/generators/workflow.ts
-export const workflowGenerator: GeneratorConfig = {
-  name: 'workflow',
-  description: 'Generate Temporal workflow',
+// config/signet/src/generators/service.ts
+export const serviceGenerator: GeneratorConfig = {
+  name: 'service',
+  description: 'Generate Effect service with port',
   schema: z.object({
     name: z.string().min(1),
-    activities: z.array(z.string()).default([]),
+    methods: z.array(z.string()).default([]),
   }),
 
   async generate(config) {
     return [
-      { path: `src/workflows/${config.name}.workflow.ts`, content: ... },
-      { path: `src/workflows/${config.name}.activities.ts`, content: ... },
-      { path: `tests/${config.name}.workflow.test.ts`, content: ... },
+      { path: `src/services/${config.name}.service.ts`, content: ... },
+      { path: `src/ports/${config.name}.port.ts`, content: ... },
+      { path: `tests/${config.name}.service.test.ts`, content: ... },
     ];
   },
 };
@@ -166,11 +166,11 @@ export const workflowGenerator: GeneratorConfig = {
 ### Register in `generators/index.ts`
 
 ```typescript
-import { workflowGenerator } from './workflow';
-export const generators = { ...existing, workflow: workflowGenerator };
+import { serviceGenerator } from './service';
+export const generators = { ...existing, service: serviceGenerator };
 ```
 
-### Use: `signet gen workflow payment`
+### Use: `signet gen service payment`
 
 ## Architecture Rules Enforced
 

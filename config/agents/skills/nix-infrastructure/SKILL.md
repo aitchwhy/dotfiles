@@ -40,12 +40,11 @@ Prevent port conflicts with a single source of truth (`lib/ports.nix`).
   databases = {
     redis = 6379;
     postgresql = 5432;
-    temporal = 7233;
   };
 
   development = {
     api = 3000;
-    temporalUI = 8233;
+    worker = 3001;
   };
 
   otel = {
