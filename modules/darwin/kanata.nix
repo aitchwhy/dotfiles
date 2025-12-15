@@ -20,11 +20,12 @@ in
 
   config = mkIf config.modules.darwin.kanata.enable {
     # System-level LaunchDaemon (runs as root)
+    # Use kanata-with-cmd to enable Command key in combinations (for Meh/Hyper)
     launchd.daemons.kanata = {
       serviceConfig = {
         Label = "org.kanata.daemon";
         ProgramArguments = [
-          "${pkgs.kanata}/bin/kanata"
+          "${pkgs.kanata-with-cmd}/bin/kanata"
           "--cfg"
           "/Users/${config.system.primaryUser}/.config/kanata/kanata.kbd"
         ];

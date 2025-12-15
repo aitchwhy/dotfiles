@@ -117,7 +117,8 @@ in
 
   config = mkIf cfg.enable {
     # Install kanata binary (for manual testing)
-    home.packages = [ pkgs.kanata ];
+    # Use kanata-with-cmd to enable Command key in combinations (for Meh/Hyper)
+    home.packages = [ pkgs.kanata-with-cmd ];
 
     # Generate config from Nix (not sourced from external file)
     xdg.configFile."kanata/kanata.kbd".text = kanataConfig;
@@ -129,7 +130,7 @@ in
         #!/bin/bash
         # Start Kanata keyboard remapper manually
         # Note: The daemon runs via launchd (see modules/darwin/kanata.nix)
-        exec sudo ${pkgs.kanata}/bin/kanata --cfg "$HOME/.config/kanata/kanata.kbd"
+        exec sudo ${pkgs.kanata-with-cmd}/bin/kanata --cfg "$HOME/.config/kanata/kanata.kbd"
       '';
     };
   };
