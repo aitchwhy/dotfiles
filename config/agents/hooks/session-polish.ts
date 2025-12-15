@@ -15,6 +15,7 @@ import { spawn } from 'bun';
 import { existsSync, appendFileSync, mkdirSync, readdirSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { z } from 'zod';
+import { emitContinue, logError } from './lib/hook-logging';
 
 // ============================================================================
 // Input Types
@@ -239,12 +240,12 @@ async function main(): Promise<void> {
   try {
     rawInput = await Bun.stdin.text();
   } catch {
-    console.log(JSON.stringify({ continue: true }));
+    emitContinue();
     return;
   }
 
   if (!rawInput.trim()) {
-    console.log(JSON.stringify({ continue: true }));
+    emitContinue();
     return;
   }
 
@@ -252,7 +253,7 @@ async function main(): Promise<void> {
   try {
     input = HookInputSchema.parse(JSON.parse(rawInput));
   } catch {
-    console.log(JSON.stringify({ continue: true }));
+    emitContinue();
     return;
   }
 
@@ -265,7 +266,7 @@ async function main(): Promise<void> {
   const modifiedFiles = await getModifiedFiles(cwd);
   if (modifiedFiles.length === 0) {
     log(`No modified files to polish`);
-    console.log(JSON.stringify({ continue: true }));
+    emitContinue();
     return;
   }
 
@@ -297,15 +298,12 @@ async function main(): Promise<void> {
     sigVerifyPassed: sigResult.passed,
   };
 
-  console.log(
-    JSON.stringify({
-      continue: true,
-      additionalContext: `Session polish: ${summary.filesPolished} files formatted, ${summary.violations} violations logged`,
-    })
-  );
+  emitContinue({
+    additionalContext: `Session polish: ${summary.filesPolished} files formatted, ${summary.violations} violations logged`,
+  });
 }
 
 main().catch((e) => {
-  console.error('Session Polish error:', e);
-  console.log(JSON.stringify({ continue: true }));
+  logError('session-polish', e);
+  emitContinue();
 });

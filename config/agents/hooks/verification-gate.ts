@@ -13,6 +13,7 @@
 import { Database } from 'bun:sqlite';
 import { existsSync } from 'node:fs';
 import { z } from 'zod';
+import { emitContinue, logError, logWarning } from './lib/hook-logging';
 
 // Input types (TypeScript first, schema satisfies type)
 type HookInput = {
@@ -75,7 +76,7 @@ async function main() {
   try {
     rawInput = await Bun.stdin.text();
   } catch {
-    console.log(JSON.stringify({ continue: true }));
+    emitContinue();
     return;
   }
 
@@ -84,13 +85,13 @@ async function main() {
     input = HookInputSchema.parse(JSON.parse(rawInput));
   } catch {
     // Invalid input - allow continuation
-    console.log(JSON.stringify({ continue: true }));
+    emitContinue();
     return;
   }
 
   // Only gate Stop events
   if (input.hook_event_name !== 'Stop') {
-    console.log(JSON.stringify({ continue: true }));
+    emitContinue();
     return;
   }
 
@@ -115,16 +116,16 @@ Verification format:
      Test: [test_file]:[test_name]
      Output: [relevant test output]`;
 
-    console.error(errorMsg);
+    logWarning('verification-gate', errorMsg);
     process.exit(2);
   }
 
-  console.log(JSON.stringify({ continue: true }));
+  emitContinue();
 }
 
 main().catch((e) => {
-  console.error('Verification Gate error:', e);
+  logError('verification-gate', e);
   // On error, allow continuation to avoid blocking (fail-safe)
-  console.log(JSON.stringify({ continue: true }));
+  emitContinue();
   process.exit(0);
 });

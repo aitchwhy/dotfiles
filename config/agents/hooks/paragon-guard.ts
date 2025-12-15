@@ -51,6 +51,11 @@ import { z } from 'zod';
 import { appendFileSync, mkdirSync, existsSync, readFileSync } from 'fs';
 import { homedir } from 'os';
 import { join } from 'path';
+import {
+  approve as hookApprove,
+  block as hookBlock,
+  logError as hookLogError,
+} from './lib/hook-logging';
 
 // ============================================================================
 // Infinite Loop Prevention System
@@ -206,11 +211,11 @@ const HookInputSchema = z.object({
 // ============================================================================
 
 function allow(): void {
-  console.log(JSON.stringify({ decision: 'approve' }));
+  hookApprove();
 }
 
 function block(reason: string): void {
-  console.log(JSON.stringify({ decision: 'block', reason }));
+  hookBlock(reason);
 }
 
 // ============================================================================
@@ -2002,13 +2007,13 @@ async function main(): Promise<void> {
   // All checks passed - log performance and include advisory warnings if any
   logAndExit('approve');
   if (advisoryWarnings.length > 0) {
-    console.log(JSON.stringify({ decision: 'approve', reason: advisoryWarnings.join(' | ') }));
+    hookApprove(advisoryWarnings.join(' | '));
   } else {
     allow();
   }
 }
 
 main().catch((e) => {
-  console.error('Unified Guard error:', e);
+  hookLogError('paragon-guard', e);
   allow(); // Fail-open on error
 });
