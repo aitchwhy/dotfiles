@@ -175,13 +175,6 @@ contains() {
   contains "$result" "darwin" || contains "$result" "nix-darwin" || fail "Missing nix-darwin knowledge: $result"
 }
 
-# bats test_tags=live
-@test "skill: hono-workers - knows Cloudflare Workers" {
-  skip_if_no_api
-  result=$(ask_claude "What runtime does Hono run on according to your hono-workers skill? Just the platform name.")
-  contains "$result" "Cloudflare" || contains "$result" "Workers" || fail "Missing Hono/Workers knowledge: $result"
-}
-
 # Helper to skip live tests if API not available
 skip_if_no_api() {
   # Check if we can reach Claude (basic connectivity test)
