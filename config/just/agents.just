@@ -66,3 +66,27 @@ verify PATH=".":
 # Run verification with auto-fix
 verify-fix PATH=".":
     sig verify --fix {{ PATH }}
+
+# Show PARAGON cleanup statistics
+paragon-stats:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "═══════════════════════════════════════════════════════════════"
+    echo "  PARAGON Cleanup Statistics"
+    echo "═══════════════════════════════════════════════════════════════"
+    if [ ! -f ~/.claude-metrics/cleanup.jsonl ]; then
+        echo "No metrics yet. Run 'just agents paragon-clean' to generate."
+        exit 0
+    fi
+    echo ""
+    echo "Total cleanups: $(wc -l < ~/.claude-metrics/cleanup.jsonl | tr -d ' ')"
+    echo ""
+    echo "Last 5 runs:"
+    tail -5 ~/.claude-metrics/cleanup.jsonl | jq -r '"  \(.timestamp[:19]) | \(.mode) | \(.filesAnalyzed) files | \(.smellsDetected) smells"' 2>/dev/null || echo "  (parse error)"
+    echo ""
+    echo "Smells by severity (last run):"
+    tail -1 ~/.claude-metrics/cleanup.jsonl | jq -r '.bySeverity | to_entries | .[] | "  \(.key): \(.value)"' 2>/dev/null || echo "  (no data)"
+
+# Run full PARAGON cleanup on codebase
+paragon-clean:
+    @bun run {{ agents_dir }}/hooks/paragon-cleanup.ts --mode full
