@@ -1,8 +1,8 @@
 #!/usr/bin/env bun
 /**
- * PARAGON Guard v2.0 - Enforcement System PreToolUse gatekeeper
+ * PARAGON Guard v3.1 - Enforcement System PreToolUse gatekeeper
  *
- * Guards (25 total - all blocking except 11, 12):
+ * Guards (31 total - all blocking except 11, 12):
  *
  * Tier 1: Original Guards (1-14)
  * 1. Bash safety - blocks dangerous rm -rf commands
@@ -35,6 +35,14 @@
  * 23. Null returns - blocks return null (use Option/Result)
  * 24. Interface segregation - blocks large interfaces (>7 members)
  * 25. Deep nesting - blocks >3 indent levels
+ *
+ * Tier 5: Configuration Centralization (28-30) - Nix files
+ * 28. No hardcoded ports - blocks port = 3000 outside lib/config/
+ * 30. No hardcoded URLs - blocks localhost:3000 outside lib/config/
+ * (Guard 29 Split-brain is cross-file, handled by sig-config MCP tool)
+ *
+ * Tier 6: Stack Compliance (31) - package.json
+ * 31. Stack compliance - blocks forbidden deps (lodash, express, prisma, etc.)
  *
  * Infinite Loop Prevention:
  * - Violation batching: all issues reported at once
@@ -1651,6 +1659,208 @@ See: Clean Code by Robert C. Martin, Chapter 3: Functions`;
 }
 
 // ============================================================================
+// 28-30. CONFIGURATION CENTRALIZATION (Nix files)
+// ============================================================================
+
+function isConfigAllowedPath(filePath: string): boolean {
+  // Files in lib/config/ or lib/ports.nix are the SSOT - they can have hardcoded values
+  return (
+    filePath.includes('lib/config/') ||
+    filePath.includes('lib/ports.nix') ||
+    filePath.includes('/config/ports') ||
+    filePath.includes('ports.nix')
+  );
+}
+
+function checkHardcodedPorts(content: string, filePath: string): string | null {
+  // Guard 28: No hardcoded ports outside lib/config/
+  const lines = content.split('\n');
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i] || '';
+    const lineNum = i + 1;
+
+    // Match: port = 3000; or ports = [ 22 ]; but not ports.infrastructure.ssh
+    const portPattern = /(?<!ports\.[\w.]*)\b(port|ports)\s*=\s*\[?\s*(\d{2,5})\b/gi;
+    let match;
+    while ((match = portPattern.exec(line)) !== null) {
+      const portNum = parseInt(match[2], 10);
+      // Filter to likely port numbers (>= 22 and <= 65535)
+      if (portNum >= 22 && portNum <= 65535) {
+        return `GUARD 28: HARDCODED PORT DETECTED
+
+File: ${filePath}:${lineNum}
+Match: ${match[0]}
+
+Hardcoded port ${portNum} found outside lib/config/.
+All ports must be centralized in lib/config/ports.nix.
+
+  // ❌ BLOCKED - Hardcoded port
+  port = ${portNum};
+
+  // ✅ CORRECT - Reference config
+  port = cfg.ports.myService;
+
+Bypass: Create .paragon-skip-28 file to skip this check.`;
+      }
+    }
+  }
+
+  return null;
+}
+
+function checkHardcodedUrls(content: string, filePath: string): string | null {
+  // Guard 30: No hardcoded localhost URLs outside lib/config/
+  const lines = content.split('\n');
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i] || '';
+    const lineNum = i + 1;
+
+    const localhostPattern = /(?:localhost|127\.0\.0\.1):\d{2,5}/g;
+    let match;
+    while ((match = localhostPattern.exec(line)) !== null) {
+      return `GUARD 30: HARDCODED LOCALHOST URL DETECTED
+
+File: ${filePath}:${lineNum}
+Match: ${match[0]}
+
+Hardcoded localhost URL found outside lib/config/.
+All service URLs must be centralized.
+
+  // ❌ BLOCKED - Hardcoded URL
+  url = "http://localhost:3000";
+
+  // ✅ CORRECT - Reference config
+  url = cfg.services.api.url;
+
+Bypass: Create .paragon-skip-30 file to skip this check.`;
+    }
+  }
+
+  return null;
+}
+
+// ============================================================================
+// 31. STACK COMPLIANCE (package.json)
+// ============================================================================
+
+/** Forbidden dependencies - these have better alternatives */
+const FORBIDDEN_DEPS: Record<string, string> = {
+  // lodash -> Use native methods or Effect
+  lodash: 'Use native Array/Object methods or Effect utilities',
+  'lodash-es': 'Use native Array/Object methods or Effect utilities',
+  underscore: 'Use native Array/Object methods or Effect utilities',
+  // express -> Use Hono
+  express: 'Use Hono instead (Web Standards, faster, smaller)',
+  fastify: 'Use Hono instead (Web Standards, portable)',
+  koa: 'Use Hono instead (Web Standards, portable)',
+  // prisma -> Use Drizzle
+  prisma: 'Use Drizzle ORM instead (type-safe, SQL-first)',
+  '@prisma/client': 'Use Drizzle ORM instead (type-safe, SQL-first)',
+  // mongoose -> Use Drizzle + PostgreSQL
+  mongoose: 'Use Drizzle + PostgreSQL instead of MongoDB',
+  // moment -> Use native Date or Temporal
+  moment: 'Use native Date API or Temporal (Stage 3)',
+  'moment-timezone': 'Use native Date API or Temporal (Stage 3)',
+  // axios -> Use fetch (native)
+  axios: 'Use native fetch() or Effect HttpClient',
+  // jest -> Use Vitest
+  jest: 'Use Vitest instead (Vite-native, faster)',
+  '@jest/globals': 'Use Vitest instead (Vite-native, faster)',
+  // eslint -> Use Biome or OXLint
+  eslint: 'Use Biome or OXLint instead (faster, unified)',
+  prettier: 'Use Biome instead (unified format + lint)',
+  // redux -> Use XState or Zustand
+  redux: 'Use XState (state machines) or Zustand (simple state)',
+  '@reduxjs/toolkit': 'Use XState (state machines) or Zustand (simple state)',
+  // webpack -> Use Vite
+  webpack: 'Use Vite instead (ESM-native, faster)',
+  'webpack-cli': 'Use Vite instead (ESM-native, faster)',
+};
+
+/** Key npm packages with enforced versions (from STACK.npm) */
+const STACK_VERSIONS: Record<string, string> = {
+  typescript: '5.9.3',
+  effect: '3.19.9',
+  zod: '4.1.13',
+  react: '19.2.1',
+  'react-dom': '19.2.1',
+  '@biomejs/biome': '2.3.8',
+  '@types/bun': '1.2.10',
+  '@effect/cli': '0.72.1',
+  '@effect/platform': '0.93.6',
+  '@effect/platform-node': '0.103.0',
+  'drizzle-orm': '0.45.0',
+  'drizzle-kit': '0.30.0',
+  '@tanstack/react-router': '1.140.0',
+  tailwindcss: '4.1.17',
+  xstate: '5.24.0',
+  '@xstate/react': '5.0.0',
+  vitest: '4.0.15',
+  '@playwright/test': '1.57.0',
+  'better-auth': '1.4.6',
+};
+
+function checkStackCompliance(content: string, filePath: string): string | null {
+  if (!filePath.endsWith('package.json')) return null;
+  if (filePath.includes('/node_modules/')) return null;
+
+  // Parse package.json
+  let pkg: {
+    dependencies?: Record<string, string>;
+    devDependencies?: Record<string, string>;
+  };
+
+  try {
+    pkg = JSON.parse(content);
+  } catch {
+    return null; // Invalid JSON, let other tools handle
+  }
+
+  const allDeps = {
+    ...(pkg.dependencies ?? {}),
+    ...(pkg.devDependencies ?? {}),
+  };
+
+  const violations: string[] = [];
+
+  // Check forbidden dependencies
+  for (const [dep, reason] of Object.entries(FORBIDDEN_DEPS)) {
+    if (allDeps[dep]) {
+      violations.push(`  ❌ FORBIDDEN: ${dep} - ${reason}`);
+    }
+  }
+
+  // Check version drift (advisory - don't block, just warn in message)
+  const versionDrift: string[] = [];
+  for (const [pkg, expected] of Object.entries(STACK_VERSIONS)) {
+    const actual = allDeps[pkg];
+    if (actual && !actual.includes(expected)) {
+      versionDrift.push(`  ⚠️  ${pkg}: expected ^${expected}, got ${actual}`);
+    }
+  }
+
+  if (violations.length > 0) {
+    return `GUARD 31: STACK COMPLIANCE VIOLATION
+
+File: ${filePath}
+
+Forbidden dependencies detected:
+${violations.join('\n')}
+
+Remove these dependencies and use the recommended alternatives.
+See: config/signet/src/stack/versions.ts for approved packages.
+
+${versionDrift.length > 0 ? `\nVersion drift (advisory):\n${versionDrift.join('\n')}` : ''}
+
+Bypass: Create .paragon-skip-31 file to skip this check.`;
+  }
+
+  return null;
+}
+
+// ============================================================================
 // Main Hook Logic
 // ============================================================================
 
@@ -2000,6 +2210,50 @@ async function main(): Promise<void> {
           block(nestingError);
           return;
         }
+      }
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // GUARDS 28-30: Configuration Centralization (for .nix files)
+  // ─────────────────────────────────────────────────────────────────────────
+  if ((tool_name === 'Write' || tool_name === 'Edit') && content && filePath) {
+    if (filePath.endsWith('.nix') && !isConfigAllowedPath(filePath)) {
+      // Guard 28: No Hardcoded Ports
+      if (!checkBypassFiles(28)) {
+        guardsChecked++;
+        const portError = checkHardcodedPorts(content, filePath);
+        if (portError) {
+          logAndExit('block');
+          block(portError);
+          return;
+        }
+      }
+
+      // Guard 30: No Hardcoded Localhost URLs
+      if (!checkBypassFiles(30)) {
+        guardsChecked++;
+        const urlError = checkHardcodedUrls(content, filePath);
+        if (urlError) {
+          logAndExit('block');
+          block(urlError);
+          return;
+        }
+      }
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // GUARD 31: Stack Compliance (for package.json)
+  // ─────────────────────────────────────────────────────────────────────────
+  if ((tool_name === 'Write' || tool_name === 'Edit') && content && filePath) {
+    if (filePath.endsWith('package.json') && !checkBypassFiles(31)) {
+      guardsChecked++;
+      const stackError = checkStackCompliance(content, filePath);
+      if (stackError) {
+        logAndExit('block');
+        block(stackError);
+        return;
       }
     }
   }
