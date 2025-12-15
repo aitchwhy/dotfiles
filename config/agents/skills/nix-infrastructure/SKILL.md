@@ -384,5 +384,4 @@ See `config/agents/skills/nix-build-optimization/SKILL.md` for full patterns.
 
 - `nix-build-optimization` - **Critical** - Derivation splitting, Cachix, CI/CD
 - `devops-patterns` - Philosophy and blocked files/commands
-- `nix-flake-parts` - Modular flake composition
-- `nix-darwin-patterns` - macOS system configuration
+- `nix-patterns` - Flake-parts, nix-darwin, Home Manager patterns

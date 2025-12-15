@@ -1,8 +1,10 @@
 #!/usr/bin/env bun
 /**
- * PARAGON Guard - Enforcement System PreToolUse gatekeeper
+ * PARAGON Guard v2.0 - Enforcement System PreToolUse gatekeeper
  *
- * Guards (14 total):
+ * Guards (25 total - all blocking except 11, 12):
+ *
+ * Tier 1: Original Guards (1-14)
  * 1. Bash safety - blocks dangerous rm -rf commands
  * 2. Conventional commits - validates git commit messages
  * 3. Forbidden files - blocks package-lock.json, eslint config, Docker files, etc.
@@ -10,24 +12,135 @@
  * 5. Any type detector - blocks TypeScript `any` usage
  * 6. z.infer detector - blocks z.infer<>, z.input<>, z.output<> (use satisfies pattern)
  * 7. No-mock enforcer - blocks jest.mock, vi.mock, Mock*Live patterns
+ *    NOTE: Layer.succeed() is ALLOWED for dependency injection
  * 8. TDD enforcer - requires test file before source code
  * 9. DevOps files - blocks docker-compose.yml, Dockerfile, .dockerignore
  * 10. DevOps commands - blocks docker-compose, docker build, npm run dev
  * 11. Flake patterns - advisory warnings for flake.nix best practices
  * 12. Port registry - advisory warnings for undeclared ports
  * 13. Assumption language - blocks "should work", "probably", "I think", etc.
- * 14. Throw detector - advisory warnings for throw in non-invariant contexts
+ * 14. Throw detector - blocks throw in non-invariant contexts
+ *
+ * Tier 2: Clean Code Guards (15-17) - Uncle Bob
+ * 15. No comments - blocks unnecessary inline comments
+ * 16. Meaningful names - blocks cryptic abbreviations, Hungarian notation
+ * 17. No commented-out code - blocks dead code in comments
+ *
+ * Tier 3: Extended Clean Code Guards (18-25) - Uncle Bob + SOLID
+ * 18. Function arguments - blocks >3 positional parameters
+ * 19. Law of Demeter - blocks method chain violations (a.b().c().d())
+ * 20. Function size - blocks functions >20 lines
+ * 21. Cyclomatic complexity - blocks functions with >10 branches
+ * 22. Switch on type - blocks switch(x.type) anti-pattern
+ * 23. Null returns - blocks return null (use Option/Result)
+ * 24. Interface segregation - blocks large interfaces (>7 members)
+ * 25. Deep nesting - blocks >3 indent levels
+ *
+ * Infinite Loop Prevention:
+ * - Violation batching: all issues reported at once
+ * - Per-file cooldown: 30s between checks on same file
+ * - Max iterations: 3 guard-triggered edits per file per session
+ * - Guard groups: related guards skip if sibling fired
+ * - Bypass: .paragon-skip, .paragon-skip-{N}, .paragon-refactoring
  *
  * Observability standard: Datadog + OTEL 2.x via OTLP proto exporters.
  * See: paragon skill for full guard matrix.
- *
- * This consolidation reduces shell spawns from 14 → 1 per Write/Edit operation.
  */
 
 import { z } from 'zod';
-import { appendFileSync, mkdirSync, existsSync } from 'fs';
+import { appendFileSync, mkdirSync, existsSync, readFileSync } from 'fs';
 import { homedir } from 'os';
 import { join } from 'path';
+
+// ============================================================================
+// Infinite Loop Prevention System
+// ============================================================================
+
+type GuardViolation = {
+  readonly guard: number;
+  readonly file: string;
+  readonly line?: number;
+  readonly message: string;
+};
+
+const GUARD_COOLDOWNS = new Map<string, number>();
+const COOLDOWN_MS = 30_000;
+
+const ITERATION_COUNTS = new Map<string, number>();
+const MAX_ITERATIONS = 3;
+
+const FIRED_GUARD_GROUPS = new Map<string, Set<string>>();
+
+const GUARD_GROUPS: Record<string, number[]> = {
+  naming: [14, 16, 18],
+  structure: [20, 21, 25],
+  patterns: [19, 22, 23],
+  comments: [15, 17],
+};
+
+function getGuardGroup(guardNum: number): string | null {
+  for (const [group, guards] of Object.entries(GUARD_GROUPS)) {
+    if (guards.includes(guardNum)) return group;
+  }
+  return null;
+}
+
+function shouldSkipGuard(filePath: string, guardNum: number): boolean {
+  const group = getGuardGroup(guardNum);
+  if (!group) return false;
+
+  const fileKey = filePath;
+  const firedGroups = FIRED_GUARD_GROUPS.get(fileKey);
+  if (!firedGroups) return false;
+
+  return firedGroups.has(group) && !firedGroups.has(`guard-${guardNum}`);
+}
+
+function markGuardFired(filePath: string, guardNum: number): void {
+  const group = getGuardGroup(guardNum);
+  if (!group) return;
+
+  const fileKey = filePath;
+  if (!FIRED_GUARD_GROUPS.has(fileKey)) {
+    FIRED_GUARD_GROUPS.set(fileKey, new Set());
+  }
+  FIRED_GUARD_GROUPS.get(fileKey)?.add(group);
+  FIRED_GUARD_GROUPS.get(fileKey)?.add(`guard-${guardNum}`);
+}
+
+function shouldSkipDueToCooldown(filePath: string): boolean {
+  const lastCheck = GUARD_COOLDOWNS.get(filePath);
+  if (lastCheck && Date.now() - lastCheck < COOLDOWN_MS) {
+    return true;
+  }
+  GUARD_COOLDOWNS.set(filePath, Date.now());
+  return false;
+}
+
+function shouldAllowDueToMaxIterations(filePath: string): boolean {
+  const count = (ITERATION_COUNTS.get(filePath) || 0) + 1;
+  ITERATION_COUNTS.set(filePath, count);
+  return count > MAX_ITERATIONS;
+}
+
+function checkBypassFiles(guardNum?: number): boolean {
+  if (existsSync('.paragon-skip')) return true;
+  if (existsSync('.paragon-refactoring')) return true;
+  if (guardNum && existsSync(`.paragon-skip-${guardNum}`)) return true;
+  return false;
+}
+
+function formatBatchedViolations(violations: GuardViolation[]): string {
+  if (violations.length === 0) return '';
+  if (violations.length === 1) return violations[0]?.message || '';
+
+  const header = `PARAGON GUARD: ${violations.length} violations detected\n\n`;
+  const body = violations
+    .map((v, i) => `[${i + 1}] Guard ${v.guard}${v.line ? ` (line ${v.line})` : ''}\n${v.message}`)
+    .join('\n\n---\n\n');
+
+  return header + body + '\n\nFix ALL issues before proceeding.';
+}
 
 // ============================================================================
 // Performance Metrics
@@ -476,8 +589,9 @@ Use real adapters with service containers instead:
   // ✅ ALLOWED - Factory returns real MinIO in tests
   const storage = createStorageAdapter(); // Auto-detects MINIO_ENDPOINT
 
-  // ✅ ALLOWED - Effect-TS Layer DI (not mocking)
+  // ✅ ALLOWED - Effect-TS Layer.succeed() for DI at composition root
   const TestLayer = Layer.succeed(Database, testDbService);
+  // This is dependency injection, NOT mocking!
 
 See: hexagonal-architecture skill for service container patterns.
 Run: process-compose up (local) or use GitHub Actions services (CI).`;
@@ -1064,6 +1178,468 @@ See: Clean Code by Robert C. Martin, Chapter 4: Comments`;
 }
 
 // ============================================================================
+// 18. FUNCTION ARGUMENTS (Uncle Bob's Clean Code - >3 params)
+// ============================================================================
+
+const FUNCTION_ARGS_PATTERN = /(?:function\s+\w+|(?:const|let|var)\s+\w+\s*=\s*(?:async\s+)?(?:function|\([^)]*\)\s*=>))\s*\(([^)]*)\)/g;
+
+function countFunctionParams(paramString: string): number {
+  if (!paramString.trim()) return 0;
+  const params = paramString.split(',').filter((p) => p.trim() && !p.includes('...'));
+  return params.length;
+}
+
+function checkFunctionArguments(content: string, filePath: string): string | null {
+  if (!/\.tsx?$/.test(filePath)) return null;
+  if (filePath.endsWith('.d.ts')) return null;
+  if (filePath.includes('/node_modules/')) return null;
+  if (/\.(test|spec)\.[tj]sx?$/.test(filePath)) return null;
+
+  const cleanContent = stripCommentsAndStrings(content);
+  const lines = cleanContent.split('\n');
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i] || '';
+
+    const funcMatch = line.match(/(?:function\s+(\w+)|(?:const|let|var)\s+(\w+)\s*=\s*(?:async\s+)?(?:function|\())\s*\(([^)]*)\)/);
+    if (funcMatch) {
+      const funcName = funcMatch[1] || funcMatch[2] || 'anonymous';
+      const params = funcMatch[3] || '';
+      const paramCount = countFunctionParams(params);
+
+      if (paramCount > 3) {
+        return `CLEAN CODE VIOLATION: Function '${funcName}' has ${paramCount} parameters (line ${i + 1})
+
+Uncle Bob's Clean Code: Functions should have few arguments (ideally 0-2, max 3).
+
+  // ❌ BLOCKED - Too many positional parameters
+  function createUser(name, email, age, role, dept) { }
+
+  // ✅ CORRECT - Object parameter pattern
+  function createUser(params: { name: string; email: string; ... }) { }
+
+  // ✅ CORRECT - Builder pattern
+  User.builder().name("John").email("...").build()
+
+See: Clean Code by Robert C. Martin, Chapter 3: Functions`;
+      }
+    }
+  }
+  return null;
+}
+
+// ============================================================================
+// 19. LAW OF DEMETER (Uncle Bob's Clean Code)
+// ============================================================================
+
+const DEMETER_PATTERN = /\.\w+\([^)]*\)\.\w+\([^)]*\)\.\w+\(/;
+
+const FLUENT_API_PATTERNS = [
+  /\.pipe\(/,
+  /\.then\(/,
+  /\.catch\(/,
+  /\.finally\(/,
+  /Effect\./,
+  /Layer\./,
+  /Stream\./,
+  /Option\./,
+  /Either\./,
+  /\.select\(/,
+  /\.from\(/,
+  /\.where\(/,
+  /\.orderBy\(/,
+  /\.filter\(/,
+  /\.map\(/,
+  /\.flatMap\(/,
+  /\.reduce\(/,
+];
+
+function checkLawOfDemeter(content: string, filePath: string): string | null {
+  if (!/\.tsx?$/.test(filePath)) return null;
+  if (filePath.endsWith('.d.ts')) return null;
+  if (filePath.includes('/node_modules/')) return null;
+  if (/\.(test|spec)\.[tj]sx?$/.test(filePath)) return null;
+
+  const cleanContent = stripCommentsAndStrings(content);
+  const lines = cleanContent.split('\n');
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i] || '';
+
+    if (DEMETER_PATTERN.test(line)) {
+      const isFluent = FLUENT_API_PATTERNS.some((p) => p.test(line));
+      if (isFluent) continue;
+
+      return `CLEAN CODE VIOLATION: Law of Demeter violation (line ${i + 1})
+
+"${line.trim().substring(0, 60)}${line.trim().length > 60 ? '...' : ''}"
+
+Uncle Bob's Clean Code: Only talk to your immediate friends.
+
+  // ❌ BLOCKED - Chain of 3+ method calls
+  const city = order.getCustomer().getAddress().getCity();
+
+  // ✅ CORRECT - Direct access or delegation
+  const city = order.getShippingCity();
+
+  // ✅ ALLOWED - Fluent APIs (Effect, builders, array methods)
+  const result = Effect.gen(...).pipe(Effect.map(...));
+
+See: Clean Code by Robert C. Martin, Chapter 6: Objects and Data Structures`;
+    }
+  }
+  return null;
+}
+
+// ============================================================================
+// 20. FUNCTION SIZE (Uncle Bob's Clean Code - >20 lines)
+// ============================================================================
+
+function checkFunctionSize(content: string, filePath: string): string | null {
+  if (!/\.tsx?$/.test(filePath)) return null;
+  if (filePath.endsWith('.d.ts')) return null;
+  if (filePath.includes('/node_modules/')) return null;
+  if (/\.(test|spec)\.[tj]sx?$/.test(filePath)) return null;
+
+  const lines = content.split('\n');
+  let funcStart = -1;
+  let funcName = '';
+  let braceCount = 0;
+  let inFunction = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i] || '';
+
+    const funcMatch = line.match(/(?:function\s+(\w+)|(?:const|let|var)\s+(\w+)\s*=\s*(?:async\s+)?(?:function|\([^)]*\)\s*=>))\s*[^{]*\{/);
+    if (funcMatch && !inFunction) {
+      funcStart = i;
+      funcName = funcMatch[1] || funcMatch[2] || 'anonymous';
+      braceCount = 1;
+      inFunction = true;
+      continue;
+    }
+
+    if (inFunction) {
+      braceCount += (line.match(/\{/g) || []).length;
+      braceCount -= (line.match(/\}/g) || []).length;
+
+      if (braceCount === 0) {
+        const funcLength = i - funcStart + 1;
+        if (funcLength > 20) {
+          return `CLEAN CODE VIOLATION: Function '${funcName}' is ${funcLength} lines (line ${funcStart + 1})
+
+Uncle Bob's Clean Code: Functions should be small. Really small.
+- First rule: Functions should be small
+- Second rule: Functions should be smaller than that
+
+  // ❌ BLOCKED - Function > 20 lines
+  function processOrder() {
+    // ... 25 lines of code
+  }
+
+  // ✅ CORRECT - Decomposed into smaller functions
+  function processOrder() {
+    const validated = validateOrder(order);
+    const enriched = enrichOrder(validated);
+    return persistOrder(enriched);
+  }
+
+See: Clean Code by Robert C. Martin, Chapter 3: Functions`;
+        }
+        inFunction = false;
+        funcStart = -1;
+      }
+    }
+  }
+  return null;
+}
+
+// ============================================================================
+// 21. CYCLOMATIC COMPLEXITY (>10 branches)
+// ============================================================================
+
+const BRANCH_KEYWORDS = /\b(if|else if|case|catch|while|for|\?\?|\|\||&&|\?)\b/g;
+
+function checkCyclomaticComplexity(content: string, filePath: string): string | null {
+  if (!/\.tsx?$/.test(filePath)) return null;
+  if (filePath.endsWith('.d.ts')) return null;
+  if (filePath.includes('/node_modules/')) return null;
+  if (/\.(test|spec)\.[tj]sx?$/.test(filePath)) return null;
+
+  const lines = content.split('\n');
+  let funcStart = -1;
+  let funcName = '';
+  let braceCount = 0;
+  let inFunction = false;
+  let complexity = 1;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i] || '';
+
+    const funcMatch = line.match(/(?:function\s+(\w+)|(?:const|let|var)\s+(\w+)\s*=\s*(?:async\s+)?(?:function|\([^)]*\)\s*=>))\s*[^{]*\{/);
+    if (funcMatch && !inFunction) {
+      funcStart = i;
+      funcName = funcMatch[1] || funcMatch[2] || 'anonymous';
+      braceCount = 1;
+      inFunction = true;
+      complexity = 1;
+      continue;
+    }
+
+    if (inFunction) {
+      const branches = line.match(BRANCH_KEYWORDS);
+      if (branches) {
+        complexity += branches.length;
+      }
+
+      braceCount += (line.match(/\{/g) || []).length;
+      braceCount -= (line.match(/\}/g) || []).length;
+
+      if (braceCount === 0) {
+        if (complexity > 10) {
+          return `CLEAN CODE VIOLATION: Function '${funcName}' has cyclomatic complexity ${complexity} (line ${funcStart + 1})
+
+Cyclomatic complexity > 10 indicates too many branches/paths.
+
+  // ❌ BLOCKED - Too many branches
+  function processInput(x) {
+    if (a) { ... }
+    else if (b) { ... }
+    switch (c) { case 1: ... case 2: ... }
+    // complexity = 12
+  }
+
+  // ✅ CORRECT - Decompose or use polymorphism
+  function processInput(x) {
+    const handler = handlers[x.type];
+    return handler(x);
+  }
+
+See: Clean Code by Robert C. Martin, Chapter 3: Functions`;
+        }
+        inFunction = false;
+        funcStart = -1;
+        complexity = 1;
+      }
+    }
+  }
+  return null;
+}
+
+// ============================================================================
+// 22. SWITCH ON TYPE (Use polymorphism instead)
+// ============================================================================
+
+const SWITCH_ON_TYPE_PATTERN = /switch\s*\(\s*\w+\.(type|kind|variant|tag)\s*\)/;
+
+function checkSwitchOnType(content: string, filePath: string): string | null {
+  if (!/\.tsx?$/.test(filePath)) return null;
+  if (filePath.endsWith('.d.ts')) return null;
+  if (filePath.includes('/node_modules/')) return null;
+  if (/\.(test|spec)\.[tj]sx?$/.test(filePath)) return null;
+
+  const cleanContent = stripCommentsAndStrings(content);
+  const lines = cleanContent.split('\n');
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i] || '';
+
+    if (SWITCH_ON_TYPE_PATTERN.test(line)) {
+      return `CLEAN CODE VIOLATION: Switch on type detected (line ${i + 1})
+
+Uncle Bob's Clean Code: Replace switch statements with polymorphism.
+
+  // ❌ BLOCKED - Switch on type field
+  switch (shape.type) {
+    case 'circle': return Math.PI * r * r;
+    case 'square': return s * s;
+  }
+
+  // ✅ CORRECT - Polymorphism via methods
+  interface Shape { area(): number; }
+  class Circle implements Shape { area() { return Math.PI * r * r; } }
+
+  // ✅ CORRECT - Handler map pattern
+  const areaHandlers = {
+    circle: (s) => Math.PI * s.r * s.r,
+    square: (s) => s.side * s.side,
+  };
+
+See: Clean Code by Robert C. Martin, Chapter 3: Functions`;
+    }
+  }
+  return null;
+}
+
+// ============================================================================
+// 23. NULL RETURNS (Use Option/Result instead)
+// ============================================================================
+
+const NULL_RETURN_PATTERN = /return\s+null\s*;/;
+
+function checkNullReturns(content: string, filePath: string): string | null {
+  if (!/\.tsx?$/.test(filePath)) return null;
+  if (filePath.endsWith('.d.ts')) return null;
+  if (filePath.includes('/node_modules/')) return null;
+  if (/\.(test|spec)\.[tj]sx?$/.test(filePath)) return null;
+
+  const cleanContent = stripCommentsAndStrings(content);
+  const lines = cleanContent.split('\n');
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i] || '';
+
+    if (NULL_RETURN_PATTERN.test(line)) {
+      return `CLEAN CODE VIOLATION: return null detected (line ${i + 1})
+
+Uncle Bob's Clean Code: Don't return null.
+
+  // ❌ BLOCKED - Returning null
+  function findUser(id): User | null {
+    return user ?? null;
+  }
+
+  // ✅ CORRECT - Option type
+  function findUser(id): Option<User> {
+    return user ? Option.some(user) : Option.none();
+  }
+
+  // ✅ CORRECT - Effect with typed error
+  function findUser(id): Effect<User, UserNotFoundError> {
+    return user ? Effect.succeed(user) : Effect.fail(new UserNotFoundError());
+  }
+
+See: Clean Code by Robert C. Martin, Chapter 7: Error Handling`;
+    }
+  }
+  return null;
+}
+
+// ============================================================================
+// 24. INTERFACE SEGREGATION (SOLID - >7 members)
+// ============================================================================
+
+function checkInterfaceSegregation(content: string, filePath: string): string | null {
+  if (!/\.tsx?$/.test(filePath)) return null;
+  if (filePath.endsWith('.d.ts')) return null;
+  if (filePath.includes('/node_modules/')) return null;
+
+  const lines = content.split('\n');
+  let interfaceStart = -1;
+  let interfaceName = '';
+  let braceCount = 0;
+  let inInterface = false;
+  let memberCount = 0;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i] || '';
+
+    const interfaceMatch = line.match(/(?:interface|type)\s+(\w+)\s*(?:extends\s+\w+\s*)?[={]/);
+    if (interfaceMatch && !inInterface) {
+      interfaceStart = i;
+      interfaceName = interfaceMatch[1] || 'unknown';
+      braceCount = line.includes('{') ? 1 : 0;
+      inInterface = braceCount > 0;
+      memberCount = 0;
+      continue;
+    }
+
+    if (inInterface) {
+      braceCount += (line.match(/\{/g) || []).length;
+      braceCount -= (line.match(/\}/g) || []).length;
+
+      if (line.includes(':') && !line.trim().startsWith('//')) {
+        memberCount++;
+      }
+
+      if (braceCount === 0) {
+        if (memberCount > 7) {
+          return `SOLID VIOLATION: Interface '${interfaceName}' has ${memberCount} members (line ${interfaceStart + 1})
+
+Interface Segregation Principle: Clients should not depend on interfaces they don't use.
+
+  // ❌ BLOCKED - Fat interface
+  interface Worker {
+    work(): void;
+    eat(): void;
+    sleep(): void;
+    code(): void;
+    manage(): void;
+    design(): void;
+    test(): void;
+    deploy(): void;  // 8 members
+  }
+
+  // ✅ CORRECT - Segregated interfaces
+  interface Workable { work(): void; }
+  interface Feedable { eat(): void; }
+  interface Developer extends Workable { code(): void; test(): void; }
+
+See: SOLID Principles - Interface Segregation`;
+        }
+        inInterface = false;
+        interfaceStart = -1;
+        memberCount = 0;
+      }
+    }
+  }
+  return null;
+}
+
+// ============================================================================
+// 25. DEEP NESTING (>3 indent levels)
+// ============================================================================
+
+function checkDeepNesting(content: string, filePath: string): string | null {
+  if (!/\.tsx?$/.test(filePath)) return null;
+  if (filePath.endsWith('.d.ts')) return null;
+  if (filePath.includes('/node_modules/')) return null;
+  if (/\.(test|spec)\.[tj]sx?$/.test(filePath)) return null;
+
+  const lines = content.split('\n');
+  const INDENT_SIZE = 2;
+  const MAX_INDENT = INDENT_SIZE * 4;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i] || '';
+    const match = line.match(/^(\s*)\S/);
+    if (!match) continue;
+
+    const indent = match[1]?.length || 0;
+
+    if (indent >= MAX_INDENT && !line.trim().startsWith('//') && !line.trim().startsWith('*')) {
+      const context = lines.slice(Math.max(0, i - 2), i + 1).join('\n');
+      if (context.includes('if') || context.includes('for') || context.includes('while')) {
+        return `CLEAN CODE VIOLATION: Deep nesting detected (line ${i + 1}, indent ${indent / INDENT_SIZE} levels)
+
+Uncle Bob's Clean Code: Avoid deep nesting. Use guard clauses.
+
+  // ❌ BLOCKED - Deep nesting
+  if (user) {
+    if (user.isActive) {
+      if (user.hasPermission) {
+        if (user.isVerified) {
+          // level 4 - too deep
+        }
+      }
+    }
+  }
+
+  // ✅ CORRECT - Guard clauses (early returns)
+  if (!user) return;
+  if (!user.isActive) return;
+  if (!user.hasPermission) return;
+  if (!user.isVerified) return;
+  // proceed with logic
+
+See: Clean Code by Robert C. Martin, Chapter 3: Functions`;
+      }
+    }
+  }
+  return null;
+}
+
+// ============================================================================
 // Main Hook Logic
 // ============================================================================
 
@@ -1092,6 +1668,17 @@ async function main(): Promise<void> {
   const filePath = tool_input.file_path || '';
   const content = tool_input.content || tool_input.new_string || '';
   const command = tool_input.command || '';
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // INFINITE LOOP PREVENTION: Check bypass files and cooldowns
+  // ─────────────────────────────────────────────────────────────────────────
+  if (checkBypassFiles()) {
+    allow();
+    return;
+  }
+
+  const skipDueToCooldown = filePath && shouldSkipDueToCooldown(filePath);
+  const allowDueToMaxIterations = filePath && shouldAllowDueToMaxIterations(filePath);
 
   // Track and log performance on exit
   const logAndExit = (decision: 'approve' | 'block') => {
@@ -1299,6 +1886,110 @@ async function main(): Promise<void> {
       logAndExit('block');
       block(deadCodeError);
       return;
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // GUARDS 18-25: Extended Clean Code (with infinite loop protection)
+  // Skip if cooldown active or max iterations reached
+  // ─────────────────────────────────────────────────────────────────────────
+  if ((tool_name === 'Write' || tool_name === 'Edit') && content && filePath) {
+    if (!skipDueToCooldown && !allowDueToMaxIterations) {
+      // Guard 18: Function Arguments
+      if (!checkBypassFiles(18) && !shouldSkipGuard(filePath, 18)) {
+        guardsChecked++;
+        const argsError = checkFunctionArguments(content, filePath);
+        if (argsError) {
+          markGuardFired(filePath, 18);
+          logAndExit('block');
+          block(argsError);
+          return;
+        }
+      }
+
+      // Guard 19: Law of Demeter
+      if (!checkBypassFiles(19) && !shouldSkipGuard(filePath, 19)) {
+        guardsChecked++;
+        const demeterError = checkLawOfDemeter(content, filePath);
+        if (demeterError) {
+          markGuardFired(filePath, 19);
+          logAndExit('block');
+          block(demeterError);
+          return;
+        }
+      }
+
+      // Guard 20: Function Size
+      if (!checkBypassFiles(20) && !shouldSkipGuard(filePath, 20)) {
+        guardsChecked++;
+        const sizeError = checkFunctionSize(content, filePath);
+        if (sizeError) {
+          markGuardFired(filePath, 20);
+          logAndExit('block');
+          block(sizeError);
+          return;
+        }
+      }
+
+      // Guard 21: Cyclomatic Complexity
+      if (!checkBypassFiles(21) && !shouldSkipGuard(filePath, 21)) {
+        guardsChecked++;
+        const complexityError = checkCyclomaticComplexity(content, filePath);
+        if (complexityError) {
+          markGuardFired(filePath, 21);
+          logAndExit('block');
+          block(complexityError);
+          return;
+        }
+      }
+
+      // Guard 22: Switch on Type
+      if (!checkBypassFiles(22) && !shouldSkipGuard(filePath, 22)) {
+        guardsChecked++;
+        const switchError = checkSwitchOnType(content, filePath);
+        if (switchError) {
+          markGuardFired(filePath, 22);
+          logAndExit('block');
+          block(switchError);
+          return;
+        }
+      }
+
+      // Guard 23: Null Returns
+      if (!checkBypassFiles(23) && !shouldSkipGuard(filePath, 23)) {
+        guardsChecked++;
+        const nullError = checkNullReturns(content, filePath);
+        if (nullError) {
+          markGuardFired(filePath, 23);
+          logAndExit('block');
+          block(nullError);
+          return;
+        }
+      }
+
+      // Guard 24: Interface Segregation
+      if (!checkBypassFiles(24) && !shouldSkipGuard(filePath, 24)) {
+        guardsChecked++;
+        const ispError = checkInterfaceSegregation(content, filePath);
+        if (ispError) {
+          markGuardFired(filePath, 24);
+          logAndExit('block');
+          block(ispError);
+          return;
+        }
+      }
+
+      // Guard 25: Deep Nesting
+      if (!checkBypassFiles(25) && !shouldSkipGuard(filePath, 25)) {
+        guardsChecked++;
+        const nestingError = checkDeepNesting(content, filePath);
+        if (nestingError) {
+          markGuardFired(filePath, 25);
+          logAndExit('block');
+          block(nestingError);
+          return;
+        }
+      }
     }
   }
 
