@@ -2,7 +2,6 @@
  * Workflow Port - Durable Workflow Service Interface
  *
  * Defines the contract for durable workflow execution.
- * Implemented by adapters like Temporal or Restate.
  */
 import { Context, type Effect, Schema } from 'effect';
 
