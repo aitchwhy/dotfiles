@@ -63,7 +63,7 @@ mcp__signet__sig-migrate(path: ".", fix: true)
 
 ## Backend
 
-- Hono 4.x, Drizzle ORM, Effect-TS services
+- Effect Platform HTTP (@effect/platform), Drizzle ORM, Effect-TS services
 
 ## APIs
 
@@ -147,7 +147,7 @@ const userSchema = z.object({
          |                      |
 +--------+--------+  +---------+---------+
 | Inbound Adapter |  | Outbound Adapters |
-| (Hono handlers) |  | (GCS, PostgreSQL) |
+| (Effect HTTP)   |  | (GCS, PostgreSQL) |
 +-----------------+  +-------------------+
 ```
 
