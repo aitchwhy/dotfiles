@@ -2,6 +2,7 @@
 # Session Stop Hook - Extracts learnings and triggers consolidation
 # Runs when Claude session ends
 # Input: JSON with transcript_path from Claude Code Stop hook
+# Uses modern CLI tools: fd
 set -euo pipefail
 
 DOTFILES="${DOTFILES:-$HOME/dotfiles}"
@@ -34,8 +35,8 @@ if [[ -z "$TRANSCRIPT_PATH" || ! -f "$TRANSCRIPT_PATH" ]]; then
 
   for dir in "${SESSION_DIRS[@]}"; do
     if [[ -d "$dir" ]]; then
-      # Find most recently modified .jsonl file in last 10 minutes
-      FOUND=$(find "$dir" -name "*.jsonl" -mmin -10 -type f 2>/dev/null | head -1)
+      # Find most recently modified .jsonl file in last 10 minutes (using fd)
+      FOUND=$(fd -t f -e jsonl --changed-within 10m . "$dir" 2>/dev/null | head -1)
       if [[ -n "$FOUND" ]]; then
         TRANSCRIPT_PATH="$FOUND"
         break

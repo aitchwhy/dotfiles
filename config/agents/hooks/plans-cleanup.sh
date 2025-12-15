@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Plans Cleanup Hook - Purges plan files older than 3 days
 # Runs on SessionStart to prevent accumulation of stale plans
+# Uses modern CLI tools: fd
 set -euo pipefail
 
 PLANS_DIR="$HOME/.claude/plans"
@@ -13,11 +14,13 @@ if [[ ! -d "$PLANS_DIR" ]]; then
 fi
 
 # Find and delete plan files older than MAX_AGE_DAYS
-# Using -mtime +N means "modified more than N days ago"
+# Using fd with --changed-before for cleaner syntax
 DELETED_COUNT=0
-while IFS= read -r -d '' file; do
+
+# fd --changed-before NDd finds files not modified in last N days
+for file in $(fd -t f -e md --changed-before "${MAX_AGE_DAYS}d" . "$PLANS_DIR" 2>/dev/null || true); do
     rm -f "$file" 2>/dev/null && ((DELETED_COUNT++)) || true
-done < <(command find "$PLANS_DIR" -maxdepth 1 -name "*.md" -type f -mtime +${MAX_AGE_DAYS} -print0 2>/dev/null)
+done
 
 # Report cleanup if any files were deleted
 if [[ $DELETED_COUNT -gt 0 ]]; then
