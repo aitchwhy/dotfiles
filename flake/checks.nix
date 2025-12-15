@@ -28,6 +28,30 @@
             '';
 
         # ═══════════════════════════════════════════════════════════════════════════
+        # Port Conflict Detection
+        # Validates lib/config/ports.nix has no duplicate port assignments
+        # ═══════════════════════════════════════════════════════════════════════════
+        port-conflicts =
+          let
+            cfg = import ../lib/config { inherit (pkgs) lib; };
+            failed = builtins.filter (a: !a.assertion) cfg.assertions;
+          in
+          if failed == [ ] then
+            pkgs.runCommand "port-conflicts-check" { } ''
+              echo "═══════════════════════════════════════════════════════════════"
+              echo "Port Conflict Check - PASSED"
+              echo "═══════════════════════════════════════════════════════════════"
+              echo ""
+              echo "Total ports defined: ${toString (builtins.length cfg.flatPorts)}"
+              echo "No duplicate port assignments detected."
+              echo ""
+              echo "✓ All port assignments are unique"
+              touch $out
+            ''
+          else
+            throw (builtins.concatStringsSep "\n" (map (a: a.message) failed));
+
+        # ═══════════════════════════════════════════════════════════════════════════
         # Comprehensive AI CLI Configuration Validation
         # All assertions are BLOCKING - failures exit non-zero
         # ═══════════════════════════════════════════════════════════════════════════
