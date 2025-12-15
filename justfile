@@ -209,21 +209,6 @@ _verify-paragon:
 _nix-check:
     @./scripts/verify-nix-optimization.sh
 
-[private]
-_nix-bench:
-    @echo "Cold build..."
-    rm -rf result
-    time nix build .#api 2>&1 | tail -5
-    @echo ""
-    @echo "Warm build..."
-    touch apps/api/src/index.ts 2>/dev/null || touch src/index.ts 2>/dev/null || true
-    time nix build .#api 2>&1 | tail -5
-
-[private]
-_nix-sizes:
-    @echo "Closure sizes:"
-    nix path-info -rsSh .#api 2>/dev/null | sort -k2 -h | tail -15 || echo "Build .#api first"
-
 # ═══════════════════════════════════════════════════════════════════════════════
 # PERFORMANCE (hidden)
 # ═══════════════════════════════════════════════════════════════════════════════
