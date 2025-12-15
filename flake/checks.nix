@@ -39,6 +39,9 @@
                 pkgs.gnused
                 pkgs.gawk
                 pkgs.coreutils
+                pkgs.ripgrep
+                pkgs.fd
+                pkgs.eza
               ];
               src = ../.;
             }
@@ -69,12 +72,12 @@
               echo ""
               echo "─── Test 1: Skills Cross-Reference ───"
 
-              # Get skills defined in directory (portable)
-              SKILLS_DIR=$(ls -1 config/agents/skills/ | sort)
+              # Get skills defined in directory (modern: eza)
+              SKILLS_DIR=$(${pkgs.eza}/bin/eza --oneline config/agents/skills/ | sort)
               SKILLS_DIR_COUNT=$(echo "$SKILLS_DIR" | wc -l | tr -d ' ')
 
-              # Get skills symlinked in agents.nix (portable sed extraction)
-              SKILLS_NIX=$(grep '\.claude/skills/' config/agents/nix/agents.nix | \
+              # Get skills symlinked in agents.nix (modern: rg)
+              SKILLS_NIX=$(${pkgs.ripgrep}/bin/rg '\.claude/skills/' config/agents/nix/agents.nix | \
                 sed -E 's/.*\.claude\/skills\/([a-z0-9-]+)".*/\1/' | sort | uniq)
               SKILLS_NIX_COUNT=$(echo "$SKILLS_NIX" | wc -l | tr -d ' ')
 
@@ -132,7 +135,7 @@
 
               # Assertion: Required servers exist
               for server in memory context7 fetch repomix signet; do
-                if echo "$MCP_SERVERS" | grep -q "^$server$"; then
+                if echo "$MCP_SERVERS" | ${pkgs.ripgrep}/bin/rg -q "^$server$"; then
                   assert_pass "Required MCP server: $server"
                 else
                   assert_fail "Required MCP server MISSING: $server"
@@ -200,9 +203,9 @@
               echo ""
               echo "─── Test 5: Hook Files Validation ───"
 
-              # Extract hook files referenced in settings (portable)
+              # Extract hook files referenced in settings (modern: rg)
               REFERENCED_HOOKS=$(${pkgs.jq}/bin/jq -r '.. | .command? // empty' "$SETTINGS" 2>/dev/null | \
-                grep 'hooks/' | sed -E 's/.*hooks\/([a-zA-Z0-9_-]+\.(ts|sh)).*/\1/' | sort | uniq)
+                ${pkgs.ripgrep}/bin/rg 'hooks/' | sed -E 's/.*hooks\/([a-zA-Z0-9_-]+\.(ts|sh)).*/\1/' | sort | uniq)
 
               for hook in $REFERENCED_HOOKS; do
                 if [ -f "config/agents/hooks/$hook" ]; then
@@ -231,13 +234,13 @@
                   AGENT_COUNT=$((AGENT_COUNT + 1))
 
                   # Assertion: name field exists
-                  if ! grep -q "^name:" "$agent"; then
+                  if ! ${pkgs.ripgrep}/bin/rg -q "^name:" "$agent"; then
                     assert_fail "$agent_name missing 'name:' field"
                   fi
                   assert_pass "$agent_name has 'name:' field"
 
                   # Assertion: description field exists
-                  if ! grep -q "^description:" "$agent"; then
+                  if ! ${pkgs.ripgrep}/bin/rg -q "^description:" "$agent"; then
                     assert_fail "$agent_name missing 'description:' field"
                   fi
                   assert_pass "$agent_name has 'description:' field"
