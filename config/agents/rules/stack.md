@@ -241,6 +241,59 @@ eza --oneline            # One file per line (like ls -1)
 
 **Installation**: All tools provided via Nix (`pkgs.ripgrep`, `pkgs.fd`, `pkgs.eza`, `pkgs.dust`)
 
+## Parse-at-Boundary Architecture (Guards 32-36)
+
+### Core Principle
+
+Parse ONCE at boundary, typed internally. No optional chaining or null checks in domain code.
+
+> "Parse, don't validate" — Alexis King
+
+### Boundaries (Where Parsing Happens)
+
+| Boundary | Tool |
+|----------|------|
+| HTTP request | `Schema.decodeUnknownSync(RequestSchema)` |
+| External API response | `Schema.decodeUnknownSync(ResponseSchema)` |
+| User input | `Schema.decodeUnknownSync(InputSchema)` |
+| XState events | `Schema.decodeUnknownSync(EventSchema)` |
+| Environment | `Schema.decodeUnknownSync(EnvSchema)` |
+
+### After Parsing (BLOCKED in domain code)
+
+| Pattern | Guard | Blocked |
+|---------|-------|---------|
+| `?.` optional chaining | 32 | `context.phone?.trim()` |
+| `??` nullish coalescing | 33 | `config.port ?? 3000` |
+| Null check then assert | 34 | `if (x === null) ... x!` |
+| Type assertions | 35 | `as Type` (warning) |
+| Non-null assert | 36 | `x!` without narrowing |
+
+### XState Pattern
+
+Use discriminated union context by phase:
+
+```typescript
+type Context =
+  | { phase: "idle" }
+  | { phase: "active"; data: Data }  // data is REQUIRED here
+
+// Type narrowing via phase check
+if (context.phase === "active") {
+  context.data  // TypeScript knows data exists
+}
+```
+
+### Boundary Files (Guards 32-36 Skip These)
+
+- `*/api/*.ts` - API route handlers
+- `*/lib/*-client.ts` - API clients
+- `*.schema.ts` - Schema definitions
+- `*/schemas/*`, `*/parsers/*` - Schema/parser directories
+- `*.test.ts`, `*.spec.ts` - Test files
+
+See `parse-boundary-patterns` skill for comprehensive patterns.
+
 ## Nix Build Rules
 
 ### Derivation Splitting (Mandatory)
