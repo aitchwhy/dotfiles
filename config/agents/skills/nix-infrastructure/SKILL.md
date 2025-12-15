@@ -23,12 +23,14 @@ Achieved via:
 
 ### Purpose
 
-Prevent port conflicts with a single source of truth (`lib/ports.nix`).
+Prevent port conflicts with a single source of truth (`lib/config/`).
+
+**IMPORTANT**: Read `nix-configuration-centralization` skill for complete patterns.
 
 ### Structure
 
 ```nix
-# lib/ports.nix
+# lib/config/ports.nix - see nix-configuration-centralization skill
 {
   infrastructure = {
     ssh = 22;
@@ -51,6 +53,12 @@ Prevent port conflicts with a single source of truth (`lib/ports.nix`).
     grpc = 4317;
     http = 4318;
   };
+
+  observability = {
+    prometheus = 9090;
+    grafana = 3100;
+    loki = 3200;
+  };
 }
 ```
 
@@ -59,13 +67,21 @@ Prevent port conflicts with a single source of truth (`lib/ports.nix`).
 ```nix
 { lib, ... }:
 let
-  ports = import ../../../lib/ports.nix;
+  # Centralized config - see lib/config/
+  cfg = import ../../../lib/config { inherit lib; };
+  ports = cfg.ports;
+  services = cfg.services;
 in
 {
   services.prometheus.exporters.node = {
     enable = true;
     port = ports.infrastructure.nodeExporter;
   };
+
+  # Use derived service URLs instead of hardcoding
+  services.promtail.configuration.clients = [
+    { url = services.loki.pushUrl; }
+  ];
 
   networking.firewall.allowedTCPPorts = [
     ports.infrastructure.ssh
@@ -381,6 +397,9 @@ See `config/agents/skills/nix-build-optimization/SKILL.md` for full patterns.
 
 ## Related Skills
 
-- `nix-build-optimization` - **Critical** - Derivation splitting, Cachix, CI/CD
-- `devops-patterns` - Philosophy and blocked files/commands
-- `nix-patterns` - Flake-parts, nix-darwin, Home Manager patterns
+| Skill | Relationship |
+|-------|--------------|
+| **nix-configuration-centralization** | **Core pattern - read first for config centralization** |
+| `nix-build-optimization` | **Critical** - Derivation splitting, Cachix, CI/CD |
+| `devops-patterns` | Philosophy and blocked files/commands |
+| `nix-patterns` | Flake-parts, nix-darwin, Home Manager patterns |
