@@ -113,7 +113,13 @@ async function main(): Promise<void> {
     }
   } catch (e) {
     logError('paragon-guard', e);
-    approve(); // Fail-open on error
+    // Fail-closed: only approve on known-safe parse errors
+    if (e instanceof SyntaxError && rawInput.trim() === '') {
+      approve('Empty input');
+      return;
+    }
+    block(`Guard system error: ${e instanceof Error ? e.message : 'Unknown error'}`);
+    return;
   }
 }
 
