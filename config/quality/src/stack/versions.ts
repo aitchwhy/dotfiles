@@ -233,6 +233,23 @@ export const STACK = {
     '@pulumi/gcp': '9.6.0',
     '@pulumi/random': '4.18.4',
     '@pulumi/policy': '1.20.0',
+
+    // Effect ecosystem - OpenTelemetry integration
+    '@effect/opentelemetry': '0.44.0',
+
+    // Voice AI
+    hume: '0.15.7',
+
+    // Auth (JWT)
+    jose: '6.1.3',
+
+    // React ecosystem - additional utilities
+    'react-hook-form': '7.56.4',
+    clsx: '2.1.1',
+    'tailwind-merge': '3.2.0',
+
+    // WebGL
+    ogl: '1.0.11',
   },
 } as const satisfies StackDefinition;
 
