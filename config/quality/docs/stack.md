@@ -1,6 +1,6 @@
 # Stack Constraints
 
-> **Version Authority**: `config/signet/src/stack/versions.ts` is the SSOT.
+> **Version Authority**: `config/quality/src/stack/versions.ts` is the SSOT.
 > Run `just sig-doctor` to check alignment.
 > Import: `import { STACK } from '@/stack'`
 
