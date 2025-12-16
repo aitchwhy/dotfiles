@@ -1,75 +1,55 @@
 /**
- * Pulumi Entry Point - Cloud Infrastructure
+ * Pulumi Entry Point - AWS Foundation Infrastructure
  *
- * Unified GCP infrastructure stack managing:
- * - Compute: NixOS VM with Tailscale access
- * - Storage: GCS buckets for DVC and snapshots
- * - Secrets: Secret Manager for all credentials
+ * Generic infrastructure shared by ALL projects:
+ * - VPC with public/private subnets
+ * - GitHub OIDC for CI/CD authentication
  *
- * 100% IaC - no manual resource creation.
+ * NO project-specific resources here.
+ * Projects create their own resources using these foundations.
+ *
+ * AWS Account: 952084167040
+ * Region: us-east-1
  */
-import * as pulumi from '@pulumi/pulumi'
-import { CloudNixos } from './components/cloud-nixos'
-import { SecretsResources } from './components/secrets'
-import { StorageResources } from './components/storage'
+import * as pulumi from "@pulumi/pulumi"
+import { AwsFoundation } from "./components/aws-foundation.ts"
+import { GitHubOidc } from "./components/aws-github-oidc.ts"
 
-// Get configuration
-const config = new pulumi.Config()
-const gcpConfig = new pulumi.Config('gcp')
-
-const project = gcpConfig.require('project')
-const region = gcpConfig.require('region')
-const zone = gcpConfig.require('zone')
-
-// Optional overrides
-const machineType = config.get('machineType')
-const diskSizeGb = config.getNumber('diskSizeGb')
-
-// GCS location (multi-region for durability)
-const storageLocation = config.get('storageLocation') ?? 'US'
+// Configuration
+const config = new pulumi.Config("cloud")
+const vpcCidr = config.get("vpcCidr") ?? "10.0.0.0/16"
+const azCount = config.getNumber("azCount") ?? 2
+const githubOrg = config.require("githubOrg")
 
 // =============================================================================
-// Compute Resources
+// Foundation Infrastructure
 // =============================================================================
-const cloudNixos = new CloudNixos('cloud', {
-  project,
-  region,
-  zone,
-  machineType,
-  diskSizeGb,
+const foundation = new AwsFoundation("foundation", {
+  vpcCidr,
+  azCount,
 })
 
 // =============================================================================
-// Storage Resources
+// GitHub OIDC
 // =============================================================================
-const storage = new StorageResources('cloud', {
-  project,
-  location: storageLocation,
-  serviceAccountEmail: cloudNixos.serviceAccount.email,
-})
-
-// =============================================================================
-// Secrets Resources
-// =============================================================================
-const secrets = new SecretsResources('cloud', {
-  project,
-  serviceAccountEmail: cloudNixos.serviceAccount.email,
+const githubOidc = new GitHubOidc("github", {
+  githubOrg,
+  // Allow all repos from the org by default
 })
 
 // =============================================================================
 // Exports
 // =============================================================================
 
-// Compute
-export const publicIp = cloudNixos.publicIp
-export const instanceId = cloudNixos.instanceId
-export const instanceName = cloudNixos.instanceName
-export const sshCommand = cloudNixos.sshCommand
-export const serviceAccountEmail = cloudNixos.serviceAccount.email
+// VPC
+export const vpcId = foundation.vpcId
+export const publicSubnetIds = foundation.publicSubnetIds
+export const privateSubnetIds = foundation.privateSubnetIds
+export const defaultSecurityGroupId = foundation.defaultSecurityGroupId
 
-// Storage
-export const dataBucketUrl = storage.dataBucket.url
-export const snapshotsBucketUrl = storage.snapshotsBucket.url
+// GitHub OIDC
+export const githubActionsRoleArn = githubOidc.roleArn
 
-// Secrets (just the count, not the values)
-export const secretCount = secrets.secretNames.length
+// Metadata
+export const awsAccountId = "952084167040"
+export const awsRegion = "us-east-1"

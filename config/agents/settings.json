@@ -1,5 +1,23 @@
 {
   "$comment": "Global Claude Code settings for ALL projects. See settings/claude-code.json for dotfiles-specific enforcement hooks.",
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@1.0.8"]
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking@0.6.2"]
+    },
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory@0.6.2"]
+    },
+    "aws-knowledge": {
+      "type": "http",
+      "url": "https://knowledge-mcp.global.api.aws"
+    }
+  },
   "cleanupPeriodDays": 90,
   "includeCoAuthoredBy": false,
   "permissions": {

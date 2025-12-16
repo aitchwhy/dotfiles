@@ -1,3 +1,6 @@
-name: cloud
-runtime: nodejs
-description: Unified GCP infrastructure - VM, storage, secrets (100% IaC)
+name: dotfiles-aws-infra
+runtime:
+  name: nodejs
+  options:
+    packagemanager: bun
+description: AWS foundation infrastructure - VPC, GitHub OIDC (generic for all projects)

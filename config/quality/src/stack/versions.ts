@@ -62,7 +62,8 @@ export const STACK = {
   // ===========================================================================
   infra: {
     pulumi: '3.210.0', // IaC (TypeScript) - Dec 2025
-    'pulumi-gcp': '9.6.0', // GCP provider
+    'pulumi-aws': '7.14.0', // AWS provider
+    'pulumi-awsx': '3.1.0', // AWS Crosswalk (higher-level constructs)
     'process-compose': '1.5.0', // Unified observability
     tailscale: '1.78.0', // Mesh network
   },
@@ -230,7 +231,8 @@ export const STACK = {
 
     // Pulumi (infrastructure) - Dec 2025
     '@pulumi/pulumi': '3.210.0',
-    '@pulumi/gcp': '9.6.0',
+    '@pulumi/aws': '7.14.0',
+    '@pulumi/awsx': '3.1.0',
     '@pulumi/random': '4.18.4',
     '@pulumi/policy': '1.20.0',
 

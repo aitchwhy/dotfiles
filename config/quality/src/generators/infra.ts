@@ -178,57 +178,56 @@ const PULUMI_INDEX_TEMPLATE = `/**
  * See: https://www.pulumi.com/docs/
  */
 import * as pulumi from '@pulumi/pulumi'
-import * as gcp from '@pulumi/gcp'
+import * as aws from '@pulumi/aws'
+import * as awsx from '@pulumi/awsx'
 
 // Configuration
 const config = new pulumi.Config()
 const environment = config.require('environment') as 'dev' | 'staging' | 'prod'
-const project = config.require('project')
-const region = config.get('region') ?? 'us-central1'
+const region = config.get('region') ?? 'us-east-1'
 
-// Labels for all resources
-const labels = {
-  environment,
-  project,
-  'managed-by': 'signet',
-  'stack-version': '${STACK.meta.ssotVersion}',
+// Tags for all resources
+const tags = {
+  Environment: environment,
+  ManagedBy: 'signet',
+  StackVersion: '${STACK.meta.ssotVersion}',
 }
 
 // Export stack outputs
 export const env = environment
 export const stackName = pulumi.getStack()
-export const gcpRegion = region
+export const awsRegion = region
 
 // =============================================================================
 // Infrastructure Resources
 // =============================================================================
 
-// Example: Cloud Run API Service
+// Example: App Runner Service
 // Uncomment and configure as needed:
 //
-// const apiService = new gcp.cloudrunv2.Service('api', {
-//   name: \`\${project}-api-\${environment}\`,
-//   location: region,
-//   template: {
-//     containers: [{
-//       image: \`gcr.io/\${project}/api:latest\`,
-//       ports: [{ containerPort: 3000 }],
-//       resources: {
-//         limits: { memory: '512Mi', cpu: '1' },
+// const appRunner = new aws.apprunner.Service('api', {
+//   serviceName: \`{{name}}-api-\${environment}\`,
+//   sourceConfiguration: {
+//     imageRepository: {
+//       imageIdentifier: \`\${process.env.AWS_ACCOUNT_ID}.dkr.ecr.\${region}.amazonaws.com/{{name}}-api:latest\`,
+//       imageRepositoryType: 'ECR',
+//       imageConfiguration: {
+//         port: '3000',
+//         runtimeEnvironmentVariables: {
+//           NODE_ENV: environment === 'prod' ? 'production' : 'development',
+//         },
 //       },
-//       envs: [
-//         { name: 'NODE_ENV', value: environment === 'prod' ? 'production' : 'development' },
-//       ],
-//     }],
-//     scaling: {
-//       minInstanceCount: environment === 'prod' ? 1 : 0,
-//       maxInstanceCount: 10,
 //     },
+//     autoDeploymentsEnabled: true,
 //   },
-//   labels,
+//   instanceConfiguration: {
+//     cpu: '1024',
+//     memory: '2048',
+//   },
+//   tags,
 // })
 //
-// export const apiUrl = apiService.uri
+// export const apiUrl = appRunner.serviceUrl
 `;
 
 // Pulumi package.json generated from STACK versions
@@ -245,7 +244,8 @@ const PULUMI_PACKAGE_JSON_TEMPLATE = `{
   },
   "dependencies": {
     "@pulumi/pulumi": "${STACK.npm['@pulumi/pulumi']}",
-    "@pulumi/gcp": "${STACK.npm['@pulumi/gcp']}",
+    "@pulumi/aws": "${STACK.npm['@pulumi/aws']}",
+    "@pulumi/awsx": "${STACK.npm['@pulumi/awsx']}",
     "@pulumi/random": "${STACK.npm['@pulumi/random']}"
   },
   "devDependencies": {

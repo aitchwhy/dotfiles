@@ -16,18 +16,18 @@
 
 // Schema - Types and validation
 export type {
+  AppRunnerCpu,
+  AppRunnerMemory,
+  AwsRegion,
   BackendVersions,
-  CloudRunCpu,
-  CloudRunMemory,
-  DatabaseTier,
   DatabaseVersions,
   Environment,
   FrontendVersions,
-  GcpRegion,
   InfraVersions,
   NpmVersions,
   ObservabilityVersions,
   PythonVersions,
+  RdsInstanceClass,
   RuntimeVersions,
   ServiceVersions,
   StackDefinition,

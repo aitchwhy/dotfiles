@@ -1,4 +1,6 @@
 config:
-  gcp:project: cloud-infra-480717
-  gcp:region: us-central1
-  gcp:zone: us-central1-a
+  aws:region: us-east-1
+  aws:profile: AdministratorAccess-952084167040
+  cloud:vpcCidr: "10.0.0.0/16"
+  cloud:azCount: "2"
+  cloud:githubOrg: aitchwhy

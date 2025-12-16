@@ -78,7 +78,8 @@ export type BackendVersions = {
  */
 export type InfraVersions = {
   readonly pulumi: string;
-  readonly 'pulumi-gcp': string;
+  readonly 'pulumi-aws': string;
+  readonly 'pulumi-awsx': string;
   readonly 'process-compose': string;
   readonly tailscale: string;
 };
@@ -254,7 +255,8 @@ export type NpmVersions = {
 
   // Pulumi (infrastructure)
   readonly '@pulumi/pulumi': string;
-  readonly '@pulumi/gcp': string;
+  readonly '@pulumi/aws': string;
+  readonly '@pulumi/awsx': string;
   readonly '@pulumi/random': string;
   readonly '@pulumi/policy': string;
 };
@@ -303,7 +305,8 @@ export const backendVersionsSchema = z.object({
 
 export const infraVersionsSchema = z.object({
   pulumi: versionString,
-  'pulumi-gcp': versionString,
+  'pulumi-aws': versionString,
+  'pulumi-awsx': versionString,
   'process-compose': versionString,
   tailscale: versionString,
 }) satisfies z.ZodType<InfraVersions>;
@@ -457,7 +460,8 @@ export const npmVersionsSchema = z.object({
 
   // Pulumi
   '@pulumi/pulumi': versionString,
-  '@pulumi/gcp': versionString,
+  '@pulumi/aws': versionString,
+  '@pulumi/awsx': versionString,
   '@pulumi/random': versionString,
   '@pulumi/policy': versionString,
 }) satisfies z.ZodType<NpmVersions>;
@@ -484,19 +488,19 @@ export const stackDefinitionSchema = z.object({
 /** Environment type for infrastructure */
 export type Environment = 'dev' | 'staging' | 'prod';
 
-/** GCP regions we support */
-export type GcpRegion = 'us-central1' | 'us-east1' | 'us-west1' | 'europe-west1' | 'asia-east1';
+/** AWS regions we support */
+export type AwsRegion = 'us-east-1' | 'us-east-2' | 'us-west-1' | 'us-west-2' | 'eu-west-1' | 'ap-northeast-1';
 
-/** Database tiers for Cloud SQL */
-export type DatabaseTier =
-  | 'db-f1-micro'
-  | 'db-g1-small'
-  | 'db-custom-1-3840'
-  | 'db-custom-2-7680'
-  | 'db-custom-4-15360';
+/** RDS instance classes */
+export type RdsInstanceClass =
+  | 'db.t4g.micro'
+  | 'db.t4g.small'
+  | 'db.t4g.medium'
+  | 'db.r6g.large'
+  | 'db.r6g.xlarge';
 
-/** Cloud Run memory options */
-export type CloudRunMemory = '256Mi' | '512Mi' | '1Gi' | '2Gi' | '4Gi' | '8Gi';
+/** App Runner memory options (MB) */
+export type AppRunnerMemory = '512' | '1024' | '2048' | '3072' | '4096';
 
-/** Cloud Run CPU options */
-export type CloudRunCpu = '1' | '2' | '4' | '8';
+/** App Runner CPU options (vCPU units) */
+export type AppRunnerCpu = '256' | '512' | '1024' | '2048' | '4096';

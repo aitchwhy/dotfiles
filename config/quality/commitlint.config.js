@@ -6,11 +6,7 @@ export default {
   extends: ['@commitlint/config-conventional'],
   rules: {
     // Allowed commit types
-    'type-enum': [
-      2,
-      'always',
-      ['feat', 'fix', 'refactor', 'test', 'docs', 'chore', 'perf', 'ci'],
-    ],
+    'type-enum': [2, 'always', ['feat', 'fix', 'refactor', 'test', 'docs', 'chore', 'perf', 'ci']],
     // Scope must be lowercase
     'scope-case': [2, 'always', 'lower-case'],
     // No period at end of subject

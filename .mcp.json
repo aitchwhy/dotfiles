@@ -1,5 +1,5 @@
 {
   "$schema": "https://claude.ai/schemas/mcp.json",
-  "$comment": "Signet MCP deprecated - functionality migrated to paragon-guard.ts",
+  "$comment": "MCP servers defined in config/agents/settings.json (Nix SSOT)",
   "mcpServers": {}
 }
