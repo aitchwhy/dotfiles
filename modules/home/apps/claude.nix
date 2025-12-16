@@ -69,7 +69,7 @@ let
       command = "bun";
       args = [
         "run"
-        "${config.home.homeDirectory}/dotfiles/config/signet/src/mcp-server.ts"
+        "${config.home.homeDirectory}/dotfiles/config/quality/src/mcp-server.ts"
       ];
       isLocal = true; # Not an npx package
     };

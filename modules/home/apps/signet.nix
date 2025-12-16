@@ -38,7 +38,7 @@ in
         #   signet enforce [--fix]        Run enforcers
         #   signet reconcile [path]       Detect and fix code drift
 
-        SIGNET_DIR="${config.home.homeDirectory}/dotfiles/config/signet"
+        SIGNET_DIR="${config.home.homeDirectory}/dotfiles/config/quality"
 
         if [ ! -f "$SIGNET_DIR/src/cli.ts" ]; then
           echo "Error: Signet not initialized. Run 'bun install' in $SIGNET_DIR"
@@ -57,13 +57,13 @@ in
 
     # Environment variables
     home.sessionVariables = {
-      SIGNET_HOME = "${config.home.homeDirectory}/dotfiles/config/signet";
-      SIGNET_VERSIONS = "${config.home.homeDirectory}/dotfiles/config/signet/versions.json";
+      SIGNET_HOME = "${config.home.homeDirectory}/dotfiles/config/quality";
+      SIGNET_VERSIONS = "${config.home.homeDirectory}/dotfiles/config/quality/versions.json";
     };
 
     # Generate versions.json from src/stack/versions.ts on activation
     home.activation.signetSetup = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      SIGNET_DIR="${config.home.homeDirectory}/dotfiles/config/signet"
+      SIGNET_DIR="${config.home.homeDirectory}/dotfiles/config/quality"
       VERSIONS_FILE="$SIGNET_DIR/versions.json"
 
       # Create signet directory if it doesn't exist

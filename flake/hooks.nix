@@ -38,7 +38,7 @@
               [ ''${#files[@]} -eq 0 ] && exit 0
 
               # Scan rules directory
-              RULES_DIR="$HOME/dotfiles/config/agents/rules/ast-grep"
+              RULES_DIR="$HOME/dotfiles/config/quality/rules/paragon"
               if [ ! -d "$RULES_DIR" ]; then
                 echo "Warning: PARAGON rules directory not found at $RULES_DIR"
                 exit 0

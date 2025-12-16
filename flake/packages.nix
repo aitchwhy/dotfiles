@@ -25,7 +25,7 @@
           pname = "signet";
           version = "2.0.0";
 
-          src = ../config/signet;
+          src = ../config/quality;
 
           nativeBuildInputs = [
             pkgs.bun
@@ -35,7 +35,7 @@
 
           # bun2nix.hook requires bunDeps - the pre-fetched dependency cache
           bunDeps = bun2nix.fetchBunDeps {
-            bunNix = ../config/signet/bun.nix;
+            bunNix = ../config/quality/bun.nix;
           };
 
           # Disable default bun phases - we do custom TypeScript bundling

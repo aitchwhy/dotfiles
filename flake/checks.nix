@@ -14,7 +14,7 @@
                 pkgs.bun
                 pkgs.nodejs
               ];
-              src = ../config/signet;
+              src = ../config/quality;
             }
             ''
               # Copy source to writable location
@@ -372,7 +372,7 @@
                 pkgs.git
                 pkgs.nodejs
               ];
-              src = ../config/signet;
+              src = ../config/quality;
               HOME = "/tmp/signet-test";
               GIT_AUTHOR_NAME = "Signet CI";
               GIT_AUTHOR_EMAIL = "ci@signet.local";
