@@ -161,11 +161,11 @@ _test-rx:
 
 [private]
 _test-signet:
-    cd config/signet && bun test
+    cd config/quality && bun test
 
 [private]
 _test-factory:
-    cd config/signet && bun test tests/e2e/factory-smoke.test.ts
+    cd config/quality && bun test tests/e2e/factory-smoke.test.ts
 
 [private]
 _verify-factory:
