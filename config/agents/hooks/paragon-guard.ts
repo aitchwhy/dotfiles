@@ -127,7 +127,7 @@ async function main(): Promise<void> {
 // Performance Logging
 // =============================================================================
 
-import { appendFileSync, mkdirSync, existsSync } from 'fs';
+import { appendFileSync, mkdirSync, existsSync, statSync, renameSync } from 'fs';
 import { homedir } from 'os';
 import { join } from 'path';
 
@@ -139,6 +139,14 @@ function logPerf(tool: string, file: string, durationMs: number, result: 'approv
     if (!existsSync(METRICS_DIR)) {
       mkdirSync(METRICS_DIR, { recursive: true });
     }
+
+    // Rotate if > 10MB
+    const stats = existsSync(PERF_LOG) ? statSync(PERF_LOG) : null;
+    if (stats && stats.size > 10 * 1024 * 1024) {
+      const archive = `${PERF_LOG}.${Date.now()}.archive`;
+      renameSync(PERF_LOG, archive);
+    }
+
     const metric = {
       timestamp: new Date().toISOString(),
       hook: 'paragon-guard',
