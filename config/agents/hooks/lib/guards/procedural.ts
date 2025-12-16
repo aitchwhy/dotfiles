@@ -167,7 +167,22 @@ export async function checkTDD(filePath: string): Promise<GuardResult> {
   if (isTestFile(filePath, language)) return { ok: true };
 
   // Check for .tdd-skip bypass
-  if (await Bun.file('.tdd-skip').exists()) return { ok: true };
+  if (await Bun.file('.tdd-skip').exists()) {
+    // Audit trail for bypass
+    const auditEntry = {
+      timestamp: new Date().toISOString(),
+      guard: 'tdd-enforcer',
+      file: filePath,
+      bypass: '.tdd-skip',
+    };
+    try {
+      const auditPath = `${process.env.HOME}/.claude-metrics/tdd-bypass.jsonl`;
+      await Bun.write(auditPath, JSON.stringify(auditEntry) + '\n', { append: true });
+    } catch {
+      /* ignore audit failures */
+    }
+    return { ok: true, warnings: ['TDD bypassed via .tdd-skip'] };
+  }
 
   // Check if test exists
   const testPaths = language.getTestPaths(filePath);
