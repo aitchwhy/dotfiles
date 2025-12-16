@@ -3,13 +3,13 @@ name: Signet CI
 on:
   pull_request:
     paths:
-      - 'config/signet/**'
+      - 'config/quality/**'
       - 'lib/versions.nix'
       - '.github/workflows/signet.yml'
   push:
     branches: [main]
     paths:
-      - 'config/signet/**'
+      - 'config/quality/**'
       - 'lib/versions.nix'
       - '.github/workflows/signet.yml'
 
@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: config/signet
+        working-directory: config/quality
 
     steps:
       - name: Checkout

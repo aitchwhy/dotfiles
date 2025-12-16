@@ -5,14 +5,14 @@ on:
     paths:
       - 'config/agents/agents/**'
       - 'config/agents/skills/**'
-      - 'config/signet/src/agents/**'
+      - 'config/quality/src/agents/**'
       - '.github/workflows/agents.yml'
   push:
     branches: [main]
     paths:
       - 'config/agents/agents/**'
       - 'config/agents/skills/**'
-      - 'config/signet/src/agents/**'
+      - 'config/quality/src/agents/**'
       - '.github/workflows/agents.yml'
 
 jobs:
@@ -54,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: config/signet
+        working-directory: config/quality
 
     steps:
       - name: Checkout
@@ -91,4 +91,4 @@ jobs:
           echo "|----------|-------|"
           echo "| Agents | $(ls config/agents/agents/*.md 2>/dev/null | wc -l) |"
           echo "| Skills | $(ls -d config/agents/skills/*/ 2>/dev/null | wc -l) |"
-          echo "| Trigger Rules | $(grep -c 'id:' config/signet/src/agents/trigger-registry.ts || echo 0) |"
+          echo "| Trigger Rules | $(grep -c 'id:' config/quality/src/agents/trigger-registry.ts || echo 0) |"
