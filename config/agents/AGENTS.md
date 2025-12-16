@@ -24,8 +24,8 @@ Read `paragon` skill for full guard matrix.
 | Need | Action |
 |------|--------|
 | **PARAGON guards** | Read `config/agents/skills/paragon/SKILL.md` |
-| Stack versions | Read `config/signet/src/stack/versions.ts` |
-| Stack rules | Read `config/agents/rules/stack.md` |
+| Stack versions | Read `config/quality/src/stack/versions.ts` |
+| Stack rules | Read `config/quality/docs/stack.md` |
 | Pattern skills | Read `config/agents/skills/{skill}/SKILL.md` |
 | Agent personas | Read `config/agents/agents/{persona}.md` |
 | Lessons learned | Read `config/agents/memory/lessons.md` |

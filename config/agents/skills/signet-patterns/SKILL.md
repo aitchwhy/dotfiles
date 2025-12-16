@@ -40,7 +40,7 @@ bun validate
 
 ## SSOT Version Integration
 
-All versions come from `config/signet/src/stack/versions.ts`:
+All versions come from `config/quality/src/stack/versions.ts`:
 
 ```typescript
 export const STACK = {
@@ -144,7 +144,7 @@ const sessionSchema = Schema.Struct({
 ### Add New Generator
 
 ```typescript
-// config/signet/src/generators/service.ts
+// config/quality/src/generators/service.ts
 export const serviceGenerator: GeneratorConfig = {
   name: 'service',
   description: 'Generate Effect service with port',

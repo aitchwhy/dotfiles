@@ -9,11 +9,11 @@
     "headerText": "# Signet CLI Context\n\nCode generation platform with hexagonal architecture.\nStack: Bun + Effect-TS + ast-grep + OXC"
   },
   "include": [
-    "config/signet/src/**/*.ts",
-    "config/signet/package.json",
-    "config/signet/tsconfig.json",
-    "config/signet/biome.json",
-    "config/signet/versions.json"
+    "config/quality/src/**/*.ts",
+    "config/quality/package.json",
+    "config/quality/tsconfig.json",
+    "config/quality/biome.json",
+    "config/quality/versions.json"
   ],
   "ignore": {
     "customPatterns": [

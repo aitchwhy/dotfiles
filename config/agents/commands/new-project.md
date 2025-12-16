@@ -46,7 +46,7 @@ bun validate          # typecheck + lint + test
 ## Version Authority
 
 All generated projects use versions from the SSOT:
-`config/signet/src/stack/versions.ts`
+`config/quality/src/stack/versions.ts`
 
 Run `just sig-doctor` to check version alignment.
 

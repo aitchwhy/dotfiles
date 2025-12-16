@@ -173,7 +173,7 @@ url = cfg.services.loki.pushUrl;
 }
 ```
 
-See `config/signet/src/stack/versions.ts` for the full approved version registry.
+See `config/quality/src/stack/versions.ts` for the full approved version registry.
 
 ### Tier 7: Parse-at-Boundary Guards (32-39)
 
@@ -336,7 +336,7 @@ touch .tdd-skip
 |------|---------|
 | `config/agents/hooks/paragon-guard.ts` | PreToolUse enforcement (31 guards) |
 | `config/agents/rules/paragon-combined.yaml` | Combined ast-grep rules for pre-commit |
-| `config/signet/src/stack/versions.ts` | SSOT for stack versions (Guard 31) |
+| `config/quality/src/stack/versions.ts` | SSOT for stack versions (Guard 31) |
 | `flake/hooks.nix` | git-hooks.nix pre-commit (single ast-grep) |
 | `.github/workflows/paragon-check.yml` | CI enforcement |
 

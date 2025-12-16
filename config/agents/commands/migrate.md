@@ -42,4 +42,4 @@ signet migrate --dry-run && signet migrate && bun install && signet verify
 
 ## STACK Authority
 
-Version source of truth: `config/signet/src/stack/versions.ts`
+Version source of truth: `config/quality/src/stack/versions.ts`

@@ -39,7 +39,7 @@ signet migrate
 
 ## STACK Authority
 
-Source of truth: `config/signet/src/stack/versions.ts`
+Source of truth: `config/quality/src/stack/versions.ts`
 
 Import pattern:
 ```typescript

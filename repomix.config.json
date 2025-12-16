@@ -33,7 +33,7 @@
     "useGitignore": true,
     "useDefaultPatterns": true,
     "customPatterns": [
-      "config/signet/node_modules/**",
+      "config/quality/node_modules/**",
       "**/*.code-profile",
       "**/tmtheme.xml",
       "result",
