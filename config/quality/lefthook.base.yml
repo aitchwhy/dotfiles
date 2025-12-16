@@ -1,0 +1,38 @@
+# lefthook.base.yml - SSOT for all projects
+# Consume: cp ~/dotfiles/config/quality/lefthook.base.yml lefthook.yml
+min_version: 1.6.0
+
+pre-commit:
+  parallel: true
+  commands:
+    biome:
+      glob: '*.{js,ts,tsx,json}'
+      run: bunx @biomejs/biome check --write {staged_files}
+      stage_fixed: true
+
+    typecheck:
+      glob: '*.{ts,tsx}'
+      run: bun run typecheck
+
+    paragon-ast:
+      glob: '*.{ts,tsx}'
+      run: |
+        RULES_DIR="$HOME/dotfiles/config/agents/rules/ast-grep"
+        [ ! -d "$RULES_DIR" ] && exit 0
+        has_error=0
+        for rule in "$RULES_DIR"/*.yml; do
+          [ -f "$rule" ] || continue
+          # Run ast-grep and capture output
+          output=$(sg scan --rule "$rule" {staged_files} 2>&1 | grep -v "paragon-guard\|sig-\|ast-engine")
+          if [ -n "$output" ] && echo "$output" | grep -qE "error|warning"; then
+            echo "=== $(basename "$rule") ==="
+            echo "$output"
+            has_error=1
+          fi
+        done
+        exit $has_error
+
+commit-msg:
+  commands:
+    commitlint:
+      run: bunx commitlint --edit {1}
