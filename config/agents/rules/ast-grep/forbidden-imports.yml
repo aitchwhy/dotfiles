@@ -1,0 +1,30 @@
+# PARAGON Guard 4 + 31: Forbidden imports
+# Blocks banned packages and frameworks
+id: paragon-forbidden-imports
+language: typescript
+severity: error
+message: "PARAGON Guard 4/31: This import is forbidden. See STACK.ts for approved alternatives."
+
+rule:
+  any:
+    # Guard 4: Forbidden frameworks (use Effect Platform HTTP instead)
+    - pattern: "import $BINDING from 'express'"
+    - pattern: "import $BINDING from 'fastify'"
+    - pattern: "import $BINDING from 'koa'"
+    - pattern: "import $BINDING from 'prisma'"
+    - pattern: "import $BINDING from '@prisma/client'"
+    # Guard 31: Forbidden utilities (use native or Effect)
+    - pattern: "import $BINDING from 'lodash'"
+    - pattern: "import $BINDING from 'underscore'"
+    - pattern: "import $BINDING from 'moment'"
+    - pattern: "import $BINDING from 'axios'"
+    # Legacy testing/tooling (use Vitest, Biome)
+    - pattern: "import $BINDING from 'jest'"
+    # Legacy state management (use XState, Effect)
+    - pattern: "import $BINDING from 'redux'"
+    - pattern: "import $BINDING from '@reduxjs/toolkit'"
+    # Legacy ORM (use Drizzle)
+    - pattern: "import $BINDING from 'mongoose'"
+    - pattern: "import $BINDING from 'sequelize'"
+    # Legacy tracing (use OTEL)
+    - pattern: "import $BINDING from 'dd-trace'"
