@@ -25,7 +25,7 @@ import { stackDefinitionSchema } from './schema';
 export const STACK = {
   meta: {
     frozen: '2025-12',
-    updated: '2025-12-10',
+    updated: '2025-12-16',
     ssotVersion: '3.0.0',
   },
 
@@ -179,13 +179,14 @@ export const STACK = {
     react: '19.2.1',
     'react-dom': '19.2.1',
     xstate: '5.24.0',
-    '@xstate/react': '5.0.0',
+    '@xstate/react': '6.0.0',
     '@tanstack/react-router': '1.140.0',
     tailwindcss: '4.1.17',
 
     // Backend (Effect Platform HTTP - uses @effect/platform versions above)
+    hono: '4.11.1',
     'drizzle-orm': '0.45.0',
-    'drizzle-kit': '0.30.0',
+    'drizzle-kit': '0.31.0',
 
     // Auth
     'better-auth': '1.4.6',
