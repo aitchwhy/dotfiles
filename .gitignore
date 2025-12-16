@@ -31,6 +31,9 @@ lib/clients/api/specs/
 # Evolution system runtime metrics (machine-specific)
 .claude-metrics/
 
+# TDD bypass file (temporary, never commit)
+.tdd-skip
+
 # Secrets (never commit)
 .env
 .env.local
