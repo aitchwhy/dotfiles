@@ -26,7 +26,7 @@ export const STACK = {
   meta: {
     frozen: '2025-12',
     updated: '2025-12-16',
-    ssotVersion: '3.0.0',
+    ssotVersion: '3.1.0',
   },
 
   // ===========================================================================
@@ -51,7 +51,8 @@ export const STACK = {
   },
 
   // ===========================================================================
-  // BACKEND (Effect Platform HTTP + Drizzle)
+  // BACKEND (Effect Platform HTTP - NO Hono)
+  // @effect/platform provides HttpServer via platform-node/platform-bun
   // ===========================================================================
   backend: {
     'drizzle-orm': '0.45.0',
@@ -184,8 +185,7 @@ export const STACK = {
     '@tanstack/react-router': '1.140.0',
     tailwindcss: '4.1.17',
 
-    // Backend (Effect Platform HTTP - uses @effect/platform versions above)
-    hono: '4.11.1',
+    // Backend (Effect Platform HTTP - NO Hono)
     'drizzle-orm': '0.45.0',
     'drizzle-kit': '0.31.0',
 
