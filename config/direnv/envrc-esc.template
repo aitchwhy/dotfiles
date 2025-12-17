@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# vim: set ft=bash:
+
+# =============================================================================
+# Project .envrc - Pulumi ESC + Nix + direnv integration
+# =============================================================================
+
+# Layer 1: Nix Development Shell
+if [ -f flake.nix ]; then
+  use flake
+fi
+
+# Layer 2: Pulumi ESC Environment
+# Set your ESC environment path (org/project/environment)
+# use_esc "myorg/myproject/dev"
+
+# Layer 3: Local overrides (gitignored, for secrets not in ESC)
+[[ -f .env.local ]] && source_env .env.local
+
+# Layer 4: PATH additions
+PATH_add ./scripts
+PATH_add ./node_modules/.bin
+
+# Layer 5: Validation (uncomment and customize required variables)
+# : "${DATABASE_URL:?DATABASE_URL is required}"
+# : "${API_KEY:?API_KEY is required}"
+
+# Minimize log output in terminal multiplexers
+if [[ -n "$ZELLIJ" || -n "$TMUX" ]]; then
+  export DIRENV_LOG_FORMAT=""
+fi
