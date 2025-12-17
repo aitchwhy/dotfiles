@@ -4,7 +4,7 @@ Senior software engineer. macOS Apple Silicon, zsh, Nix Flakes.
 
 ## PARAGON Enforcement
 
-All code changes are enforced by PARAGON (14 guards).
+All code changes are enforced by PARAGON (39 guards).
 Read `paragon` skill for full guard matrix.
 
 | Layer | Mechanism |
