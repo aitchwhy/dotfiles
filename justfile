@@ -119,6 +119,23 @@ sig *ARGS:
 sig-status:
     @./scripts/sig --status
 
+# Check for Claude Code pattern updates
+upgrade-check:
+    @echo "Checking for Claude Code updates..."
+    @echo ""
+    @echo "1. Current settings.json hooks:"
+    @jq -r '.hooks | keys[]' config/agents/settings.json 2>/dev/null || echo "   (unable to read)"
+    @echo ""
+    @echo "2. Current skills:"
+    @ls -1 config/agents/skills/ 2>/dev/null | head -10 || echo "   (unable to list)"
+    @echo ""
+    @echo "See config/agents/skills/upgrade/SKILL.md for manual upgrade workflow."
+
+# Show upgrade diff (placeholder)
+upgrade-diff:
+    @echo "Upgrade diff not yet implemented."
+    @echo "Run: just upgrade-check"
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # HIDDEN HELPERS
 # ═══════════════════════════════════════════════════════════════════════════════
