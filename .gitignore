@@ -1,8 +1,11 @@
 # Nix build outputs
 result
+result-*
 
-# Generated files
+# Generated files - Repomix
 repomix-output.xml
+**/repomix-output.xml
+**/repomix-*.xml
 state.yml
 .zcompdump
 .zcompdump-*
@@ -46,3 +49,12 @@ lib/clients/api/specs/
 config/wispr-flow/
 config/httpie/sessions/
 .pre-commit-config.yaml
+
+# Editor backups
+*.bak
+*~
+
+# macOS extras
+._*
+.Spotlight-V100
+.Trashes
