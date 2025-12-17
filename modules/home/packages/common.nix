@@ -31,6 +31,7 @@ in
         terraform
         terragrunt
         pulumi
+        pulumi-esc # ESC CLI for secrets/config management
       ])
       # Container Tools
       ++ [
