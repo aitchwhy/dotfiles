@@ -1,0 +1,176 @@
+#!/usr/bin/env bash
+#
+# sig - Signet-aware Claude Code Launcher
+#
+# A wrapper around `claude` that provides:
+# - Configuration status display
+# - Verbose mode toggle
+# - Hook bypass for debugging
+# - Directory targeting
+#
+# Usage:
+#   sig                     # Launch in current directory
+#   sig ~/src/project       # Launch in specific directory
+#   sig -v                  # Verbose mode
+#   sig --no-hooks          # Disable hooks (debugging)
+#   sig --status            # Show current configuration
+#
+# Environment:
+#   CLAUDE_DISABLE_HOOKS=1  # Disable all hooks
+#   CLAUDE_VERBOSE=1        # Enable verbose output
+
+set -euo pipefail
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+VERBOSE=""
+EXTRA_ARGS=()
+SHOW_STATUS=false
+
+usage() {
+    cat << 'USAGE'
+sig - Signet-aware Claude Code Launcher
+
+USAGE:
+    sig [OPTIONS] [DIRECTORY]
+
+OPTIONS:
+    -v, --verbose     Enable verbose mode
+    --no-hooks        Disable all hooks (sets CLAUDE_DISABLE_HOOKS=1)
+    --status          Show current configuration and exit
+    -h, --help        Show this help message
+
+EXAMPLES:
+    sig                 Launch in current directory
+    sig ~/src/ember     Launch in Ember project
+    sig -v              Launch with verbose output
+    sig --status        Check configuration
+
+FUTURE ENHANCEMENTS:
+    sig -m notion       Load Notion MCP dynamically
+    sig -s effect       Start with Effect-TS skill context
+USAGE
+}
+
+show_status() {
+    echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}"
+    echo -e "${BLUE}   Signet Configuration Status${NC}"
+    echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}"
+    echo ""
+
+    # Check claude command
+    if command -v claude >/dev/null 2>&1; then
+        echo -e "${GREEN}✓${NC} claude command: $(which claude)"
+    else
+        echo -e "${RED}✗${NC} claude command: NOT FOUND"
+    fi
+
+    # Check settings file
+    SETTINGS="$HOME/dotfiles/config/agents/settings.json"
+    if [ -f "$SETTINGS" ]; then
+        echo -e "${GREEN}✓${NC} settings.json: $SETTINGS"
+        if command -v jq >/dev/null 2>&1; then
+            HOOKS=$(jq -r '.hooks | keys | length' "$SETTINGS" 2>/dev/null || echo "?")
+            echo "    Hooks configured: $HOOKS"
+        fi
+    else
+        echo -e "${RED}✗${NC} settings.json: NOT FOUND"
+    fi
+
+    # Check MCP config
+    MCP_CONFIG="$HOME/.config/claude/mcp-servers.json"
+    if [ -f "$MCP_CONFIG" ]; then
+        echo -e "${GREEN}✓${NC} MCP servers: $MCP_CONFIG"
+        if command -v jq >/dev/null 2>&1; then
+            SERVERS=$(jq -r 'keys | length' "$MCP_CONFIG" 2>/dev/null || echo "?")
+            echo "    Servers configured: $SERVERS"
+        fi
+    else
+        echo -e "${YELLOW}!${NC} MCP servers: Not generated (run darwin-rebuild switch)"
+    fi
+
+    # Check PARAGON guard
+    PARAGON_GUARD="$HOME/dotfiles/config/agents/hooks/paragon-guard.ts"
+    if [ -f "$PARAGON_GUARD" ]; then
+        echo -e "${GREEN}✓${NC} PARAGON guard: Active"
+    else
+        echo -e "${RED}✗${NC} PARAGON guard: NOT FOUND"
+    fi
+
+    # Check AGENTS.md (SSOT)
+    AGENTS_MD="$HOME/dotfiles/config/agents/AGENTS.md"
+    if [ -f "$AGENTS_MD" ]; then
+        echo -e "${GREEN}✓${NC} AGENTS.md (SSOT): $AGENTS_MD"
+    else
+        echo -e "${RED}✗${NC} AGENTS.md: NOT FOUND"
+    fi
+
+    # Environment
+    echo ""
+    echo "Environment:"
+    [ -n "${CLAUDE_DISABLE_HOOKS:-}" ] && echo "    CLAUDE_DISABLE_HOOKS=$CLAUDE_DISABLE_HOOKS"
+    [ -n "${CLAUDE_VERBOSE:-}" ] && echo "    CLAUDE_VERBOSE=$CLAUDE_VERBOSE"
+    [ -z "${CLAUDE_DISABLE_HOOKS:-}${CLAUDE_VERBOSE:-}" ] && echo "    (no overrides set)"
+
+    echo ""
+    echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}"
+}
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -v|--verbose)
+            VERBOSE="--verbose"
+            export CLAUDE_VERBOSE=1
+            shift
+            ;;
+        --no-hooks)
+            export CLAUDE_DISABLE_HOOKS=1
+            echo -e "${YELLOW}⚠${NC}  Hooks disabled for this session"
+            shift
+            ;;
+        --status)
+            SHOW_STATUS=true
+            shift
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        -*)
+            echo -e "${RED}Unknown option: $1${NC}"
+            usage
+            exit 1
+            ;;
+        *)
+            EXTRA_ARGS+=("$1")
+            shift
+            ;;
+    esac
+done
+
+# Handle --status
+if [ "$SHOW_STATUS" = true ]; then
+    show_status
+    exit 0
+fi
+
+# Change to directory if provided
+if [ ${#EXTRA_ARGS[@]} -gt 0 ]; then
+    TARGET_DIR="${EXTRA_ARGS[0]}"
+    if [ -d "$TARGET_DIR" ]; then
+        cd "$TARGET_DIR"
+        echo -e "${BLUE}→${NC} Working in: $(pwd)"
+    else
+        echo -e "${RED}Directory not found: $TARGET_DIR${NC}"
+        exit 1
+    fi
+fi
+
+# Launch Claude
+exec claude $VERBOSE

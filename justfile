@@ -108,6 +108,18 @@ evolve *ARGS:
     @bash config/agents/evolution/evolve.sh {{ ARGS }}
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# CLAUDE CODE
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Launch Claude Code with Signet tooling
+sig *ARGS:
+    @./scripts/sig {{ ARGS }}
+
+# Check sig launcher status
+sig-status:
+    @./scripts/sig --status
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # HIDDEN HELPERS
 # ═══════════════════════════════════════════════════════════════════════════════
 
