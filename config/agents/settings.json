@@ -34,8 +34,7 @@
       "Bash(uniq:*)",
       "Bash(jq:*)",
       "Bash(curl:*)",
-      "Bash(bun:*)",
-      "Bash(bunx:*)",
+      "Bash(pnpm:*)",
       "Bash(npm:*)",
       "Bash(npx:*)",
       "Bash(node:*)",
@@ -138,7 +137,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bun run \"$HOME/dotfiles/config/agents/hooks/unified-polish.ts\"",
+            "command": "node --import tsx \"$HOME/dotfiles/config/agents/hooks/unified-polish.ts\"",
             "timeout": 60
           }
         ]
@@ -148,7 +147,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bun run \"$HOME/dotfiles/config/agents/hooks/enforce-versions.ts\"",
+            "command": "node --import tsx \"$HOME/dotfiles/config/agents/hooks/enforce-versions.ts\"",
             "timeout": 10
           }
         ]
@@ -170,7 +169,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bun run \"$HOME/dotfiles/config/agents/hooks/paragon-guard.ts\"",
+            "command": "node --import tsx \"$HOME/dotfiles/config/agents/hooks/paragon-guard.ts\"",
             "timeout": 20
           }
         ]
@@ -228,7 +227,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bun run \"$HOME/dotfiles/config/agents/hooks/verification-gate.ts\"",
+            "command": "node --import tsx \"$HOME/dotfiles/config/agents/hooks/verification-gate.ts\"",
             "timeout": 15
           }
         ]
