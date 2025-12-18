@@ -13,7 +13,7 @@ import { TemplateEngineLive } from '@/layers/template-engine';
 describe('Infrastructure Generator', () => {
   describe('generateInfra', () => {
     test('generates process-compose.yaml', async () => {
-      const spec = makeSpec({ name: 'ember-infra' });
+      const spec = makeSpec({ name: 'my-infra' });
 
       const program = generateInfra(spec).pipe(Effect.provide(TemplateEngineLive));
       const tree = await Effect.runPromise(program);

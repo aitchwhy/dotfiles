@@ -47,7 +47,7 @@ OPTIONS:
 
 EXAMPLES:
     sig                 Launch in current directory
-    sig ~/src/ember     Launch in Ember project
+    sig ~/src/myproject Launch in specific project
     sig -v              Launch with verbose output
     sig --status        Check configuration
 

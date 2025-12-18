@@ -47,13 +47,13 @@ describe('Core Generator', () => {
     });
 
     test('generates flake.nix', async () => {
-      const spec = makeSpec({ name: 'ember-api' });
+      const spec = makeSpec({ name: 'my-api' });
 
       const program = generateCore(spec).pipe(Effect.provide(TemplateEngineLive));
       const tree = await Effect.runPromise(program);
 
       expect(tree['flake.nix']).toBeDefined();
-      expect(tree['flake.nix']).toContain('ember-api');
+      expect(tree['flake.nix']).toContain('my-api');
       expect(tree['flake.nix']).toContain('bun');
     });
 

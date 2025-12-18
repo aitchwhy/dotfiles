@@ -16,7 +16,7 @@ Or add `~/dotfiles/scripts` to your PATH.
 
 ```bash
 sig                     # Launch Claude Code in current directory
-sig ~/src/ember         # Launch in specific directory
+sig ~/src/myproject     # Launch in specific directory
 sig -v                  # Verbose mode
 sig --no-hooks          # Disable hooks for debugging
 sig --status            # Show configuration status

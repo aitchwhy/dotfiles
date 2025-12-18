@@ -52,12 +52,12 @@ using TypeSpec.Http;
 using TypeSpec.Rest;
 
 @service({
-  title: "Ember API",
+  title: "My API",
   version: "1.0.0",
 })
-@server("https://api.ember.dev", "Production")
+@server("https://api.example.dev", "Production")
 @server("http://localhost:3000", "Development")
-namespace EmberAPI;
+namespace MyAPI;
 ```
 
 ## Models

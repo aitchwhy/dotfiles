@@ -290,7 +290,7 @@ describe.skip('Max Rigor: Hook Enforcement', () => {
 describe('Max Rigor: Integration', () => {
   test('complete API project structure is valid', async () => {
     const spec = makeSpec({
-      name: 'ember-api',
+      name: 'my-api',
       type: 'api',
       infra: { runtime: 'bun', database: 'turso' },
     });

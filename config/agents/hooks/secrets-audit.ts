@@ -48,7 +48,7 @@ const SECRET_PATTERNS: ReadonlyArray<{ name: string; regex: RegExp }> = [
   // AWS
   { name: 'AWS_SECRET', regex: /AWS[_-]?SECRET[_-]?ACCESS[_-]?KEY["\s]*[:=]["\s]*["'][A-Za-z0-9+/=]{32,}["']/gi },
 
-  // Specific services (from ember-platform incident)
+  // Specific services
   { name: 'HUME_KEY', regex: /HUME[_-]?(?:API|SECRET)[_-]?KEY["\s]*[:=]["\s]*["'][^"']{20,}["']/gi },
   { name: 'TWILIO_TOKEN', regex: /TWILIO[_-]?(?:AUTH[_-]?TOKEN|ACCOUNT[_-]?SID)["\s]*[:=]["\s]*["'][^"']{20,}["']/gi },
   { name: 'BETTER_AUTH_SECRET', regex: /BETTER[_-]?AUTH[_-]?SECRET["\s]*[:=]["\s]*["'][^"']{20,}["']/gi },

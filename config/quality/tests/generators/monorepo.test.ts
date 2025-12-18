@@ -13,14 +13,14 @@ import { TemplateEngineLive } from '@/layers/template-engine';
 describe('Monorepo Generator', () => {
   describe('generateMonorepo', () => {
     test('generates root package.json with workspaces', async () => {
-      const spec = makeSpec({ name: 'ember-platform' });
+      const spec = makeSpec({ name: 'my-platform' });
 
       const program = generateMonorepo(spec).pipe(Effect.provide(TemplateEngineLive));
       const tree = await Effect.runPromise(program);
 
       expect(tree['package.json']).toBeDefined();
       const pkg = JSON.parse(tree['package.json']!);
-      expect(pkg.name).toBe('ember-platform');
+      expect(pkg.name).toBe('my-platform');
       expect(pkg.workspaces).toBeDefined();
       expect(pkg.workspaces).toContain('packages/*');
       expect(pkg.workspaces).toContain('apps/*');
@@ -112,13 +112,13 @@ describe('Monorepo Generator', () => {
     });
 
     test('generates README with project structure', async () => {
-      const spec = makeSpec({ name: 'ember-platform' });
+      const spec = makeSpec({ name: 'my-platform' });
 
       const program = generateMonorepo(spec).pipe(Effect.provide(TemplateEngineLive));
       const tree = await Effect.runPromise(program);
 
       expect(tree['README.md']).toBeDefined();
-      expect(tree['README.md']).toContain('ember-platform');
+      expect(tree['README.md']).toContain('my-platform');
       expect(tree['README.md']).toContain('packages/');
       expect(tree['README.md']).toContain('apps/');
     });

@@ -24,8 +24,8 @@ token-budget: 800
 
 ```bash
 # Initialize monorepo
-signet init monorepo ember-platform
-cd ember-platform
+signet init monorepo my-platform
+cd my-platform
 
 # Add services
 signet gen api voice-service

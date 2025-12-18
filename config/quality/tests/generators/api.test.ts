@@ -99,13 +99,13 @@ describe('API Generator', () => {
     });
 
     test('generates wrangler.toml for Workers deployment', async () => {
-      const spec = makeSpec({ name: 'ember-api' });
+      const spec = makeSpec({ name: 'my-api' });
 
       const program = generateApi(spec).pipe(Effect.provide(TemplateEngineLive));
       const tree = await Effect.runPromise(program);
 
       expect(tree['wrangler.toml']).toBeDefined();
-      expect(tree['wrangler.toml']).toContain('ember-api');
+      expect(tree['wrangler.toml']).toContain('my-api');
       expect(tree['wrangler.toml']).toContain('compatibility_date');
     });
 

@@ -1020,7 +1020,7 @@ Examples:
   signet verify --tiers execution           Run only execution tier
   signet verify --tiers patterns,execution  Run patterns + execution
   signet verify --fix --verbose             Auto-fix with details
-  signet init monorepo ember-platform
+  signet init monorepo my-platform
   signet gen api voice-service
   signet gen ui web-app
   signet validate

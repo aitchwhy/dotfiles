@@ -24,8 +24,8 @@ describe('ProjectSpec Schema', () => {
     });
 
     test('accepts names starting with letter', () => {
-      const result = Schema.decodeUnknownSync(ProjectName)('ember-api');
-      expect(result as string).toBe('ember-api');
+      const result = Schema.decodeUnknownSync(ProjectName)('my-api');
+      expect(result as string).toBe('my-api');
     });
 
     test('accepts names with numbers', () => {
@@ -186,8 +186,8 @@ describe('ProjectSpec Schema', () => {
 
     test('accepts full spec with all optional fields', () => {
       const spec = {
-        name: 'ember-platform',
-        description: 'Voice memory platform for families',
+        name: 'my-platform',
+        description: 'Platform for families',
         type: 'monorepo',
         ports: {
           http: 3000,
@@ -205,8 +205,8 @@ describe('ProjectSpec Schema', () => {
         },
       };
       const result = Schema.decodeUnknownSync(ProjectSpec)(spec);
-      expect(result.name as string).toBe('ember-platform');
-      expect(result.description).toBe('Voice memory platform for families');
+      expect(result.name as string).toBe('my-platform');
+      expect(result.description).toBe('Platform for families');
       expect(result.ports?.http as number).toBe(3000);
       expect(result.infra.database).toBe('turso');
     });

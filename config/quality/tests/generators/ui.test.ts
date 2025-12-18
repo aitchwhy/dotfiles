@@ -13,13 +13,13 @@ import { TemplateEngineLive } from '@/layers/template-engine';
 describe('UI Generator', () => {
   describe('generateUi', () => {
     test('generates App.tsx root component', async () => {
-      const spec = makeSpec({ name: 'ember-web' });
+      const spec = makeSpec({ name: 'my-web' });
 
       const program = generateUi(spec).pipe(Effect.provide(TemplateEngineLive));
       const tree = await Effect.runPromise(program);
 
       expect(tree['src/App.tsx']).toBeDefined();
-      expect(tree['src/App.tsx']).toContain('ember-web');
+      expect(tree['src/App.tsx']).toContain('my-web');
       expect(tree['src/App.tsx']).toContain('RouterProvider');
     });
 

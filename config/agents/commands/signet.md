@@ -35,8 +35,8 @@ Guide me through using Signet to create formally consistent software systems.
 
 ```bash
 # Initialize monorepo
-signet init monorepo ember-platform
-cd ember-platform
+signet init monorepo my-platform
+cd my-platform
 
 # Add API service
 signet gen api voice-service
