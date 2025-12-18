@@ -26,12 +26,6 @@ in
       "hazel".source = ../../../config/hazel;
     };
 
-    # CLI scripts (executable symlinks to ~/.local/bin)
-    home.file.".local/bin/rx" = {
-      source = ../../../config/scripts/rx;
-      executable = true;
-    };
-
     # Note: Wispr Flow config is NOT managed here
     # It contains PII and is excluded from git (see config/SECURITY_NOTICE.md)
   };

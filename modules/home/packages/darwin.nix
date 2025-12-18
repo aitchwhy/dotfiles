@@ -2,7 +2,7 @@
 # These packages are either:
 # - macOS-specific applications (iina, keka)
 # - Only needed on macOS workstation (docker-client, opentofu)
-# - macOS-specific tooling (gum for rx config editor)
+# - macOS-specific tooling (gum for TUI prompts)
 {
   config,
   lib,
@@ -24,7 +24,7 @@ in
       pulumiPackages.pulumi-nodejs
 
       # TUI Components
-      gum # TUI components for rx config editor
+      gum # TUI components for shell scripts
 
       # macOS Apps (migrated from Homebrew)
       iina # Video player

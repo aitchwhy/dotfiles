@@ -100,12 +100,6 @@ in
       s = "signet";
       sig = "signet";
 
-      # Repomix CLI (rx is the script in ~/.local/bin)
-      rxy = "rx copy"; # Pack and copy to clipboard
-      rxd = "rx dots"; # Pack dotfiles
-      rxe = "rx ember"; # Pack ember-platform
-      rxr = "rx remote"; # Pack remote repo
-
       # Claude Code
       cc = "claude";
       ccd = "claude --dangerously-skip-permissions";
