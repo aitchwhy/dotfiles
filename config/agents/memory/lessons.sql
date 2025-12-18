@@ -1,5 +1,5 @@
 -- Active Lessons Dump
--- Generated: 2025-12-18T19:08:38.464Z
+-- Generated: 2025-12-18T19:17:45.095Z
 -- Count: 10
 
 BEGIN TRANSACTION;
@@ -14,15 +14,15 @@ INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_co
 1. Delete Caddyfile (S3+CloudFront is production, Caddy is dead code)
 2. Switch to build-time config (remove window.__CONFIG__, use import.meta.env.VITE_*)
 3. Add X-Request-ID correlation middleware for backend
-4. Optimize ECS/ALB for <2min deploys', 'claude', 4, 1.0000, '2025-12-18 16:55:15');
+4. Optimize ECS/ALB for <2min deploys', 'claude', 5, 1.0000, '2025-12-18 16:55:15');
 INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (11, '2025-12-18', 'optimization', 'The plan aligns with your confirmed requirements:', 'The plan aligns with your confirmed requirements:
 - S3+CloudFront is production (Caddyfile is dead code)
 - Build-time config (accept separate images per environment)
 - X-Request-ID for distributed tracing
-- Aggressive deploy optimization', 'claude', 4, 1.0000, '2025-12-18 16:55:15');
+- Aggressive deploy optimization', 'claude', 5, 1.0000, '2025-12-18 16:55:15');
 INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (12, '2025-12-18', 'optimization', '1. **Phase 1 (Frontend)**: Delete Caddyfile, switch to build-time `import.meta.env.VITE_*`', '1. **Phase 1 (Frontend)**: Delete Caddyfile, switch to build-time `import.meta.env.VITE_*`
 2. **Phase 2 (Backend)**: Just add `exposedHeaders: [''traceparent'', ''tracestate'']` to CORS - no custom middleware needed
-3. **Phase 3 (Infra)**: Optimize ECS/ALB for <2min deploys', 'claude', 4, 1.0000, '2025-12-18 16:55:15');
+3. **Phase 3 (Infra)**: Optimize ECS/ALB for <2min deploys', 'claude', 5, 1.0000, '2025-12-18 16:55:15');
 INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (13, '2025-12-18', 'optimization', '### Phase 3: ECS/ALB Deploy Optimization ✓', '### Phase 3: ECS/ALB Deploy Optimization ✓
 - **Modified** `infra/pulumi/src/ecs.ts`:
   - healthCheck.interval: 30 → 10
@@ -33,7 +33,7 @@ INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_co
   - healthCheckGracePeriodSeconds: 120 → 30
 - **Modified** `infra/pulumi/src/alb.ts`:
   - interval: 30 → 10
-  - deregistrationDelay: 30 → 10', 'claude', 4, 1.0000, '2025-12-18 16:55:15');
+  - deregistrationDelay: 30 → 10', 'claude', 5, 1.0000, '2025-12-18 16:55:15');
 INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (3, '2025-12-12', 'pattern', 'Three cache layers for Nix: Cachix (remote), magic-nix-cache (GHA local), Bun cache (useless in sandbox).', 'CI runs dropped from 30+ minutes to 5-10 minutes with proper layer configuration', 'manual', 1, 0.6213, '2025-12-12');
 INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (4, '2025-12-12', 'gotcha', 'Nix sandbox isolation: Package manager caches (~/.bun, ~/.npm) NOT accessible during builds. Use derivation splitting instead.', 'Bun inside Nix derivation cannot see ~/.bun cache', 'manual', 1, 0.6213, '2025-12-12');
 INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (5, '2025-12-12', 'pattern', 'Derivation splitting anti-patterns: bun install in app derivation, using nixos-unstable, missing magic-nix-cache, post-build Cachix push.', 'nix build .#api -v 2>&1 | grep -E "building|cached" shows cached for nodeModules', 'manual', 1, 0.6213, '2025-12-12');
