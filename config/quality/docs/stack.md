@@ -40,8 +40,8 @@ mcp__signet__sig-migrate(path: ".", fix: true)
 
 ## Runtime
 
-- **Bun**: 1.3+
-- **Node**: 25+ (current, not LTS)
+- **pnpm**: 9.15+ (package manager)
+- **Node.js**: 25+ (current, not LTS)
 - **UV**: 0.5+ (Python)
 
 ## TypeScript
@@ -94,8 +94,10 @@ Effect.provide(HookLoggerLive);       // Claude Code hooks
 
 ## Infrastructure
 
-- Nix Flakes + nix-darwin
-- Pulumi (GCP, TypeScript-native IaC)
+- **Docker Compose**: Local orchestration (replaces process-compose)
+- **Pulumi ESC**: Secrets and configuration (fail-fast required)
+- **Nix Flakes**: nix-darwin for macOS, reproducible builds
+- **Pulumi**: GCP, TypeScript-native IaC
 
 ## Core Principles
 
@@ -105,7 +107,7 @@ Effect.provide(HookLoggerLive);       // Claude Code hooks
 localhost === CI === production
 ```
 
-Achieved via: Nix Flakes (hermetic), Process Compose (orchestration), Cloud Build (identical images).
+Achieved via: Docker Compose (local orchestration), Nix Flakes (hermetic builds), GitHub Actions (CI/CD).
 
 ### Type Safety Hierarchy
 
@@ -180,7 +182,7 @@ const userSchema = z.object({
 
 | Environment | Infrastructure |
 |-------------|---------------|
-| Local | Docker via process-compose |
+| Local | Docker Compose (`docker compose up`) |
 | CI | GitHub Actions services |
 | Staging | Real GCP (Cloud SQL, GCS) |
 
@@ -205,7 +207,7 @@ After writing/modifying TypeScript code, always run:
 
 ```bash
 biome check --write .  # Format + lint + fix
-bun typecheck          # Type check
+pnpm run typecheck     # Type check
 ```
 
 ## Modern CLI Tools (Guard 27)
@@ -303,11 +305,11 @@ See `parse-boundary-patterns` skill for comprehensive patterns.
 
 For ANY TypeScript project with Nix builds:
 
-1. **nodeModules derivation** - Contains ONLY `bun install`
-   - Hash based on `bun.lock` only
+1. **nodeModules derivation** - Contains ONLY `pnpm install`
+   - Hash based on `pnpm-lock.yaml` only
    - Uses `__noChroot = true` for network access
 
-2. **App derivation** - Contains ONLY `bun build`
+2. **App derivation** - Contains ONLY `pnpm build`
    - Symlinks to nodeModules: `ln -s ${nodeModules}/node_modules ./`
    - No network access needed
 
@@ -322,20 +324,20 @@ For ANY TypeScript project with Nix builds:
 ### Prohibited Patterns
 
 ```nix
-# NEVER: bun install in app derivation
+# NEVER: pnpm install in app derivation
 api = mkDerivation {
   buildPhase = ''
-    bun install  # WRONG - kills cache
-    bun build
+    pnpm install  # WRONG - kills cache
+    pnpm build
   '';
 };
 
 # ALWAYS: Split derivations
-nodeModules = mkDerivation { buildPhase = "bun install"; };
+nodeModules = mkDerivation { buildPhase = "pnpm install --frozen-lockfile"; };
 api = mkDerivation {
   buildPhase = ''
     ln -s ${nodeModules}/node_modules ./
-    bun build
+    pnpm build
   '';
 };
 ```

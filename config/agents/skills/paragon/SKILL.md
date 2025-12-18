@@ -34,14 +34,14 @@ PARAGON is the unified enforcement layer ensuring all code changes comply with:
 |---|-------|---------|--------|
 | 1 | Bash Safety | Bash | `rm -rf /`, `rm -rf ~` |
 | 2 | Conventional Commits | Bash(git commit) | Non-conventional messages |
-| 3 | Forbidden Files | Write | package-lock, eslint, prettier, jest, prisma, Docker |
+| 3 | Forbidden Files | Write | package-lock, bun.lock, eslint, prettier, jest, prisma, process-compose, .env |
 | 4 | Forbidden Imports | Write/Edit TS | express, fastify, prisma, zod/v3, GCP OTEL, dd-trace |
 | 5 | Any Type | Write/Edit TS | `: any`, `as any`, `<any>` |
 | 6 | z.infer | Write/Edit TS | `z.infer<>`, `z.input<>`, `z.output<>` |
 | 7 | No-Mock | Write/Edit TS | jest.mock, vi.mock, Mock*Live (Layer.succeed ALLOWED) |
 | 8 | TDD | Write source | Source files without corresponding test |
-| 9 | DevOps Files | Write | Dockerfile, docker-compose.yml |
-| 10 | DevOps Commands | Bash | docker-compose, docker build, npm run dev |
+| 9 | DevOps Files | Write | process-compose.yaml, .env (Docker files ALLOWED) |
+| 10 | DevOps Commands | Bash | process-compose, bun run/test/install, npm run dev |
 | 13 | Assumption Language | Write/Edit TS | "should work", "probably", "I think" |
 | 14 | Throw Detector | Write/Edit TS | `throw` for expected errors |
 
@@ -149,7 +149,7 @@ url = cfg.services.loki.pushUrl;
 
 | # | Guard | Trigger | Blocks |
 |---|-------|---------|--------|
-| 31 | Stack Compliance | Write package.json | lodash, express, prisma, webpack, jest, eslint, etc. |
+| 31 | Stack Compliance | Write package.json | lodash, express, prisma, webpack, jest, eslint, bun, etc. |
 
 **Guard 31 Rationale**: Enforce stack standards in package.json:
 ```json
@@ -159,7 +159,8 @@ url = cfg.services.loki.pushUrl;
     "lodash": "^4.17.0",    // Use native methods or Effect
     "express": "^4.18.0",   // Use Hono instead
     "prisma": "^5.0.0",     // Use Drizzle instead
-    "axios": "^1.6.0"       // Use native fetch
+    "axios": "^1.6.0",      // Use native fetch
+    "bun": "^1.0.0"         // Use pnpm + Node.js instead
   }
 }
 
@@ -387,7 +388,7 @@ The enforcement hooks run automatically:
 
 ```bash
 # Run verification manually
-bun run config/agents/hooks/paragon-guard.ts < test-input.json
+pnpm exec tsx config/agents/hooks/paragon-guard.ts < test-input.json
 ```
 
 ## Quick Reference

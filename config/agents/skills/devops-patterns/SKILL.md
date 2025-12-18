@@ -1,11 +1,11 @@
 ---
 name: devops-patterns
-description: Nix-first DevOps - process-compose for local dev, Nix builds, nix2container for deployment. This is THE way.
+description: Docker-first DevOps - Docker Compose for local dev, Vitest for testing, Pulumi ESC for secrets.
 allowed-tools: Read, Write, Edit, Bash
 token-budget: 1000
 ---
 
-# Nix-First DevOps
+# Docker-First DevOps
 
 ## Core Philosophy
 
@@ -14,152 +14,167 @@ localhost === CI === production
 ```
 
 Achieved via:
-- **Nix Flakes**: Hermetic, reproducible builds
-- **process-compose**: Local service orchestration
-- **nix2container**: OCI image generation (no Dockerfile)
-- **GitHub Actions**: CI/CD runs `nix build`
+- **Docker Compose**: Local service orchestration
+- **pnpm**: Fast, disk-efficient package manager
+- **Vitest**: Fast TypeScript-native testing
+- **Pulumi ESC**: Secrets and configuration (fail-fast)
 
 ## The Stack
 
 | Layer | Tool | Anti-Pattern |
 |-------|------|--------------|
-| Local Dev | `process-compose` | `docker-compose`, `npm run dev` |
-| Builds | `nix build` | Manual compilation, `docker build` |
-| Containers | `nix2container` | `Dockerfile`, `docker build` |
-| CI/CD | GHA + `nix build` | `docker build` in pipelines |
+| Local Dev | `docker compose` | `process-compose`, `bun run dev` |
+| Package Manager | `pnpm` | `bun`, `npm`, `yarn` |
+| Testing | `vitest` | `bun test`, `jest` |
+| Containers | `Dockerfile` | `nix2container` |
+| Secrets | `Pulumi ESC` | `.env` files, hardcoded |
 
 ## Blocked Files (enforced by hook)
 
 These files trigger a BLOCK in Claude Code:
-- `docker-compose.yml` / `docker-compose.yaml`
-- `Dockerfile` / `Dockerfile.*`
-- `.dockerignore`
+- `process-compose.yaml` / `process-compose.yml`
+- `bun.lock` / `bun.lockb`
+- `.env` (use Pulumi ESC instead)
 
 ## Blocked Commands (enforced by hook)
 
 These commands trigger a BLOCK in Claude Code:
-- `docker-compose up|start|run|exec|build`
-- `docker build`
-- `npm|bun|yarn|pnpm run dev|start|serve`
+- `process-compose up|start`
+- `bun run|test|install`
+- `npm|yarn run dev|start|serve`
 
 ## Correct Patterns
 
 ### Local Development
 
-Always start services via process-compose:
+Always start services via Docker Compose:
 
 ```bash
 # Start all services
-process-compose up
+docker compose up -d
 
 # Start specific service
-process-compose up api
+docker compose up -d api
 
 # Or use just alias
 just dev
 ```
 
-### process-compose.yaml Structure
+### docker-compose.yml Structure
 
 ```yaml
-version: "0.5"
-
-processes:
+services:
   api:
-    command: bun run dev
-    ready_log_line: "Server listening"
-    restart: on_failure
-    max_restarts: 3
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${PORT:-8787}:8787"
+    environment:
+      - NODE_ENV=development
     depends_on:
       db:
-        condition: process_healthy
+        condition: service_healthy
+    volumes:
+      - ./apps/api:/app/apps/api
+      - /app/node_modules
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8787/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   db:
-    command: postgres -D data/
-    is_daemon: true
-    readiness_probe:
-      exec:
-        command: pg_isready -h localhost
-      initial_delay_seconds: 2
-      period_seconds: 1
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: app
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - db-data:/var/lib/postgresql/data
 
   worker:
-    command: bun run worker
+    build: .
+    command: pnpm run worker
     depends_on:
-      api:
-        condition: process_started
+      - api
+
+volumes:
+  db-data:
 ```
 
-### Nix Flake with process-compose-flake
+### Dockerfile Pattern (Multi-stage)
 
-```nix
-{
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    flake-parts.url = "github:hercules-ci/flake-parts";
-    process-compose-flake.url = "github:Platonic-Systems/process-compose-flake";
-  };
+```dockerfile
+# Stage 1: Base with pnpm
+FROM node:22-slim AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 
-  outputs = inputs @ { flake-parts, ... }:
-    flake-parts.lib.mkFlake { inherit inputs; } {
-      imports = [
-        inputs.process-compose-flake.flakeModule
-      ];
+# Stage 2: Dependencies
+FROM base AS deps
+WORKDIR /app
+COPY pnpm-lock.yaml package.json ./
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
-      systems = [ "x86_64-linux" "aarch64-darwin" ];
+# Stage 3: Builder
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN pnpm build
 
-      perSystem = { pkgs, ... }: {
-        # Define process-compose configurations
-        process-compose."dev" = {
-          settings.processes = {
-            api.command = "${pkgs.bun}/bin/bun run dev";
-            db.command = "${pkgs.postgresql}/bin/postgres -D ./data";
-          };
-        };
-
-        # nix run .#dev starts process-compose
-        apps.dev = {
-          type = "app";
-          program = "${self'.packages.dev}/bin/dev";
-        };
-      };
-    };
-}
+# Stage 4: Runtime
+FROM base AS runtime
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY package.json ./
+EXPOSE 8787
+CMD ["node", "dist/index.js"]
 ```
 
-### nix2container for OCI Images (Conceptual)
-
-Instead of Dockerfile:
-
-```nix
-# In flake.nix perSystem
-packages.container-api = nix2container.buildImage {
-  name = "api";
-  tag = "latest";
-
-  copyToRoot = pkgs.buildEnv {
-    name = "root";
-    paths = [ self'.packages.api ];
-  };
-
-  config = {
-    Cmd = [ "${self'.packages.api}/bin/api" ];
-    ExposedPorts."8080/tcp" = {};
-  };
-};
-```
-
-Build and push:
+### Testing with Vitest
 
 ```bash
-# Build container
-nix build .#container-api
+# Run all tests
+pnpm test
 
-# Load into Docker (for local testing)
-./result | docker load
+# Watch mode
+vitest --watch
 
-# Or push directly to registry
-nix run .#container-api.copyToRegistry -- docker://ghcr.io/org/api:latest
+# With coverage
+vitest --coverage
+
+# Run specific test file
+vitest run src/api.test.ts
+```
+
+### Pulumi ESC Integration
+
+**Required .envrc pattern (fail-fast):**
+
+```bash
+# Layer 1: Nix dev shell
+use flake
+
+# Layer 2: Pulumi ESC (REQUIRED - fail-fast)
+if ! use_esc "org/project/dev"; then
+  log_error "FATAL: Pulumi ESC environment not available"
+  exit 1
+fi
+
+# Layer 3: Fail-fast validation
+: "${DATABASE_URL:?FATAL: DATABASE_URL not set - check ESC}"
+: "${API_KEY:?FATAL: API_KEY not set - check ESC}"
+
+# NO .env.local - ESC is source of truth
 ```
 
 ### GitHub Actions Workflow
@@ -178,58 +193,61 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: DeterminateSystems/nix-installer-action@main
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
 
-      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
 
-      - name: Build
-        run: nix build .#api
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm run typecheck
+
+      - name: Lint
+        run: pnpm run lint
 
       - name: Test
-        run: nix flake check
+        run: pnpm test
 
-      - name: Build Container
-        run: nix build .#container-api
+      - name: Build
+        run: pnpm build
 
-      - name: Push Container
-        if: github.ref == 'refs/heads/main'
-        run: |
-          nix run .#container-api.copyToRegistry -- \
-            docker://ghcr.io/${{ github.repository }}/api:${{ github.sha }}
+      - name: Build Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 ```
 
 ## Decision Tree
 
 | Question | Answer |
 |----------|--------|
-| Start API locally? | `process-compose up api` |
-| Run all services? | `process-compose up` or `just dev` |
-| Build binary? | `nix build .#api` |
-| Create container? | `nix build .#container-api` |
-| Run tests? | `nix flake check` or `bun test` |
-| Deploy? | Push to main, GHA runs `nix build` |
+| Start API locally? | `docker compose up api` |
+| Run all services? | `docker compose up` or `just dev` |
+| Build image? | `docker build -t api .` |
+| Run tests? | `pnpm test` or `vitest` |
+| Deploy? | Push to main, GHA builds & pushes |
 
-## Why This Approach?
+## Why Docker-First?
 
-### Problems with Docker-First
-
-1. **Dockerfile drift**: Dockerfile gets out of sync with Nix
-2. **Two build systems**: Maintaining both Nix and Docker
-3. **Non-reproducible**: `apt-get update` yields different results daily
-4. **Slow iteration**: Rebuild entire image for small changes
-5. **Layer caching complexity**: Optimizing Dockerfile layers is an art
-
-### Benefits of Nix-First
-
-1. **Single source of truth**: Nix defines everything
-2. **Reproducible**: Same inputs = same outputs, always
-3. **Fast iteration**: Only rebuilds what changed
-4. **Minimal images**: nix2container creates tiny, optimized images
-5. **No layer games**: Nix handles caching automatically
-6. **Local = CI = Prod**: Exact same binaries everywhere
+1. **Universal knowledge**: Docker is industry standard
+2. **Fast iteration**: Volume mounts for hot reload
+3. **Clear debugging**: Dockerfile layers are explicit
+4. **CI/CD simplicity**: Native Docker support everywhere
+5. **Environment parity**: Same containers locally and in prod
 
 ## Related Skills
 
-- `nix-darwin-patterns`: System configuration with Nix
-- `nix-flake-parts`: Modular flake structure
+- `pulumi-esc`: Secrets and configuration management
 - `hexagonal-architecture`: No-mock testing with real services
+- `typescript-patterns`: TypeScript best practices

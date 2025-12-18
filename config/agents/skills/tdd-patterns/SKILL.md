@@ -1,6 +1,6 @@
 ---
 name: tdd-patterns
-description: Test-Driven Development patterns for Bun test runner. Red-Green-Refactor. E2E to Integration to Unit hierarchy.
+description: Test-Driven Development patterns for Vitest. Red-Green-Refactor. E2E to Integration to Unit hierarchy.
 allowed-tools: Read, Write, Edit, Bash
 token-budget: 400
 ---
@@ -23,10 +23,10 @@ Unit Tests (many)       -> Test pure functions, isolated logic
 
 ## Unit Test Patterns
 
-### Bun Test Structure
+### Vitest Test Structure
 
 ```typescript
-import { describe, test, expect } from 'bun:test';
+import { describe, test, expect } from 'vitest';
 import { Ok, Err, map, all } from '@/lib/result';
 
 describe('Result', () => {
@@ -52,7 +52,7 @@ describe('Result', () => {
 ### Service Tests with Setup/Teardown
 
 ```typescript
-import { describe, test, expect, beforeEach, afterEach } from 'bun:test';
+import { describe, test, expect, beforeEach, afterEach } from 'vitest';
 
 describe('UserService', () => {
   let db: TestDb;
@@ -74,12 +74,13 @@ describe('UserService', () => {
 
 ## Running Tests
 
-### Bun Test Commands
+### Vitest Commands
 
 ```bash
-bun test                      # Run all tests
-bun test --coverage           # With coverage
-bun test --grep "UserService" # Pattern match
-bun test --watch              # Watch mode
-bun test --bail               # Stop on first failure
+pnpm test                       # Run all tests (via vitest)
+vitest                          # Run all tests directly
+vitest --coverage               # With coverage
+vitest --watch                  # Watch mode
+vitest run src/api.test.ts      # Run specific test file
+vitest --run --grep "UserService"  # Pattern match
 ```

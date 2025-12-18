@@ -60,20 +60,24 @@ environmentVariables:
 
 ## direnv Integration
 
-### .envrc Pattern
+### .envrc Pattern (FAIL-FAST Required)
 
 ```bash
 # Layer 1: Nix Development Shell
 use flake
 
-# Layer 2: Pulumi ESC Environment
-use_esc "myorg/myproject/dev"
+# Layer 2: Pulumi ESC Environment (REQUIRED - fail-fast)
+if ! use_esc "myorg/myproject/dev"; then
+  log_error "FATAL: Pulumi ESC environment not available"
+  exit 1
+fi
 
-# Layer 3: Local overrides (gitignored)
-[[ -f .env.local ]] && source_env .env.local
+# Layer 3: Fail-fast validation (REQUIRED)
+: "${DATABASE_URL:?FATAL: DATABASE_URL not set - check ESC}"
+: "${API_KEY:?FATAL: API_KEY not set - check ESC}"
 
-# Layer 4: Validation
-: "${DATABASE_URL:?DATABASE_URL is required}"
+# NO .env.local - ESC is the ONLY source of truth
+# .env files are BLOCKED by PARAGON Guard 3/9
 ```
 
 ### use_esc Function (in direnvrc)
@@ -133,8 +137,9 @@ esc env diff org/proj/dev org/proj/staging  # Compare envs
 1. **Per-project ESC environments** - Not shared across repos
 2. **Base environment composition** - DRY via imports
 3. **Last import wins** - Later imports override earlier
-4. **Local fallback** - `.env.local` for secrets not in ESC
-5. **Fail-fast validation** - Check required vars on shell entry
+4. **NO local fallback** - `.env` files are BLOCKED (Guard 3/9)
+5. **Fail-fast validation** - Exit 1 if ESC unavailable or vars missing
+6. **ESC is SSOT** - All secrets and config MUST come from ESC
 
 ## Secret Management
 
