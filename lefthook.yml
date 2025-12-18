@@ -1,0 +1,15 @@
+# lefthook.yml - Git hooks for dotfiles repo
+# Docs: https://github.com/evilmartians/lefthook
+min_version: 1.6.0
+
+pre-commit:
+  parallel: true
+  commands:
+    nixfmt:
+      glob: "*.nix"
+      run: nixfmt --check {staged_files}
+
+commit-msg:
+  commands:
+    commitlint:
+      run: bunx commitlint --edit {1}

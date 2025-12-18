@@ -3,8 +3,11 @@
 
 /** @type {import('@commitlint/types').UserConfig} */
 export default {
-  extends: ['@commitlint/config-conventional'],
   rules: {
+    // Type is required
+    'type-empty': [2, 'never'],
+    // Subject is required
+    'subject-empty': [2, 'never'],
     // Allowed commit types
     'type-enum': [2, 'always', ['feat', 'fix', 'refactor', 'test', 'docs', 'chore', 'perf', 'ci']],
     // Scope must be lowercase
