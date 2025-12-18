@@ -2,7 +2,8 @@
  * Infrastructure Generator
  *
  * Generates infrastructure-as-code with:
- * - process-compose.yaml for local development
+ * - docker-compose.yml for local development
+ * - Dockerfile for containerized builds
  * - Pulumi TypeScript project for cloud infrastructure (version-aware)
  * - VSCode/Neovim debug configurations
  *
@@ -15,50 +16,115 @@ import type { ProjectSpec } from '@/schema/project-spec';
 import { STACK } from '@/stack';
 
 // =============================================================================
-// Templates - Process Compose
+// Templates - Docker Compose
 // =============================================================================
 
-const PROCESS_COMPOSE_TEMPLATE = `version: "0.5"
+const DOCKER_COMPOSE_TEMPLATE = `# {{name}} - Local Development Orchestrator
+# Start with: docker compose up
 
-# {{name}} - Local Development Orchestrator
-# Start with: process-compose up
-
-processes:
-  # Example API service
+services:
   api:
-    command: bun run dev
-    working_dir: ./apps/api
-    availability:
-      restart: on_failure
-      max_restarts: 3
-    readiness_probe:
-      http_get:
-        host: 127.0.0.1
-        port: 3000
-        path: /health
-      initial_delay_seconds: 2
-      period_seconds: 5
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "\${PORT:-3000}:3000"
     environment:
       - NODE_ENV=development
-      - PORT=3000
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./apps/api:/app/apps/api
+      - /app/node_modules
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
-  # Example web service (depends on API)
   web:
-    command: bun run dev
-    working_dir: ./apps/web
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: web
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://localhost:3000
     depends_on:
       api:
-        condition: process_healthy
+        condition: service_healthy
+    volumes:
+      - ./apps/web:/app/apps/web
+      - /app/node_modules
+
+  db:
+    image: postgres:16
     environment:
-      - NODE_ENV=development
-      - API_URL=http://localhost:3000
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: {{name}}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - db-data:/var/lib/postgresql/data
 
-# Log configuration
-log_level: info
-log_location: ./.logs
+volumes:
+  db-data:
+`;
 
-# TUI configuration
-tui: true
+const DOCKERFILE_TEMPLATE = `# Stage 1: Base with pnpm
+FROM node:22-slim AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+# Stage 2: Dependencies
+FROM base AS deps
+WORKDIR /app
+COPY pnpm-lock.yaml package.json ./
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+
+# Stage 3: Builder
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN pnpm build
+
+# Stage 4: Runtime (API)
+FROM base AS api
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY package.json ./
+EXPOSE 3000
+CMD ["node", "dist/index.js"]
+
+# Stage 5: Web (dev server)
+FROM base AS web
+WORKDIR /app
+ENV NODE_ENV=development
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+EXPOSE 5173
+CMD ["pnpm", "run", "dev", "--host"]
+`;
+
+const DOCKERIGNORE_TEMPLATE = `node_modules
+dist
+.git
+.env
+.env.*
+*.log
+.DS_Store
+coverage
+.nyc_output
 `;
 
 // =============================================================================
@@ -69,36 +135,43 @@ const VSCODE_LAUNCH_TEMPLATE = `{
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "bun",
+      "type": "node",
       "request": "launch",
       "name": "Debug Current File",
-      "program": "\${file}",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["exec", "tsx"],
+      "args": ["\${file}"],
       "cwd": "\${workspaceFolder}",
-      "stopOnEntry": false
+      "skipFiles": ["<node_internals>/**"]
     },
     {
-      "type": "bun",
+      "type": "node",
       "request": "launch",
       "name": "Debug API",
-      "program": "\${workspaceFolder}/apps/api/src/index.ts",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["exec", "tsx"],
+      "args": ["\${workspaceFolder}/apps/api/src/index.ts"],
       "cwd": "\${workspaceFolder}/apps/api",
       "env": {
         "NODE_ENV": "development"
-      }
+      },
+      "skipFiles": ["<node_internals>/**"]
     },
     {
-      "type": "bun",
+      "type": "node",
       "request": "launch",
       "name": "Debug Tests",
-      "program": "\${workspaceFolder}/node_modules/bun/bin/bun",
-      "args": ["test", "\${file}"],
-      "cwd": "\${workspaceFolder}"
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["exec", "vitest", "run", "\${file}"],
+      "cwd": "\${workspaceFolder}",
+      "skipFiles": ["<node_internals>/**"]
     },
     {
-      "type": "bun",
+      "type": "node",
       "request": "attach",
       "name": "Attach to Process",
-      "url": "ws://localhost:6499"
+      "port": 9229,
+      "skipFiles": ["<node_internals>/**"]
     }
   ],
   "compounds": [
@@ -115,37 +188,44 @@ const NVIM_DAP_TEMPLATE = `-- {{name}} DAP Configuration
 
 local dap = require('dap')
 
--- Bun adapter
-dap.adapters.bun = {
+-- Node.js adapter (via vscode-js-debug)
+dap.adapters['pwa-node'] = {
   type = 'server',
   host = '127.0.0.1',
-  port = 6499,
+  port = 9229,
 }
 
 -- Configurations
 dap.configurations.typescript = {
   {
-    type = 'bun',
+    type = 'pwa-node',
     request = 'launch',
     name = 'Debug Current File',
-    program = '\${file}',
+    runtimeExecutable = 'pnpm',
+    runtimeArgs = { 'exec', 'tsx' },
+    args = { '\${file}' },
     cwd = '\${workspaceFolder}',
+    sourceMaps = true,
   },
   {
-    type = 'bun',
+    type = 'pwa-node',
     request = 'launch',
     name = 'Debug API',
-    program = '\${workspaceFolder}/apps/api/src/index.ts',
+    runtimeExecutable = 'pnpm',
+    runtimeArgs = { 'exec', 'tsx' },
+    args = { '\${workspaceFolder}/apps/api/src/index.ts' },
     cwd = '\${workspaceFolder}/apps/api',
     env = {
       NODE_ENV = 'development',
     },
+    sourceMaps = true,
   },
   {
-    type = 'bun',
+    type = 'pwa-node',
     request = 'attach',
     name = 'Attach to Process',
-    port = 6499,
+    port = 9229,
+    sourceMaps = true,
   },
 }
 
@@ -275,7 +355,7 @@ const PULUMI_TSCONFIG_TEMPLATE = `{
 // =============================================================================
 
 /**
- * Generate infrastructure files (Pulumi + process-compose + debug config)
+ * Generate infrastructure files (Pulumi + Docker Compose + debug config)
  */
 export const generateInfra = (
   spec: ProjectSpec
@@ -289,15 +369,17 @@ export const generateInfra = (
 
   // Base templates
   const templates: FileTree = {
-    // Process Compose
-    'process-compose.yaml': PROCESS_COMPOSE_TEMPLATE,
+    // Docker (local orchestration)
+    'docker-compose.yml': DOCKER_COMPOSE_TEMPLATE,
+    Dockerfile: DOCKERFILE_TEMPLATE,
+    '.dockerignore': DOCKERIGNORE_TEMPLATE,
 
-    // Pulumi
-    'Pulumi.yaml': PULUMI_YAML_TEMPLATE,
-    'Pulumi.dev.yaml': PULUMI_DEV_YAML_TEMPLATE,
-    'index.ts': PULUMI_INDEX_TEMPLATE,
-    'package.json': PULUMI_PACKAGE_JSON_TEMPLATE,
-    'tsconfig.json': PULUMI_TSCONFIG_TEMPLATE,
+    // Pulumi (cloud infrastructure)
+    'infra/Pulumi.yaml': PULUMI_YAML_TEMPLATE,
+    'infra/Pulumi.dev.yaml': PULUMI_DEV_YAML_TEMPLATE,
+    'infra/index.ts': PULUMI_INDEX_TEMPLATE,
+    'infra/package.json': PULUMI_PACKAGE_JSON_TEMPLATE,
+    'infra/tsconfig.json': PULUMI_TSCONFIG_TEMPLATE,
   };
 
   // Conditional: Debug configuration based on editor

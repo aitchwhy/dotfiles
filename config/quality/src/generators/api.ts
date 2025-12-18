@@ -30,12 +30,13 @@ const API_PACKAGE_JSON_TEMPLATE = `{
     "dev": "wrangler dev",
     "start": "wrangler dev",
     "deploy": "wrangler deploy",
-    "test": "bun test",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "lint": "bunx biome check .",
-    "lint:fix": "bunx biome check --write .",
-    "format": "bunx biome format --write .",
-    "validate": "bun run typecheck && bun run lint && bun test"
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "validate": "pnpm typecheck && pnpm lint && pnpm test"
   },
   "dependencies": {
     "hono": "^{{honoVersion}}",
@@ -44,13 +45,15 @@ const API_PACKAGE_JSON_TEMPLATE = `{
   },
   "devDependencies": {
     "@biomejs/biome": "^{{biomeVersion}}",
-    "@types/bun": "^{{bunTypesVersion}}",
+    "@types/node": "^{{nodeTypesVersion}}",
     "typescript": "^{{typescriptVersion}}",
+    "vitest": "^{{vitestVersion}}",
     "wrangler": "^3.99.0"
   },
   "engines": {
-    "bun": ">={{bunVersion}}"
-  }
+    "node": ">=25.0.0"
+  },
+  "packageManager": "pnpm@{{pnpmVersion}}"
 }`;
 
 // =============================================================================
@@ -348,13 +351,15 @@ export const generateApi = (spec: ProjectSpec): Effect.Effect<FileTree, Error, T
     hasDatabase: Boolean(spec.infra.database),
     isTurso: spec.infra.database === 'turso',
     isD1: spec.infra.database === 'd1',
+    honoVersion: npmVersions['hono'],
     effectVersion: npmVersions['effect'],
     effectPlatformVersion: npmVersions['@effect/platform'],
     zodVersion: npmVersions['zod'],
     typescriptVersion: npmVersions['typescript'],
     biomeVersion: npmVersions['@biomejs/biome'],
-    bunTypesVersion: npmVersions['@types/bun'],
-    bunVersion: runtimeVersions['bun'],
+    nodeTypesVersion: npmVersions['@types/node'],
+    vitestVersion: npmVersions['vitest'],
+    pnpmVersion: runtimeVersions['pnpm'],
   };
 
   // Base templates (always generated)

@@ -26,12 +26,13 @@ const UI_PACKAGE_JSON_TEMPLATE = `{
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "test": "vitest",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "lint": "bunx biome check .",
-    "lint:fix": "bunx biome check --write .",
-    "format": "bunx biome format --write .",
-    "validate": "bun run typecheck && bun run lint && bun test"
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "validate": "pnpm typecheck && pnpm lint && pnpm test"
   },
   "dependencies": {
     "react": "^{{reactVersion}}",
@@ -43,7 +44,7 @@ const UI_PACKAGE_JSON_TEMPLATE = `{
   },
   "devDependencies": {
     "@biomejs/biome": "^{{biomeVersion}}",
-    "@types/bun": "^{{bunTypesVersion}}",
+    "@types/node": "^{{nodeTypesVersion}}",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "typescript": "^{{typescriptVersion}}",
@@ -54,8 +55,9 @@ const UI_PACKAGE_JSON_TEMPLATE = `{
     "@tanstack/router-plugin": "^{{tanstackRouterVersion}}"
   },
   "engines": {
-    "bun": ">={{bunVersion}}"
-  }
+    "node": ">=25.0.0"
+  },
+  "packageManager": "pnpm@{{pnpmVersion}}"
 }`;
 
 // =============================================================================
@@ -305,11 +307,11 @@ export const generateUi = (spec: ProjectSpec): Effect.Effect<FileTree, Error, Te
     zodVersion: npmVersions['zod'],
     typescriptVersion: npmVersions['typescript'],
     biomeVersion: npmVersions['@biomejs/biome'],
-    bunTypesVersion: npmVersions['@types/bun'],
+    nodeTypesVersion: npmVersions['@types/node'],
     viteVersion: npmVersions['vite'],
     vitestVersion: npmVersions['vitest'],
     tailwindVersion: frontendVersions['tailwindcss'],
-    bunVersion: runtimeVersions['bun'],
+    pnpmVersion: runtimeVersions['pnpm'],
   };
 
   const templates: FileTree = {

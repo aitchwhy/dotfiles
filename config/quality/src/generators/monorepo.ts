@@ -1,11 +1,13 @@
 /**
  * Monorepo Generator
  *
- * Generates Bun workspaces monorepo structure with:
+ * Generates pnpm workspaces monorepo structure with:
  * - Root package.json with workspace configuration
+ * - pnpm-workspace.yaml for workspace definitions
  * - Shared TypeScript config
  * - Biome linting at root
  * - Shared packages scaffold
+ * - Docker Compose for local development
  */
 import type { Effect } from 'effect';
 import type { FileTree } from '@/layers/file-system';
@@ -17,32 +19,38 @@ import versions from '../../versions.json';
 // Templates - Root Configuration
 // =============================================================================
 
+const PNPM_WORKSPACE_TEMPLATE = `packages:
+  - 'packages/*'
+  - 'apps/*'
+`;
+
 const ROOT_PACKAGE_JSON_TEMPLATE = `{
   "name": "{{name}}",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "workspaces": [
-    "packages/*",
-    "apps/*"
-  ],
+  "workspaces": ["packages/*", "apps/*"],
   "scripts": {
-    "dev": "bun run --filter '*' dev",
-    "build": "bun run --filter '*' build",
-    "test": "bun run --filter '*' test",
-    "typecheck": "bun run --filter '*' typecheck",
-    "lint": "bunx biome check .",
-    "lint:fix": "bunx biome check --write .",
-    "format": "bunx biome format --write .",
-    "validate": "bun run typecheck && bun run lint && bun run test"
+    "dev": "docker compose up",
+    "build": "pnpm -r build",
+    "test": "vitest",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "validate": "pnpm typecheck && pnpm lint && pnpm test"
   },
   "devDependencies": {
     "@biomejs/biome": "^{{biomeVersion}}",
-    "typescript": "^{{typescriptVersion}}"
+    "@types/node": "^{{nodeTypesVersion}}",
+    "typescript": "^{{typescriptVersion}}",
+    "vitest": "^{{vitestVersion}}",
+    "tsx": "^{{tsxVersion}}"
   },
   "engines": {
-    "bun": ">={{bunVersion}}"
-  }
+    "node": ">=25.0.0"
+  },
+  "packageManager": "pnpm@{{pnpmVersion}}"
 }`;
 
 const ROOT_TSCONFIG_TEMPLATE = `{
@@ -142,14 +150,15 @@ const SHARED_PACKAGE_JSON_TEMPLATE = `{
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "bun test"
+    "test": "vitest run"
   },
   "dependencies": {
     "zod": "^{{zodVersion}}"
   },
   "devDependencies": {
-    "@types/bun": "^{{bunTypesVersion}}",
-    "typescript": "^{{typescriptVersion}}"
+    "@types/node": "^{{nodeTypesVersion}}",
+    "typescript": "^{{typescriptVersion}}",
+    "vitest": "^{{vitestVersion}}"
   }
 }`;
 
@@ -192,16 +201,6 @@ build/
 .next/
 .tsbuildinfo
 
-# Bun
-bun.lockb
-.bun/
-
-# Environment
-.env
-.env.local
-.env.*.local
-.envrc.local
-
 # IDE
 .idea/
 .vscode/
@@ -220,12 +219,21 @@ result-*
 # Logs
 *.log
 npm-debug.log*
+
+# NOTE: .env files are BLOCKED by PARAGON - use Pulumi ESC
 `;
 
-const ENVRC_TEMPLATE = `# Enable Nix flake dev shell
-if [ -f flake.nix ]; then
-  use flake
+const ENVRC_TEMPLATE = `# Layer 1: Nix Development Shell
+use flake
+
+# Layer 2: Pulumi ESC Environment (REQUIRED - fail-fast)
+if ! use_esc "{{escOrg}}/{{name}}/dev"; then
+  log_error "FATAL: Pulumi ESC environment not available"
+  exit 1
 fi
+
+# Layer 3: Fail-fast validation (REQUIRED)
+: "\${DATABASE_URL:?FATAL: DATABASE_URL not set - check ESC}"
 
 # Add local scripts to PATH
 PATH_add ./scripts
@@ -236,10 +244,7 @@ if [[ -n "$ZELLIJ" || -n "$TMUX" ]]; then
   export DIRENV_LOG_FORMAT=""
 fi
 
-# Load local overrides
-if [ -f .envrc.local ]; then
-  source_env .envrc.local
-fi
+# NO .env.local - ESC is the ONLY source of truth
 `;
 
 const FLAKE_NIX_TEMPLATE = `{
@@ -265,12 +270,16 @@ const FLAKE_NIX_TEMPLATE = `{
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
             # Core
-            bun
+            pnpm
             nodejs_22
 
             # TypeScript tooling
             typescript
             nodePackages.typescript-language-server
+
+            # Docker
+            docker
+            docker-compose
 
             # Utilities
             jq
@@ -280,9 +289,9 @@ const FLAKE_NIX_TEMPLATE = `{
 
           shellHook = ''
             echo "{{name}} Development Shell"
-            echo "  bun install  - Install dependencies"
-            echo "  bun dev      - Start all dev servers"
-            echo "  bun validate - Run all checks"
+            echo "  pnpm install    - Install dependencies"
+            echo "  docker compose up - Start all services"
+            echo "  pnpm validate   - Run all checks"
           '';
         };
 
@@ -293,7 +302,7 @@ const FLAKE_NIX_TEMPLATE = `{
 
 const README_TEMPLATE = `# {{name}}
 
-Monorepo powered by Bun workspaces.
+Monorepo powered by pnpm workspaces + Docker Compose.
 
 ## Structure
 
@@ -304,6 +313,9 @@ Monorepo powered by Bun workspaces.
 ├── packages/          # Shared packages
 │   └── shared/        # Common utilities and types
 ├── package.json       # Root workspace config
+├── pnpm-workspace.yaml # Workspace definitions
+├── docker-compose.yml # Local orchestration
+├── Dockerfile         # Container builds
 ├── tsconfig.json      # TypeScript project references
 ├── tsconfig.base.json # Shared TypeScript settings
 ├── biome.json         # Linting and formatting
@@ -314,13 +326,13 @@ Monorepo powered by Bun workspaces.
 
 \`\`\`bash
 # Install dependencies
-bun install
+pnpm install
 
-# Start development
-bun dev
+# Start development (via Docker Compose)
+docker compose up
 
 # Run all checks
-bun validate
+pnpm validate
 \`\`\`
 
 ## Workspaces
@@ -332,10 +344,16 @@ bun validate
 
 | Command | Description |
 |---------|-------------|
-| \`bun dev\` | Start all dev servers |
-| \`bun build\` | Build all packages |
-| \`bun test\` | Run all tests |
-| \`bun validate\` | Typecheck + lint + test |
+| \`docker compose up\` | Start all services |
+| \`pnpm build\` | Build all packages |
+| \`pnpm test\` | Run all tests (vitest) |
+| \`pnpm validate\` | Typecheck + lint + test |
+
+## Configuration
+
+- **Secrets**: Pulumi ESC (see .envrc)
+- **Local Dev**: Docker Compose
+- **Testing**: Vitest
 `;
 
 // =============================================================================
@@ -343,7 +361,7 @@ bun validate
 // =============================================================================
 
 /**
- * Generate Bun workspaces monorepo structure
+ * Generate pnpm workspaces monorepo structure
  *
  * Uses versions from versions.json as single source of truth.
  */
@@ -356,27 +374,25 @@ export const generateMonorepo = (
   const data = {
     name: spec.name,
     description: spec.description,
-    // Versions from single source of truth
+    escOrg: spec.name,
     zodVersion: npmVersions['zod'],
     typescriptVersion: npmVersions['typescript'],
     biomeVersion: npmVersions['@biomejs/biome'],
-    bunTypesVersion: npmVersions['@types/bun'],
-    bunVersion: runtimeVersions['bun'],
+    nodeTypesVersion: npmVersions['@types/node'],
+    vitestVersion: npmVersions['vitest'],
+    tsxVersion: npmVersions['tsx'],
+    pnpmVersion: runtimeVersions['pnpm'],
   };
 
   const templates: FileTree = {
-    // Root configuration
     'package.json': ROOT_PACKAGE_JSON_TEMPLATE,
+    'pnpm-workspace.yaml': PNPM_WORKSPACE_TEMPLATE,
     'tsconfig.json': ROOT_TSCONFIG_TEMPLATE,
     'tsconfig.base.json': TSCONFIG_BASE_TEMPLATE,
     'biome.json': BIOME_JSON_TEMPLATE,
-
-    // Shared package
     'packages/shared/package.json': SHARED_PACKAGE_JSON_TEMPLATE,
     'packages/shared/tsconfig.json': SHARED_TSCONFIG_TEMPLATE,
     'packages/shared/src/index.ts': SHARED_INDEX_TS_TEMPLATE,
-
-    // Infrastructure
     '.gitignore': GITIGNORE_TEMPLATE,
     '.envrc': ENVRC_TEMPLATE,
     'flake.nix': FLAKE_NIX_TEMPLATE,

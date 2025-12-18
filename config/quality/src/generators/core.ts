@@ -2,13 +2,13 @@
  * Core Generator
  *
  * The base generator that all other generators extend.
- * Generates the foundation for any TypeScript/Bun project:
- * - package.json
+ * Generates the foundation for any TypeScript/Node.js project:
+ * - package.json (pnpm)
  * - tsconfig.json
  * - biome.json
- * - flake.nix
+ * - flake.nix (pnpm + Docker)
  * - .gitignore
- * - .envrc
+ * - .envrc (ESC fail-fast)
  * - src/index.ts
  * - src/lib/result.ts
  */
@@ -36,32 +36,31 @@ const PACKAGE_JSON_TEMPLATE = `{
   "type": "module",
   "description": "{{#if description}}{{description}}{{else}}{{name}} project{{/if}}",
   "scripts": {
-    "dev": "bun run --watch src/index.ts",
-    "start": "bun run src/index.ts",
-    "test": "bun test",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "lint": "bunx biome check .",
-    "lint:fix": "bunx biome check --write .",
-    "format": "bunx biome format --write .",
-    "validate": "bun run typecheck && bun run lint && bun test"
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "validate": "pnpm typecheck && pnpm lint && pnpm test"
   },
   "dependencies": {
     "zod": "^{{zodVersion}}"
   },
   "devDependencies": {
     "@biomejs/biome": "^{{biomeVersion}}",
-{{#if isBun}}
-    "@types/bun": "^{{bunTypesVersion}}",
-{{/if}}
-    "typescript": "^{{typescriptVersion}}"
+    "@types/node": "^{{nodeTypesVersion}}",
+    "tsx": "^{{tsxVersion}}",
+    "typescript": "^{{typescriptVersion}}",
+    "vitest": "^{{vitestVersion}}"
   },
   "engines": {
-{{#if isBun}}
-    "bun": ">={{bunVersion}}"
-{{else}}
-    "node": ">={{nodeVersion}}"
-{{/if}}
-  }
+    "node": ">=25.0.0"
+  },
+  "packageManager": "pnpm@{{pnpmVersion}}"
 }`;
 
 const TSCONFIG_JSON_TEMPLATE = `{
@@ -70,9 +69,6 @@ const TSCONFIG_JSON_TEMPLATE = `{
     "module": "ESNext",
     "moduleResolution": "bundler",
     "lib": ["ES2024"],
-{{#if isBun}}
-    "types": ["bun-types"],
-{{/if}}
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
@@ -141,7 +137,7 @@ const BIOME_JSON_TEMPLATE = `{
 }`;
 
 const FLAKE_NIX_TEMPLATE = `{
-  description = "{{name}} - TypeScript/Bun project";
+  description = "{{name}} - TypeScript/Node.js project";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -162,15 +158,12 @@ const FLAKE_NIX_TEMPLATE = `{
       {
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
-            # Core
-            bun
+            pnpm
             nodejs_22
-
-            # TypeScript tooling
             typescript
             nodePackages.typescript-language-server
-
-            # Utilities
+            docker
+            docker-compose
             jq
             fd
             ripgrep
@@ -178,9 +171,9 @@ const FLAKE_NIX_TEMPLATE = `{
 
           shellHook = ''
             echo "{{name}} Development Shell"
-            echo "  bun dev      - Start development server"
-            echo "  bun test     - Run tests"
-            echo "  bun validate - Run all checks"
+            echo "  pnpm dev      - Start development server"
+            echo "  pnpm test     - Run tests (vitest)"
+            echo "  pnpm validate - Run all checks"
           '';
         };
 
@@ -196,16 +189,6 @@ node_modules/
 dist/
 build/
 .tsbuildinfo
-
-# Bun
-bun.lockb
-.bun/
-
-# Environment
-.env
-.env.local
-.env.*.local
-.envrc.local
 
 # IDE
 .idea/
@@ -227,10 +210,17 @@ result-*
 npm-debug.log*
 `;
 
-const ENVRC_TEMPLATE = `# Enable Nix flake dev shell
-if [ -f flake.nix ]; then
-  use flake
+const ENVRC_TEMPLATE = `# Layer 1: Nix Development Shell
+use flake
+
+# Layer 2: Pulumi ESC Environment (REQUIRED - fail-fast)
+if ! use_esc "{{escOrg}}/{{name}}/dev"; then
+  log_error "FATAL: Pulumi ESC environment not available"
+  exit 1
 fi
+
+# Layer 3: Fail-fast validation
+: "\${DATABASE_URL:?FATAL: DATABASE_URL not set - check ESC}"
 
 # Add local scripts and bins to PATH
 PATH_add ./scripts
@@ -239,11 +229,6 @@ PATH_add ./node_modules/.bin
 # Minimal logging in terminal multiplexers
 if [[ -n "$ZELLIJ" || -n "$TMUX" ]]; then
   export DIRENV_LOG_FORMAT=""
-fi
-
-# Load local overrides (keep last)
-if [ -f .envrc.local ]; then
-  source_env .envrc.local
 fi
 `;
 
@@ -312,39 +297,36 @@ export const tryCatchAsync = async <T>(fn: () => Promise<T>): Promise<Result<T, 
 // Generator
 // =============================================================================
 
-/**
- * Generate core project files from ProjectSpec
- *
- * Uses versions from versions.json as single source of truth.
- */
-export const generateCore = (spec: ProjectSpec): Effect.Effect<FileTree, Error, TemplateEngine> => {
+const buildTemplateData = (spec: ProjectSpec) => {
   const npmVersions = versions.npm as Record<string, string>;
   const runtimeVersions = versions.runtime as Record<string, string>;
-
-  const data = {
+  return {
     name: spec.name,
     description: spec.description,
-    isBun: spec.infra.runtime === 'bun',
-    isNode: spec.infra.runtime === 'node',
-    // Versions from single source of truth
+    escOrg: spec.name,
     zodVersion: npmVersions['zod'],
     typescriptVersion: npmVersions['typescript'],
     biomeVersion: npmVersions['@biomejs/biome'],
-    bunTypesVersion: npmVersions['@types/bun'],
-    bunVersion: runtimeVersions['bun'],
-    nodeVersion: runtimeVersions['node'],
+    nodeTypesVersion: npmVersions['@types/node'],
+    vitestVersion: npmVersions['vitest'],
+    tsxVersion: npmVersions['tsx'],
+    pnpmVersion: runtimeVersions['pnpm'],
   };
-
-  const templates: FileTree = {
-    'package.json': PACKAGE_JSON_TEMPLATE,
-    'tsconfig.json': TSCONFIG_JSON_TEMPLATE,
-    'biome.json': BIOME_JSON_TEMPLATE,
-    'flake.nix': FLAKE_NIX_TEMPLATE,
-    '.gitignore': GITIGNORE_TEMPLATE,
-    '.envrc': ENVRC_TEMPLATE,
-    'src/index.ts': INDEX_TS_TEMPLATE,
-    'src/lib/result.ts': RESULT_TS_TEMPLATE,
-  };
-
-  return renderTemplates(templates, data);
 };
+
+const CORE_TEMPLATES: FileTree = {
+  'package.json': PACKAGE_JSON_TEMPLATE,
+  'tsconfig.json': TSCONFIG_JSON_TEMPLATE,
+  'biome.json': BIOME_JSON_TEMPLATE,
+  'flake.nix': FLAKE_NIX_TEMPLATE,
+  '.gitignore': GITIGNORE_TEMPLATE,
+  '.envrc': ENVRC_TEMPLATE,
+  'src/index.ts': INDEX_TS_TEMPLATE,
+  'src/lib/result.ts': RESULT_TS_TEMPLATE,
+};
+
+/**
+ * Generate core project files from ProjectSpec
+ */
+export const generateCore = (spec: ProjectSpec): Effect.Effect<FileTree, Error, TemplateEngine> =>
+  renderTemplates(CORE_TEMPLATES, buildTemplateData(spec));
