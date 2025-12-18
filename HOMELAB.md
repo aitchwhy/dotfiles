@@ -444,7 +444,6 @@ networking.firewall = {
 /home/hank/
 ├── dotfiles/           # Git-tracked, synced
 ├── projects/           # Active development
-│   └── ember/          # Main project
 ├── .claude/            # Claude Code state
 │   ├── settings.json   # From dotfiles
 │   └── sessions/       # Local state
