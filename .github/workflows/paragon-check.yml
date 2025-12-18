@@ -35,14 +35,13 @@ jobs:
           forbidden=(
             "package-lock.json"
             "yarn.lock"
-            "pnpm-lock.yaml"
+            "bun.lock"
+            "bun.lockb"
             ".eslintrc"
             ".prettierrc"
             "jest.config"
-            "Dockerfile"
-            "docker-compose.yml"
-            "docker-compose.yaml"
-            ".dockerignore"
+            "process-compose.yaml"
+            "process-compose.yml"
           )
           found=0
           for pattern in "${forbidden[@]}"; do
@@ -123,13 +122,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          bun-version: latest
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '25'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: config/agents
 
       - name: Run PARAGON Cleanup Analysis
         run: |
-          bun run config/agents/hooks/paragon-cleanup.ts --mode full --json
+          pnpm exec tsx config/agents/hooks/paragon-cleanup.ts --mode full --json
           echo ""
           echo "Note: Cleanup is advisory. Critical violations blocked by guards job."
