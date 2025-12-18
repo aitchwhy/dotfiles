@@ -1,5 +1,5 @@
 -- Active Lessons Dump
--- Generated: 2025-12-18T15:57:18.678Z
+-- Generated: 2025-12-18T15:57:18.901Z
 -- Count: 6
 
 BEGIN TRANSACTION;
