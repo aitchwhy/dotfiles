@@ -39,8 +39,8 @@ in
       ]
       # Programming Languages & Tools
       ++ (optionals cfg.enableLanguages [
-        # Node.js - using latest current (not LTS)
-        nodejs
+        # Node.js 24 LTS
+        nodejs_24
         nodePackages.pnpm
         yarn-berry
         bun
