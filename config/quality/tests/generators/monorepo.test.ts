@@ -98,7 +98,7 @@ describe('Monorepo Generator', () => {
 
       expect(tree['flake.nix']).toBeDefined();
       expect(tree['flake.nix']).toContain('platform');
-      expect(tree['flake.nix']).toContain('bun');
+      expect(tree['flake.nix']).toContain('pnpm');
     });
 
     test('generates .envrc for direnv', async () => {

@@ -54,7 +54,7 @@ describe('Core Generator', () => {
 
       expect(tree['flake.nix']).toBeDefined();
       expect(tree['flake.nix']).toContain('my-api');
-      expect(tree['flake.nix']).toContain('bun');
+      expect(tree['flake.nix']).toContain('pnpm');
     });
 
     test('generates .gitignore', async () => {
@@ -65,7 +65,7 @@ describe('Core Generator', () => {
 
       expect(tree['.gitignore']).toBeDefined();
       expect(tree['.gitignore']).toContain('node_modules');
-      expect(tree['.gitignore']).toContain('.env');
+      expect(tree['.gitignore']).toContain('dist/');
     });
 
     test('generates .envrc', async () => {
@@ -99,21 +99,17 @@ describe('Core Generator', () => {
       expect(tree['src/lib/result.ts']).toContain('Err');
     });
 
-    test('includes runtime-specific packages', async () => {
-      const bunSpec = makeSpec({ infra: { runtime: 'bun' } });
-      const nodeSpec = makeSpec({ infra: { runtime: 'node' } });
+    test('includes node runtime packages', async () => {
+      const spec = makeSpec({ infra: { runtime: 'node' } });
 
-      const bunProgram = generateCore(bunSpec).pipe(Effect.provide(TemplateEngineLive));
-      const nodeProgram = generateCore(nodeSpec).pipe(Effect.provide(TemplateEngineLive));
+      const program = generateCore(spec).pipe(Effect.provide(TemplateEngineLive));
+      const tree = await Effect.runPromise(program);
 
-      const bunTree = await Effect.runPromise(bunProgram);
-      // Run nodeProgram to ensure it generates successfully (validates both runtimes work)
-      await Effect.runPromise(nodeProgram);
+      const pkg = JSON.parse(tree['package.json']!);
 
-      const bunPkg = JSON.parse(bunTree['package.json']!);
-
-      // Bun should have @types/bun
-      expect(bunPkg.devDependencies['@types/bun']).toBeDefined();
+      // Node projects should have @types/node and vitest
+      expect(pkg.devDependencies['@types/node']).toBeDefined();
+      expect(pkg.devDependencies['vitest']).toBeDefined();
     });
   });
 });

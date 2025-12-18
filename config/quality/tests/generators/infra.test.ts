@@ -1,7 +1,7 @@
 /**
  * Infrastructure Generator Tests
  *
- * Tests for the Pulumi + process-compose infrastructure generator.
+ * Tests for the Docker Compose + Pulumi infrastructure generator.
  */
 
 import { describe, expect, test } from 'bun:test';
@@ -12,15 +12,26 @@ import { TemplateEngineLive } from '@/layers/template-engine';
 
 describe('Infrastructure Generator', () => {
   describe('generateInfra', () => {
-    test('generates process-compose.yaml', async () => {
+    test('generates docker-compose.yml', async () => {
       const spec = makeSpec({ name: 'my-infra' });
 
       const program = generateInfra(spec).pipe(Effect.provide(TemplateEngineLive));
       const tree = await Effect.runPromise(program);
 
-      expect(tree['process-compose.yaml']).toBeDefined();
-      expect(tree['process-compose.yaml']).toContain('version:');
-      expect(tree['process-compose.yaml']).toContain('processes:');
+      expect(tree['docker-compose.yml']).toBeDefined();
+      expect(tree['docker-compose.yml']).toContain('services:');
+      expect(tree['docker-compose.yml']).toContain('my-infra');
+    });
+
+    test('generates Dockerfile with pnpm', async () => {
+      const spec = makeSpec({ name: 'my-project' });
+
+      const program = generateInfra(spec).pipe(Effect.provide(TemplateEngineLive));
+      const tree = await Effect.runPromise(program);
+
+      expect(tree['Dockerfile']).toBeDefined();
+      expect(tree['Dockerfile']).toContain('pnpm');
+      expect(tree['Dockerfile']).toContain('node:22');
     });
 
     test('generates VSCode launch.json for debugging', async () => {
@@ -33,7 +44,7 @@ describe('Infrastructure Generator', () => {
 
       expect(tree['.vscode/launch.json']).toBeDefined();
       expect(tree['.vscode/launch.json']).toContain('configurations');
-      expect(tree['.vscode/launch.json']).toContain('bun');
+      expect(tree['.vscode/launch.json']).toContain('pnpm');
     });
 
     test('generates nvim-dap config when debugger is nvim-dap', async () => {
@@ -54,9 +65,9 @@ describe('Infrastructure Generator', () => {
       const program = generateInfra(spec).pipe(Effect.provide(TemplateEngineLive));
       const tree = await Effect.runPromise(program);
 
-      expect(tree['Pulumi.yaml']).toBeDefined();
-      expect(tree['Pulumi.yaml']).toContain('cloud-infra');
-      expect(tree['Pulumi.yaml']).toContain('runtime:');
+      expect(tree['infra/Pulumi.yaml']).toBeDefined();
+      expect(tree['infra/Pulumi.yaml']).toContain('cloud-infra');
+      expect(tree['infra/Pulumi.yaml']).toContain('runtime:');
     });
 
     test('generates Pulumi index.ts entry point', async () => {
@@ -65,9 +76,9 @@ describe('Infrastructure Generator', () => {
       const program = generateInfra(spec).pipe(Effect.provide(TemplateEngineLive));
       const tree = await Effect.runPromise(program);
 
-      expect(tree['index.ts']).toBeDefined();
-      expect(tree['index.ts']).toContain('pulumi');
-      expect(tree['index.ts']).toContain('export');
+      expect(tree['infra/index.ts']).toBeDefined();
+      expect(tree['infra/index.ts']).toContain('pulumi');
+      expect(tree['infra/index.ts']).toContain('export');
     });
 
     test('generates Pulumi stack config', async () => {
@@ -76,8 +87,8 @@ describe('Infrastructure Generator', () => {
       const program = generateInfra(spec).pipe(Effect.provide(TemplateEngineLive));
       const tree = await Effect.runPromise(program);
 
-      expect(tree['Pulumi.dev.yaml']).toBeDefined();
-      expect(tree['Pulumi.dev.yaml']).toContain('config:');
+      expect(tree['infra/Pulumi.dev.yaml']).toBeDefined();
+      expect(tree['infra/Pulumi.dev.yaml']).toContain('config:');
     });
 
     test('generates package.json for Pulumi deps', async () => {
@@ -86,8 +97,8 @@ describe('Infrastructure Generator', () => {
       const program = generateInfra(spec).pipe(Effect.provide(TemplateEngineLive));
       const tree = await Effect.runPromise(program);
 
-      expect(tree['package.json']).toBeDefined();
-      const pkg = JSON.parse(tree['package.json']!);
+      expect(tree['infra/package.json']).toBeDefined();
+      const pkg = JSON.parse(tree['infra/package.json']!);
       expect(pkg.dependencies['@pulumi/pulumi']).toBeDefined();
     });
 
@@ -97,8 +108,8 @@ describe('Infrastructure Generator', () => {
       const program = generateInfra(spec).pipe(Effect.provide(TemplateEngineLive));
       const tree = await Effect.runPromise(program);
 
-      expect(tree['tsconfig.json']).toBeDefined();
-      const tsconfig = JSON.parse(tree['tsconfig.json']!);
+      expect(tree['infra/tsconfig.json']).toBeDefined();
+      const tsconfig = JSON.parse(tree['infra/tsconfig.json']!);
       expect(tsconfig.compilerOptions.strict).toBe(true);
     });
 

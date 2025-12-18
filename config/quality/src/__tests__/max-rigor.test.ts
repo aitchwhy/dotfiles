@@ -43,7 +43,7 @@ describe('Max Rigor: Version Unity', () => {
       'typescript',
       'zod',
       '@biomejs/biome',
-      '@types/bun',
+      '@types/node',
       'effect',
       'hono',
       'drizzle-orm',
