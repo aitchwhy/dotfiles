@@ -5,6 +5,7 @@
  *         8 (TDD), 9-10 (DevOps), 11-12 (advisory), 28-31 (config/stack)
  */
 
+import { existsSync, appendFileSync } from 'node:fs';
 import { type GuardResult } from '../types';
 
 // =============================================================================
@@ -74,18 +75,18 @@ type ForbiddenFile = {
 };
 
 const FORBIDDEN_FILES: readonly ForbiddenFile[] = [
-  { pattern: 'package-lock.json', reason: 'Use Bun', alternative: 'bun install' },
-  { pattern: 'yarn.lock', reason: 'Use Bun', alternative: 'bun install' },
-  { pattern: 'pnpm-lock.yaml', reason: 'Use Bun', alternative: 'bun install' },
+  { pattern: 'package-lock.json', reason: 'Use pnpm', alternative: 'pnpm install' },
+  { pattern: 'yarn.lock', reason: 'Use pnpm', alternative: 'pnpm install' },
+  { pattern: 'bun.lock', reason: 'Use pnpm', alternative: 'pnpm install' },
+  { pattern: 'bun.lockb', reason: 'Use pnpm', alternative: 'pnpm install' },
   { pattern: /\.eslintrc(\.(js|cjs|mjs|json|yaml|yml))?$/, reason: 'Use Biome', alternative: 'biome.json' },
   { pattern: /eslint\.config\.(js|cjs|mjs|ts)$/, reason: 'Use Biome', alternative: 'biome.json' },
   { pattern: /\.prettierrc(\.(js|cjs|mjs|json|yaml|yml))?$/, reason: 'Use Biome', alternative: 'biome.json' },
   { pattern: /prettier\.config\.(js|cjs|mjs|ts)$/, reason: 'Use Biome', alternative: 'biome.json' },
-  { pattern: /jest\.config\.(js|cjs|mjs|ts|json)$/, reason: 'Use Bun test', alternative: 'bun test' },
+  { pattern: /jest\.config\.(js|cjs|mjs|ts|json)$/, reason: 'Use Vitest', alternative: 'vitest.config.ts' },
   { pattern: /prisma\/schema\.prisma$/, reason: 'Use Drizzle', alternative: 'drizzle.config.ts' },
-  { pattern: /^docker-compose\.(ya?ml)$/, reason: 'Use process-compose', alternative: 'process-compose.yaml' },
-  { pattern: /^Dockerfile(\..*)?$/, reason: 'Use nix2container', alternative: 'nix build .#container-<name>' },
-  { pattern: '.dockerignore', reason: 'Not needed with nix2container', alternative: 'Nix handles build context' },
+  { pattern: /^process-compose\.(ya?ml)$/, reason: 'Use Docker Compose', alternative: 'docker compose up' },
+  { pattern: /^\.env$/, reason: 'Use Pulumi ESC', alternative: 'esc env open org/proj/dev' },
 ];
 
 export function checkForbiddenFiles(filePath: string): GuardResult {
@@ -155,7 +156,7 @@ function isTestFile(path: string, language: LanguageConfig): boolean {
   return language.testPatterns.some((p) => p.test(fileName) || p.test(path));
 }
 
-export async function checkTDD(filePath: string): Promise<GuardResult> {
+export function checkTDD(filePath: string): GuardResult {
   const language = getLanguage(filePath);
   if (!language) return { ok: true };
 
@@ -167,7 +168,7 @@ export async function checkTDD(filePath: string): Promise<GuardResult> {
   if (isTestFile(filePath, language)) return { ok: true };
 
   // Check for .tdd-skip bypass
-  if (await Bun.file('.tdd-skip').exists()) {
+  if (existsSync('.tdd-skip')) {
     // Audit trail for bypass
     const auditEntry = {
       timestamp: new Date().toISOString(),
@@ -177,7 +178,7 @@ export async function checkTDD(filePath: string): Promise<GuardResult> {
     };
     try {
       const auditPath = `${process.env.HOME}/.claude-metrics/tdd-bypass.jsonl`;
-      await Bun.write(auditPath, JSON.stringify(auditEntry) + '\n', { append: true });
+      appendFileSync(auditPath, JSON.stringify(auditEntry) + '\n');
     } catch {
       /* ignore audit failures */
     }
@@ -187,7 +188,7 @@ export async function checkTDD(filePath: string): Promise<GuardResult> {
   // Check if test exists
   const testPaths = language.getTestPaths(filePath);
   for (const p of testPaths) {
-    if (await Bun.file(p).exists()) return { ok: true };
+    if (existsSync(p)) return { ok: true };
   }
 
   return {
@@ -207,16 +208,15 @@ Bypass: touch .tdd-skip`,
 
 export function checkDevOpsCommands(command: string): GuardResult {
   const forbidden = [
-    { pattern: /\bdocker-compose\s+(up|start|run|exec|build)\b/, alt: 'process-compose up' },
-    { pattern: /\bdocker\s+compose\s+(up|start|run|exec|build)\b/, alt: 'process-compose up' },
-    { pattern: /\bdocker\s+build\b/, alt: 'nix build .#container-<name>' },
-    { pattern: /\b(npm|bun|yarn|pnpm)\s+run\s+(dev|start|serve)\b/, alt: 'process-compose up' },
-    { pattern: /\bnpm\s+start\b/, alt: 'process-compose up' },
+    { pattern: /\bprocess-compose\s+(up|start)\b/, alt: 'docker compose up' },
+    { pattern: /\bbun\s+(run|test|install)\b/, alt: 'pnpm run / vitest / pnpm install' },
+    { pattern: /\b(npm|yarn)\s+run\s+(dev|start|serve)\b/, alt: 'docker compose up' },
+    { pattern: /\bnpm\s+start\b/, alt: 'docker compose up' },
   ];
 
   for (const { pattern, alt } of forbidden) {
     if (pattern.test(command)) {
-      return { ok: false, error: `DEVOPS VIOLATION\n\nAlternative: ${alt}\n\nUse process-compose for local orchestration.` };
+      return { ok: false, error: `DEVOPS VIOLATION\n\nAlternative: ${alt}\n\nUse Docker Compose for local orchestration.` };
     }
   }
 
@@ -346,6 +346,8 @@ const FORBIDDEN_DEPS = [
   'jasmine',
   'chai',
   'sinon',
+  'bun',
+  '@types/bun',
 ];
 
 type PackageJson = {
@@ -386,10 +388,10 @@ export function checkStackCompliance(content: string, filePath: string): GuardRe
 // Main Entry Point
 // =============================================================================
 
-export async function runProceduralGuards(
+export function runProceduralGuards(
   toolName: string,
   toolInput: { file_path?: string; content?: string; command?: string }
-): Promise<GuardResult> {
+): GuardResult {
   const { file_path: filePath, content, command } = toolInput;
 
   // Bash guards
@@ -409,8 +411,8 @@ export async function runProceduralGuards(
     const forbiddenResult = checkForbiddenFiles(filePath);
     if (!forbiddenResult.ok) return forbiddenResult;
 
-    // TDD check (async)
-    const tddResult = await checkTDD(filePath);
+    // TDD check
+    const tddResult = checkTDD(filePath);
     if (!tddResult.ok) return tddResult;
 
     // Config centralization (Nix)
