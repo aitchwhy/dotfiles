@@ -49,7 +49,7 @@ const pythonMinVersion = z
  * Runtime version definitions
  */
 export type RuntimeVersions = {
-  readonly bun: string;
+  readonly pnpm: string;
   readonly node: string;
   readonly uv: string;
   readonly volta: string;
@@ -80,7 +80,7 @@ export type InfraVersions = {
   readonly pulumi: string;
   readonly 'pulumi-aws': string;
   readonly 'pulumi-awsx': string;
-  readonly 'process-compose': string;
+  readonly 'docker-compose': string;
   readonly tailscale: string;
 };
 
@@ -196,7 +196,6 @@ export type NpmVersions = {
   readonly '@effect/cli': string;
   readonly '@effect/platform': string;
   readonly '@effect/platform-node': string;
-  readonly '@effect/platform-bun': string;
   readonly '@effect/printer': string;
   readonly '@effect/printer-ansi': string;
   readonly zod: string;
@@ -210,6 +209,7 @@ export type NpmVersions = {
   readonly tailwindcss: string;
 
   // Backend (Effect Platform HTTP - uses @effect/platform)
+  readonly hono: string;
   readonly 'drizzle-orm': string;
   readonly 'drizzle-kit': string;
 
@@ -250,7 +250,8 @@ export type NpmVersions = {
   // Dev & Linting
   readonly oxlint: string;
   readonly '@biomejs/biome': string;
-  readonly '@types/bun': string;
+  readonly '@types/node': string;
+  readonly tsx: string;
   readonly '@ast-grep/napi': string;
 
   // Pulumi (infrastructure)
@@ -259,6 +260,23 @@ export type NpmVersions = {
   readonly '@pulumi/awsx': string;
   readonly '@pulumi/random': string;
   readonly '@pulumi/policy': string;
+
+  // Effect ecosystem - OpenTelemetry integration
+  readonly '@effect/opentelemetry': string;
+
+  // Voice AI
+  readonly hume: string;
+
+  // Auth (JWT)
+  readonly jose: string;
+
+  // React ecosystem - additional utilities
+  readonly 'react-hook-form': string;
+  readonly clsx: string;
+  readonly 'tailwind-merge': string;
+
+  // WebGL
+  readonly ogl: string;
 };
 
 /**
@@ -285,7 +303,7 @@ export type StackDefinition = {
 // =============================================================================
 
 export const runtimeVersionsSchema = z.object({
-  bun: versionString,
+  pnpm: versionString,
   node: versionString,
   uv: versionString,
   volta: versionString,
@@ -307,7 +325,7 @@ export const infraVersionsSchema = z.object({
   pulumi: versionString,
   'pulumi-aws': versionString,
   'pulumi-awsx': versionString,
-  'process-compose': versionString,
+  'docker-compose': versionString,
   tailscale: versionString,
 }) satisfies z.ZodType<InfraVersions>;
 
@@ -401,7 +419,6 @@ export const npmVersionsSchema = z.object({
   '@effect/cli': versionString,
   '@effect/platform': versionString,
   '@effect/platform-node': versionString,
-  '@effect/platform-bun': versionString,
   '@effect/printer': versionString,
   '@effect/printer-ansi': versionString,
   zod: versionString,
@@ -415,6 +432,7 @@ export const npmVersionsSchema = z.object({
   tailwindcss: versionString,
 
   // Backend (Effect Platform HTTP - uses @effect/platform)
+  hono: versionString,
   'drizzle-orm': versionString,
   'drizzle-kit': versionString,
 
@@ -455,7 +473,8 @@ export const npmVersionsSchema = z.object({
   // Dev & Linting
   oxlint: versionString,
   '@biomejs/biome': versionString,
-  '@types/bun': versionString,
+  '@types/node': versionString,
+  tsx: versionString,
   '@ast-grep/napi': versionString,
 
   // Pulumi
@@ -464,6 +483,23 @@ export const npmVersionsSchema = z.object({
   '@pulumi/awsx': versionString,
   '@pulumi/random': versionString,
   '@pulumi/policy': versionString,
+
+  // Effect ecosystem - OpenTelemetry integration
+  '@effect/opentelemetry': versionString,
+
+  // Voice AI
+  hume: versionString,
+
+  // Auth (JWT)
+  jose: versionString,
+
+  // React ecosystem - additional utilities
+  'react-hook-form': versionString,
+  clsx: versionString,
+  'tailwind-merge': versionString,
+
+  // WebGL
+  ogl: versionString,
 }) satisfies z.ZodType<NpmVersions>;
 
 export const stackDefinitionSchema = z.object({

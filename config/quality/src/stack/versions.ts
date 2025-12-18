@@ -25,15 +25,15 @@ import { stackDefinitionSchema } from './schema';
 export const STACK = {
   meta: {
     frozen: '2025-12',
-    updated: '2025-12-16',
-    ssotVersion: '3.1.0',
+    updated: '2025-12-18',
+    ssotVersion: '4.0.0',
   },
 
   // ===========================================================================
   // RUNTIME
   // ===========================================================================
   runtime: {
-    bun: '1.3.4', // Anthropic-acquired, latest stable
+    pnpm: '9.15.4', // Fast, disk-efficient package manager
     node: '25.2.1', // Current (NOT LTS - user preference)
     uv: '0.5.1', // Python manager (Rust)
     volta: '2.0.1', // Tool manager (Rust)
@@ -65,7 +65,7 @@ export const STACK = {
     pulumi: '3.210.0', // IaC (TypeScript) - Dec 2025
     'pulumi-aws': '7.14.0', // AWS provider
     'pulumi-awsx': '3.1.0', // AWS Crosswalk (higher-level constructs)
-    'process-compose': '1.5.0', // Unified observability
+    'docker-compose': '2.32.0', // Container orchestration
     tailscale: '1.78.0', // Mesh network
   },
 
@@ -172,7 +172,6 @@ export const STACK = {
     '@effect/cli': '0.72.1',
     '@effect/platform': '0.93.6',
     '@effect/platform-node': '0.103.0',
-    '@effect/platform-bun': '0.86.0',
     '@effect/printer': '0.47.0',
     '@effect/printer-ansi': '0.47.0',
     zod: '4.1.13',
@@ -185,7 +184,8 @@ export const STACK = {
     '@tanstack/react-router': '1.140.0',
     tailwindcss: '4.1.17',
 
-    // Backend (Effect Platform HTTP - NO Hono)
+    // Backend (Hono for now, Effect Platform HTTP migration pending)
+    hono: '4.7.10',
     'drizzle-orm': '0.45.0',
     'drizzle-kit': '0.31.0',
 
@@ -226,7 +226,8 @@ export const STACK = {
     // Dev & Linting
     oxlint: '1.32.0',
     '@biomejs/biome': '2.3.8',
-    '@types/bun': '1.2.10',
+    '@types/node': '22.10.2',
+    tsx: '4.19.2',
     '@ast-grep/napi': '0.33.1',
 
     // Pulumi (infrastructure) - Dec 2025
