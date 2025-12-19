@@ -2,30 +2,75 @@
 # vim: set ft=bash:
 
 # =============================================================================
-# Project .envrc - Pulumi ESC + Nix + direnv integration
+# Project .envrc - Pulumi ESC Integration (Fail-Fast Pattern)
+# =============================================================================
+# ESC is the SINGLE SOURCE OF TRUTH for all configuration.
+# .env files are BLOCKED by PARAGON Guard 3.
+#
+# Override environment: ESC_ENV=org/project/staging direnv reload
 # =============================================================================
 
-# Layer 1: Nix Development Shell
+# Layer 1: Nix Development Shell (if present)
 if [ -f flake.nix ]; then
   use flake
 fi
 
-# Layer 2: Pulumi ESC Environment
-# Set your ESC environment path (org/project/environment)
-# use_esc "myorg/myproject/dev"
+# Layer 2: Pulumi ESC (REQUIRED - fail-fast)
+# Set your project's ESC environment path below
+ESC_ENV="${ESC_ENV:-CHANGE_ME/CHANGE_ME/dev}"
 
-# Layer 3: Local overrides (gitignored, for secrets not in ESC)
-[[ -f .env.local ]] && source_env .env.local
+if [[ "$ESC_ENV" == *"CHANGE_ME"* ]]; then
+  log_error "Configure ESC_ENV in .envrc (e.g., myorg/myproject/dev)"
+  return 1
+fi
+
+if ! command -v esc &> /dev/null; then
+  log_error "esc CLI not found"
+  log_error "Install: curl -fsSL https://get.pulumi.com/esc/install.sh | sh"
+  log_error "Then: pulumi login"
+  return 1
+fi
+
+log_status "Loading ESC: ${ESC_ENV}"
+
+if ! ESC_OUTPUT=$(esc open "${ESC_ENV}" --format shell 2>&1); then
+  log_error "Failed to load ESC: ${ESC_ENV}"
+  log_error ""
+  log_error "${ESC_OUTPUT}"
+  log_error ""
+  log_error "Troubleshooting:"
+  log_error "  1. pulumi login"
+  log_error "  2. esc env get ${ESC_ENV}"
+  return 1
+fi
+
+eval "${ESC_OUTPUT}"
+VAR_COUNT=$(echo "${ESC_OUTPUT}" | grep -c '^export' || echo "0")
+log_status "Loaded ${VAR_COUNT} env vars from ESC"
+
+# Layer 3: Local overrides (ONLY for truly local-only values)
+# WARNING: Secrets should be in ESC, not .envrc.local
+if [[ -f .envrc.local ]]; then
+  source_env .envrc.local
+  log_status "Loaded .envrc.local overrides"
+fi
 
 # Layer 4: PATH additions
 PATH_add ./scripts
 PATH_add ./node_modules/.bin
 
-# Layer 5: Validation (uncomment and customize required variables)
-# : "${DATABASE_URL:?DATABASE_URL is required}"
-# : "${API_KEY:?API_KEY is required}"
+# Layer 5: Validation (customize per project)
+# Uncomment and add required variables:
+# : "${DATABASE_URL:?DATABASE_URL required - check ESC}"
+# : "${API_URL:?API_URL required - check ESC}"
 
-# Minimize log output in terminal multiplexers
-if [[ -n "$ZELLIJ" || -n "$TMUX" ]]; then
+# Docker configuration
+export COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-$(basename "$PWD")}"
+export DOCKER_BUILDKIT=1
+
+# Quiet in terminal multiplexers
+if [[ -n "${ZELLIJ:-}" || -n "${TMUX:-}" ]]; then
   export DIRENV_LOG_FORMAT=""
 fi
+
+log_status "Ready! Start: docker compose up"

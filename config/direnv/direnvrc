@@ -63,3 +63,39 @@ layout_uv() {
     export UV_ACTIVE=1  # or VENV_ACTIVE=1
     export VIRTUAL_ENV
 }
+
+# Pulumi ESC integration for direnv
+# Usage: use_esc "org/project/environment"
+use_esc() {
+  local env="$1"
+
+  if [[ -z "$env" ]]; then
+    log_error "use_esc requires environment path (e.g., org/project/dev)"
+    return 1
+  fi
+
+  if ! has esc; then
+    log_error "esc CLI not found. Install: curl -fsSL https://get.pulumi.com/esc/install.sh | sh"
+    return 1
+  fi
+
+  if ! esc whoami &>/dev/null 2>&1; then
+    log_error "Not logged into Pulumi. Run: pulumi login"
+    return 1
+  fi
+
+  log_status "Loading ESC: $env"
+
+  local output
+  if ! output=$(esc open "$env" --format shell 2>&1); then
+    log_error "Failed to load ESC environment: $env"
+    log_error "$output"
+    return 1
+  fi
+
+  eval "$output"
+
+  local count
+  count=$(echo "$output" | grep -c '^export' || echo "0")
+  log_status "Loaded $count variables from ESC"
+}
