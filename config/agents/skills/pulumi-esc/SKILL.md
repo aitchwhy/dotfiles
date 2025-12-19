@@ -1,168 +1,158 @@
 ---
 name: pulumi-esc
-description: Pulumi ESC patterns for secrets and configuration management. Environment composition, direnv integration, Nix devShell setup.
+description: Pulumi ESC patterns for hybrid OIDC architecture. GitHub OIDC for AWS identity, ESC for config via pulumi-stacks and aws-secrets providers.
 allowed-tools: Read, Write, Edit, Bash, Grep
-token-budget: 600
+token-budget: 800
+version: 2.0.0
 ---
 
-## Overview
+# Pulumi ESC v2.0 - Hybrid OIDC Architecture
 
-Pulumi ESC (Environments, Secrets, and Configuration) provides centralized configuration management for infrastructure and applications. This skill covers integration with Nix Flakes and nix-direnv.
+## Core Principle: Separation of Concerns
 
-## ESC Environment Hierarchy (Per-Project)
+| Concern | Solution | Provider |
+|---------|----------|----------|
+| **Identity** (Who am I?) | GitHub OIDC | `aws-actions/configure-aws-credentials` |
+| **Config** (What infra?) | Pulumi ESC | `pulumi-stacks` provider |
+| **Secrets** (What secrets?) | Pulumi ESC | `aws-secrets` provider |
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     GitHub Actions Runner                        │
+│                                                                  │
+│  ┌──────────────────┐         ┌──────────────────┐              │
+│  │  GitHub OIDC     │         │  Pulumi ESC      │              │
+│  │  ──────────────  │         │  ──────────────  │              │
+│  │  "Who am I?"     │         │  "What config?"  │              │
+│  │                  │         │                  │              │
+│  │  aws-actions/    │         │  pulumi-stacks   │              │
+│  │  configure-creds │         │  aws-secrets     │              │
+│  │        │         │         │        │         │              │
+│  │        ▼         │         │        ▼         │              │
+│  │   AWS IAM Role   │         │   Config Values  │              │
+│  └──────────────────┘         └──────────────────┘              │
+│           │                            │                         │
+│           └────────────┬───────────────┘                         │
+│                        ▼                                         │
+│              Environment Variables                               │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │ AWS_ACCESS_KEY_ID     ← GitHub OIDC                     │    │
+│  │ ECS_CLUSTER, API_URL  ← ESC pulumi-stacks               │    │
+│  │ DATABASE_URL          ← ESC aws-secrets                 │    │
+│  └─────────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+## ESC Environment Structure
 
 ```
 {org}/{project}/
-├── base        # Shared constants (ports, regions, domains)
-├── dev         # imports: base, local dev values
-├── staging     # imports: base, staging secrets
-└── prod        # imports: base, production secrets
+├── base           # Constants: ports, regions, domains
+├── dev            # imports: base + local dev overrides
+├── staging        # imports: base + pulumi-stacks + aws-secrets
+└── prod           # imports: base + pulumi-stacks + aws-secrets (prod)
 ```
 
-## Base Environment Pattern
+## Staging Environment (Full Pattern)
 
 ```yaml
-# infra/pulumi/esc/base.yaml
-values:
-  aws:
-    account: "123456789012"
-    region: us-east-1
-
-  ports:
-    api: 8787
-    web: 5173
-    postgres: 5432
-
-  domain: example.com
-
-environmentVariables:
-  AWS_DEFAULT_REGION: ${aws.region}
-```
-
-## Dev Environment (imports base)
-
-```yaml
-# infra/pulumi/esc/dev.yaml
+# infra/pulumi/esc/staging.yaml
 imports:
   - base
 
 values:
-  database:
-    url: postgresql://user@localhost:5432/myapp
+  # 1. Pull infrastructure outputs from Pulumi stacks
+  infra:
+    fn::open::pulumi-stacks:
+      stacks:
+        infra:
+          stack: myorg/infra/staging
+        api:
+          stack: myorg/api/staging
 
-  api:
-    url: http://localhost:${ports.api}
+  # 2. Pull secrets from AWS Secrets Manager
+  secrets:
+    fn::open::aws-secrets:
+      region: ${aws.region}
+      login: ${aws.login}
+      get:
+        database:
+          secretId: myapp/staging/database
+        jwt:
+          secretId: myapp/staging/jwt
+
+  # 3. Compose URLs from infra outputs
+  urls:
+    api: https://api-staging.${domain}
+    ecr: ${infra.infra.ecr_repository_url}
 
 environmentVariables:
-  DATABASE_URL: ${database.url}
-  PORT: ${ports.api}
+  # From pulumi-stacks
+  ECS_CLUSTER: ${infra.infra.ecs_cluster_name}
+  ECS_SERVICE: ${infra.api.service_name}
+  ECR_REPOSITORY_URL: ${infra.infra.ecr_repository_url}
+
+  # From aws-secrets
+  DATABASE_URL: ${secrets.database.url}
+  JWT_SECRET: ${secrets.jwt.secret}
+
+  # Composed
+  API_URL: ${urls.api}
 ```
 
-## direnv Integration
+## Why Hybrid OIDC?
 
-### .envrc Pattern (FAIL-FAST Required)
+### Problem: Circular Dependency
+```
+ESC needs AWS creds → to read AWS Secrets Manager
+AWS creds come from → ??? (can't use ESC, not authenticated yet)
+```
+
+### Solution: Orthogonal Auth
+```
+GitHub OIDC → AWS IAM Role   (runner identity, no secrets)
+ESC         → Config values  (uses GitHub's AWS session for aws-secrets)
+```
+
+### Benefits
+1. **No stored credentials** - GitHub OIDC is ephemeral
+2. **Orthogonal failure modes** - AWS auth failure ≠ config failure
+3. **Audit trail** - GitHub OIDC subject in CloudTrail
+4. **Least privilege** - Separate roles for CI vs ESC
+
+## direnv Integration (Local Dev)
 
 ```bash
-# Layer 1: Nix Development Shell
-use flake
-
-# Layer 2: Pulumi ESC Environment (REQUIRED - fail-fast)
-if ! use_esc "myorg/myproject/dev"; then
-  log_error "FATAL: Pulumi ESC environment not available"
-  exit 1
+# .envrc - Fail-fast pattern
+if [ -f flake.nix ]; then
+  use flake
 fi
 
-# Layer 3: Fail-fast validation (REQUIRED)
-: "${DATABASE_URL:?FATAL: DATABASE_URL not set - check ESC}"
-: "${API_KEY:?FATAL: API_KEY not set - check ESC}"
+# ESC for local dev (no pulumi-stacks needed)
+ESC_ENV="${ESC_ENV:-myorg/myproject/dev}"
 
-# NO .env.local - ESC is the ONLY source of truth
-# .env files are BLOCKED by PARAGON Guard 3/9
+if ! esc open "${ESC_ENV}" --format shell > /tmp/esc-env 2>&1; then
+  log_error "ESC failed: $(cat /tmp/esc-env)"
+  return 1
+fi
+
+eval "$(cat /tmp/esc-env)"
+log_status "Loaded ESC: ${ESC_ENV}"
+
+# Fail-fast validation
+: "${DATABASE_URL:?DATABASE_URL required - check ESC}"
 ```
 
-### use_esc Function (in direnvrc)
+## CLI Verification
 
 ```bash
-use_esc() {
-  local env="$1"
+# Test local dev
+direnv reload
+echo "API_URL=$API_URL"
 
-  if ! has esc; then
-    log_status "esc CLI not found, skipping ESC integration"
-    return 0
-  fi
+# Test staging (requires OIDC trust policy)
+esc open myorg/myproject/staging --format json | jq '.urls'
 
-  if ! esc whoami &>/dev/null; then
-    log_error "Not logged into Pulumi ESC. Run: esc login"
-    return 1
-  fi
-
-  log_status "Loading ESC environment: $env"
-  eval "$(esc open "$env" --format shell 2>/dev/null)" || {
-    log_error "Failed to load ESC environment: $env"
-    return 1
-  }
-}
-```
-
-## Nix devShell Integration
-
-```nix
-devShells.default = pkgs.mkShell {
-  buildInputs = with pkgs; [
-    pulumi
-    pulumi-esc  # Required for esc CLI
-  ];
-};
-```
-
-## CLI Commands
-
-```bash
-# Authentication
-esc login                    # OAuth login to Pulumi Cloud
-esc env ls                   # List environments (verifies auth)
-
-# Environment operations
-esc open org/proj/dev        # Open env (JSON output)
-esc open org/proj/dev --format shell  # Export as shell vars
-esc run org/proj/dev -- cmd  # Run command with env vars
-
-# Environment management
-esc env init org/proj/dev    # Create new environment
-esc env diff org/proj/dev org/proj/staging  # Compare envs
-```
-
-## Key Patterns
-
-1. **Per-project ESC environments** - Not shared across repos
-2. **Base environment composition** - DRY via imports
-3. **Last import wins** - Later imports override earlier
-4. **NO local fallback** - `.env` files are BLOCKED (Guard 3/9)
-5. **Fail-fast validation** - Exit 1 if ESC unavailable or vars missing
-6. **ESC is SSOT** - All secrets and config MUST come from ESC
-
-## Secret Management
-
-ESC supports multiple secret backends:
-- Pulumi Cloud (default)
-- AWS Secrets Manager
-- Vault
-- 1Password
-
-```yaml
-# Dynamic secret from AWS Secrets Manager
-values:
-  aws:
-    login:
-      fn::open::aws-login:
-        oidc:
-          roleArn: arn:aws:iam::123456789012:role/ESC
-          sessionName: esc-session
-
-  database:
-    credentials:
-      fn::open::aws-secrets:
-        login: ${aws.login}
-        get:
-          secretId: myapp/database
+# Test pulumi-stacks integration
+esc open myorg/myproject/staging --format json | jq '.stacks.infra'
 ```
