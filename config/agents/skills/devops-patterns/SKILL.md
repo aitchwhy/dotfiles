@@ -177,7 +177,7 @@ fi
 # NO .env.local - ESC is source of truth
 ```
 
-### GitHub Actions Workflow
+### GitHub Actions Workflow (Hybrid OIDC Pattern)
 
 ```yaml
 name: CI
@@ -187,46 +187,56 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+  id-token: write  # Required for OIDC
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
+      - uses: pnpm/action-setup@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'pnpm'
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile
 
-      - name: Typecheck
-        run: pnpm run typecheck
+      - run: pnpm test
 
-      - name: Lint
-        run: pnpm run lint
-
-      - name: Test
-        run: pnpm test
-
-      - name: Build
-        run: pnpm build
-
-      - name: Build Docker image
-        uses: docker/build-push-action@v6
+      # AWS auth via GitHub OIDC (runner identity)
+      - uses: aws-actions/configure-aws-credentials@v4
         with:
-          context: .
-          push: false
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/github-actions
+          aws-region: us-east-1
+
+      # Config from ESC (pulumi-stacks provides infra values)
+      - uses: pulumi/auth-actions@v1
+        with:
+          organization: myorg
+          requested-token-type: urn:pulumi:token-type:access_token:organization
+
+      - uses: pulumi/esc-action@v1
+        with:
+          environment: myorg/myproject/staging
+
+      # Build with ECR URL from ESC
+      - uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: ${{ env.ECR_REPOSITORY_URL }}:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 ```
+
+**Hybrid OIDC explained:**
+- `aws-actions/configure-aws-credentials`: GitHub OIDC -> AWS (runner identity)
+- `pulumi/esc-action`: ESC -> Config values (pulumi-stacks for infra outputs)
+- Never use `curl | sh` for Pulumi in CI
 
 ## Decision Tree
 
