@@ -54,7 +54,7 @@ nix-patterns, nix-build-optimization, nix-infrastructure, secrets-management
 tanstack-patterns, state-machine-patterns, observability-patterns
 
 ### DevOps/Workflow Skills
-devops-patterns, planning-patterns, signet-patterns, typespec-patterns
+devops-patterns, gha-oidc-patterns, planning-patterns, signet-patterns, typespec-patterns, pulumi-esc
 
 ### Reference Skills
 repomix, context7-mcp
