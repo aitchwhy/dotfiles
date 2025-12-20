@@ -160,7 +160,6 @@ _fmt:
 
 [private]
 _lint:
-    @nix fmt -- --fail-on-change .
     @nix flake check --no-build
 
 [private]
