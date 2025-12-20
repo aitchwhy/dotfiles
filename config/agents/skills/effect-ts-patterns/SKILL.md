@@ -272,31 +272,195 @@ const program = Effect.scoped(
 );
 ```
 
-## Integration with Hono
+## HttpApiBuilder Contract Pattern
+
+### 1. Define Contract in Domain Package
 
 ```typescript
-import { Hono } from "hono";
-import { Effect, Layer } from "effect";
+// packages/domain/src/api.ts
+import { HttpApi, HttpApiGroup, HttpApiEndpoint } from "@effect/platform";
+import { Schema } from "effect";
 
-const app = new Hono();
+const RecordingId = Schema.String.pipe(Schema.brand("RecordingId"));
 
-// Helper to run effects in routes
-const runEffect = <A, E>(
-  effect: Effect.Effect<A, E, AppServices>,
-  appLayer: Layer.Layer<AppServices>,
-) => Effect.runPromise(effect.pipe(Effect.provide(appLayer)));
-
-app.get("/users", async (c) => {
-  const result = await runEffect(
-    Effect.gen(function* () {
-      const userService = yield* UserService;
-      return yield* userService.list();
-    }),
-    AppLayer,
-  );
-
-  return c.json(result);
+const Recording = Schema.Struct({
+  id: RecordingId,
+  status: Schema.Literal("pending", "processing", "completed"),
+  createdAt: Schema.Date,
 });
+
+const listRecordings = HttpApiEndpoint.get("list", "/recordings")
+  .addSuccess(Schema.Array(Recording));
+
+const getRecording = HttpApiEndpoint.get("get", "/recordings/:id")
+  .setPath(Schema.Struct({ id: Schema.String }))
+  .addSuccess(Recording)
+  .addError(Schema.Struct({ message: Schema.String }), { status: 404 });
+
+class RecordingsGroup extends HttpApiGroup.make("recordings")
+  .add(listRecordings)
+  .add(getRecording) {}
+
+export class EmberApi extends HttpApi.make("EmberApi")
+  .add(RecordingsGroup) {}
+```
+
+### 2. Implement Handlers
+
+```typescript
+// apps/api/src/handlers/recordings.ts
+import { HttpApiBuilder } from "@effect/platform";
+import { EmberApi } from "@ember/domain";
+import { Effect } from "effect";
+
+export const RecordingsHandlers = HttpApiBuilder.group(
+  EmberApi, "recordings", (handlers) =>
+    handlers
+      .handle("list", () => Effect.gen(function* () {
+        const db = yield* Database;
+        return yield* db.query.recordings.findMany();
+      }))
+      .handle("get", ({ path }) => Effect.gen(function* () {
+        const db = yield* Database;
+        const recording = yield* db.findById(path.id);
+        if (!recording) {
+          return yield* HttpApiBuilder.Error({ status: 404, body: { message: "Not found" } });
+        }
+        return recording;
+      }))
+);
+```
+
+### 3. Generate Client
+
+```typescript
+// apps/web/src/lib/api.ts
+import { HttpApiClient } from "@effect/platform";
+import { EmberApi } from "@ember/domain";
+
+const client = yield* HttpApiClient.make(EmberApi, { baseUrl });
+const recordings = yield* client.recordings.list({});
+```
+
+## HttpClient (Guard 44)
+
+Use `@effect/platform` HttpClient instead of raw `fetch()`:
+
+```typescript
+import { HttpClient, HttpClientRequest } from "@effect/platform";
+import { Effect } from "effect";
+
+// WRONG: raw fetch (blocked by Guard 44)
+const fetchRaw = Effect.tryPromise(() => fetch("/api/users"));
+
+// CORRECT: Effect HttpClient
+const fetchUsers = Effect.gen(function* () {
+  const client = yield* HttpClient.HttpClient;
+  const response = yield* client.get("/api/users");
+  const users = yield* response.json;
+  return users;
+});
+
+// With request building
+const createUser = (name: string) => Effect.gen(function* () {
+  const client = yield* HttpClient.HttpClient;
+  const request = HttpClientRequest.post("/api/users").pipe(
+    HttpClientRequest.jsonBody({ name })
+  );
+  const response = yield* client.execute(request);
+  return yield* response.json;
+});
+```
+
+## Clock (Guard 42)
+
+Use Effect Clock instead of `new Date()` or `Date.now()`:
+
+```typescript
+import { Clock, Effect } from "effect";
+
+// WRONG: untestable (blocked by Guard 42)
+const createdAt = new Date();
+const timestamp = Date.now();
+
+// CORRECT: Effect Clock
+const currentTimestamp = Effect.map(Clock.currentTimeMillis, (ms) => new Date(ms));
+
+// Usage
+const createRecord = Effect.gen(function* () {
+  const now = yield* currentTimestamp;
+  return { createdAt: now, updatedAt: now };
+});
+
+// Test with TestClock
+import { TestClock } from "effect";
+
+const test = Effect.gen(function* () {
+  yield* TestClock.setTime(new Date("2024-06-15").getTime());
+  const record = yield* createRecord;
+  expect(record.createdAt).toEqual(new Date("2024-06-15"));
+});
+```
+
+## Logging (Guard 26)
+
+Use Effect logging instead of `console.log`:
+
+```typescript
+import { Effect } from "effect";
+
+// WRONG: unstructured (blocked by Guard 26)
+console.log("Processing user", userId);
+console.error("Failed:", error);
+
+// CORRECT: Effect logging
+yield* Effect.log("Processing user").pipe(
+  Effect.annotateLogs({ userId })
+);
+
+yield* Effect.logError("Failed").pipe(
+  Effect.annotateLogs({ error: String(error) })
+);
+
+// Log levels
+yield* Effect.logDebug("Debug message");
+yield* Effect.logInfo("Info message");
+yield* Effect.logWarning("Warning message");
+yield* Effect.logError("Error message");
+yield* Effect.logFatal("Fatal message");
+```
+
+## Option (No Null Virus)
+
+Use `Option<T>` instead of `T | null`:
+
+```typescript
+import { Option, Schema } from "effect";
+
+// WRONG: null spreads through codebase
+const phone: string | null = user.phone ?? null;
+
+// CORRECT: Option at boundary
+const phone: Option.Option<string> = Option.fromNullable(user.phone);
+
+// Schema with Option
+const UserSchema = Schema.Struct({
+  id: Schema.String,
+  email: Schema.String,
+  phone: Schema.OptionFromNullOr(Schema.String),
+});
+
+// Working with Option
+const formattedPhone = Option.match(user.phone, {
+  onNone: () => "No phone",
+  onSome: (phone) => `+1 ${phone}`,
+});
+
+// Or with getOrElse
+const displayPhone = Option.getOrElse(user.phone, () => "N/A");
+
+// Convert back to nullable for JSON
+const toJson = Option.getOrNull(user.phone);
 ```
 
 ## Testing with Mock Layers
