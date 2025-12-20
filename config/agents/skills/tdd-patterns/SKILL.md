@@ -5,6 +5,8 @@ allowed-tools: Read, Write, Edit, Bash
 token-budget: 400
 ---
 
+> **VITEST ONLY** - Jest is forbidden (Guard 49). Use `{ describe, test, expect, vi }` from `vitest`.
+
 ## Testing Hierarchy
 
 ### Test Pyramid

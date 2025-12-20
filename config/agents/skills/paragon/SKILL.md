@@ -1,12 +1,12 @@
 ---
 name: paragon
-description: PARAGON Enforcement System v3.3 - 39 guards for Clean Code, SOLID, configuration centralization, stack compliance, parse-at-boundary, and evidence-based development.
+description: PARAGON Enforcement System v3.5 - 49 guards for Clean Code, SOLID, configuration centralization, stack compliance, parse-at-boundary, and evidence-based development.
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 token-budget: 900
-version: 3.3.0
+version: 3.5.0
 ---
 
-# PARAGON Enforcement System v3.3
+# PARAGON Enforcement System v3.5
 
 > **P**rotocol for **A**utomated **R**ules, **A**nalysis, **G**uards, **O**bservance, and **N**orms
 >
@@ -26,7 +26,7 @@ PARAGON is the unified enforcement layer ensuring all code changes comply with:
 | Git | pre-commit hooks (`git-hooks.nix`) | Every commit |
 | CI | GitHub Actions (`paragon-check.yml`) | Every PR/push |
 
-## Guard Matrix (39 Guards)
+## Guard Matrix (49 Guards)
 
 ### Tier 1: Original Guards (1-14)
 
@@ -157,9 +157,9 @@ url = cfg.services.loki.pushUrl;
 {
   "dependencies": {
     "lodash": "^4.17.0",    // Use native methods or Effect
-    "express": "^4.18.0",   // Use Hono instead
+    "express": "^4.18.0",   // Use @effect/platform HttpApiBuilder
     "prisma": "^5.0.0",     // Use Drizzle instead
-    "axios": "^1.6.0",      // Use native fetch
+    "axios": "^1.6.0",      // Use Effect HttpClient
     "bun": "^1.0.0"         // Use pnpm + Node.js instead
   }
 }
@@ -168,7 +168,7 @@ url = cfg.services.loki.pushUrl;
 {
   "dependencies": {
     "effect": "^3.19.9",
-    "hono": "^4.7.0",
+    "@effect/platform": "^0.82.0",
     "drizzle-orm": "^0.45.0"
   }
 }
@@ -266,6 +266,62 @@ const config = Schema.decodeUnknownSync(ConfigSchema)(raw);
 ```
 
 See `parse-boundary-patterns` skill for comprehensive patterns.
+
+### Tier 8: Parse Don't Validate Guards (40-48)
+
+| # | Guard | Category | Severity | Blocks |
+|---|-------|----------|----------|--------|
+| 40 | Type Assertion | Parse | error | `as Type`, `as { ... }` (allows `as const`, `as unknown`, `as never`) |
+| 41 | Null Propagation | Parse | error | `?? null` (spreads null virus) |
+| 42 | Uncontrolled Date | Effect | error | `new Date()`, `Date.now()` (use Effect Clock) |
+| 43 | Try/Catch in Domain | Effect | error | `try/catch` outside boundary files |
+| 44 | Raw Fetch | Effect | error | `fetch()`, `window.fetch()` (use Effect HttpClient) |
+| 45 | Nullable Union | Type | warning | `T \| null` in type definitions |
+| 46 | Undefined Union | Type | warning | `T \| undefined` in type definitions |
+| 47 | pg Driver | Import | error | `from 'pg'` (use postgres.js) |
+| 48 | Non-Null Assertion | Parse | error | `x!`, `foo.bar!` (parse at boundary or use Option) |
+| 49 | No Jest | Testing | error | `jest.*`, `from 'jest'`, `from '@jest/globals'` |
+
+**Guard 40 Rationale**: Type assertions bypass TypeScript's type safety:
+```typescript
+// BAD - lies to compiler
+const user = response.data as User;
+const config = raw as { port: number };
+
+// GOOD - parse at boundary
+const user = yield* Schema.decodeUnknown(UserSchema)(response.data);
+```
+
+**Guard 41 Rationale**: `?? null` spreads the null virus through your codebase:
+```typescript
+// BAD - null spreads
+const phone = user.phone ?? null;
+const carrier = getCarrier(phone) ?? null;
+
+// GOOD - convert to Option at boundary
+const phone = Option.fromNullable(user.phone);
+```
+
+**Guard 42 Rationale**: `new Date()` is untestable - inject time via Effect Clock:
+```typescript
+// BAD - untestable
+const createdAt = new Date();
+
+// GOOD - injectable, testable
+const now = yield* currentTimestamp;  // Effect.map(Clock.currentTimeMillis, ms => new Date(ms))
+```
+
+**Guard 48 Rationale**: Non-null assertions are lies to the compiler:
+```typescript
+// BAD - asserts without proof
+const name = user.name!.toUpperCase();
+
+// GOOD - parse at boundary
+const user = yield* Schema.decodeUnknown(UserSchema)(raw);
+// Now user.name is guaranteed non-null
+```
+
+See `type-boundary-patterns`, `option-patterns`, and `effect-clock-patterns` skills.
 
 ## Infinite Loop Prevention
 
