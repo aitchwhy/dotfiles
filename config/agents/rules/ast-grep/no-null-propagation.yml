@@ -1,0 +1,8 @@
+id: no-null-propagation
+language: typescript
+severity: error
+rule:
+  pattern: $EXPR ?? null
+message: |
+  Guard 41: Use Option.fromNullable() at system boundary, not ?? null propagation.
+  Replace with: Option.fromNullable($EXPR)

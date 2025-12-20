@@ -1,0 +1,9 @@
+id: no-try-catch-domain
+language: typescript
+severity: error
+rule:
+  pattern: |
+    try { $$$BODY } catch ($ERR) { $$$HANDLER }
+message: |
+  Guard 43: No try/catch in domain code.
+  Use Effect.tryPromise() for async or Effect.try() for sync operations.
