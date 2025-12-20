@@ -4,7 +4,7 @@ Senior software engineer. macOS Apple Silicon, zsh, Nix Flakes.
 
 ## PARAGON Enforcement
 
-All code changes are enforced by PARAGON (39 guards).
+All code changes are enforced by PARAGON (49 guards).
 Read `paragon` skill for full guard matrix.
 
 | Layer | Mechanism |
@@ -44,17 +44,20 @@ Read `paragon` skill for full guard matrix.
 **Rule**: Before ANY Nix changes to TypeScript projects, read `nix-build-optimization`.
 
 ### Core Pattern Skills
-typescript-patterns, zod-patterns, effect-ts-patterns, quality-patterns,
+typescript-patterns, effect-ts-patterns, quality-patterns,
 hexagonal-architecture, formal-verification, tdd-patterns, parse-boundary-patterns
+
+### Effect-TS Skills
+effect-resilience, api-contract
 
 ### Nix Skills
 nix-patterns, nix-build-optimization, nix-infrastructure, secrets-management
 
 ### Framework Skills
-tanstack-patterns, state-machine-patterns, observability-patterns
+state-machine-patterns, observability-patterns
 
 ### DevOps/Workflow Skills
-devops-patterns, gha-oidc-patterns, planning-patterns, signet-patterns, typespec-patterns, pulumi-esc
+devops-patterns, gha-oidc-patterns, planning-patterns, typespec-patterns, pulumi-esc
 
 ### Reference Skills
 repomix, context7-mcp

@@ -249,36 +249,19 @@ instead of { data: { user, token } }
 ### New Project
 
 ```bash
-# API project (Hono + Drizzle + Effect)
-signet init api my-service
+# Use the new-project slash command
+/new-project
 
-# UI project (React 19 + TanStack + XState)
-signet init ui my-app
-
-# Full monorepo (Bun workspaces)
-signet init monorepo my-platform
+# Or use just commands
+just new-ts-project my-service
 ```
 
-### Migration Workflow
+### Stack Verification
 
 ```bash
-# 1. Preview changes
-signet migrate --dry-run --verbose
+# Check PARAGON compliance
+just verify-paragon
 
-# 2. Execute migration
-signet migrate
-
-# 3. Refresh dependencies
-bun install
-
-# 4. Verify compliance
-signet verify
+# Run pre-commit hooks
+just lint-staged
 ```
-
-### Quick Reference
-
-| Command | Purpose |
-|---------|---------|
-| `signet init <type> <name>` | Create new project |
-| `signet migrate` | Migrate existing project |
-| `signet verify` | Validate compliance |

@@ -4,59 +4,61 @@ description: Create a new TypeScript/Bun project from template
 
 # New TypeScript/Bun Project
 
-Create a project using Signet, the Single Source of Truth for project generation.
+Create a TypeScript project with Effect-TS stack.
 
 ## Quick Start
 
 ```bash
-# Initialize a standalone library/service
-signet init library my-project
+# Initialize a standalone project
+just new-ts-project my-project
 cd ~/src/my-project
-
-# Or initialize a monorepo platform
-signet init monorepo my-platform
 ```
 
-## Project Types
+## Stack
 
-| Type | Use Case |
-|------|----------|
-| `library` | Standalone TypeScript package |
-| `api` | Hexagonal Hono backend (Ports/Adapters, Effect Layers) |
-| `ui` | React 19 frontend (XState, TanStack Router) |
-| `monorepo` | Multi-package workspace (Bun workspaces) |
-| `infra` | Infrastructure (Pulumi, process-compose) |
+| Layer | Technology |
+|-------|------------|
+| Runtime | Bun + Node.js (via Nix) |
+| HTTP | @effect/platform HttpApiBuilder |
+| Validation | Effect Schema |
+| Database | Drizzle ORM + postgres.js |
+| Testing | Vitest |
+| Linting | Biome |
 
-## Adding to Existing Projects
+## Project Structure
 
-```bash
-cd my-platform
-signet gen api voice-service
-signet gen ui web-app
 ```
+my-project/
+├── src/
+│   ├── domain/       # Pure business logic
+│   ├── ports/        # Service interfaces
+│   ├── adapters/     # Infrastructure implementations
+│   └── lib/          # Shared utilities
+├── flake.nix         # Nix flake
+├── package.json
+├── tsconfig.json
+└── vitest.config.ts
+```
+
+## Conventions
+
+- TypeScript-first: TS types are source of truth
+- Effect Schema for validation (not Zod)
+- Result types: Use Effect.fail, don't throw
+- Branded types: `UserId` not `string`
+- TDD: Write tests first
 
 ## Verification
 
 ```bash
-signet validate       # Check project structure
-signet enforce --fix  # Run architecture enforcers
-bun validate          # typecheck + lint + test
+# Check PARAGON compliance
+just verify-paragon
+
+# Type check + lint + test
+bun validate
 ```
 
 ## Version Authority
 
-All generated projects use versions from the SSOT:
+All projects use versions from the SSOT:
 `config/quality/src/stack/versions.ts`
-
-Run `just sig-doctor` to check version alignment.
-
-## Conventions
-
-- TypeScript-first: TS types are source of truth, Zod satisfies types
-- Result types: Use `Ok`/`Err`, don't throw for expected failures
-- Branded types: `UserId` not `string`
-- TDD: Write tests first
-
-## See Also
-
-- `/signet` - Full Signet command reference
