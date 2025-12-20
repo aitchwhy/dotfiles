@@ -140,7 +140,6 @@
         ./flake/checks.nix
         ./flake/deploy.nix
         ./flake/vm-tests.nix
-        ./flake/packages.nix
       ];
 
       systems = [
