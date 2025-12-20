@@ -1,0 +1,9 @@
+id: paragon-no-nullable-union
+language: typescript
+severity: warning
+message: "Guard 45: 'T | null' in type definition. Use Option<T> for explicit absence."
+
+rule:
+  kind: union_type
+  has:
+    kind: null

@@ -1,0 +1,14 @@
+id: paragon-no-type-assertion
+language: typescript
+severity: error
+message: "Guard 40: 'as Type' bypasses type safety. Use Schema.decodeUnknown() to parse runtime data."
+
+rule:
+  any:
+    - pattern: $EXPR as $TYPE
+    - pattern: $EXPR as { $$$FIELDS }
+  not:
+    any:
+      - pattern: $EXPR as const
+      - pattern: $EXPR as unknown
+      - pattern: $EXPR as never
