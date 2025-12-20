@@ -1,6 +1,6 @@
 -- Active Lessons Dump
--- Generated: 2025-12-20T03:06:57.617Z
--- Count: 10
+-- Generated: 2025-12-20T04:03:34.019Z
+-- Count: 12
 
 BEGIN TRANSACTION;
 
@@ -33,10 +33,16 @@ INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_co
 - **Modified** `infra/pulumi/src/alb.ts`:
   - interval: 30 → 10
   - deregistrationDelay: 30 → 10', 'claude', 8, 1.0000, '2025-12-18 16:55:15');
+INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (42, '2025-12-20', 'optimization', '1. **Hono references** exist in 7 skills (observability-patterns, typespec-patterns, context7-mcp, mcp-optimization, signet-patterns, hexagonal-architecture, paragon)', '1. **Hono references** exist in 7 skills (observability-patterns, typespec-patterns, context7-mcp, mcp-optimization, signet-patterns, hexagonal-architecture, paragon)', 'claude', 1, 1.0000, '2025-12-20 04:03:33');
+INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (43, '2025-12-20', 'optimization', '| Category | Count | Details |', '| Category | Count | Details |
+|----------|-------|---------|
+| **Deleted** | 4 | signet.md, signet-patterns/, zod-patterns/, tanstack-patterns/ |
+| **Created** | 4 | no-jest.yml, effect-resilience/, api-contract/ (pulumi-esc/ already existed) |
+| **Updated** | 12 | paragon, hexagonal, observability, typespec, context7, mcp-optimization, effect-ts-patterns, tdd-patterns, planning-patterns, new-project.md, AGENTS.md, content.ts |', 'claude', 1, 1.0000, '2025-12-20 04:03:33');
 INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (2, '2025-12-12', 'optimization', 'Nix build cache miss problem: Derivation hash includes source code. Split dependencies into separate derivation based on lockfile only.', 'After split, warm builds complete in <60 seconds vs 25+ minutes', 'manual', 2, 0.9473, '2025-12-12');
-INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (3, '2025-12-12', 'pattern', 'Three cache layers for Nix: Cachix (remote), magic-nix-cache (GHA local), Bun cache (useless in sandbox).', 'CI runs dropped from 30+ minutes to 5-10 minutes with proper layer configuration', 'manual', 1, 0.5687, '2025-12-12');
-INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (4, '2025-12-12', 'gotcha', 'Nix sandbox isolation: Package manager caches (~/.bun, ~/.npm) NOT accessible during builds. Use derivation splitting instead.', 'Bun inside Nix derivation cannot see ~/.bun cache', 'manual', 1, 0.5687, '2025-12-12');
-INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (5, '2025-12-12', 'pattern', 'Derivation splitting anti-patterns: bun install in app derivation, using nixos-unstable, missing magic-nix-cache, post-build Cachix push.', 'nix build .#api -v 2>&1 | grep -E "building|cached" shows cached for nodeModules', 'manual', 1, 0.5687, '2025-12-12');
-INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (1, '2025-12-11', 'pattern', 'Architecture switched to Bootloader pattern. Single AGENTS.md routes to modular content.', 'Symlinks verified via readlink ~/.claude/CLAUDE.md', 'manual', 1, 0.5295, '2025-12-11');
+INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (3, '2025-12-12', 'pattern', 'Three cache layers for Nix: Cachix (remote), magic-nix-cache (GHA local), Bun cache (useless in sandbox).', 'CI runs dropped from 30+ minutes to 5-10 minutes with proper layer configuration', 'manual', 1, 0.5579, '2025-12-12');
+INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (4, '2025-12-12', 'gotcha', 'Nix sandbox isolation: Package manager caches (~/.bun, ~/.npm) NOT accessible during builds. Use derivation splitting instead.', 'Bun inside Nix derivation cannot see ~/.bun cache', 'manual', 1, 0.5579, '2025-12-12');
+INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (5, '2025-12-12', 'pattern', 'Derivation splitting anti-patterns: bun install in app derivation, using nixos-unstable, missing magic-nix-cache, post-build Cachix push.', 'nix build .#api -v 2>&1 | grep -E "building|cached" shows cached for nodeModules', 'manual', 1, 0.5579, '2025-12-12');
+INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (1, '2025-12-11', 'pattern', 'Architecture switched to Bootloader pattern. Single AGENTS.md routes to modular content.', 'Symlinks verified via readlink ~/.claude/CLAUDE.md', 'manual', 1, 0.5195, '2025-12-11');
 
 COMMIT;
