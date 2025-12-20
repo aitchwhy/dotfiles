@@ -1,0 +1,19 @@
+id: paragon-no-jest
+language: typescript
+severity: error
+message: "Guard 49: Jest is forbidden. Use Vitest instead. Import { describe, test, expect, vi } from 'vitest'."
+
+rule:
+  any:
+    - pattern: import $_ from 'jest'
+    - pattern: import { $$_ } from 'jest'
+    - pattern: import $_ from '@jest/globals'
+    - pattern: import { $$_ } from '@jest/globals'
+    - pattern: jest.mock($$_)
+    - pattern: jest.fn($$_)
+    - pattern: jest.spyOn($$_)
+    - pattern: jest.resetAllMocks()
+    - pattern: jest.clearAllMocks()
+    - pattern: jest.resetModules()
+    - pattern: jest.useFakeTimers($$_)
+    - pattern: jest.useRealTimers()

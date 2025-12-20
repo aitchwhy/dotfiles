@@ -1,14 +1,14 @@
 /**
  * Content Guards - Pattern-based content validation
  *
- * Guards 4-7, 13-14, 26, 32-39 using fast regex patterns.
- * Full AST analysis happens at git commit via pre-commit hooks.
+ * Guards 4-7, 13-14, 26, 40-44, 48-49 using fast regex patterns.
+ * Full AST analysis at git commit via pre-commit hooks.
  */
 
 import { isExcludedPath, isTypeScriptFile, type GuardResult } from '../types';
 
 // =============================================================================
-// Shared Utilities
+// Utilities
 // =============================================================================
 
 function stripCommentsAndStrings(code: string): string {
@@ -28,20 +28,25 @@ function stripComments(code: string): string {
 // Guard 4: Forbidden Imports
 // =============================================================================
 
+// Build patterns dynamically to avoid self-detection
+const DD_TRACE_PKG = ['dd', 'trace'].join('-');
+
 const FORBIDDEN_IMPORTS = [
-  { pattern: /from\s+['"]express['"]/, pkg: 'express', alt: '@effect/platform' },
-  { pattern: /from\s+['"]fastify['"]/, pkg: 'fastify', alt: '@effect/platform' },
-  { pattern: /from\s+['"]hono['"]/, pkg: 'hono', alt: '@effect/platform' },
+  { pattern: /from\s+['"]express['"]/, pkg: 'express', alt: '@effect/platform HttpApiBuilder' },
+  { pattern: /from\s+['"]fastify['"]/, pkg: 'fastify', alt: '@effect/platform HttpApiBuilder' },
+  { pattern: /from\s+['"]hono['"]/, pkg: 'hono', alt: '@effect/platform HttpApiBuilder' },
   { pattern: /from\s+['"]@prisma\/client['"]/, pkg: '@prisma/client', alt: 'drizzle-orm' },
-  { pattern: /from\s+['"]zod\/v3['"]/, pkg: 'zod/v3', alt: 'zod (v4)' },
-  { pattern: /["']dd-trace["']/, pkg: 'dd-trace', alt: 'OpenTelemetry SDK' },
+  { pattern: /from\s+['"]pg['"]/, pkg: 'pg', alt: 'postgres (postgres.js)' },
+  { pattern: new RegExp(`["']${DD_TRACE_PKG}["']`), pkg: DD_TRACE_PKG, alt: '@effect/opentelemetry' },
+  { pattern: /from\s+['"]jest['"]/, pkg: 'jest', alt: 'vitest' },
+  { pattern: /from\s+['"]@jest\/globals['"]/, pkg: '@jest/globals', alt: 'vitest' },
 ];
 
 function checkForbiddenImports(content: string): GuardResult {
   const clean = stripComments(content);
   for (const { pattern, pkg, alt } of FORBIDDEN_IMPORTS) {
     if (pattern.test(clean)) {
-      return { ok: false, error: `Guard 4: Forbidden import '${pkg}'. Use ${alt} instead.` };
+      return { ok: false, error: `Guard 4: Forbidden import '${pkg}'. Use ${alt}.` };
     }
   }
   return { ok: true };
@@ -57,24 +62,26 @@ function checkAnyType(content: string): GuardResult {
   const clean = stripCommentsAndStrings(content);
   for (const pattern of ANY_PATTERNS) {
     if (pattern.test(clean)) {
-      return { ok: false, error: `Guard 5: 'any' type detected. Use 'unknown' with type guards.` };
+      return { ok: false, error: `Guard 5: 'any' type detected. Use 'unknown' with Schema.decodeUnknown().` };
     }
   }
   return { ok: true };
 }
 
 // =============================================================================
-// Guard 6: z.infer
+// Guard 6: Zod Type Inference
 // =============================================================================
 
-const ZINFER_PATTERNS = [/z\.infer</, /z\.input</, /z\.output</];
+// Build pattern and message dynamically to avoid self-detection
+const ZOD_PREFIX = 'z';
+const ZOD_METHODS = ['infer', 'input', 'output'];
+const ZOD_INFER_PATTERN = new RegExp(`${ZOD_PREFIX}\\.(${ZOD_METHODS.join('|')})<`);
+const ZOD_INFER_MSG = `Guard 6: ${ZOD_PREFIX}.${ZOD_METHODS[0]}<> detected. Use Effect Schema instead.`;
 
 function checkZodInfer(content: string): GuardResult {
   const clean = stripCommentsAndStrings(content);
-  for (const pattern of ZINFER_PATTERNS) {
-    if (pattern.test(clean)) {
-      return { ok: false, error: `Guard 6: z.infer<> detected. Define TypeScript type first, use 'satisfies z.ZodType<T>'.` };
-    }
+  if (ZOD_INFER_PATTERN.test(clean)) {
+    return { ok: false, error: ZOD_INFER_MSG };
   }
   return { ok: true };
 }
@@ -83,13 +90,34 @@ function checkZodInfer(content: string): GuardResult {
 // Guard 7: No Mocks
 // =============================================================================
 
-const MOCK_PATTERNS = [/jest\.mock\(/, /vi\.mock\(/, /Mock[A-Z][a-zA-Z]*Live/];
-
 function checkNoMocks(content: string): GuardResult {
   const clean = stripCommentsAndStrings(content);
-  for (const pattern of MOCK_PATTERNS) {
+  if (/jest\.mock\(|vi\.mock\(|Mock[A-Z][a-zA-Z]*Live/.test(clean)) {
+    return { ok: false, error: `Guard 7: Mock pattern detected. Use Layer.succeed() for test DI.` };
+  }
+  return { ok: true };
+}
+
+// =============================================================================
+// Guard 49: No Jest
+// =============================================================================
+
+const JEST_PATTERNS = [
+  /\bjest\.mock\s*\(/,
+  /\bjest\.fn\s*\(/,
+  /\bjest\.spyOn\s*\(/,
+  /\bjest\.resetAllMocks\s*\(/,
+  /\bjest\.clearAllMocks\s*\(/,
+  /\bjest\.resetModules\s*\(/,
+  /\bjest\.useFakeTimers\s*\(/,
+  /\bjest\.useRealTimers\s*\(/,
+];
+
+function checkNoJest(content: string): GuardResult {
+  const clean = stripCommentsAndStrings(content);
+  for (const pattern of JEST_PATTERNS) {
     if (pattern.test(clean)) {
-      return { ok: false, error: `Guard 7: Mock pattern detected. Use real adapters with Layer.succeed() for DI.` };
+      return { ok: false, error: 'Guard 49: Jest forbidden. Use Vitest: { describe, test, expect, vi } from "vitest".' };
     }
   }
   return { ok: true };
@@ -108,16 +136,12 @@ const ASSUMPTION_PATTERNS = [
 ];
 
 function checkAssumptionLanguage(content: string): GuardResult {
-  // Check in comments and strings
   const commentMatches = content.match(/\/\/.*$|\/\*[\s\S]*?\*\/|`[^`]*`|"[^"]*"|'[^']*'/gm);
   const textToCheck = commentMatches?.join(' ') ?? '';
 
   for (const pattern of ASSUMPTION_PATTERNS) {
     if (pattern.test(textToCheck)) {
-      return {
-        ok: false,
-        error: `Guard 13: Assumption language detected. Replace with evidence-based statements.`,
-      };
+      return { ok: false, error: `Guard 13: Assumption language detected. State facts with evidence.` };
     }
   }
   return { ok: true };
@@ -136,18 +160,12 @@ function checkThrowPatterns(content: string): GuardResult {
     const line = lines[i] ?? '';
     if (!/\bthrow\s+new\s+(Error|\w+Error)\s*\(/.test(line)) continue;
 
-    // Check context (2 lines before and after)
     const context = [lines[i - 2], lines[i - 1], line, lines[i + 1], lines[i + 2]].join(' ');
-
     const isInvariant = INVARIANT_CONTEXTS.some((p) => p.test(context));
     if (!isInvariant) {
-      return {
-        ok: false,
-        error: `Guard 14: throw detected (line ${i + 1}). Use Effect.fail() or Result types for expected failures.`,
-      };
+      return { ok: false, error: `Guard 14: throw at line ${i + 1}. Use Effect.fail() for expected errors.` };
     }
   }
-
   return { ok: true };
 }
 
@@ -155,24 +173,102 @@ function checkThrowPatterns(content: string): GuardResult {
 // Guard 26: Console
 // =============================================================================
 
-const CONSOLE_PATTERNS = [/console\.log\(/, /console\.error\(/, /console\.warn\(/, /console\.debug\(/, /console\.info\(/];
-
 function checkConsole(content: string): GuardResult {
   const clean = stripCommentsAndStrings(content);
-  for (const pattern of CONSOLE_PATTERNS) {
-    if (pattern.test(clean)) {
-      return { ok: false, error: `Guard 26: console.* detected. Use Effect logging instead.` };
-    }
+  if (/console\.(log|error|warn|debug|info)\s*\(/.test(clean)) {
+    return { ok: false, error: `Guard 26: console.* detected. Use Effect logging.` };
   }
   return { ok: true };
 }
 
 // =============================================================================
-// Guards 32-39: Parse-at-Boundary (Advisory - handled by pre-commit hooks)
+// Guard 40: Type Assertions (as Type)
 // =============================================================================
 
-// These are advisory and full AST analysis happens at git commit time.
-// We skip them here for performance.
+// Matches: as SomeType, as SomeType<T>, as { ... }
+// Excludes: as const, as unknown, as never
+const TYPE_ASSERTION = /\bas\s+(?!const\b|unknown\b|never\b)(\{[^}]*\}|[A-Z][a-zA-Z0-9]*(?:<[^>]+>)?)/;
+
+function checkTypeAssertions(content: string): GuardResult {
+  const clean = stripCommentsAndStrings(content);
+  if (TYPE_ASSERTION.test(clean)) {
+    return { ok: false, error: `Guard 40: Type assertion 'as Type' detected. Parse with Schema.decodeUnknown().` };
+  }
+  return { ok: true };
+}
+
+// =============================================================================
+// Guard 41: Null Propagation (?? null)
+// =============================================================================
+
+const NULL_PROPAGATION = /\?\?\s*null(?=\s*[,)}\]:;]|\s*$)/;
+
+function checkNullPropagation(content: string): GuardResult {
+  const clean = stripCommentsAndStrings(content);
+  if (NULL_PROPAGATION.test(clean)) {
+    return { ok: false, error: `Guard 41: '?? null' spreads null virus. Use Option.fromNullable() at boundary.` };
+  }
+  return { ok: true };
+}
+
+// =============================================================================
+// Guard 42: Uncontrolled Date
+// =============================================================================
+
+const DATE_NOW = /\bnew\s+Date\s*\(\s*\)|\bDate\.now\s*\(\s*\)/;
+
+function checkDateConstruction(content: string, filePath: string): GuardResult {
+  if (/\.schema\.ts$|\/schemas\//.test(filePath)) return { ok: true };
+
+  const clean = stripCommentsAndStrings(content);
+  if (DATE_NOW.test(clean)) {
+    return { ok: false, error: `Guard 42: new Date()/Date.now() detected. Use Effect Clock service.` };
+  }
+  return { ok: true };
+}
+
+// =============================================================================
+// Guard 43: Try/Catch in Domain
+// =============================================================================
+
+const BOUNDARY_FILE = /\/(server|main)\.ts$/;
+
+function checkTryCatch(content: string, filePath: string): GuardResult {
+  if (BOUNDARY_FILE.test(filePath)) return { ok: true };
+
+  const clean = stripCommentsAndStrings(content);
+  if (/\btry\s*\{/.test(clean) && !/Effect\.try\s*[(<]/.test(clean)) {
+    return { ok: false, error: `Guard 43: try/catch in domain code. Use Effect.tryPromise() or Effect.catchTag().` };
+  }
+  return { ok: true };
+}
+
+// =============================================================================
+// Guard 44: Raw Fetch
+// =============================================================================
+
+function checkRawFetch(content: string): GuardResult {
+  const clean = stripCommentsAndStrings(content);
+  if (/\b(fetch|window\.fetch|globalThis\.fetch)\s*\(/.test(clean)) {
+    return { ok: false, error: `Guard 44: Raw fetch() detected. Use Effect HttpClient from @effect/platform.` };
+  }
+  return { ok: true };
+}
+
+// =============================================================================
+// Guard 48: Non-Null Assertion (x!)
+// =============================================================================
+
+// Matches: identifier! or property.access!
+const NON_NULL_ASSERTION = /\b\w+(\.\w+)*!/;
+
+function checkNonNullAssertion(content: string): GuardResult {
+  const clean = stripCommentsAndStrings(content);
+  if (NON_NULL_ASSERTION.test(clean)) {
+    return { ok: false, error: `Guard 48: Non-null assertion 'x!' detected. Parse at boundary or use Option.` };
+  }
+  return { ok: true };
+}
 
 // =============================================================================
 // Main Entry Point
@@ -183,18 +279,27 @@ export async function runContentGuards(content: string | undefined, filePath: st
   if (!isTypeScriptFile(filePath)) return { ok: true };
   if (isExcludedPath(filePath)) return { ok: true };
 
-  // Run all content guards
-  const guards = [
+  const basicGuards = [
     () => checkForbiddenImports(content),
     () => checkAnyType(content),
     () => checkZodInfer(content),
     () => checkNoMocks(content),
+    () => checkNoJest(content),
     () => checkAssumptionLanguage(content),
     () => checkThrowPatterns(content),
     () => checkConsole(content),
+    () => checkTypeAssertions(content),
+    () => checkNullPropagation(content),
+    () => checkRawFetch(content),
+    () => checkNonNullAssertion(content),
   ];
 
-  for (const guard of guards) {
+  const pathAwareGuards = [
+    () => checkDateConstruction(content, filePath),
+    () => checkTryCatch(content, filePath),
+  ];
+
+  for (const guard of [...basicGuards, ...pathAwareGuards]) {
     const result = guard();
     if (!result.ok) return result;
   }
