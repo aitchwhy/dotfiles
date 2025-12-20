@@ -1,8 +1,8 @@
 {
   "meta": {
     "frozen": "2025-12",
-    "updated": "2025-12-16",
-    "ssotVersion": "3.1.0"
+    "updated": "2025-12-18",
+    "ssotVersion": "4.0.0"
   },
   "runtime": {
     "pnpm": "9.15.4",
