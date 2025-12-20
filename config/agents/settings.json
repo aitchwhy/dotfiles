@@ -137,7 +137,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node --import tsx \"$HOME/dotfiles/config/agents/hooks/unified-polish.ts\"",
+            "command": "bun \"$HOME/dotfiles/config/agents/hooks/unified-polish.ts\"",
             "timeout": 60
           }
         ]
@@ -147,7 +147,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node --import tsx \"$HOME/dotfiles/config/agents/hooks/enforce-versions.ts\"",
+            "command": "bun \"$HOME/dotfiles/config/agents/hooks/enforce-versions.ts\"",
             "timeout": 10
           }
         ]
@@ -169,8 +169,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node --import tsx \"$HOME/dotfiles/config/agents/hooks/paragon-guard.ts\"",
-            "timeout": 20
+            "command": "bun \"$HOME/dotfiles/config/agents/hooks/paragon-guard.ts\"",
+            "timeout": 2
           }
         ]
       }
@@ -209,7 +209,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node --import tsx \"$HOME/dotfiles/config/agents/hooks/verification-gate.ts\"",
+            "command": "bun \"$HOME/dotfiles/config/agents/hooks/verification-gate.ts\"",
             "timeout": 15
           }
         ]
