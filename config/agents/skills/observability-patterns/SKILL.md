@@ -194,52 +194,46 @@ export const logger = {
 };
 ```
 
-## Hono Middleware
+## Effect HttpApiBuilder Middleware
 
 ```typescript
 // src/middleware/tracing.ts
-import { SpanKind, SpanStatusCode, context, trace, propagation } from '@opentelemetry/api';
-import type { Context, Next } from 'hono';
-import { recordHttpRequest } from '../lib/telemetry/metrics.js';
-import { logger } from '../lib/telemetry/logger.js';
+import { HttpMiddleware, HttpServerRequest, HttpServerResponse } from '@effect/platform';
+import { Effect } from 'effect';
 
-const tracer = trace.getTracer('my-service');
+// Effect HttpApiBuilder provides built-in tracing via @effect/opentelemetry
+// Use HttpMiddleware.logger for request logging
 
-export function tracingMiddleware() {
-  return async (c: Context, next: Next) => {
+export const TracingMiddleware = HttpMiddleware.make((app) =>
+  Effect.gen(function* () {
+    const request = yield* HttpServerRequest.HttpServerRequest;
     const start = performance.now();
-    const method = c.req.method;
-    const path = c.req.path;
 
     // Skip health checks
-    if (path === '/health' || path === '/ready') return next();
-
-    // Extract trace context from incoming request
-    const parentContext = propagation.extract(context.active(), c.req.raw.headers, {
-      get: (h, k) => h instanceof Headers ? h.get(k) ?? undefined : undefined,
-      keys: (h) => h instanceof Headers ? [...h.keys()] : [],
-    });
-
-    const span = tracer.startSpan(`${method} ${path}`, { kind: SpanKind.SERVER }, parentContext);
-
-    let status = 500;
-    try {
-      await context.with(trace.setSpan(parentContext, span), () => next());
-      status = c.res.status;
-      span.setStatus({ code: status >= 400 ? SpanStatusCode.ERROR : SpanStatusCode.OK });
-    } catch (e) {
-      span.recordException(e instanceof Error ? e : new Error(String(e)));
-      span.setStatus({ code: SpanStatusCode.ERROR });
-      throw e;
-    } finally {
-      const duration = performance.now() - start;
-      span.setAttribute('http.status_code', status);
-      span.end();
-      recordHttpRequest(method, path, status, duration);
-      logger.info(`${method} ${path} ${status}`, { durationMs: Math.round(duration) });
+    if (request.url === '/health' || request.url === '/ready') {
+      return yield* app;
     }
-  };
-}
+
+    const response = yield* app.pipe(
+      Effect.tapError((error) =>
+        Effect.log(`Request failed: ${request.method} ${request.url}`).pipe(
+          Effect.annotateLogs({ error: String(error) })
+        )
+      )
+    );
+
+    const duration = performance.now() - start;
+    yield* Effect.log(`${request.method} ${request.url} ${response.status}`).pipe(
+      Effect.annotateLogs({ durationMs: Math.round(duration) })
+    );
+
+    return response;
+  })
+);
+
+// For full OTEL integration, use @effect/opentelemetry
+// import { NodeSdk } from '@effect/opentelemetry';
+// const TracingLive = NodeSdk.layer(() => ({ ... }));
 ```
 
 ## PostHog (Browser)
@@ -341,7 +335,7 @@ VITE_DEVCYCLE_CLIENT_KEY=dvc_client_xxx
 - [ ] DD_SERVICE, DD_ENV, DD_VERSION env vars set
 - [ ] Custom metrics defined in `lib/telemetry/metrics.ts`
 - [ ] Structured logger in `lib/telemetry/logger.ts`
-- [ ] Tracing middleware in Hono app
+- [ ] Tracing middleware in HttpApiBuilder
 - [ ] PostHog initialized in web entry (if frontend)
 - [ ] No banned packages in package.json
 - [ ] Health endpoints excluded from tracing

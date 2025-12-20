@@ -42,8 +42,8 @@ const deps = await readPackageJson();
 // Pre-fetch docs for frequently used libraries
 await Promise.all([
   mcp__context7__resolve-library-id({ libraryName: "effect" }),
-  mcp__context7__resolve-library-id({ libraryName: "hono" }),
-  mcp__context7__resolve-library-id({ libraryName: "zod" }),
+  mcp__context7__resolve-library-id({ libraryName: "@effect/platform" }),
+  mcp__context7__resolve-library-id({ libraryName: "drizzle-orm" }),
 ]);
 ```
 

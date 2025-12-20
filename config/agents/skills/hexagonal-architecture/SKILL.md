@@ -74,7 +74,7 @@ apps/<service>/src/
 │       └── llm.port.ts
 ├── adapters/               # Implementations
 │   ├── inbound/            # HTTP handlers, WebSocket handlers
-│   │   └── hono/           # Hono-specific adapters
+│   │   └── http/           # HttpApiBuilder adapters
 │   └── outbound/           # Infrastructure adapters
 │       ├── gcs-storage.adapter.ts
 │       ├── s3-storage.adapter.ts
@@ -89,7 +89,7 @@ apps/<service>/src/
 
 ```typescript
 // ports/outbound/storage.port.ts
-import { z } from 'zod';
+import { Schema } from 'effect';
 
 // 1. TypeScript type is source of truth
 type StorageObject = {
@@ -100,14 +100,14 @@ type StorageObject = {
   readonly lastModified: Date;
 };
 
-// 2. Schema satisfies type (NEVER z.infer)
-const storageObjectSchema = z.object({
-  key: z.string(),
-  bucket: z.string(),
-  contentType: z.string(),
-  size: z.number().nonnegative(),
-  lastModified: z.date(),
-}) satisfies z.ZodType<StorageObject>;
+// 2. Schema satisfies type (Effect Schema)
+const StorageObjectSchema = Schema.Struct({
+  key: Schema.String,
+  bucket: Schema.String,
+  contentType: Schema.String,
+  size: Schema.Number.pipe(Schema.nonNegative()),
+  lastModified: Schema.DateFromSelf,
+}) satisfies Schema.Schema<StorageObject>;
 
 // 3. Port interface with typed errors
 type StorageError =

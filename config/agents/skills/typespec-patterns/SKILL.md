@@ -277,58 +277,52 @@ npx @hey-api/openapi-ts \
   -c @hey-api/client-fetch
 ```
 
-## Integration with Hono
+## Integration with Effect HttpApiBuilder
 
 ### Type-Safe Routes
 
 ```typescript
-// src/api/routes/users.ts
-import { Hono } from "hono";
-import { zValidator } from "@hono/zod-validator";
-import * as z from "zod/v4";
-import type { User, CreateUserInput, UpdateUserInput } from "../types";
+// packages/domain/src/api.ts
+import { HttpApi, HttpApiEndpoint, HttpApiGroup } from '@effect/platform';
+import { Schema } from 'effect';
 
-// TypeScript types from TypeSpec -> openapi-typescript
-// Zod schemas satisfy those types
-const CreateUserSchema = z.object({
-  name: z.string().min(1).max(100),
-  email: z.email(),
-  role: z.enum(["admin", "user", "guest"]).default("user"),
-}) satisfies z.ZodType<CreateUserInput>;
+// Define API contract once
+const UsersApi = HttpApiGroup.make('users').pipe(
+  HttpApiGroup.add(
+    HttpApiEndpoint.get('list', '/users').pipe(
+      HttpApiEndpoint.setSuccess(Schema.Array(UserSchema))
+    )
+  ),
+  HttpApiGroup.add(
+    HttpApiEndpoint.get('getById', '/users/:id').pipe(
+      HttpApiEndpoint.setSuccess(UserSchema),
+      HttpApiEndpoint.setError(NotFoundError)
+    )
+  ),
+  HttpApiGroup.add(
+    HttpApiEndpoint.post('create', '/users').pipe(
+      HttpApiEndpoint.setPayload(CreateUserSchema),
+      HttpApiEndpoint.setSuccess(UserSchema)
+    )
+  )
+);
 
-const UpdateUserSchema = z.object({
-  name: z.string().min(1).max(100).optional(),
-  role: z.enum(["admin", "user", "guest"]).optional(),
-}) satisfies z.ZodType<UpdateUserInput>;
+export const MyApi = HttpApi.make('my-api').pipe(HttpApi.addGroup(UsersApi));
 
-const users = new Hono();
+// apps/api/src/handlers/users.ts
+import { HttpApiBuilder } from '@effect/platform';
+import { MyApi } from '@my/domain';
 
-users.get("/", async (c) => {
-  const limit = Number(c.req.query("limit") ?? 20);
-  const offset = Number(c.req.query("offset") ?? 0);
-
-  const result = await userService.list({ limit, offset });
-  return c.json(result);
-});
-
-users.get("/:id", async (c) => {
-  const id = c.req.param("id");
-  const user = await userService.findById(id);
-
-  if (!user) {
-    return c.json({ code: "NOT_FOUND", message: `User ${id} not found` }, 404);
-  }
-
-  return c.json(user);
-});
-
-users.post("/", zValidator("json", CreateUserSchema), async (c) => {
-  const input = c.req.valid("json");
-  const user = await userService.create(input);
-  return c.json(user, 201);
-});
-
-export { users };
+export const UsersHandlers = HttpApiBuilder.group(MyApi, 'users', (handlers) =>
+  handlers
+    .handle('list', () => UserService.list())
+    .handle('getById', ({ path }) =>
+      UserService.findById(path.id).pipe(
+        Effect.mapError(() => new NotFoundError({ id: path.id }))
+      )
+    )
+    .handle('create', ({ payload }) => UserService.create(payload))
+);
 ```
 
 ## Build Pipeline

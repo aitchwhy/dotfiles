@@ -60,12 +60,10 @@ mcp__context7__get-library-docs({
 | Package | Library ID |
 |---------|-----------|
 | effect | `/effect-ts/effect` |
+| @effect/platform | `/effect-ts/effect` |
 | next.js | `/vercel/next.js` |
 | react | `/facebook/react` |
-| hono | `/honojs/hono` |
-| zod | `/colinhacks/zod` |
 | drizzle-orm | `/drizzle-team/drizzle-orm` |
-| tanstack-query | `/tanstack/query` |
 | xstate | `/statelyai/xstate` |
 | tailwindcss | `/tailwindlabs/tailwindcss` |
 
