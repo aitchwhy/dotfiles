@@ -177,29 +177,11 @@
     ],
     "SessionStart": [
       {
-        "matcher": "*",
         "hooks": [
           {
             "type": "command",
-            "command": "echo \"[$(date '+%Y-%m-%d %H:%M:%S')] Session: $(pwd)\" >> ~/.claude/session.log"
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"$HOME/dotfiles/config/agents/hooks/plans-cleanup.sh\"",
-            "timeout": 5
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"$HOME/dotfiles/config/agents/hooks/session-start.sh\"",
-            "timeout": 5
+            "command": "bash \"$HOME/dotfiles/config/agents/hooks/session-init.sh\"",
+            "timeout": 10
           }
         ]
       }
