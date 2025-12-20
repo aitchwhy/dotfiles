@@ -8,23 +8,15 @@
  * Queries the verification_claims table for pending claims and blocks
  * session completion if any exist. Claims must be verified via tests
  * or explicitly marked as UNVERIFIED.
+ *
+ * Full Effect pipeline - no try/catch.
  */
 
+import { Effect, pipe } from "effect";
 import { Database } from 'bun:sqlite';
 import { existsSync } from 'node:fs';
-import { z } from 'zod';
 import { emitContinue, logError, logWarning } from './lib/hook-logging';
-
-// Input types (TypeScript first, schema satisfies type)
-type HookInput = {
-  readonly hook_event_name: string;
-  readonly session_id: string;
-};
-
-const HookInputSchema = z.object({
-  hook_event_name: z.string(),
-  session_id: z.string(),
-}) satisfies z.ZodType<HookInput>;
+import { decodeGenericHookInput, type GenericHookInput } from './lib/types';
 
 const DB_PATH = `${process.env.HOME}/.claude-metrics/evolution.db`;
 
@@ -34,76 +26,84 @@ interface UnverifiedClaim {
   claim_type: string;
 }
 
-async function getUnverifiedClaims(sessionId: string): Promise<UnverifiedClaim[]> {
-  // Check if database exists
-  if (!existsSync(DB_PATH)) {
-    return [];
-  }
+// =============================================================================
+// Database Query (Effect-wrapped)
+// =============================================================================
 
-  try {
-    const db = new Database(DB_PATH, { readonly: true });
+const getUnverifiedClaims = (sessionId: string): Effect.Effect<UnverifiedClaim[], never, never> =>
+  Effect.try({
+    try: () => {
+      if (!existsSync(DB_PATH)) {
+        return [];
+      }
 
-    // Check if table exists
-    const tableCheck = db
-      .query("SELECT name FROM sqlite_master WHERE type='table' AND name='verification_claims'")
-      .get();
+      const db = new Database(DB_PATH, { readonly: true });
 
-    if (!tableCheck) {
+      const tableCheck = db
+        .query("SELECT name FROM sqlite_master WHERE type='table' AND name='verification_claims'")
+        .get();
+
+      if (!tableCheck) {
+        db.close();
+        return [];
+      }
+
+      const claims = db
+        .query(
+          `
+        SELECT id, claim_text, claim_type
+        FROM verification_claims
+        WHERE session_id = ? AND verification_status = 'pending'
+      `
+        )
+        .all(sessionId) as UnverifiedClaim[];
+
       db.close();
-      return [];
+      return claims;
+    },
+    catch: () => [] as UnverifiedClaim[], // Database error - return empty to avoid blocking
+  }).pipe(Effect.catchAll(() => Effect.succeed([] as UnverifiedClaim[])));
+
+// =============================================================================
+// Read stdin
+// =============================================================================
+
+const readStdin = Effect.tryPromise({
+  try: async () => {
+    const text = await Bun.stdin.text();
+    if (!text.trim()) return null;
+    return JSON.parse(text);
+  },
+  catch: () => null,
+});
+
+// =============================================================================
+// Main Program
+// =============================================================================
+
+const program = pipe(
+  readStdin,
+  Effect.flatMap((raw) => {
+    if (raw === null) {
+      emitContinue();
+      return Effect.void;
     }
+    return pipe(
+      decodeGenericHookInput(raw),
+      Effect.flatMap((input: GenericHookInput) => {
+        // Only gate Stop events
+        if (input.hook_event_name !== 'Stop') {
+          emitContinue();
+          return Effect.void;
+        }
 
-    const claims = db
-      .query(
-        `
-      SELECT id, claim_text, claim_type
-      FROM verification_claims
-      WHERE session_id = ? AND verification_status = 'pending'
-    `
-      )
-      .all(sessionId) as UnverifiedClaim[];
+        return pipe(
+          getUnverifiedClaims(input.session_id),
+          Effect.tap((unverified) => {
+            if (unverified.length > 0) {
+              const claimsList = unverified.map((c) => `  - [${c.claim_type}] ${c.claim_text}`).join('\n');
 
-    db.close();
-    return claims;
-  } catch {
-    // Database error - return empty to avoid blocking
-    return [];
-  }
-}
-
-async function main() {
-  let rawInput: string;
-  try {
-    rawInput = await Bun.stdin.text();
-  } catch {
-    emitContinue();
-    return;
-  }
-
-  let input: HookInput;
-  try {
-    input = HookInputSchema.parse(JSON.parse(rawInput));
-  } catch {
-    // Invalid input - allow continuation
-    emitContinue();
-    return;
-  }
-
-  // Only gate Stop events
-  if (input.hook_event_name !== 'Stop') {
-    emitContinue();
-    return;
-  }
-
-  // Query for unverified claims
-  const unverified = await getUnverifiedClaims(input.session_id);
-
-  if (unverified.length > 0) {
-    // BLOCK: Use exit code 2 (blocking error) with stderr
-    // Exit code 2 is Claude Code's signal for "blocking error"
-    const claimsList = unverified.map((c) => `  - [${c.claim_type}] ${c.claim_text}`).join('\n');
-
-    const errorMsg = `BLOCKED: ${unverified.length} unverified claim(s) require proof:
+              const errorMsg = `BLOCKED: ${unverified.length} unverified claim(s) require proof:
 
 ${claimsList}
 
@@ -116,16 +116,27 @@ Verification format:
      Test: [test_file]:[test_name]
      Output: [relevant test output]`;
 
-    logWarning('verification-gate', errorMsg);
-    process.exit(2);
-  }
+              logWarning('verification-gate', errorMsg);
+              process.exit(2);
+            }
 
-  emitContinue();
-}
+            emitContinue();
+            return Effect.void;
+          }),
+        );
+      }),
+    );
+  }),
+  Effect.catchAll((error) => {
+    logError('verification-gate', error);
+    // On error, allow continuation to avoid blocking (fail-safe)
+    emitContinue();
+    return Effect.void;
+  }),
+);
 
-main().catch((e) => {
-  logError('verification-gate', e);
-  // On error, allow continuation to avoid blocking (fail-safe)
-  emitContinue();
-  process.exit(0);
-});
+// =============================================================================
+// Execute
+// =============================================================================
+
+Effect.runPromise(program);

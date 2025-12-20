@@ -1,10 +1,11 @@
 /**
  * Shared types for PARAGON hooks
  *
- * TypeScript types are source of truth (never z.infer)
+ * TypeScript types are source of truth - using Effect Schema (not Zod)
+ * All decoders return Effect, never throw.
  */
 
-import { z } from 'zod';
+import { Schema } from "effect";
 
 // =============================================================================
 // Hook Protocol Types
@@ -20,35 +21,52 @@ export type GuardResultError = { readonly ok: false; readonly error: string };
 export type GuardResult = GuardResultOk | GuardResultError;
 
 // =============================================================================
-// Hook Input Types
+// Hook Input Schema (Effect Schema)
 // =============================================================================
 
-export type HookInput = {
-  readonly hook_event_name: 'PreToolUse';
-  readonly session_id: string;
-  readonly tool_name: string;
-  readonly tool_input: {
-    readonly file_path?: string;
-    readonly content?: string;
-    readonly new_string?: string;
-    readonly command?: string;
-    readonly [key: string]: unknown;
-  };
-};
+const ToolInputSchema = Schema.Struct({
+  file_path: Schema.optional(Schema.String),
+  content: Schema.optional(Schema.String),
+  new_string: Schema.optional(Schema.String),
+  command: Schema.optional(Schema.String),
+  description: Schema.optional(Schema.String),
+}).pipe(Schema.extend(Schema.Record({ key: Schema.String, value: Schema.Unknown })));
 
-export const HookInputSchema = z.object({
-  hook_event_name: z.literal('PreToolUse'),
-  session_id: z.string(),
-  tool_name: z.string(),
-  tool_input: z
-    .object({
-      file_path: z.string().optional(),
-      content: z.string().optional(),
-      new_string: z.string().optional(),
-      command: z.string().optional(),
-    })
-    .passthrough(),
-}) satisfies z.ZodType<HookInput>;
+export const PreToolUseInputSchema = Schema.Struct({
+  hook_event_name: Schema.Literal("PreToolUse"),
+  session_id: Schema.String,
+  tool_name: Schema.String,
+  tool_input: ToolInputSchema,
+});
+
+export type PreToolUseInput = typeof PreToolUseInputSchema.Type;
+
+export const StopInputSchema = Schema.Struct({
+  hook_event_name: Schema.Literal("Stop"),
+  session_id: Schema.String,
+  cwd: Schema.optional(Schema.String),
+});
+
+export type StopInput = typeof StopInputSchema.Type;
+
+export const GenericHookInputSchema = Schema.Struct({
+  hook_event_name: Schema.String,
+  session_id: Schema.String,
+});
+
+export type GenericHookInput = typeof GenericHookInputSchema.Type;
+
+// =============================================================================
+// Decoders (return Effect, never throw)
+// =============================================================================
+
+export const decodePreToolUseInput = Schema.decodeUnknown(PreToolUseInputSchema);
+export const decodeStopInput = Schema.decodeUnknown(StopInputSchema);
+export const decodeGenericHookInput = Schema.decodeUnknown(GenericHookInputSchema);
+
+// Legacy alias for backward compatibility during migration
+export const HookInputSchema = PreToolUseInputSchema;
+export type HookInput = PreToolUseInput;
 
 // =============================================================================
 // Guard Context
