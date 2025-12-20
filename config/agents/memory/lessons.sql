@@ -1,6 +1,6 @@
 -- Active Lessons Dump
--- Generated: 2025-12-20T04:06:33.710Z
--- Count: 12
+-- Generated: 2025-12-20T05:13:10.788Z
+-- Count: 19
 
 BEGIN TRANSACTION;
 
@@ -39,6 +39,40 @@ INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_co
 | **Deleted** | 4 | signet.md, signet-patterns/, zod-patterns/, tanstack-patterns/ |
 | **Created** | 4 | no-jest.yml, effect-resilience/, api-contract/ (pulumi-esc/ already existed) |
 | **Updated** | 12 | paragon, hexagonal, observability, typespec, context7, mcp-optimization, effect-ts-patterns, tdd-patterns, planning-patterns, new-project.md, AGENTS.md, content.ts |', 'claude', 2, 1.0000, '2025-12-20 04:03:33');
+INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (46, '2025-12-20', 'optimization', '1. **Effect Schema Migration** - Replace Zod in 4 hook files', '1. **Effect Schema Migration** - Replace Zod in 4 hook files
+2. **Hook Caching** - 5-minute TTL cache for guard results  
+3. **SessionStart Consolidation** - Fresh session-init.sh
+4. **AST-grep Rules** - 4 new rules for Guards 41-44
+5. **settings.json** - bun invocation + reduced timeouts
+6. **Progressive Disclosure** - Split 7 skills into core + references/', 'claude', 1, 1.0000, '2025-12-20 05:13:10');
+INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (47, '2025-12-20', 'optimization', 'Thank you for the corrected plan. This is much more principled:', 'Thank you for the corrected plan. This is much more principled:
+- Zero try/catch with full Effect pipelines
+- Delete instead of deprecate (no "keep for reference")
+- No caching layer (premature optimization)
+- Audit skills before splitting (delete unused first)
+- Measure before optimizing timeouts', 'claude', 1, 1.0000, '2025-12-20 05:13:10');
+INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (48, '2025-12-20', 'optimization', '- **Zero try/catch** with full Effect pipelines', '- **Zero try/catch** with full Effect pipelines
+- **Delete, don''t deprecate** (session-start.sh will be deleted, not kept for reference)
+- **No caching layer** (removed as premature optimization)
+- **Audit before splitting** (typespec-patterns, refactoring-catalog marked for deletion)
+- **Evidence-based timeouts** (measure p99 first, then set 3× that value)', 'claude', 1, 1.0000, '2025-12-20 05:13:10');
+INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (49, '2025-12-20', 'optimization', 'Phase 4: settings.json Optimization. First, measure hook latency:', 'Phase 4: settings.json Optimization. First, measure hook latency:', 'claude', 1, 1.0000, '2025-12-20 05:13:10');
+INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (50, '2025-12-20', 'optimization', 'Skills over 250 lines:', 'Skills over 250 lines:
+- state-machine-patterns: 529
+- paragon: 464
+- nix-infrastructure: 405
+- hexagonal-architecture: 397
+- secrets-management: 353
+- nix-build-optimization: 347
+- observability-patterns: 341
+- semantic-codebase: 316
+- parse-boundary-patterns: 280
+- planning-patterns: 267
+- devops-patterns: 263', 'claude', 1, 1.0000, '2025-12-20 05:13:10');
+INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (51, '2025-12-20', 'optimization', 'All 5 phases complete. Summary of the optimization:', 'All 5 phases complete. Summary of the optimization:', 'claude', 1, 1.0000, '2025-12-20 05:13:10');
+INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (52, '2025-12-20', 'optimization', '## Phase 4: settings.json Optimization', '## Phase 4: settings.json Optimization
+- Switched all hook invocations from `node --import tsx` to `bun`
+- Evidence-based timeout: 2s (measured 88ms p99, 3× with 2s minimum)', 'claude', 1, 1.0000, '2025-12-20 05:13:10');
 INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (2, '2025-12-12', 'optimization', 'Nix build cache miss problem: Derivation hash includes source code. Split dependencies into separate derivation based on lockfile only.', 'After split, warm builds complete in <60 seconds vs 25+ minutes', 'manual', 2, 0.9473, '2025-12-12');
 INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (3, '2025-12-12', 'pattern', 'Three cache layers for Nix: Cachix (remote), magic-nix-cache (GHA local), Bun cache (useless in sandbox).', 'CI runs dropped from 30+ minutes to 5-10 minutes with proper layer configuration', 'manual', 1, 0.5579, '2025-12-12');
 INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (4, '2025-12-12', 'gotcha', 'Nix sandbox isolation: Package manager caches (~/.bun, ~/.npm) NOT accessible during builds. Use derivation splitting instead.', 'Bun inside Nix derivation cannot see ~/.bun cache', 'manual', 1, 0.5579, '2025-12-12');
