@@ -94,7 +94,7 @@ Effect.provide(HookLoggerLive);       // Claude Code hooks
 
 ## Infrastructure
 
-- **Docker Compose**: Local orchestration (replaces process-compose)
+- **Docker Compose**: Local orchestration
 - **Pulumi ESC**: Secrets and configuration (fail-fast required)
 - **Nix Flakes**: nix-darwin for macOS, reproducible builds
 - **Pulumi**: GCP, TypeScript-native IaC

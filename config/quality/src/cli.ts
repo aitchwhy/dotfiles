@@ -982,7 +982,7 @@ Project Types:
   api         Hexagonal Hono API
   ui          React 19 + XState + TanStack Router
   library     Standalone TypeScript library
-  infra       Pulumi + process-compose infrastructure
+  infra       Pulumi + Docker Compose infrastructure
 
 Verify Options (5-Tier Hard Gate):
   --tiers <list>          Comma-separated tiers: patterns,formal,execution,review,context

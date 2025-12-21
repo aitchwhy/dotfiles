@@ -26,5 +26,5 @@ message: |
     const TestLayer = Layer.succeed(Database, testDbService);
 
   See hexagonal-architecture skill for service container patterns.
-  Run: process-compose up (local) or use GitHub Actions services (CI).
+  Run: docker compose up (local) or use GitHub Actions services (CI).
 note: "See: config/agents/skills/hexagonal-architecture/SKILL.md"

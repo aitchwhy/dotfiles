@@ -90,7 +90,6 @@ in
       flush = "dscacheutil -flushcache && killall -HUP mDNSResponder";
 
       # Tool shortcuts
-      pc = "process-compose";
       sp = "supabase";
       ts = "tailscale";
       hf = "huggingface-cli";

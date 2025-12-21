@@ -7,9 +7,9 @@
 #   let cfg = import ../../../lib/config { inherit lib; }; in
 #   { services.foo.port = cfg.ports.infrastructure.nodeExporter; }
 #
-# Usage in process-compose-flake:
-#   let cfg = import ../lib/config { inherit lib; }; in
-#   environment.PORT = toString cfg.ports.development.api;
+# Usage in docker-compose.yml:
+#   environment:
+#     - API_PORT=3000  # From lib/config/ports.nix: development.api
 { lib }:
 let
   # ===========================================================================

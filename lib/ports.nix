@@ -7,9 +7,9 @@
 #   let ports = import ../../../lib/ports.nix; in
 #   { services.foo.port = ports.infrastructure.nodeExporter; }
 #
-# Usage in process-compose.yaml:
-#   # Port from lib/ports.nix: databases.redis = 6379
-#   command: redis-server --port 6379
+# Usage in docker-compose.yml:
+#   environment:
+#     - REDIS_PORT=6379  # From lib/ports.nix: databases.redis
 {
   # ===========================================================================
   # INFRASTRUCTURE PORTS (NixOS services, networking)
