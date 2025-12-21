@@ -2,10 +2,19 @@
 name: devops-patterns
 description: Docker-first DevOps - Docker Compose for local dev, Vitest for testing, Pulumi ESC for secrets.
 allowed-tools: Read, Write, Edit, Bash
-token-budget: 1000
+token-budget: 1200
 ---
 
 # Docker-First DevOps
+
+## Stack Versions (December 2025)
+
+| Tool | Version | Notes |
+|------|---------|-------|
+| Node.js | 24 | Current (not LTS 22) |
+| pnpm | 10.x | Required package manager |
+| PostgreSQL | 18 | Latest major |
+| TypeScript | 5.8+ | Project references |
 
 ## Core Philosophy
 
@@ -111,7 +120,7 @@ volumes:
 
 ```dockerfile
 # Stage 1: Base with pnpm
-FROM node:22-slim AS base
+FROM node:24-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
@@ -201,7 +210,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
           cache: 'pnpm'
 
       - run: pnpm install --frozen-lockfile
@@ -247,6 +256,37 @@ jobs:
 | Build image? | `docker build -t api .` |
 | Run tests? | `pnpm test` or `vitest` |
 | Deploy? | Push to main, GHA builds & pushes |
+
+## Pulumi ESC 4-Layer Hierarchy
+
+Configuration imports from most abstract to most specific:
+
+| Layer | File | Purpose | Example |
+|-------|------|---------|---------|
+| 1 | `vendor.yaml` | External service configs | Twilio, Hume, OpenAI |
+| 2 | `infra-shared.yaml` | Shared infra outputs | ECR URLs, RDS endpoints |
+| 3 | `base.yaml` | Constants | Ports, regions, defaults |
+| 4 | `{env}.yaml` | Environment-specific | dev, staging, prod |
+
+```yaml
+# staging.yaml
+imports:
+  - org/project/base
+  - org/project/infra-shared
+  - org/project/vendor
+values:
+  environment: staging
+```
+
+## Explicitly Replaces
+
+| Deprecated | Replacement | Reason |
+|------------|-------------|--------|
+| process-compose | Docker Compose | Industry standard |
+| nix2container | Multi-stage Dockerfile | Clear, portable |
+| devenv.sh | Docker Compose | Simpler, universal |
+| .env files | Pulumi ESC | No file drift |
+| Bun runtime | Node.js 24 | Node.js parity |
 
 ## Why Docker-First?
 
