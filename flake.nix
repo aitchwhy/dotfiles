@@ -43,20 +43,10 @@
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
 
     # ═══════════════════════════════════════════════════════════════════════════
-    # NIXOS DEPLOYMENT
+    # SECRETS MANAGEMENT
     # ═══════════════════════════════════════════════════════════════════════════
-    disko = {
-      url = "github:nix-community/disko";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     sops-nix = {
       url = "github:Mic92/sops-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    colmena = {
-      url = "github:zhaofengli/colmena";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -135,16 +125,12 @@
         inputs.git-hooks-nix.flakeModule
         ./flake/treefmt.nix
         ./flake/darwin.nix
-        ./flake/nixos.nix
         ./flake/devshells.nix
         ./flake/checks.nix
-        ./flake/deploy.nix
-        ./flake/vm-tests.nix
       ];
 
       systems = [
         "aarch64-darwin"
-        "x86_64-linux"
       ];
 
       # Per-system configuration handled by imported modules:
