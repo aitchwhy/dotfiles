@@ -1,8 +1,24 @@
 ---
 name: nix-patterns
-description: Nix Flakes + flake-parts + nix-darwin + Home Manager patterns. Modular composition for macOS configuration.
+description: Nix patterns for DOTFILES MANAGEMENT ONLY (nix-darwin + home-manager)
+scope: ~/dotfiles
+NOT_FOR: development, orchestration, containers, builds
 allowed-tools: Read, Write, Edit, Bash, Grep
 token-budget: 700
+---
+
+> **SCOPE RESTRICTION**
+>
+> This skill applies to **dotfiles management only**:
+> - nix-darwin (macOS system config)
+> - home-manager (user dotfiles)
+> - Flake structure for reproducibility
+>
+> **NOT for development.** Use `devops-patterns` skill for:
+> - Docker Compose (orchestration)
+> - Multi-stage Dockerfile (builds)
+> - Pulumi ESC (configuration)
+
 ---
 
 ## Architecture
@@ -226,6 +242,5 @@ nix flake update      # Update inputs
 
 ## See Also
 
-- `nix-build-optimization` - Derivation splitting, Cachix
-- `nix-infrastructure` - Port registry, nix2container
-- `secrets-management` - sops-nix patterns
+- `secrets-management` - sops-nix patterns for dotfiles
+- `devops-patterns` - Docker-first development (NOT Nix)
