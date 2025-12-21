@@ -1,5 +1,5 @@
 {
-  "$schema": "https://claude.ai/schemas/settings.json",
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "$comment": "SSOT - Symlinked to ~/.claude/settings.json via nix-darwin. Do not duplicate.",
 
   "cleanupPeriodDays": 90,
