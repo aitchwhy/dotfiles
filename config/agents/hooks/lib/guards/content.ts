@@ -231,7 +231,7 @@ function checkDateConstruction(content: string, filePath: string): GuardResult {
 // Guard 43: Try/Catch in Domain
 // =============================================================================
 
-const BOUNDARY_FILE = /\/(server|main)\.ts$/;
+const BOUNDARY_FILE = /\/(server|main|result)\.ts$/;
 
 function checkTryCatch(content: string, filePath: string): GuardResult {
   if (BOUNDARY_FILE.test(filePath)) return { ok: true };
