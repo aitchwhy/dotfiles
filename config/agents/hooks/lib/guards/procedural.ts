@@ -2,7 +2,8 @@
  * Procedural Guards - Guards that need file system or command parsing
  *
  * Guards: 1 (bash safety), 2 (commits), 3 (forbidden files),
- *         8 (TDD), 9-10 (DevOps), 11-12 (advisory), 28-31 (config/stack)
+ *         8 (TDD), 9-10 (DevOps), 11-12 (advisory), 28-31 (config/stack),
+ *         32 (secrets detection - absorbed from secrets-audit.ts)
  */
 
 import { existsSync, appendFileSync } from 'node:fs';
@@ -314,6 +315,45 @@ export function checkHardcodedUrls(content: string, filePath: string): GuardResu
 }
 
 // =============================================================================
+// Guard 32: Secrets Detection (absorbed from secrets-audit.ts)
+// =============================================================================
+
+const SECRETS_PATTERNS: readonly { name: string; pattern: RegExp }[] = [
+  { name: 'PRIVATE_KEY', pattern: /-----BEGIN\s+(RSA\s+|EC\s+)?PRIVATE KEY-----/ },
+  { name: 'AWS_ACCESS_KEY', pattern: /AKIA[0-9A-Z]{16}/ },
+  { name: 'GITHUB_PAT', pattern: /ghp_[A-Za-z0-9]{36}/ },
+  { name: 'GITHUB_OAUTH', pattern: /gho_[A-Za-z0-9]{36}/ },
+  { name: 'GITHUB_FINE_PAT', pattern: /github_pat_[A-Za-z0-9]{22}_[A-Za-z0-9]{59}/ },
+  { name: 'OPENAI_KEY', pattern: /sk-[A-Za-z0-9]{48}/ },
+  { name: 'OPENAI_PROJECT', pattern: /sk-proj-[A-Za-z0-9]{48}/ },
+  { name: 'SLACK_TOKEN', pattern: /xox[baprs]-[A-Za-z0-9-]+/ },
+  { name: 'STRIPE_LIVE', pattern: /sk_live_[A-Za-z0-9]{24,}/ },
+  { name: 'STRIPE_PK', pattern: /pk_live_[A-Za-z0-9]{24,}/ },
+];
+
+const SECRETS_ALLOWED_PATHS = ['.enc', '/secrets/', '.example', '.template', 'SKILL.md', '.test.', '.spec.'];
+
+export function checkSecrets(content: string, filePath: string): GuardResult {
+  // Skip allowed paths
+  if (SECRETS_ALLOWED_PATHS.some((p) => filePath.includes(p))) {
+    return { ok: true };
+  }
+
+  for (const { name, pattern } of SECRETS_PATTERNS) {
+    const match = content.match(pattern);
+    if (match) {
+      const masked = match[0].substring(0, 8) + '...';
+      return {
+        ok: false,
+        error: `Guard 32: SECRETS DETECTED\n\nType: ${name}\nMatch: ${masked}\nFile: ${filePath}\n\nFix: Use Pulumi ESC for secrets, not code.`,
+      };
+    }
+  }
+
+  return { ok: true };
+}
+
+// =============================================================================
 // Guard 31: Stack Compliance
 // =============================================================================
 
@@ -417,6 +457,10 @@ export function runProceduralGuards(
 
     // Config centralization (Nix)
     if (content) {
+      // Secrets detection (Guard 32)
+      const secretsResult = checkSecrets(content, filePath);
+      if (!secretsResult.ok) return secretsResult;
+
       const portsResult = checkHardcodedPorts(content, filePath);
       if (!portsResult.ok) return portsResult;
 
