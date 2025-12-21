@@ -202,7 +202,6 @@ nix eval .#lib.config.services --json | jq '.loki'
 
 | Skill | Relationship |
 |-------|--------------|
-| `nix-infrastructure` | Uses this for port registry |
 | `nix-patterns` | flake-parts integration |
 | `observability-patterns` | OTEL config generation |
 | `paragon` | Guards 28-30 enforce this |
