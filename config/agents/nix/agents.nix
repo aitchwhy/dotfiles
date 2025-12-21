@@ -25,9 +25,8 @@ in
       # ========================================
       # Claude Code CLI
       # ========================================
+      # NOTE: .claude/settings.json is now managed by modules/home/apps/claude.nix
       ".claude/CLAUDE.md".source = config.lib.file.mkOutOfStoreSymlink "${agentsDir}/AGENTS.md";
-      ".claude/settings.json".source =
-        config.lib.file.mkOutOfStoreSymlink "${agentsDir}/settings/claude-code.json";
       ".claude/commands".source = config.lib.file.mkOutOfStoreSymlink "${agentsDir}/commands";
       ".claude/agents".source = config.lib.file.mkOutOfStoreSymlink "${agentsDir}/agents";
       ".claude/rules".source = config.lib.file.mkOutOfStoreSymlink "${agentsDir}/rules";

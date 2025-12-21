@@ -215,6 +215,11 @@ in
       text = desktopConfigJson;
     };
 
+    # Settings SSOT - symlink prevents drift
+    home.file.".claude/settings.json" = {
+      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/agents/settings.json";
+    };
+
     # Generate mcp-servers.json for Claude Code CLI (used by agents.nix)
     # This replaces the manually maintained config/agents/mcp-servers.json
     xdg.configFile."claude/mcp-servers.json" = {
