@@ -1,6 +1,6 @@
 -- Active Lessons Dump
--- Generated: 2025-12-21T01:54:57.245Z
--- Count: 19
+-- Generated: 2025-12-21T02:30:28.638Z
+-- Count: 23
 
 BEGIN TRANSACTION;
 
@@ -73,6 +73,33 @@ INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_co
 INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (52, '2025-12-20', 'optimization', '## Phase 4: settings.json Optimization', '## Phase 4: settings.json Optimization
 - Switched all hook invocations from `node --import tsx` to `bun`
 - Evidence-based timeout: 2s (measured 88ms p99, 3× with 2s minimum)', 'claude', 2, 1.0000, '2025-12-20 05:13:10');
+INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (60, '2025-12-21', 'optimization', '| Item | Status | Files |', '| Item | Status | Files |
+|------|--------|-------|
+| Nix skills | 4 found | nix-patterns, nix-build-optimization, nix-infrastructure, nix-configuration-centralization |
+| process-compose refs | ~20 found | nix-infrastructure skill, lib/ports.nix, devops-patterns, aliases |
+| nix2container refs | ~10 found | nix-build-optimization, AGENTS.md, verify script |
+| SessionStart hooks | GOOD in settings.json | Only session-init.sh |
+| secrets-audit.ts | EXISTS (6.7k) | Needs absorption into paragon-gu', 'claude', 1, 1.0000, '2025-12-21 02:30:28');
+INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (61, '2025-12-21', 'optimization', '**Key actions:**', '**Key actions:**
+1. **DELETE** nix-infrastructure and nix-build-optimization skills
+2. **KEEP** nix-patterns (with scope note) and nix-configuration-centralization
+3. **SYMLINK** settings.json via nix-darwin (not copy)
+4. **ABSORB** secrets-audit.ts into paragon-guard.ts, then delete
+5. **PURGE** all process-compose references (~20 files)
+6. **ONE hook per event** (no multiple SessionStart entries)', 'claude', 1, 1.0000, '2025-12-21 02:30:28');
+INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (62, '2025-12-21', 'optimization', '**Nix Scope Enforcement:**', '**Nix Scope Enforcement:**
+- Deleted `nix-infrastructure` and `nix-build-optimization` skills
+- Updated `nix-patterns/SKILL.md` with scope restriction (dotfiles only)
+- Updated `AGENTS.md` with new Nix skills section', 'claude', 1, 1.0000, '2025-12-21 02:30:28');
+INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (63, '2025-12-21', 'optimization', '**Verification Results:**', '**Verification Results:**
+```
+✓ nix-infrastructure deleted
+✓ nix-build-optimization deleted
+✓ Symlink exists
+✓ No claude-code.json
+✓ secrets-audit.ts deleted
+✓ paragon-guard has secrets
+```', 'claude', 1, 1.0000, '2025-12-21 02:30:28');
 INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (2, '2025-12-12', 'optimization', 'Nix build cache miss problem: Derivation hash includes source code. Split dependencies into separate derivation based on lockfile only.', 'After split, warm builds complete in <60 seconds vs 25+ minutes', 'manual', 2, 0.8876, '2025-12-12');
 INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (3, '2025-12-12', 'pattern', 'Three cache layers for Nix: Cachix (remote), magic-nix-cache (GHA local), Bun cache (useless in sandbox).', 'CI runs dropped from 30+ minutes to 5-10 minutes with proper layer configuration', 'manual', 1, 0.5259, '2025-12-12');
 INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (4, '2025-12-12', 'gotcha', 'Nix sandbox isolation: Package manager caches (~/.bun, ~/.npm) NOT accessible during builds. Use derivation splitting instead.', 'Bun inside Nix derivation cannot see ~/.bun cache', 'manual', 1, 0.5259, '2025-12-12');
