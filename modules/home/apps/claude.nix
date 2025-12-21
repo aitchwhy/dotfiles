@@ -64,15 +64,6 @@ let
       package = "repomix";
       args = [ "--mcp" ];
     };
-    signet = {
-      # Local MCP server for Signet code quality
-      command = "bun";
-      args = [
-        "run"
-        "${config.home.homeDirectory}/dotfiles/config/quality/src/mcp-server.ts"
-      ];
-      isLocal = true; # Not an npx package
-    };
     github = {
       # GitHub API: repos, issues, PRs, code search
       # Token sourced from sops-nix secret file
@@ -216,8 +207,19 @@ in
     };
 
     # Settings SSOT - symlink prevents drift
+    # Points to generated settings from Quality System
     home.file.".claude/settings.json" = {
-      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/agents/settings.json";
+      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/quality/generated/settings.json";
+    };
+
+    # Skills symlink - generated from TypeScript definitions
+    home.file.".claude/skills" = {
+      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/quality/generated/skills";
+    };
+
+    # Personas symlink - generated from TypeScript definitions
+    home.file.".claude/agents" = {
+      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/quality/generated/personas";
     };
 
     # Generate mcp-servers.json for Claude Code CLI (used by agents.nix)
@@ -225,5 +227,27 @@ in
     xdg.configFile."claude/mcp-servers.json" = {
       text = cliConfigJson;
     };
+
+    # Generate Quality System artifacts (skills, personas, rules, settings)
+    # Runs after writeBoundary to ensure all files are in place
+    home.activation.generateQuality = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      QUALITY_DIR="${config.home.homeDirectory}/dotfiles/config/quality"
+      if [ -f "$QUALITY_DIR/package.json" ]; then
+        echo "Generating Quality System artifacts..."
+        cd "$QUALITY_DIR"
+        ${
+          if builtins.pathExists /etc/profiles/per-user/hank/bin/bun then
+            "/etc/profiles/per-user/hank/bin/bun"
+          else
+            "bun"
+        } install --frozen-lockfile 2>/dev/null || true
+        ${
+          if builtins.pathExists /etc/profiles/per-user/hank/bin/bun then
+            "/etc/profiles/per-user/hank/bin/bun"
+          else
+            "bun"
+        } run generate 2>/dev/null || echo "Quality generation skipped (run manually: cd $QUALITY_DIR && bun run generate)"
+      fi
+    '';
   };
 }
