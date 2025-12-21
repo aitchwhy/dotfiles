@@ -206,26 +206,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo \"[$(date '+%Y-%m-%d %H:%M:%S')] Session ended | Dir: $(basename \"$PWD\") | Files: $(git diff --name-only HEAD~5 2>/dev/null | wc -l | tr -d ' ') modified | Commits: $(git log --oneline --since='1 hour ago' 2>/dev/null | wc -l | tr -d ' ')\" >> ~/.claude/session.log",
-            "timeout": 10
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
             "command": "bash \"$HOME/dotfiles/config/agents/hooks/session-stop.sh\"",
-            "timeout": 30
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun \"$HOME/dotfiles/config/agents/hooks/verification-gate.ts\"",
-            "timeout": 15
+            "timeout": 45
           }
         ]
       }
