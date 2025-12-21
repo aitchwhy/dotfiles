@@ -30,7 +30,7 @@ The domain is the center. All I/O happens through ports (interfaces) implemented
 
 | Need | Solution |
 |------|----------|
-| Test database | PostgreSQL via process-compose or GitHub Actions services |
+| Test database | PostgreSQL via Docker Compose or GitHub Actions services |
 | Test blob storage | MinIO (S3-compatible) via service container |
 | Test external API | Real sandbox/staging endpoint OR contract test |
 | Test message queue | Real Redis/NATS via service container |
@@ -212,37 +212,36 @@ export function createStorageAdapter(env?: StorageEnvironment): StoragePort {
 
 ## Service Container Setup
 
-### Local Development (process-compose.yml)
+### Local Development (docker-compose.yml)
 
 ```yaml
-version: "0.5"
-processes:
+services:
   postgres:
-    command: |
-      docker run --rm --name app-postgres \
-        -e POSTGRES_DB=app_dev \
-        -e POSTGRES_USER=app \
-        -e POSTGRES_PASSWORD=app_dev \
-        -p 5432:5432 \
-        postgres:16-alpine
-    readiness_probe:
-      exec:
-        command: pg_isready -h localhost -p 5432
-      initial_delay_seconds: 2
-      period_seconds: 1
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: app_dev
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app_dev
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "localhost", "-p", "5432"]
+      interval: 1s
+      start_period: 2s
 
   minio:
-    command: |
-      docker run --rm --name app-minio \
-        -e MINIO_ROOT_USER=minioadmin \
-        -e MINIO_ROOT_PASSWORD=minioadmin \
-        -p 9000:9000 -p 9001:9001 \
-        minio/minio server /data --console-address ":9001"
-    readiness_probe:
-      http_get:
-        host: localhost
-        port: 9000
-        path: /minio/health/live
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 1s
+      start_period: 2s
 ```
 
 ### CI/CD (GitHub Actions)
@@ -387,10 +386,10 @@ Before committing adapter code, verify:
 
 ```bash
 # Start service containers
-process-compose up -d
+docker compose up -d
 
 # Run integration tests
-bun test --grep "Integration"
+vitest run --grep "Integration"
 
 # Check no mock patterns exist
 rg "Mock[A-Z].*Live|jest\.mock|vi\.mock" src/
