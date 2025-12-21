@@ -32,16 +32,17 @@ Read `paragon` skill for full guard matrix.
 
 ## Available Skills
 
-### Nix Build Skills (Critical for TypeScript/Nix projects)
+### Nix Skills (Dotfiles ONLY)
 
 | Skill | Purpose |
 |-------|---------|
-| `nix-build-optimization` | **Critical** - Derivation splitting, Cachix, CI/CD |
-| `nix-patterns` | flake-parts, nix-darwin, Home Manager |
-| `nix-infrastructure` | Port registry, nix2container, deployment |
+| `nix-patterns` | nix-darwin, Home Manager (DOTFILES ONLY) |
+| `nix-configuration-centralization` | Port registry for dotfiles |
 | `secrets-management` | sops-nix patterns |
 
-**Rule**: Before ANY Nix changes to TypeScript projects, read `nix-build-optimization`.
+**DELETED**: `nix-infrastructure`, `nix-build-optimization` (use `devops-patterns` for Docker)
+
+**Scope**: Nix is ONLY for dotfiles management. Development uses Docker Compose.
 
 ### Core Pattern Skills
 typescript-patterns, effect-ts-patterns, quality-patterns,
@@ -50,8 +51,8 @@ hexagonal-architecture, formal-verification, tdd-patterns, parse-boundary-patter
 ### Effect-TS Skills
 effect-resilience, api-contract
 
-### Nix Skills
-nix-patterns, nix-build-optimization, nix-infrastructure, secrets-management
+### Nix Skills (Dotfiles Only)
+nix-patterns, nix-configuration-centralization, secrets-management
 
 ### Framework Skills
 state-machine-patterns, observability-patterns
