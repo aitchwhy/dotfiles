@@ -160,6 +160,39 @@
     ]
   },
 
+  "agents": [
+    {
+      "name": "effect-architect",
+      "description": "System design, Layer composition, Effect patterns",
+      "model": "opus"
+    },
+    {
+      "name": "type-guardian",
+      "description": "Branded types, Effect Schema, type-first development",
+      "model": "sonnet"
+    },
+    {
+      "name": "reliability-engineer",
+      "description": "Retry, timeout, circuit breaker patterns with Effect",
+      "model": "sonnet"
+    },
+    {
+      "name": "test-architect",
+      "description": "TDD patterns with Effect Layer substitution",
+      "model": "sonnet"
+    },
+    {
+      "name": "debugger",
+      "description": "Effect stack traces, Fiber debugging, error analysis",
+      "model": "opus"
+    },
+    {
+      "name": "security-auditor",
+      "description": "Authentication, authorization, input validation, secrets",
+      "model": "opus"
+    }
+  ],
+
   "enabledPlugins": {
     "code-review@claude-code-plugins": true,
     "commit-commands@claude-code-plugins": true,
