@@ -109,6 +109,7 @@ export const EXCLUDED_PATTERNS: readonly RegExp[] = [
 	/\/node_modules\//,
 	/\.stories\.[jt]sx?$/,
 	/\/mocks?\//,
+	/\/hooks\//, // Hook scripts are entry points that need env access
 ];
 
 export const isExcludedPath = (filePath: string): boolean =>
