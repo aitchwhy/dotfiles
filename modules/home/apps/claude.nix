@@ -231,14 +231,14 @@ in
     # Generate Quality System artifacts (skills, personas, rules, settings)
     # Runs after writeBoundary to ensure all files are in place
     # Errors are NOT swallowed - generation must succeed
+    #
+    # NOTE: We use absolute path to bun because:
+    # 1. PATH is not available during home-manager activation
+    # 2. builtins.pathExists evaluates at Nix build time, not runtime
+    # 3. This path is stable - it's where nix-darwin installs user packages
     home.activation.generateQuality = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       QUALITY_DIR="${config.home.homeDirectory}/dotfiles/config/quality"
-      BUN="${
-        if builtins.pathExists /etc/profiles/per-user/hank/bin/bun then
-          "/etc/profiles/per-user/hank/bin/bun"
-        else
-          "bun"
-      }"
+      BUN="/etc/profiles/per-user/${config.home.username}/bin/bun"
 
       if [ -f "$QUALITY_DIR/package.json" ]; then
         echo "Generating Quality System artifacts..."

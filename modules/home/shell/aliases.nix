@@ -95,10 +95,6 @@ in
       hf = "huggingface-cli";
       at = "atuin";
 
-      # Signet CLI (Code Quality & Generation Platform)
-      s = "signet";
-      sig = "signet";
-
       # Claude Code
       cc = "claude";
       ccd = "claude --dangerously-skip-permissions";

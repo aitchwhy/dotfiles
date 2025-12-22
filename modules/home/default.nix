@@ -47,7 +47,6 @@ in
     ./apps/betterdisplay.nix
     ./apps/default-apps.nix
     ./apps/paste.nix
-    ./apps/signet.nix
 
     # Third-party apps (targets.darwin.defaults)
     ./apps/fantastical.nix
@@ -109,7 +108,6 @@ in
         betterdisplay.enable = mkDefault true;
         defaultApps.enable = mkDefault true;
         paste.enable = mkDefault true;
-        signet.enable = mkDefault true;
 
         # Third-party apps
         fantastical.enable = mkDefault true;
