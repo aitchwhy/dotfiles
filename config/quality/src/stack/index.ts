@@ -25,7 +25,7 @@ export type {
 	TestingVersions,
 } from "./schema";
 
-export { stackDefinitionSchema } from "./schema";
+export { StackDefinitionSchema } from "./schema";
 
 // Versions - SSOT
 export {

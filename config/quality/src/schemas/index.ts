@@ -1,133 +1,176 @@
 /**
- * Quality System Schema Definitions
+ * Quality System Schemas
  *
- * TypeScript types are SSOT - Schema satisfies type (never infer from Schema)
+ * Type definitions for skills, personas, and rules.
  */
 
-import { Brand, Schema } from "effect";
+// ═══════════════════════════════════════════════════════════════════════════
+// Skills
+// ═══════════════════════════════════════════════════════════════════════════
 
-// =============================================================================
-// Branded Types (compile-time safety)
-// =============================================================================
+export interface SkillSection {
+	readonly heading: string;
+	readonly content: string;
+}
 
-export type SkillName = string & Brand.Brand<"SkillName">;
-export const SkillName = Brand.nominal<SkillName>();
-
-export type PersonaName = string & Brand.Brand<"PersonaName">;
-export const PersonaName = Brand.nominal<PersonaName>();
-
-export type RuleId = string & Brand.Brand<"RuleId">;
-export const RuleId = Brand.nominal<RuleId>();
-
-// =============================================================================
-// Skill Schema
-// =============================================================================
-
-export type SkillFrontmatter = {
-	readonly name: SkillName;
+export interface SkillFrontmatter {
+	readonly name: string;
 	readonly description: string;
 	readonly allowedTools?: readonly string[];
 	readonly tokenBudget?: number;
-};
+}
 
-export const SkillFrontmatter = Schema.Struct({
-	name: Schema.String.pipe(
-		Schema.pattern(/^[a-z][a-z0-9-]*$/),
-		Schema.maxLength(64),
-		Schema.brand("SkillName"),
-	),
-	description: Schema.String.pipe(Schema.maxLength(1024)),
-	allowedTools: Schema.optional(Schema.Array(Schema.String)),
-	tokenBudget: Schema.optional(Schema.Number.pipe(Schema.between(100, 5000))),
-}) satisfies Schema.Schema<SkillFrontmatter, unknown>;
-
-export type SkillSection = {
-	readonly heading: string;
-	readonly content: string;
-};
-
-export const SkillSection = Schema.Struct({
-	heading: Schema.String,
-	content: Schema.String,
-}) satisfies Schema.Schema<SkillSection, unknown>;
-
-export type SkillDefinition = {
+export interface SkillDefinition {
 	readonly frontmatter: SkillFrontmatter;
 	readonly sections: readonly SkillSection[];
-};
+}
 
-export const SkillDefinition = Schema.Struct({
-	frontmatter: SkillFrontmatter,
-	sections: Schema.Array(SkillSection),
-}) satisfies Schema.Schema<SkillDefinition, unknown>;
+/** Branded type for skill names */
+export type SkillName = string & { readonly _brand: "SkillName" };
+export const SkillName = (name: string): SkillName => name as SkillName;
 
-// =============================================================================
-// Persona Schema
-// =============================================================================
+// ═══════════════════════════════════════════════════════════════════════════
+// Personas
+// ═══════════════════════════════════════════════════════════════════════════
 
-export type ModelChoice = "inherit" | "opus" | "sonnet" | "haiku";
+/** Available model choices */
+export type ModelChoice = "sonnet" | "opus" | "haiku";
 
-export type PersonaDefinition = {
-	readonly name: PersonaName;
+export interface PersonaDefinition {
+	readonly name: string;
 	readonly description: string;
-	readonly model: ModelChoice;
+	readonly model?: ModelChoice;
 	readonly color?: string;
 	readonly systemPrompt: string;
-};
+}
 
-export const PersonaDefinition = Schema.Struct({
-	name: Schema.String.pipe(
-		Schema.pattern(/^[a-z][a-z0-9-]*$/),
-		Schema.brand("PersonaName"),
-	),
-	description: Schema.String.pipe(Schema.maxLength(1024)),
-	model: Schema.Literal("inherit", "opus", "sonnet", "haiku"),
-	color: Schema.optional(Schema.String),
-	systemPrompt: Schema.String,
-}) satisfies Schema.Schema<PersonaDefinition, unknown>;
+/** Branded type for persona names */
+export type PersonaName = string & { readonly _brand: "PersonaName" };
+export const PersonaName = (name: string): PersonaName => name as PersonaName;
 
-// =============================================================================
-// Quality Rule Schema
-// =============================================================================
+// ═══════════════════════════════════════════════════════════════════════════
+// Rules
+// ═══════════════════════════════════════════════════════════════════════════
 
-export type RuleSeverity = "error" | "warning";
+/** Rule severity levels */
+export type RuleSeverity = "error" | "warning" | "info";
+
+/** Rule categories */
 export type RuleCategory =
 	| "type-safety"
+	| "effect-ts"
 	| "effect"
 	| "architecture"
-	| "observability";
+	| "observability"
+	| "security"
+	| "testing";
 
-export type QualityRule = {
-	readonly id: RuleId;
+export interface QualityRule {
+	readonly id: string;
 	readonly name: string;
 	readonly category: RuleCategory;
 	readonly severity: RuleSeverity;
 	readonly message: string;
 	readonly patterns: readonly string[];
-	readonly fix: string;
+	readonly antiPattern?: string;
+	readonly fix?: string;
 	readonly note?: string;
-};
+	readonly enabled?: boolean;
+}
 
-export const QualityRule = Schema.Struct({
-	id: Schema.String.pipe(Schema.brand("RuleId")),
-	name: Schema.String,
-	category: Schema.Literal(
-		"type-safety",
-		"effect",
-		"architecture",
-		"observability",
-	),
-	severity: Schema.Literal("error", "warning"),
-	message: Schema.String,
-	patterns: Schema.Array(Schema.String),
-	fix: Schema.String,
-	note: Schema.optional(Schema.String),
-}) satisfies Schema.Schema<QualityRule, unknown>;
+/** Branded type for rule IDs */
+export type RuleId = string & { readonly _brand: "RuleId" };
+export const RuleId = (id: string): RuleId => id as RuleId;
 
-// =============================================================================
-// Decoders
-// =============================================================================
+// ═══════════════════════════════════════════════════════════════════════════
+// Decoders (Simple validation functions)
+// ═══════════════════════════════════════════════════════════════════════════
 
-export const decodeSkill = Schema.decodeUnknownSync(SkillDefinition);
-export const decodePersona = Schema.decodeUnknownSync(PersonaDefinition);
-export const decodeRule = Schema.decodeUnknownSync(QualityRule);
+/**
+ * Decode and validate a skill definition
+ */
+export function decodeSkill(input: unknown): SkillDefinition {
+	if (!isObject(input)) {
+		throw new Error("Skill must be an object");
+	}
+	const obj = input as Record<string, unknown>;
+
+	if (!isObject(obj["frontmatter"])) {
+		throw new Error("Skill must have frontmatter");
+	}
+	const fm = obj["frontmatter"] as Record<string, unknown>;
+
+	if (typeof fm["name"] !== "string") {
+		throw new Error("Skill frontmatter must have name");
+	}
+	if (typeof fm["description"] !== "string") {
+		throw new Error("Skill frontmatter must have description");
+	}
+
+	if (!Array.isArray(obj["sections"])) {
+		throw new Error("Skill must have sections array");
+	}
+
+	return obj as unknown as SkillDefinition;
+}
+
+/**
+ * Decode and validate a persona definition
+ */
+export function decodePersona(input: unknown): PersonaDefinition {
+	if (!isObject(input)) {
+		throw new Error("Persona must be an object");
+	}
+	const obj = input as Record<string, unknown>;
+
+	if (typeof obj["name"] !== "string") {
+		throw new Error("Persona must have name");
+	}
+	if (typeof obj["description"] !== "string") {
+		throw new Error("Persona must have description");
+	}
+	if (typeof obj["systemPrompt"] !== "string") {
+		throw new Error("Persona must have systemPrompt");
+	}
+
+	return obj as unknown as PersonaDefinition;
+}
+
+/**
+ * Decode and validate a quality rule
+ */
+export function decodeRule(input: unknown): QualityRule {
+	if (!isObject(input)) {
+		throw new Error("Rule must be an object");
+	}
+	const obj = input as Record<string, unknown>;
+
+	if (typeof obj["id"] !== "string") {
+		throw new Error("Rule must have id");
+	}
+	if (typeof obj["name"] !== "string") {
+		throw new Error("Rule must have name");
+	}
+	if (typeof obj["category"] !== "string") {
+		throw new Error("Rule must have category");
+	}
+	if (typeof obj["severity"] !== "string") {
+		throw new Error("Rule must have severity");
+	}
+	if (typeof obj["message"] !== "string") {
+		throw new Error("Rule must have message");
+	}
+	if (!Array.isArray(obj["patterns"])) {
+		throw new Error("Rule must have patterns array");
+	}
+
+	return obj as unknown as QualityRule;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Helpers
+// ═══════════════════════════════════════════════════════════════════════════
+
+function isObject(value: unknown): value is Record<string, unknown> {
+	return typeof value === "object" && value !== null && !Array.isArray(value);
+}

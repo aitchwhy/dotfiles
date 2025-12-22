@@ -1,5 +1,5 @@
 /**
- * Signet Stack - Frozen Version Registry
+ * Quality System Stack - Frozen Version Registry
  *
  * SSOT (Single Source of Truth) for all version numbers.
  * Frozen: December 2025
@@ -7,13 +7,12 @@
  * This file replaces lib/versions.nix.
  *
  * Consumed by:
- *   - Signet generators (package.json generation)
- *   - Pulumi components (version-aware provisioning)
+ *   - Quality System generators (package.json generation)
  *   - Enforcement hooks (version drift detection)
- *   - Policy as Code (deploy-time validation)
  */
 import type { StackDefinition } from './schema';
-import { stackDefinitionSchema } from './schema';
+import { Schema } from "effect";
+import { StackDefinitionSchema } from "./schema";
 
 /**
  * STACK - Frozen December 2025 Configuration
@@ -272,7 +271,7 @@ export const STACK = {
  * Throws if STACK doesn't match schema
  */
 export function validateStack(): void {
-  stackDefinitionSchema.parse(STACK);
+	Schema.decodeUnknownSync(StackDefinitionSchema)(STACK);
 }
 
 /**
