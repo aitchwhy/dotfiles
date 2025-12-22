@@ -1,176 +1,132 @@
 /**
- * Quality System Schemas
+ * Quality System Schemas - Effect Schema SSOT
  *
- * Type definitions for skills, personas, and rules.
+ * These are the SOURCE OF TRUTH. The official JSON Schema at
+ * schemastore.org is used for CI drift detection only.
+ *
+ * Decoders never throw:
+ * - decodeXxx returns Effect (use in Effect.gen)
+ * - decodeXxxEither returns Either (use in sync contexts)
  */
+import { Schema } from "effect";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Skills
 // ═══════════════════════════════════════════════════════════════════════════
 
-export interface SkillSection {
-	readonly heading: string;
-	readonly content: string;
-}
+export const SkillFrontmatterSchema = Schema.Struct({
+	name: Schema.String.pipe(Schema.minLength(1)),
+	description: Schema.String,
+	allowedTools: Schema.optional(Schema.Array(Schema.String)),
+	tokenBudget: Schema.optional(Schema.Number.pipe(Schema.positive())),
+});
 
-export interface SkillFrontmatter {
-	readonly name: string;
-	readonly description: string;
-	readonly allowedTools?: readonly string[];
-	readonly tokenBudget?: number;
-}
+export const SkillSectionSchema = Schema.Struct({
+	heading: Schema.String,
+	content: Schema.String,
+});
 
-export interface SkillDefinition {
-	readonly frontmatter: SkillFrontmatter;
-	readonly sections: readonly SkillSection[];
-}
+export const SkillDefinitionSchema = Schema.Struct({
+	frontmatter: SkillFrontmatterSchema,
+	sections: Schema.Array(SkillSectionSchema),
+});
 
-/** Branded type for skill names */
-export type SkillName = string & { readonly _brand: "SkillName" };
-export const SkillName = (name: string): SkillName => name as SkillName;
+// Types derived FROM schema (Effect Schema as SSOT)
+export type SkillFrontmatter = typeof SkillFrontmatterSchema.Type;
+export type SkillSection = typeof SkillSectionSchema.Type;
+export type SkillDefinition = typeof SkillDefinitionSchema.Type;
+
+// Branded type with Schema.brand (not manual cast)
+export const SkillNameSchema = Schema.String.pipe(
+	Schema.minLength(1),
+	Schema.brand("SkillName"),
+);
+export type SkillName = typeof SkillNameSchema.Type;
+
+// Constructor function for backward compatibility
+export const SkillName = Schema.decodeSync(SkillNameSchema);
+
+// Decoders (Effect-native, never throw)
+export const decodeSkill = Schema.decodeUnknown(SkillDefinitionSchema);
+
+// For sync contexts that can't use Effect runtime — returns Either, NEVER throws
+export const decodeSkillEither = Schema.decodeUnknownEither(SkillDefinitionSchema);
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Personas
 // ═══════════════════════════════════════════════════════════════════════════
 
-/** Available model choices */
-export type ModelChoice = "sonnet" | "opus" | "haiku";
+export const ModelChoiceSchema = Schema.Literal("sonnet", "opus", "haiku");
+export type ModelChoice = typeof ModelChoiceSchema.Type;
 
-export interface PersonaDefinition {
-	readonly name: string;
-	readonly description: string;
-	readonly model?: ModelChoice;
-	readonly color?: string;
-	readonly systemPrompt: string;
-}
+export const PersonaDefinitionSchema = Schema.Struct({
+	name: Schema.String.pipe(Schema.minLength(1)),
+	description: Schema.String,
+	model: Schema.optional(ModelChoiceSchema),
+	color: Schema.optional(Schema.String),
+	systemPrompt: Schema.String,
+});
 
-/** Branded type for persona names */
-export type PersonaName = string & { readonly _brand: "PersonaName" };
-export const PersonaName = (name: string): PersonaName => name as PersonaName;
+export type PersonaDefinition = typeof PersonaDefinitionSchema.Type;
+
+// Branded type with Schema.brand (not manual cast)
+export const PersonaNameSchema = Schema.String.pipe(
+	Schema.minLength(1),
+	Schema.brand("PersonaName"),
+);
+export type PersonaName = typeof PersonaNameSchema.Type;
+
+// Constructor function for backward compatibility
+export const PersonaName = Schema.decodeSync(PersonaNameSchema);
+
+// Decoders (Effect-native, never throw)
+export const decodePersona = Schema.decodeUnknown(PersonaDefinitionSchema);
+export const decodePersonaEither =
+	Schema.decodeUnknownEither(PersonaDefinitionSchema);
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Rules
 // ═══════════════════════════════════════════════════════════════════════════
 
-/** Rule severity levels */
-export type RuleSeverity = "error" | "warning" | "info";
+export const RuleSeveritySchema = Schema.Literal("error", "warning", "info");
+export type RuleSeverity = typeof RuleSeveritySchema.Type;
 
-/** Rule categories */
-export type RuleCategory =
-	| "type-safety"
-	| "effect-ts"
-	| "effect"
-	| "architecture"
-	| "observability"
-	| "security"
-	| "testing";
+export const RuleCategorySchema = Schema.Literal(
+	"type-safety",
+	"effect-ts",
+	"effect",
+	"architecture",
+	"observability",
+	"security",
+	"testing",
+);
+export type RuleCategory = typeof RuleCategorySchema.Type;
 
-export interface QualityRule {
-	readonly id: string;
-	readonly name: string;
-	readonly category: RuleCategory;
-	readonly severity: RuleSeverity;
-	readonly message: string;
-	readonly patterns: readonly string[];
-	readonly antiPattern?: string;
-	readonly fix?: string;
-	readonly note?: string;
-	readonly enabled?: boolean;
-}
+export const QualityRuleSchema = Schema.Struct({
+	id: Schema.String.pipe(Schema.minLength(1)),
+	name: Schema.String,
+	category: RuleCategorySchema,
+	severity: RuleSeveritySchema,
+	message: Schema.String,
+	patterns: Schema.Array(Schema.String).pipe(Schema.minItems(1)),
+	antiPattern: Schema.optional(Schema.String),
+	fix: Schema.optional(Schema.String),
+	note: Schema.optional(Schema.String),
+	enabled: Schema.optional(Schema.Boolean),
+});
 
-/** Branded type for rule IDs */
-export type RuleId = string & { readonly _brand: "RuleId" };
-export const RuleId = (id: string): RuleId => id as RuleId;
+export type QualityRule = typeof QualityRuleSchema.Type;
 
-// ═══════════════════════════════════════════════════════════════════════════
-// Decoders (Simple validation functions)
-// ═══════════════════════════════════════════════════════════════════════════
+// Branded type with Schema.brand (not manual cast)
+export const RuleIdSchema = Schema.String.pipe(
+	Schema.minLength(1),
+	Schema.brand("RuleId"),
+);
+export type RuleId = typeof RuleIdSchema.Type;
 
-/**
- * Decode and validate a skill definition
- */
-export function decodeSkill(input: unknown): SkillDefinition {
-	if (!isObject(input)) {
-		throw new Error("Skill must be an object");
-	}
-	const obj = input as Record<string, unknown>;
+// Constructor function for backward compatibility
+export const RuleId = Schema.decodeSync(RuleIdSchema);
 
-	if (!isObject(obj["frontmatter"])) {
-		throw new Error("Skill must have frontmatter");
-	}
-	const fm = obj["frontmatter"] as Record<string, unknown>;
-
-	if (typeof fm["name"] !== "string") {
-		throw new Error("Skill frontmatter must have name");
-	}
-	if (typeof fm["description"] !== "string") {
-		throw new Error("Skill frontmatter must have description");
-	}
-
-	if (!Array.isArray(obj["sections"])) {
-		throw new Error("Skill must have sections array");
-	}
-
-	return obj as unknown as SkillDefinition;
-}
-
-/**
- * Decode and validate a persona definition
- */
-export function decodePersona(input: unknown): PersonaDefinition {
-	if (!isObject(input)) {
-		throw new Error("Persona must be an object");
-	}
-	const obj = input as Record<string, unknown>;
-
-	if (typeof obj["name"] !== "string") {
-		throw new Error("Persona must have name");
-	}
-	if (typeof obj["description"] !== "string") {
-		throw new Error("Persona must have description");
-	}
-	if (typeof obj["systemPrompt"] !== "string") {
-		throw new Error("Persona must have systemPrompt");
-	}
-
-	return obj as unknown as PersonaDefinition;
-}
-
-/**
- * Decode and validate a quality rule
- */
-export function decodeRule(input: unknown): QualityRule {
-	if (!isObject(input)) {
-		throw new Error("Rule must be an object");
-	}
-	const obj = input as Record<string, unknown>;
-
-	if (typeof obj["id"] !== "string") {
-		throw new Error("Rule must have id");
-	}
-	if (typeof obj["name"] !== "string") {
-		throw new Error("Rule must have name");
-	}
-	if (typeof obj["category"] !== "string") {
-		throw new Error("Rule must have category");
-	}
-	if (typeof obj["severity"] !== "string") {
-		throw new Error("Rule must have severity");
-	}
-	if (typeof obj["message"] !== "string") {
-		throw new Error("Rule must have message");
-	}
-	if (!Array.isArray(obj["patterns"])) {
-		throw new Error("Rule must have patterns array");
-	}
-
-	return obj as unknown as QualityRule;
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// Helpers
-// ═══════════════════════════════════════════════════════════════════════════
-
-function isObject(value: unknown): value is Record<string, unknown> {
-	return typeof value === "object" && value !== null && !Array.isArray(value);
-}
+// Decoders (Effect-native, never throw)
+export const decodeRule = Schema.decodeUnknown(QualityRuleSchema);
+export const decodeRuleEither = Schema.decodeUnknownEither(QualityRuleSchema);

@@ -19,7 +19,14 @@ export type {
 	QualityRule,
 } from "./schemas";
 
-export { decodeSkill, decodePersona, decodeRule } from "./schemas";
+export {
+	decodeSkill,
+	decodeSkillEither,
+	decodePersona,
+	decodePersonaEither,
+	decodeRule,
+	decodeRuleEither,
+} from "./schemas";
 
 // Rules
 export { ALL_RULES, TYPE_SAFETY_RULES, EFFECT_RULES } from "./rules";
