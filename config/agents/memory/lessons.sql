@@ -1,6 +1,6 @@
 -- Active Lessons Dump
--- Generated: 2025-12-21T22:48:12.188Z
--- Count: 24
+-- Generated: 2025-12-22T03:00:16.882Z
+-- Count: 27
 
 BEGIN TRANSACTION;
 
@@ -100,6 +100,16 @@ INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_co
 ✓ secrets-audit.ts deleted
 ✓ paragon-guard has secrets
 ```', 'claude', 2, 1.0000, '2025-12-21 02:30:28');
+INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (69, '2025-12-22', 'optimization', 'Now let me fix the skills files. First the MCP optimization skill:', 'Now let me fix the skills files. First the MCP optimization skill:', 'claude', 1, 1.0000, '2025-12-22 03:00:16');
+INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (70, '2025-12-22', 'gotcha', '**Nix Sandbox Gotcha**: The quality-typecheck fix highlights that Nix builds run in a read-only sandbox. Any tool that needs to write (like `bun install`) must copy sources to `$TMPDIR` first.', '**Nix Sandbox Gotcha**: The quality-typecheck fix highlights that Nix builds run in a read-only sandbox. Any tool that needs to write (like `bun install`) must copy sources to `$TMPDIR` first.
+`─────────────────────────────────────────────────`', 'claude', 1, 1.0000, '2025-12-22 03:00:16');
+INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (71, '2025-12-22', 'optimization', '**Files updated** (Signet → Quality System):', '**Files updated** (Signet → Quality System):
+- `config/quality/src/stack/versions.ts`
+- `config/quality/src/hooks/enforce-versions.ts`
+- `config/agents/skills/{mcp-optimization,nix-configuration-centralization,semantic-codebase}/SKILL.md`
+- `config/agents/hooks/{lib/types.ts,enforce-versions.ts}`
+- `config/agents/{README.md,evolution/grade.sh}`
+- `justfile`, `.github/workflows/validate.yml`', 'claude', 1, 1.0000, '2025-12-22 03:00:16');
 INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (68, '2025-12-21', 'optimization', '**dotfiles (10 commits):**', '**dotfiles (10 commits):**
 ```
 5e21b3d docs(agents): update nix skills section for dotfiles-only scope
@@ -108,8 +118,8 @@ b4de066 docs(skills): update devops-patterns with node 24 and esc hierarchy
 e1477d2 chore(cleanup): purge process-compose references
 023d36a chore(cleanup): delete redundant secrets-audit.ts and claude-code.json
 b4717a9 feat(paragon): absorb secrets detection into guard 32
-8158893 chore(settings): consolidate hooks with p', 'claude', 1, 0.9562, '2025-12-21 02:33:07');
-INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (2, '2025-12-12', 'optimization', 'Nix build cache miss problem: Derivation hash includes source code. Split dependencies into separate derivation based on lockfile only.', 'After split, warm builds complete in <60 seconds vs 25+ minutes', 'manual', 2, 0.8415, '2025-12-12');
+8158893 chore(settings): consolidate hooks with p', 'claude', 1, 0.9437, '2025-12-21 02:33:07');
+INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (2, '2025-12-12', 'optimization', 'Nix build cache miss problem: Derivation hash includes source code. Split dependencies into separate derivation based on lockfile only.', 'After split, warm builds complete in <60 seconds vs 25+ minutes', 'manual', 2, 0.8215, '2025-12-12');
 INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (3, '2025-12-12', 'pattern', 'Three cache layers for Nix: Cachix (remote), magic-nix-cache (GHA local), Bun cache (useless in sandbox).', 'CI runs dropped from 30+ minutes to 5-10 minutes with proper layer configuration', 'manual', 1, 0.4928, '2025-12-12');
 INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (4, '2025-12-12', 'gotcha', 'Nix sandbox isolation: Package manager caches (~/.bun, ~/.npm) NOT accessible during builds. Use derivation splitting instead.', 'Bun inside Nix derivation cannot see ~/.bun cache', 'manual', 1, 0.4928, '2025-12-12');
 INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (5, '2025-12-12', 'pattern', 'Derivation splitting anti-patterns: bun install in app derivation, using nixos-unstable, missing magic-nix-cache, post-build Cachix push.', 'nix build .#api -v 2>&1 | grep -E "building|cached" shows cached for nodeModules', 'manual', 1, 0.4928, '2025-12-12');
