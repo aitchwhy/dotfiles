@@ -28,6 +28,9 @@ state.yml
 # API specs (fetch dynamically)
 lib/clients/api/specs/
 
+# Evolution system generated output
+config/agents/memory/reflections/
+
 # Claude Code local settings (user-specific, not config)
 .claude/settings.local.json
 
