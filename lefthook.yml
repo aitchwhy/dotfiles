@@ -9,6 +9,46 @@ pre-commit:
       glob: "*.nix"
       run: nixfmt --check {staged_files}
 
+    # Enforcement: No shell scripts in hooks directory
+    no-shell-hooks:
+      glob: "config/quality/src/hooks/*.sh"
+      run: |
+        if [ -n "{staged_files}" ]; then
+          echo "ERROR: Shell scripts in hooks directory are banned"
+          echo "Convert to TypeScript: {staged_files}"
+          exit 1
+        fi
+
+    # Enforcement: No error swallowing in Nix files
+    no-error-swallowing:
+      glob: "*.nix"
+      run: |
+        if grep -E '\|\| true|2>/dev/null' {staged_files}; then
+          echo "ERROR: Error swallowing patterns detected"
+          echo "Replace '|| true' and '2>/dev/null' with proper error handling"
+          exit 1
+        fi
+
+    # Enforcement: No README.md in config directory
+    no-readmes:
+      glob: "config/**/*.md"
+      run: |
+        if echo "{staged_files}" | grep -q "README.md"; then
+          echo "ERROR: README.md files in config/ are banned"
+          echo "Code should be self-documenting"
+          exit 1
+        fi
+
+    # Enforcement: No hardcoded version ranges in package.json
+    no-version-ranges:
+      glob: "**/package.json"
+      run: |
+        if grep -E '"[~^]' {staged_files}; then
+          echo "ERROR: Semver ranges (^ or ~) are banned"
+          echo "Use exact versions from STACK.npm"
+          exit 1
+        fi
+
 commit-msg:
   commands:
     commitlint:
