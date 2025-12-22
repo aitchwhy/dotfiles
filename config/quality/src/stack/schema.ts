@@ -196,6 +196,7 @@ export type NpmVersions = {
   readonly '@effect/cli': string;
   readonly '@effect/platform': string;
   readonly '@effect/platform-node': string;
+  readonly '@effect/platform-bun': string;
   readonly '@effect/printer': string;
   readonly '@effect/printer-ansi': string;
   readonly zod: string;
@@ -263,6 +264,16 @@ export type NpmVersions = {
 
   // Effect ecosystem - OpenTelemetry integration
   readonly '@effect/opentelemetry': string;
+
+  // Effect SQL (evolution system)
+  readonly '@effect/sql': string;
+  readonly '@effect/sql-sqlite-bun': string;
+
+  // Effect testing
+  readonly '@effect/vitest': string;
+
+  // Utilities
+  readonly tinyglobby: string;
 
   // Voice AI
   readonly hume: string;
@@ -419,6 +430,7 @@ export const npmVersionsSchema = z.object({
   '@effect/cli': versionString,
   '@effect/platform': versionString,
   '@effect/platform-node': versionString,
+  '@effect/platform-bun': versionString,
   '@effect/printer': versionString,
   '@effect/printer-ansi': versionString,
   zod: versionString,
@@ -486,6 +498,16 @@ export const npmVersionsSchema = z.object({
 
   // Effect ecosystem - OpenTelemetry integration
   '@effect/opentelemetry': versionString,
+
+  // Effect SQL (evolution system)
+  '@effect/sql': versionString,
+  '@effect/sql-sqlite-bun': versionString,
+
+  // Effect testing
+  '@effect/vitest': versionString,
+
+  // Utilities
+  tinyglobby: versionString,
 
   // Voice AI
   hume: versionString,

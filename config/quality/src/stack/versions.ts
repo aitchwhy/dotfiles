@@ -172,6 +172,7 @@ export const STACK = {
     '@effect/cli': '0.72.1',
     '@effect/platform': '0.93.6',
     '@effect/platform-node': '0.103.0',
+    '@effect/platform-bun': '0.87.0',
     '@effect/printer': '0.47.0',
     '@effect/printer-ansi': '0.47.0',
     zod: '4.1.13',
@@ -239,6 +240,16 @@ export const STACK = {
 
     // Effect ecosystem - OpenTelemetry integration
     '@effect/opentelemetry': '0.44.0',
+
+    // Effect SQL (evolution system)
+    '@effect/sql': '0.49.0',
+    '@effect/sql-sqlite-bun': '0.50.0',
+
+    // Effect testing
+    '@effect/vitest': '0.27.0',
+
+    // Utilities
+    tinyglobby: '0.2.15',
 
     // Voice AI
     hume: '0.15.7',
