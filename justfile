@@ -101,19 +101,23 @@ status:
     nix flake check --no-build > /dev/null 2>&1 && echo "  ✓ Flake valid" || echo "  ✗ Flake check failed"
     echo ""
     echo "Evolution:"
-    bash config/agents/evolution/evolve.sh --json 2>/dev/null | jq -r '"  Score: \(.score_percent)% | Trend: \(.trend) | Recommendation: \(.recommendation)"' 2>/dev/null || echo "  Run: bash config/agents/evolution/evolve.sh"
+    bun run config/agents/evolution/evolve.ts --json 2>/dev/null | jq -r '"  Score: \(.score_percent)% | Trend: \(.trend) | Recommendation: \(.recommendation)"' 2>/dev/null || echo "  Run: just evolve"
 
 # Evolution system dashboard
 evolve *ARGS:
-    @bash config/agents/evolution/evolve.sh {{ ARGS }}
+    @bun run config/agents/evolution/evolve.ts {{ ARGS }}
 
 # Grade system health (TypeScript - Effect-based)
 grade:
     @bun run config/agents/evolution/grade.ts
 
-# Grade system health (legacy shell script)
-grade-legacy:
-    @bash config/agents/evolution/grade.sh
+# Analyze trends and detect regressions
+trends *ARGS:
+    @bun run config/agents/evolution/trend-alert.ts {{ ARGS }}
+
+# Synthesize lessons into CLAUDE.md update proposals
+reflect:
+    @bun run config/agents/evolution/reflect.ts
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # CLAUDE CODE
@@ -223,3 +227,47 @@ _perf-report:
 _perf-clear:
     @rm -f ~/.claude-metrics/perf.jsonl
     @echo "Metrics cleared"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# VERSIONING (semver via git tags)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Show current version from git tags
+version:
+    @git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0 (no tags)"
+
+# Tag a new patch release (0.9.0 → 0.9.1)
+release-patch:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    current=$(git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//' || echo "0.0.0")
+    IFS='.' read -r major minor patch <<< "$current"
+    new="v${major}.${minor}.$((patch + 1))"
+    echo "Releasing: v${current} → ${new}"
+    git tag -a "$new" -m "Release ${new}"
+    git push origin "$new"
+    echo "✓ Tagged and pushed ${new}"
+
+# Tag a new minor release (0.9.0 → 0.10.0)
+release-minor:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    current=$(git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//' || echo "0.0.0")
+    IFS='.' read -r major minor patch <<< "$current"
+    new="v${major}.$((minor + 1)).0"
+    echo "Releasing: v${current} → ${new}"
+    git tag -a "$new" -m "Release ${new}"
+    git push origin "$new"
+    echo "✓ Tagged and pushed ${new}"
+
+# Tag a new major release (0.9.0 → 1.0.0)
+release-major:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    current=$(git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//' || echo "0.0.0")
+    IFS='.' read -r major minor patch <<< "$current"
+    new="v$((major + 1)).0.0"
+    echo "Releasing: v${current} → ${new}"
+    git tag -a "$new" -m "Release ${new}"
+    git push origin "$new"
+    echo "✓ Tagged and pushed ${new}"

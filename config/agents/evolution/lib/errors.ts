@@ -23,3 +23,9 @@ export class FileSystemError extends Data.TaggedError("FileSystemError")<{
 	readonly operation: "read" | "write" | "stat";
 	readonly cause: unknown;
 }> {}
+
+export class SpawnError extends Data.TaggedError("SpawnError")<{
+	readonly script: string;
+	readonly exitCode: number;
+	readonly stderr: string;
+}> {}

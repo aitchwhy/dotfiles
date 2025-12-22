@@ -184,7 +184,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$HOME/dotfiles/config/agents/hooks/post-switch-gc.sh\"",
+            "command": "bun \"$HOME/dotfiles/config/agents/hooks/post-switch-gc.ts\"",
             "timeout": 120
           }
         ]
@@ -195,7 +195,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$HOME/dotfiles/config/agents/hooks/session-init.sh\"",
+            "command": "bun \"$HOME/dotfiles/config/agents/hooks/session-init.ts\"",
             "timeout": 10
           }
         ]
@@ -206,7 +206,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$HOME/dotfiles/config/agents/hooks/session-stop.sh\"",
+            "command": "bun \"$HOME/dotfiles/config/agents/hooks/session-stop.ts\"",
             "timeout": 45
           }
         ]
