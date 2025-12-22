@@ -5,6 +5,7 @@
  * and helper functions work correctly.
  */
 import { describe, expect, test } from 'bun:test';
+import { Either } from 'effect';
 import { STACK, getNpmVersion, getNpmVersions, isVersionMatch, getDrift, validateStack } from './versions';
 
 describe('Stack Versions', () => {
@@ -18,8 +19,9 @@ describe('Stack Versions', () => {
     expect(STACK.npm).toBeDefined();
   });
 
-  test('validateStack does not throw', () => {
-    expect(() => validateStack()).not.toThrow();
+  test('validateStack returns Right for valid STACK', () => {
+    const result = validateStack();
+    expect(Either.isRight(result)).toBe(true);
   });
 
   test('getNpmVersion returns correct version', () => {

@@ -11,7 +11,7 @@
  *   - Enforcement hooks (version drift detection)
  */
 import type { StackDefinition } from './schema';
-import { Schema } from "effect";
+import { Either, ParseResult, Schema } from "effect";
 import { StackDefinitionSchema } from "./schema";
 
 /**
@@ -268,10 +268,13 @@ export const STACK = {
 
 /**
  * Validate STACK at runtime (development check)
- * Throws if STACK doesn't match schema
+ * Returns Either with validation result.
+ *
+ * Note: This is redundant with `as const satisfies StackDefinition` compile-time check,
+ * but kept for backward compatibility and explicit runtime assertion.
  */
-export function validateStack(): void {
-	Schema.decodeUnknownSync(StackDefinitionSchema)(STACK);
+export function validateStack(): Either.Either<StackDefinition, ParseResult.ParseError> {
+	return Schema.decodeUnknownEither(StackDefinitionSchema)(STACK);
 }
 
 /**
