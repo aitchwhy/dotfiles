@@ -1,0 +1,28 @@
+# Effect Schema: Prevent throwing decoders
+# @see https://effect.website/docs/schema/basic-usage
+id: no-throw-decoder
+language: TypeScript
+severity: error
+message: "Use Effect Schema decoders that don't throw. decodeUnknownSync throws; use decodeUnknown (Effect) or decodeUnknownEither (Either)"
+note: |
+  Schema.decodeUnknownSync throws ParseError on invalid input, violating
+  the "never throw" principle for runtime parsing.
+
+  Instead, use:
+  - Schema.decodeUnknown (returns Effect, use in Effect.gen)
+  - Schema.decodeUnknownEither (returns Either, use in sync contexts)
+
+  Exception: Schema.decodeSync is acceptable for branded type constructors
+  where input is known to be valid (e.g., string literals).
+
+  Example:
+    // BAD: throws on invalid input
+    const skill = Schema.decodeUnknownSync(SkillSchema)(data)
+
+    // GOOD: returns Either, caller handles errors
+    const result = Schema.decodeUnknownEither(SkillSchema)(data)
+    if (Either.isLeft(result)) handleError(result.left)
+    else useSkill(result.right)
+
+rule:
+  pattern: Schema.decodeUnknownSync($$$)
