@@ -230,23 +230,31 @@ in
 
     # Generate Quality System artifacts (skills, personas, rules, settings)
     # Runs after writeBoundary to ensure all files are in place
+    # Errors are NOT swallowed - generation must succeed
     home.activation.generateQuality = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       QUALITY_DIR="${config.home.homeDirectory}/dotfiles/config/quality"
+      BUN="${
+        if builtins.pathExists /etc/profiles/per-user/hank/bin/bun then
+          "/etc/profiles/per-user/hank/bin/bun"
+        else
+          "bun"
+      }"
+
       if [ -f "$QUALITY_DIR/package.json" ]; then
         echo "Generating Quality System artifacts..."
         cd "$QUALITY_DIR"
-        ${
-          if builtins.pathExists /etc/profiles/per-user/hank/bin/bun then
-            "/etc/profiles/per-user/hank/bin/bun"
-          else
-            "bun"
-        } install --frozen-lockfile 2>/dev/null || true
-        ${
-          if builtins.pathExists /etc/profiles/per-user/hank/bin/bun then
-            "/etc/profiles/per-user/hank/bin/bun"
-          else
-            "bun"
-        } run generate 2>/dev/null || echo "Quality generation skipped (run manually: cd $QUALITY_DIR && bun run generate)"
+
+        if ! $BUN install --frozen-lockfile; then
+          echo "ERROR: bun install failed in $QUALITY_DIR"
+          exit 1
+        fi
+
+        if ! $BUN run generate; then
+          echo "ERROR: Quality generation failed in $QUALITY_DIR"
+          exit 1
+        fi
+
+        echo "Quality System artifacts generated successfully"
       fi
     '';
   };
