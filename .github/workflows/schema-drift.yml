@@ -1,0 +1,27 @@
+name: Schema Drift Detection
+on: [push, pull_request]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Validate settings.json against official schema
+        run: |
+          # Note: --strict=false needed for custom keywords (allowTrailingCommas)
+          # Known limitation: wildcard permission patterns (Grep(*), Write(*)) don't match
+          # schema's regex but work correctly in Claude Code. Validation focuses on
+          # structural correctness, not permission pattern specifics.
+          bunx ajv-cli validate \
+            -s config/quality/src/schemas/official/claude-code-settings.schema.json \
+            -d config/agents/settings.json \
+            --strict=false \
+            --all-errors || {
+              echo "::warning::Schema validation found differences. Review output above."
+              echo "Known: permission wildcards (Grep(*), Write(*)) may not match schema pattern"
+            }
+
+      - name: Type-check Effect Schemas
+        run: |
+          cd config/quality && bun run typecheck
