@@ -55,8 +55,16 @@ export const readStdin = Effect.gen(function* () {
 	const stdin = process.stdin;
 
 	yield* Effect.async<string, Error>((resume) => {
-		stdin.on("data", (chunk) => chunks.push(chunk));
-		stdin.on("end", () => resume(Effect.succeed(Buffer.concat(chunks).toString())));
+		stdin.on("data", (chunk: Buffer | string) => {
+			if (typeof chunk === "string") {
+				chunks.push(Buffer.from(chunk));
+			} else {
+				chunks.push(chunk);
+			}
+		});
+		stdin.on("end", () =>
+			resume(Effect.succeed(Buffer.concat(chunks).toString())),
+		);
 		stdin.on("error", (err) => resume(Effect.fail(err)));
 	});
 
@@ -77,20 +85,18 @@ export const outputDecision = (decision: HookDecision) =>
 		yield* Console.log(JSON.stringify(decision));
 	});
 
-export const approve = (reason?: string): HookDecision => ({
-	decision: "approve",
-	reason,
-});
+export const approve = (reason?: string): HookDecision =>
+	reason !== undefined
+		? { decision: "approve", reason }
+		: { decision: "approve" };
 
 export const block = (reason: string): HookDecision => ({
 	decision: "block",
 	reason,
 });
 
-export const skip = (reason?: string): HookDecision => ({
-	decision: "skip",
-	reason,
-});
+export const skip = (reason?: string): HookDecision =>
+	reason !== undefined ? { decision: "skip", reason } : { decision: "skip" };
 
 // =============================================================================
 // File Path Utilities

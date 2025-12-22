@@ -31,4 +31,5 @@ export const ALL_PERSONAS = [
 type AssertLength<T extends readonly unknown[], N extends number> =
 	T["length"] extends N ? true : never;
 
-const _: AssertLength<typeof ALL_PERSONAS, 6> = true;
+const _assertPersonaCount: AssertLength<typeof ALL_PERSONAS, 6> = true;
+void _assertPersonaCount;

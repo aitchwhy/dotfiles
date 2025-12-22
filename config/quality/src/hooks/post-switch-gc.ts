@@ -8,9 +8,7 @@
  * - Runs GC if >10 generations (background)
  */
 
-import { Effect, pipe, Console, Schema } from "effect";
-import * as fs from "node:fs/promises";
-import * as path from "node:path";
+import { Console, Effect, pipe } from "effect";
 import * as os from "node:os";
 import { exec, spawn } from "node:child_process";
 import { promisify } from "node:util";
@@ -36,14 +34,6 @@ type PostToolUseOutput = {
 	readonly additionalContext?: string;
 };
 
-const PostToolUseInputSchema = Schema.Struct({
-	hook_event_name: Schema.Literal("PostToolUse"),
-	tool_name: Schema.String,
-	tool_input: Schema.Struct({
-		command: Schema.optional(Schema.String),
-	}),
-	tool_result: Schema.optional(Schema.String),
-});
 
 // =============================================================================
 // Helpers

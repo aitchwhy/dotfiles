@@ -40,4 +40,5 @@ export const ALL_SKILLS = [
 type AssertLength<T extends readonly unknown[], N extends number> =
 	T["length"] extends N ? true : never;
 
-const _: AssertLength<typeof ALL_SKILLS, 9> = true;
+const _assertSkillCount: AssertLength<typeof ALL_SKILLS, 9> = true;
+void _assertSkillCount;

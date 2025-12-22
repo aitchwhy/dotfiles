@@ -24,7 +24,9 @@ import { emitContinue } from './lib/hook-logging';
 // Configuration
 // ============================================================================
 
-const filePaths = (process.env.CLAUDE_FILE_PATHS || '').split(',').filter(Boolean);
+const filePaths = (process.env["CLAUDE_FILE_PATHS"] ?? "")
+	.split(",")
+	.filter(Boolean);
 
 // Exit early if no files
 if (filePaths.length === 0) {

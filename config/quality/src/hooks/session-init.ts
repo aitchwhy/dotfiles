@@ -90,7 +90,7 @@ const isInNixShell = Effect.gen(function* () {
 
 const checkEnvironment = Effect.gen(function* () {
 	const warnings: string[] = [];
-	const cwd = Bun.cwd();
+	const cwd = process.cwd();
 
 	const hasFlake = yield* Effect.tryPromise(() =>
 		fs.access(path.join(cwd, "flake.nix")).then(() => true).catch(() => false)
@@ -159,7 +159,7 @@ const main = Effect.gen(function* () {
 
 	// 1. Log session start
 	const timestamp = new Date().toISOString();
-	yield* appendToLog(`[${timestamp}] Session started: ${Bun.cwd()}`);
+	yield* appendToLog(`[${timestamp}] Session started: ${process.cwd()}`);
 
 	// 2. Clean old plans
 	const deletedCount = yield* cleanOldPlans.pipe(

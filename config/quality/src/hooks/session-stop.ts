@@ -10,7 +10,7 @@
  * - Runs grading (background)
  */
 
-import { Effect, pipe, Console, Schema } from "effect";
+import { Console, Effect, pipe } from "effect";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import * as os from "node:os";
@@ -41,11 +41,6 @@ type StopOutput = {
 	readonly additionalContext?: string;
 };
 
-const StopInputSchema = Schema.Struct({
-	hook_event_name: Schema.Literal("Stop"),
-	session_id: Schema.String,
-	transcript_path: Schema.optional(Schema.String),
-});
 
 // =============================================================================
 // Helpers
@@ -90,7 +85,7 @@ const logSessionEnd = Effect.gen(function* () {
 	}).pipe(Effect.catchAll(() => Effect.succeed(0)));
 
 	const timestamp = new Date().toISOString();
-	const cwd = path.basename(Bun.cwd());
+	const cwd = path.basename(process.cwd());
 	const logLine = `[${timestamp}] Session ended | Dir: ${cwd} | Files: ${filesModified} modified | Commits: ${recentCommits}`;
 
 	yield* Effect.tryPromise(() => fs.appendFile(LOG_FILE, `${logLine}\n`));
@@ -228,7 +223,7 @@ const main = Effect.gen(function* () {
 			additionalContext: gateResult.output,
 		});
 		yield* Effect.sync(() => {
-			Bun.exitCode = 2;
+			process.exitCode = 2;
 		});
 		return;
 	}

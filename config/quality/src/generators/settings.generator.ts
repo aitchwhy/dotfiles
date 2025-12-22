@@ -184,7 +184,7 @@ type ClaudeSettings = {
 	readonly agents: readonly {
 		readonly name: string;
 		readonly description: string;
-		readonly model: string;
+		readonly model?: string;
 	}[];
 	readonly enabledPlugins: typeof ENABLED_PLUGINS;
 };
@@ -204,11 +204,17 @@ const generateSettings = (
 	verbose: false,
 	permissions: PERMISSIONS,
 	hooks: HOOK_DEFINITIONS,
-	agents: personas.map((p) => ({
-		name: p.name,
-		description: p.description,
-		model: p.model,
-	})),
+	agents: personas.map((p) => {
+		const agent: {
+			readonly name: string;
+			readonly description: string;
+			readonly model?: string;
+		} = { name: p.name, description: p.description };
+		if (p.model !== undefined) {
+			return { ...agent, model: p.model };
+		}
+		return agent;
+	}),
 	enabledPlugins: ENABLED_PLUGINS,
 });
 

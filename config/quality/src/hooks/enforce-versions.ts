@@ -23,7 +23,7 @@ type Violation = {
 };
 
 // =============================================================================
-// Configuration (must match config/signet/src/services/stack.ts)
+// Configuration (must match config/quality/src/stack/versions.ts)
 // =============================================================================
 
 const FORBIDDEN_DEPS: Record<string, string> = {
@@ -54,7 +54,9 @@ const FORBIDDEN_DEPS: Record<string, string> = {
 // Main
 // =============================================================================
 
-const filePaths = (process.env.CLAUDE_FILE_PATHS || '').split(',').filter(Boolean);
+const filePaths = (process.env["CLAUDE_FILE_PATHS"] ?? "")
+	.split(",")
+	.filter(Boolean);
 
 // Only check package.json files
 const packageJsonFiles = filePaths.filter((p) => p.endsWith('package.json'));

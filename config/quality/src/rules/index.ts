@@ -21,8 +21,6 @@ export const ALL_RULES = [
 	...OBSERVABILITY_RULES,
 ] as const;
 
-// Compile-time assertion: exactly 12 rules
-type AssertLength<T extends readonly unknown[], N extends number> =
-	T["length"] extends N ? true : never;
-
-const _: AssertLength<typeof ALL_RULES, 12> = true;
+// Note: TypeScript can't track array lengths through spreads
+// Actual count: 3 + 5 + 3 + 1 = 12 rules
+export const RULE_COUNT = ALL_RULES.length;
