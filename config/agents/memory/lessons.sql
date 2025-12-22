@@ -1,5 +1,5 @@
 -- Active Lessons Dump
--- Generated: 2025-12-22T14:51:27.641Z
+-- Generated: 2025-12-22T15:00:20.005Z
 -- Count: 28
 
 BEGIN TRANSACTION;
@@ -110,7 +110,7 @@ INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_co
 - `config/agents/hooks/{lib/types.ts,enforce-versions.ts}`
 - `config/agents/{README.md,evolution/grade.sh}`
 - `justfile`, `.github/workflows/validate.yml`', 'claude', 2, 1.0000, '2025-12-22 03:00:16');
-INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (75, '2025-12-22', 'bug', 'Version 26 exists. The error was a race condition. Let me refresh the state and try again:', 'Version 26 exists. The error was a race condition. Let me refresh the state and try again:', 'claude', 1, 1.0000, '2025-12-22 14:51:26');
+INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (75, '2025-12-22', 'bug', 'Version 26 exists. The error was a race condition. Let me refresh the state and try again:', 'Version 26 exists. The error was a race condition. Let me refresh the state and try again:', 'claude', 2, 1.0000, '2025-12-22 14:51:26');
 INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (68, '2025-12-21', 'optimization', '**dotfiles (10 commits):**', '**dotfiles (10 commits):**
 ```
 5e21b3d docs(agents): update nix skills section for dotfiles-only scope
