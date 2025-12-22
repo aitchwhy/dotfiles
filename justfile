@@ -107,6 +107,14 @@ status:
 evolve *ARGS:
     @bash config/agents/evolution/evolve.sh {{ ARGS }}
 
+# Grade system health (TypeScript - Effect-based)
+grade:
+    @bun run config/agents/evolution/grade.ts
+
+# Grade system health (legacy shell script)
+grade-legacy:
+    @bash config/agents/evolution/grade.sh
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # CLAUDE CODE
 # ═══════════════════════════════════════════════════════════════════════════════
