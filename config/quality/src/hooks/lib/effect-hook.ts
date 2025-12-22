@@ -2,12 +2,15 @@
  * Effect-based Hook Utilities
  *
  * Provides typed hook infrastructure using Effect.
+ *
+ * SSOT Reference: Types should match config/agents/hooks/lib/types.ts
+ * (Cannot import directly due to separate node_modules causing type mismatches)
  */
 
 import { Effect, Schema, Console } from "effect";
 
 // =============================================================================
-// Hook Protocol Types
+// Hook Protocol Types (must match SSOT at config/agents/hooks/lib/types.ts)
 // =============================================================================
 
 export type HookDecision =
@@ -16,7 +19,7 @@ export type HookDecision =
 	| { readonly decision: "skip"; readonly reason?: string };
 
 // =============================================================================
-// Hook Input Schemas
+// Hook Input Schemas (must match SSOT at config/agents/hooks/lib/types.ts)
 // =============================================================================
 
 const ToolInputSchema = Schema.Struct({
@@ -45,6 +48,32 @@ export const StopInputSchema = Schema.Struct({
 });
 
 export type StopInput = typeof StopInputSchema.Type;
+
+// =============================================================================
+// File Exclusion Patterns (must match SSOT at config/agents/hooks/lib/types.ts)
+// =============================================================================
+
+export const EXCLUDED_PATTERNS: readonly RegExp[] = [
+	/\.test\.[jt]sx?$/,
+	/\.spec\.[jt]sx?$/,
+	/\.d\.ts$/,
+	/\/api\/.*\.[jt]s$/, // API boundary files
+	/-client\.[jt]s$/, // Client boundary files
+	/\.schema\.[jt]s$/, // Schema files
+	/\/schemas\//, // Schema directories
+	/\/parsers\//, // Parser directories
+	/-guard\.[jt]s$/, // Guard files themselves
+	/\/node_modules\//,
+	/\.stories\.[jt]sx?$/,
+	/\/mocks?\//,
+	/\/hooks\//, // Hook scripts are entry points that need env access
+];
+
+export const isExcludedPath = (filePath: string): boolean =>
+	EXCLUDED_PATTERNS.some((pattern) => pattern.test(filePath));
+
+export const isTypeScriptFile = (filePath: string): boolean =>
+	/\.[jt]sx?$/.test(filePath) && !filePath.endsWith(".d.ts");
 
 // =============================================================================
 // Hook Execution
@@ -97,29 +126,3 @@ export const block = (reason: string): HookDecision => ({
 
 export const skip = (reason?: string): HookDecision =>
 	reason !== undefined ? { decision: "skip", reason } : { decision: "skip" };
-
-// =============================================================================
-// File Path Utilities
-// =============================================================================
-
-export const EXCLUDED_PATTERNS: readonly RegExp[] = [
-	/\.test\.[jt]sx?$/,
-	/\.spec\.[jt]sx?$/,
-	/\.d\.ts$/,
-	/\/api\/.*\.[jt]s$/,
-	/-client\.[jt]s$/,
-	/\.schema\.[jt]s$/,
-	/\/schemas\//,
-	/\/parsers\//,
-	/-guard\.[jt]s$/,
-	/\/node_modules\//,
-	/\.stories\.[jt]sx?$/,
-	/\/mocks?\//,
-	/\/hooks\//, // Hook scripts are entry points that need env access
-];
-
-export const isExcludedPath = (filePath: string): boolean =>
-	EXCLUDED_PATTERNS.some((pattern) => pattern.test(filePath));
-
-export const isTypeScriptFile = (filePath: string): boolean =>
-	/\.[jt]sx?$/.test(filePath) && !filePath.endsWith(".d.ts");

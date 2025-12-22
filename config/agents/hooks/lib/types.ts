@@ -84,18 +84,19 @@ export type GuardContext = {
 // =============================================================================
 
 export const EXCLUDED_PATTERNS: readonly RegExp[] = [
-  /\.test\.tsx?$/,
-  /\.spec\.tsx?$/,
+  /\.test\.[jt]sx?$/,
+  /\.spec\.[jt]sx?$/,
   /\.d\.ts$/,
-  /\/api\/.*\.ts$/, // API boundary files
-  /-client\.ts$/, // Client boundary files
-  /\.schema\.ts$/, // Schema files
+  /\/api\/.*\.[jt]s$/, // API boundary files
+  /-client\.[jt]s$/, // Client boundary files
+  /\.schema\.[jt]s$/, // Schema files
   /\/schemas\//, // Schema directories
   /\/parsers\//, // Parser directories
-  /-guard\.ts$/, // Guard files themselves
+  /-guard\.[jt]s$/, // Guard files themselves
   /\/node_modules\//,
-  /\.stories\.tsx?$/,
+  /\.stories\.[jt]sx?$/,
   /\/mocks?\//,
+  /\/hooks\//, // Hook scripts are entry points that need env access
 ];
 
 export function isExcludedPath(filePath: string): boolean {
