@@ -93,7 +93,6 @@ export const EXCLUDED_PATTERNS: readonly RegExp[] = [
   /\/schemas\//, // Schema directories
   /\/parsers\//, // Parser directories
   /-guard\.ts$/, // Guard files themselves
-  /\/sig-.*\.ts$/, // Signet tools
   /\/node_modules\//,
   /\.stories\.tsx?$/,
   /\/mocks?\//,

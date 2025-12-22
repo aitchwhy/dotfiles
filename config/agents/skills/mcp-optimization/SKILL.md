@@ -13,7 +13,6 @@ token-budget: 600
 |--------|---------|------------|-------------|
 | `context7` | Library docs | Low (cached) | Before new library usage |
 | `repomix` | Codebase packing | High | Once per session for exploration |
-| `signet` | Stack compliance | Low | After package.json changes |
 | `memory` | Persistent knowledge | Low | Session start/end |
 | `sequential-thinking` | Complex planning | Medium | Multi-step reasoning |
 | `fetch` | URL content | Medium | External documentation |
@@ -91,23 +90,6 @@ repomix pack . --include "*.nix,*.json,*.toml"
 1. pack_codebase → returns output_id
 2. grep_repomix_output(output_id, pattern) → targeted search
 3. read_repomix_output(output_id, startLine, endLine) → detailed view
-```
-
-## Signet Patterns
-
-### Proactive Compliance Checking
-
-Run after modifying package.json:
-
-```
-mcp__signet__sig-stack(fix: true)  # Check and fix versions
-mcp__signet__sig-migrate(fix: true) # Check project structure
-```
-
-Run before writing TypeScript:
-
-```
-mcp__signet__sig-guard(content, filePath)  # Pre-validate content
 ```
 
 ## Memory Server Optimization
@@ -195,7 +177,6 @@ mcp__ast-grep__rewrite_code({
 - [ ] Use native tools (Read/Write) over MCP filesystem
 - [ ] Pre-fetch context7 docs at session start
 - [ ] Use targeted repomix includes
-- [ ] Run sig-stack after package.json changes
 - [ ] Skip sequential thinking for trivial tasks
 - [ ] Cache library IDs for repeated queries
 - [ ] Use grep_repomix_output instead of full reads

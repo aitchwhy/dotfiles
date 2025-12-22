@@ -287,9 +287,9 @@ alias tests='f() { fd "$1.test|$1.spec" --type f; }; f'
 alias exports='f() { rg "^export " "$1" --type ts; }; f'
 ```
 
-## Integration with Signet
+## Effect-TS Project Patterns
 
-When working on Signet projects:
+When working on Effect-TS projects:
 
 ```bash
 # Find port definitions

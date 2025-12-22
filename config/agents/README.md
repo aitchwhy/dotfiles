@@ -97,7 +97,7 @@ Self-improving configuration with 5-check health grader:
 | Check | Weight | Purpose |
 |-------|--------|---------|
 | nix_flake | 25% | Flake validity |
-| typescript | 20% | Type checking (signet) |
+| typescript | 20% | Type checking (quality system) |
 | hooks | 20% | Hook file integrity |
 | skills | 15% | SKILL.md presence |
 | versions | 20% | SSOT alignment |

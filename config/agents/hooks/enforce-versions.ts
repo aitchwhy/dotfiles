@@ -23,7 +23,7 @@ type Violation = {
 };
 
 // =============================================================================
-// Configuration (must match config/signet/src/services/stack.ts)
+// Configuration (must match config/quality/src/stack/versions.ts)
 // =============================================================================
 
 const FORBIDDEN_DEPS: Record<string, string> = {

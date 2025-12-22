@@ -5,7 +5,7 @@
 set -euo pipefail
 
 DOTFILES="${DOTFILES:-$HOME/dotfiles}"
-SIGNET_DIR="$DOTFILES/config/signet"
+QUALITY_DIR="$DOTFILES/config/quality"
 AGENTS_DIR="$DOTFILES/config/agents"
 METRICS_DIR="${HOME}/.claude-metrics"
 DB_FILE="${METRICS_DIR}/evolution.db"
@@ -124,14 +124,14 @@ check_typescript() {
   local any_count=0
   local zinfer_count=0
 
-  if [[ ! -d "$SIGNET_DIR" ]]; then
+  if [[ ! -d "$QUALITY_DIR" ]]; then
     score=0
-    message="signet directory missing"
-  elif [[ ! -f "$SIGNET_DIR/package.json" ]]; then
+    message="quality directory missing"
+  elif [[ ! -f "$QUALITY_DIR/package.json" ]]; then
     score=50
     message="package.json missing"
   else
-    pushd "$SIGNET_DIR" >/dev/null
+    pushd "$QUALITY_DIR" >/dev/null
     if ! bun run typecheck >/dev/null 2>&1; then
       score=30
       message="type errors detected"
@@ -226,8 +226,8 @@ check_versions() {
   local message="ok"
   local drift_count=0
 
-  local versions_ts="$SIGNET_DIR/src/stack/versions.ts"
-  local versions_json="$SIGNET_DIR/versions.json"
+  local versions_ts="$QUALITY_DIR/src/stack/versions.ts"
+  local versions_json="$QUALITY_DIR/versions.json"
 
   if [[ ! -f "$versions_ts" ]]; then
     score=0

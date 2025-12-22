@@ -123,9 +123,9 @@ Run `nix flake check` to validate - fails on duplicate ports.
 | 29 | No Split-Brain | Same value in 2+ .nix files |
 | 30 | Config Reference Required | Hardcoded localhost URLs |
 
-Use `sig-config` MCP tool to check:
+Validate with nix flake check:
 ```bash
-mcp__signet__sig-config
+nix flake check
 ```
 
 ## Migration Checklist
@@ -187,9 +187,6 @@ ports = {
 ```bash
 # Validate port conflicts
 nix flake check
-
-# Check configuration centralization
-mcp__signet__sig-config
 
 # Inspect all ports
 nix eval .#lib.config.ports --json | jq
