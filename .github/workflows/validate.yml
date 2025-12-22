@@ -145,7 +145,7 @@ jobs:
           echo "$MCP_SERVERS"
 
           # Validate required servers exist
-          for server in memory context7 fetch repomix signet; do
+          for server in memory context7 fetch repomix github; do
             # Use rg instead of grep
             if echo "$MCP_SERVERS" | rg -q "^$server$"; then
               echo "✓ Required server: $server"

@@ -111,14 +111,6 @@ evolve *ARGS:
 # CLAUDE CODE
 # ═══════════════════════════════════════════════════════════════════════════════
 
-# Launch Claude Code with Signet tooling
-sig *ARGS:
-    @./scripts/sig {{ ARGS }}
-
-# Check sig launcher status
-sig-status:
-    @./scripts/sig --status
-
 # Check for Claude Code pattern updates
 upgrade-check:
     @echo "Checking for Claude Code updates..."
@@ -188,16 +180,8 @@ _test-rx:
     @bats tests/repomix.bats
 
 [private]
-_test-signet:
+_test-quality:
     cd config/quality && bun test
-
-[private]
-_test-factory:
-    cd config/quality && bun test tests/e2e/factory-smoke.test.ts
-
-[private]
-_verify-factory:
-    @bash scripts/verify-factory.sh
 
 [private]
 _verify-paragon:
