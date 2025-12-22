@@ -1,5 +1,5 @@
 -- Active Lessons Dump
--- Generated: 2025-12-22T03:00:17.552Z
+-- Generated: 2025-12-22T03:03:56.873Z
 -- Count: 27
 
 BEGIN TRANSACTION;
@@ -100,16 +100,16 @@ INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_co
 ✓ secrets-audit.ts deleted
 ✓ paragon-guard has secrets
 ```', 'claude', 2, 1.0000, '2025-12-21 02:30:28');
-INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (69, '2025-12-22', 'optimization', 'Now let me fix the skills files. First the MCP optimization skill:', 'Now let me fix the skills files. First the MCP optimization skill:', 'claude', 1, 1.0000, '2025-12-22 03:00:16');
+INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (69, '2025-12-22', 'optimization', 'Now let me fix the skills files. First the MCP optimization skill:', 'Now let me fix the skills files. First the MCP optimization skill:', 'claude', 2, 1.0000, '2025-12-22 03:00:16');
 INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (70, '2025-12-22', 'gotcha', '**Nix Sandbox Gotcha**: The quality-typecheck fix highlights that Nix builds run in a read-only sandbox. Any tool that needs to write (like `bun install`) must copy sources to `$TMPDIR` first.', '**Nix Sandbox Gotcha**: The quality-typecheck fix highlights that Nix builds run in a read-only sandbox. Any tool that needs to write (like `bun install`) must copy sources to `$TMPDIR` first.
-`─────────────────────────────────────────────────`', 'claude', 1, 1.0000, '2025-12-22 03:00:16');
+`─────────────────────────────────────────────────`', 'claude', 2, 1.0000, '2025-12-22 03:00:16');
 INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (71, '2025-12-22', 'optimization', '**Files updated** (Signet → Quality System):', '**Files updated** (Signet → Quality System):
 - `config/quality/src/stack/versions.ts`
 - `config/quality/src/hooks/enforce-versions.ts`
 - `config/agents/skills/{mcp-optimization,nix-configuration-centralization,semantic-codebase}/SKILL.md`
 - `config/agents/hooks/{lib/types.ts,enforce-versions.ts}`
 - `config/agents/{README.md,evolution/grade.sh}`
-- `justfile`, `.github/workflows/validate.yml`', 'claude', 1, 1.0000, '2025-12-22 03:00:16');
+- `justfile`, `.github/workflows/validate.yml`', 'claude', 2, 1.0000, '2025-12-22 03:00:16');
 INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (68, '2025-12-21', 'optimization', '**dotfiles (10 commits):**', '**dotfiles (10 commits):**
 ```
 5e21b3d docs(agents): update nix skills section for dotfiles-only scope
