@@ -1,6 +1,6 @@
 -- Active Lessons Dump
--- Generated: 2025-12-23T04:35:14.023Z
--- Count: 29
+-- Generated: 2025-12-23T18:57:59.776Z
+-- Count: 32
 
 BEGIN TRANSACTION;
 
@@ -114,6 +114,25 @@ INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_co
 INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (77, '2025-12-23', 'bug', '`★ Insight ─────────────────────────────────────`', '`★ Insight ─────────────────────────────────────`
 **Why this fix works**: When Pulumi creates a task definition with `imageUri: ember:sha-abc123`, ECS stores that exact digest. On the next deploy with `sha-xyz789`, Pulumi creates a **new task definition revision** which forces ECS to pull the new image. The `:latest` tag problem was that Pulumi reused the same task definition (since `:latest` is the same string), so ECS never knew to pull a new image.
 `───────────────────────────────────────────', 'claude', 2, 1.0000, '2025-12-23 02:14:32');
+INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (79, '2025-12-23', 'optimization', '`★ Insight ─────────────────────────────────────`', '`★ Insight ─────────────────────────────────────`
+**MCP Server Selection Strategy**:
+- Your current 9 servers are well-aligned with general development needs
+- Adding 4 stack-specific servers creates a comprehensive toolkit:
+  - **jsrepo** → Component registry (shadcn patterns)
+  - **docker** → Docker Compose workflows (matches your dev setup)
+  - **postgres** → Query optimization for Drizzle/PG
+  - **shadcn** → React 19 + Tailwind 4.x component access', 'claude', 1, 1.0000, '2025-12-23 18:57:59');
+INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (80, '2025-12-23', 'optimization', '| New Server | Package | Purpose |', '| New Server | Package | Purpose |
+|------------|---------|---------|
+| jsrepo | `@jsrepo/mcp` | Component registries |
+| docker | `mcp-server-docker` | Container management |
+| postgres | `postgres-mcp` | PostgreSQL optimization |
+| shadcn | `shadcn-ui-mcp` | React/Tailwind components |', 'claude', 1, 1.0000, '2025-12-23 18:57:59');
+INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (81, '2025-12-23', 'optimization', 'The new tools will be available in your next Claude Code or Claude Desktop session. You can now use:', 'The new tools will be available in your next Claude Code or Claude Desktop session. You can now use:
+- **jsrepo tools**: Search registries, browse components, add code blocks
+- **docker tools**: Manage containers, compose stacks
+- **postgres tools**: Query optimization, index tuning, health checks
+- **shadcn tools**: React component docs, installation', 'claude', 1, 1.0000, '2025-12-23 18:57:59');
 INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (68, '2025-12-21', 'optimization', '**dotfiles (10 commits):**', '**dotfiles (10 commits):**
 ```
 5e21b3d docs(agents): update nix skills section for dotfiles-only scope
@@ -122,11 +141,11 @@ b4de066 docs(skills): update devops-patterns with node 24 and esc hierarchy
 e1477d2 chore(cleanup): purge process-compose references
 023d36a chore(cleanup): delete redundant secrets-audit.ts and claude-code.json
 b4717a9 feat(paragon): absorb secrets detection into guard 32
-8158893 chore(settings): consolidate hooks with p', 'claude', 1, 0.8769, '2025-12-21 02:33:07');
-INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (2, '2025-12-12', 'optimization', 'Nix build cache miss problem: Derivation hash includes source code. Split dependencies into separate derivation based on lockfile only.', 'After split, warm builds complete in <60 seconds vs 25+ minutes', 'manual', 2, 0.7633, '2025-12-12');
-INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (3, '2025-12-12', 'pattern', 'Three cache layers for Nix: Cachix (remote), magic-nix-cache (GHA local), Bun cache (useless in sandbox).', 'CI runs dropped from 30+ minutes to 5-10 minutes with proper layer configuration', 'manual', 1, 0.4577, '2025-12-12');
-INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (4, '2025-12-12', 'gotcha', 'Nix sandbox isolation: Package manager caches (~/.bun, ~/.npm) NOT accessible during builds. Use derivation splitting instead.', 'Bun inside Nix derivation cannot see ~/.bun cache', 'manual', 1, 0.4577, '2025-12-12');
-INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (5, '2025-12-12', 'pattern', 'Derivation splitting anti-patterns: bun install in app derivation, using nixos-unstable, missing magic-nix-cache, post-build Cachix push.', 'nix build .#api -v 2>&1 | grep -E "building|cached" shows cached for nodeModules', 'manual', 1, 0.4577, '2025-12-12');
-INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (1, '2025-12-11', 'pattern', 'Architecture switched to Bootloader pattern. Single AGENTS.md routes to modular content.', 'Symlinks verified via readlink ~/.claude/CLAUDE.md', 'manual', 1, 0.4249, '2025-12-11');
+8158893 chore(settings): consolidate hooks with p', 'claude', 1, 0.8379, '2025-12-21 02:33:07');
+INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (2, '2025-12-12', 'optimization', 'Nix build cache miss problem: Derivation hash includes source code. Split dependencies into separate derivation based on lockfile only.', 'After split, warm builds complete in <60 seconds vs 25+ minutes', 'manual', 2, 0.7294, '2025-12-12');
+INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (3, '2025-12-12', 'pattern', 'Three cache layers for Nix: Cachix (remote), magic-nix-cache (GHA local), Bun cache (useless in sandbox).', 'CI runs dropped from 30+ minutes to 5-10 minutes with proper layer configuration', 'manual', 1, 0.4308, '2025-12-12');
+INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (4, '2025-12-12', 'gotcha', 'Nix sandbox isolation: Package manager caches (~/.bun, ~/.npm) NOT accessible during builds. Use derivation splitting instead.', 'Bun inside Nix derivation cannot see ~/.bun cache', 'manual', 1, 0.4308, '2025-12-12');
+INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (5, '2025-12-12', 'pattern', 'Derivation splitting anti-patterns: bun install in app derivation, using nixos-unstable, missing magic-nix-cache, post-build Cachix push.', 'nix build .#api -v 2>&1 | grep -E "building|cached" shows cached for nodeModules', 'manual', 1, 0.4308, '2025-12-12');
+INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (1, '2025-12-11', 'pattern', 'Architecture switched to Bootloader pattern. Single AGENTS.md routes to modular content.', 'Symlinks verified via readlink ~/.claude/CLAUDE.md', 'manual', 1, 0.4011, '2025-12-11');
 
 COMMIT;
