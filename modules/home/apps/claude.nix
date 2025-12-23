@@ -90,11 +90,7 @@ let
     # ═══════════════════════════════════════════════════════════════════════════
     # Stack-specific MCP servers (Ember-Dash-Platform alignment)
     # ═══════════════════════════════════════════════════════════════════════════
-    jsrepo = {
-      # Component registry access - search, browse, install code blocks
-      package = "@jsrepo/mcp";
-      args = [ ];
-    };
+    # NOTE: jsrepo removed - @jsrepo/mcp outputs non-JSON to stdout (MCP protocol violation)
     docker = {
       # Container and compose stack management
       package = "mcp-server-docker";
@@ -111,11 +107,7 @@ let
       package = "chrome-devtools-mcp";
       args = [ ];
     };
-    postgres = {
-      # PostgreSQL database - schema inspection, read-only queries
-      package = "@modelcontextprotocol/server-postgres";
-      args = [ ];
-    };
+    # NOTE: postgres removed - requires connection URL arg, package is deprecated
   };
 
   # ═══════════════════════════════════════════════════════════════════════════
