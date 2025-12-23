@@ -1,5 +1,5 @@
 -- Active Lessons Dump
--- Generated: 2025-12-23T19:49:43.831Z
+-- Generated: 2025-12-23T19:51:32.564Z
 -- Count: 33
 
 BEGIN TRANSACTION;
@@ -121,25 +121,25 @@ INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_co
   - **jsrepo** → Component registry (shadcn patterns)
   - **docker** → Docker Compose workflows (matches your dev setup)
   - **postgres** → Query optimization for Drizzle/PG
-  - **shadcn** → React 19 + Tailwind 4.x component access', 'claude', 5, 1.0000, '2025-12-23 18:57:59');
+  - **shadcn** → React 19 + Tailwind 4.x component access', 'claude', 6, 1.0000, '2025-12-23 18:57:59');
 INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (80, '2025-12-23', 'optimization', '| New Server | Package | Purpose |', '| New Server | Package | Purpose |
 |------------|---------|---------|
 | jsrepo | `@jsrepo/mcp` | Component registries |
 | docker | `mcp-server-docker` | Container management |
 | postgres | `postgres-mcp` | PostgreSQL optimization |
-| shadcn | `shadcn-ui-mcp` | React/Tailwind components |', 'claude', 5, 1.0000, '2025-12-23 18:57:59');
+| shadcn | `shadcn-ui-mcp` | React/Tailwind components |', 'claude', 6, 1.0000, '2025-12-23 18:57:59');
 INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (81, '2025-12-23', 'optimization', 'The new tools will be available in your next Claude Code or Claude Desktop session. You can now use:', 'The new tools will be available in your next Claude Code or Claude Desktop session. You can now use:
 - **jsrepo tools**: Search registries, browse components, add code blocks
 - **docker tools**: Manage containers, compose stacks
 - **postgres tools**: Query optimization, index tuning, health checks
-- **shadcn tools**: React component docs, installation', 'claude', 5, 1.0000, '2025-12-23 18:57:59');
+- **shadcn tools**: React component docs, installation', 'claude', 6, 1.0000, '2025-12-23 18:57:59');
 INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (88, '2025-12-23', 'optimization', '| Server | Package | Value for Your Stack |', '| Server | Package | Value for Your Stack |
 |--------|---------|---------------------|
 | **PostgreSQL** | `@modelcontextprotocol/server-postgres` | Query execution, schema inspection |
 | **Brave Search** | `@anthropic/mcp-server-brave-search` | Web search alternative to fetch |
 | **Tavily** | `tavily-mcp` | AI-optimized web research |
 | **mem0** | `mem0-mcp` | Persistent AI memory across sessions |
-| **SonarQube** | `sonarqube-mcp-server` | Code quality analysis |', 'claude', 3, 1.0000, '2025-12-23 19:10:50');
+| **SonarQube** | `sonarqube-mcp-server` | Code quality analysis |', 'claude', 4, 1.0000, '2025-12-23 19:10:50');
 INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (68, '2025-12-21', 'optimization', '**dotfiles (10 commits):**', '**dotfiles (10 commits):**
 ```
 5e21b3d docs(agents): update nix skills section for dotfiles-only scope
