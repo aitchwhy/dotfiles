@@ -46,7 +46,12 @@ let
         "${config.home.homeDirectory}/Documents"
       ];
     };
-    # git server removed - GitHub MCP server provides richer functionality
+    git = {
+      # Git repository operations - read, search, manipulate repos
+      package = "mcp-server-git";
+      args = [ ];
+      isPython = true;
+    };
     sequential-thinking = {
       package = "@modelcontextprotocol/server-sequential-thinking";
       args = [ ];
@@ -92,12 +97,23 @@ let
     };
     docker = {
       # Container and compose stack management
-      package = "@ckreiling/mcp-server-docker";
+      package = "mcp-server-docker";
       args = [ ];
+      isPython = true;
     };
     shadcn = {
       # React/Tailwind shadcn/ui v4 components, blocks, and demos
       package = "@jpisnice/shadcn-ui-mcp-server";
+      args = [ ];
+    };
+    chrome-devtools = {
+      # Chrome DevTools Protocol - browser debugging, performance, network
+      package = "chrome-devtools-mcp";
+      args = [ ];
+    };
+    postgres = {
+      # PostgreSQL database - schema inspection, read-only queries
+      package = "@modelcontextprotocol/server-postgres";
       args = [ ];
     };
   };
