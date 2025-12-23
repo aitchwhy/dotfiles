@@ -81,6 +81,25 @@ let
       package = "@notprolands/ast-grep-mcp";
       args = [ ];
     };
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # Stack-specific MCP servers (Ember-Dash-Platform alignment)
+    # ═══════════════════════════════════════════════════════════════════════════
+    jsrepo = {
+      # Component registry access - search, browse, install code blocks
+      package = "@jsrepo/mcp";
+      args = [ ];
+    };
+    docker = {
+      # Container and compose stack management
+      package = "@ckreiling/mcp-server-docker";
+      args = [ ];
+    };
+    shadcn = {
+      # React/Tailwind shadcn/ui v4 components, blocks, and demos
+      package = "@jpisnice/shadcn-ui-mcp-server";
+      args = [ ];
+    };
   };
 
   # ═══════════════════════════════════════════════════════════════════════════
