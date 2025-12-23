@@ -1,6 +1,6 @@
 -- Active Lessons Dump
--- Generated: 2025-12-22T23:36:44.650Z
--- Count: 28
+-- Generated: 2025-12-23T02:14:32.137Z
+-- Count: 29
 
 BEGIN TRANSACTION;
 
@@ -111,6 +111,9 @@ INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_co
 - `config/agents/{README.md,evolution/grade.sh}`
 - `justfile`, `.github/workflows/validate.yml`', 'claude', 2, 1.0000, '2025-12-22 03:00:16');
 INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (75, '2025-12-22', 'bug', 'Version 26 exists. The error was a race condition. Let me refresh the state and try again:', 'Version 26 exists. The error was a race condition. Let me refresh the state and try again:', 'claude', 2, 1.0000, '2025-12-22 14:51:26');
+INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (77, '2025-12-23', 'bug', '`★ Insight ─────────────────────────────────────`', '`★ Insight ─────────────────────────────────────`
+**Why this fix works**: When Pulumi creates a task definition with `imageUri: ember:sha-abc123`, ECS stores that exact digest. On the next deploy with `sha-xyz789`, Pulumi creates a **new task definition revision** which forces ECS to pull the new image. The `:latest` tag problem was that Pulumi reused the same task definition (since `:latest` is the same string), so ECS never knew to pull a new image.
+`───────────────────────────────────────────', 'claude', 1, 1.0000, '2025-12-23 02:14:32');
 INSERT INTO lessons (id, date, category, lesson, evidence, source, occurrence_count, decay_score, created_at) VALUES (68, '2025-12-21', 'optimization', '**dotfiles (10 commits):**', '**dotfiles (10 commits):**
 ```
 5e21b3d docs(agents): update nix skills section for dotfiles-only scope
