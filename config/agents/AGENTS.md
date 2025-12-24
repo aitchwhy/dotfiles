@@ -28,7 +28,8 @@ Read `paragon` skill for full guard matrix.
 | Stack rules | Read `config/quality/docs/stack.md` |
 | Pattern skills | Read `config/agents/skills/{skill}/SKILL.md` |
 | Agent personas | Read `config/agents/agents/{persona}.md` |
-| Lessons learned | Read `config/agents/memory/lessons.md` |
+| **Canonical memories** | Read `config/quality/generated/memories.md` |
+| **Critic-mode protocol** | Read `config/quality/generated/critic-mode.md` |
 
 ## Available Skills
 
