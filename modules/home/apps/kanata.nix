@@ -8,7 +8,6 @@
 # Key mappings:
 #   CapsLock: Escape (tap) | Hyper (Ctrl+Alt+Cmd) (hold)
 #   Space: Space (tap) | Symbols layer (hold)
-#   Right Alt: Navigation layer (hold)
 {
   config,
   lib,
@@ -30,7 +29,6 @@ let
     ;; Key mappings:
     ;;   CapsLock: Escape (tap) | Hyper (Ctrl+Alt+Cmd) (hold)
     ;;   Space: Space (tap) | Symbols layer (hold)
-    ;;   Right Alt: Navigation layer (hold)
 
     (defcfg
       process-unmapped-keys yes
@@ -67,7 +65,6 @@ let
 
       ;; Layer toggles
       sym (layer-toggle symbols)
-      nav (layer-toggle navigation)
 
       ;; Space: Normal space, or hold for symbols layer
       spc (tap-hold $tap-time $hold-time spc @sym)
@@ -83,7 +80,7 @@ let
       tab  q    w    e    r    t    y    u    i    o    p    [    ]    \
       @caps a   s    d    f    g    h    j    k    l    ;    '    ret
       lsft z    x    c    v    b    n    m    ,    .    /    rsft
-      fn   lctl lalt lmet           @spc           rmet @nav rctl
+      fn   lctl lalt lmet           @spc           rmet ralt rctl
     )
 
     ;; Symbols layer (activated by holding space)
@@ -98,16 +95,6 @@ let
       _    _    _    _              _              _    _    _
     )
 
-    ;; Navigation layer (activated by holding right alt)
-    ;; Vim-style arrows on home row: h=left, j=down, k=up, l=right
-    ;; Also: y=home, u=pgup, i=pgdn, o=end
-    (deflayer navigation
-      _    _    _    _    _    _    _    _    _    _    _    _    _    _
-      _    _    _    _    _    _    home pgup pgdn end  _    _    _    _
-      _    _    _    _    _    _    left down up   rght _    _    _
-      _    _    _    _    _    _    _    _    _    _    _    _
-      _    _    _    _              _              _    _    _
-    )
   '';
 in
 {
