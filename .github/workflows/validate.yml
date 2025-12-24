@@ -7,6 +7,125 @@ on:
     branches: [main]
 
 jobs:
+  quality-tests:
+    name: Quality System Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        working-directory: config/quality
+        run: bun install --frozen-lockfile
+
+      - name: Run tests
+        working-directory: config/quality
+        run: bun test
+
+      - name: Validate artifacts
+        working-directory: config/quality
+        run: bun run validate
+
+  mcp-smoke-tests:
+    name: MCP Server Smoke Tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Setup Node (for npx)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Setup Python (for uvx)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        run: pip install uv
+
+      - name: Build MCP test harness
+        run: |
+          cat > /tmp/mcp-smoke.ts << 'EOF'
+          import { spawn } from 'bun';
+          import { setTimeout } from 'timers/promises';
+
+          interface McpServer {
+            name: string;
+            cmd: string[];
+            env?: Record<string, string | undefined>;
+            skip?: boolean;
+          }
+
+          const MCP_SERVERS: McpServer[] = [
+            { name: 'repomix', cmd: ['npx', '-y', 'repomix', '--mcp'] },
+            { name: 'fetch', cmd: ['uvx', 'mcp-server-fetch'] },
+            {
+              name: 'github',
+              cmd: ['npx', '-y', '@modelcontextprotocol/server-github'],
+              env: { GITHUB_PERSONAL_ACCESS_TOKEN: process.env.GITHUB_TOKEN },
+            },
+          ];
+
+          let passed = 0;
+          let failed = 0;
+
+          for (const server of MCP_SERVERS) {
+            if (server.skip) {
+              console.log(`⏭️  ${server.name} (skipped)`);
+              continue;
+            }
+
+            console.log(`Testing ${server.name}...`);
+            try {
+              const proc = spawn({
+                cmd: server.cmd,
+                env: { ...process.env, ...server.env },
+                stdout: 'pipe',
+                stderr: 'pipe',
+              });
+
+              // Give it 8s to start
+              await setTimeout(8000);
+
+              // Check if still running (good) or crashed (bad)
+              if (proc.exitCode !== null) {
+                console.error(`❌ ${server.name} crashed with code ${proc.exitCode}`);
+                failed++;
+              } else {
+                console.log(`✅ ${server.name} started successfully`);
+                passed++;
+              }
+              proc.kill();
+            } catch (err) {
+              console.error(`❌ ${server.name} failed to start: ${err}`);
+              failed++;
+            }
+          }
+
+          console.log(`\nResults: ${passed} passed, ${failed} failed`);
+          if (failed > 0) {
+            process.exit(1);
+          }
+          EOF
+
+      - name: Run MCP smoke tests
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bun run /tmp/mcp-smoke.ts
+
   nix-check:
     name: Nix Flake Check (nixbuild.net)
     runs-on: ubuntu-24.04-arm # Free arm64 for public repos
