@@ -66,7 +66,7 @@ export const STACK = {
     'pulumi-aws': '7.14.0', // AWS provider
     'pulumi-awsx': '3.1.0', // AWS Crosswalk (higher-level constructs)
     'docker-compose': '2.32.0', // Container orchestration
-    tailscale: '1.78.0', // Mesh network
+    tailscale: '1.76.6', // Mesh network (nixpkgs-unstable, Dec 2025)
   },
 
   // ===========================================================================

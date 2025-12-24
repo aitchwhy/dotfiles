@@ -149,7 +149,8 @@
       # ─────────────────────────────────────────────────────────────
       # Networking
       # ─────────────────────────────────────────────────────────────
-      "Tailscale" = 1475387142; # VPN mesh network (GUI menu bar)
+      # Tailscale managed by nix-darwin (services.tailscale)
+      # Use CLI: tailscale status, tailscale up, tailscale down
 
       # ─────────────────────────────────────────────────────────────
       # Utilities
