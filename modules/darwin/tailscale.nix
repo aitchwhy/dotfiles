@@ -76,7 +76,7 @@ in
         echo "Configuring Tailscale..."
 
         # Wait for tailscaled to be ready (max 10 seconds)
-        for i in $(seq 1 10); do
+        for _ in $(seq 1 10); do
           if /run/current-system/sw/bin/tailscale status &>/dev/null; then
             break
           fi
@@ -84,7 +84,7 @@ in
         done
 
         # Check current state
-        current_status=$(/run/current-system/sw/bin/tailscale status --json 2>/dev/null | /run/current-system/sw/bin/jq -r '.BackendState // "Unknown"' || echo "Unknown")
+        current_status=$(/run/current-system/sw/bin/tailscale status --json 2>/dev/null | ${pkgs.jq}/bin/jq -r '.BackendState // "Unknown"' || echo "Unknown")
 
         if [ "$current_status" = "Running" ]; then
           echo "Tailscale already connected"

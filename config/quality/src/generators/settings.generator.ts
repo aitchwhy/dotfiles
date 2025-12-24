@@ -96,6 +96,7 @@ const PERMISSIONS = {
     'Bash(shfmt:*)',
     'Bash(stylua:*)',
 
+    'Bash(ps:*)',
     'Bash(pgrep:*)',
     'Bash(killall:*)',
     'Bash(launchctl:*)',
