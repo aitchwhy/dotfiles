@@ -6,7 +6,6 @@ set shell := ["bash", "-uc"]
 host := env_var_or_default("HOST", "hank-mbp-m4")
 
 # Import namespaced modules
-mod cloud "config/just/cloud.just"
 mod data "config/just/data.just"
 mod nvim "config/just/nvim.just"
 mod yazi "config/just/yazi.just"
@@ -44,12 +43,8 @@ switch: _preflight _fmt _lint _test
     echo ""
     echo "✓ System switched"
 
-# Deploy everything: system + cloud infrastructure + data
+# Deploy everything: system + data sync
 deploy: switch
-    @echo ""
-    @echo "Deploying cloud infrastructure..."
-    @just cloud secrets-sync-github
-    @just cloud up
     @echo ""
     @echo "Syncing data to GCS..."
     @just data push

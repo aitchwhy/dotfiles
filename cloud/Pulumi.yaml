@@ -1,6 +1,0 @@
-name: dotfiles-aws-infra
-runtime:
-  name: nodejs
-  options:
-    packagemanager: bun
-description: AWS foundation infrastructure - VPC, GitHub OIDC (generic for all projects)
