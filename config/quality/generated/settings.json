@@ -197,6 +197,17 @@
           }
         ]
       }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun \"$HOME/dotfiles/config/quality/src/hooks/prompt-validator.ts\"",
+            "timeout": 3
+          }
+        ]
+      }
     ]
   },
   "agents": [
