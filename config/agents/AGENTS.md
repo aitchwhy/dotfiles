@@ -83,3 +83,20 @@ Run `just <task>` for execution. Run `just --list` for available commands.
 - Biome enforced after every code change
 - Ban assumption language ("should work" -> "verified via test")
 - Conventional commits: type(scope): description
+
+## CLI Tool Preferences
+
+**Always use modern alternatives** instead of legacy commands:
+
+| Instead of | Use | Reason |
+|------------|-----|--------|
+| `grep` | `rg` (ripgrep) | Faster, respects .gitignore, better defaults |
+| `find` | `fd` | Simpler syntax, faster, respects .gitignore |
+| `ls` | `eza` | Better formatting, git integration, colors |
+| `cat` | `bat` | Syntax highlighting, line numbers |
+
+Examples:
+- `rg "pattern"` not `grep -r "pattern"`
+- `fd "*.nix"` not `find . -name "*.nix"`
+- `eza -la` not `ls -la`
+- `bat file.ts` not `cat file.ts`
