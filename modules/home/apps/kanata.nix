@@ -44,7 +44,7 @@ let
       tab  q    w    e    r    t    y    u    i    o    p    [    ]    \
       caps a    s    d    f    g    h    j    k    l    ;    '    ret
       lsft z    x    c    v    b    n    m    ,    .    /    rsft
-      fn   lctl lalt lmet           spc            rmet ralt rctl
+      lctl lalt lmet           spc            rmet ralt rctl
     )
 
     ;; ============================================================================
@@ -80,7 +80,7 @@ let
       tab  q    w    e    r    t    y    u    i    o    p    [    ]    \
       @caps a   s    d    f    g    h    j    k    l    ;    '    ret
       lsft z    x    c    v    b    n    m    ,    .    /    rsft
-      fn   lctl lalt lmet           @spc           rmet ralt rctl
+      lctl lalt lmet           @spc           rmet ralt rctl
     )
 
     ;; Symbols layer (activated by holding space)
@@ -92,7 +92,7 @@ let
       _    S-1  S-2  S-3  S-4  S-5  S-6  S-7  S-8  S-9  S-0  S-[  S-]  S-\
       _    1    2    3    4    5    6    7    8    9    0    `    _
       _    S-`  `    _    _    _    -    =    S-,  S-.  S-/  _
-      _    _    _    _              _              _    _    _
+      _    _    _              _              _    _    _
     )
 
   '';
