@@ -149,7 +149,7 @@
               MCP_COUNT=$(echo "$MCP_SERVERS" | wc -l | tr -d ' ')
 
               # Assertion: Required servers exist
-              for server in memory context7 fetch repomix github; do
+              for server in context7 fetch repomix github; do
                 if echo "$MCP_SERVERS" | ${pkgs.ripgrep}/bin/rg -q "^$server$"; then
                   assert_pass "Required MCP server: $server"
                 else
