@@ -33,8 +33,8 @@ export const STACK = {
   // RUNTIME
   // ===========================================================================
   runtime: {
-    pnpm: '9.15.4', // Fast, disk-efficient package manager
-    node: '25.2.1', // Current (NOT LTS - user preference)
+    pnpm: '10.25.0', // Fast, disk-efficient package manager
+    node: '24.12.0', // Current (NOT LTS - user preference)
     uv: '0.5.1', // Python manager (Rust)
     volta: '2.0.1', // Tool manager (Rust)
   },
@@ -120,8 +120,8 @@ export const STACK = {
     'opentelemetry-auto-instrumentations-node': '0.56.0',
     'posthog-js': '1.200.0',
     'posthog-node': '5.14.1',
-    'devcycle-server-sdk': '2.0.0',
-    'devcycle-client-sdk': '1.30.0',
+    'statsig-js-client': '3.31.0', // Web feature flags
+    'statsig-node': '5.20.0', // Server feature flags
     'datadog-agent': '7.60.0', // Reference only (not npm)
   },
 
@@ -185,8 +185,7 @@ export const STACK = {
     '@tanstack/react-router': '1.140.0',
     tailwindcss: '4.1.17',
 
-    // Backend (Hono for now, Effect Platform HTTP migration pending)
-    hono: '4.7.10',
+    // Backend (Effect Platform HTTP - no Hono)
     'drizzle-orm': '0.45.0',
     'drizzle-kit': '0.31.0',
 
@@ -205,8 +204,9 @@ export const STACK = {
     '@opentelemetry/auto-instrumentations-node': '0.56.0',
     'posthog-js': '1.200.0',
     'posthog-node': '5.14.1',
-    '@devcycle/nodejs-server-sdk': '2.0.0',
-    '@devcycle/js-client-sdk': '1.30.0',
+    '@statsig/js-client': '3.31.0',
+    '@statsig/react-bindings': '3.31.0',
+    'statsig-node': '2.6.0',
 
     // Cache & Queue
     ioredis: '5.8.2',

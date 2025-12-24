@@ -167,8 +167,8 @@ export type ObservabilityVersions = {
   readonly 'opentelemetry-auto-instrumentations-node': string;
   readonly 'posthog-js': string;
   readonly 'posthog-node': string;
-  readonly 'devcycle-server-sdk': string;
-  readonly 'devcycle-client-sdk': string;
+  readonly 'statsig-js-client': string;
+  readonly 'statsig-node': string;
   readonly 'datadog-agent': string;
 };
 
@@ -242,8 +242,7 @@ export type NpmVersions = {
   readonly '@tanstack/react-router': string;
   readonly tailwindcss: string;
 
-  // Backend (Effect Platform HTTP - uses @effect/platform)
-  readonly hono: string;
+  // Backend (Effect Platform HTTP - no Hono)
   readonly 'drizzle-orm': string;
   readonly 'drizzle-kit': string;
 
@@ -262,8 +261,9 @@ export type NpmVersions = {
   readonly '@opentelemetry/auto-instrumentations-node': string;
   readonly 'posthog-js': string;
   readonly 'posthog-node': string;
-  readonly '@devcycle/nodejs-server-sdk': string;
-  readonly '@devcycle/js-client-sdk': string;
+  readonly '@statsig/js-client': string;
+  readonly '@statsig/react-bindings': string;
+  readonly 'statsig-node': string;
 
   // Cache & Queue
   readonly ioredis: string;
@@ -408,8 +408,8 @@ export const ObservabilityVersionsSchema = Schema.Struct({
   'opentelemetry-auto-instrumentations-node': VersionString,
   'posthog-js': VersionString,
   'posthog-node': VersionString,
-  'devcycle-server-sdk': VersionString,
-  'devcycle-client-sdk': VersionString,
+  'statsig-js-client': VersionString,
+  'statsig-node': VersionString,
   'datadog-agent': VersionString,
 }) satisfies Schema.Schema<ObservabilityVersions, ObservabilityVersions>;
 
@@ -473,8 +473,7 @@ export const NpmVersionsSchema = Schema.Struct({
   '@tanstack/react-router': VersionString,
   tailwindcss: VersionString,
 
-  // Backend (Effect Platform HTTP - uses @effect/platform)
-  hono: VersionString,
+  // Backend (Effect Platform HTTP - no Hono)
   'drizzle-orm': VersionString,
   'drizzle-kit': VersionString,
 
@@ -493,8 +492,9 @@ export const NpmVersionsSchema = Schema.Struct({
   '@opentelemetry/auto-instrumentations-node': VersionString,
   'posthog-js': VersionString,
   'posthog-node': VersionString,
-  '@devcycle/nodejs-server-sdk': VersionString,
-  '@devcycle/js-client-sdk': VersionString,
+  '@statsig/js-client': VersionString,
+  '@statsig/react-bindings': VersionString,
+  'statsig-node': VersionString,
 
   // Cache & Queue
   ioredis: VersionString,
