@@ -4,18 +4,18 @@
   "files": {
     "includes": [
       "**",
-      "!node_modules/**",
-      "!dist/**",
+      "!node_modules",
+      "!dist",
       "!*.gen.ts",
-      "!.claude/**",
-      "!playwright-report/**",
-      "!test-results/**",
-      "!.venv/**",
-      "!**/.venv/**",
-      "!/nix/store/**",
-      "!.data/**",
-      "!.logs/**",
-      "!**/coverage/**"
+      "!.claude",
+      "!playwright-report",
+      "!test-results",
+      "!.venv",
+      "!**/.venv",
+      "!/nix/store",
+      "!.data",
+      "!.logs",
+      "!**/coverage"
     ]
   },
   "linter": {
