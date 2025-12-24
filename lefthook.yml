@@ -49,6 +49,24 @@ pre-commit:
           exit 1
         fi
 
+    # Enforcement: No sync FS in hooks (use @effect/platform)
+    no-sync-fs-in-hooks:
+      glob: "config/quality/src/hooks/**/*.ts"
+      run: |
+        if grep -E 'existsSync|readFileSync|writeFileSync|appendFileSync|mkdirSync|readdirSync|statSync' {staged_files}; then
+          echo "ERROR: Sync FS in hooks. Use @effect/platform FileSystem"
+          exit 1
+        fi
+
+    # Enforcement: No try/catch (use Effect.try)
+    no-try-catch:
+      glob: "config/**/*.ts"
+      run: |
+        if grep -E '\btry\s*\{' {staged_files} | grep -v 'Effect.try'; then
+          echo "ERROR: try/catch detected. Use Effect.try"
+          exit 1
+        fi
+
 commit-msg:
   commands:
     commitlint:
