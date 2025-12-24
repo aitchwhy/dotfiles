@@ -25,8 +25,8 @@ import { StackDefinitionSchema } from './schema';
 export const STACK = {
   meta: {
     frozen: '2025-12',
-    updated: '2025-12-18',
-    ssotVersion: '4.0.0',
+    updated: '2024-12-24',
+    ssotVersion: '4.1.0',
   },
 
   // ===========================================================================
@@ -45,7 +45,7 @@ export const STACK = {
   frontend: {
     react: '19.2.1',
     'react-dom': '19.2.1',
-    xstate: '5.24.0', // Actor model state machines (handles API state)
+    xstate: '5.25.0', // Actor model state machines (handles API state)
     'tanstack-router': '1.140.0',
     tailwindcss: '4.1.17',
   },
@@ -101,7 +101,7 @@ export const STACK = {
   // AUTH & SERVICES
   // ===========================================================================
   services: {
-    'better-auth': '1.4.6', // TypeScript-first auth (replaces Clerk)
+    'better-auth': '1.4.7', // TypeScript-first auth (replaces Clerk)
     livekit: '2.9.0',
   },
 
@@ -110,13 +110,13 @@ export const STACK = {
   // ===========================================================================
   observability: {
     'opentelemetry-api': '1.9.0',
-    'opentelemetry-sdk-node': '0.200.0',
-    'opentelemetry-sdk-trace-node': '2.0.0',
-    'opentelemetry-sdk-metrics': '2.0.0',
-    'opentelemetry-resources': '2.0.0',
-    'opentelemetry-semantic-conventions': '1.30.0',
-    'opentelemetry-exporter-trace-otlp-proto': '0.200.0',
-    'opentelemetry-exporter-metrics-otlp-proto': '0.200.0',
+    'opentelemetry-sdk-node': '0.208.0',
+    'opentelemetry-sdk-trace-node': '2.2.0',
+    'opentelemetry-sdk-metrics': '2.2.0',
+    'opentelemetry-resources': '2.2.0',
+    'opentelemetry-semantic-conventions': '1.38.0',
+    'opentelemetry-exporter-trace-otlp-proto': '0.208.0',
+    'opentelemetry-exporter-metrics-otlp-proto': '0.208.0',
     'opentelemetry-auto-instrumentations-node': '0.56.0',
     'posthog-js': '1.200.0',
     'posthog-node': '5.14.1',
@@ -168,10 +168,10 @@ export const STACK = {
   npm: {
     // Core (Effect ecosystem - versions must be compatible)
     typescript: '5.9.3',
-    effect: '3.19.9',
+    effect: '3.19.13',
     '@effect/cli': '0.72.1',
-    '@effect/platform': '0.93.6',
-    '@effect/platform-node': '0.103.0',
+    '@effect/platform': '0.94.0',
+    '@effect/platform-node': '0.104.0',
     '@effect/platform-bun': '0.87.0',
     '@effect/printer': '0.47.0',
     '@effect/printer-ansi': '0.47.0',
@@ -180,7 +180,7 @@ export const STACK = {
     // Frontend
     react: '19.2.1',
     'react-dom': '19.2.1',
-    xstate: '5.24.0',
+    xstate: '5.25.0',
     '@xstate/react': '6.0.0',
     '@tanstack/react-router': '1.140.0',
     tailwindcss: '4.1.17',
@@ -190,17 +190,17 @@ export const STACK = {
     'drizzle-kit': '0.31.0',
 
     // Auth
-    'better-auth': '1.4.6',
+    'better-auth': '1.4.7',
 
     // Observability (Datadog + OTEL 2.x)
     '@opentelemetry/api': '1.9.0',
-    '@opentelemetry/sdk-node': '0.200.0',
-    '@opentelemetry/sdk-trace-node': '2.0.0',
-    '@opentelemetry/sdk-metrics': '2.0.0',
-    '@opentelemetry/resources': '2.0.0',
-    '@opentelemetry/semantic-conventions': '1.30.0',
-    '@opentelemetry/exporter-trace-otlp-proto': '0.200.0',
-    '@opentelemetry/exporter-metrics-otlp-proto': '0.200.0',
+    '@opentelemetry/sdk-node': '0.208.0',
+    '@opentelemetry/sdk-trace-node': '2.2.0',
+    '@opentelemetry/sdk-metrics': '2.2.0',
+    '@opentelemetry/resources': '2.2.0',
+    '@opentelemetry/semantic-conventions': '1.38.0',
+    '@opentelemetry/exporter-trace-otlp-proto': '0.208.0',
+    '@opentelemetry/exporter-metrics-otlp-proto': '0.208.0',
     '@opentelemetry/auto-instrumentations-node': '0.56.0',
     'posthog-js': '1.200.0',
     'posthog-node': '5.14.1',

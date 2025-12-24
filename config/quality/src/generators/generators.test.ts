@@ -32,7 +32,7 @@ describe('Generated Artifacts', () => {
 
     it('reports correct total', () => {
       const content = fs.readFileSync(filePath, 'utf-8');
-      expect(content).toContain('17 memories');
+      expect(content).toContain('23 memories');
     });
   });
 

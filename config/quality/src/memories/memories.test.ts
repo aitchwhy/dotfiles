@@ -1,7 +1,7 @@
 /**
  * Memory System Tests
  *
- * Validates the 17 canonical memories are correctly defined
+ * Validates the 23 canonical memories are correctly defined
  * and maintain structural integrity.
  */
 import { Schema } from 'effect';
@@ -11,15 +11,15 @@ import { MemorySchema } from './schemas';
 
 describe('Memory System', () => {
   describe('counts', () => {
-    it('has exactly 17 memories', () => {
-      expect(MEMORIES).toHaveLength(17);
-      expect(MEMORY_COUNTS.total).toBe(17);
+    it('has exactly 23 memories', () => {
+      expect(MEMORIES).toHaveLength(23);
+      expect(MEMORY_COUNTS.total).toBe(23);
     });
 
     it('has correct category distribution', () => {
       expect(MEMORY_COUNTS.principle).toBe(5);
       expect(MEMORY_COUNTS.constraint).toBe(4);
-      expect(MEMORY_COUNTS.pattern).toBe(6);
+      expect(MEMORY_COUNTS.pattern).toBe(12);
       expect(MEMORY_COUNTS.gotcha).toBe(2);
     });
 
@@ -84,6 +84,13 @@ describe('Memory System', () => {
       'effect-platform-http',
       'statsig-feature-flags',
       'hexagonal-architecture',
+      'dynamic-credentials', // renamed from pulumi-esc-only
+      'xstate-actor-model',
+      'betterauth-sessions',
+      'docker-compose-dev',
+      'e2e-first-testing',
+      'nx-monorepo',
+      'drizzle-postgres',
     ];
 
     it.each(requiredIds)('has required memory: %s', (id) => {
@@ -95,7 +102,7 @@ describe('Memory System', () => {
     it('getMemoriesByCategory returns correct counts', () => {
       expect(getMemoriesByCategory('principle')).toHaveLength(5);
       expect(getMemoriesByCategory('constraint')).toHaveLength(4);
-      expect(getMemoriesByCategory('pattern')).toHaveLength(6);
+      expect(getMemoriesByCategory('pattern')).toHaveLength(12);
       expect(getMemoriesByCategory('gotcha')).toHaveLength(2);
     });
 
