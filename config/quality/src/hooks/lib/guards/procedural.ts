@@ -408,7 +408,7 @@ export function checkSecrets(content: string, filePath: string): GuardResult {
   for (const { name, pattern } of SECRETS_PATTERNS) {
     const match = content.match(pattern);
     if (match) {
-      const masked = match[0].substring(0, 8) + '...';
+      const masked = `${match[0].substring(0, 8)}...`;
       return {
         ok: false,
         error: `Guard 32: SECRETS DETECTED\n\nType: ${name}\nMatch: ${masked}\nFile: ${filePath}\n\nFix: Use Pulumi ESC for secrets, not code.`,

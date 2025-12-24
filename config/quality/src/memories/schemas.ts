@@ -19,9 +19,7 @@ export const MemorySchema = Schema.Struct({
   category: MemoryCategorySchema,
   title: Schema.String.pipe(Schema.maxLength(80)),
   content: Schema.String.pipe(Schema.maxLength(500)),
-  verified: Schema.optional(
-    Schema.String.pipe(Schema.pattern(/^\d{4}-\d{2}-\d{2}$/))
-  ),
+  verified: Schema.optional(Schema.String.pipe(Schema.pattern(/^\d{4}-\d{2}-\d{2}$/))),
 });
 export type Memory = typeof MemorySchema.Type;
 

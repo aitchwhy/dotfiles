@@ -43,7 +43,7 @@ export type HookContinue = {
  * ```
  */
 export const emitDecision = (output: HookDecision): void => {
-  process.stdout.write(JSON.stringify(output) + '\n');
+  process.stdout.write(`${JSON.stringify(output)}\n`);
 };
 
 /**
@@ -91,7 +91,7 @@ export const skip = (reason?: string): void => {
  */
 export const emitContinue = (extra?: Record<string, unknown>): void => {
   const output: HookContinue = { continue: true, ...extra };
-  process.stdout.write(JSON.stringify(output) + '\n');
+  process.stdout.write(`${JSON.stringify(output)}\n`);
 };
 
 /**
@@ -100,7 +100,7 @@ export const emitContinue = (extra?: Record<string, unknown>): void => {
  */
 export const emitHalt = (extra?: Record<string, unknown>): void => {
   const output: HookContinue = { continue: false, ...extra };
-  process.stdout.write(JSON.stringify(output) + '\n');
+  process.stdout.write(`${JSON.stringify(output)}\n`);
 };
 
 // =============================================================================
@@ -116,13 +116,13 @@ export const logError = (context: string, error?: unknown): void => {
   const stack = error instanceof Error ? error.stack : undefined;
 
   process.stderr.write(
-    JSON.stringify({
+    `${JSON.stringify({
       level: 'error',
       context,
       message: errorMessage,
       stack,
       timestamp: new Date().toISOString(),
-    }) + '\n'
+    })}\n`
   );
 };
 
@@ -131,12 +131,12 @@ export const logError = (context: string, error?: unknown): void => {
  */
 export const logWarning = (context: string, message: string): void => {
   process.stderr.write(
-    JSON.stringify({
+    `${JSON.stringify({
       level: 'warning',
       context,
       message,
       timestamp: new Date().toISOString(),
-    }) + '\n'
+    })}\n`
   );
 };
 
@@ -145,12 +145,12 @@ export const logWarning = (context: string, message: string): void => {
  */
 export const logDebug = (context: string, message: string, data?: unknown): void => {
   process.stderr.write(
-    JSON.stringify({
+    `${JSON.stringify({
       level: 'debug',
       context,
       message,
       data,
       timestamp: new Date().toISOString(),
-    }) + '\n'
+    })}\n`
   );
 };

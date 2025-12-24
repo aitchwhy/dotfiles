@@ -56,7 +56,7 @@ const generateMarkdown = (): string => {
 
   const categories = CATEGORY_ORDER.map(formatCategory).join('\n\n---\n\n');
 
-  return header + categories + '\n';
+  return `${header + categories}\n`;
 };
 
 export const generateMemoriesFile = (outDir: string) =>

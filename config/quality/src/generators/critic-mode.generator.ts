@@ -8,7 +8,7 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Effect } from 'effect';
-import { CRITIC_BEHAVIORS, BEHAVIOR_COUNTS } from '../critic-mode';
+import { BEHAVIOR_COUNTS, CRITIC_BEHAVIORS } from '../critic-mode';
 import type { CriticBehavior, CriticPhase } from '../critic-mode/schemas';
 
 const PHASE_ORDER: readonly CriticPhase[] = ['planning', 'execution'];
@@ -53,7 +53,7 @@ const generateMarkdown = (): string => {
 
   const phases = PHASE_ORDER.map(formatPhase).join('\n\n---\n\n');
 
-  return header + phases + '\n';
+  return `${header + phases}\n`;
 };
 
 export const generateCriticModeFile = (outDir: string) =>
