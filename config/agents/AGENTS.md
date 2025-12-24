@@ -86,17 +86,78 @@ Run `just <task>` for execution. Run `just --list` for available commands.
 
 ## CLI Tool Preferences
 
-**Always use modern alternatives** instead of legacy commands:
+**ALWAYS use modern alternatives** - legacy commands (`grep`, `find`, `ls`, `cat`) are discouraged.
 
-| Instead of | Use | Reason |
-|------------|-----|--------|
-| `grep` | `rg` (ripgrep) | Faster, respects .gitignore, better defaults |
-| `find` | `fd` | Simpler syntax, faster, respects .gitignore |
-| `ls` | `eza` | Better formatting, git integration, colors |
-| `cat` | `bat` | Syntax highlighting, line numbers |
+### ripgrep (`rg`) - replaces `grep`
 
-Examples:
-- `rg "pattern"` not `grep -r "pattern"`
-- `fd "*.nix"` not `find . -name "*.nix"`
-- `eza -la` not `ls -la`
-- `bat file.ts` not `cat file.ts`
+```bash
+# Basic search (recursive by default, respects .gitignore)
+rg "pattern"                    # NOT: grep -r "pattern"
+rg "pattern" src/               # search in specific directory
+rg -i "pattern"                 # case-insensitive
+rg -w "word"                    # whole word match
+rg -l "pattern"                 # list files only (like grep -l)
+rg -c "pattern"                 # count matches per file
+rg -A3 -B3 "pattern"            # context lines (after/before)
+rg --type ts "pattern"          # filter by file type
+rg -g "*.nix" "pattern"         # filter by glob
+rg -F "literal.string"          # literal string (no regex)
+rg --hidden "pattern"           # include hidden files
+```
+
+### fd - replaces `find`
+
+```bash
+# Basic search (recursive, respects .gitignore)
+fd "pattern"                    # NOT: find . -name "*pattern*"
+fd -e nix                       # by extension: find . -name "*.nix"
+fd -e ts -e tsx                 # multiple extensions
+fd "^config"                    # regex: names starting with "config"
+fd -t f                         # files only (type: f=file, d=dir, l=symlink)
+fd -t d                         # directories only
+fd -H "pattern"                 # include hidden files
+fd -I "pattern"                 # include gitignored files
+fd -x cmd {}                    # execute command on each result
+fd -X cmd                       # execute command with all results as args
+fd . -e ts --exec wc -l         # count lines in all .ts files
+```
+
+### eza - replaces `ls`
+
+```bash
+# Basic listing
+eza                             # NOT: ls
+eza -l                          # long format with git status
+eza -la                         # include hidden files
+eza -lah                        # with human-readable sizes
+eza -T                          # tree view
+eza -T -L 2                     # tree with depth limit
+eza -l --git                    # show git status column
+eza -l --icons                  # with file type icons
+eza --group-directories-first   # dirs first
+eza -l -s modified              # sort by modified time
+eza -l -s size                  # sort by size
+```
+
+### bat - replaces `cat`
+
+```bash
+# View files with syntax highlighting
+bat file.ts                     # NOT: cat file.ts
+bat -n file.ts                  # with line numbers only (no decorations)
+bat -p file.ts                  # plain output (like cat)
+bat -l nix file                 # force language syntax
+bat --style=numbers file.ts     # minimal style with line numbers
+bat -r 10:20 file.ts            # show only lines 10-20
+```
+
+### Key Differences from Legacy Commands
+
+| Legacy | Modern | Key Syntax Difference |
+|--------|--------|----------------------|
+| `grep -r` | `rg` | Recursive by default, no `-r` needed |
+| `grep -E` | `rg` | Extended regex by default, no `-E` needed |
+| `find . -name "*.x"` | `fd -e x` | Extension flag, no quotes needed |
+| `find . -type f` | `fd -t f` | Shorter type flag |
+| `ls -la` | `eza -la` | Same flags, better output |
+| `cat file` | `bat file` | Same syntax, adds highlighting |
