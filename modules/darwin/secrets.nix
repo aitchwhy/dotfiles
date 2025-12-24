@@ -54,6 +54,14 @@ in
         owner = config.system.primaryUser;
         path = "/Users/${config.system.primaryUser}/.config/claude/github-token";
       };
+
+      # Claude Code userID for analytics/preferences
+      # Enables pure declarative ~/.claude.json generation
+      claude-user-id = {
+        mode = "0400";
+        owner = config.system.primaryUser;
+        path = "/Users/${config.system.primaryUser}/.config/claude/user-id";
+      };
     };
   };
 }
