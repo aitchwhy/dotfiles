@@ -10,9 +10,10 @@
  *   - Quality System generators (package.json generation)
  *   - Enforcement hooks (version drift detection)
  */
+
+import { type Either, type ParseResult, Schema } from 'effect';
 import type { StackDefinition } from './schema';
-import { Either, ParseResult, Schema } from "effect";
-import { StackDefinitionSchema } from "./schema";
+import { StackDefinitionSchema } from './schema';
 
 /**
  * STACK - Frozen December 2025 Configuration
@@ -274,7 +275,7 @@ export const STACK = {
  * but kept for backward compatibility and explicit runtime assertion.
  */
 export function validateStack(): Either.Either<StackDefinition, ParseResult.ParseError> {
-	return Schema.decodeUnknownEither(StackDefinitionSchema)(STACK);
+  return Schema.decodeUnknownEither(StackDefinitionSchema)(STACK);
 }
 
 /**

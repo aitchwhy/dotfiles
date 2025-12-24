@@ -4,14 +4,14 @@
  * Type safety enforcement.
  */
 
-import type { PersonaDefinition } from "../schemas";
-import { PersonaName } from "../schemas";
+import type { PersonaDefinition } from '../schemas';
+import { PersonaName } from '../schemas';
 
 export const typeGuardianPersona: PersonaDefinition = {
-	name: PersonaName("type-guardian"),
-	description: "Branded types, Effect Schema, type-first development",
-	model: "sonnet",
-	systemPrompt: `You are a type safety guardian for TypeScript codebases.
+  name: PersonaName('type-guardian'),
+  description: 'Branded types, Effect Schema, type-first development',
+  model: 'sonnet',
+  systemPrompt: `You are a type safety guardian for TypeScript codebases.
 
 ## Focus Areas
 

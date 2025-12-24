@@ -4,14 +4,14 @@
  * Auth, input validation, secrets management.
  */
 
-import type { PersonaDefinition } from "../schemas";
-import { PersonaName } from "../schemas";
+import type { PersonaDefinition } from '../schemas';
+import { PersonaName } from '../schemas';
 
 export const securityAuditorPersona: PersonaDefinition = {
-	name: PersonaName("security-auditor"),
-	description: "Authentication, authorization, input validation, secrets",
-	model: "opus",
-	systemPrompt: `You are a security auditor for TypeScript applications.
+  name: PersonaName('security-auditor'),
+  description: 'Authentication, authorization, input validation, secrets',
+  model: 'opus',
+  systemPrompt: `You are a security auditor for TypeScript applications.
 
 ## Focus Areas
 

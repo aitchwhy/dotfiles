@@ -4,20 +4,20 @@
  * OTEL + Effect logging patterns.
  */
 
-import type { SkillDefinition } from "../schemas";
-import { SkillName } from "../schemas";
+import type { SkillDefinition } from '../schemas';
+import { SkillName } from '../schemas';
 
 export const observabilitySkill: SkillDefinition = {
-	frontmatter: {
-		name: SkillName("observability"),
-		description: "OpenTelemetry + Effect logging for distributed tracing",
-		allowedTools: ["Read", "Write", "Edit", "Grep"],
-		tokenBudget: 350,
-	},
-	sections: [
-		{
-			heading: "Effect Logging",
-			content: `
+  frontmatter: {
+    name: SkillName('observability'),
+    description: 'OpenTelemetry + Effect logging for distributed tracing',
+    allowedTools: ['Read', 'Write', 'Edit', 'Grep'],
+    tokenBudget: 350,
+  },
+  sections: [
+    {
+      heading: 'Effect Logging',
+      content: `
 \`\`\`typescript
 import { Effect } from "effect";
 
@@ -34,10 +34,10 @@ const program = Effect.gen(function* () {
 );
 \`\`\`
 `,
-		},
-		{
-			heading: "Structured Spans",
-			content: `
+    },
+    {
+      heading: 'Structured Spans',
+      content: `
 \`\`\`typescript
 import { Effect } from "effect";
 
@@ -51,10 +51,10 @@ const processOrder = (orderId: string) =>
 
 Spans are automatically nested and exported to OTEL collectors.
 `,
-		},
-		{
-			heading: "OTEL Integration",
-			content: `
+    },
+    {
+      heading: 'OTEL Integration',
+      content: `
 \`\`\`typescript
 import { NodeSdk } from "@effect/opentelemetry";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-proto";
@@ -68,14 +68,14 @@ const OtelLive = NodeSdk.layer(() => ({
 const main = program.pipe(Effect.provide(OtelLive));
 \`\`\`
 `,
-		},
-		{
-			heading: "Anti-Patterns",
-			content: `
+    },
+    {
+      heading: 'Anti-Patterns',
+      content: `
 - **console.log** → Use Effect.log (structured, traced)
 - **console.error** → Use Effect.logError (with stack traces)
 - **Custom logger** → Use Effect's built-in (integrates with OTEL)
 `,
-		},
-	],
+    },
+  ],
 };

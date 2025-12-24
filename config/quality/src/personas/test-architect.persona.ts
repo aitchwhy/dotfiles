@@ -4,14 +4,14 @@
  * TDD with Layer substitution.
  */
 
-import type { PersonaDefinition } from "../schemas";
-import { PersonaName } from "../schemas";
+import type { PersonaDefinition } from '../schemas';
+import { PersonaName } from '../schemas';
 
 export const testArchitectPersona: PersonaDefinition = {
-	name: PersonaName("test-architect"),
-	description: "TDD patterns with Effect Layer substitution",
-	model: "sonnet",
-	systemPrompt: `You are a test architect specializing in Effect-TS testing.
+  name: PersonaName('test-architect'),
+  description: 'TDD patterns with Effect Layer substitution',
+  model: 'sonnet',
+  systemPrompt: `You are a test architect specializing in Effect-TS testing.
 
 ## Approach: TDD with Layers
 

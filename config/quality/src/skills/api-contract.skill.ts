@@ -4,30 +4,30 @@
  * HttpApiBuilder for typed HTTP endpoints.
  */
 
-import type { SkillDefinition } from "../schemas";
-import { SkillName } from "../schemas";
+import type { SkillDefinition } from '../schemas';
+import { SkillName } from '../schemas';
 
 export const apiContractSkill: SkillDefinition = {
-	frontmatter: {
-		name: SkillName("api-contract"),
-		description: "Typed HTTP APIs with @effect/platform HttpApiBuilder",
-		allowedTools: ["Read", "Write", "Edit", "Grep"],
-		tokenBudget: 450,
-	},
-	sections: [
-		{
-			heading: "Why HttpApiBuilder",
-			content: `
+  frontmatter: {
+    name: SkillName('api-contract'),
+    description: 'Typed HTTP APIs with @effect/platform HttpApiBuilder',
+    allowedTools: ['Read', 'Write', 'Edit', 'Grep'],
+    tokenBudget: 450,
+  },
+  sections: [
+    {
+      heading: 'Why HttpApiBuilder',
+      content: `
 - Type-safe request/response schemas
 - Automatic client generation
 - Built-in error handling
 - OpenAPI spec generation
 - NO framework lock-in (no Hono, Express)
 `,
-		},
-		{
-			heading: "Define API Contract",
-			content: `
+    },
+    {
+      heading: 'Define API Contract',
+      content: `
 \`\`\`typescript
 import { HttpApi, HttpApiEndpoint, HttpApiGroup } from "@effect/platform";
 import { Schema } from "effect";
@@ -53,10 +53,10 @@ class UsersApi extends HttpApiGroup.make("users")
 class MyApi extends HttpApi.empty.add(UsersApi) {}
 \`\`\`
 `,
-		},
-		{
-			heading: "Implement Handlers",
-			content: `
+    },
+    {
+      heading: 'Implement Handlers',
+      content: `
 \`\`\`typescript
 import { HttpApiBuilder } from "@effect/platform";
 
@@ -77,10 +77,10 @@ const UsersApiLive = HttpApiBuilder.group(MyApi, "users", (handlers) =>
 );
 \`\`\`
 `,
-		},
-		{
-			heading: "Generate Client",
-			content: `
+    },
+    {
+      heading: 'Generate Client',
+      content: `
 \`\`\`typescript
 import { HttpApiClient } from "@effect/platform";
 
@@ -93,6 +93,6 @@ const client = HttpApiClient.make(MyApi, {
 const user = yield* client.users.getUser({ path: { id: "123" } });
 \`\`\`
 `,
-		},
-	],
+    },
+  ],
 };

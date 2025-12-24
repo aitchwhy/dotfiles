@@ -59,8 +59,10 @@ pre-commit:
         fi
 
     # Enforcement: No try/catch (use Effect.try)
+    # Excludes: rule definitions (contain patterns), standalone CLI scripts
     no-try-catch:
-      glob: "config/**/*.ts"
+      glob: "config/quality/src/**/*.ts"
+      exclude: "config/quality/src/rules/*.ts"
       run: |
         if grep -E '\btry\s*\{' {staged_files} | grep -v 'Effect.try'; then
           echo "ERROR: try/catch detected. Use Effect.try"

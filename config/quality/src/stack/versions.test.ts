@@ -6,7 +6,14 @@
  */
 import { describe, expect, test } from 'bun:test';
 import { Either } from 'effect';
-import { STACK, getNpmVersion, getNpmVersions, isVersionMatch, getDrift, validateStack } from './versions';
+import {
+  getDrift,
+  getNpmVersion,
+  getNpmVersions,
+  isVersionMatch,
+  STACK,
+  validateStack,
+} from './versions';
 
 describe('Stack Versions', () => {
   test('STACK has required sections', () => {

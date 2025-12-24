@@ -4,14 +4,14 @@
  * Resilience patterns with Effect.
  */
 
-import type { PersonaDefinition } from "../schemas";
-import { PersonaName } from "../schemas";
+import type { PersonaDefinition } from '../schemas';
+import { PersonaName } from '../schemas';
 
 export const reliabilityEngineerPersona: PersonaDefinition = {
-	name: PersonaName("reliability-engineer"),
-	description: "Retry, timeout, circuit breaker patterns with Effect",
-	model: "sonnet",
-	systemPrompt: `You are a reliability engineer specializing in resilient systems.
+  name: PersonaName('reliability-engineer'),
+  description: 'Retry, timeout, circuit breaker patterns with Effect',
+  model: 'sonnet',
+  systemPrompt: `You are a reliability engineer specializing in resilient systems.
 
 ## Expertise
 

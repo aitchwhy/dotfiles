@@ -1,4 +1,6 @@
 #!/usr/bin/env bun
+import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { join, relative } from 'node:path';
 /**
  * sync-versions.ts - Sync package.json versions to STACK.ts SSOT
  *
@@ -9,9 +11,7 @@
  * This script finds all package.json files in a project and updates
  * their dependency versions to match the STACK.ts SSOT.
  */
-import { STACK, getDrift } from './src/stack/versions';
-import { readFileSync, writeFileSync, readdirSync, statSync, existsSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { getDrift, STACK } from './src/stack/versions';
 
 const projectPath = process.argv[2];
 const dryRun = process.argv.includes('--dry-run');
@@ -133,7 +133,9 @@ for (const pkg of packageJsons) {
     const relativePath = relative(projectPath, result.file);
     process.stdout.write(`\x1b[36m${relativePath}\x1b[0m\n`);
     for (const change of result.changes) {
-      process.stdout.write(`  \x1b[33m${change.pkg}\x1b[0m: ${change.from} \x1b[32m->\x1b[0m ${change.to}\n`);
+      process.stdout.write(
+        `  \x1b[33m${change.pkg}\x1b[0m: ${change.from} \x1b[32m->\x1b[0m ${change.to}\n`
+      );
       totalChanges++;
     }
   }
@@ -143,8 +145,12 @@ process.stdout.write('\n');
 if (totalChanges === 0) {
   process.stdout.write('\x1b[32m✓ All versions are in sync with STACK.ts\x1b[0m\n');
 } else if (dryRun) {
-  process.stdout.write(`\x1b[33m⚠ Would update ${totalChanges} package(s) across ${filesChanged} file(s)\x1b[0m\n`);
+  process.stdout.write(
+    `\x1b[33m⚠ Would update ${totalChanges} package(s) across ${filesChanged} file(s)\x1b[0m\n`
+  );
   process.stdout.write('Run without --dry-run to apply changes.\n');
 } else {
-  process.stdout.write(`\x1b[32m✓ Updated ${totalChanges} package(s) across ${filesChanged} file(s)\x1b[0m\n`);
+  process.stdout.write(
+    `\x1b[32m✓ Updated ${totalChanges} package(s) across ${filesChanged} file(s)\x1b[0m\n`
+  );
 }

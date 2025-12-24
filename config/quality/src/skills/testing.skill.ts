@@ -4,20 +4,20 @@
  * TDD with Layer substitution, no mocks.
  */
 
-import type { SkillDefinition } from "../schemas";
-import { SkillName } from "../schemas";
+import type { SkillDefinition } from '../schemas';
+import { SkillName } from '../schemas';
 
 export const testingSkill: SkillDefinition = {
-	frontmatter: {
-		name: SkillName("testing"),
-		description: "TDD with Effect Layer substitution, no mocking frameworks",
-		allowedTools: ["Read", "Write", "Edit", "Grep", "Bash"],
-		tokenBudget: 400,
-	},
-	sections: [
-		{
-			heading: "TDD with Effect",
-			content: `
+  frontmatter: {
+    name: SkillName('testing'),
+    description: 'TDD with Effect Layer substitution, no mocking frameworks',
+    allowedTools: ['Read', 'Write', 'Edit', 'Grep', 'Bash'],
+    tokenBudget: 400,
+  },
+  sections: [
+    {
+      heading: 'TDD with Effect',
+      content: `
 Red-Green-Refactor with typed effects:
 
 1. **Red**: Write failing test with expected behavior
@@ -37,10 +37,10 @@ describe("createOrder", () => {
 });
 \`\`\`
 `,
-		},
-		{
-			heading: "Test Layers",
-			content: `
+    },
+    {
+      heading: 'Test Layers',
+      content: `
 \`\`\`typescript
 // Create test implementations
 const ProductRepoTest = Layer.succeed(ProductRepository, {
@@ -60,10 +60,10 @@ const TestLayers = Layer.mergeAll(
 );
 \`\`\`
 `,
-		},
-		{
-			heading: "Testing Error Paths",
-			content: `
+    },
+    {
+      heading: 'Testing Error Paths',
+      content: `
 \`\`\`typescript
 it("handles payment failure", async () => {
   const FailingPayment = Layer.succeed(PaymentService, {
@@ -81,15 +81,15 @@ it("handles payment failure", async () => {
 });
 \`\`\`
 `,
-		},
-		{
-			heading: "Anti-Patterns",
-			content: `
+    },
+    {
+      heading: 'Anti-Patterns',
+      content: `
 - **jest.mock()** → Use Layer substitution
 - **vi.fn()** → Use real test implementations
 - **Partial mocks** → Full test adapters
 - **Testing implementation** → Test behavior via public API
 `,
-		},
-	],
+    },
+  ],
 };

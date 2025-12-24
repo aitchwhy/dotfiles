@@ -4,30 +4,30 @@
  * Ports (Context.Tag) and Adapters (Layer) for testable code.
  */
 
-import type { SkillDefinition } from "../schemas";
-import { SkillName } from "../schemas";
+import type { SkillDefinition } from '../schemas';
+import { SkillName } from '../schemas';
 
 export const hexagonalSkill: SkillDefinition = {
-	frontmatter: {
-		name: SkillName("hexagonal"),
-		description: "Ports & Adapters with Effect Context.Tag and Layer",
-		allowedTools: ["Read", "Write", "Edit", "Grep"],
-		tokenBudget: 400,
-	},
-	sections: [
-		{
-			heading: "Core Concept",
-			content: `
+  frontmatter: {
+    name: SkillName('hexagonal'),
+    description: 'Ports & Adapters with Effect Context.Tag and Layer',
+    allowedTools: ['Read', 'Write', 'Edit', 'Grep'],
+    tokenBudget: 400,
+  },
+  sections: [
+    {
+      heading: 'Core Concept',
+      content: `
 Hexagonal Architecture isolates business logic from infrastructure:
 
 - **Port** = Context.Tag (interface definition)
 - **Adapter** = Layer (implementation)
 - Live adapters for production, Test adapters for tests
 `,
-		},
-		{
-			heading: "Define a Port",
-			content: `
+    },
+    {
+      heading: 'Define a Port',
+      content: `
 \`\`\`typescript
 import { Context, Effect } from "effect";
 
@@ -40,10 +40,10 @@ class UserRepository extends Context.Tag("UserRepository")<
 >() {}
 \`\`\`
 `,
-		},
-		{
-			heading: "Create Adapters",
-			content: `
+    },
+    {
+      heading: 'Create Adapters',
+      content: `
 \`\`\`typescript
 import { Layer } from "effect";
 
@@ -65,10 +65,10 @@ const UserRepositoryTest = Layer.succeed(UserRepository, {
 });
 \`\`\`
 `,
-		},
-		{
-			heading: "Testing Without Mocks",
-			content: `
+    },
+    {
+      heading: 'Testing Without Mocks',
+      content: `
 \`\`\`typescript
 describe("createUser", () => {
   it("saves user", async () => {
@@ -85,6 +85,6 @@ describe("createUser", () => {
 
 No mocks needed - swap layers for different behaviors.
 `,
-		},
-	],
+    },
+  ],
 };

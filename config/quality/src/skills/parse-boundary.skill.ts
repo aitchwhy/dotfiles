@@ -4,30 +4,30 @@
  * Schema.decodeUnknown at system edges.
  */
 
-import type { SkillDefinition } from "../schemas";
-import { SkillName } from "../schemas";
+import type { SkillDefinition } from '../schemas';
+import { SkillName } from '../schemas';
 
 export const parseBoundarySkill: SkillDefinition = {
-	frontmatter: {
-		name: SkillName("parse-boundary"),
-		description: "Parse external data at boundaries, trust internal types",
-		allowedTools: ["Read", "Write", "Edit", "Grep"],
-		tokenBudget: 300,
-	},
-	sections: [
-		{
-			heading: "The Principle",
-			content: `
+  frontmatter: {
+    name: SkillName('parse-boundary'),
+    description: 'Parse external data at boundaries, trust internal types',
+    allowedTools: ['Read', 'Write', 'Edit', 'Grep'],
+    tokenBudget: 300,
+  },
+  sections: [
+    {
+      heading: 'The Principle',
+      content: `
 **Parse, don't validate.**
 
 External data (API requests, file reads, env vars) is \`unknown\`.
 Parse it ONCE at the boundary into typed data.
 Internal code trusts the types completely.
 `,
-		},
-		{
-			heading: "Boundary Examples",
-			content: `
+    },
+    {
+      heading: 'Boundary Examples',
+      content: `
 \`\`\`typescript
 // HTTP request boundary
 const handleRequest = (req: Request) =>
@@ -52,10 +52,10 @@ const loadConfig = (path: string) =>
   });
 \`\`\`
 `,
-		},
-		{
-			heading: "Internal Code",
-			content: `
+    },
+    {
+      heading: 'Internal Code',
+      content: `
 \`\`\`typescript
 // Internal function - trusts types, no parsing
 const createUser = (data: CreateUserData) =>
@@ -68,6 +68,6 @@ const createUser = (data: CreateUserData) =>
 
 No Schema.decode inside business logic - types are trusted.
 `,
-		},
-	],
+    },
+  ],
 };

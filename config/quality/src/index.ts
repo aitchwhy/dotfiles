@@ -4,47 +4,46 @@
  * TypeScript-first code quality enforcement for Claude Code.
  */
 
-// Schemas
-export type {
-	SkillName,
-	PersonaName,
-	RuleId,
-	SkillFrontmatter,
-	SkillSection,
-	SkillDefinition,
-	ModelChoice,
-	PersonaDefinition,
-	RuleSeverity,
-	RuleCategory,
-	QualityRule,
-} from "./schemas";
-
-export {
-	decodeSkill,
-	decodeSkillEither,
-	decodePersona,
-	decodePersonaEither,
-	decodeRule,
-	decodeRuleEither,
-} from "./schemas";
-
-// Rules
-export { ALL_RULES, TYPE_SAFETY_RULES, EFFECT_RULES } from "./rules";
-export { ARCHITECTURE_RULES, OBSERVABILITY_RULES } from "./rules";
-
-// Skills
-export { ALL_SKILLS } from "./skills";
-
-// Personas
-export { ALL_PERSONAS } from "./personas";
-
-// Stack
-export { STACK, getNpmVersion, isForbidden, FORBIDDEN_PACKAGES } from "./stack";
-
 // Generators
 export {
-	generateAllSkills,
-	generateAllPersonas,
-	generateRules,
-	generateSettingsFile,
-} from "./generators";
+  generateAllPersonas,
+  generateAllSkills,
+  generateRules,
+  generateSettingsFile,
+} from './generators';
+// Personas
+export { ALL_PERSONAS } from './personas';
+// Rules
+export {
+  ALL_RULES,
+  ARCHITECTURE_RULES,
+  EFFECT_RULES,
+  OBSERVABILITY_RULES,
+  TYPE_SAFETY_RULES,
+} from './rules';
+// Schemas
+export type {
+  ModelChoice,
+  PersonaDefinition,
+  PersonaName,
+  QualityRule,
+  RuleCategory,
+  RuleId,
+  RuleSeverity,
+  SkillDefinition,
+  SkillFrontmatter,
+  SkillName,
+  SkillSection,
+} from './schemas';
+export {
+  decodePersona,
+  decodePersonaEither,
+  decodeRule,
+  decodeRuleEither,
+  decodeSkill,
+  decodeSkillEither,
+} from './schemas';
+// Skills
+export { ALL_SKILLS } from './skills';
+// Stack
+export { FORBIDDEN_PACKAGES, getNpmVersion, isForbidden, STACK } from './stack';

@@ -4,20 +4,20 @@
  * XState v5 patterns for complex UI state.
  */
 
-import type { SkillDefinition } from "../schemas";
-import { SkillName } from "../schemas";
+import type { SkillDefinition } from '../schemas';
+import { SkillName } from '../schemas';
 
 export const stateMachinesSkill: SkillDefinition = {
-	frontmatter: {
-		name: SkillName("state-machines"),
-		description: "XState v5 for explicit state management in React",
-		allowedTools: ["Read", "Write", "Edit", "Grep"],
-		tokenBudget: 400,
-	},
-	sections: [
-		{
-			heading: "When to Use State Machines",
-			content: `
+  frontmatter: {
+    name: SkillName('state-machines'),
+    description: 'XState v5 for explicit state management in React',
+    allowedTools: ['Read', 'Write', 'Edit', 'Grep'],
+    tokenBudget: 400,
+  },
+  sections: [
+    {
+      heading: 'When to Use State Machines',
+      content: `
 Use XState when state has:
 - Multiple discrete states (idle, loading, error, success)
 - Complex transitions (can only go loading→success, not idle→success)
@@ -26,10 +26,10 @@ Use XState when state has:
 
 DON'T use for simple boolean flags or lists.
 `,
-		},
-		{
-			heading: "Define Machine",
-			content: `
+    },
+    {
+      heading: 'Define Machine',
+      content: `
 \`\`\`typescript
 import { setup, assign } from "xstate";
 
@@ -55,10 +55,10 @@ const orderMachine = setup({
 });
 \`\`\`
 `,
-		},
-		{
-			heading: "React Integration",
-			content: `
+    },
+    {
+      heading: 'React Integration',
+      content: `
 \`\`\`typescript
 import { useMachine } from "@xstate/react";
 
@@ -73,10 +73,10 @@ function OrderForm() {
 }
 \`\`\`
 `,
-		},
-		{
-			heading: "Actors for Complex Flows",
-			content: `
+    },
+    {
+      heading: 'Actors for Complex Flows',
+      content: `
 \`\`\`typescript
 const parentMachine = setup({
   actors: { orderMachine },
@@ -91,6 +91,6 @@ const parentMachine = setup({
 
 Actors allow composing machines for multi-step workflows.
 `,
-		},
-	],
+    },
+  ],
 };

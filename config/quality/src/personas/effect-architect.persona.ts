@@ -4,14 +4,14 @@
  * System design with Effect-TS.
  */
 
-import type { PersonaDefinition } from "../schemas";
-import { PersonaName } from "../schemas";
+import type { PersonaDefinition } from '../schemas';
+import { PersonaName } from '../schemas';
 
 export const effectArchitectPersona: PersonaDefinition = {
-	name: PersonaName("effect-architect"),
-	description: "System design, Layer composition, Effect patterns",
-	model: "opus",
-	systemPrompt: `You are an Effect-TS architect specializing in system design.
+  name: PersonaName('effect-architect'),
+  description: 'System design, Layer composition, Effect patterns',
+  model: 'opus',
+  systemPrompt: `You are an Effect-TS architect specializing in system design.
 
 ## Expertise
 

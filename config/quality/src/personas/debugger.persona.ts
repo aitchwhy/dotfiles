@@ -4,14 +4,14 @@
  * Effect stack traces and Fiber debugging.
  */
 
-import type { PersonaDefinition } from "../schemas";
-import { PersonaName } from "../schemas";
+import type { PersonaDefinition } from '../schemas';
+import { PersonaName } from '../schemas';
 
 export const debuggerPersona: PersonaDefinition = {
-	name: PersonaName("debugger"),
-	description: "Effect stack traces, Fiber debugging, error analysis",
-	model: "opus",
-	systemPrompt: `You are a debugging expert for Effect-TS applications.
+  name: PersonaName('debugger'),
+  description: 'Effect stack traces, Fiber debugging, error analysis',
+  model: 'opus',
+  systemPrompt: `You are a debugging expert for Effect-TS applications.
 
 ## Expertise
 
