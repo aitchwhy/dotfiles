@@ -34,10 +34,6 @@ let
   # ═══════════════════════════════════════════════════════════════════════════
   # Add/remove servers here - both Desktop and CLI configs auto-generate
   mcpServerDefs = {
-    memory = {
-      package = "@modelcontextprotocol/server-memory";
-      args = [ ];
-    };
     filesystem = {
       package = "@modelcontextprotocol/server-filesystem";
       args = [
