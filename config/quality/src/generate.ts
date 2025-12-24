@@ -9,12 +9,16 @@
 
 import * as path from 'node:path';
 import { Effect, pipe } from 'effect';
+import { BEHAVIOR_COUNTS } from './critic-mode';
 import {
   generateAllPersonas,
   generateAllSkills,
+  generateCriticModeFile,
+  generateMemoriesFile,
   generateRules,
   generateSettingsFile,
 } from './generators';
+import { MEMORY_COUNTS } from './memories';
 import { ALL_PERSONAS } from './personas';
 import { ALL_RULES } from './rules';
 import { ALL_SKILLS } from './skills';
@@ -37,14 +41,22 @@ const main = Effect.gen(function* () {
   yield* Effect.log(`Generating ${ALL_RULES.length} rules documentation...`);
   yield* generateRules(ALL_RULES, OUT_DIR);
 
+  yield* Effect.log(`Generating ${MEMORY_COUNTS.total} memories...`);
+  yield* generateMemoriesFile(OUT_DIR);
+
+  yield* Effect.log(`Generating ${BEHAVIOR_COUNTS.total} critic behaviors...`);
+  yield* generateCriticModeFile(OUT_DIR);
+
   yield* Effect.log('Generating settings.json...');
   yield* generateSettingsFile(ALL_SKILLS, ALL_PERSONAS, HOOK_PATH, OUT_DIR);
 
   yield* Effect.log('');
   yield* Effect.log('Generation complete!');
-  yield* Effect.log(`  Skills:   ${ALL_SKILLS.length}`);
-  yield* Effect.log(`  Personas: ${ALL_PERSONAS.length}`);
-  yield* Effect.log(`  Rules:    ${ALL_RULES.length}`);
+  yield* Effect.log(`  Skills:    ${ALL_SKILLS.length}`);
+  yield* Effect.log(`  Personas:  ${ALL_PERSONAS.length}`);
+  yield* Effect.log(`  Rules:     ${ALL_RULES.length}`);
+  yield* Effect.log(`  Memories:  ${MEMORY_COUNTS.total}`);
+  yield* Effect.log(`  Behaviors: ${BEHAVIOR_COUNTS.total}`);
 });
 
 pipe(
