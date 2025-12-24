@@ -1,5 +1,12 @@
 #!/usr/bin/env bun
-import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  readdirSync,
+  readFileSync,
+  type Stats,
+  statSync,
+  writeFileSync,
+} from 'node:fs';
 import { join, relative } from 'node:path';
 /**
  * sync-versions.ts - Sync package.json versions to STACK.ts SSOT
@@ -11,7 +18,7 @@ import { join, relative } from 'node:path';
  * This script finds all package.json files in a project and updates
  * their dependency versions to match the STACK.ts SSOT.
  */
-import { getDrift, STACK } from './src/stack/versions';
+import { STACK } from './src/stack/versions';
 
 const projectPath = process.argv[2];
 const dryRun = process.argv.includes('--dry-run');
@@ -52,7 +59,7 @@ function findPackageJsons(dir: string): string[] {
     }
 
     const fullPath = join(dir, entry);
-    let stat;
+    let stat: Stats;
 
     try {
       stat = statSync(fullPath);
@@ -106,7 +113,7 @@ function syncPackageJson(path: string): SyncResult {
   syncDeps(content.peerDependencies);
 
   if (changes.length > 0 && !dryRun) {
-    writeFileSync(path, JSON.stringify(content, null, 2) + '\n');
+    writeFileSync(path, `${JSON.stringify(content, null, 2)}\n`);
   }
 
   return { file: path, changes };
