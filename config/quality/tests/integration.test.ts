@@ -5,6 +5,8 @@
  */
 
 import { describe, expect, it } from 'vitest';
+import { BEHAVIOR_COUNTS, CRITIC_BEHAVIORS } from '../src/critic-mode';
+import { MEMORIES, MEMORY_COUNTS } from '../src/memories';
 import { ALL_PERSONAS } from '../src/personas';
 import { ALL_RULES } from '../src/rules';
 import { ALL_SKILLS } from '../src/skills';
@@ -70,6 +72,46 @@ describe('Quality System Integration', () => {
       for (const persona of ALL_PERSONAS) {
         expect(persona.systemPrompt.length).toBeGreaterThan(50);
       }
+    });
+  });
+
+  describe('memories coverage', () => {
+    it('has exactly 17 memories', () => {
+      expect(MEMORIES).toHaveLength(17);
+      expect(MEMORY_COUNTS.total).toBe(17);
+    });
+
+    it('has all required categories', () => {
+      const categories = new Set(MEMORIES.map((m) => m.category));
+      expect(categories).toContain('principle');
+      expect(categories).toContain('constraint');
+      expect(categories).toContain('pattern');
+      expect(categories).toContain('gotcha');
+    });
+
+    it('has correct category counts', () => {
+      expect(MEMORY_COUNTS.principle).toBe(5);
+      expect(MEMORY_COUNTS.constraint).toBe(4);
+      expect(MEMORY_COUNTS.pattern).toBe(6);
+      expect(MEMORY_COUNTS.gotcha).toBe(2);
+    });
+  });
+
+  describe('critic-mode coverage', () => {
+    it('has exactly 5 behaviors', () => {
+      expect(CRITIC_BEHAVIORS).toHaveLength(5);
+      expect(BEHAVIOR_COUNTS.total).toBe(5);
+    });
+
+    it('covers both phases', () => {
+      const phases = new Set(CRITIC_BEHAVIORS.map((b) => b.phase));
+      expect(phases).toContain('planning');
+      expect(phases).toContain('execution');
+    });
+
+    it('has correct phase counts', () => {
+      expect(BEHAVIOR_COUNTS.planning).toBe(3);
+      expect(BEHAVIOR_COUNTS.execution).toBe(2);
     });
   });
 });
