@@ -29,7 +29,6 @@ in
         kubernetes-helm
         k9s
         terraform
-        terragrunt
         pulumi
         pulumi-esc # ESC CLI for secrets/config management
       ])
