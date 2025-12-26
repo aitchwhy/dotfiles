@@ -103,6 +103,13 @@ in
         # Multi-language
         dprint
         treefmt
+
+        # Linters (moved from Mason for full Nix reproducibility)
+        markdownlint-cli # Markdown linting
+        yamllint # YAML linting
+        hadolint # Dockerfile linting
+        sqlfluff # SQL linting
+        biome # JS/TS/JSON formatting + linting
       ]
       # Development Tools
       ++ (optionals cfg.enableNixTools [
