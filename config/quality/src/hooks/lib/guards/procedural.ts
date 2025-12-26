@@ -2,14 +2,20 @@
  * Procedural Guards - Guards that need file system or command parsing
  *
  * Guards: 1 (bash safety), 2 (commits), 3 (forbidden files),
- *         8 (TDD), 9-10 (DevOps), 11-12 (advisory), 28-31 (config/stack),
- *         32 (secrets detection)
+ *         8 (TDD), 9-10 (DevOps), 11-12 (advisory), 27 (CLI tools),
+ *         28-31 (config/stack), 32 (secrets detection)
  *
  * Modernized to use Effect for FS operations (no sync FS).
  */
 
 import { FileSystem } from '@effect/platform';
 import { Effect } from 'effect';
+import {
+  findIncompatibleFlags,
+  formatFlagTranslations,
+  LEGACY_FLAG_MAPPINGS,
+  type LegacyCommand,
+} from '../../../schemas/cli-tools.js';
 import type { GuardResult } from '../effect-hook';
 
 // =============================================================================
@@ -274,6 +280,59 @@ export function checkDevOpsCommands(command: string): GuardResult {
 }
 
 // =============================================================================
+// Guard 27: Modern CLI Tools (Legacy Syntax Detection)
+// =============================================================================
+
+/**
+ * Detects when legacy CLI tool flags are used with aliased modern tools.
+ * Shell aliases transform: grep→rg, find→fd, ls→eza
+ *
+ * Examples blocked:
+ * - `grep --include="*.ts"` (rg uses --glob/-g)
+ * - `find . -name "*.ts"` (fd uses positional pattern)
+ * - `grep -r pattern` (rg is recursive by default)
+ */
+export function checkModernCLITools(command: string): GuardResult {
+  // Extract the base command (first word, ignoring env vars)
+  const cmdMatch = command.match(/^(?:[A-Z_]+=\S+\s+)*(\w+)/);
+  if (!cmdMatch?.[1]) return { ok: true };
+
+  const baseCmd = cmdMatch[1] as string;
+
+  // Check if this is a legacy command that's aliased
+  if (!Object.hasOwn(LEGACY_FLAG_MAPPINGS, baseCmd)) {
+    return { ok: true };
+  }
+
+  const legacyCmd = baseCmd as LegacyCommand;
+  const incompatible = findIncompatibleFlags(legacyCmd, command);
+
+  if (incompatible.length === 0) {
+    return { ok: true };
+  }
+
+  const mapping = LEGACY_FLAG_MAPPINGS[legacyCmd];
+  const translations = formatFlagTranslations(legacyCmd);
+
+  return {
+    ok: false,
+    error: `Guard 27: LEGACY CLI SYNTAX
+
+Command: ${command.substring(0, 60)}${command.length > 60 ? '...' : ''}
+Problem: Incompatible flags for ${mapping.modern} (aliased from ${legacyCmd})
+
+Incompatible: ${incompatible.join(', ')}
+
+Options:
+1. Use MCP tool: mcp__ripgrep__search (if searching)
+2. Use native ${mapping.modern} syntax:
+
+Flag translation (${legacyCmd} → ${mapping.modern}):
+${translations}`,
+  };
+}
+
+// =============================================================================
 // Guards 11-12: Flake Patterns & Port Registry (Advisory)
 // =============================================================================
 
@@ -506,6 +565,10 @@ export function runProceduralGuards(
 
     const devOpsResult = checkDevOpsCommands(command);
     if (!devOpsResult.ok) return devOpsResult;
+
+    // Guard 27: Legacy CLI tool syntax detection
+    const cliToolsResult = checkModernCLITools(command);
+    if (!cliToolsResult.ok) return cliToolsResult;
   }
 
   // Write/Edit guards
