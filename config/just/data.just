@@ -1,6 +1,6 @@
 # Data Operations Module (DVC + GCS)
 # Usage: just data <command>
-set shell := ["bash", "-uc"]
+set shell := ["bash", "-ec"]
 
 # Health domain path
 health_dir := `git rev-parse --show-toplevel` / "domains/health"

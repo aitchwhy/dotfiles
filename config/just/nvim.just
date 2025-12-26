@@ -1,6 +1,6 @@
 # Neovim Plugin Management Module
 # Usage: just nvim <command>
-set shell := ["bash", "-uc"]
+set shell := ["bash", "-ec"]
 
 # Show available nvim commands
 [private]

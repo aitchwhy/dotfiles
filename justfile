@@ -1,6 +1,6 @@
 # Nix Darwin Configuration Manager
 # Run 'just' to see available commands
-set shell := ["bash", "-uc"]
+set shell := ["bash", "-ec"]
 
 # Auto-detect host
 host := env_var_or_default("HOST", "hank-mbp-m4")

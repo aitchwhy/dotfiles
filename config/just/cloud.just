@@ -1,6 +1,6 @@
 # Cloud & Remote Operations Module
 # Usage: just cloud <command>
-set shell := ["bash", "-uc"]
+set shell := ["bash", "-ec"]
 
 # Cloud host for deployment
 host := env_var_or_default("CLOUD_HOST", "cloud")

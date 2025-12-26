@@ -1,6 +1,6 @@
 # AI Agents Configuration Module
 # Usage: just agents <command>
-set shell := ["bash", "-uc"]
+set shell := ["bash", "-ec"]
 
 agents_dir := env_var("HOME") + "/dotfiles/config/agents"
 

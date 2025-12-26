@@ -1,6 +1,6 @@
 # Yazi File Manager Module
 # Usage: just yazi <command>
-set shell := ["bash", "-uc"]
+set shell := ["bash", "-ec"]
 
 # Show available yazi commands
 [private]
