@@ -55,7 +55,6 @@ const PERMISSIONS = {
     'Bash(git:*)',
     'Bash(GIT_PAGER=cat git:*)',
     'Bash(gh:*)',
-    'Bash(LEFTHOOK=0 git commit:*)',
 
     'Bash(pnpm:*)',
     'Bash(npm:*)',
