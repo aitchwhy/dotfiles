@@ -6,7 +6,10 @@ vim.g.lazyvim_cmp = "blink.cmp"
 vim.g.lazyvim_picker = "snacks"
 vim.g.autoformat = true
 vim.g.snacks_animate = false
-vim.g.ai_cmp = false -- Disable ghost text for AI completions (set true to enable)
+vim.g.ai_cmp = false -- Disable ghost text for AI completions (Sidekick NES handles it)
+
+-- Sidekick/AI settings
+vim.g.sidekick_nes = true -- Enable Next Edit Suggestions
 
 -- Editor settings
 vim.opt.termguicolors = true
