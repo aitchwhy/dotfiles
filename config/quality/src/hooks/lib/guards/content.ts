@@ -314,6 +314,49 @@ function checkNonNullAssertion(content: string): GuardResult {
 }
 
 // =============================================================================
+// Guard 50: No Code Duplication (Shared Utils Enforcement)
+// =============================================================================
+
+// Detect custom implementations of utilities that should come from shared packages
+const DUPLICATION_PATTERNS = [
+  {
+    // Custom requireEnv function definition
+    pattern: /function\s+requireEnv\s*\(/,
+    error: `Guard 50: Custom requireEnv detected. Import from '@ember/config'.`,
+  },
+  {
+    // Custom env validation with fallback defaults (hides misconfiguration)
+    pattern: /process\.env\[\s*['"][^'"]+['"]\s*\]\s*\?\?\s*['"][^'"]+['"]/,
+    error: `Guard 50: process.env with default fallback. Use requireEnv() from '@ember/config' for fail-fast.`,
+  },
+  {
+    // Custom retry policy definitions (duplicate of @ember/domain)
+    pattern: /Schedule\.(exponential|spaced|recurs)\s*\([^)]+\)(?!.*RetryPolicies)/,
+    error: `Guard 50: Custom retry policy. Use RetryPolicies from '@ember/domain'.`,
+  },
+  {
+    // Custom Duration.* timeout definitions (duplicate of @ember/domain)
+    pattern: /Duration\.(seconds|millis|minutes)\s*\(\s*\d+\s*\)(?!.*Timeouts)/,
+    error: `Guard 50: Custom timeout duration. Use Timeouts from '@ember/domain'.`,
+  },
+];
+
+function checkCodeDuplication(content: string, filePath: string): GuardResult {
+  // Only apply to monorepo apps (not shared packages themselves)
+  if (!/\/(apps|packages\/e2e)\//.test(filePath)) return { ok: true };
+  // Skip config files and test files
+  if (/\.config\.[jt]s$|\.test\.[jt]sx?$|\.spec\.[jt]sx?$/.test(filePath)) return { ok: true };
+
+  const clean = stripCommentsAndStrings(content);
+  for (const { pattern, error } of DUPLICATION_PATTERNS) {
+    if (pattern.test(clean)) {
+      return { ok: false, error };
+    }
+  }
+  return { ok: true };
+}
+
+// =============================================================================
 // Main Entry Point
 // =============================================================================
 
@@ -343,6 +386,7 @@ export function runContentGuards(
   const pathAwareGuards = [
     () => checkDateConstruction(content, filePath),
     () => checkTryCatch(content, filePath),
+    () => checkCodeDuplication(content, filePath),
   ];
 
   for (const guard of [...basicGuards, ...pathAwareGuards]) {
