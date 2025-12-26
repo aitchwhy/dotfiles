@@ -30,8 +30,8 @@
               echo "Quality System TypeCheck"
               echo "═══════════════════════════════════════════════════════════════"
 
-              # Install dependencies
-              ${pkgs.bun}/bin/bun install --frozen-lockfile 2>&1 || true
+              # Install dependencies (frozen lockfile ensures reproducibility)
+              ${pkgs.bun}/bin/bun install --frozen-lockfile
 
               # Run typecheck
               ${pkgs.bun}/bin/bun x tsc --noEmit
@@ -172,32 +172,32 @@
               SETTINGS="config/quality/generated/settings.json"
 
               # Assertion: JSON is valid
-              if ! ${pkgs.jq}/bin/jq empty "$SETTINGS" 2>/dev/null; then
+              if ! ${pkgs.jq}/bin/jq empty "$SETTINGS"; then
                 assert_fail "Invalid JSON syntax in $SETTINGS"
               fi
               assert_pass "claude-code.json is valid JSON"
 
               # Assertion: hooks field exists
-              if ! ${pkgs.jq}/bin/jq -e '.hooks' "$SETTINGS" >/dev/null 2>&1; then
+              if ! ${pkgs.jq}/bin/jq -e '.hooks' "$SETTINGS" >/dev/null; then
                 assert_fail "Missing 'hooks' field in settings"
               fi
               assert_pass "hooks field present"
 
               # Assertion: permissions field exists
-              if ! ${pkgs.jq}/bin/jq -e '.permissions' "$SETTINGS" >/dev/null 2>&1; then
+              if ! ${pkgs.jq}/bin/jq -e '.permissions' "$SETTINGS" >/dev/null; then
                 assert_fail "Missing 'permissions' field in settings"
               fi
               assert_pass "permissions field present"
 
               # Assertion: permissions.allow is non-empty array
-              ALLOW_COUNT=$(${pkgs.jq}/bin/jq '.permissions.allow | length' "$SETTINGS" 2>/dev/null)
+              ALLOW_COUNT=$(${pkgs.jq}/bin/jq '.permissions.allow | length' "$SETTINGS")
               if [ "$ALLOW_COUNT" -lt 5 ]; then
                 assert_fail "permissions.allow too small: $ALLOW_COUNT (expected >= 5)"
               fi
               assert_pass "permissions.allow has $ALLOW_COUNT entries"
 
               # Assertion: permissions.deny exists
-              DENY_COUNT=$(${pkgs.jq}/bin/jq '.permissions.deny | length' "$SETTINGS" 2>/dev/null)
+              DENY_COUNT=$(${pkgs.jq}/bin/jq '.permissions.deny | length' "$SETTINGS")
               if [ "$DENY_COUNT" -lt 3 ]; then
                 assert_fail "permissions.deny too small: $DENY_COUNT (expected >= 3)"
               fi
@@ -205,7 +205,7 @@
 
               # Assertion: All hook types defined
               for hook_type in PreToolUse PostToolUse SessionStart Stop; do
-                if ${pkgs.jq}/bin/jq -e ".hooks.$hook_type" "$SETTINGS" >/dev/null 2>&1; then
+                if ${pkgs.jq}/bin/jq -e ".hooks.$hook_type" "$SETTINGS" >/dev/null; then
                   assert_pass "Hook type defined: $hook_type"
                 else
                   assert_fail "Missing hook type: $hook_type"
@@ -219,7 +219,7 @@
               echo "─── Test 4: Hook Files Validation ───"
 
               # Extract hook files referenced in settings (modern: rg)
-              REFERENCED_HOOKS=$(${pkgs.jq}/bin/jq -r '.. | .command? // empty' "$SETTINGS" 2>/dev/null | \
+              REFERENCED_HOOKS=$(${pkgs.jq}/bin/jq -r '.. | .command? // empty' "$SETTINGS" | \
                 ${pkgs.ripgrep}/bin/rg 'hooks/' | sed -E 's/.*hooks\/([a-zA-Z0-9_-]+\.(ts|sh)).*/\1/' | sort | uniq)
 
               for hook in $REFERENCED_HOOKS; do
@@ -352,6 +352,108 @@
               fi
 
               echo "✓ All AI CLI config checks passed ($COVERAGE% coverage)"
+              touch $out
+            '';
+
+        # ═══════════════════════════════════════════════════════════════════════════
+        # Neovim Configuration Validation
+        # Validates Lua syntax of all Neovim configuration files
+        # ═══════════════════════════════════════════════════════════════════════════
+        neovim-config =
+          pkgs.runCommand "neovim-config-check"
+            {
+              nativeBuildInputs = [
+                pkgs.luajit
+                pkgs.fd
+              ];
+              src = ../.;
+            }
+            ''
+              cd $src
+
+              echo "═══════════════════════════════════════════════════════════════"
+              echo "Neovim Configuration Validation"
+              echo "═══════════════════════════════════════════════════════════════"
+
+              ERRORS=0
+              TOTAL=0
+
+              echo ""
+              echo "─── Lua Syntax Validation ───"
+
+              # Check all Lua files in config/nvim/lua/
+              for file in $(${pkgs.fd}/bin/fd -e lua . config/nvim/lua/); do
+                TOTAL=$((TOTAL + 1))
+                if ${pkgs.luajit}/bin/luajit -bl "$file" /dev/null; then
+                  echo "✓ $file"
+                else
+                  echo "✗ SYNTAX ERROR: $file"
+                  ERRORS=$((ERRORS + 1))
+                fi
+              done
+
+              echo ""
+              echo "─── Test Files Validation ───"
+
+              # Check test files (directory may not exist in all configurations)
+              if [ -d "config/nvim/tests" ]; then
+                for file in $(${pkgs.fd}/bin/fd -e lua . config/nvim/tests/); do
+                  TOTAL=$((TOTAL + 1))
+                  if ${pkgs.luajit}/bin/luajit -bl "$file" /dev/null; then
+                    echo "✓ $file"
+                  else
+                    echo "✗ SYNTAX ERROR: $file"
+                    ERRORS=$((ERRORS + 1))
+                  fi
+                done
+              fi
+
+              echo ""
+              echo "─── Mason Configuration Check ───"
+
+              # Verify Mason only has debug adapters (no linters)
+              if grep -qE '"(markdownlint|yamllint|hadolint|sqlfluff)"' config/nvim/lua/plugins/mason.lua; then
+                echo "✗ Mason contains linters that should be in Nix"
+                ERRORS=$((ERRORS + 1))
+              else
+                echo "✓ Mason correctly limited to debug adapters"
+              fi
+              TOTAL=$((TOTAL + 1))
+
+              echo ""
+              echo "─── Nix LSP Override Check ───"
+
+              # Verify lang-nix.lua exists and disables nil_ls
+              if [ -f "config/nvim/lua/plugins/lang-nix.lua" ]; then
+                if grep -q "nil_ls = false" config/nvim/lua/plugins/lang-nix.lua; then
+                  echo "✓ nil_ls correctly disabled in lang-nix.lua"
+                else
+                  echo "✗ nil_ls not disabled in lang-nix.lua"
+                  ERRORS=$((ERRORS + 1))
+                fi
+                if grep -q "nixd" config/nvim/lua/plugins/lang-nix.lua; then
+                  echo "✓ nixd configured in lang-nix.lua"
+                else
+                  echo "✗ nixd not configured in lang-nix.lua"
+                  ERRORS=$((ERRORS + 1))
+                fi
+              else
+                echo "✗ lang-nix.lua not found"
+                ERRORS=$((ERRORS + 1))
+              fi
+              TOTAL=$((TOTAL + 2))
+
+              echo ""
+              echo "═══════════════════════════════════════════════════════════════"
+              echo "Summary: $((TOTAL - ERRORS)) / $TOTAL checks passed"
+              echo "═══════════════════════════════════════════════════════════════"
+
+              if [ "$ERRORS" -gt 0 ]; then
+                echo "✗ $ERRORS error(s) found"
+                exit 1
+              fi
+
+              echo "✓ All Neovim configuration checks passed"
               touch $out
             '';
       };

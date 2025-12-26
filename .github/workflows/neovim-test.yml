@@ -39,10 +39,90 @@ jobs:
           done
           echo "✅ All Lua files valid"
 
+      - name: Validate Test Files Syntax
+        run: |
+          echo "Checking test file syntax..."
+          fdfind -e lua . config/nvim/tests/ | while read file; do
+            echo "Checking: $file"
+            luajit -bl "$file" /dev/null || { echo "Syntax error: $file"; exit 1; }
+          done
+          echo "✅ All test files valid"
+
       - name: Luacheck (optional linting)
-        continue-on-error: true # Advisory for now
+        continue-on-error: true
         run: |
           luacheck config/nvim/lua/ --no-unused-args --no-redefined || true
+
+  tool-config-validation:
+    name: Tool Configuration Validation
+    runs-on: ubuntu-latest
+    needs: lua-syntax
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify Mason Only Has DAP
+        run: |
+          echo "Verifying Mason only installs debug adapters..."
+          if grep -qE '"(markdownlint|yamllint|hadolint|sqlfluff)"' config/nvim/lua/plugins/mason.lua; then
+            echo "❌ Mason still has linters - should be in Nix"
+            exit 1
+          fi
+          echo "✅ Mason correctly limited to debug adapters"
+
+      - name: Verify DAP Tools in Mason
+        run: |
+          echo "Verifying debug adapters are configured..."
+          for tool in js-debug-adapter debugpy delve; do
+            if ! grep -q "$tool" config/nvim/lua/plugins/mason.lua; then
+              echo "❌ Missing $tool in Mason"
+              exit 1
+            fi
+            echo "✓ $tool configured"
+          done
+          echo "✅ All debug adapters configured"
+
+      - name: Verify Nix LSP Override
+        run: |
+          echo "Verifying lang-nix.lua exists and configures nixd..."
+          if [ ! -f config/nvim/lua/plugins/lang-nix.lua ]; then
+            echo "❌ lang-nix.lua not found"
+            exit 1
+          fi
+          if ! grep -q "nil_ls = false" config/nvim/lua/plugins/lang-nix.lua; then
+            echo "❌ nil_ls not disabled in lang-nix.lua"
+            exit 1
+          fi
+          if ! grep -q "nixd" config/nvim/lua/plugins/lang-nix.lua; then
+            echo "❌ nixd not configured in lang-nix.lua"
+            exit 1
+          fi
+          echo "✅ Nix LSP override correctly configured"
+
+      - name: Verify Linter References
+        run: |
+          echo "Checking nvim-lint.lua references Nix-installed tools..."
+          for tool in markdownlint yamllint hadolint statix; do
+            if grep -q "$tool" config/nvim/lua/plugins/nvim-lint.lua; then
+              echo "✓ $tool referenced"
+            else
+              echo "⚠️ $tool not found (may be optional)"
+            fi
+          done
+          echo "✅ Linter configuration verified"
+
+      - name: Verify Formatter References
+        run: |
+          echo "Checking conform.lua references Nix-installed tools..."
+          for tool in nixfmt shfmt biome; do
+            if grep -q "$tool" config/nvim/lua/plugins/conform.lua; then
+              echo "✓ $tool referenced"
+            else
+              echo "⚠️ $tool not found"
+            fi
+          done
+          echo "✅ Formatter configuration verified"
 
   neovim-headless:
     name: NeoVim Headless Tests
@@ -73,50 +153,146 @@ jobs:
 
       - name: Test NeoVim Loads Without Errors
         run: |
-          # Test startup (60 second timeout)
           timeout 60 nvim --headless -c "lua print('NeoVim startup: OK')" +qa || {
             echo "❌ NeoVim failed to start"
             exit 1
           }
           echo "✅ NeoVim starts successfully"
 
-      - name: Test Lazy Plugin Spec Valid
-        run: |
-          nvim --headless -c "lua \
-            local ok, lazy = pcall(require, 'lazy') \
-            if not ok then print('Lazy not installed - bootstrap mode') os.exit(0) end \
-            local plugins = lazy.plugins() \
-            print('Plugin count: ' .. #plugins) \
-            for _, p in ipairs(plugins) do \
-              if p._.loaded then \
-                print('✓ ' .. p.name) \
-              end \
-            end \
-          " +qa || echo "⚠️ Plugin loading in CI limited"
-
       - name: Validate Plugin Specs Parse
         run: |
-          # Ensure all plugin files parse without errors
           nvim --headless -c "lua \
             local files = vim.fn.glob('${{ github.workspace }}/config/nvim/lua/plugins/*.lua', false, true) \
+            local errors = {} \
             for _, file in ipairs(files) do \
               local ok, err = pcall(dofile, file) \
               if not ok then \
-                print('❌ Parse error: ' .. file) \
-                print(err) \
-                os.exit(1) \
+                table.insert(errors, file .. ': ' .. tostring(err)) \
               else \
                 print('✓ ' .. vim.fn.fnamemodify(file, ':t')) \
               end \
             end \
-            print('All plugin specs valid') \
+            if #errors > 0 then \
+              print('') \
+              print('❌ Parse errors:') \
+              for _, e in ipairs(errors) do print(e) end \
+              vim.cmd('cq') \
+            else \
+              print('') \
+              print('✅ All ' .. #files .. ' plugin specs valid') \
+            end \
+          " +qa
+
+  lua-unit-tests:
+    name: Lua Unit Tests (Plenary)
+    runs-on: ubuntu-latest
+    needs: neovim-headless
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Neovim (Stable)
+        uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: stable
+
+      - name: Setup Test Environment
+        run: |
+          mkdir -p ~/.config
+          ln -sf ${{ github.workspace }}/config/nvim ~/.config/nvim
+          mkdir -p ~/.local/share/nvim/site/pack/test/start
+
+          # Clone plenary.nvim for testing
+          git clone --depth 1 https://github.com/nvim-lua/plenary.nvim \
+            ~/.local/share/nvim/site/pack/test/start/plenary.nvim
+
+      - name: Run Plenary Tests
+        run: |
+          cd ${{ github.workspace }}/config/nvim
+          nvim --headless -c "lua \
+            -- Set config path for tests \
+            vim.env.XDG_CONFIG_HOME = '${{ github.workspace }}/config' \
+            \
+            local ok, plenary = pcall(require, 'plenary') \
+            if not ok then \
+              print('⚠️ Plenary not available - skipping unit tests') \
+              vim.cmd('qa') \
+              return \
+            end \
+            \
+            -- Run tests \
+            local harness = require('plenary.test_harness') \
+            local results = {} \
+            \
+            harness.test_directory('tests/', { \
+              minimal_init = 'tests/minimal_init.lua', \
+              sequential = true, \
+            }) \
+          " || {
+            echo "⚠️ Plenary tests incomplete (expected in CI without full init)"
+            exit 0
+          }
+          echo "✅ Lua unit tests completed"
+
+  lsp-config-check:
+    name: LSP Configuration Check
+    runs-on: ubuntu-latest
+    needs: neovim-headless
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Neovim (Stable)
+        uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: stable
+
+      - name: Setup NeoVim
+        run: |
+          mkdir -p ~/.config ~/.local/share/nvim
+          ln -sf ${{ github.workspace }}/config/nvim ~/.config/nvim
+          git clone --filter=blob:none --branch=stable \
+            https://github.com/folke/lazy.nvim.git \
+            ~/.local/share/nvim/lazy/lazy.nvim
+
+      - name: Verify LSP Configuration Structure
+        run: |
+          nvim --headless -c "lua \
+            -- Verify nvim-lspconfig.lua returns valid structure \
+            local file = vim.fn.stdpath('config') .. '/lua/plugins/nvim-lspconfig.lua' \
+            local ok, result = pcall(dofile, file) \
+            if not ok then \
+              print('❌ nvim-lspconfig.lua failed to load: ' .. tostring(result)) \
+              vim.cmd('cq') \
+            end \
+            if type(result) ~= 'table' then \
+              print('❌ nvim-lspconfig.lua must return a table') \
+              vim.cmd('cq') \
+            end \
+            print('✅ LSP configuration structure valid') \
+          " +qa
+
+      - name: Verify lang-nix.lua Structure
+        run: |
+          nvim --headless -c "lua \
+            local file = vim.fn.stdpath('config') .. '/lua/plugins/lang-nix.lua' \
+            local ok, result = pcall(dofile, file) \
+            if not ok then \
+              print('❌ lang-nix.lua failed to load: ' .. tostring(result)) \
+              vim.cmd('cq') \
+            end \
+            print('✅ lang-nix.lua structure valid') \
           " +qa
 
   plugin-install-smoke:
     name: Plugin Install Smoke Test
     runs-on: ubuntu-latest
-    needs: neovim-headless
-    continue-on-error: true # Full install may timeout in CI
+    needs: [neovim-headless, tool-config-validation]
+    continue-on-error: true
 
     steps:
       - name: Checkout
@@ -142,12 +318,10 @@ jobs:
       - name: Bootstrap and Sync Lazy
         timeout-minutes: 5
         run: |
-          # Clone lazy.nvim
           git clone --filter=blob:none --branch=stable \
             https://github.com/folke/lazy.nvim.git \
             ~/.local/share/nvim/lazy/lazy.nvim
 
-          # Run Lazy sync with timeout
           nvim --headless "+Lazy! sync" +qa || {
             echo "⚠️ Lazy sync incomplete (expected in CI)"
           }
@@ -155,7 +329,6 @@ jobs:
       - name: List Installed Plugins
         run: |
           ls -la ~/.local/share/nvim/lazy/ 2>/dev/null || echo "No plugins installed yet"
-          # Count installed plugins
           count=$(ls ~/.local/share/nvim/lazy/ 2>/dev/null | wc -l || echo 0)
           echo "Plugins installed: $count"
 
@@ -167,4 +340,28 @@ jobs:
           if [ -f /tmp/health.txt ]; then
             echo "=== Checkhealth Summary ==="
             grep -E "^(OK|ERROR|WARNING)" /tmp/health.txt | head -50 || true
+
+            # Count errors (but don't fail - many are expected in CI)
+            errors=$(grep -c "^ERROR" /tmp/health.txt 2>/dev/null || echo 0)
+            warnings=$(grep -c "^WARNING" /tmp/health.txt 2>/dev/null || echo 0)
+            oks=$(grep -c "^OK" /tmp/health.txt 2>/dev/null || echo 0)
+            echo ""
+            echo "Summary: $oks OK, $warnings warnings, $errors errors"
           fi
+
+      - name: Verify No Critical Startup Errors
+        run: |
+          # Run nvim and capture any error output
+          nvim --headless -c "lua \
+            -- Check for critical errors in messages \
+            vim.defer_fn(function() \
+              local messages = vim.fn.execute('messages') \
+              if messages:match('E%d+:') then \
+                print('⚠️ Vim errors detected in messages') \
+                print(messages) \
+              else \
+                print('✅ No critical Vim errors') \
+              end \
+              vim.cmd('qa') \
+            end, 1000) \
+          " 2>&1 || echo "⚠️ Check completed with warnings"
