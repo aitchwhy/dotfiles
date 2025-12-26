@@ -103,6 +103,16 @@ let
       package = "chrome-devtools-mcp";
       args = [ ];
     };
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # Modern CLI Tool MCP Servers (schema-based enforcement)
+    # ═══════════════════════════════════════════════════════════════════════════
+    ripgrep = {
+      # Ripgrep search with proper schema - enforces correct flag usage
+      # Replaces: grep --include → rg --glob
+      package = "mcp-ripgrep";
+      args = [ ];
+    };
     # NOTE: postgres removed - requires connection URL arg, package is deprecated
   };
 
