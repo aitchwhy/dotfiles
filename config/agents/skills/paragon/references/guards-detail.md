@@ -103,3 +103,53 @@ services.foo.port = cfg.ports.development.api;
 | 47 | pg Driver | error | `from 'pg'` (use postgres.js) |
 | 48 | Non-Null Assertion | error | `x!`, `foo.bar!` |
 | 49 | No Jest | error | `jest.*`, `from 'jest'` |
+
+## Tier 9: Shared Utils Enforcement (50)
+
+| # | Guard | Severity | Blocks |
+|---|-------|----------|--------|
+| 50 | No Code Duplication | error | Custom utils that duplicate shared packages |
+
+**Guard 50 Rationale**: Duplication is the root of all evil. Monorepo shared packages exist for a reason.
+
+**Applies to**: Files in `apps/` and `packages/e2e/` (NOT shared packages like `@ember/config`, `@ember/domain`).
+
+**Blocked Patterns**:
+
+```typescript
+// BAD - Custom requireEnv (duplicates @ember/config)
+function requireEnv(name: string) {
+  const value = process.env[name];
+  if (!value) throw new Error(`Missing ${name}`);
+  return value;
+}
+
+// GOOD - Use shared package
+import { requireEnv } from '@ember/config';
+
+// BAD - Process.env with fallback (hides misconfiguration)
+const PORT = process.env['PORT'] ?? '8787';
+
+// GOOD - Fail-fast with shared util
+const PORT = requireEnv('PORT', 'API server');
+
+// BAD - Custom retry policy
+const myRetry = Schedule.exponential('100 millis');
+
+// GOOD - Use shared RetryPolicies
+import { RetryPolicies } from '@ember/domain';
+effect.pipe(Effect.retry(RetryPolicies.standard));
+
+// BAD - Custom timeout duration
+const timeout = Duration.seconds(30);
+
+// GOOD - Use shared Timeouts
+import { Timeouts } from '@ember/domain';
+effect.pipe(Effect.timeout(Timeouts.standard));
+```
+
+**When adding new utilities**:
+1. Add to appropriate shared package (`@ember/config`, `@ember/domain`, `@ember/otel`)
+2. Export from package index
+3. Migrate all existing usages
+4. Delete duplicated code

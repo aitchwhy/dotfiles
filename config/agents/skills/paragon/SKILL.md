@@ -1,15 +1,15 @@
 ---
 name: paragon
-description: PARAGON Enforcement System v3.5 - 49 guards for Clean Code, SOLID, configuration centralization, stack compliance, parse-at-boundary, and evidence-based development.
+description: PARAGON Enforcement System v3.6 - 50 guards for Clean Code, SOLID, configuration centralization, stack compliance, parse-at-boundary, shared utils enforcement, and evidence-based development.
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 token-budget: 500
-version: 3.5.0
+version: 3.6.0
 references:
-  - references/guards-detail.md: "Detailed guard explanations (Tiers 3-8)"
+  - references/guards-detail.md: "Detailed guard explanations (Tiers 3-9)"
   - references/bypasses.md: "Bypass mechanisms and refactoring catalog"
 ---
 
-# PARAGON Enforcement System v3.5
+# PARAGON Enforcement System v3.6
 
 > **P**rotocol for **A**utomated **R**ules, **A**nalysis, **G**uards, **O**bservance, and **N**orms
 >
@@ -23,7 +23,7 @@ references:
 | Git | pre-commit hooks (`git-hooks.nix`) | Every commit |
 | CI | GitHub Actions (`paragon-check.yml`) | Every PR/push |
 
-## Guard Matrix Summary (49 Guards)
+## Guard Matrix Summary (50 Guards)
 
 ### Tier 1: Original Guards (1-14) - BLOCKING
 
@@ -50,7 +50,7 @@ references:
 | 16 | Meaningful Names | Cryptic abbrevs, Hungarian notation |
 | 17 | No Commented-Out Code | Dead code in comments |
 
-### Quick Reference (Tiers 3-8)
+### Quick Reference (Tiers 3-9)
 
 See `references/guards-detail.md` for full details on:
 - Tier 3: Extended Clean Code (18-25)
@@ -59,6 +59,7 @@ See `references/guards-detail.md` for full details on:
 - Tier 6: Stack Compliance (31)
 - Tier 7: Parse-at-Boundary (32-39)
 - Tier 8: Parse Don't Validate (40-49)
+- Tier 9: Shared Utils Enforcement (50)
 
 ## Verification-First Philosophy
 
