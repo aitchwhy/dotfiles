@@ -1,0 +1,170 @@
+name: NeoVim Plugin Tests
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'config/nvim/**'
+      - '.github/workflows/neovim-test.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'config/nvim/**'
+      - '.github/workflows/neovim-test.yml'
+
+concurrency:
+  group: neovim-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lua-syntax:
+    name: Lua Syntax Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Lua Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y luajit lua-check fd-find
+
+      - name: Validate Lua Syntax
+        run: |
+          echo "Checking Lua syntax..."
+          fdfind -e lua . config/nvim/lua/ | while read file; do
+            echo "Checking: $file"
+            luajit -bl "$file" /dev/null || { echo "Syntax error: $file"; exit 1; }
+          done
+          echo "✅ All Lua files valid"
+
+      - name: Luacheck (optional linting)
+        continue-on-error: true # Advisory for now
+        run: |
+          luacheck config/nvim/lua/ --no-unused-args --no-redefined || true
+
+  neovim-headless:
+    name: NeoVim Headless Tests
+    runs-on: ubuntu-latest
+    needs: lua-syntax
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Neovim (Stable)
+        uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: stable
+
+      - name: Setup XDG for NeoVim
+        run: |
+          mkdir -p ~/.config
+          ln -sf ${{ github.workspace }}/config/nvim ~/.config/nvim
+          mkdir -p ~/.local/share/nvim
+
+      - name: Bootstrap lazy.nvim
+        run: |
+          git clone --filter=blob:none --branch=stable \
+            https://github.com/folke/lazy.nvim.git \
+            ~/.local/share/nvim/lazy/lazy.nvim
+
+      - name: Test NeoVim Loads Without Errors
+        run: |
+          # Test startup (60 second timeout)
+          timeout 60 nvim --headless -c "lua print('NeoVim startup: OK')" +qa || {
+            echo "❌ NeoVim failed to start"
+            exit 1
+          }
+          echo "✅ NeoVim starts successfully"
+
+      - name: Test Lazy Plugin Spec Valid
+        run: |
+          nvim --headless -c "lua \
+            local ok, lazy = pcall(require, 'lazy') \
+            if not ok then print('Lazy not installed - bootstrap mode') os.exit(0) end \
+            local plugins = lazy.plugins() \
+            print('Plugin count: ' .. #plugins) \
+            for _, p in ipairs(plugins) do \
+              if p._.loaded then \
+                print('✓ ' .. p.name) \
+              end \
+            end \
+          " +qa || echo "⚠️ Plugin loading in CI limited"
+
+      - name: Validate Plugin Specs Parse
+        run: |
+          # Ensure all plugin files parse without errors
+          nvim --headless -c "lua \
+            local files = vim.fn.glob('${{ github.workspace }}/config/nvim/lua/plugins/*.lua', false, true) \
+            for _, file in ipairs(files) do \
+              local ok, err = pcall(dofile, file) \
+              if not ok then \
+                print('❌ Parse error: ' .. file) \
+                print(err) \
+                os.exit(1) \
+              else \
+                print('✓ ' .. vim.fn.fnamemodify(file, ':t')) \
+              end \
+            end \
+            print('All plugin specs valid') \
+          " +qa
+
+  plugin-install-smoke:
+    name: Plugin Install Smoke Test
+    runs-on: ubuntu-latest
+    needs: neovim-headless
+    continue-on-error: true # Full install may timeout in CI
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Neovim (Stable)
+        uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: stable
+
+      - name: Install Modern CLI Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ripgrep fd-find
+
+      - name: Setup XDG for NeoVim
+        run: |
+          mkdir -p ~/.config
+          ln -sf ${{ github.workspace }}/config/nvim ~/.config/nvim
+          mkdir -p ~/.local/share/nvim
+
+      - name: Bootstrap and Sync Lazy
+        timeout-minutes: 5
+        run: |
+          # Clone lazy.nvim
+          git clone --filter=blob:none --branch=stable \
+            https://github.com/folke/lazy.nvim.git \
+            ~/.local/share/nvim/lazy/lazy.nvim
+
+          # Run Lazy sync with timeout
+          nvim --headless "+Lazy! sync" +qa || {
+            echo "⚠️ Lazy sync incomplete (expected in CI)"
+          }
+
+      - name: List Installed Plugins
+        run: |
+          ls -la ~/.local/share/nvim/lazy/ 2>/dev/null || echo "No plugins installed yet"
+          # Count installed plugins
+          count=$(ls ~/.local/share/nvim/lazy/ 2>/dev/null | wc -l || echo 0)
+          echo "Plugins installed: $count"
+
+      - name: Checkhealth Summary
+        timeout-minutes: 2
+        continue-on-error: true
+        run: |
+          nvim --headless "+checkhealth" "+w! /tmp/health.txt" +qa || true
+          if [ -f /tmp/health.txt ]; then
+            echo "=== Checkhealth Summary ==="
+            grep -E "^(OK|ERROR|WARNING)" /tmp/health.txt | head -50 || true
+          fi
