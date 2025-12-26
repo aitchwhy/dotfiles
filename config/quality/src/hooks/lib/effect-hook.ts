@@ -70,6 +70,7 @@ export const EXCLUDED_PATTERNS: readonly RegExp[] = [
   /\.stories\.[jt]sx?$/,
   /\/mocks?\//,
   /\/hooks\//, // Hook scripts are entry points that need env access
+  /\.config\.[jt]s$/, // Build-time config files need env access (vite, vitest, etc.)
 ];
 
 export const isExcludedPath = (filePath: string): boolean =>
