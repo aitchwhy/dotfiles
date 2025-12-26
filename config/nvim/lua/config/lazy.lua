@@ -14,15 +14,6 @@ if not vim.uv.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- -- vscode-neovim
--- if vim.g.vscode then
---   -- VSCode extension
---   print("[vim.g.vscode = TRUE] VSCODE")
--- else
---   -- ordinary Neovim
---   print("[vim.g.vscode = FALSE] NEOVIM")
--- end
-
 require("lazy").setup({
   -- Store lockfile in writable location (config dir is managed by Nix)
   lockfile = vim.fn.stdpath("data") .. "/lazy-lock.json",

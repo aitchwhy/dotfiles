@@ -1,17 +1,4 @@
 return {
-  -- {
-  --   "stevearc/oil.nvim",
-  --   dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if you prefer nvim-web-devicons
-  --   ---@module 'oil'
-  --   ---@type oil.SetupOpts
-  --   opts = {
-  --     default_file_explorer = false,
-  --     watch_for_changes = true,
-  --     view_options = {
-  --       show_hidden = true,
-  --     },
-  --   },
-  -- },
   {
     "stevearc/oil.nvim",
     ---@module 'oil'

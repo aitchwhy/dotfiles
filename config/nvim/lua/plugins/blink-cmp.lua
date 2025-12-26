@@ -1,5 +1,5 @@
 -- Blink.cmp completion engine for LazyVim 15.x
--- NOTE: Copilot integration handled by lazyvim.plugins.extras.ai.copilot
+-- NOTE: AI integration handled by lazyvim.plugins.extras.ai.sidekick
 return {
   {
     "saghen/blink.cmp",
