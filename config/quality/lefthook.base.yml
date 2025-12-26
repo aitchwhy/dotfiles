@@ -4,6 +4,11 @@ min_version: 1.6.0
 
 pre-commit:
   parallel: true
+  # Skip all pre-commit hooks during merge/rebase operations
+  # This is the legitimate alternative to LEFTHOOK=0 or --no-verify
+  skip:
+    - merge
+    - rebase
   commands:
     biome:
       glob: '*.{js,ts,tsx,json}'
