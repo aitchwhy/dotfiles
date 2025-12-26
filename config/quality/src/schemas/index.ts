@@ -123,3 +123,27 @@ export const RuleId = Schema.decodeSync(RuleIdSchema);
 // Decoders (Effect-native, never throw)
 export const decodeRule = Schema.decodeUnknown(QualityRuleSchema);
 export const decodeRuleEither = Schema.decodeUnknownEither(QualityRuleSchema);
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CLI Tools (Modern Replacements)
+// ═══════════════════════════════════════════════════════════════════════════
+
+export {
+  type BatFlags,
+  BatFlagsSchema,
+  type EzaFlags,
+  EzaFlagsSchema,
+  type FdFlags,
+  FdFlagsSchema,
+  type FlagMapping,
+  // Helpers
+  findIncompatibleFlags,
+  formatFlagTranslations,
+  // Constants
+  LEGACY_FLAG_MAPPINGS,
+  type LegacyCommand,
+  // Types
+  type RipgrepFlags,
+  // Schemas
+  RipgrepFlagsSchema,
+} from './cli-tools.js';
