@@ -3,7 +3,7 @@
  *
  * Guards: 1 (bash safety), 2 (commits), 3 (forbidden files),
  *         8 (TDD), 9-10 (DevOps), 11-12 (advisory), 27 (CLI tools),
- *         28-31 (config/stack), 32 (secrets detection)
+ *         28-31 (config/stack), 32 (secrets detection), 33 (hook bypass)
  *
  * Modernized to use Effect for FS operations (no sync FS).
  */
@@ -26,6 +26,42 @@ export function checkBashSafety(command: string): GuardResult {
   if (command.includes('rm -rf /') || command.includes('rm -rf ~')) {
     return { ok: false, error: 'BLOCKED: Dangerous recursive delete command detected.' };
   }
+  return { ok: true };
+}
+
+// =============================================================================
+// Guard 33: Hook Bypass Prevention
+// =============================================================================
+
+const HOOK_BYPASS_PATTERNS = [
+  { pattern: /\bLEFTHOOK=0\b/, name: 'LEFTHOOK=0' },
+  { pattern: /\bHUSKY=0\b/, name: 'HUSKY=0' },
+  { pattern: /--no-verify\b/, name: '--no-verify' },
+  { pattern: /\bgit\s+commit\s+.*-n\b/, name: '-n (no-verify shorthand)' },
+] as const;
+
+export function checkHookBypass(command: string): GuardResult {
+  for (const { pattern, name } of HOOK_BYPASS_PATTERNS) {
+    if (pattern.test(command)) {
+      return {
+        ok: false,
+        error: `Guard 33: HOOK BYPASS BLOCKED
+
+Detected: ${name}
+Command: ${command.substring(0, 60)}${command.length > 60 ? '...' : ''}
+
+Hook bypasses defeat PARAGON enforcement.
+
+Legitimate alternatives:
+1. Use lefthook skip configuration (skip: merge, skip: rebase)
+2. Create lefthook-local.yml for local overrides
+3. Fix the underlying issue instead of bypassing
+
+See: config/agents/skills/paragon/references/bypasses.md`,
+      };
+    }
+  }
+
   return { ok: true };
 }
 
@@ -559,6 +595,10 @@ export function runProceduralGuards(
   if (toolName === 'Bash' && command) {
     const bashResult = checkBashSafety(command);
     if (!bashResult.ok) return bashResult;
+
+    // Guard 33: Hook bypass prevention
+    const hookBypassResult = checkHookBypass(command);
+    if (!hookBypassResult.ok) return hookBypassResult;
 
     const commitResult = checkConventionalCommit(command);
     if (!commitResult.ok) return commitResult;
