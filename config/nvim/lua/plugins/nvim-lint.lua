@@ -10,9 +10,9 @@ return {
             return vim.fs.find({ "selene.toml" }, { path = ctx.filename, upward = true })[1]
           end,
         },
-        eslint_d = {
+        biome = {
           condition = function(ctx)
-            return vim.fs.find({ "eslint.config.js", ".eslintrc.js", ".eslintrc.json" }, { path = ctx.filename, upward = true })[1]
+            return vim.fs.find({ "biome.json", "biome.jsonc" }, { path = ctx.filename, upward = true })[1]
           end,
         },
         ruff = {
@@ -25,10 +25,14 @@ return {
         fish = { "fish" },
         lua = { "selene" },
         python = { "ruff" },
-        javascript = { "eslint_d" },
-        typescript = { "eslint_d" },
-        javascriptreact = { "eslint_d" },
-        typescriptreact = { "eslint_d" },
+        -- Biome for JS/TS ecosystem (replaces eslint_d)
+        javascript = { "biome" },
+        typescript = { "biome" },
+        javascriptreact = { "biome" },
+        typescriptreact = { "biome" },
+        json = { "biome" },
+        jsonc = { "biome" },
+        -- Other languages
         markdown = { "markdownlint" },
         yaml = { "yamllint" },
         dockerfile = { "hadolint" },
