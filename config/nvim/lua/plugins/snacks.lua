@@ -13,6 +13,19 @@ return {
       },
       picker = {
         enabled = true,
+        -- Sidekick integration: send picker items to AI CLI
+        actions = {
+          sidekick_send = function(...)
+            return require("sidekick.cli.snacks").send(...)
+          end,
+        },
+        win = {
+          input = {
+            keys = {
+              ["<a-a>"] = { "sidekick_send", mode = { "n", "i" } },
+            },
+          },
+        },
         sources = {
           explorer = {
             layout = { preset = "sidebar", preview = false },
