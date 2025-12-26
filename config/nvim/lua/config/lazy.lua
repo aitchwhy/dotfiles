@@ -30,18 +30,54 @@ require("lazy").setup({
     -- add LazyVim and import its plugins
     { "LazyVim/LazyVim", import = "lazyvim.plugins" },
 
-    -- Dev essentials extras
+    -- Completion (blink.cmp)
     { import = "lazyvim.plugins.extras.coding.blink" },
-    -- FZF replaced by Snacks.picker
-    -- { import = "lazyvim.plugins.extras.editor.fzf" },
-    { import = "lazyvim.plugins.extras.ai.copilot" },
 
-    -- Language support
+    -- AI (Single Entry Point - Sidekick with Claude CLI)
+    -- NOTE: Sidekick replaces basic Copilot - provides NES + Claude CLI integration
+    { import = "lazyvim.plugins.extras.ai.sidekick" },
+
+    -- DAP (Full Debugging)
+    { import = "lazyvim.plugins.extras.dap.core" },
+    { import = "lazyvim.plugins.extras.dap.nlua" },
+
+    -- Language support (Core)
     { import = "lazyvim.plugins.extras.lang.typescript" },
     { import = "lazyvim.plugins.extras.lang.python" },
     { import = "lazyvim.plugins.extras.lang.go" },
     { import = "lazyvim.plugins.extras.lang.rust" },
     { import = "lazyvim.plugins.extras.lang.nix" },
+
+    -- Language support (Extended)
+    { import = "lazyvim.plugins.extras.lang.json" },
+    { import = "lazyvim.plugins.extras.lang.yaml" },
+    { import = "lazyvim.plugins.extras.lang.markdown" },
+    { import = "lazyvim.plugins.extras.lang.docker" },
+    { import = "lazyvim.plugins.extras.lang.sql" },
+    { import = "lazyvim.plugins.extras.lang.tailwind" },
+    { import = "lazyvim.plugins.extras.lang.toml" },
+
+    -- Formatting (Biome for JS/TS, Black for Python)
+    { import = "lazyvim.plugins.extras.formatting.biome" },
+    { import = "lazyvim.plugins.extras.formatting.black" },
+
+    -- UI/UX (IDE-like Experience)
+    { import = "lazyvim.plugins.extras.ui.edgy" },
+    { import = "lazyvim.plugins.extras.ui.treesitter-context" },
+    -- NOTE: mini-animate skipped - vim.g.snacks_animate = false in options.lua
+
+    -- Navigation & Symbols
+    { import = "lazyvim.plugins.extras.editor.outline" },
+    { import = "lazyvim.plugins.extras.editor.navic" },
+    { import = "lazyvim.plugins.extras.editor.illuminate" },
+
+    -- Refactoring
+    { import = "lazyvim.plugins.extras.editor.refactoring" },
+    { import = "lazyvim.plugins.extras.editor.inc-rename" },
+
+    -- Editor Enhancements
+    { import = "lazyvim.plugins.extras.editor.harpoon2" },
+    { import = "lazyvim.plugins.extras.editor.overseer" },
 
     -- import/override with your plugins
     { import = "plugins" },
