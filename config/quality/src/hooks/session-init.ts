@@ -15,7 +15,7 @@ import * as fs from 'node:fs/promises'
 import * as os from 'node:os'
 import * as path from 'node:path'
 import { promisify } from 'node:util'
-import { Console, Effect, pipe } from 'effect'
+import { Cause, Console, Effect, pipe } from 'effect'
 
 const execAsync = promisify(exec)
 
@@ -207,10 +207,10 @@ const main = Effect.gen(function* () {
   yield* outputResult(output)
 })
 
-pipe(
+void pipe(
   main,
-  Effect.catchAll((error) =>
-    outputResult({ continue: true, additionalContext: `Hook error: ${String(error)}` }),
+  Effect.catchAllCause((cause) =>
+    outputResult({ continue: true, additionalContext: `Hook error: ${Cause.pretty(cause)}` }),
   ),
   Effect.runPromise,
 )

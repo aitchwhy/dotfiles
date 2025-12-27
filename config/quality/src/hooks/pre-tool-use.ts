@@ -11,7 +11,7 @@
  * - Structural: clean code metrics
  */
 
-import { Effect, pipe, Schema } from 'effect'
+import { Cause, Effect, pipe, Schema } from 'effect'
 import { ALL_RULES } from '../rules'
 import { isForbidden } from '../stack'
 import { checkContent, filterBySeverity, formatMatches } from './lib/ast-grep'
@@ -71,7 +71,7 @@ const parseDependencies = (content: string) =>
       catch: () => new Error('Invalid package.json'),
     })
     const pkg = yield* Schema.decodeUnknown(PackageJsonSchema)(rawJson)
-    return { ...(pkg.dependencies ?? {}), ...(pkg.devDependencies ?? {}) }
+    return { ...pkg.dependencies, ...pkg.devDependencies }
   })
 
 // =============================================================================
@@ -110,7 +110,7 @@ const checkForbiddenPackages = (input: PreToolUseInput) =>
   })
 
 const checkDangerousCommands = (input: PreToolUseInput) =>
-  Effect.gen(function* () {
+  Effect.sync(() => {
     if (input.tool_name !== 'Bash') return approve()
 
     const command = input.tool_input.command
@@ -127,7 +127,7 @@ const checkDangerousCommands = (input: PreToolUseInput) =>
 // =============================================================================
 
 const runParagonGuards = (input: PreToolUseInput) =>
-  Effect.gen(function* () {
+  Effect.sync(() => {
     const { file_path: filePath, content, new_string, command } = input.tool_input
     const effectiveContent = content ?? new_string
 
@@ -195,8 +195,8 @@ const main = Effect.gen(function* () {
   yield* outputDecision(approve())
 })
 
-pipe(
+void pipe(
   main,
-  Effect.catchAll((error) => outputDecision(block(`Hook error: ${String(error)}`))),
+  Effect.catchAllCause((cause) => outputDecision(block(`Hook error: ${Cause.pretty(cause)}`))),
   Effect.runPromise,
 )

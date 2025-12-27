@@ -12,7 +12,7 @@
 import { exec, spawn } from 'node:child_process'
 import * as os from 'node:os'
 import { promisify } from 'node:util'
-import { Console, Effect, pipe } from 'effect'
+import { Cause, Console, Effect, pipe } from 'effect'
 
 const execAsync = promisify(exec)
 
@@ -144,10 +144,10 @@ const main = Effect.gen(function* () {
   yield* outputResult({ continue: true })
 })
 
-pipe(
+void pipe(
   main,
-  Effect.catchAll((error) =>
-    outputResult({ continue: true, additionalContext: `Hook error: ${String(error)}` }),
+  Effect.catchAllCause((cause) =>
+    outputResult({ continue: true, additionalContext: `Hook error: ${Cause.pretty(cause)}` }),
   ),
   Effect.runPromise,
 )
