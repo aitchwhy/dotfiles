@@ -11,9 +11,9 @@
  *   - Enforcement hooks (version drift detection)
  */
 
-import { type Either, type ParseResult, Schema } from 'effect';
-import type { StackDefinition } from './schema';
-import { StackDefinitionSchema } from './schema';
+import { type Either, type ParseResult, Schema } from 'effect'
+import type { StackDefinition } from './schema'
+import { StackDefinitionSchema } from './schema'
 
 /**
  * STACK - Frozen December 2025 Configuration
@@ -225,7 +225,8 @@ export const STACK = {
     handlebars: '4.7.8',
 
     // Dev & Linting
-    oxlint: '1.32.0',
+    oxlint: '1.35.0',
+    'oxlint-tsgolint': '0.10.0',
     '@biomejs/biome': '2.3.8',
     '@types/node': '22.10.2',
     tsx: '4.19.2',
@@ -265,7 +266,7 @@ export const STACK = {
     // WebGL
     ogl: '1.0.11',
   },
-} as const satisfies StackDefinition;
+} as const satisfies StackDefinition
 
 /**
  * Validate STACK at runtime (development check)
@@ -275,21 +276,21 @@ export const STACK = {
  * but kept for backward compatibility and explicit runtime assertion.
  */
 export function validateStack(): Either.Either<StackDefinition, ParseResult.ParseError> {
-  return Schema.decodeUnknownEither(StackDefinitionSchema)(STACK);
+  return Schema.decodeUnknownEither(StackDefinitionSchema)(STACK)
 }
 
 /**
  * Export as JSON for backward compatibility
  * This allows existing code that reads versions.json to continue working
  */
-export const versionsJson = JSON.stringify(STACK, null, 2);
+export const versionsJson = JSON.stringify(STACK, null, 2)
 
 /**
  * Get a specific npm package version
  * Type-safe access to npm versions
  */
 export function getNpmVersion<K extends keyof typeof STACK.npm>(pkg: K): string {
-  return STACK.npm[pkg];
+  return STACK.npm[pkg]
 }
 
 /**
@@ -297,34 +298,34 @@ export function getNpmVersion<K extends keyof typeof STACK.npm>(pkg: K): string 
  * Useful for generating package.json dependencies
  */
 export function getNpmVersions(): Record<string, string> {
-  return { ...STACK.npm };
+  return { ...STACK.npm }
 }
 
 /**
  * Check if a package version matches the SSOT
  */
 export function isVersionMatch(pkg: string, version: string): boolean {
-  const npmVersions: Readonly<Record<string, string>> = STACK.npm;
-  const expected = npmVersions[pkg];
-  if (!expected) return true; // Unknown packages are allowed
-  return expected === version;
+  const npmVersions: Readonly<Record<string, string>> = STACK.npm
+  const expected = npmVersions[pkg]
+  if (!expected) return true // Unknown packages are allowed
+  return expected === version
 }
 
 /**
  * Get drift report for a set of dependencies
  */
 export function getDrift(
-  dependencies: Record<string, string>
+  dependencies: Record<string, string>,
 ): Array<{ pkg: string; expected: string; actual: string }> {
-  const drift: Array<{ pkg: string; expected: string; actual: string }> = [];
-  const npmVersions: Readonly<Record<string, string>> = STACK.npm;
+  const drift: Array<{ pkg: string; expected: string; actual: string }> = []
+  const npmVersions: Readonly<Record<string, string>> = STACK.npm
 
   for (const [pkg, version] of Object.entries(dependencies)) {
-    const expected = npmVersions[pkg];
+    const expected = npmVersions[pkg]
     if (expected && expected !== version) {
-      drift.push({ pkg, expected, actual: version });
+      drift.push({ pkg, expected, actual: version })
     }
   }
 
-  return drift;
+  return drift
 }
