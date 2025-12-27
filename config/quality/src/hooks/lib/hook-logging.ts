@@ -107,12 +107,21 @@ export const emitHalt = (extra?: Record<string, unknown>): void => {
 // Error Logging (stderr - does not affect protocol output)
 // =============================================================================
 
+const stringifyError = (error: unknown): string =>
+  error instanceof Error
+    ? error.message
+    : typeof error === 'string'
+      ? error
+      : error === undefined || error === null
+        ? ''
+        : JSON.stringify(error)
+
 /**
  * Log an error to stderr. Does not affect protocol output.
  * Use for internal errors that shouldn't be part of the decision.
  */
 export const logError = (context: string, error?: unknown): void => {
-  const errorMessage = error instanceof Error ? error.message : String(error ?? '')
+  const errorMessage = stringifyError(error)
   const stack = error instanceof Error ? error.stack : undefined
 
   process.stderr.write(

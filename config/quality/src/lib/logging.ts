@@ -144,8 +144,17 @@ export const logHookDecision = (output: HookOutput): Effect.Effect<void> =>
  * Log an error to stderr for hooks (does not affect protocol output).
  * Use for internal errors that shouldn't be part of the decision.
  */
+const stringifyError = (error: unknown): string =>
+  error instanceof Error
+    ? error.message
+    : typeof error === 'string'
+      ? error
+      : error === undefined || error === null
+        ? ''
+        : JSON.stringify(error)
+
 export const logHookError = (message: string, error?: unknown): Effect.Effect<void> =>
   Effect.sync(() => {
-    const errorMessage = error instanceof Error ? error.message : String(error ?? '')
+    const errorMessage = stringifyError(error)
     process.stderr.write(`[hook-error] ${message}${errorMessage ? `: ${errorMessage}` : ''}\n`)
   })
