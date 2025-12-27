@@ -283,6 +283,7 @@ export type NpmVersions = {
 
   // Dev & Linting
   readonly oxlint: string
+  readonly 'oxlint-tsgolint': string
   readonly '@biomejs/biome': string
   readonly '@types/node': string
   readonly tsx: string
@@ -514,6 +515,7 @@ export const NpmVersionsSchema = Schema.Struct({
 
   // Dev & Linting
   oxlint: VersionString,
+  'oxlint-tsgolint': VersionString,
   '@biomejs/biome': VersionString,
   '@types/node': VersionString,
   tsx: VersionString,
