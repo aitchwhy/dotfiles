@@ -77,8 +77,8 @@ const checkPackageJson = (pkgPath: string) =>
     const pkg = yield* Schema.decodeUnknown(PackageJsonSchema)(rawJson)
 
     const allDeps = {
-      ...(pkg.dependencies ?? {}),
-      ...(pkg.devDependencies ?? {}),
+      ...pkg.dependencies,
+      ...pkg.devDependencies,
     }
 
     const violations: Violation[] = []
