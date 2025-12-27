@@ -2,7 +2,7 @@
 -- Only debug adapters - all linters/formatters are installed via Nix
 return {
   {
-    "williamboman/mason.nvim",
+    "mason-org/mason.nvim",
     opts = {
       ensure_installed = {
         -- Debug adapters only (IDE-specific, complex binaries)
