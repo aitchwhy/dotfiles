@@ -59,7 +59,7 @@ const main = Effect.gen(function* () {
   yield* Effect.log(`  Behaviors: ${BEHAVIOR_COUNTS.total}`)
 })
 
-pipe(
+void pipe(
   main,
   Effect.catchAll((error) =>
     Effect.gen(function* () {

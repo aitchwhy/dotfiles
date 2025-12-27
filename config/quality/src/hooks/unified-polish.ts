@@ -123,7 +123,7 @@ const program = Effect.gen(function* () {
 // Run
 // ============================================================================
 
-pipe(
+void pipe(
   program,
   Effect.catchAll(() => Effect.sync(() => emitContinue())),
   Effect.runPromise,

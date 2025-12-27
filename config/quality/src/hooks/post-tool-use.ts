@@ -16,4 +16,4 @@ const main = Effect.gen(function* () {
   yield* Effect.succeed(undefined)
 })
 
-pipe(main, Effect.runPromise)
+void pipe(main, Effect.runPromise)
