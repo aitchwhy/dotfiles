@@ -103,6 +103,12 @@ let
       package = "chrome-devtools-mcp";
       args = [ ];
     };
+    reactbits = {
+      # React Bits - 135+ animated React components (buttons, backgrounds, text effects)
+      # https://reactbits.dev - provides component code and Tailwind/CSS variants
+      package = "reactbits-dev-mcp-server";
+      args = [ ];
+    };
 
     # ═══════════════════════════════════════════════════════════════════════════
     # Modern CLI Tool MCP Servers (schema-based enforcement)
