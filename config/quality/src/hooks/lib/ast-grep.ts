@@ -40,8 +40,8 @@ rule:
 export const checkContent = (
   content: string,
   rules: readonly QualityRule[],
-): Effect.Effect<readonly AstGrepMatch[], Error> =>
-  Effect.gen(function* () {
+): Effect.Effect<readonly AstGrepMatch[], never> =>
+  Effect.sync(() => {
     const matches: AstGrepMatch[] = []
 
     for (const rule of rules) {
