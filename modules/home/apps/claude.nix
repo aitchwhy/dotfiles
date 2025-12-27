@@ -94,9 +94,10 @@ let
       isPython = true;
     };
     shadcn = {
-      # React/Tailwind shadcn/ui v4 components, blocks, and demos
-      package = "@jpisnice/shadcn-ui-mcp-server";
-      args = [ ];
+      # Official shadcn/ui MCP - components, blocks, demos for React/Tailwind
+      # https://ui.shadcn.com/docs/mcp
+      package = "shadcn@latest";
+      args = [ "mcp" ];
     };
     chrome-devtools = {
       # Chrome DevTools Protocol - browser debugging, performance, network
