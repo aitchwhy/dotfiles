@@ -62,6 +62,23 @@ in
         owner = config.system.primaryUser;
         path = "/Users/${config.system.primaryUser}/.config/claude/user-id";
       };
+
+      # DataDog API Key for MCP server
+      # Generate at: https://app.datadoghq.com/organization-settings/api-keys
+      datadog-api-key = {
+        mode = "0400";
+        owner = config.system.primaryUser;
+        path = "/Users/${config.system.primaryUser}/.config/claude/datadog-api-key";
+      };
+
+      # DataDog Application Key for MCP server
+      # Generate at: https://app.datadoghq.com/organization-settings/application-keys
+      # Scopes: incidents_read, dashboards_read, monitors_read, metrics_read, logs_read
+      datadog-app-key = {
+        mode = "0400";
+        owner = config.system.primaryUser;
+        path = "/Users/${config.system.primaryUser}/.config/claude/datadog-app-key";
+      };
     };
   };
 }
