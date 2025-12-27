@@ -1,16 +1,16 @@
 /**
  * Memory Registry - Flat Memory List
  *
- * 23 consolidated engineering patterns.
+ * 22 consolidated engineering patterns.
  * Staff-to-Principal level craft knowledge.
  *
  * Categories:
  *   - principle (5): Guiding philosophies
  *   - constraint (4): Hard rules
- *   - pattern (12): Reusable solutions
+ *   - pattern (11): Reusable solutions
  *   - gotcha (2): Pitfalls to avoid
  */
-import type { Memory } from './schemas';
+import type { Memory } from './schemas'
 
 export const MEMORIES: readonly Memory[] = [
   // ===========================================================================
@@ -104,7 +104,7 @@ export const MEMORIES: readonly Memory[] = [
   },
 
   // ===========================================================================
-  // PATTERNS (11) - Reusable solutions
+  // PATTERNS (11) - Reusable solutions (Nx removed - using pnpm + Docker Compose)
   // ===========================================================================
   {
     id: 'evidence-based-timeouts',
@@ -204,16 +204,6 @@ export const MEMORIES: readonly Memory[] = [
     verified: '2024-12-24',
   },
   {
-    id: 'nx-monorepo',
-    category: 'pattern',
-    title: 'NX Monorepo Structure',
-    content:
-      'Projects organized as NX workspace: apps/ (api, web) and packages/ (config, domain, e2e, otel). ' +
-      'NX handles task orchestration, caching, and affected detection. ' +
-      'Each package has project.json defining build targets. Use nx affected for CI.',
-    verified: '2024-12-24',
-  },
-  {
     id: 'drizzle-postgres',
     category: 'pattern',
     title: 'Drizzle ORM with PostgreSQL',
@@ -246,20 +236,20 @@ export const MEMORIES: readonly Memory[] = [
       'Old revisions retained for rollback.',
     verified: '2024-12-24',
   },
-] as const satisfies readonly Memory[];
+] as const satisfies readonly Memory[]
 
 /**
  * Get memories by category
  */
 export function getMemoriesByCategory(category: Memory['category']): readonly Memory[] {
-  return MEMORIES.filter((m) => m.category === category);
+  return MEMORIES.filter((m) => m.category === category)
 }
 
 /**
  * Get a single memory by ID
  */
 export function getMemory(id: string): Memory | undefined {
-  return MEMORIES.find((m) => m.id === id);
+  return MEMORIES.find((m) => m.id === id)
 }
 
 /**
@@ -271,4 +261,4 @@ export const MEMORY_COUNTS = {
   pattern: MEMORIES.filter((m) => m.category === 'pattern').length,
   gotcha: MEMORIES.filter((m) => m.category === 'gotcha').length,
   total: MEMORIES.length,
-} as const;
+} as const

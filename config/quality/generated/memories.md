@@ -3,10 +3,10 @@
 Staff-to-Principal level craft knowledge.
 Flat list of patterns, constraints, and gotchas.
 
-**Total**: 23 memories
+**Total**: 22 memories
 - Principles: 5
 - Constraints: 4
-- Patterns: 12
+- Patterns: 11
 - Gotchas: 2
 
 ---
@@ -137,12 +137,6 @@ Local development uses docker compose up with Caddy reverse proxy. Nix is for do
 ### E2E-First Testing Strategy
 
 E2E tests are primary verification layer. Run before every deploy. packages/e2e is independent, imports only @ember/config and @ember/domain. No test bypass code in production. E2E generates valid JWTs using same contract as prod.
-
-*Verified: 2024-12-24*
-
-### NX Monorepo Structure
-
-Projects organized as NX workspace: apps/ (api, web) and packages/ (config, domain, e2e, otel). NX handles task orchestration, caching, and affected detection. Each package has project.json defining build targets. Use nx affected for CI.
 
 *Verified: 2024-12-24*
 

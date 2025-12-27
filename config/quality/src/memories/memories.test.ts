@@ -1,79 +1,79 @@
 /**
  * Memory System Tests
  *
- * Validates the 23 canonical memories are correctly defined
+ * Validates the 22 canonical memories are correctly defined
  * and maintain structural integrity.
  */
-import { Schema } from 'effect';
-import { describe, expect, it } from 'vitest';
-import { getMemoriesByCategory, getMemory, MEMORIES, MEMORY_COUNTS } from './index';
-import { MemorySchema } from './schemas';
+import { Schema } from 'effect'
+import { describe, expect, it } from 'vitest'
+import { getMemoriesByCategory, getMemory, MEMORIES, MEMORY_COUNTS } from './index'
+import { MemorySchema } from './schemas'
 
 describe('Memory System', () => {
   describe('counts', () => {
-    it('has exactly 23 memories', () => {
-      expect(MEMORIES).toHaveLength(23);
-      expect(MEMORY_COUNTS.total).toBe(23);
-    });
+    it('has exactly 22 memories', () => {
+      expect(MEMORIES).toHaveLength(22)
+      expect(MEMORY_COUNTS.total).toBe(22)
+    })
 
     it('has correct category distribution', () => {
-      expect(MEMORY_COUNTS.principle).toBe(5);
-      expect(MEMORY_COUNTS.constraint).toBe(4);
-      expect(MEMORY_COUNTS.pattern).toBe(12);
-      expect(MEMORY_COUNTS.gotcha).toBe(2);
-    });
+      expect(MEMORY_COUNTS.principle).toBe(5)
+      expect(MEMORY_COUNTS.constraint).toBe(4)
+      expect(MEMORY_COUNTS.pattern).toBe(11)
+      expect(MEMORY_COUNTS.gotcha).toBe(2)
+    })
 
     it('category counts sum to total', () => {
       const sum =
         MEMORY_COUNTS.principle +
         MEMORY_COUNTS.constraint +
         MEMORY_COUNTS.pattern +
-        MEMORY_COUNTS.gotcha;
-      expect(sum).toBe(MEMORY_COUNTS.total);
-    });
-  });
+        MEMORY_COUNTS.gotcha
+      expect(sum).toBe(MEMORY_COUNTS.total)
+    })
+  })
 
   describe('schema validation', () => {
     it('all memories pass schema validation', () => {
-      const decode = Schema.decodeUnknownSync(MemorySchema);
+      const decode = Schema.decodeUnknownSync(MemorySchema)
       for (const memory of MEMORIES) {
-        expect(() => decode(memory)).not.toThrow();
+        expect(() => decode(memory)).not.toThrow()
       }
-    });
+    })
 
     it('all memory IDs are unique', () => {
-      const ids = MEMORIES.map((m) => m.id);
-      const uniqueIds = new Set(ids);
-      expect(uniqueIds.size).toBe(ids.length);
-    });
+      const ids = MEMORIES.map((m) => m.id)
+      const uniqueIds = new Set(ids)
+      expect(uniqueIds.size).toBe(ids.length)
+    })
 
     it('all memory IDs match kebab-case pattern', () => {
-      const pattern = /^[a-z0-9-]+$/;
+      const pattern = /^[a-z0-9-]+$/
       for (const memory of MEMORIES) {
-        expect(memory.id).toMatch(pattern);
+        expect(memory.id).toMatch(pattern)
       }
-    });
-  });
+    })
+  })
 
   describe('content quality', () => {
     it('all memories have non-empty content', () => {
       for (const memory of MEMORIES) {
-        expect(memory.content.length).toBeGreaterThan(50);
+        expect(memory.content.length).toBeGreaterThan(50)
       }
-    });
+    })
 
     it('all memories have titles under 80 chars', () => {
       for (const memory of MEMORIES) {
-        expect(memory.title.length).toBeLessThanOrEqual(80);
+        expect(memory.title.length).toBeLessThanOrEqual(80)
       }
-    });
+    })
 
     it('all memories have content under 500 chars', () => {
       for (const memory of MEMORIES) {
-        expect(memory.content.length).toBeLessThanOrEqual(500);
+        expect(memory.content.length).toBeLessThanOrEqual(500)
       }
-    });
-  });
+    })
+  })
 
   describe('required memories exist', () => {
     const requiredIds = [
@@ -84,36 +84,35 @@ describe('Memory System', () => {
       'effect-platform-http',
       'statsig-feature-flags',
       'hexagonal-architecture',
-      'dynamic-credentials', // renamed from pulumi-esc-only
+      'dynamic-credentials',
       'xstate-actor-model',
       'betterauth-sessions',
       'docker-compose-dev',
       'e2e-first-testing',
-      'nx-monorepo',
       'drizzle-postgres',
-    ];
+    ]
 
     it.each(requiredIds)('has required memory: %s', (id) => {
-      expect(getMemory(id)).toBeDefined();
-    });
-  });
+      expect(getMemory(id)).toBeDefined()
+    })
+  })
 
   describe('helper functions', () => {
     it('getMemoriesByCategory returns correct counts', () => {
-      expect(getMemoriesByCategory('principle')).toHaveLength(5);
-      expect(getMemoriesByCategory('constraint')).toHaveLength(4);
-      expect(getMemoriesByCategory('pattern')).toHaveLength(12);
-      expect(getMemoriesByCategory('gotcha')).toHaveLength(2);
-    });
+      expect(getMemoriesByCategory('principle')).toHaveLength(5)
+      expect(getMemoriesByCategory('constraint')).toHaveLength(4)
+      expect(getMemoriesByCategory('pattern')).toHaveLength(11)
+      expect(getMemoriesByCategory('gotcha')).toHaveLength(2)
+    })
 
     it('getMemory returns undefined for unknown ID', () => {
-      expect(getMemory('nonexistent-memory')).toBeUndefined();
-    });
+      expect(getMemory('nonexistent-memory')).toBeUndefined()
+    })
 
     it('getMemory returns correct memory for valid ID', () => {
-      const memory = getMemory('parse-dont-validate');
-      expect(memory).toBeDefined();
-      expect(memory?.category).toBe('principle');
-    });
-  });
-});
+      const memory = getMemory('parse-dont-validate')
+      expect(memory).toBeDefined()
+      expect(memory?.category).toBe('principle')
+    })
+  })
+})
