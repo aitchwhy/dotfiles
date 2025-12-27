@@ -70,7 +70,9 @@ let
       # Token sourced from sops-nix secret file
       package = "@modelcontextprotocol/server-github";
       args = [ ];
-      hasEnvFile = true; # Signal to wrapper to source GITHUB_PERSONAL_ACCESS_TOKEN
+      envVars = {
+        GITHUB_PERSONAL_ACCESS_TOKEN = "$HOME/.config/claude/github-token";
+      };
     };
     playwright = {
       # Browser automation for testing and web interactions
@@ -121,26 +123,60 @@ let
       args = [ ];
     };
     # NOTE: postgres removed - requires connection URL arg, package is deprecated
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # Observability & Infrastructure MCP Servers
+    # ═══════════════════════════════════════════════════════════════════════════
+    datadog = {
+      # Query logs, metrics, monitors, dashboards, incidents
+      # https://github.com/GeLi2001/datadog-mcp-server
+      package = "datadog-mcp-server";
+      args = [ ];
+      envVars = {
+        DD_API_KEY = "$HOME/.config/claude/datadog-api-key";
+        DD_APP_KEY = "$HOME/.config/claude/datadog-app-key";
+      };
+    };
+
+    pulumi = {
+      # Pulumi Cloud: stacks, resources, registry, Neo agent
+      # OAuth via browser - no local credentials stored
+      isRemote = true;
+      url = "https://mcp.ai.pulumi.com/mcp";
+    };
   };
 
   # ═══════════════════════════════════════════════════════════════════════════
   # Format Generators
   # ═══════════════════════════════════════════════════════════════════════════
 
+  # Generic env sourcing from sops-nix decrypted files
+  # Uses semicolon (not &&) for independent sourcing - missing files don't block others
+  mkEnvSource =
+    def:
+    let
+      envVars = def.envVars or { };
+      sources = lib.mapAttrsToList (
+        name: path: "[ -f ${path} ] && export ${name}=$(cat ${path})"
+      ) envVars;
+    in
+    if sources == [ ] then "" else (lib.concatStringsSep "; " sources) + "; ";
+
   # Claude Desktop format: wrap commands in /bin/sh to inject Nix PATH
   # Electron apps don't inherit shell PATH, so we must inject it
   toDesktopFormat =
     _name: def:
     let
-      argsString = if def.args == [ ] then "" else " " + (concatStringsSep " " def.args);
-      # Source GitHub token from sops-nix decrypted file if hasEnvFile is set
-      envSource =
-        if def.hasEnvFile or false then
-          "[ -f $HOME/.config/claude/github-token ] && export GITHUB_PERSONAL_ACCESS_TOKEN=$(cat $HOME/.config/claude/github-token); "
-        else
-          "";
+      argsString = if def.args or [ ] == [ ] then "" else " " + (concatStringsSep " " def.args);
+      envSource = mkEnvSource def;
     in
-    if def.isLocal or false then
+    # Remote MCP servers (HTTP transport, e.g., Pulumi OAuth)
+    if def.isRemote or false then
+      {
+        type = "http";
+        url = def.url;
+      }
+    else if def.isLocal or false then
       {
         # Local servers (e.g., bun scripts) - wrap with PATH injection
         command = "/bin/sh";
@@ -169,18 +205,20 @@ let
       };
 
   # Claude Code CLI format: direct commands (shell has PATH)
-  # For servers needing env vars (like GitHub), we wrap in sh to source the token
+  # For servers needing env vars, we wrap in sh to source secrets
   toCliFormat =
     _name: def:
     let
-      envSource =
-        if def.hasEnvFile or false then
-          "[ -f $HOME/.config/claude/github-token ] && export GITHUB_PERSONAL_ACCESS_TOKEN=$(cat $HOME/.config/claude/github-token); "
-        else
-          "";
-      needsWrapper = def.hasEnvFile or false;
+      envSource = mkEnvSource def;
+      needsWrapper = (def.envVars or { }) != { };
     in
-    if def.isLocal or false then
+    # Remote MCP servers (HTTP transport, e.g., Pulumi OAuth)
+    if def.isRemote or false then
+      {
+        type = "http";
+        url = def.url;
+      }
+    else if def.isLocal or false then
       {
         command = def.command;
         args = def.args;
