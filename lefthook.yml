@@ -1,5 +1,6 @@
 # lefthook.yml - Git hooks for dotfiles repo
 # Docs: https://github.com/evilmartians/lefthook
+# Type-aware linting runs in CI only (requires full program context)
 min_version: 1.6.0
 
 pre-commit:
@@ -10,6 +11,17 @@ pre-commit:
     - merge
     - rebase
   commands:
+    format:
+      glob: "config/quality/**/*.{ts,tsx,js,jsx,json}"
+      root: "config/quality"
+      run: npx biome check --write {staged_files}
+      stage_fixed: true
+
+    lint-syntax:
+      glob: "config/quality/**/*.{ts,tsx,js,jsx}"
+      root: "config/quality"
+      run: npx oxlint {staged_files}
+
     nixfmt:
       glob: "*.nix"
       run: nixfmt --check {staged_files}
