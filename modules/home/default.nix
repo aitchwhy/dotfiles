@@ -151,6 +151,9 @@ in
       SOPS_AGE_KEY_FILE = "$HOME/.config/sops/age/keys.txt";
       ZELLIJ_CONFIG_DIR = "$HOME/dotfiles/config/zellij";
 
+      # Claude Code LSP support
+      ENABLE_LSP_TOOL = "1";
+
       # FZF options are set in modules/home/tools/fzf.nix
 
       # Colors
