@@ -4,8 +4,8 @@
  * Type safety enforcement.
  */
 
-import type { PersonaDefinition } from '../schemas';
-import { PersonaName } from '../schemas';
+import type { PersonaDefinition } from '../schemas'
+import { PersonaName } from '../schemas'
 
 export const typeGuardianPersona: PersonaDefinition = {
   name: PersonaName('type-guardian'),
@@ -43,4 +43,4 @@ When reviewing code:
 2. Explain the risk
 3. Provide corrected code
 4. Show the improved type signatures`,
-};
+}

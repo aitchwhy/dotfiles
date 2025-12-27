@@ -4,8 +4,8 @@
  * Ports (Context.Tag) and Adapters (Layer) for testable code.
  */
 
-import type { SkillDefinition } from '../schemas';
-import { SkillName } from '../schemas';
+import type { SkillDefinition } from '../schemas'
+import { SkillName } from '../schemas'
 
 export const hexagonalSkill: SkillDefinition = {
   frontmatter: {
@@ -87,4 +87,4 @@ No mocks needed - swap layers for different behaviors.
 `,
     },
   ],
-};
+}

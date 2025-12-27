@@ -4,8 +4,8 @@
  * HttpApiBuilder for typed HTTP endpoints.
  */
 
-import type { SkillDefinition } from '../schemas';
-import { SkillName } from '../schemas';
+import type { SkillDefinition } from '../schemas'
+import { SkillName } from '../schemas'
 
 export const apiContractSkill: SkillDefinition = {
   frontmatter: {
@@ -95,4 +95,4 @@ const user = yield* client.users.getUser({ path: { id: "123" } });
 `,
     },
   ],
-};
+}

@@ -4,8 +4,8 @@
  * Core patterns for typed effects, errors, and dependencies.
  */
 
-import type { SkillDefinition } from '../schemas';
-import { SkillName } from '../schemas';
+import type { SkillDefinition } from '../schemas'
+import { SkillName } from '../schemas'
 
 export const effectTsSkill: SkillDefinition = {
   frontmatter: {
@@ -103,4 +103,4 @@ getUser("123").pipe(
 `,
     },
   ],
-};
+}

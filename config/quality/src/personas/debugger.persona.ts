@@ -4,8 +4,8 @@
  * Effect stack traces and Fiber debugging.
  */
 
-import type { PersonaDefinition } from '../schemas';
-import { PersonaName } from '../schemas';
+import type { PersonaDefinition } from '../schemas'
+import { PersonaName } from '../schemas'
 
 export const debuggerPersona: PersonaDefinition = {
   name: PersonaName('debugger'),
@@ -57,4 +57,4 @@ When debugging:
 3. Identify root cause
 4. Propose fix
 5. Add diagnostics to prevent recurrence`,
-};
+}

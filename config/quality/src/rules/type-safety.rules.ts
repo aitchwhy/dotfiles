@@ -4,8 +4,8 @@
  * Enforce strict typing - no escape hatches.
  */
 
-import type { QualityRule } from '../schemas';
-import { RuleId } from '../schemas';
+import type { QualityRule } from '../schemas'
+import { RuleId } from '../schemas'
 
 export const TYPE_SAFETY_RULES: readonly QualityRule[] = [
   {
@@ -36,4 +36,4 @@ export const TYPE_SAFETY_RULES: readonly QualityRule[] = [
     fix: "Use branded types: type UserId = string & Brand.Brand<'UserId'>",
     note: 'Advisory - triggers on common patterns but may have false positives',
   },
-] as const;
+] as const

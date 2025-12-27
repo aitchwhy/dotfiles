@@ -4,8 +4,8 @@
  * Enforce hexagonal architecture and dependency management.
  */
 
-import type { QualityRule } from '../schemas';
-import { RuleId } from '../schemas';
+import type { QualityRule } from '../schemas'
+import { RuleId } from '../schemas'
 
 // Forbidden package names (split to avoid hook self-detection)
 const FORBIDDEN = {
@@ -15,7 +15,7 @@ const FORBIDDEN = {
   moment: 'moment',
   prisma: 'prisma',
   hono: 'hono',
-} as const;
+} as const
 
 export const ARCHITECTURE_RULES: readonly QualityRule[] = [
   {
@@ -53,4 +53,4 @@ export const ARCHITECTURE_RULES: readonly QualityRule[] = [
     ],
     fix: 'Use stack alternatives: Effect for FP, @effect/platform for HTTP, Temporal for dates, Drizzle for DB',
   },
-] as const;
+] as const

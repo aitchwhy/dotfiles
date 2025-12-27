@@ -9,32 +9,32 @@
 // Types
 // =============================================================================
 
-type HookType = 'command';
+type HookType = 'command'
 
 type HookEntry = {
-  readonly type: HookType;
-  readonly command: string;
-  readonly timeout: number;
-};
+  readonly type: HookType
+  readonly command: string
+  readonly timeout: number
+}
 
 type MatcherHookGroup = {
-  readonly matcher?: string;
-  readonly hooks: readonly HookEntry[];
-};
+  readonly matcher?: string
+  readonly hooks: readonly HookEntry[]
+}
 
 type HookDefinitions = {
-  readonly PreToolUse: readonly MatcherHookGroup[];
-  readonly PostToolUse: readonly MatcherHookGroup[];
-  readonly SessionStart: readonly MatcherHookGroup[];
-  readonly Stop: readonly MatcherHookGroup[];
-  readonly UserPromptSubmit: readonly MatcherHookGroup[];
-};
+  readonly PreToolUse: readonly MatcherHookGroup[]
+  readonly PostToolUse: readonly MatcherHookGroup[]
+  readonly SessionStart: readonly MatcherHookGroup[]
+  readonly Stop: readonly MatcherHookGroup[]
+  readonly UserPromptSubmit: readonly MatcherHookGroup[]
+}
 
 // =============================================================================
 // Path Helpers
 // =============================================================================
 
-const qualityHook = (name: string) => `bun "$HOME/dotfiles/config/quality/src/hooks/${name}"`;
+const qualityHook = (name: string) => `bun "$HOME/dotfiles/config/quality/src/hooks/${name}"`
 
 // =============================================================================
 // Hook Definitions
@@ -122,10 +122,10 @@ export const HOOK_DEFINITIONS: HookDefinitions = {
       ],
     },
   ],
-} as const;
+} as const
 
 // =============================================================================
 // Exports for Generator
 // =============================================================================
 
-export type { HookDefinitions, HookEntry, MatcherHookGroup };
+export type { HookDefinitions, HookEntry, MatcherHookGroup }

@@ -4,8 +4,8 @@
  * Auth, input validation, secrets management.
  */
 
-import type { PersonaDefinition } from '../schemas';
-import { PersonaName } from '../schemas';
+import type { PersonaDefinition } from '../schemas'
+import { PersonaName } from '../schemas'
 
 export const securityAuditorPersona: PersonaDefinition = {
   name: PersonaName('security-auditor'),
@@ -53,4 +53,4 @@ When auditing:
 3. Attack scenario
 4. Remediation code
 5. Additional hardening suggestions`,
-};
+}

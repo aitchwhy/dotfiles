@@ -4,8 +4,8 @@
  * XState v5 patterns for complex UI state.
  */
 
-import type { SkillDefinition } from '../schemas';
-import { SkillName } from '../schemas';
+import type { SkillDefinition } from '../schemas'
+import { SkillName } from '../schemas'
 
 export const stateMachinesSkill: SkillDefinition = {
   frontmatter: {
@@ -93,4 +93,4 @@ Actors allow composing machines for multi-step workflows.
 `,
     },
   ],
-};
+}

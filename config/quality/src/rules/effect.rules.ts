@@ -4,8 +4,8 @@
  * Enforce Effect-TS patterns for typed effects, errors, and composition.
  */
 
-import type { QualityRule } from '../schemas';
-import { RuleId } from '../schemas';
+import type { QualityRule } from '../schemas'
+import { RuleId } from '../schemas'
 
 export const EFFECT_RULES: readonly QualityRule[] = [
   {
@@ -54,4 +54,4 @@ export const EFFECT_RULES: readonly QualityRule[] = [
     patterns: ['process.env.', 'Bun.env.'],
     fix: 'Use a Config service: yield* Config; with ConfigLive/ConfigTest layers',
   },
-] as const;
+] as const

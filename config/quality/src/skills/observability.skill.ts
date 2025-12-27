@@ -4,8 +4,8 @@
  * OTEL + Effect logging patterns.
  */
 
-import type { SkillDefinition } from '../schemas';
-import { SkillName } from '../schemas';
+import type { SkillDefinition } from '../schemas'
+import { SkillName } from '../schemas'
 
 export const observabilitySkill: SkillDefinition = {
   frontmatter: {
@@ -78,4 +78,4 @@ const main = program.pipe(Effect.provide(OtelLive));
 `,
     },
   ],
-};
+}

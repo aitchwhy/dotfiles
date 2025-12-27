@@ -9,7 +9,7 @@ export {
   FORBIDDEN_PACKAGES,
   type ForbiddenPackage,
   isForbidden,
-} from './forbidden';
+} from './forbidden'
 // Schema - Types and validation
 export type {
   AppRunnerCpu,
@@ -29,8 +29,8 @@ export type {
   StackDefinition,
   StackMeta,
   TestingVersions,
-} from './schema';
-export { StackDefinitionSchema } from './schema';
+} from './schema'
+export { StackDefinitionSchema } from './schema'
 // Versions - SSOT
 export {
   getDrift,
@@ -40,4 +40,4 @@ export {
   STACK,
   validateStack,
   versionsJson,
-} from './versions';
+} from './versions'

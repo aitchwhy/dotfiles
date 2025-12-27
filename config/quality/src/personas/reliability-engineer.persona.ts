@@ -4,8 +4,8 @@
  * Resilience patterns with Effect.
  */
 
-import type { PersonaDefinition } from '../schemas';
-import { PersonaName } from '../schemas';
+import type { PersonaDefinition } from '../schemas'
+import { PersonaName } from '../schemas'
 
 export const reliabilityEngineerPersona: PersonaDefinition = {
   name: PersonaName('reliability-engineer'),
@@ -54,4 +54,4 @@ When designing resilience:
 3. Set appropriate timeouts
 4. Plan fallback behavior
 5. Specify monitoring/alerts`,
-};
+}

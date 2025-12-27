@@ -8,15 +8,15 @@
  * Modernized to use Effect for FS operations (no sync FS).
  */
 
-import { FileSystem } from '@effect/platform';
-import { Effect } from 'effect';
+import { FileSystem } from '@effect/platform'
+import { Effect } from 'effect'
 import {
   findIncompatibleFlags,
   formatFlagTranslations,
   LEGACY_FLAG_MAPPINGS,
   type LegacyCommand,
-} from '../../../schemas/cli-tools.js';
-import type { GuardResult } from '../effect-hook';
+} from '../../../schemas/cli-tools.js'
+import type { GuardResult } from '../effect-hook'
 
 // =============================================================================
 // Guard 1: Bash Safety
@@ -24,9 +24,9 @@ import type { GuardResult } from '../effect-hook';
 
 export function checkBashSafety(command: string): GuardResult {
   if (command.includes('rm -rf /') || command.includes('rm -rf ~')) {
-    return { ok: false, error: 'BLOCKED: Dangerous recursive delete command detected.' };
+    return { ok: false, error: 'BLOCKED: Dangerous recursive delete command detected.' }
   }
-  return { ok: true };
+  return { ok: true }
 }
 
 // =============================================================================
@@ -38,7 +38,7 @@ const HOOK_BYPASS_PATTERNS = [
   { pattern: /\bHUSKY=0\b/, name: 'HUSKY=0' },
   { pattern: /--no-verify\b/, name: '--no-verify' },
   { pattern: /\bgit\s+commit\s+.*-n\b/, name: '-n (no-verify shorthand)' },
-] as const;
+] as const
 
 export function checkHookBypass(command: string): GuardResult {
   for (const { pattern, name } of HOOK_BYPASS_PATTERNS) {
@@ -58,11 +58,11 @@ Legitimate alternatives:
 3. Fix the underlying issue instead of bypassing
 
 See: config/agents/skills/paragon/references/bypasses.md`,
-      };
+      }
     }
   }
 
-  return { ok: true };
+  return { ok: true }
 }
 
 // =============================================================================
@@ -70,29 +70,29 @@ See: config/agents/skills/paragon/references/bypasses.md`,
 // =============================================================================
 
 const CONVENTIONAL_COMMIT_REGEX =
-  /^(feat|fix|refactor|test|docs|chore|perf|ci)(\([a-z0-9-]+\))?!?:\s+[a-z]/;
-const VALID_COMMIT_TYPES = ['feat', 'fix', 'refactor', 'test', 'docs', 'chore', 'perf', 'ci'];
+  /^(feat|fix|refactor|test|docs|chore|perf|ci)(\([a-z0-9-]+\))?!?:\s+[a-z]/
+const VALID_COMMIT_TYPES = ['feat', 'fix', 'refactor', 'test', 'docs', 'chore', 'perf', 'ci']
 
 function extractCommitMessage(command: string): string | null {
-  const doubleQuoteMatch = command.match(/git\s+commit\s+.*-m\s+"([^"]+)"/);
-  if (doubleQuoteMatch?.[1]) return doubleQuoteMatch[1];
+  const doubleQuoteMatch = command.match(/git\s+commit\s+.*-m\s+"([^"]+)"/)
+  if (doubleQuoteMatch?.[1]) return doubleQuoteMatch[1]
 
-  const singleQuoteMatch = command.match(/git\s+commit\s+.*-m\s+'([^']+)'/);
-  if (singleQuoteMatch?.[1]) return singleQuoteMatch[1];
+  const singleQuoteMatch = command.match(/git\s+commit\s+.*-m\s+'([^']+)'/)
+  if (singleQuoteMatch?.[1]) return singleQuoteMatch[1]
 
   const heredocMatch = command.match(
-    /git\s+commit\s+.*-m\s+"\$\(cat\s+<<['"]?(\w+)['"]?\n([\s\S]*?)\n\1/
-  );
-  if (heredocMatch?.[2]) return heredocMatch[2].trim().split('\n')[0] ?? null;
+    /git\s+commit\s+.*-m\s+"\$\(cat\s+<<['"]?(\w+)['"]?\n([\s\S]*?)\n\1/,
+  )
+  if (heredocMatch?.[2]) return heredocMatch[2].trim().split('\n')[0] ?? null
 
-  return null;
+  return null
 }
 
 export function checkConventionalCommit(command: string): GuardResult {
-  if (!/git\s+commit\s+.*-m\s+/.test(command)) return { ok: true };
+  if (!/git\s+commit\s+.*-m\s+/.test(command)) return { ok: true }
 
-  const message = extractCommitMessage(command);
-  if (!message) return { ok: true };
+  const message = extractCommitMessage(command)
+  if (!message) return { ok: true }
 
   if (!CONVENTIONAL_COMMIT_REGEX.test(message)) {
     return {
@@ -107,10 +107,10 @@ Types: ${VALID_COMMIT_TYPES.join(', ')}
 Examples:
   feat(auth): add OAuth2 login
   fix(api): handle null response`,
-    };
+    }
   }
 
-  return { ok: true };
+  return { ok: true }
 }
 
 // =============================================================================
@@ -118,10 +118,10 @@ Examples:
 // =============================================================================
 
 type ForbiddenFile = {
-  readonly pattern: string | RegExp;
-  readonly reason: string;
-  readonly alternative: string;
-};
+  readonly pattern: string | RegExp
+  readonly reason: string
+  readonly alternative: string
+}
 
 const FORBIDDEN_FILES: readonly ForbiddenFile[] = [
   { pattern: 'package-lock.json', reason: 'Use pnpm', alternative: 'pnpm install' },
@@ -152,26 +152,26 @@ const FORBIDDEN_FILES: readonly ForbiddenFile[] = [
     alternative: 'docker compose up',
   },
   { pattern: /^\.env$/, reason: 'Use Pulumi ESC', alternative: 'esc env open org/proj/dev' },
-];
+]
 
 export function checkForbiddenFiles(filePath: string): GuardResult {
-  const fileName = filePath.split('/').pop() ?? '';
+  const fileName = filePath.split('/').pop() ?? ''
 
   for (const forbidden of FORBIDDEN_FILES) {
     const matches =
       typeof forbidden.pattern === 'string'
         ? fileName === forbidden.pattern || filePath.endsWith(forbidden.pattern)
-        : forbidden.pattern.test(fileName) || forbidden.pattern.test(filePath);
+        : forbidden.pattern.test(fileName) || forbidden.pattern.test(filePath)
 
     if (matches) {
       return {
         ok: false,
         error: `FORBIDDEN FILE: ${fileName}\n\nReason: ${forbidden.reason}\nAlternative: ${forbidden.alternative}`,
-      };
+      }
     }
   }
 
-  return { ok: true };
+  return { ok: true }
 }
 
 // =============================================================================
@@ -179,36 +179,36 @@ export function checkForbiddenFiles(filePath: string): GuardResult {
 // =============================================================================
 
 type LanguageConfig = {
-  readonly extensions: readonly string[];
-  readonly testPatterns: readonly RegExp[];
-  readonly getTestPaths: (sourcePath: string) => string[];
-};
+  readonly extensions: readonly string[]
+  readonly testPatterns: readonly RegExp[]
+  readonly getTestPaths: (sourcePath: string) => string[]
+}
 
 const LANGUAGES: Record<string, LanguageConfig> = {
   typescript: {
     extensions: ['.ts', '.tsx'],
     testPatterns: [/\.test\.[tj]sx?$/, /\.spec\.[tj]sx?$/, /_test\.[tj]sx?$/, /\.e2e\.[tj]sx?$/],
     getTestPaths: (sourcePath: string) => {
-      const dir = sourcePath.replace(/\/[^/]+$/, '');
-      const base = sourcePath.replace(/^.*\//, '').replace(/\.[^.]+$/, '');
-      const ext = sourcePath.match(/\.[^.]+$/)?.[0] ?? '.ts';
+      const dir = sourcePath.replace(/\/[^/]+$/, '')
+      const base = sourcePath.replace(/^.*\//, '').replace(/\.[^.]+$/, '')
+      const ext = sourcePath.match(/\.[^.]+$/)?.[0] ?? '.ts'
       return [
         `${dir}/${base}.test${ext}`,
         `${dir}/${base}.spec${ext}`,
         `${dir}/__tests__/${base}.test${ext}`,
-      ];
+      ]
     },
   },
   python: {
     extensions: ['.py'],
     testPatterns: [/^test_.*\.py$/, /.*_test\.py$/],
     getTestPaths: (sourcePath: string) => {
-      const dir = sourcePath.replace(/\/[^/]+$/, '');
-      const base = sourcePath.replace(/^.*\//, '').replace(/\.py$/, '');
-      return [`${dir}/test_${base}.py`, `${dir}/${base}_test.py`];
+      const dir = sourcePath.replace(/\/[^/]+$/, '')
+      const base = sourcePath.replace(/^.*\//, '').replace(/\.py$/, '')
+      return [`${dir}/test_${base}.py`, `${dir}/${base}_test.py`]
     },
   },
-};
+}
 
 const TDD_EXCLUDED_DIRS = [
   '/node_modules/',
@@ -217,47 +217,47 @@ const TDD_EXCLUDED_DIRS = [
   '/migrations/',
   '/scripts/',
   '/__pycache__/',
-];
-const TDD_EXCLUDED_FILES = [/^__init__\.py$/, /\.config\.[tj]sx?$/, /\.d\.ts$/, /index\.[tj]sx?$/];
+]
+const TDD_EXCLUDED_FILES = [/^__init__\.py$/, /\.config\.[tj]sx?$/, /\.d\.ts$/, /index\.[tj]sx?$/]
 
 function getLanguage(path: string): LanguageConfig | null {
   for (const config of Object.values(LANGUAGES)) {
-    if (config.extensions.some((ext) => path.endsWith(ext))) return config;
+    if (config.extensions.some((ext) => path.endsWith(ext))) return config
   }
-  return null;
+  return null
 }
 
 function isTestFile(path: string, language: LanguageConfig): boolean {
-  const fileName = path.replace(/^.*\//, '');
-  return language.testPatterns.some((p) => p.test(fileName) || p.test(path));
+  const fileName = path.replace(/^.*\//, '')
+  return language.testPatterns.some((p) => p.test(fileName) || p.test(path))
 }
 
 /** Effect-based TDD check - requires FileSystem service */
 export const checkTDDEffect = (filePath: string) =>
   Effect.gen(function* () {
-    const language = getLanguage(filePath);
-    if (!language) return { ok: true } as GuardResult;
+    const language = getLanguage(filePath)
+    if (!language) return { ok: true } as GuardResult
 
-    if (TDD_EXCLUDED_DIRS.some((dir) => filePath.includes(dir))) return { ok: true } as GuardResult;
+    if (TDD_EXCLUDED_DIRS.some((dir) => filePath.includes(dir))) return { ok: true } as GuardResult
 
-    const fileName = filePath.replace(/^.*\//, '');
-    if (TDD_EXCLUDED_FILES.some((p) => p.test(fileName))) return { ok: true } as GuardResult;
+    const fileName = filePath.replace(/^.*\//, '')
+    if (TDD_EXCLUDED_FILES.some((p) => p.test(fileName))) return { ok: true } as GuardResult
 
-    if (isTestFile(filePath, language)) return { ok: true } as GuardResult;
+    if (isTestFile(filePath, language)) return { ok: true } as GuardResult
 
-    const fs = yield* FileSystem.FileSystem;
+    const fs = yield* FileSystem.FileSystem
 
     // Check for .tdd-skip bypass
-    const hasBypass = yield* fs.exists('.tdd-skip');
+    const hasBypass = yield* fs.exists('.tdd-skip')
     if (hasBypass) {
-      return { ok: true, warnings: ['TDD bypassed via .tdd-skip'] } as GuardResult;
+      return { ok: true, warnings: ['TDD bypassed via .tdd-skip'] } as GuardResult
     }
 
     // Check if any test file exists
-    const testPaths = language.getTestPaths(filePath);
+    const testPaths = language.getTestPaths(filePath)
     for (const p of testPaths) {
-      const testExists = yield* fs.exists(p);
-      if (testExists) return { ok: true } as GuardResult;
+      const testExists = yield* fs.exists(p)
+      if (testExists) return { ok: true } as GuardResult
     }
 
     return {
@@ -271,24 +271,24 @@ ${testPaths
   .join('\n')}
 
 Bypass: touch .tdd-skip`,
-    } as GuardResult;
-  });
+    } as GuardResult
+  })
 
 /** Synchronous TDD check - for non-Effect contexts (skips FS checks) */
 export function checkTDD(filePath: string): GuardResult {
-  const language = getLanguage(filePath);
-  if (!language) return { ok: true };
+  const language = getLanguage(filePath)
+  if (!language) return { ok: true }
 
-  if (TDD_EXCLUDED_DIRS.some((dir) => filePath.includes(dir))) return { ok: true };
+  if (TDD_EXCLUDED_DIRS.some((dir) => filePath.includes(dir))) return { ok: true }
 
-  const fileName = filePath.replace(/^.*\//, '');
-  if (TDD_EXCLUDED_FILES.some((p) => p.test(fileName))) return { ok: true };
+  const fileName = filePath.replace(/^.*\//, '')
+  if (TDD_EXCLUDED_FILES.some((p) => p.test(fileName))) return { ok: true }
 
-  if (isTestFile(filePath, language)) return { ok: true };
+  if (isTestFile(filePath, language)) return { ok: true }
 
   // In sync mode, we skip the FS checks and allow
   // Full TDD enforcement happens at commit time via lefthook
-  return { ok: true, warnings: ['TDD enforcement deferred to commit hook'] };
+  return { ok: true, warnings: ['TDD enforcement deferred to commit hook'] }
 }
 
 // =============================================================================
@@ -301,18 +301,18 @@ export function checkDevOpsCommands(command: string): GuardResult {
     { pattern: /\bbun\s+(run|test|install)\b/, alt: 'pnpm run / vitest / pnpm install' },
     { pattern: /\b(npm|yarn)\s+run\s+(dev|start|serve)\b/, alt: 'docker compose up' },
     { pattern: /\bnpm\s+start\b/, alt: 'docker compose up' },
-  ];
+  ]
 
   for (const { pattern, alt } of forbidden) {
     if (pattern.test(command)) {
       return {
         ok: false,
         error: `DEVOPS VIOLATION\n\nAlternative: ${alt}\n\nUse Docker Compose for local orchestration.`,
-      };
+      }
     }
   }
 
-  return { ok: true };
+  return { ok: true }
 }
 
 // =============================================================================
@@ -330,25 +330,25 @@ export function checkDevOpsCommands(command: string): GuardResult {
  */
 export function checkModernCLITools(command: string): GuardResult {
   // Extract the base command (first word, ignoring env vars)
-  const cmdMatch = command.match(/^(?:[A-Z_]+=\S+\s+)*(\w+)/);
-  if (!cmdMatch?.[1]) return { ok: true };
+  const cmdMatch = command.match(/^(?:[A-Z_]+=\S+\s+)*(\w+)/)
+  if (!cmdMatch?.[1]) return { ok: true }
 
-  const baseCmd = cmdMatch[1] as string;
+  const baseCmd = cmdMatch[1] as string
 
   // Check if this is a legacy command that's aliased
   if (!Object.hasOwn(LEGACY_FLAG_MAPPINGS, baseCmd)) {
-    return { ok: true };
+    return { ok: true }
   }
 
-  const legacyCmd = baseCmd as LegacyCommand;
-  const incompatible = findIncompatibleFlags(legacyCmd, command);
+  const legacyCmd = baseCmd as LegacyCommand
+  const incompatible = findIncompatibleFlags(legacyCmd, command)
 
   if (incompatible.length === 0) {
-    return { ok: true };
+    return { ok: true }
   }
 
-  const mapping = LEGACY_FLAG_MAPPINGS[legacyCmd];
-  const translations = formatFlagTranslations(legacyCmd);
+  const mapping = LEGACY_FLAG_MAPPINGS[legacyCmd]
+  const translations = formatFlagTranslations(legacyCmd)
 
   return {
     ok: false,
@@ -365,7 +365,7 @@ Options:
 
 Flag translation (${legacyCmd} → ${mapping.modern}):
 ${translations}`,
-  };
+  }
 }
 
 // =============================================================================
@@ -373,53 +373,53 @@ ${translations}`,
 // =============================================================================
 
 export function checkFlakePatterns(content: string, filePath: string): GuardResult {
-  if (!filePath.endsWith('flake.nix')) return { ok: true };
+  if (!filePath.endsWith('flake.nix')) return { ok: true }
 
-  const warnings: string[] = [];
+  const warnings: string[] = []
 
   if (!content.includes('flake-parts')) {
-    warnings.push('Consider flake-parts for modular composition');
+    warnings.push('Consider flake-parts for modular composition')
   }
   if (content.includes('forAllSystems') || content.includes('lib.genAttrs')) {
-    warnings.push('forAllSystems deprecated - use flake-parts perSystem');
+    warnings.push('forAllSystems deprecated - use flake-parts perSystem')
   }
   if (
     content.includes('mkShell') &&
     !content.includes('pre-commit') &&
     !content.includes('git-hooks')
   ) {
-    warnings.push('Consider git-hooks.nix for pre-commit integration');
+    warnings.push('Consider git-hooks.nix for pre-commit integration')
   }
 
   if (warnings.length > 0) {
-    return { ok: true, warnings };
+    return { ok: true, warnings }
   }
-  return { ok: true };
+  return { ok: true }
 }
 
 const KNOWN_PORTS = new Set([
   22, 41641, 9100, 9080, 6379, 5432, 7233, 3000, 3001, 8233, 4317, 4318, 9090, 3100, 3200,
-]);
+])
 
 export function checkPortRegistry(content: string, filePath: string): GuardResult {
-  if (!filePath.endsWith('.nix')) return { ok: true };
-  if (!filePath.includes('/modules/') && !filePath.includes('/services/')) return { ok: true };
+  if (!filePath.endsWith('.nix')) return { ok: true }
+  if (!filePath.includes('/modules/') && !filePath.includes('/services/')) return { ok: true }
 
-  const portMatches = content.matchAll(/\bport\s*=\s*(\d{2,5})\b/gi);
-  const unknownPorts: number[] = [];
+  const portMatches = content.matchAll(/\bport\s*=\s*(\d{2,5})\b/gi)
+  const unknownPorts: number[] = []
 
   for (const match of portMatches) {
-    const port = parseInt(match[1] ?? '0', 10);
+    const port = parseInt(match[1] ?? '0', 10)
     if (port > 0 && !KNOWN_PORTS.has(port)) {
-      unknownPorts.push(port);
+      unknownPorts.push(port)
     }
   }
 
   if (unknownPorts.length > 0) {
-    return { ok: true, warnings: [`Port(s) ${unknownPorts.join(', ')} not in lib/ports.nix`] };
+    return { ok: true, warnings: [`Port(s) ${unknownPorts.join(', ')} not in lib/ports.nix`] }
   }
 
-  return { ok: true };
+  return { ok: true }
 }
 
 // =============================================================================
@@ -432,39 +432,39 @@ function isConfigAllowedPath(filePath: string): boolean {
     filePath.includes('lib/ports') ||
     filePath.endsWith('.test.ts') ||
     filePath.endsWith('.spec.ts')
-  );
+  )
 }
 
 export function checkHardcodedPorts(content: string, filePath: string): GuardResult {
-  if (!filePath.endsWith('.nix')) return { ok: true };
-  if (isConfigAllowedPath(filePath)) return { ok: true };
+  if (!filePath.endsWith('.nix')) return { ok: true }
+  if (isConfigAllowedPath(filePath)) return { ok: true }
 
-  const portPattern = /\bport\s*=\s*(\d{4,5})\b/g;
-  const matches = [...content.matchAll(portPattern)];
+  const portPattern = /\bport\s*=\s*(\d{4,5})\b/g
+  const matches = [...content.matchAll(portPattern)]
 
   if (matches.length > 0 && !content.includes('ports.')) {
     return {
       ok: false,
       error: `Guard 28: Hardcoded port detected. Use ports.* reference from lib/config/`,
-    };
+    }
   }
 
-  return { ok: true };
+  return { ok: true }
 }
 
 export function checkHardcodedUrls(content: string, filePath: string): GuardResult {
-  if (!filePath.endsWith('.nix')) return { ok: true };
-  if (isConfigAllowedPath(filePath)) return { ok: true };
+  if (!filePath.endsWith('.nix')) return { ok: true }
+  if (isConfigAllowedPath(filePath)) return { ok: true }
 
-  const urlPattern = /localhost:\d{4,5}/g;
+  const urlPattern = /localhost:\d{4,5}/g
   if (urlPattern.test(content) && !content.includes('urls.') && !content.includes('services.')) {
     return {
       ok: false,
       error: `Guard 30: Hardcoded localhost URL. Use urls.* reference from lib/config/`,
-    };
+    }
   }
 
-  return { ok: true };
+  return { ok: true }
 }
 
 // =============================================================================
@@ -482,7 +482,7 @@ const SECRETS_PATTERNS: readonly { name: string; pattern: RegExp }[] = [
   { name: 'SLACK_TOKEN', pattern: /xox[baprs]-[A-Za-z0-9-]+/ },
   { name: 'STRIPE_LIVE', pattern: /sk_live_[A-Za-z0-9]{24,}/ },
   { name: 'STRIPE_PK', pattern: /pk_live_[A-Za-z0-9]{24,}/ },
-];
+]
 
 const SECRETS_ALLOWED_PATHS = [
   '.enc',
@@ -492,26 +492,26 @@ const SECRETS_ALLOWED_PATHS = [
   'SKILL.md',
   '.test.',
   '.spec.',
-];
+]
 
 export function checkSecrets(content: string, filePath: string): GuardResult {
   // Skip allowed paths
   if (SECRETS_ALLOWED_PATHS.some((p) => filePath.includes(p))) {
-    return { ok: true };
+    return { ok: true }
   }
 
   for (const { name, pattern } of SECRETS_PATTERNS) {
-    const match = content.match(pattern);
+    const match = content.match(pattern)
     if (match) {
-      const masked = `${match[0].substring(0, 8)}...`;
+      const masked = `${match[0].substring(0, 8)}...`
       return {
         ok: false,
         error: `Guard 32: SECRETS DETECTED\n\nType: ${name}\nMatch: ${masked}\nFile: ${filePath}\n\nFix: Use Pulumi ESC for secrets, not code.`,
-      };
+      }
     }
   }
 
-  return { ok: true };
+  return { ok: true }
 }
 
 // =============================================================================
@@ -549,36 +549,36 @@ const FORBIDDEN_DEPS = [
   'sinon',
   'bun',
   '@types/bun',
-];
+]
 
 type PackageJson = {
-  readonly dependencies?: Record<string, string>;
-  readonly devDependencies?: Record<string, string>;
-};
+  readonly dependencies?: Record<string, string>
+  readonly devDependencies?: Record<string, string>
+}
 
 function parsePackageJson(content: string): PackageJson | null {
-  const parsed: unknown = JSON.parse(content);
-  if (typeof parsed !== 'object' || parsed === null) return null;
-  return parsed as PackageJson;
+  const parsed: unknown = JSON.parse(content)
+  if (typeof parsed !== 'object' || parsed === null) return null
+  return parsed as PackageJson
 }
 
 export function checkStackCompliance(content: string, filePath: string): GuardResult {
-  if (!filePath.endsWith('package.json')) return { ok: true };
+  if (!filePath.endsWith('package.json')) return { ok: true }
 
-  const pkg = parsePackageJson(content);
-  if (!pkg) return { ok: true };
+  const pkg = parsePackageJson(content)
+  if (!pkg) return { ok: true }
 
-  const allDeps = { ...pkg.dependencies, ...pkg.devDependencies };
-  const forbidden = Object.keys(allDeps).filter((dep) => FORBIDDEN_DEPS.includes(dep));
+  const allDeps = { ...pkg.dependencies, ...pkg.devDependencies }
+  const forbidden = Object.keys(allDeps).filter((dep) => FORBIDDEN_DEPS.includes(dep))
 
   if (forbidden.length > 0) {
     return {
       ok: false,
       error: `Guard 31: Forbidden dependencies: ${forbidden.join(', ')}\n\nSee stack.md for alternatives.`,
-    };
+    }
   }
 
-  return { ok: true };
+  return { ok: true }
 }
 
 // =============================================================================
@@ -587,73 +587,73 @@ export function checkStackCompliance(content: string, filePath: string): GuardRe
 
 export function runProceduralGuards(
   toolName: string,
-  toolInput: { file_path?: string; content?: string; command?: string }
+  toolInput: { file_path?: string; content?: string; command?: string },
 ): GuardResult {
-  const { file_path: filePath, content, command } = toolInput;
+  const { file_path: filePath, content, command } = toolInput
 
   // Bash guards
   if (toolName === 'Bash' && command) {
-    const bashResult = checkBashSafety(command);
-    if (!bashResult.ok) return bashResult;
+    const bashResult = checkBashSafety(command)
+    if (!bashResult.ok) return bashResult
 
     // Guard 33: Hook bypass prevention
-    const hookBypassResult = checkHookBypass(command);
-    if (!hookBypassResult.ok) return hookBypassResult;
+    const hookBypassResult = checkHookBypass(command)
+    if (!hookBypassResult.ok) return hookBypassResult
 
-    const commitResult = checkConventionalCommit(command);
-    if (!commitResult.ok) return commitResult;
+    const commitResult = checkConventionalCommit(command)
+    if (!commitResult.ok) return commitResult
 
-    const devOpsResult = checkDevOpsCommands(command);
-    if (!devOpsResult.ok) return devOpsResult;
+    const devOpsResult = checkDevOpsCommands(command)
+    if (!devOpsResult.ok) return devOpsResult
 
     // Guard 27: Legacy CLI tool syntax detection
-    const cliToolsResult = checkModernCLITools(command);
-    if (!cliToolsResult.ok) return cliToolsResult;
+    const cliToolsResult = checkModernCLITools(command)
+    if (!cliToolsResult.ok) return cliToolsResult
   }
 
   // Write/Edit guards
   if ((toolName === 'Write' || toolName === 'Edit') && filePath) {
-    const forbiddenResult = checkForbiddenFiles(filePath);
-    if (!forbiddenResult.ok) return forbiddenResult;
+    const forbiddenResult = checkForbiddenFiles(filePath)
+    if (!forbiddenResult.ok) return forbiddenResult
 
     // TDD check (sync version - full enforcement at commit time)
-    const tddResult = checkTDD(filePath);
-    if (!tddResult.ok) return tddResult;
+    const tddResult = checkTDD(filePath)
+    if (!tddResult.ok) return tddResult
 
     // Config centralization (Nix)
     if (content) {
       // Secrets detection (Guard 32)
-      const secretsResult = checkSecrets(content, filePath);
-      if (!secretsResult.ok) return secretsResult;
+      const secretsResult = checkSecrets(content, filePath)
+      if (!secretsResult.ok) return secretsResult
 
-      const portsResult = checkHardcodedPorts(content, filePath);
-      if (!portsResult.ok) return portsResult;
+      const portsResult = checkHardcodedPorts(content, filePath)
+      if (!portsResult.ok) return portsResult
 
-      const urlsResult = checkHardcodedUrls(content, filePath);
-      if (!urlsResult.ok) return urlsResult;
+      const urlsResult = checkHardcodedUrls(content, filePath)
+      if (!urlsResult.ok) return urlsResult
 
       // Stack compliance (package.json)
-      const stackResult = checkStackCompliance(content, filePath);
-      if (!stackResult.ok) return stackResult;
+      const stackResult = checkStackCompliance(content, filePath)
+      if (!stackResult.ok) return stackResult
 
       // Advisory guards (collect warnings)
-      const warnings: string[] = [];
+      const warnings: string[] = []
 
-      const flakeResult = checkFlakePatterns(content, filePath);
+      const flakeResult = checkFlakePatterns(content, filePath)
       if (flakeResult.ok && flakeResult.warnings) {
-        warnings.push(...flakeResult.warnings);
+        warnings.push(...flakeResult.warnings)
       }
 
-      const portResult = checkPortRegistry(content, filePath);
+      const portResult = checkPortRegistry(content, filePath)
       if (portResult.ok && portResult.warnings) {
-        warnings.push(...portResult.warnings);
+        warnings.push(...portResult.warnings)
       }
 
       if (warnings.length > 0) {
-        return { ok: true, warnings };
+        return { ok: true, warnings }
       }
     }
   }
 
-  return { ok: true };
+  return { ok: true }
 }

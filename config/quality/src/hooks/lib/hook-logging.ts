@@ -15,18 +15,18 @@
  * PreToolUse hook decision output for Claude Code protocol
  */
 export type HookDecision = {
-  readonly decision: 'approve' | 'block' | 'skip';
-  readonly reason?: string;
-  readonly [key: string]: unknown;
-};
+  readonly decision: 'approve' | 'block' | 'skip'
+  readonly reason?: string
+  readonly [key: string]: unknown
+}
 
 /**
  * PostToolUse/Stop hook output for Claude Code protocol
  */
 export type HookContinue = {
-  readonly continue: boolean;
-  readonly [key: string]: unknown;
-};
+  readonly continue: boolean
+  readonly [key: string]: unknown
+}
 
 // =============================================================================
 // Hook Protocol Output
@@ -43,37 +43,37 @@ export type HookContinue = {
  * ```
  */
 export const emitDecision = (output: HookDecision): void => {
-  process.stdout.write(`${JSON.stringify(output)}\n`);
-};
+  process.stdout.write(`${JSON.stringify(output)}\n`)
+}
 
 /**
  * Emit an approval decision
  */
 export const approve = (reason?: string): void => {
   if (reason) {
-    emitDecision({ decision: 'approve', reason });
+    emitDecision({ decision: 'approve', reason })
   } else {
-    emitDecision({ decision: 'approve' });
+    emitDecision({ decision: 'approve' })
   }
-};
+}
 
 /**
  * Emit a block decision
  */
 export const block = (reason: string): void => {
-  emitDecision({ decision: 'block', reason });
-};
+  emitDecision({ decision: 'block', reason })
+}
 
 /**
  * Emit a skip decision (hook doesn't apply)
  */
 export const skip = (reason?: string): void => {
   if (reason) {
-    emitDecision({ decision: 'skip', reason });
+    emitDecision({ decision: 'skip', reason })
   } else {
-    emitDecision({ decision: 'skip' });
+    emitDecision({ decision: 'skip' })
   }
-};
+}
 
 // =============================================================================
 // PostToolUse/Stop Hook Protocol Output
@@ -90,18 +90,18 @@ export const skip = (reason?: string): void => {
  * ```
  */
 export const emitContinue = (extra?: Record<string, unknown>): void => {
-  const output: HookContinue = { continue: true, ...extra };
-  process.stdout.write(`${JSON.stringify(output)}\n`);
-};
+  const output: HookContinue = { continue: true, ...extra }
+  process.stdout.write(`${JSON.stringify(output)}\n`)
+}
 
 /**
  * Emit a halt signal for PostToolUse/Stop hooks.
  * This tells Claude Code to stop processing.
  */
 export const emitHalt = (extra?: Record<string, unknown>): void => {
-  const output: HookContinue = { continue: false, ...extra };
-  process.stdout.write(`${JSON.stringify(output)}\n`);
-};
+  const output: HookContinue = { continue: false, ...extra }
+  process.stdout.write(`${JSON.stringify(output)}\n`)
+}
 
 // =============================================================================
 // Error Logging (stderr - does not affect protocol output)
@@ -112,8 +112,8 @@ export const emitHalt = (extra?: Record<string, unknown>): void => {
  * Use for internal errors that shouldn't be part of the decision.
  */
 export const logError = (context: string, error?: unknown): void => {
-  const errorMessage = error instanceof Error ? error.message : String(error ?? '');
-  const stack = error instanceof Error ? error.stack : undefined;
+  const errorMessage = error instanceof Error ? error.message : String(error ?? '')
+  const stack = error instanceof Error ? error.stack : undefined
 
   process.stderr.write(
     `${JSON.stringify({
@@ -122,9 +122,9 @@ export const logError = (context: string, error?: unknown): void => {
       message: errorMessage,
       stack,
       timestamp: new Date().toISOString(),
-    })}\n`
-  );
-};
+    })}\n`,
+  )
+}
 
 /**
  * Log a warning to stderr. Does not affect protocol output.
@@ -136,9 +136,9 @@ export const logWarning = (context: string, message: string): void => {
       context,
       message,
       timestamp: new Date().toISOString(),
-    })}\n`
-  );
-};
+    })}\n`,
+  )
+}
 
 /**
  * Log debug info to stderr. Does not affect protocol output.
@@ -151,6 +151,6 @@ export const logDebug = (context: string, message: string, data?: unknown): void
       message,
       data,
       timestamp: new Date().toISOString(),
-    })}\n`
-  );
-};
+    })}\n`,
+  )
+}

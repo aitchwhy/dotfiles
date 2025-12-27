@@ -5,11 +5,11 @@
  * Imports HOOK_DEFINITIONS for all 4 hook types.
  */
 
-import * as fs from 'node:fs/promises';
-import * as path from 'node:path';
-import { Effect } from 'effect';
-import { HOOK_DEFINITIONS } from '../hooks/definitions';
-import type { PersonaDefinition } from '../schemas';
+import * as fs from 'node:fs/promises'
+import * as path from 'node:path'
+import { Effect } from 'effect'
+import { HOOK_DEFINITIONS } from '../hooks/definitions'
+import type { PersonaDefinition } from '../schemas'
 
 // =============================================================================
 // Permissions SSOT
@@ -151,7 +151,7 @@ const PERMISSIONS = {
     'Bash(git push --force:*)',
     'Bash(git reset --hard:*)',
   ],
-} as const;
+} as const
 
 // =============================================================================
 // Enabled Plugins SSOT
@@ -166,28 +166,28 @@ const ENABLED_PLUGINS = {
   'learning-output-style@claude-code-plugins': true,
   'pr-review-toolkit@claude-code-plugins': true,
   'ralph-wiggum@claude-code-plugins': true,
-} as const;
+} as const
 
 // =============================================================================
 // Settings Type
 // =============================================================================
 
 type ClaudeSettings = {
-  readonly $schema: string;
-  readonly $comment: string;
-  readonly cleanupPeriodDays: number;
-  readonly includeCoAuthoredBy: boolean;
-  readonly alwaysThinkingEnabled: boolean;
-  readonly verbose: boolean;
-  readonly permissions: typeof PERMISSIONS;
-  readonly hooks: typeof HOOK_DEFINITIONS;
+  readonly $schema: string
+  readonly $comment: string
+  readonly cleanupPeriodDays: number
+  readonly includeCoAuthoredBy: boolean
+  readonly alwaysThinkingEnabled: boolean
+  readonly verbose: boolean
+  readonly permissions: typeof PERMISSIONS
+  readonly hooks: typeof HOOK_DEFINITIONS
   readonly agents: readonly {
-    readonly name: string;
-    readonly description: string;
-    readonly model?: string;
-  }[];
-  readonly enabledPlugins: typeof ENABLED_PLUGINS;
-};
+    readonly name: string
+    readonly description: string
+    readonly model?: string
+  }[]
+  readonly enabledPlugins: typeof ENABLED_PLUGINS
+}
 
 // =============================================================================
 // Generator
@@ -204,30 +204,30 @@ const generateSettings = (personas: readonly PersonaDefinition[]): ClaudeSetting
   hooks: HOOK_DEFINITIONS,
   agents: personas.map((p) => {
     const agent: {
-      readonly name: string;
-      readonly description: string;
-      readonly model?: string;
-    } = { name: p.name, description: p.description };
+      readonly name: string
+      readonly description: string
+      readonly model?: string
+    } = { name: p.name, description: p.description }
     if (p.model !== undefined) {
-      return { ...agent, model: p.model };
+      return { ...agent, model: p.model }
     }
-    return agent;
+    return agent
   }),
   enabledPlugins: ENABLED_PLUGINS,
-});
+})
 
 export const generateSettingsFile = (
   _skills: readonly unknown[],
   personas: readonly PersonaDefinition[],
   _hookPath: string,
-  outDir: string
+  outDir: string,
 ) =>
   Effect.gen(function* () {
-    const settings = generateSettings(personas);
-    const filePath = path.join(outDir, 'settings.json');
+    const settings = generateSettings(personas)
+    const filePath = path.join(outDir, 'settings.json')
 
-    yield* Effect.tryPromise(() => fs.writeFile(filePath, JSON.stringify(settings, null, 2)));
+    yield* Effect.tryPromise(() => fs.writeFile(filePath, JSON.stringify(settings, null, 2)))
 
-    yield* Effect.log(`Generated: ${filePath}`);
-    return filePath;
-  });
+    yield* Effect.log(`Generated: ${filePath}`)
+    return filePath
+  })

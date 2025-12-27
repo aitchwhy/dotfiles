@@ -10,7 +10,7 @@
  * These schemas define the VALID flag patterns for modern tools.
  * Used by Guard 27 (checkModernCLITools) to catch incompatible legacy syntax.
  */
-import { Schema } from 'effect';
+import { Schema } from 'effect'
 
 // =============================================================================
 // Ripgrep (rg) - replaces grep
@@ -36,9 +36,9 @@ export const RipgrepFlagsSchema = Schema.Struct({
   count: Schema.optional(Schema.Boolean), // -c
   hidden: Schema.optional(Schema.Boolean), // --hidden
   multiline: Schema.optional(Schema.Boolean), // -U
-});
+})
 
-export type RipgrepFlags = typeof RipgrepFlagsSchema.Type;
+export type RipgrepFlags = typeof RipgrepFlagsSchema.Type
 
 // =============================================================================
 // fd - replaces find
@@ -61,9 +61,9 @@ export const FdFlagsSchema = Schema.Struct({
   exec: Schema.optional(Schema.String), // -x
   execBatch: Schema.optional(Schema.String), // -X
   maxDepth: Schema.optional(Schema.Number), // -d
-});
+})
 
-export type FdFlags = typeof FdFlagsSchema.Type;
+export type FdFlags = typeof FdFlagsSchema.Type
 
 // =============================================================================
 // eza - replaces ls
@@ -86,9 +86,9 @@ export const EzaFlagsSchema = Schema.Struct({
   icons: Schema.optional(Schema.Boolean), // --icons
   sort: Schema.optional(Schema.Literal('name', 'size', 'time', 'modified')),
   header: Schema.optional(Schema.Boolean), // -h
-});
+})
 
-export type EzaFlags = typeof EzaFlagsSchema.Type;
+export type EzaFlags = typeof EzaFlagsSchema.Type
 
 // =============================================================================
 // bat - replaces cat
@@ -109,21 +109,21 @@ export const BatFlagsSchema = Schema.Struct({
   range: Schema.optional(Schema.String), // -r 10:20
   style: Schema.optional(Schema.String), // --style
   theme: Schema.optional(Schema.String), // --theme
-});
+})
 
-export type BatFlags = typeof BatFlagsSchema.Type;
+export type BatFlags = typeof BatFlagsSchema.Type
 
 // =============================================================================
 // Legacy → Modern Flag Mapping (for guard error messages)
 // =============================================================================
 
-export type LegacyCommand = 'grep' | 'find' | 'ls' | 'cat';
+export type LegacyCommand = 'grep' | 'find' | 'ls' | 'cat'
 
 export type FlagMapping = {
-  readonly modern: string;
-  readonly incompatible: readonly string[];
-  readonly translations: Readonly<Record<string, string>>;
-};
+  readonly modern: string
+  readonly incompatible: readonly string[]
+  readonly translations: Readonly<Record<string, string>>
+}
 
 export const LEGACY_FLAG_MAPPINGS: Readonly<Record<LegacyCommand, FlagMapping>> = {
   grep: {
@@ -160,7 +160,7 @@ export const LEGACY_FLAG_MAPPINGS: Readonly<Record<LegacyCommand, FlagMapping>> 
     incompatible: [], // cat alias removed for heredoc compatibility
     translations: {},
   },
-} as const;
+} as const
 
 // =============================================================================
 // Guard Helpers
@@ -172,19 +172,19 @@ export const LEGACY_FLAG_MAPPINGS: Readonly<Record<LegacyCommand, FlagMapping>> 
  */
 export function findIncompatibleFlags(
   legacyCommand: LegacyCommand,
-  commandString: string
+  commandString: string,
 ): readonly string[] {
-  const mapping = LEGACY_FLAG_MAPPINGS[legacyCommand];
-  return mapping.incompatible.filter((flag) => commandString.includes(flag));
+  const mapping = LEGACY_FLAG_MAPPINGS[legacyCommand]
+  return mapping.incompatible.filter((flag) => commandString.includes(flag))
 }
 
 /**
  * Generate a helpful error message for incompatible flags.
  */
 export function formatFlagTranslations(legacyCommand: LegacyCommand): string {
-  const mapping = LEGACY_FLAG_MAPPINGS[legacyCommand];
+  const mapping = LEGACY_FLAG_MAPPINGS[legacyCommand]
   const lines = Object.entries(mapping.translations).map(
-    ([legacy, modern]) => `  ${legacy} → ${modern}`
-  );
-  return lines.join('\n');
+    ([legacy, modern]) => `  ${legacy} → ${modern}`,
+  )
+  return lines.join('\n')
 }

@@ -4,8 +4,8 @@
  * System design with Effect-TS.
  */
 
-import type { PersonaDefinition } from '../schemas';
-import { PersonaName } from '../schemas';
+import type { PersonaDefinition } from '../schemas'
+import { PersonaName } from '../schemas'
 
 export const effectArchitectPersona: PersonaDefinition = {
   name: PersonaName('effect-architect'),
@@ -44,4 +44,4 @@ When designing systems, provide:
 3. Layer composition diagram
 4. Error type hierarchy
 5. Example usage`,
-};
+}

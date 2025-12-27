@@ -1,13 +1,6 @@
 #!/usr/bin/env bun
-import {
-  existsSync,
-  readdirSync,
-  readFileSync,
-  type Stats,
-  statSync,
-  writeFileSync,
-} from 'node:fs';
-import { join, relative } from 'node:path';
+import { existsSync, readdirSync, readFileSync, type Stats, statSync, writeFileSync } from 'node:fs'
+import { join, relative } from 'node:path'
 /**
  * sync-versions.ts - Sync package.json versions to STACK.ts SSOT
  *
@@ -18,32 +11,32 @@ import { join, relative } from 'node:path';
  * This script finds all package.json files in a project and updates
  * their dependency versions to match the STACK.ts SSOT.
  */
-import { STACK } from './src/stack/versions';
+import { STACK } from './src/stack/versions'
 
-const projectPath = process.argv[2];
-const dryRun = process.argv.includes('--dry-run');
+const projectPath = process.argv[2]
+const dryRun = process.argv.includes('--dry-run')
 
 if (!projectPath) {
-  process.stderr.write('Usage: bun run sync-versions.ts /path/to/project [--dry-run]\n');
-  process.exit(1);
+  process.stderr.write('Usage: bun run sync-versions.ts /path/to/project [--dry-run]\n')
+  process.exit(1)
 }
 
 if (!existsSync(projectPath)) {
-  process.stderr.write(`Error: Path does not exist: ${projectPath}\n`);
-  process.exit(1);
+  process.stderr.write(`Error: Path does not exist: ${projectPath}\n`)
+  process.exit(1)
 }
 
 /**
  * Recursively find all package.json files in a directory
  */
 function findPackageJsons(dir: string): string[] {
-  const results: string[] = [];
-  let entries: string[];
+  const results: string[] = []
+  let entries: string[]
 
   try {
-    entries = readdirSync(dir);
+    entries = readdirSync(dir)
   } catch {
-    return results;
+    return results
   }
 
   for (const entry of entries) {
@@ -55,109 +48,109 @@ function findPackageJsons(dir: string): string[] {
       entry === 'build' ||
       entry === 'coverage'
     ) {
-      continue;
+      continue
     }
 
-    const fullPath = join(dir, entry);
-    let stat: Stats;
+    const fullPath = join(dir, entry)
+    let stat: Stats
 
     try {
-      stat = statSync(fullPath);
+      stat = statSync(fullPath)
     } catch {
-      continue;
+      continue
     }
 
     if (stat.isDirectory()) {
-      results.push(...findPackageJsons(fullPath));
+      results.push(...findPackageJsons(fullPath))
     } else if (entry === 'package.json') {
-      results.push(fullPath);
+      results.push(fullPath)
     }
   }
 
-  return results;
+  return results
 }
 
 type SyncResult = {
-  file: string;
-  changes: Array<{ pkg: string; from: string; to: string }>;
-};
+  file: string
+  changes: Array<{ pkg: string; from: string; to: string }>
+}
 
 /**
  * Sync a single package.json file to STACK versions
  */
 function syncPackageJson(path: string): SyncResult {
-  const content = JSON.parse(readFileSync(path, 'utf-8'));
-  const changes: Array<{ pkg: string; from: string; to: string }> = [];
+  const content = JSON.parse(readFileSync(path, 'utf-8'))
+  const changes: Array<{ pkg: string; from: string; to: string }> = []
 
-  const npmVersions = STACK.npm as Record<string, string>;
+  const npmVersions = STACK.npm as Record<string, string>
 
   const syncDeps = (deps: Record<string, string> | undefined) => {
-    if (!deps) return;
+    if (!deps) return
     for (const [pkg, version] of Object.entries(deps)) {
-      const stackVersion = npmVersions[pkg];
+      const stackVersion = npmVersions[pkg]
       // Only sync if:
       // 1. Package is in STACK
       // 2. Version differs
       // 3. Not a workspace reference
       if (stackVersion && version !== stackVersion && !version.startsWith('workspace:')) {
-        changes.push({ pkg, from: version, to: stackVersion });
+        changes.push({ pkg, from: version, to: stackVersion })
         if (!dryRun) {
-          deps[pkg] = stackVersion;
+          deps[pkg] = stackVersion
         }
       }
     }
-  };
-
-  syncDeps(content.dependencies);
-  syncDeps(content.devDependencies);
-  syncDeps(content.peerDependencies);
-
-  if (changes.length > 0 && !dryRun) {
-    writeFileSync(path, `${JSON.stringify(content, null, 2)}\n`);
   }
 
-  return { file: path, changes };
+  syncDeps(content.dependencies)
+  syncDeps(content.devDependencies)
+  syncDeps(content.peerDependencies)
+
+  if (changes.length > 0 && !dryRun) {
+    writeFileSync(path, `${JSON.stringify(content, null, 2)}\n`)
+  }
+
+  return { file: path, changes }
 }
 
 // Main execution
-const modeLabel = dryRun ? '[DRY RUN] ' : '';
-process.stdout.write(`${modeLabel}Syncing versions in ${projectPath} to STACK.ts...\n\n`);
+const modeLabel = dryRun ? '[DRY RUN] ' : ''
+process.stdout.write(`${modeLabel}Syncing versions in ${projectPath} to STACK.ts...\n\n`)
 
-const packageJsons = findPackageJsons(projectPath);
+const packageJsons = findPackageJsons(projectPath)
 
 if (packageJsons.length === 0) {
-  process.stdout.write('No package.json files found.\n');
-  process.exit(0);
+  process.stdout.write('No package.json files found.\n')
+  process.exit(0)
 }
 
-let totalChanges = 0;
-let filesChanged = 0;
+let totalChanges = 0
+let filesChanged = 0
 
 for (const pkg of packageJsons) {
-  const result = syncPackageJson(pkg);
+  const result = syncPackageJson(pkg)
   if (result.changes.length > 0) {
-    filesChanged++;
-    const relativePath = relative(projectPath, result.file);
-    process.stdout.write(`\x1b[36m${relativePath}\x1b[0m\n`);
+    filesChanged++
+    const relativePath = relative(projectPath, result.file)
+    process.stdout.write(`\x1b[36m${relativePath}\x1b[0m\n`)
     for (const change of result.changes) {
       process.stdout.write(
-        `  \x1b[33m${change.pkg}\x1b[0m: ${change.from} \x1b[32m->\x1b[0m ${change.to}\n`
-      );
-      totalChanges++;
+        `  \x1b[33m${change.pkg}\x1b[0m: ${change.from} \x1b[32m->\x1b[0m ${change.to}\n`,
+      )
+      totalChanges++
     }
   }
 }
 
-process.stdout.write('\n');
+process.stdout.write('\n')
 if (totalChanges === 0) {
-  process.stdout.write('\x1b[32m✓ All versions are in sync with STACK.ts\x1b[0m\n');
+  process.stdout.write('\x1b[32m✓ All versions are in sync with STACK.ts\x1b[0m\n')
 } else if (dryRun) {
   process.stdout.write(
-    `\x1b[33m⚠ Would update ${totalChanges} package(s) across ${filesChanged} file(s)\x1b[0m\n`
-  );
-  process.stdout.write('Run without --dry-run to apply changes.\n');
+    `\x1b[33m⚠ Would update ${totalChanges} package(s) across ${filesChanged} file(s)\x1b[0m\n`,
+  )
+  process.stdout.write('Run without --dry-run to apply changes.\n')
 } else {
   process.stdout.write(
-    `\x1b[32m✓ Updated ${totalChanges} package(s) across ${filesChanged} file(s)\x1b[0m\n`
-  );
+    `\x1b[32m✓ Updated ${totalChanges} package(s) across ${filesChanged} file(s)\x1b[0m\n`,
+  )
 }

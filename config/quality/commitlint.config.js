@@ -23,4 +23,4 @@ export default {
     // Header max length
     'header-max-length': [2, 'always', 100],
   },
-};
+}

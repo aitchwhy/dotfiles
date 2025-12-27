@@ -6,13 +6,13 @@
  */
 
 export type ForbiddenPackage = {
-  readonly name: string;
-  readonly reason: string;
-  readonly alternative: string;
-};
+  readonly name: string
+  readonly reason: string
+  readonly alternative: string
+}
 
 // Split strings to avoid hook self-detection
-const pkg = (parts: string[]) => parts.join('');
+const pkg = (parts: string[]) => parts.join('')
 
 export const FORBIDDEN_PACKAGES: readonly ForbiddenPackage[] = [
   {
@@ -95,8 +95,8 @@ export const FORBIDDEN_PACKAGES: readonly ForbiddenPackage[] = [
     reason: 'No Effect integration',
     alternative: 'Effect.log with OTEL exporter',
   },
-] as const;
+] as const
 
 export function isForbidden(packageName: string): ForbiddenPackage | undefined {
-  return FORBIDDEN_PACKAGES.find((p) => p.name === packageName);
+  return FORBIDDEN_PACKAGES.find((p) => p.name === packageName)
 }

@@ -4,8 +4,8 @@
  * Schema.decodeUnknown at system edges.
  */
 
-import type { SkillDefinition } from '../schemas';
-import { SkillName } from '../schemas';
+import type { SkillDefinition } from '../schemas'
+import { SkillName } from '../schemas'
 
 export const parseBoundarySkill: SkillDefinition = {
   frontmatter: {
@@ -70,4 +70,4 @@ No Schema.decode inside business logic - types are trusted.
 `,
     },
   ],
-};
+}

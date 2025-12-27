@@ -4,8 +4,8 @@
  * Reference for all 12 active quality rules.
  */
 
-import type { SkillDefinition } from '../schemas';
-import { SkillName } from '../schemas';
+import type { SkillDefinition } from '../schemas'
+import { SkillName } from '../schemas'
 
 export const qualityRulesSkill: SkillDefinition = {
   frontmatter: {
@@ -68,4 +68,4 @@ To see all rules: \`config/quality/src/rules/\`
 `,
     },
   ],
-};
+}

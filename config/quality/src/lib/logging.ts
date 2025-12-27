@@ -5,7 +5,7 @@
  * All logging in the codebase MUST use these Effect-based patterns.
  */
 
-import { Effect, Layer, Logger, LogLevel } from 'effect';
+import { Effect, Layer, Logger, LogLevel } from 'effect'
 
 // =============================================================================
 // Types
@@ -15,10 +15,10 @@ import { Effect, Layer, Logger, LogLevel } from 'effect';
  * Hook output format for Claude Code protocol
  */
 export type HookOutput = {
-  readonly decision: 'allow' | 'block' | 'skip';
-  readonly reason?: string;
-  readonly [key: string]: unknown;
-};
+  readonly decision: 'allow' | 'block' | 'skip'
+  readonly reason?: string
+  readonly [key: string]: unknown
+}
 
 // =============================================================================
 // CLI Logging Layer
@@ -29,15 +29,15 @@ export type HookOutput = {
  * Human-readable format with colors and formatting.
  * In Effect-TS 3.x, Logger.pretty is already a Layer.
  */
-export const CliLoggerLive = Logger.pretty;
+export const CliLoggerLive = Logger.pretty
 
 /**
  * Minimal logging (warnings and errors only) for quiet mode
  */
 export const QuietLoggerLive = Layer.mergeAll(
   Logger.pretty,
-  Logger.minimumLogLevel(LogLevel.Warning)
-);
+  Logger.minimumLogLevel(LogLevel.Warning),
+)
 
 // =============================================================================
 // Service Logging Layer
@@ -48,15 +48,12 @@ export const QuietLoggerLive = Layer.mergeAll(
  * Machine-parseable format for log aggregation.
  * In Effect-TS 3.x, Logger.json is already a Layer.
  */
-export const ServiceLoggerLive = Logger.json;
+export const ServiceLoggerLive = Logger.json
 
 /**
  * Debug-level logging for development
  */
-export const DebugLoggerLive = Layer.mergeAll(
-  Logger.pretty,
-  Logger.minimumLogLevel(LogLevel.Debug)
-);
+export const DebugLoggerLive = Layer.mergeAll(Logger.pretty, Logger.minimumLogLevel(LogLevel.Debug))
 
 // =============================================================================
 // Hook Logging Layer (Claude Code Protocol)
@@ -74,9 +71,9 @@ const HookLogger = Logger.make(({ logLevel, message, annotations }) => {
     message,
     ...Object.fromEntries(annotations),
     timestamp: new Date().toISOString(),
-  });
-  process.stdout.write(`${output}\n`);
-});
+  })
+  process.stdout.write(`${output}\n`)
+})
 
 /**
  * Logger layer for Claude Code hooks.
@@ -84,7 +81,7 @@ const HookLogger = Logger.make(({ logLevel, message, annotations }) => {
  * In Effect-TS 3.x, we create a Layer by providing our custom HookLogger
  * using Logger.add or by replacing the default with Logger.replaceScoped.
  */
-export const HookLoggerLive = Logger.add(HookLogger);
+export const HookLoggerLive = Logger.add(HookLogger)
 
 // =============================================================================
 // Convenience Functions
@@ -94,25 +91,25 @@ export const HookLoggerLive = Logger.add(HookLogger);
  * Run an Effect with CLI-style pretty logging
  */
 export const runWithCliLogging = <A, E>(effect: Effect.Effect<A, E>): Promise<A> =>
-  Effect.runPromise(effect.pipe(Effect.provide(CliLoggerLive)));
+  Effect.runPromise(effect.pipe(Effect.provide(CliLoggerLive)))
 
 /**
  * Run an Effect synchronously with CLI-style pretty logging
  */
 export const runSyncWithCliLogging = <A, E>(effect: Effect.Effect<A, E>): A =>
-  Effect.runSync(effect.pipe(Effect.provide(CliLoggerLive)));
+  Effect.runSync(effect.pipe(Effect.provide(CliLoggerLive)))
 
 /**
  * Run an Effect with structured JSON logging
  */
 export const runWithServiceLogging = <A, E>(effect: Effect.Effect<A, E>): Promise<A> =>
-  Effect.runPromise(effect.pipe(Effect.provide(ServiceLoggerLive)));
+  Effect.runPromise(effect.pipe(Effect.provide(ServiceLoggerLive)))
 
 /**
  * Run an Effect with hook protocol logging (stdout JSON)
  */
 export const runWithHookLogging = <A, E>(effect: Effect.Effect<A, E>): A =>
-  Effect.runSync(effect.pipe(Effect.provide(HookLoggerLive)));
+  Effect.runSync(effect.pipe(Effect.provide(HookLoggerLive)))
 
 // =============================================================================
 // Hook Protocol Helpers
@@ -129,8 +126,8 @@ export const runWithHookLogging = <A, E>(effect: Effect.Effect<A, E>): A =>
  * ```
  */
 export const emitHookDecision = (output: HookOutput): void => {
-  process.stdout.write(`${JSON.stringify(output)}\n`);
-};
+  process.stdout.write(`${JSON.stringify(output)}\n`)
+}
 
 /**
  * Effect version of emitHookDecision for use in Effect pipelines.
@@ -141,7 +138,7 @@ export const emitHookDecision = (output: HookOutput): void => {
  * ```
  */
 export const logHookDecision = (output: HookOutput): Effect.Effect<void> =>
-  Effect.sync(() => emitHookDecision(output));
+  Effect.sync(() => emitHookDecision(output))
 
 /**
  * Log an error to stderr for hooks (does not affect protocol output).
@@ -149,6 +146,6 @@ export const logHookDecision = (output: HookOutput): Effect.Effect<void> =>
  */
 export const logHookError = (message: string, error?: unknown): Effect.Effect<void> =>
   Effect.sync(() => {
-    const errorMessage = error instanceof Error ? error.message : String(error ?? '');
-    process.stderr.write(`[hook-error] ${message}${errorMessage ? `: ${errorMessage}` : ''}\n`);
-  });
+    const errorMessage = error instanceof Error ? error.message : String(error ?? '')
+    process.stderr.write(`[hook-error] ${message}${errorMessage ? `: ${errorMessage}` : ''}\n`)
+  })

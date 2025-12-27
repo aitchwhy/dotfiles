@@ -4,8 +4,8 @@
  * Enforce structured logging and tracing.
  */
 
-import type { QualityRule } from '../schemas';
-import { RuleId } from '../schemas';
+import type { QualityRule } from '../schemas'
+import { RuleId } from '../schemas'
 
 export const OBSERVABILITY_RULES: readonly QualityRule[] = [
   {
@@ -17,4 +17,4 @@ export const OBSERVABILITY_RULES: readonly QualityRule[] = [
     patterns: ['console.log(', 'console.error(', 'console.warn('],
     fix: 'Use Effect.log, Effect.logError, or Effect.logWarning for structured output',
   },
-] as const;
+] as const

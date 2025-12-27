@@ -5,7 +5,7 @@
  *   - planning (3): Before writing code
  *   - execution (2): During implementation
  */
-import type { CriticBehavior, CriticModeConfig } from './schemas';
+import type { CriticBehavior, CriticModeConfig } from './schemas'
 
 export const CRITIC_BEHAVIORS: readonly CriticBehavior[] = [
   // ===========================================================================
@@ -60,7 +60,7 @@ export const CRITIC_BEHAVIORS: readonly CriticBehavior[] = [
       'Run typecheck and tests before moving on. Fix errors immediately. ' +
       'Never accumulate multiple changes before verification.',
   },
-] as const satisfies readonly CriticBehavior[];
+] as const satisfies readonly CriticBehavior[]
 
 /**
  * Full critic mode configuration
@@ -68,13 +68,13 @@ export const CRITIC_BEHAVIORS: readonly CriticBehavior[] = [
 export const CRITIC_MODE_CONFIG: CriticModeConfig = {
   enabled: true,
   behaviors: [...CRITIC_BEHAVIORS],
-} as const satisfies CriticModeConfig;
+} as const satisfies CriticModeConfig
 
 /**
  * Get behaviors by phase
  */
 export function getBehaviorsByPhase(phase: CriticBehavior['phase']): readonly CriticBehavior[] {
-  return CRITIC_BEHAVIORS.filter((b) => b.phase === phase);
+  return CRITIC_BEHAVIORS.filter((b) => b.phase === phase)
 }
 
 /**
@@ -84,4 +84,4 @@ export const BEHAVIOR_COUNTS = {
   planning: CRITIC_BEHAVIORS.filter((b) => b.phase === 'planning').length,
   execution: CRITIC_BEHAVIORS.filter((b) => b.phase === 'execution').length,
   total: CRITIC_BEHAVIORS.length,
-} as const;
+} as const

@@ -4,8 +4,8 @@
  * TDD with Layer substitution.
  */
 
-import type { PersonaDefinition } from '../schemas';
-import { PersonaName } from '../schemas';
+import type { PersonaDefinition } from '../schemas'
+import { PersonaName } from '../schemas'
 
 export const testArchitectPersona: PersonaDefinition = {
   name: PersonaName('test-architect'),
@@ -61,4 +61,4 @@ When writing tests:
 3. Happy path tests
 4. Error path tests
 5. Edge case tests`,
-};
+}

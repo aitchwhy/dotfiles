@@ -4,8 +4,8 @@
  * Branded types and Effect Schema patterns.
  */
 
-import type { SkillDefinition } from '../schemas';
-import { SkillName } from '../schemas';
+import type { SkillDefinition } from '../schemas'
+import { SkillName } from '../schemas'
 
 export const typeSafetySkill: SkillDefinition = {
   frontmatter: {
@@ -89,4 +89,4 @@ Internal code trusts the types - no runtime checks needed.
 `,
     },
   ],
-};
+}
