@@ -295,16 +295,42 @@ export function checkTDD(filePath: string): GuardResult {
 // Guards 9-10: DevOps Files and Commands
 // =============================================================================
 
+/**
+ * Directories where bun is allowed (quality system uses bun internally)
+ */
+const BUN_ALLOWED_PATHS = ['config/quality', 'dotfiles/config/quality'] as const
+
+function isBunAllowed(command: string): boolean {
+  return BUN_ALLOWED_PATHS.some((path) => command.includes(path))
+}
+
 export function checkDevOpsCommands(command: string): GuardResult {
   const forbidden = [
-    { pattern: /\bprocess-compose\s+(up|start)\b/, alt: 'docker compose up' },
-    { pattern: /\bbun\s+(run|test|install)\b/, alt: 'pnpm run / vitest / pnpm install' },
-    { pattern: /\b(npm|yarn)\s+run\s+(dev|start|serve)\b/, alt: 'docker compose up' },
-    { pattern: /\bnpm\s+start\b/, alt: 'docker compose up' },
+    {
+      pattern: /\bprocess-compose\s+(up|start)\b/,
+      alt: 'docker compose up',
+      checkBunException: false,
+    },
+    {
+      pattern: /\bbun\s+(run|test|install)\b/,
+      alt: 'pnpm run / vitest / pnpm install',
+      checkBunException: true,
+    },
+    {
+      pattern: /\b(npm|yarn)\s+run\s+(dev|start|serve)\b/,
+      alt: 'docker compose up',
+      checkBunException: false,
+    },
+    { pattern: /\bnpm\s+start\b/, alt: 'docker compose up', checkBunException: false },
   ]
 
-  for (const { pattern, alt } of forbidden) {
+  for (const { pattern, alt, checkBunException } of forbidden) {
     if (pattern.test(command)) {
+      // Allow bun commands in config/quality (quality system uses bun)
+      if (checkBunException && isBunAllowed(command)) {
+        return { ok: true }
+      }
+
       return {
         ok: false,
         error: `DEVOPS VIOLATION\n\nAlternative: ${alt}\n\nUse Docker Compose for local orchestration.`,
