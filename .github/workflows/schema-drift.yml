@@ -8,7 +8,7 @@ jobs:
       - uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
-        run: cd config/quality && bun install --frozen-lockfile
+        run: cd config/brain && bun install --frozen-lockfile
 
       - name: Validate settings.json against official schema
         run: |
@@ -17,8 +17,8 @@ jobs:
           # schema's regex but work correctly in Claude Code. Validation focuses on
           # structural correctness, not permission pattern specifics.
           bunx ajv-cli validate \
-            -s config/quality/src/schemas/official/claude-code-settings.schema.json \
-            -d config/agents/settings.json \
+            -s config/brain/src/schemas/official/claude-code-settings.schema.json \
+            -d config/brain/generated/claude/settings.json \
             --strict=false \
             --all-errors || {
               echo "::warning::Schema validation found differences. Review output above."
@@ -27,4 +27,4 @@ jobs:
 
       - name: Type-check Effect Schemas
         run: |
-          cd config/quality && bun run typecheck
+          cd config/brain && bun run typecheck

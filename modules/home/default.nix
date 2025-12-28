@@ -39,7 +39,6 @@ in
     ./apps/bartender.nix
     ./apps/raycast.nix
     ./apps/claude.nix
-    ../../config/agents/nix/agents.nix
     ./apps/cursor.nix
     ./apps/misc.nix
     ./apps/keyboard-layout.nix

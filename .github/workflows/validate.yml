@@ -7,8 +7,8 @@ on:
     branches: [main]
 
 jobs:
-  quality-tests:
-    name: Quality System Tests
+  brain-tests:
+    name: Brain System Tests
     runs-on: ubuntu-latest
 
     steps:
@@ -19,15 +19,15 @@ jobs:
         uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
-        working-directory: config/quality
+        working-directory: config/brain
         run: bun install --frozen-lockfile
 
       - name: Run tests
-        working-directory: config/quality
+        working-directory: config/brain
         run: bun test
 
       - name: Validate artifacts
-        working-directory: config/quality
+        working-directory: config/brain
         run: bun run validate
 
   mcp-smoke-tests:
@@ -180,167 +180,3 @@ jobs:
             echo "Checking: $file"
             python3 -c "import yaml; yaml.safe_load(open('$file'))" || { echo "Invalid YAML: $file"; exit 1; }
           done
-
-  claude-config:
-    name: Claude Config Cross-Reference
-    runs-on: ubuntu-latest
-    continue-on-error: true # Skills cross-reference is tech debt for later
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install Modern CLI Tools
-        run: |
-          # Install ripgrep, fd-find, eza (modern Rust alternatives)
-          sudo apt-get update
-          sudo apt-get install -y ripgrep fd-find
-          wget -qO- https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz | sudo tar xz -C /usr/local/bin
-
-      - name: Skills Cross-Reference Validation
-        run: |
-          echo "═══ Test 1: Skills Cross-Reference ═══"
-
-          # Get skills defined in directory (modern: eza)
-          SKILLS_DIR=$(eza --oneline config/agents/skills/ | sort)
-          SKILLS_DIR_COUNT=$(echo "$SKILLS_DIR" | wc -l | tr -d ' ')
-
-          # Get skills symlinked in agents.nix (modern: rg)
-          SKILLS_NIX=$(rg '\.claude/skills/' config/agents/nix/agents.nix | \
-            sed -E 's/.*\.claude\/skills\/([a-z0-9-]+)".*/\1/' | sort | uniq)
-          SKILLS_NIX_COUNT=$(echo "$SKILLS_NIX" | wc -l | tr -d ' ')
-
-          echo "Skills in directory: $SKILLS_DIR_COUNT"
-          echo "Skills symlinked in agents.nix: $SKILLS_NIX_COUNT"
-
-          # Find skills in directory but NOT symlinked
-          MISSING_SYMLINKS=$(comm -23 <(echo "$SKILLS_DIR") <(echo "$SKILLS_NIX"))
-          if [ -n "$MISSING_SYMLINKS" ]; then
-            echo "ERROR: Skills in directory but NOT symlinked:"
-            echo "$MISSING_SYMLINKS"
-            exit 1
-          fi
-          echo "✓ All skills in directory are symlinked"
-
-          # Find skills symlinked but NOT in directory (broken symlinks)
-          ORPHAN_SYMLINKS=$(comm -13 <(echo "$SKILLS_DIR") <(echo "$SKILLS_NIX"))
-          if [ -n "$ORPHAN_SYMLINKS" ]; then
-            echo "ERROR: Broken symlinks (skill directory missing):"
-            echo "$ORPHAN_SYMLINKS"
-            exit 1
-          fi
-          echo "✓ No orphan symlinks"
-
-          # Exact count match
-          if [ "$SKILLS_DIR_COUNT" -ne "$SKILLS_NIX_COUNT" ]; then
-            echo "ERROR: Skill count mismatch: directory=$SKILLS_DIR_COUNT, symlinked=$SKILLS_NIX_COUNT"
-            exit 1
-          fi
-          echo "✓ Skill counts match: $SKILLS_DIR_COUNT"
-
-      - name: MCP Servers Validation
-        run: |
-          echo "═══ Test 2: MCP Servers Validation ═══"
-
-          # Extract MCP server names from claude.nix (portable sed)
-          MCP_SERVERS=$(awk '/mcpServerDefs = \{/,/^  \};/' modules/home/apps/claude.nix | \
-            sed -n '/^    [a-z].*= {$/p' | sed -E 's/^    ([a-z0-9-]+) =.*/\1/' | sort)
-          MCP_COUNT=$(echo "$MCP_SERVERS" | wc -l | tr -d ' ')
-
-          echo "MCP servers defined: $MCP_COUNT"
-          echo "$MCP_SERVERS"
-
-          # Validate required servers exist
-          for server in memory context7 fetch repomix github; do
-            # Use rg instead of grep
-            if echo "$MCP_SERVERS" | rg -q "^$server$"; then
-              echo "✓ Required server: $server"
-            else
-              echo "ERROR: Required MCP server MISSING: $server"
-              exit 1
-            fi
-          done
-
-      - name: Settings JSON Validation
-        run: |
-          echo "═══ Test 3: Settings JSON Validation ═══"
-
-          # Validate all JSON files
-          for json in config/agents/settings/*.json; do
-            if [ -f "$json" ]; then
-              python3 -m json.tool "$json" > /dev/null || { echo "ERROR: Invalid JSON: $json"; exit 1; }
-              echo "✓ $json"
-            fi
-          done
-
-          # Check required fields in claude-code.json
-          SETTINGS="config/agents/settings/claude-code.json"
-          python3 -c "import json; d=json.load(open('$SETTINGS')); assert 'hooks' in d" || { echo "ERROR: hooks field missing"; exit 1; }
-          python3 -c "import json; d=json.load(open('$SETTINGS')); assert 'permissions' in d" || { echo "ERROR: permissions field missing"; exit 1; }
-          echo "✓ Required fields present in claude-code.json"
-
-      - name: Hook Files Validation
-        run: |
-          echo "═══ Test 4: Hook Files Validation ═══"
-
-          # Extract hook files referenced in settings
-          SETTINGS="config/agents/settings/claude-code.json"
-          REFERENCED_HOOKS=$(python3 -c "
-          import json
-          import re
-          d = json.load(open('$SETTINGS'))
-          hooks_str = json.dumps(d.get('hooks', {}))
-          matches = re.findall(r'hooks/([a-zA-Z0-9_-]+\.(ts|sh))', hooks_str)
-          for m in sorted(set(m[0] for m in matches)):
-              print(m)
-          ")
-
-          for hook in $REFERENCED_HOOKS; do
-            if [ -f "config/agents/hooks/$hook" ]; then
-              echo "✓ Hook exists: $hook"
-            else
-              echo "ERROR: Hook MISSING: $hook"
-              exit 1
-            fi
-          done
-
-      - name: Agent/Command Definitions
-        run: |
-          echo "═══ Test 5: Agent/Command Definitions ═══"
-
-          # Validate skills have SKILL.md
-          for skill in config/agents/skills/*/; do
-            if [ -d "$skill" ]; then
-              test -f "$skill/SKILL.md" || { echo "ERROR: Missing SKILL.md in $skill"; exit 1; }
-              echo "✓ $skill"
-            fi
-          done
-
-          # Validate agents have required frontmatter
-          for agent in config/agents/agents/*.md; do
-            if [ -f "$agent" ]; then
-              # Use rg instead of grep
-              rg -q "^name:" "$agent" || { echo "ERROR: Missing 'name:' in $agent"; exit 1; }
-              rg -q "^description:" "$agent" || { echo "ERROR: Missing 'description:' in $agent"; exit 1; }
-              echo "✓ $agent"
-            fi
-          done
-
-          # Validate commands are not empty
-          for cmd in config/agents/commands/*.md; do
-            if [ -f "$cmd" ]; then
-              [ -s "$cmd" ] || { echo "ERROR: Empty command file: $cmd"; exit 1; }
-              echo "✓ $cmd"
-            fi
-          done
-
-      - name: Summary
-        run: |
-          echo "═══ Summary ═══"
-          # Use eza instead of ls
-          echo "Skills:   $(eza --oneline config/agents/skills/ | wc -l | tr -d ' ') defined"
-          echo "Agents:   $(eza config/agents/agents/*.md 2>/dev/null | wc -l | tr -d ' ') definitions"
-          echo "Commands: $(eza config/agents/commands/*.md 2>/dev/null | wc -l | tr -d ' ') commands"
-          echo "Hooks:    $(eza config/agents/hooks/*.ts config/agents/hooks/*.sh 2>/dev/null | wc -l | tr -d ' ') files"
-          echo ""
-          echo "All Claude config checks passed"
