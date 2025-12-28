@@ -298,7 +298,7 @@ export function checkTDD(filePath: string): GuardResult {
 /**
  * Directories where bun is allowed (quality system uses bun internally)
  */
-const BUN_ALLOWED_PATHS = ['config/quality', 'dotfiles/config/quality'] as const
+const BUN_ALLOWED_PATHS = ['config/brain', 'dotfiles/config/brain'] as const
 
 function isBunAllowed(command: string): boolean {
   return BUN_ALLOWED_PATHS.some((path) => command.includes(path))
@@ -326,7 +326,7 @@ export function checkDevOpsCommands(command: string): GuardResult {
 
   for (const { pattern, alt, checkBunException } of forbidden) {
     if (pattern.test(command)) {
-      // Allow bun commands in config/quality (quality system uses bun)
+      // Allow bun commands in config/brain (brain system uses bun)
       if (checkBunException && isBunAllowed(command)) {
         return { ok: true }
       }

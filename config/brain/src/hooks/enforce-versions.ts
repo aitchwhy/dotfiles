@@ -30,7 +30,7 @@ const PackageJsonSchema = Schema.Struct({
 })
 
 // =============================================================================
-// Configuration (must match config/quality/src/stack/versions.ts)
+// Configuration (must match config/brain/src/stack/versions.ts)
 // =============================================================================
 
 const FORBIDDEN_DEPS: Record<string, string> = {

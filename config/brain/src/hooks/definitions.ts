@@ -34,7 +34,7 @@ type HookDefinitions = {
 // Path Helpers
 // =============================================================================
 
-const qualityHook = (name: string) => `bun "$HOME/dotfiles/config/quality/src/hooks/${name}"`
+const qualityHook = (name: string) => `bun "$HOME/dotfiles/config/brain/src/hooks/${name}"`
 
 // =============================================================================
 // Hook Definitions

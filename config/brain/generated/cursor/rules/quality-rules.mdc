@@ -45,4 +45,4 @@ Rules are enforced at multiple layers:
 2. **Pre-commit hook**: Runs AST-grep before commit
 3. **CI pipeline**: Fails PRs with violations
 
-To see all rules: `config/quality/src/rules/`
+To see all rules: `config/brain/src/rules/`
