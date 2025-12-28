@@ -1,242 +1,208 @@
 /**
  * Memory Registry - Flat Memory List
  *
- * 22 consolidated engineering patterns.
- * Staff-to-Principal level craft knowledge.
+ * 18 consolidated engineering patterns for Dec 2025 Stack.
+ * SSOT for code quality, architecture, and tech stack.
  *
  * Categories:
- *   - principle (5): Guiding philosophies
- *   - constraint (4): Hard rules
- *   - pattern (11): Reusable solutions
- *   - gotcha (2): Pitfalls to avoid
+ *   - principle: Guiding philosophies
+ *   - constraint: Hard rules
+ *   - pattern: Reusable solutions
+ *   - gotcha: Pitfalls to avoid
  */
 import type { Memory } from './schemas'
 
-export const MEMORIES: readonly Memory[] = [
-  // ===========================================================================
-  // PRINCIPLES (5) - Guiding philosophies
-  // ===========================================================================
+// 1. Stack
+const INFRA_MEMORIES: Memory[] = [
+  {
+    id: 'infra-stack',
+    category: 'pattern',
+    title: 'Foundation Stack',
+    content:
+      'pnpm + Docker Compose (OrbStack) + AWS (ECS Fargate + RDS + CloudFront). Node.js 24, Vite 7, TypeScript 7 (tsgo). ' +
+      'All config from Pulumi ESC (4-layer: vendor→infra-shared→base→env).',
+    verified: '2025-12-28',
+  },
+  {
+    id: 'infra-iac',
+    category: 'pattern',
+    title: 'IaC via Pulumi Automation API',
+    content:
+      'Pulumi Automation API (deploy.ts+Effect). ESC refs via template literal types. DeployStack=Schema.Literal. ' +
+      'sha-$GITHUB_SHA. tsx usage. AWS+OIDC.',
+    verified: '2025-12-28',
+  },
+  {
+    id: 'transport-unification',
+    category: 'pattern',
+    title: 'Same-Origin Reverse Proxy',
+    content:
+      'Single baseUrl, /api/*→backend. Local=Caddy (tls internal), Deployed=CloudFront→HTTP→ALB. ' +
+      'Zero CORS, zero SSL bypass, 12-factor parity.',
+    verified: '2025-12-28',
+  },
+  {
+    id: 'ember-staging',
+    category: 'pattern',
+    title: 'Ember Staging Strategy',
+    content:
+      'No custom domain. Uses CloudFront URL directly (*.cloudfront.net). No ember.app or staging.ember.app exists.',
+    verified: '2025-12-28',
+  },
+]
+
+// 2. Runtime
+const RUNTIME_MEMORIES: Memory[] = [
+  {
+    id: 'effect-platform-only',
+    category: 'constraint',
+    title: 'Effect-TS ONLY',
+    content:
+      '@effect/platform HttpServer+HttpRouter. BetterAuth via auth.api.* direct calls. ' +
+      'returnHeaders:true for Set-Cookie. Zero try/catch, zero Hono/Express.',
+    verified: '2025-12-28',
+  },
+  {
+    id: 'api-contract',
+    category: 'pattern',
+    title: 'Contract-First API',
+    content:
+      'Backend (@ember/domain EmberApi) is source of truth. Frontend derives client via HttpApiClient.make(). ' +
+      'Zero drift, auto-sync.',
+    verified: '2025-12-28',
+  },
+  {
+    id: 'xstate-machines',
+    category: 'pattern',
+    title: 'XState with Effect',
+    content:
+      'Use Effect primitives (retry, timeout, polling) via fromPromise wrapping Effect.runPromise. ' +
+      'No custom retry code. setup() API with typed actors.',
+    verified: '2025-12-28',
+  },
+  {
+    id: 'backend-routing',
+    category: 'pattern',
+    title: 'Backend Routing Architecture',
+    content:
+      'Server-level path prefix dispatch, single dispatcher. External URLs as named constants. ' +
+      'Branded types for domain IDs.',
+    verified: '2025-12-28',
+  },
+  {
+    id: 'explicit-config',
+    category: 'principle',
+    title: 'Explicit Configuration',
+    content:
+      "No default values in code. All config must be explicit, well-typed, and DI'd via Context/Layer. " +
+      'Zero magic numbers.',
+    verified: '2025-12-28',
+  },
   {
     id: 'parse-dont-validate',
     category: 'principle',
-    title: "Parse, Don't Validate",
+    title: "Parse Don't Validate",
     content:
-      'Transform untyped data into typed data at boundaries using Schema.decodeUnknown. ' +
-      'Once parsed, trust the types throughout the codebase. Never re-validate internal data.',
-    verified: '2024-12-24',
+      'Zero `as Type` except TS2589. Schema.decodeUnknown for runtime. $Infer vendor types only.',
+    verified: '2025-12-28',
   },
-  {
-    id: 'schema-first',
-    category: 'principle',
-    title: 'Schema-First Development',
-    content:
-      'Define Effect Schema first, derive types via `typeof Schema.Type`. ' +
-      'Schemas are SSOT for validation, serialization, and documentation. Zod is banned.',
-    verified: '2024-12-24',
-  },
-  {
-    id: 'enforcement-over-docs',
-    category: 'principle',
-    title: 'Enforcement Over Documentation',
-    content:
-      'Constraints that can be enforced by code must be. Pre-commit hooks, TypeScript types, ' +
-      'and Effect pipelines replace policy documents. Docs describe; code enforces.',
-    verified: '2024-12-24',
-  },
-  {
-    id: 'single-source-of-truth',
-    category: 'principle',
-    title: 'Single Source of Truth',
-    content:
-      'Every piece of configuration lives in exactly one place. versions.ts for deps, ' +
-      'ports.nix for ports, schema.ts for types. Derivation over duplication.',
-    verified: '2024-12-24',
-  },
-  {
-    id: 'delete-dont-deprecate',
-    category: 'principle',
-    title: "Delete, Don't Deprecate",
-    content:
-      'Remove unused code immediately. No @deprecated annotations, no TODO(remove) comments. ' +
-      'Git preserves history. Dead code is debt that compounds.',
-    verified: '2024-12-24',
-  },
+]
 
-  // ===========================================================================
-  // CONSTRAINTS (4) - Hard rules that MUST be followed
-  // ===========================================================================
+// 3. Auth
+const AUTH_MEMORIES: Memory[] = [
   {
-    id: 'zero-try-catch',
-    category: 'constraint',
-    title: 'Zero Try-Catch in Business Logic',
+    id: 'auth-cookies',
+    category: 'pattern',
+    title: 'Cookie-Based Auth',
     content:
-      'Never use try/catch in business logic. All errors flow through Effect pipelines. ' +
-      'EXCEPTIONS: (1) Server entrypoint for uncaught errors, (2) Adapters wrapping external SDKs, ' +
-      '(3) Boundary functions like Schema.decodeUnknownSync. Use Effect.tryPromise for async calls.',
-    verified: '2024-12-24',
+      'HttpOnly cookies, credentials:"include". handleRaw+returnHeaders:true for Set-Cookie. ' +
+      'CloudFront /api/*→ALB same-domain.',
+    verified: '2025-12-28',
   },
   {
-    id: 'result-types-only',
-    category: 'constraint',
-    title: 'Result Types for Fallible Operations',
+    id: 'betterauth-performance',
+    category: 'pattern',
+    title: 'BetterAuth Performance',
     content:
-      'Functions that can fail return Effect<A, E, R> or Either<A, E>. ' +
-      'Exceptions are banned from business logic. Type signatures must reflect failure modes.',
-    verified: '2024-12-24',
+      'experimental.joins:true for 2-3x latency improvement via DB joins instead of multiple queries.',
+    verified: '2025-12-28',
   },
-  {
-    id: 'effect-platform-http',
-    category: 'constraint',
-    title: 'Effect Platform for HTTP',
-    content:
-      '@effect/platform HttpServer is the only HTTP layer. No Hono, Express, or Fastify. ' +
-      'Effect Platform provides typed middleware, error handling, and OpenTelemetry integration.',
-    verified: '2024-12-24',
-  },
-  {
-    id: 'one-hook-per-event',
-    category: 'constraint',
-    title: 'One Hook Per Event Type',
-    content:
-      'Each Claude Code hook event (PreToolUse, PostToolUse, etc.) has exactly one handler. ' +
-      'Multiple concerns go in one handler, not multiple handlers per event.',
-    verified: '2024-12-24',
-  },
+]
 
-  // ===========================================================================
-  // PATTERNS (11) - Reusable solutions (Nx removed - using pnpm + Docker Compose)
-  // ===========================================================================
+// 4. Tooling
+const TOOLING_MEMORIES: Memory[] = [
   {
-    id: 'evidence-based-timeouts',
-    category: 'pattern',
-    title: 'Evidence-Based Timeouts',
+    id: 'no-docs',
+    category: 'principle',
+    title: 'Types As Documentation',
     content:
-      'Timeouts derived from p99 latency + buffer, not guesses. ' +
-      'Use Effect.timeout with Schedule.exponential for retries. ' +
-      'Document timeout source in comments.',
-    verified: '2024-12-24',
+      'No documentation/comments/ADRs - code is self-documenting. Enforcement via tooling, not docs.',
+    verified: '2025-12-28',
   },
   {
-    id: 'bootloader-pattern',
-    category: 'pattern',
-    title: 'Bootloader Pattern for Context',
+    id: 'no-scripts',
+    category: 'principle',
+    title: 'No One-Off Scripts',
     content:
-      'CLAUDE.md is a bootloader, not a manual. It provides protocol for dynamic context loading. ' +
-      'Read skills on-demand, never dump entire codebase into context.',
-    verified: '2024-12-24',
+      'Verification is tests, config is declarative (biome/lefthook/Pulumi). No standalone scripts.',
+    verified: '2025-12-28',
   },
   {
-    id: 'hexagonal-architecture',
-    category: 'pattern',
-    title: 'Hexagonal Architecture with Effect',
+    id: 'programmatic-toolchain',
+    category: 'constraint',
+    title: 'High-Performance Toolchain',
     content:
-      'Ports are Context.Tag interfaces, adapters are Layer implementations. ' +
-      'Business logic depends on ports, never concrete adapters. Test via Layer.succeed mocks.',
-    verified: '2024-12-24',
+      'tsgo (type-check), oxlint (lint), biome (format), AST-grep (custom rules), lefthook. ' +
+      'Zero tsc, zero eslint.',
+    verified: '2025-12-28',
   },
-  {
-    id: 'dynamic-credentials',
-    category: 'pattern',
-    title: 'Dynamic Credentials via ESC + OIDC',
-    content:
-      'No static secrets in CI/CD. GitHub Actions uses OIDC to assume AWS IAM roles. ' +
-      'Credentials are short-lived (1 hour), scoped to repo/branch via JWT claims. ' +
-      'Local dev uses Pulumi ESC. Production uses direct OIDC federation.',
-    verified: '2024-12-24',
-  },
-  {
-    id: 'statsig-feature-flags',
-    category: 'pattern',
-    title: 'Statsig for Feature Flags',
-    content:
-      '@statsig/js-client for web, statsig-node for API. ' +
-      'Gates control feature rollout, experiments run A/B tests. ' +
-      'Never hardcode feature toggles.',
-    verified: '2024-12-24',
-  },
-  {
-    id: 'derivation-splitting',
-    category: 'pattern',
-    title: 'Nix Derivation Splitting',
-    content:
-      'Split large Nix derivations for cache efficiency. deps derivation for node_modules, ' +
-      'build derivation for app code. Changes to app code skip dependency rebuild.',
-    verified: '2024-12-24',
-  },
-  {
-    id: 'xstate-actor-model',
-    category: 'pattern',
-    title: 'XState v5 Actor Model',
-    content:
-      'Complex async state uses XState v5 machines with singleton actors. ' +
-      'authMachine handles auth state transitions. Machines are typed with setup(). ' +
-      'Use @xstate/react useSelector for reactive state access.',
-    verified: '2024-12-24',
-  },
-  {
-    id: 'betterauth-sessions',
-    category: 'pattern',
-    title: 'BetterAuth Session Pattern',
-    content:
-      'Authentication via BetterAuth with HttpOnly session cookies (browser) and Bearer tokens (API). ' +
-      'Sessions stored server-side in PostgreSQL. Session middleware validates on every request. ' +
-      'Phone OTP is primary auth method for mobile-first UX.',
-    verified: '2024-12-24',
-  },
-  {
-    id: 'docker-compose-dev',
-    category: 'pattern',
-    title: 'Docker Compose for Development',
-    content:
-      'Local development uses docker compose up with Caddy reverse proxy. ' +
-      'Nix is for dotfiles only, not application dev shells. ' +
-      'File watching via docker compose watch. ESC env vars loaded via direnv.',
-    verified: '2024-12-24',
-  },
-  {
-    id: 'e2e-first-testing',
-    category: 'pattern',
-    title: 'E2E-First Testing Strategy',
-    content:
-      'E2E tests are primary verification layer. Run before every deploy. ' +
-      'packages/e2e is independent, imports only @ember/config and @ember/domain. ' +
-      'No test bypass code in production. E2E generates valid JWTs using same contract as prod.',
-    verified: '2024-12-24',
-  },
-  {
-    id: 'drizzle-postgres',
-    category: 'pattern',
-    title: 'Drizzle ORM with PostgreSQL',
-    content:
-      'Database access via Drizzle ORM in drizzle.adapter.ts. Schema in packages/domain. ' +
-      'Uses Effect Layer for connection pooling. All queries return Effect, never raw promises. ' +
-      'Migrations via drizzle-kit. No Prisma, no raw pg driver.',
-    verified: '2024-12-24',
-  },
+]
 
-  // ===========================================================================
-  // GOTCHAS (2) - Pitfalls to avoid
-  // ===========================================================================
+// 5. Deps
+const DEPS_MEMORIES: Memory[] = [
   {
-    id: 'nix-sandbox-isolation',
-    category: 'gotcha',
-    title: 'Nix Sandbox Isolation',
+    id: 'dec-2025-deps',
+    category: 'constraint',
+    title: 'Dec 2025 Version Pinning',
     content:
-      'Nix builds run in sandboxed environment without network access. ' +
-      'All dependencies must be declared in inputs. Builds that fetch at build-time fail.',
-    verified: '2024-12-24',
+      'effect@3.19, react@19.2, vite@7.3, xstate@5.25, @tanstack/react-router@1.144, ' +
+      '@playwright/test@1.57, vitest@4.0, typescript@5.9, tsgo, better-auth@1.4.9.',
+    verified: '2025-12-28',
+  },
+]
+
+// 6. Principles
+const ARCH_MEMORIES: Memory[] = [
+  {
+    id: 'ai-prompts',
+    category: 'pattern',
+    title: 'Conversational Prompts',
+    content:
+      'Claude Code prompts: conversational markdown in chat. User copies. Include validation tests.',
+    verified: '2025-12-28',
   },
   {
-    id: 'task-definition-immutability',
-    category: 'gotcha',
-    title: 'ECS Task Definition Immutability',
+    id: 'inversion-of-control',
+    category: 'principle',
+    title: 'Max IoC',
     content:
-      'ECS task definitions are immutable. Updates create new revisions. ' +
-      'Blue-green deploys via service update, not in-place modification. ' +
-      'Old revisions retained for rollback.',
-    verified: '2024-12-24',
+      'Apps/packages/modules unaware of caller/env. Define only own configs, accept env vars at runtime. ' +
+      'No getEnvironment().',
+    verified: '2025-12-28',
   },
-] as const satisfies readonly Memory[]
+]
+
+// Flatten and Export
+const ALL_NEW_MEMORIES = [
+  ...INFRA_MEMORIES,
+  ...RUNTIME_MEMORIES,
+  ...AUTH_MEMORIES,
+  ...TOOLING_MEMORIES,
+  ...DEPS_MEMORIES,
+  ...ARCH_MEMORIES,
+]
+
+export const MEMORIES: readonly Memory[] = ALL_NEW_MEMORIES as unknown as readonly Memory[]
 
 /**
  * Get memories by category
