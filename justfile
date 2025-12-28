@@ -188,7 +188,7 @@ _test-rx:
 
 [private]
 _test-quality:
-    cd config/quality && bun test
+    cd config/brain && bun test
 
 [private]
 _verify-paragon:
