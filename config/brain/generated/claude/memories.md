@@ -3,10 +3,10 @@
 Staff-to-Principal level craft knowledge.
 Flat list of patterns, constraints, and gotchas.
 
-**Total**: 18 memories
-- Principles: 5
-- Constraints: 3
-- Patterns: 10
+**Total**: 31 memories
+- Principles: 6
+- Constraints: 9
+- Patterns: 16
 - Gotchas: 0
 
 ---
@@ -44,6 +44,12 @@ Apps/packages/modules unaware of caller/env. Define only own configs, accept env
 
 *Verified: 2025-12-28*
 
+### Domain is Truth
+
+packages/domain is the Single Source of Truth. Contains: Branded types, Effect Schemas, HttpApi contracts, Context.Tag interfaces. Zero side effects, zero external adapter dependencies.
+
+*Verified: 2025-12-28*
+
 ---
 
 ## Constraints
@@ -65,6 +71,42 @@ tsgo (type-check), oxlint (lint), biome (format), AST-grep (custom rules), lefth
 ### Dec 2025 Version Pinning
 
 effect@3.19, react@19.2, vite@7.3, xstate@5.25, @tanstack/react-router@1.144, @playwright/test@1.57, vitest@4.0, typescript@5.9, tsgo, better-auth@1.4.9.
+
+*Verified: 2025-12-28*
+
+### Layer Import Rules
+
+L0 (Domain) imports NOTHING. L1 imports L0. L2 imports L0, L1. Never import across same-level apps (e.g. api cannot import web). Use shared packages for code sharing.
+
+*Verified: 2025-12-28*
+
+### File Naming Conventions
+
+kebab-case only. {name}-machine.ts, {name}.adapter.ts, {name}.test.ts. Route params: $param.tsx. Root: __root.tsx.
+
+*Verified: 2025-12-28*
+
+### Code Naming Conventions
+
+PascalCase for Components, Types, Interfaces, Effect Tags (Database). camelCase for functions. SCREAMING_SNAKE for constants.
+
+*Verified: 2025-12-28*
+
+### Effect-TS Naming Rules
+
+Name Context.Tag by Capability (e.g. Database), not implementation. Implementations use Technology prefix (e.g. DrizzleDatabase). BANNED SUFFIXES: *Live, *Port, *Service, *Adapter, *Impl.
+
+*Verified: 2025-12-28*
+
+### Strict Import Ordering
+
+1. External (effect, react). 2. Workspace (@scope/domain). 3. Relative (../). Enforced by Biome. Always use barrel imports from packages (e.g. import { ... } from "@scope/ui").
+
+*Verified: 2025-12-28*
+
+### No .env Files
+
+Use direnv + Pulumi ESC for secrets. Config package (@scope/config) is SSOT for EnvSchema. eval $(pulumi env open project/dev --format shell).
 
 *Verified: 2025-12-28*
 
@@ -131,6 +173,42 @@ experimental.joins:true for 2-3x latency improvement via DB joins instead of mul
 ### Conversational Prompts
 
 Claude Code prompts: conversational markdown in chat. User copies. Include validation tests.
+
+*Verified: 2025-12-28*
+
+### Monorepo Layer Architecture
+
+Strict unidirectional dependencies (L5 deps on L4 on L3...). L5=Infra, L4=Apps, L3=Auth, L2=Adapters(DB/Storage), L1=Config/UI, L0=Pure(Domain/Schemas). Higher layers depend on lower only.
+
+*Verified: 2025-12-28*
+
+### Directory Structure
+
+apps/{api,web,agent}, packages/{domain,config,ui,db,auth}, infra/. apps/api/src: handlers (thin), middleware, runtime (AppLive). packages/domain/src: schemas, api, capabilities.
+
+*Verified: 2025-12-28*
+
+### Thin API Handlers
+
+Handlers (HttpApiBuilder.group) are thin orchestration only. NEVER contain business logic. Pattern: parse request -> call capability -> format response. Delegate logic to Repository/Domain.
+
+*Verified: 2025-12-28*
+
+### Type-Safe Dependency Injection
+
+Use Context.Tag for capabilities (interfaces). Use Layer for implementations. Compose in runtime/AppLive.ts using Layer.mergeAll. No manual DI containers.
+
+*Verified: 2025-12-28*
+
+### XState v5 Patterns
+
+Use discriminated union contexts (phase: idle|loading|loaded|error). Use setup() factory pattern. Bridge Effect to XState via runPromise helpers. Explicit states over implicit boolean flags.
+
+*Verified: 2025-12-28*
+
+### 3-Tier Testing Strategy
+
+1. E2E (Playwright) for critical user journeys/auth. 2. Integration (TestContainers) for API/Database. 3. Unit (Vitest+Effect) for Pure Domain logic. Auth Tier 2: Reuse storageState json for speed.
 
 *Verified: 2025-12-28*
 
