@@ -110,6 +110,7 @@ in
         hadolint # Dockerfile linting
         sqlfluff # SQL linting
         biome # JS/TS/JSON formatting + linting
+        ast-grep # AST search and replace
       ]
       # Development Tools
       ++ (optionals cfg.enableNixTools [
