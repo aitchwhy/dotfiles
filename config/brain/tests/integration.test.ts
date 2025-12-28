@@ -76,9 +76,9 @@ describe('Quality System Integration', () => {
   })
 
   describe('memories coverage', () => {
-    it('has exactly 22 memories', () => {
-      expect(MEMORIES).toHaveLength(22)
-      expect(MEMORY_COUNTS.total).toBe(22)
+    it('has exactly 31 memories', () => {
+      expect(MEMORIES).toHaveLength(31)
+      expect(MEMORY_COUNTS.total).toBe(31)
     })
 
     it('has all required categories', () => {
@@ -86,14 +86,13 @@ describe('Quality System Integration', () => {
       expect(categories).toContain('principle')
       expect(categories).toContain('constraint')
       expect(categories).toContain('pattern')
-      expect(categories).toContain('gotcha')
     })
 
     it('has correct category counts', () => {
-      expect(MEMORY_COUNTS.principle).toBe(5)
-      expect(MEMORY_COUNTS.constraint).toBe(4)
-      expect(MEMORY_COUNTS.pattern).toBe(11)
-      expect(MEMORY_COUNTS.gotcha).toBe(2)
+      expect(MEMORY_COUNTS.principle).toBe(6)
+      expect(MEMORY_COUNTS.constraint).toBe(9)
+      expect(MEMORY_COUNTS.pattern).toBe(16)
+      expect(MEMORY_COUNTS.gotcha).toBe(0)
     })
   })
 

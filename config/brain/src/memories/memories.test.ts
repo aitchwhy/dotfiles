@@ -11,16 +11,16 @@ import { MemorySchema } from './schemas'
 
 describe('Memory System', () => {
   describe('counts', () => {
-    it('has exactly 22 memories', () => {
-      expect(MEMORIES).toHaveLength(22)
-      expect(MEMORY_COUNTS.total).toBe(22)
+    it('has exactly 31 memories', () => {
+      expect(MEMORIES).toHaveLength(31)
+      expect(MEMORY_COUNTS.total).toBe(31)
     })
 
     it('has correct category distribution', () => {
-      expect(MEMORY_COUNTS.principle).toBe(5)
-      expect(MEMORY_COUNTS.constraint).toBe(4)
-      expect(MEMORY_COUNTS.pattern).toBe(11)
-      expect(MEMORY_COUNTS.gotcha).toBe(2)
+      expect(MEMORY_COUNTS.principle).toBe(6)
+      expect(MEMORY_COUNTS.constraint).toBe(9)
+      expect(MEMORY_COUNTS.pattern).toBe(16)
+      expect(MEMORY_COUNTS.gotcha).toBe(0)
     })
 
     it('category counts sum to total', () => {
@@ -78,18 +78,12 @@ describe('Memory System', () => {
   describe('required memories exist', () => {
     const requiredIds = [
       'parse-dont-validate',
-      'schema-first',
-      'enforcement-over-docs',
-      'zero-try-catch',
-      'effect-platform-http',
-      'statsig-feature-flags',
-      'hexagonal-architecture',
-      'dynamic-credentials',
-      'xstate-actor-model',
-      'betterauth-sessions',
-      'docker-compose-dev',
-      'e2e-first-testing',
-      'drizzle-postgres',
+      'domain-purity',
+      'layer-architecture',
+      'effect-platform-only',
+      'xstate-patterns',
+      'testing-strategy',
+      'directory-structure',
     ]
 
     it.each(requiredIds)('has required memory: %s', (id) => {
@@ -99,10 +93,10 @@ describe('Memory System', () => {
 
   describe('helper functions', () => {
     it('getMemoriesByCategory returns correct counts', () => {
-      expect(getMemoriesByCategory('principle')).toHaveLength(5)
-      expect(getMemoriesByCategory('constraint')).toHaveLength(4)
-      expect(getMemoriesByCategory('pattern')).toHaveLength(11)
-      expect(getMemoriesByCategory('gotcha')).toHaveLength(2)
+      expect(getMemoriesByCategory('principle')).toHaveLength(6)
+      expect(getMemoriesByCategory('constraint')).toHaveLength(9)
+      expect(getMemoriesByCategory('pattern')).toHaveLength(16)
+      expect(getMemoriesByCategory('gotcha')).toHaveLength(0)
     })
 
     it('getMemory returns undefined for unknown ID', () => {

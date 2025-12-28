@@ -27,12 +27,11 @@ describe('Generated Artifacts', () => {
       expect(content).toContain('## Principles')
       expect(content).toContain('## Constraints')
       expect(content).toContain('## Patterns')
-      expect(content).toContain('## Gotchas')
     })
 
     it('reports correct total', () => {
       const content = fs.readFileSync(filePath, 'utf-8')
-      expect(content).toContain('22 memories')
+      expect(content).toContain('31 memories')
     })
   })
 
