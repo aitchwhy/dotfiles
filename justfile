@@ -75,6 +75,30 @@ dev:
 update:
     nix flake update
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# GITHUB ACTIONS (Local)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Read act arguments from config
+act_args := shell("grep -v '^#' config/act/actrc | tr '\n' ' '")
+
+# Run GitHub Actions locally (arguments passed to act)
+# Usage: just gha -j job_name
+gha *ARGS:
+    act {{ act_args }} {{ ARGS }}
+
+# List available GitHub Actions jobs
+gha-list:
+    @just gha -l
+
+# Watch mode for rapid iteration on a specific job
+# Usage: just gha-watch job_name
+gha-watch JOB:
+    @echo "Watching for changes to run {{ JOB }}..."
+    @watchexec -e yml,yaml,ts,js,json,nix -- \
+        just gha -j {{ JOB }}
+
+
 # Show system status and health
 status:
     #!/usr/bin/env bash
