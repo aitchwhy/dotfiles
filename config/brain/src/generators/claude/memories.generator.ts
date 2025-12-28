@@ -18,6 +18,7 @@ const CATEGORY_DESCRIPTIONS: Record<MemoryCategory, string> = {
   constraint: 'Hard rules that MUST be followed',
   pattern: 'Reusable solutions',
   gotcha: 'Pitfalls to avoid',
+  standard: 'Dec 2025 SOTA Standards (Must Follow)',
 }
 
 const formatMemory = (memory: Memory): string => {

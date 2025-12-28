@@ -225,11 +225,11 @@ export const STACK = {
     handlebars: '4.7.8',
 
     // Dev & Linting
-    oxlint: '1.35.0',
-    'oxlint-tsgolint': '0.10.0',
-    '@biomejs/biome': '2.3.8',
+    oxlint: '0.15.10', // Type-aware standard
+    'oxlint-tsgolint': '0.15.10',
+    '@biomejs/biome': '1.9.4', // Formatter only
     '@types/node': '22.10.2',
-    tsx: '4.19.2',
+    tsx: '4.19.2', // TS runner
     '@ast-grep/napi': '0.33.1',
 
     // Pulumi (infrastructure) - Dec 2025

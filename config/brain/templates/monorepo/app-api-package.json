@@ -1,0 +1,30 @@
+{
+  "_comment": "SSOT API app package.json (Dec 2025)",
+  "name": "@{{SCOPE}}/api",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/server.ts"
+  },
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "dev:debug": "tsx watch --inspect=0.0.0.0:9229 src/server.ts",
+    "build": "esbuild src/server.ts --bundle --platform=node --target=node24 --outfile=dist/server.cjs --format=cjs --minify",
+    "start": "node dist/server.cjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsgo --project tsconfig.json"
+  },
+  "dependencies": {
+    "@effect/platform": "0.94.0",
+    "@effect/platform-node": "0.104.0",
+    "effect": "3.19.13"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.1",
+    "esbuild": "0.24.2",
+    "tsx": "4.19.0",
+    "vitest": "4.0.15"
+  }
+}

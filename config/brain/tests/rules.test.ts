@@ -15,16 +15,16 @@ import {
 
 describe('Quality Rules', () => {
   describe('rule counts', () => {
-    it('has exactly 12 total rules', () => {
-      expect(ALL_RULES).toHaveLength(12)
+    it('has exactly 15 total rules', () => {
+      expect(ALL_RULES).toHaveLength(15)
     })
 
     it('has 3 type-safety rules', () => {
       expect(TYPE_SAFETY_RULES).toHaveLength(3)
     })
 
-    it('has 5 effect rules', () => {
-      expect(EFFECT_RULES).toHaveLength(5)
+    it('has 8 effect rules', () => {
+      expect(EFFECT_RULES).toHaveLength(8)
     })
 
     it('has 3 architecture rules', () => {

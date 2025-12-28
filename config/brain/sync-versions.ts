@@ -1,156 +1,52 @@
 #!/usr/bin/env bun
-import { existsSync, readdirSync, readFileSync, type Stats, statSync, writeFileSync } from 'node:fs'
-import { join, relative } from 'node:path'
-/**
- * sync-versions.ts - Sync package.json versions to STACK.ts SSOT
- *
- * Usage:
- *   bun run ~/dotfiles/config/quality/sync-versions.ts /path/to/project
- *   bun run ~/dotfiles/config/quality/sync-versions.ts /path/to/project --dry-run
- *
- * This script finds all package.json files in a project and updates
- * their dependency versions to match the STACK.ts SSOT.
- */
-import { STACK } from './src/stack/versions'
-
-const projectPath = process.argv[2]
-const dryRun = process.argv.includes('--dry-run')
-
-if (!projectPath) {
-  process.stderr.write('Usage: bun run sync-versions.ts /path/to/project [--dry-run]\n')
-  process.exit(1)
-}
-
-if (!existsSync(projectPath)) {
-  process.stderr.write(`Error: Path does not exist: ${projectPath}\n`)
-  process.exit(1)
-}
 
 /**
- * Recursively find all package.json files in a directory
+ * Sync versions from versions.json to package.json
+ * Run: bun run sync-versions.ts
  */
-function findPackageJsons(dir: string): string[] {
-  const results: string[] = []
-  let entries: string[]
 
-  try {
-    entries = readdirSync(dir)
-  } catch {
-    return results
-  }
+import { FileSystem } from '@effect/platform'
+import { BunContext, BunRuntime } from '@effect/platform-bun'
+import { Console, Effect } from 'effect'
 
-  for (const entry of entries) {
-    // Skip common directories that shouldn't be traversed
-    if (
-      entry === 'node_modules' ||
-      entry.startsWith('.') ||
-      entry === 'dist' ||
-      entry === 'build' ||
-      entry === 'coverage'
-    ) {
-      continue
+const program = Effect.gen(function* () {
+  const fs = yield* FileSystem.FileSystem
+
+  const versionsRaw = yield* fs.readFileString('versions.json')
+  const versions = JSON.parse(versionsRaw) as Record<string, Record<string, string>>
+
+  const pkgRaw = yield* fs.readFileString('package.json')
+  const pkg = JSON.parse(pkgRaw) as Record<string, unknown>
+
+  const deps = pkg['dependencies'] as Record<string, string> | undefined
+  const devDeps = pkg['devDependencies'] as Record<string, string> | undefined
+
+  let updated = 0
+
+  const npmVersions = versions['npm'] ?? {}
+  const effectVersions = versions['effect'] ?? {}
+  const allVersions = { ...npmVersions, ...effectVersions }
+
+  for (const [name, version] of Object.entries(allVersions)) {
+    if (deps?.[name] && deps[name] !== version) {
+      deps[name] = version
+      updated++
+      yield* Console.log(`Updated ${name}: ${deps[name]} → ${version}`)
     }
-
-    const fullPath = join(dir, entry)
-    let stat: Stats
-
-    try {
-      stat = statSync(fullPath)
-    } catch {
-      continue
-    }
-
-    if (stat.isDirectory()) {
-      results.push(...findPackageJsons(fullPath))
-    } else if (entry === 'package.json') {
-      results.push(fullPath)
+    if (devDeps?.[name] && devDeps[name] !== version) {
+      devDeps[name] = version
+      updated++
+      yield* Console.log(`Updated ${name}: ${devDeps[name]} → ${version}`)
     }
   }
 
-  return results
-}
-
-type SyncResult = {
-  file: string
-  changes: Array<{ pkg: string; from: string; to: string }>
-}
-
-/**
- * Sync a single package.json file to STACK versions
- */
-function syncPackageJson(path: string): SyncResult {
-  const content = JSON.parse(readFileSync(path, 'utf-8'))
-  const changes: Array<{ pkg: string; from: string; to: string }> = []
-
-  const npmVersions = STACK.npm as Record<string, string>
-
-  const syncDeps = (deps: Record<string, string> | undefined) => {
-    if (!deps) return
-    for (const [pkg, version] of Object.entries(deps)) {
-      const stackVersion = npmVersions[pkg]
-      // Only sync if:
-      // 1. Package is in STACK
-      // 2. Version differs
-      // 3. Not a workspace reference
-      if (stackVersion && version !== stackVersion && !version.startsWith('workspace:')) {
-        changes.push({ pkg, from: version, to: stackVersion })
-        if (!dryRun) {
-          deps[pkg] = stackVersion
-        }
-      }
-    }
+  if (updated > 0) {
+    yield* fs.writeFileString('package.json', JSON.stringify(pkg, null, 2) + '\n')
+    yield* Console.log(`\n✓ Updated ${updated} dependencies`)
+  } else {
+    yield* Console.log('✓ All dependencies up to date')
   }
+})
 
-  syncDeps(content.dependencies)
-  syncDeps(content.devDependencies)
-  syncDeps(content.peerDependencies)
-
-  if (changes.length > 0 && !dryRun) {
-    writeFileSync(path, `${JSON.stringify(content, null, 2)}\n`)
-  }
-
-  return { file: path, changes }
-}
-
-// Main execution
-const modeLabel = dryRun ? '[DRY RUN] ' : ''
-process.stdout.write(`${modeLabel}Syncing versions in ${projectPath} to STACK.ts...\n\n`)
-
-const packageJsons = findPackageJsons(projectPath)
-
-if (packageJsons.length === 0) {
-  process.stdout.write('No package.json files found.\n')
-  process.exit(0)
-}
-
-let totalChanges = 0
-let filesChanged = 0
-
-for (const pkg of packageJsons) {
-  const result = syncPackageJson(pkg)
-  if (result.changes.length > 0) {
-    filesChanged++
-    const relativePath = relative(projectPath, result.file)
-    process.stdout.write(`\x1b[36m${relativePath}\x1b[0m\n`)
-    for (const change of result.changes) {
-      process.stdout.write(
-        `  \x1b[33m${change.pkg}\x1b[0m: ${change.from} \x1b[32m->\x1b[0m ${change.to}\n`,
-      )
-      totalChanges++
-    }
-  }
-}
-
-process.stdout.write('\n')
-if (totalChanges === 0) {
-  process.stdout.write('\x1b[32m✓ All versions are in sync with STACK.ts\x1b[0m\n')
-} else if (dryRun) {
-  process.stdout.write(
-    `\x1b[33m⚠ Would update ${totalChanges} package(s) across ${filesChanged} file(s)\x1b[0m\n`,
-  )
-  process.stdout.write('Run without --dry-run to apply changes.\n')
-} else {
-  process.stdout.write(
-    `\x1b[32m✓ Updated ${totalChanges} package(s) across ${filesChanged} file(s)\x1b[0m\n`,
-  )
-}
+const runnable = program.pipe(Effect.provide(BunContext.layer as any))
+BunRuntime.runMain(runnable as any)

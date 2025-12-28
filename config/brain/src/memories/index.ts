@@ -15,6 +15,7 @@ import { ARCHITECTURE_MEMORIES } from './architecture'
 import { NAMING_MEMORIES } from './naming'
 import { PATTERN_MEMORIES } from './patterns'
 import type { Memory } from './schemas'
+import { STANDARDS_MEMORIES } from './standards'
 
 // 1. Stack
 const INFRA_MEMORIES: Memory[] = [
@@ -207,6 +208,7 @@ const ALL_NEW_MEMORIES = [
   ...ARCHITECTURE_MEMORIES,
   ...NAMING_MEMORIES,
   ...PATTERN_MEMORIES,
+  ...STANDARDS_MEMORIES,
 ]
 
 export const MEMORIES: readonly Memory[] = ALL_NEW_MEMORIES as unknown as readonly Memory[]
@@ -233,5 +235,6 @@ export const MEMORY_COUNTS = {
   constraint: MEMORIES.filter((m) => m.category === 'constraint').length,
   pattern: MEMORIES.filter((m) => m.category === 'pattern').length,
   gotcha: MEMORIES.filter((m) => m.category === 'gotcha').length,
+  standard: MEMORIES.filter((m) => m.category === 'standard').length,
   total: MEMORIES.length,
 } as const

@@ -1,0 +1,16 @@
+{
+  "_comment": "SSOT package package.json (Dec 2025) - source-only exports",
+  "name": "@{{SCOPE}}/{{PACKAGE_NAME}}",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsgo --project tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

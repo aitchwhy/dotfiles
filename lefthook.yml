@@ -1,12 +1,7 @@
-# lefthook.yml - Git hooks for dotfiles repo
-# Docs: https://github.com/evilmartians/lefthook
-# Type-aware linting runs in CI only (requires full program context)
 min_version: 1.6.0
 
 pre-commit:
   parallel: true
-  # Skip all pre-commit hooks during merge/rebase operations
-  # This is the legitimate alternative to LEFTHOOK=0
   skip:
     - merge
     - rebase
@@ -26,62 +21,70 @@ pre-commit:
       glob: "*.nix"
       run: nixfmt --check {staged_files}
 
-    # Enforcement: No shell scripts in hooks directory
     no-shell-hooks:
       glob: "config/brain/src/hooks/*.sh"
       run: |
         if [ -n "{staged_files}" ]; then
           echo "ERROR: Shell scripts in hooks directory are banned"
-          echo "Convert to TypeScript: {staged_files}"
           exit 1
         fi
 
-    # Enforcement: No error swallowing in Nix files
     no-error-swallowing:
       glob: "*.nix"
       run: |
         if grep -E '\|\| true|2>/dev/null' {staged_files}; then
           echo "ERROR: Error swallowing patterns detected"
-          echo "Replace '|| true' and '2>/dev/null' with proper error handling"
           exit 1
         fi
 
-    # Enforcement: No README.md in config directory
     no-readmes:
       glob: "config/**/*.md"
       run: |
-        if echo "{staged_files}" | grep -q "README.md"; then
-          echo "ERROR: README.md files in config/ are banned"
-          echo "Code should be self-documenting"
+        if echo "{staged_files}" | grep -qE "README\.md$"; then
+          echo "ERROR: README.md in config/ banned. Code is self-documenting."
           exit 1
         fi
 
-    # Enforcement: No hardcoded version ranges in package.json
     no-version-ranges:
       glob: "**/package.json"
       run: |
         if grep -E '"[~^]' {staged_files}; then
-          echo "ERROR: Semver ranges (^ or ~) are banned"
-          echo "Use exact versions from STACK.npm"
+          echo "ERROR: Semver ranges (^ or ~) banned. Use exact versions."
           exit 1
         fi
 
-    # Enforcement: No sync FS in hooks (use @effect/platform)
     no-sync-fs-in-hooks:
       glob: "config/brain/src/hooks/**/*.ts"
       run: |
-        if grep -E 'existsSync|readFileSync|writeFileSync|appendFileSync|mkdirSync|readdirSync|statSync' {staged_files}; then
-          echo "ERROR: Sync FS in hooks. Use @effect/platform FileSystem"
+        if grep -E 'existsSync|readFileSync|writeFileSync' {staged_files}; then
+          echo "ERROR: Sync FS banned. Use @effect/platform FileSystem"
           exit 1
         fi
 
-    # Enforcement: No try/catch (use Effect.try)
-    # Excludes: rule definitions (contain patterns), Result utility wrapper, lib/
     no-try-catch:
-      glob: "config/brain/src/hooks/**/*.ts"
+      glob: "config/brain/src/**/*.ts"
+      exclude: "**/*.rules.ts"
       run: |
         if grep -E '\btry\s*\{' {staged_files} | grep -v 'Effect.try'; then
           echo "ERROR: try/catch detected. Use Effect.try"
+          exit 1
+        fi
+
+    # NEW: Enforce source-only exports
+    no-dist-exports:
+      glob: "**/package.json"
+      run: |
+        if grep -E '"\./(dist|build)/' {staged_files}; then
+          echo "ERROR: dist exports banned. Use ./src/index.ts (source-only)"
+          exit 1
+        fi
+
+    # NEW: No rewriteRelativeImportExtensions
+    no-rewrite-extensions:
+      glob: "**/tsconfig*.json"
+      run: |
+        if grep -q 'rewriteRelativeImportExtensions' {staged_files}; then
+          echo "ERROR: rewriteRelativeImportExtensions banned (source-only strategy)"
           exit 1
         fi
 

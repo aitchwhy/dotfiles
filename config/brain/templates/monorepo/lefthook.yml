@@ -1,0 +1,57 @@
+# SSOT lefthook config (Dec 2025)
+min_version: 1.6.0
+
+pre-commit:
+  parallel: true
+  skip:
+    - merge
+    - rebase
+  commands:
+    format:
+      glob: "**/*.{ts,tsx,js,jsx,json}"
+      run: npx biome check --write {staged_files}
+      stage_fixed: true
+
+    lint:
+      glob: "**/*.{ts,tsx,js,jsx}"
+      run: npx oxlint {staged_files}
+
+    # Enforcement: No try/catch (use Effect)
+    no-try-catch:
+      glob: "**/*.ts"
+      exclude:
+        - "**/node_modules/**"
+        - "**/*.test.ts"
+      run: |
+        if grep -E '\btry\s*\{' {staged_files} | grep -v 'Effect.try'; then
+          echo "ERROR: try/catch detected. Use Effect.try or Effect.gen"
+          exit 1
+        fi
+
+    # Enforcement: No console.log (use Effect.log)
+    no-console:
+      glob: "**/*.ts"
+      exclude:
+        - "**/node_modules/**"
+        - "**/*.test.ts"
+      run: |
+        if grep -E 'console\.(log|warn|error|info|debug)' {staged_files}; then
+          echo "ERROR: console.* detected. Use Effect.log* or Logger"
+          exit 1
+        fi
+
+    # Enforcement: No any type
+    no-any:
+      glob: "**/*.ts"
+      exclude:
+        - "**/node_modules/**"
+      run: |
+        if grep -E ':\s*any\b|as\s+any\b|<any>' {staged_files}; then
+          echo "ERROR: 'any' type detected. Use unknown or proper types"
+          exit 1
+        fi
+
+commit-msg:
+  commands:
+    commitlint:
+      run: npx commitlint --edit {1}

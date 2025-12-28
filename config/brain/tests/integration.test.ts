@@ -13,8 +13,8 @@ import { ALL_SKILLS } from '../src/skills'
 
 describe('Quality System Integration', () => {
   describe('counts', () => {
-    it('has exactly 12 rules', () => {
-      expect(ALL_RULES).toHaveLength(12)
+    it('has exactly 15 rules', () => {
+      expect(ALL_RULES).toHaveLength(15)
     })
 
     it('has exactly 28 skills', () => {
@@ -76,9 +76,9 @@ describe('Quality System Integration', () => {
   })
 
   describe('memories coverage', () => {
-    it('has exactly 31 memories', () => {
-      expect(MEMORIES).toHaveLength(31)
-      expect(MEMORY_COUNTS.total).toBe(31)
+    it('has exactly 35 memories', () => {
+      expect(MEMORIES).toHaveLength(35)
+      expect(MEMORY_COUNTS.total).toBe(35)
     })
 
     it('has all required categories', () => {
@@ -86,13 +86,15 @@ describe('Quality System Integration', () => {
       expect(categories).toContain('principle')
       expect(categories).toContain('constraint')
       expect(categories).toContain('pattern')
+      expect(categories).toContain('standard')
     })
 
     it('has correct category counts', () => {
-      expect(MEMORY_COUNTS.principle).toBe(6)
+      expect(MEMORY_COUNTS.principle).toBe(7)
       expect(MEMORY_COUNTS.constraint).toBe(9)
       expect(MEMORY_COUNTS.pattern).toBe(16)
       expect(MEMORY_COUNTS.gotcha).toBe(0)
+      expect(MEMORY_COUNTS.standard).toBe(3)
     })
   })
 

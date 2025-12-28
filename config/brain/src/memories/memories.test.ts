@@ -11,16 +11,17 @@ import { MemorySchema } from './schemas'
 
 describe('Memory System', () => {
   describe('counts', () => {
-    it('has exactly 31 memories', () => {
-      expect(MEMORIES).toHaveLength(31)
-      expect(MEMORY_COUNTS.total).toBe(31)
+    it('has exactly 35 memories', () => {
+      expect(MEMORIES).toHaveLength(35)
+      expect(MEMORY_COUNTS.total).toBe(35)
     })
 
     it('has correct category distribution', () => {
-      expect(MEMORY_COUNTS.principle).toBe(6)
+      expect(MEMORY_COUNTS.principle).toBe(7)
       expect(MEMORY_COUNTS.constraint).toBe(9)
       expect(MEMORY_COUNTS.pattern).toBe(16)
       expect(MEMORY_COUNTS.gotcha).toBe(0)
+      expect(MEMORY_COUNTS.standard).toBe(3)
     })
 
     it('category counts sum to total', () => {
@@ -28,7 +29,8 @@ describe('Memory System', () => {
         MEMORY_COUNTS.principle +
         MEMORY_COUNTS.constraint +
         MEMORY_COUNTS.pattern +
-        MEMORY_COUNTS.gotcha
+        MEMORY_COUNTS.gotcha +
+        MEMORY_COUNTS.standard
       expect(sum).toBe(MEMORY_COUNTS.total)
     })
   })
@@ -93,10 +95,11 @@ describe('Memory System', () => {
 
   describe('helper functions', () => {
     it('getMemoriesByCategory returns correct counts', () => {
-      expect(getMemoriesByCategory('principle')).toHaveLength(6)
+      expect(getMemoriesByCategory('principle')).toHaveLength(7)
       expect(getMemoriesByCategory('constraint')).toHaveLength(9)
       expect(getMemoriesByCategory('pattern')).toHaveLength(16)
       expect(getMemoriesByCategory('gotcha')).toHaveLength(0)
+      expect(getMemoriesByCategory('standard')).toHaveLength(3)
     })
 
     it('getMemory returns undefined for unknown ID', () => {

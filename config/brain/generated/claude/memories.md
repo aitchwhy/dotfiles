@@ -3,8 +3,8 @@
 Staff-to-Principal level craft knowledge.
 Flat list of patterns, constraints, and gotchas.
 
-**Total**: 31 memories
-- Principles: 6
+**Total**: 35 memories
+- Principles: 7
 - Constraints: 9
 - Patterns: 16
 - Gotchas: 0
@@ -47,6 +47,12 @@ Apps/packages/modules unaware of caller/env. Define only own configs, accept env
 ### Domain is Truth
 
 packages/domain is the Single Source of Truth. Contains: Branded types, Effect Schemas, HttpApi contracts, Context.Tag interfaces. Zero side effects, zero external adapter dependencies.
+
+*Verified: 2025-12-28*
+
+### Programmatic SSOT
+
+Configuration and Standards are enforced programmatically via `config/brain`. Do not document standards in Wiki/README without backing them by active Memory/Rule in Brain. Brain generates LLM prompts (GEMINI.md) to ensure AI alignment.
 
 *Verified: 2025-12-28*
 

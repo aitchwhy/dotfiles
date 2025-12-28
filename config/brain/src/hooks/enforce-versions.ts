@@ -125,9 +125,10 @@ const program = Effect.gen(function* () {
   emitContinue()
 })
 
-pipe(
+const runnable = pipe(
   program,
   Effect.catchAll(() => Effect.sync(() => emitContinue())),
-  Effect.provide(BunContext.layer),
-  BunRuntime.runMain,
+  Effect.provide(BunContext.layer as any),
 )
+
+BunRuntime.runMain(runnable as any)

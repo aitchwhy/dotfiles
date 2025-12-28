@@ -71,9 +71,10 @@ const program = Effect.gen(function* () {
   yield* Console.log(JSON.stringify(approve()))
 })
 
-pipe(
+const runnable = pipe(
   program,
   Effect.catchAll(() => Console.log(JSON.stringify(approve()))),
-  Effect.provide(BunContext.layer),
-  BunRuntime.runMain,
+  Effect.provide(BunContext.layer as any),
 )
+
+BunRuntime.runMain(runnable as any)

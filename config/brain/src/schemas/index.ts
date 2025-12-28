@@ -147,3 +147,21 @@ export {
   // Schemas
   RipgrepFlagsSchema,
 } from './cli-tools.js'
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Memories
+// ═══════════════════════════════════════════════════════════════════════════
+
+export const MemoryCategorySchema = Schema.Literal('pattern', 'constraint', 'principle', 'standard')
+
+export const MemorySchema = Schema.Struct({
+  id: Schema.String.pipe(Schema.minLength(1)),
+  category: MemoryCategorySchema,
+  title: Schema.String,
+  content: Schema.String,
+  verified: Schema.String,
+})
+
+export type Memory = typeof MemorySchema.Type
+
+export const decodeMemory = Schema.decodeUnknown(MemorySchema)

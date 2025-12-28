@@ -11,6 +11,7 @@ export const MemoryCategorySchema = Schema.Literal(
   'constraint', // Hard rules that MUST be followed
   'pattern', // Reusable solutions
   'gotcha', // Pitfalls to avoid
+  'standard', // SOTA standards
 )
 export type MemoryCategory = typeof MemoryCategorySchema.Type
 

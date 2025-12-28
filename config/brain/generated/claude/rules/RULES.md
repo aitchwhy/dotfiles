@@ -1,6 +1,6 @@
 # Quality Rules
 
-Total: 12 rules
+Total: 15 rules
 
 ## type-safety
 
@@ -19,6 +19,9 @@ Total: 12 rules
 | require-tagged-error | error | new Error(", Effect.fail(new Error | Use Data.TaggedError: class MyError extends Data.TaggedError('MyError')<{...}>() {} |
 | no-throw | error | throw new, throw  | Return Effect.fail(error) or use Result types |
 | no-process-env | error | process.env., Bun.env. | Use a Config service: yield* Config; with ConfigLive/ConfigTest layers |
+| no-raw-promise | error | new Promise, Promise.resolve, Promise.reject | Use Effect.promise, Effect.tryPromise, or Effect.async |
+| no-async-function | warning | async function, async () =>, async () | Use Effect.gen(function*() { ... }) |
+| no-await | error | await  | yield* effect |
 
 ## architecture
 
