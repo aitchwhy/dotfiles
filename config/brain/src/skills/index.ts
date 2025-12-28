@@ -1,0 +1,102 @@
+/**
+ * Skills Registry
+ *
+ * All 28 skills with compile-time count assertion.
+ */
+
+export { apiContractSkill } from './api-contract.skill'
+export { codebaseExposureSkill } from './codebase-exposure.skill'
+export { context7McpSkill } from './context7-mcp.skill'
+export { devopsPatternsSkill } from './devops-patterns.skill'
+export { effectClockPatternsSkill } from './effect-clock-patterns.skill'
+export { effectResilienceSkill } from './effect-resilience.skill'
+export { effectTsSkill } from './effect-ts.skill'
+export { ghaOidcPatternsSkill } from './gha-oidc-patterns.skill'
+export { hexagonalSkill } from './hexagonal.skill'
+export { livekitAgentsSkill } from './livekit-agents.skill'
+export { mcpOptimizationSkill } from './mcp-optimization.skill'
+export { nixConfigurationCentralizationSkill } from './nix-configuration-centralization.skill'
+export { nixPatternsSkill } from './nix-patterns.skill'
+export { observabilitySkill } from './observability.skill'
+export { optionPatternsSkill } from './option-patterns.skill'
+export { paragonSkill } from './paragon.skill'
+export { parseBoundarySkill } from './parse-boundary.skill'
+export { planningPatternsSkill } from './planning-patterns.skill'
+export { pulumiEscSkill } from './pulumi-esc.skill'
+export { qualityRulesSkill } from './quality-rules.skill'
+export { repomixSkill } from './repomix.skill'
+export { secretsManagementSkill } from './secrets-management.skill'
+export { semanticCodebaseSkill } from './semantic-codebase.skill'
+export { stateMachinesSkill } from './state-machines.skill'
+export { testingSkill } from './testing.skill'
+export { typeBoundaryPatternsSkill } from './type-boundary-patterns.skill'
+export { typeSafetySkill } from './type-safety.skill'
+export { upgradeSkill } from './upgrade.skill'
+
+import { apiContractSkill } from './api-contract.skill'
+import { codebaseExposureSkill } from './codebase-exposure.skill'
+import { context7McpSkill } from './context7-mcp.skill'
+import { devopsPatternsSkill } from './devops-patterns.skill'
+import { effectClockPatternsSkill } from './effect-clock-patterns.skill'
+import { effectResilienceSkill } from './effect-resilience.skill'
+import { effectTsSkill } from './effect-ts.skill'
+import { ghaOidcPatternsSkill } from './gha-oidc-patterns.skill'
+import { hexagonalSkill } from './hexagonal.skill'
+import { livekitAgentsSkill } from './livekit-agents.skill'
+import { mcpOptimizationSkill } from './mcp-optimization.skill'
+import { nixConfigurationCentralizationSkill } from './nix-configuration-centralization.skill'
+import { nixPatternsSkill } from './nix-patterns.skill'
+import { observabilitySkill } from './observability.skill'
+import { optionPatternsSkill } from './option-patterns.skill'
+import { paragonSkill } from './paragon.skill'
+import { parseBoundarySkill } from './parse-boundary.skill'
+import { planningPatternsSkill } from './planning-patterns.skill'
+import { pulumiEscSkill } from './pulumi-esc.skill'
+import { qualityRulesSkill } from './quality-rules.skill'
+import { repomixSkill } from './repomix.skill'
+import { secretsManagementSkill } from './secrets-management.skill'
+import { semanticCodebaseSkill } from './semantic-codebase.skill'
+import { stateMachinesSkill } from './state-machines.skill'
+import { testingSkill } from './testing.skill'
+import { typeBoundaryPatternsSkill } from './type-boundary-patterns.skill'
+import { typeSafetySkill } from './type-safety.skill'
+import { upgradeSkill } from './upgrade.skill'
+
+export const ALL_SKILLS = [
+  apiContractSkill,
+  codebaseExposureSkill,
+  context7McpSkill,
+  devopsPatternsSkill,
+  effectClockPatternsSkill,
+  effectResilienceSkill,
+  effectTsSkill,
+  ghaOidcPatternsSkill,
+  hexagonalSkill,
+  livekitAgentsSkill,
+  mcpOptimizationSkill,
+  nixConfigurationCentralizationSkill,
+  nixPatternsSkill,
+  observabilitySkill,
+  optionPatternsSkill,
+  paragonSkill,
+  parseBoundarySkill,
+  planningPatternsSkill,
+  pulumiEscSkill,
+  qualityRulesSkill,
+  repomixSkill,
+  secretsManagementSkill,
+  semanticCodebaseSkill,
+  stateMachinesSkill,
+  testingSkill,
+  typeBoundaryPatternsSkill,
+  typeSafetySkill,
+  upgradeSkill,
+] as const
+
+// Compile-time assertion: exactly 28 skills
+type AssertLength<T extends readonly unknown[], N extends number> = T['length'] extends N
+  ? true
+  : never
+
+const _assertSkillCount: AssertLength<typeof ALL_SKILLS, 28> = true
+void _assertSkillCount

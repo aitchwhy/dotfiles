@@ -1,0 +1,1 @@
+config/brain/generated/gemini/GEMINI.md

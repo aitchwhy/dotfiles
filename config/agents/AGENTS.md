@@ -7,11 +7,11 @@ Senior software engineer. macOS Apple Silicon, zsh, Nix Flakes.
 All code changes are enforced by PARAGON (49 guards).
 Read `paragon` skill for full guard matrix.
 
-| Layer | Mechanism |
-|-------|-----------|
+| Layer  | Mechanism                             |
+| ------ | ------------------------------------- |
 | Claude | PreToolUse hooks (`paragon-guard.ts`) |
-| Git | pre-commit hooks (`git-hooks.nix`) |
-| CI | GitHub Actions (`paragon-check.yml`) |
+| Git    | pre-commit hooks (`git-hooks.nix`)    |
+| CI     | GitHub Actions (`paragon-check.yml`)  |
 
 **Blocking guards**: bash safety, conventional commits, forbidden files/imports, any type, z.infer, no-mock, TDD, DevOps files/commands, assumption language
 
@@ -21,50 +21,57 @@ Read `paragon` skill for full guard matrix.
 
 **Pull-based context** - dynamically read files, never rely on static dumps.
 
-| Need | Action |
-|------|--------|
-| **PARAGON guards** | Read `config/agents/skills/paragon/SKILL.md` |
-| Stack versions | Read `config/quality/src/stack/versions.ts` |
-| Stack rules | Read `config/quality/docs/stack.md` |
-| Pattern skills | Read `config/agents/skills/{skill}/SKILL.md` |
-| Agent personas | Read `config/agents/agents/{persona}.md` |
-| **Canonical memories** | Read `config/quality/generated/memories.md` |
-| **Critic-mode protocol** | Read `config/quality/generated/critic-mode.md` |
+| Need                     | Action                                                     |
+| ------------------------ | ---------------------------------------------------------- |
+| **PARAGON guards**       | Read `config/brain/generated/claude/skills/paragon.md`     |
+| Stack versions           | Read `config/brain/src/stack/versions.ts`                  |
+| Stack rules              | Read `config/brain/docs/stack.md`                          |
+| Pattern skills           | Read `config/brain/generated/claude/skills/{skill}.md`     |
+| Agent personas           | Read `config/brain/generated/claude/personas/{persona}.md` |
+| **Canonical memories**   | Read `config/brain/generated/claude/memories.md`           |
+| **Critic-mode protocol** | Read `config/brain/generated/claude/critic-mode.md`        |
 
 ## Available Skills
 
 ### Nix Skills (Dotfiles ONLY)
 
-| Skill | Purpose |
-|-------|---------|
-| `nix-patterns` | nix-darwin, Home Manager (DOTFILES ONLY) |
-| `nix-configuration-centralization` | Port registry for dotfiles |
-| `secrets-management` | sops-nix patterns |
+| Skill                              | Purpose                                  |
+| ---------------------------------- | ---------------------------------------- |
+| `nix-patterns`                     | nix-darwin, Home Manager (DOTFILES ONLY) |
+| `nix-configuration-centralization` | Port registry for dotfiles               |
+| `secrets-management`               | sops-nix patterns                        |
 
 **DELETED**: `nix-infrastructure`, `nix-build-optimization` (use `devops-patterns` for Docker)
 
 **Scope**: Nix is ONLY for dotfiles management. Development uses Docker Compose.
 
 ### Core Pattern Skills
+
 typescript-patterns, effect-ts-patterns, quality-patterns,
 hexagonal-architecture, formal-verification, tdd-patterns, parse-boundary-patterns
 
 ### Effect-TS Skills
+
 effect-resilience, api-contract
 
 ### Nix Skills (Dotfiles Only)
+
 nix-patterns, nix-configuration-centralization, secrets-management
 
 ### Framework Skills
+
 state-machine-patterns, observability-patterns
 
 ### DevOps/Workflow Skills
+
 devops-patterns, gha-oidc-patterns, planning-patterns, typespec-patterns, pulumi-esc
 
 ### Reference Skills
+
 repomix, context7-mcp
 
 ### Specialized Skills
+
 livekit-agents, refactoring-catalog, semantic-codebase
 
 ## Agent Personas
@@ -153,11 +160,11 @@ bat -r 10:20 file.ts            # show only lines 10-20
 
 ### Key Differences from Legacy Commands
 
-| Legacy | Modern | Key Syntax Difference |
-|--------|--------|----------------------|
-| `grep -r` | `rg` | Recursive by default, no `-r` needed |
-| `grep -E` | `rg` | Extended regex by default, no `-E` needed |
-| `find . -name "*.x"` | `fd -e x` | Extension flag, no quotes needed |
-| `find . -type f` | `fd -t f` | Shorter type flag |
-| `ls -la` | `eza -la` | Same flags, better output |
-| `cat file` | `bat file` | Same syntax, adds highlighting |
+| Legacy               | Modern     | Key Syntax Difference                     |
+| -------------------- | ---------- | ----------------------------------------- |
+| `grep -r`            | `rg`       | Recursive by default, no `-r` needed      |
+| `grep -E`            | `rg`       | Extended regex by default, no `-E` needed |
+| `find . -name "*.x"` | `fd -e x`  | Extension flag, no quotes needed          |
+| `find . -type f`     | `fd -t f`  | Shorter type flag                         |
+| `ls -la`             | `eza -la`  | Same flags, better output                 |
+| `cat file`           | `bat file` | Same syntax, adds highlighting            |

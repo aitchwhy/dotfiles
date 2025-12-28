@@ -1,0 +1,206 @@
+---
+description: Single source of truth configuration patterns for Nix projects. Ports, services, URLs - all derived from centralized modules with compile-time validation.
+globs: **/*
+---
+
+# nix-configuration-centralization
+
+## Overview
+
+# Nix Configuration Centralization
+
+## Philosophy
+
+```
+ONE SOURCE OF TRUTH -> COMPILE-TIME VALIDATION -> RUNTIME INJECTION
+```
+
+All configuration values that can be known at build time are:
+1. Defined once in `lib/config/`
+2. Validated at `nix flake check` time
+3. Derived/generated into downstream configs
+4. Secrets injected at runtime (never in Nix store)
+
+## Problem: Split-Brain Configuration
+
+Configuration scattered across multiple files creates drift risk:
+
+| Anti-Pattern | Risk |
+|--------------|------|
+| Ports in 3+ files | Change one, forget others |
+| Localhost URLs templated differently | Connection failures |
+| Service names as string literals | Typos cause silent failures |
+
+## Solution: lib/config/ Module
+
+### Directory Structure
+
+```
+lib/config/
+├── default.nix     # Entry point, composes all modules
+├── ports.nix       # All port assignments with validation
+├── services.nix    # Service definitions (URLs, health endpoints)
+└── network.nix     # Network configuration (hosts, DNS)
+```
+
+### Usage in NixOS Modules
+
+```nix
+{ lib, ... }:
+let
+  # Import centralized config
+  cfg = import ../../../lib/config { inherit lib; };
+  ports = cfg.ports;
+  services = cfg.services;
+in
+{
+  services.prometheus.exporters.node = {
+    enable = true;
+    port = ports.infrastructure.nodeExporter;
+  };
+
+  # Use derived URLs instead of hardcoding
+  services.promtail.configuration.clients = [
+    { url = services.loki.pushUrl; }
+  ];
+}
+```
+
+### Port Conflict Detection
+
+`lib/config/ports.nix` includes compile-time validation:
+
+```nix
+{ lib }:
+let
+  ports = { /* definitions */ };
+
+  # Flatten nested ports for validation
+  flatPorts = flattenPorts "" ports;
+
+  # Detect duplicates
+  duplicates = findDuplicates flatPorts;
+in
+{
+  inherit ports;
+
+  assertions = [{
+    assertion = duplicates == {};
+    message = "Port conflict: ${formatDuplicates duplicates}";
+  }];
+}
+```
+
+Run `nix flake check` to validate - fails on duplicate ports.
+
+### Service Definitions
+
+`lib/config/services.nix` provides derived URLs:
+
+```nix
+{ lib, ports }:
+{
+  loki = {
+    name = "loki";
+    port = ports.observability.loki;
+    url = "http://127.0.0.1:${toString ports.observability.loki}";
+    pushUrl = "http://127.0.0.1:${toString ports.observability.loki}/loki/api/v1/push";
+    healthUrl = "http://127.0.0.1:${toString ports.observability.loki}/ready";
+  };
+
+  postgresql = {
+    name = "postgresql";
+    port = ports.databases.postgresql;
+    connectionString = { user, database }:
+      "postgresql://${user}@127.0.0.1:${toString ports.databases.postgresql}/${database}";
+  };
+}
+```
+
+## PARAGON Guards
+
+| Guard | Name | Detects |
+|-------|------|---------|
+| 28 | No Hardcoded Ports | Port numbers outside lib/config/ |
+| 29 | No Split-Brain | Same value in 2+ .nix files |
+| 30 | Config Reference Required | Hardcoded localhost URLs |
+
+Validate with nix flake check:
+```bash
+nix flake check
+```
+
+## Migration Checklist
+
+When migrating existing code:
+
+1. **Audit existing configs** - Find all hardcoded ports, URLs
+2. **Add to lib/config/ports.nix** - Define missing ports
+3. **Add to lib/config/services.nix** - Define service URLs
+4. **Update modules** - Replace hardcoded values with cfg.* references
+5. **Run validation** - `nix flake check` must pass
+6. **Run sig-config** - No violations allowed
+
+## Anti-Patterns vs Correct Patterns
+
+| Anti-Pattern | Correct Pattern |
+|--------------|-----------------|
+| `port = 8787` | `port = cfg.ports.development.api` |
+| `"http://localhost:8787"` | `cfg.services.api.url` |
+| `environment.PORT = "8787"` | `environment.PORT = toString cfg.ports.development.api` |
+| Same port in multiple files | Single definition in lib/config/ |
+
+## Port Categories
+
+```nix
+ports = {
+  infrastructure = {
+    ssh = 22;
+    tailscale = 41641;
+    nodeExporter = 9100;
+    promtail = 9080;
+  };
+
+  databases = {
+    redis = 6379;
+    postgresql = 5432;
+  };
+
+  development = {
+    api = 3000;
+    worker = 3001;
+  };
+
+  otel = {
+    grpc = 4317;
+    http = 4318;
+  };
+
+  observability = {
+    prometheus = 9090;
+    grafana = 3100;
+    loki = 3200;
+  };
+};
+```
+
+## Quick Reference
+
+```bash
+# Validate port conflicts
+nix flake check
+
+# Inspect all ports
+nix eval .#lib.config.ports --json | jq
+
+# Inspect service URLs
+nix eval .#lib.config.services --json | jq '.loki'
+```
+
+## Related Skills
+
+| Skill | Relationship |
+|-------|--------------|
+| `nix-patterns` | flake-parts integration |
+| `observability-patterns` | OTEL config generation |
+| `paragon` | Guards 28-30 enforce this |

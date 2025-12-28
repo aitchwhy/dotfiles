@@ -1,7 +1,0 @@
-id: paragon-no-non-null-assertion
-language: typescript
-severity: error
-message: "Guard 48: Non-null assertion 'x!' bypasses type safety. Parse at boundary or use Option."
-
-rule:
-  kind: non_null_expression

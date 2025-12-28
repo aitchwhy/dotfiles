@@ -12,14 +12,14 @@ pre-commit:
     - rebase
   commands:
     format:
-      glob: "config/quality/**/*.{ts,tsx,js,jsx,json}"
-      root: "config/quality"
+      glob: "config/brain/**/*.{ts,tsx,js,jsx,json}"
+      root: "config/brain"
       run: npx biome check --write {staged_files}
       stage_fixed: true
 
     lint-syntax:
-      glob: "config/quality/**/*.{ts,tsx,js,jsx}"
-      root: "config/quality"
+      glob: "config/brain/**/*.{ts,tsx,js,jsx}"
+      root: "config/brain"
       run: npx oxlint {staged_files}
 
     nixfmt:
@@ -28,7 +28,7 @@ pre-commit:
 
     # Enforcement: No shell scripts in hooks directory
     no-shell-hooks:
-      glob: "config/quality/src/hooks/*.sh"
+      glob: "config/brain/src/hooks/*.sh"
       run: |
         if [ -n "{staged_files}" ]; then
           echo "ERROR: Shell scripts in hooks directory are banned"
@@ -68,7 +68,7 @@ pre-commit:
 
     # Enforcement: No sync FS in hooks (use @effect/platform)
     no-sync-fs-in-hooks:
-      glob: "config/quality/src/hooks/**/*.ts"
+      glob: "config/brain/src/hooks/**/*.ts"
       run: |
         if grep -E 'existsSync|readFileSync|writeFileSync|appendFileSync|mkdirSync|readdirSync|statSync' {staged_files}; then
           echo "ERROR: Sync FS in hooks. Use @effect/platform FileSystem"
@@ -78,7 +78,7 @@ pre-commit:
     # Enforcement: No try/catch (use Effect.try)
     # Excludes: rule definitions (contain patterns), Result utility wrapper, lib/
     no-try-catch:
-      glob: "config/quality/src/hooks/**/*.ts"
+      glob: "config/brain/src/hooks/**/*.ts"
       run: |
         if grep -E '\btry\s*\{' {staged_files} | grep -v 'Effect.try'; then
           echo "ERROR: try/catch detected. Use Effect.try"
@@ -88,4 +88,4 @@ pre-commit:
 commit-msg:
   commands:
     commitlint:
-      run: bunx commitlint --edit {1}
+      run: bunx commitlint --config config/brain/commitlint.config.js --edit {1}

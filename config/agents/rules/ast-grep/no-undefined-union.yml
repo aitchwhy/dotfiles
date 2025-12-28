@@ -1,9 +1,0 @@
-id: paragon-no-undefined-union
-language: typescript
-severity: warning
-message: "Guard 46: 'T | undefined' in type definition. Use Option<T> or Schema.optional()."
-
-rule:
-  kind: union_type
-  has:
-    pattern: undefined

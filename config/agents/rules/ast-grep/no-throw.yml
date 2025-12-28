@@ -1,9 +1,0 @@
-# PARAGON Guard 14: No bare throw
-# Use Result types (Effect, fp-ts) for expected errors
-id: paragon-no-throw
-language: typescript
-severity: warning
-message: "PARAGON Guard 14: Avoid 'throw' for expected errors. Use Result types (Effect.fail, Either.left) instead."
-
-rule:
-  pattern: "throw $ERROR"
