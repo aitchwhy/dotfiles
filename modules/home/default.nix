@@ -99,7 +99,7 @@ in
         bartender.enable = mkDefault true;
         raycast.enable = mkDefault true;
         claude.enable = mkDefault true;
-        agents.enable = mkDefault true;
+
         cursor.enable = mkDefault true;
         misc.enable = mkDefault true;
         keyboardLayout.enable = mkDefault true;
