@@ -3,46 +3,46 @@
 Staff-to-Principal level craft knowledge.
 Flat list of patterns, constraints, and gotchas.
 
-**Total**: 22 memories
+**Total**: 18 memories
 - Principles: 5
-- Constraints: 4
-- Patterns: 11
-- Gotchas: 2
+- Constraints: 3
+- Patterns: 10
+- Gotchas: 0
 
 ---
 ## Principles
 
 *Guiding philosophies (highest priority)*
 
-### Parse, Don't Validate
+### Explicit Configuration
 
-Transform untyped data into typed data at boundaries using Schema.decodeUnknown. Once parsed, trust the types throughout the codebase. Never re-validate internal data.
+No default values in code. All config must be explicit, well-typed, and DI'd via Context/Layer. Zero magic numbers.
 
-*Verified: 2024-12-24*
+*Verified: 2025-12-28*
 
-### Schema-First Development
+### Parse Don't Validate
 
-Define Effect Schema first, derive types via `typeof Schema.Type`. Schemas are SSOT for validation, serialization, and documentation. Zod is banned.
+Zero `as Type` except TS2589. Schema.decodeUnknown for runtime. $Infer vendor types only.
 
-*Verified: 2024-12-24*
+*Verified: 2025-12-28*
 
-### Enforcement Over Documentation
+### Types As Documentation
 
-Constraints that can be enforced by code must be. Pre-commit hooks, TypeScript types, and Effect pipelines replace policy documents. Docs describe; code enforces.
+No documentation/comments/ADRs - code is self-documenting. Enforcement via tooling, not docs.
 
-*Verified: 2024-12-24*
+*Verified: 2025-12-28*
 
-### Single Source of Truth
+### No One-Off Scripts
 
-Every piece of configuration lives in exactly one place. versions.ts for deps, ports.nix for ports, schema.ts for types. Derivation over duplication.
+Verification is tests, config is declarative (biome/lefthook/Pulumi). No standalone scripts.
 
-*Verified: 2024-12-24*
+*Verified: 2025-12-28*
 
-### Delete, Don't Deprecate
+### Max IoC
 
-Remove unused code immediately. No @deprecated annotations, no TODO(remove) comments. Git preserves history. Dead code is debt that compounds.
+Apps/packages/modules unaware of caller/env. Define only own configs, accept env vars at runtime. No getEnvironment().
 
-*Verified: 2024-12-24*
+*Verified: 2025-12-28*
 
 ---
 
@@ -50,29 +50,23 @@ Remove unused code immediately. No @deprecated annotations, no TODO(remove) comm
 
 *Hard rules that MUST be followed*
 
-### Zero Try-Catch in Business Logic
+### Effect-TS ONLY
 
-Never use try/catch in business logic. All errors flow through Effect pipelines. EXCEPTIONS: (1) Server entrypoint for uncaught errors, (2) Adapters wrapping external SDKs, (3) Boundary functions like Schema.decodeUnknownSync. Use Effect.tryPromise for async calls.
+@effect/platform HttpServer+HttpRouter. BetterAuth via auth.api.* direct calls. returnHeaders:true for Set-Cookie. Zero try/catch, zero Hono/Express.
 
-*Verified: 2024-12-24*
+*Verified: 2025-12-28*
 
-### Result Types for Fallible Operations
+### High-Performance Toolchain
 
-Functions that can fail return Effect<A, E, R> or Either<A, E>. Exceptions are banned from business logic. Type signatures must reflect failure modes.
+tsgo (type-check), oxlint (lint), biome (format), AST-grep (custom rules), lefthook. Zero tsc, zero eslint.
 
-*Verified: 2024-12-24*
+*Verified: 2025-12-28*
 
-### Effect Platform for HTTP
+### Dec 2025 Version Pinning
 
-@effect/platform HttpServer is the only HTTP layer. No Hono, Express, or Fastify. Effect Platform provides typed middleware, error handling, and OpenTelemetry integration.
+effect@3.19, react@19.2, vite@7.3, xstate@5.25, @tanstack/react-router@1.144, @playwright/test@1.57, vitest@4.0, typescript@5.9, tsgo, better-auth@1.4.9.
 
-*Verified: 2024-12-24*
-
-### One Hook Per Event Type
-
-Each Claude Code hook event (PreToolUse, PostToolUse, etc.) has exactly one handler. Multiple concerns go in one handler, not multiple handlers per event.
-
-*Verified: 2024-12-24*
+*Verified: 2025-12-28*
 
 ---
 
@@ -80,71 +74,65 @@ Each Claude Code hook event (PreToolUse, PostToolUse, etc.) has exactly one hand
 
 *Reusable solutions*
 
-### Evidence-Based Timeouts
+### Foundation Stack
 
-Timeouts derived from p99 latency + buffer, not guesses. Use Effect.timeout with Schedule.exponential for retries. Document timeout source in comments.
+pnpm + Docker Compose (OrbStack) + AWS (ECS Fargate + RDS + CloudFront). Node.js 24, Vite 7, TypeScript 7 (tsgo). All config from Pulumi ESC (4-layer: vendor→infra-shared→base→env).
 
-*Verified: 2024-12-24*
+*Verified: 2025-12-28*
 
-### Bootloader Pattern for Context
+### IaC via Pulumi Automation API
 
-CLAUDE.md is a bootloader, not a manual. It provides protocol for dynamic context loading. Read skills on-demand, never dump entire codebase into context.
+Pulumi Automation API (deploy.ts+Effect). ESC refs via template literal types. DeployStack=Schema.Literal. sha-$GITHUB_SHA. tsx usage. AWS+OIDC.
 
-*Verified: 2024-12-24*
+*Verified: 2025-12-28*
 
-### Hexagonal Architecture with Effect
+### Same-Origin Reverse Proxy
 
-Ports are Context.Tag interfaces, adapters are Layer implementations. Business logic depends on ports, never concrete adapters. Test via Layer.succeed mocks.
+Single baseUrl, /api/*→backend. Local=Caddy (tls internal), Deployed=CloudFront→HTTP→ALB. Zero CORS, zero SSL bypass, 12-factor parity.
 
-*Verified: 2024-12-24*
+*Verified: 2025-12-28*
 
-### Dynamic Credentials via ESC + OIDC
+### Ember Staging Strategy
 
-No static secrets in CI/CD. GitHub Actions uses OIDC to assume AWS IAM roles. Credentials are short-lived (1 hour), scoped to repo/branch via JWT claims. Local dev uses Pulumi ESC. Production uses direct OIDC federation.
+No custom domain. Uses CloudFront URL directly (*.cloudfront.net). No ember.app or staging.ember.app exists.
 
-*Verified: 2024-12-24*
+*Verified: 2025-12-28*
 
-### Statsig for Feature Flags
+### Contract-First API
 
-@statsig/js-client for web, statsig-node for API. Gates control feature rollout, experiments run A/B tests. Never hardcode feature toggles.
+Backend (@ember/domain EmberApi) is source of truth. Frontend derives client via HttpApiClient.make(). Zero drift, auto-sync.
 
-*Verified: 2024-12-24*
+*Verified: 2025-12-28*
 
-### Nix Derivation Splitting
+### XState with Effect
 
-Split large Nix derivations for cache efficiency. deps derivation for node_modules, build derivation for app code. Changes to app code skip dependency rebuild.
+Use Effect primitives (retry, timeout, polling) via fromPromise wrapping Effect.runPromise. No custom retry code. setup() API with typed actors.
 
-*Verified: 2024-12-24*
+*Verified: 2025-12-28*
 
-### XState v5 Actor Model
+### Backend Routing Architecture
 
-Complex async state uses XState v5 machines with singleton actors. authMachine handles auth state transitions. Machines are typed with setup(). Use @xstate/react useSelector for reactive state access.
+Server-level path prefix dispatch, single dispatcher. External URLs as named constants. Branded types for domain IDs.
 
-*Verified: 2024-12-24*
+*Verified: 2025-12-28*
 
-### BetterAuth Session Pattern
+### Cookie-Based Auth
 
-Authentication via BetterAuth with HttpOnly session cookies (browser) and Bearer tokens (API). Sessions stored server-side in PostgreSQL. Session middleware validates on every request. Phone OTP is primary auth method for mobile-first UX.
+HttpOnly cookies, credentials:"include". handleRaw+returnHeaders:true for Set-Cookie. CloudFront /api/*→ALB same-domain.
 
-*Verified: 2024-12-24*
+*Verified: 2025-12-28*
 
-### Docker Compose for Development
+### BetterAuth Performance
 
-Local development uses docker compose up with Caddy reverse proxy. Nix is for dotfiles only, not application dev shells. File watching via docker compose watch. ESC env vars loaded via direnv.
+experimental.joins:true for 2-3x latency improvement via DB joins instead of multiple queries.
 
-*Verified: 2024-12-24*
+*Verified: 2025-12-28*
 
-### E2E-First Testing Strategy
+### Conversational Prompts
 
-E2E tests are primary verification layer. Run before every deploy. packages/e2e is independent, imports only @ember/config and @ember/domain. No test bypass code in production. E2E generates valid JWTs using same contract as prod.
+Claude Code prompts: conversational markdown in chat. User copies. Include validation tests.
 
-*Verified: 2024-12-24*
-
-### Drizzle ORM with PostgreSQL
-
-Database access via Drizzle ORM in drizzle.adapter.ts. Schema in packages/domain. Uses Effect Layer for connection pooling. All queries return Effect, never raw promises. Migrations via drizzle-kit. No Prisma, no raw pg driver.
-
-*Verified: 2024-12-24*
+*Verified: 2025-12-28*
 
 ---
 
@@ -152,14 +140,4 @@ Database access via Drizzle ORM in drizzle.adapter.ts. Schema in packages/domain
 
 *Pitfalls to avoid*
 
-### Nix Sandbox Isolation
 
-Nix builds run in sandboxed environment without network access. All dependencies must be declared in inputs. Builds that fetch at build-time fail.
-
-*Verified: 2024-12-24*
-
-### ECS Task Definition Immutability
-
-ECS task definitions are immutable. Updates create new revisions. Blue-green deploys via service update, not in-place modification. Old revisions retained for rollback.
-
-*Verified: 2024-12-24*
