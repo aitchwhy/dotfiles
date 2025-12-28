@@ -19,7 +19,9 @@
     "@effect/platform": "0.93.6",
     "@effect/platform-bun": "0.87.0",
     "@effect/platform-node": "0.103.0",
-    "effect": "3.19.9"
+    "@types/js-yaml": "4.0.9",
+    "effect": "3.19.9",
+    "js-yaml": "4.1.1"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.8",

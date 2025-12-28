@@ -1,0 +1,28 @@
+id: no-date-construction
+language: typescript
+severity: error
+rule:
+  any:
+    - pattern: "new Date()"
+    - pattern: "Date.now()"
+    - pattern: "new Date($ARGS)"
+  not:
+    inside:
+      kind: call_expression
+      field: arguments
+      inside:
+        kind: call_expression
+        field: function
+        regex: "console\\.(log|error|warn|info|debug)"
+message: |
+  Guard 42: Uncontrolled Date detected.
+
+  - new Date() / Date.now() make tests non-deterministic.
+  - Use Effect.Clock service for time.
+  - Use Clock.currentTimeMillis or Clock.make(Date)
+
+  Exceptions:
+  - .schema.ts files (for default values)
+  - Logging arguments
+
+  See: config/agents/skills/paragon/SKILL.md

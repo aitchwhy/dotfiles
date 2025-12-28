@@ -1,0 +1,15 @@
+id: no-raw-fetch
+language: typescript
+severity: error
+rule:
+  any:
+    - pattern: "fetch($$$)"
+    - pattern: "window.fetch($$$)"
+    - pattern: "globalThis.fetch($$$)"
+message: |
+  Guard 44: Raw fetch detected.
+
+  - Use @effect/platform/HttpClient instead.
+  - Raw fetch is untyped and lacks resilience policies.
+
+  See: config/agents/skills/paragon/SKILL.md

@@ -1,0 +1,13 @@
+id: no-custom-require-env
+language: typescript
+severity: error
+rule:
+  kind: function_declaration
+  pattern: "function requireEnv($$$)"
+message: |
+  Guard 50: Custom requireEnv detected.
+
+  - Import from '@ember/config' instead.
+  - Shared utilities check validation and reporting consistently.
+
+  See: config/agents/skills/paragon/SKILL.md

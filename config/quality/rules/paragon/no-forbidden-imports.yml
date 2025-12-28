@@ -1,0 +1,23 @@
+id: no-forbidden-imports
+language: typescript
+severity: error
+rule:
+  any:
+    - pattern: "import { $$$ } from 'express'"
+    - pattern: "import { $$$ } from 'fastify'"
+    - pattern: "import { $$$ } from 'hono'"
+    - pattern: "import { $$$ } from '@prisma/client'"
+    - pattern: "import { $$$ } from 'pg'"
+    - pattern: "import { $$$ } from 'dd-trace'"
+    - pattern: "import { $$$ } from 'jest'"
+    - pattern: "import { $$$ } from '@jest/globals'"
+message: |
+  Guard 4: Forbidden import detected.
+
+  - express/fastify/hono -> Use @effect/platform HttpApiBuilder
+  - @prisma/client -> Use drizzle-orm
+  - pg -> Use postgres (postgres.js)
+  - dd-trace -> Use @effect/opentelemetry
+  - jest -> Use vitest
+
+  See: config/agents/skills/paragon/SKILL.md

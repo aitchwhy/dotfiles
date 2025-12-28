@@ -1,0 +1,19 @@
+id: no-try-catch
+language: typescript
+severity: error
+rule:
+  kind: try_statement
+  not:
+    inside:
+      kind: call_expression
+      field: arguments
+      inside:
+        pattern: "Effect.try($$$)"
+message: |
+  Guard 43: try/catch block detected in domain.
+
+  - Effect-TS handles errors as values (Result type).
+  - Use Effect.try, Effect.tryPromise, or Effect.catchTag.
+  - Do not use try/catch for control flow.
+
+  See: config/agents/skills/paragon/SKILL.md

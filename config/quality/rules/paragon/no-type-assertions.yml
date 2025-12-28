@@ -1,0 +1,18 @@
+id: no-type-assertions
+language: typescript
+severity: error
+rule:
+  pattern: "$EXPR as $TYPE"
+  not:
+    any:
+      - pattern: "$EXPR as const"
+      - pattern: "$EXPR as unknown"
+      - pattern: "$EXPR as never"
+message: |
+  Guard 40: Type assertion 'as Type' detected.
+
+  Type assertions hide bugs.
+  - Parse at boundaries with Schema.decodeUnknown()
+  - Use proper type narrowing without assertions
+
+  See: config/agents/skills/paragon/SKILL.md
