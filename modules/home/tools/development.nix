@@ -57,6 +57,7 @@ in
     home.packages = with pkgs; [
       # Essential CLI tools
       just
+      act
 
       # NH - Modern Nix Helper (nh darwin switch, nh clean)
       nh
