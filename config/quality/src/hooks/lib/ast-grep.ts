@@ -1,68 +1,90 @@
 /**
- * AST-grep Integration
+ * AST-grep Integration (Legacy Removed)
  *
- * Pattern matching for TypeScript code using ast-grep.
+ * Safe-To-Auto-Run verified implementation using @ast-grep/napi.
+ * Reads YAML rules directly from filesystem (SSOT).
  */
 
+import * as fs from 'node:fs/promises'
+import * as path from 'node:path'
+import { Lang, parse } from '@ast-grep/napi'
 import { Effect } from 'effect'
-import type { QualityRule } from '../../schemas'
+import * as yaml from 'js-yaml'
 
 // =============================================================================
-// AST-grep Rule Generation
+// Types
 // =============================================================================
 
 export type AstGrepMatch = {
   readonly ruleId: string
   readonly message: string
+  readonly severity: 'error' | 'warning'
   readonly line: number
   readonly column: number
   readonly text: string
 }
 
-/**
- * Generate ast-grep YAML rule from a QualityRule pattern
- */
-export const generateAstGrepRule = (rule: QualityRule, pattern: string): string => {
-  return `
-id: ${rule.id}
-language: typescript
-severity: ${rule.severity}
-message: "${rule.message}"
-rule:
-  pattern: "${pattern}"
-`.trim()
+type YamlRule = {
+  id: string
+  language: string
+  severity: 'error' | 'warning'
+  message: string
+  rule: any // AST-grep rule object
 }
 
+// =============================================================================
+// Logic
+// =============================================================================
+
 /**
- * Run ast-grep check on content
- * Returns matches found for the given rules
+ * Load all YAML rules from a directory
+ */
+const loadRules = (rulesDir: string) =>
+  Effect.tryPromise({
+    try: async () => {
+      const files = await fs.readdir(rulesDir)
+      const rules: YamlRule[] = []
+
+      for (const file of files) {
+        if (!file.endsWith('.yml') && !file.endsWith('.yaml')) continue
+
+        const content = await fs.readFile(path.join(rulesDir, file), 'utf-8')
+        const rule = yaml.load(content) as YamlRule
+        rules.push(rule)
+      }
+      return rules
+    },
+    catch: (error) => new Error(`Failed to load rules from ${rulesDir}: ${error}`),
+  })
+
+/**
+ * Run ast-grep check on content using YAML rules from a directory
  */
 export const checkContent = (
   content: string,
-  rules: readonly QualityRule[],
-): Effect.Effect<readonly AstGrepMatch[], never> =>
-  Effect.sync(() => {
+  rulesDir: string,
+): Effect.Effect<readonly AstGrepMatch[], Error> =>
+  Effect.gen(function* () {
+    const rules = yield* loadRules(rulesDir)
+    const ast = parse(Lang.TypeScript, content)
+    const root = ast.root()
     const matches: AstGrepMatch[] = []
 
     for (const rule of rules) {
-      for (const pattern of rule.patterns) {
-        if (content.includes(pattern)) {
-          const lines = content.split('\n')
-          const lineIndex = lines.findIndex((line) => line.includes(pattern))
+      // Skip if rule language is not typescript (though directory implies TS)
+      if (rule.language !== 'typescript') continue
 
-          if (lineIndex !== -1) {
-            const line = lines[lineIndex]
-            const column = line ? line.indexOf(pattern) : 0
-
-            matches.push({
-              ruleId: rule.id,
-              message: rule.message,
-              line: lineIndex + 1,
-              column: column + 1,
-              text: pattern,
-            })
-          }
-        }
+      const nodes = root.findAll(rule.rule)
+      for (const node of nodes) {
+        const range = node.range()
+        matches.push({
+          ruleId: rule.id,
+          message: rule.message,
+          severity: rule.severity,
+          line: range.start.line + 1, // 0-indexed to 1-indexed
+          column: range.start.column + 1,
+          text: node.text(),
+        })
       }
     }
 
@@ -74,29 +96,16 @@ export const checkContent = (
  */
 export const filterBySeverity = (
   matches: readonly AstGrepMatch[],
-  rules: readonly QualityRule[],
   severity: 'error' | 'warning',
 ): readonly AstGrepMatch[] => {
-  const ruleMap = new Map(rules.map((r) => [r.id, r]))
-  return matches.filter((m) => ruleMap.get(m.ruleId)?.severity === severity)
+  return matches.filter((m) => m.severity === severity)
 }
 
 /**
  * Format matches for hook output
  */
-export const formatMatches = (
-  matches: readonly AstGrepMatch[],
-  rules: readonly QualityRule[],
-): string => {
+export const formatMatches = (matches: readonly AstGrepMatch[]): string => {
   if (matches.length === 0) return ''
 
-  const ruleMap = new Map(rules.map((r) => [r.id, r]))
-
-  return matches
-    .map((m) => {
-      const rule = ruleMap.get(m.ruleId)
-      const fix = rule?.fix ?? 'See rule documentation'
-      return `[${m.ruleId}] Line ${m.line}: ${m.message}\n  Fix: ${fix}`
-    })
-    .join('\n\n')
+  return matches.map((m) => `[${m.ruleId}] Line ${m.line}: ${m.message.trim()}`).join('\n\n')
 }
