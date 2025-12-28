@@ -1,8 +1,8 @@
 {
-  "name": "@dotfiles/quality",
-  "version": "3.0.0",
+  "name": "@dotfiles/brain",
+  "version": "4.0.0",
   "type": "module",
-  "description": "Quality System - TypeScript-first code quality enforcement for Claude Code",
+  "description": "Brain System - Multi-provider intelligence source (Claude, Cursor, Gemini)",
   "scripts": {
     "postinstall": "command -v bun2nix >/dev/null && bun2nix -o bun.nix || true",
     "generate": "bun run src/generate.ts",
