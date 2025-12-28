@@ -10,6 +10,10 @@
  *   - pattern: Reusable solutions
  *   - gotcha: Pitfalls to avoid
  */
+
+import { ARCHITECTURE_MEMORIES } from './architecture'
+import { NAMING_MEMORIES } from './naming'
+import { PATTERN_MEMORIES } from './patterns'
 import type { Memory } from './schemas'
 
 // 1. Stack
@@ -200,6 +204,9 @@ const ALL_NEW_MEMORIES = [
   ...TOOLING_MEMORIES,
   ...DEPS_MEMORIES,
   ...ARCH_MEMORIES,
+  ...ARCHITECTURE_MEMORIES,
+  ...NAMING_MEMORIES,
+  ...PATTERN_MEMORIES,
 ]
 
 export const MEMORIES: readonly Memory[] = ALL_NEW_MEMORIES as unknown as readonly Memory[]
