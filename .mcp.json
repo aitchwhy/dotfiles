@@ -1,5 +1,8 @@
 {
-  "$schema": "https://claude.ai/schemas/mcp.json",
-  "$comment": "GENERATED - MCP servers defined in modules/home/apps/claude.nix",
-  "mcpServers": {}
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"]
+    }
+  }
 }

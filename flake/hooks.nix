@@ -1,5 +1,5 @@
 # PARAGON pre-commit hooks via git-hooks.nix
-# AST-grep scans rules/ast-grep/ directory for all YAML rules
+# AST-grep scans rules/paragon/ directory for all YAML rules
 { ... }:
 {
   perSystem =
@@ -14,7 +14,8 @@
         # ═══════════════════════════════════════════════════════════════════════
         # PARAGON GUARDS (AST-grep)
         # ═══════════════════════════════════════════════════════════════════════
-        # Scans all YAML rules in config/agents/rules/ast-grep/
+        # Scans all YAML rules in config/quality/rules/paragon/
+        # Matches logic in config/quality/src/hooks/pre-tool-use.ts (SSOT)
         paragon-ast = {
           enable = true;
           name = "paragon-ast";
@@ -62,9 +63,9 @@
           language = "system";
         };
 
-        # ═══════════════════════════════════════════════════════════════════════
+        # ═══════════════════════════════════════════════════════════════════════════
         # CONVENTIONAL COMMITS
-        # ═══════════════════════════════════════════════════════════════════════
+        # ═══════════════════════════════════════════════════════════════════════════
         commitizen.enable = true;
       };
     };

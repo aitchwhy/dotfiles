@@ -1,18 +1,16 @@
 #!/usr/bin/env bun
+
 /**
- * Pre-Tool-Use Hook
+ * Pre-Tool-Use Hook (Unified AST Architecture)
  *
  * Blocks writes that violate quality rules.
- * Effect-based, no try/catch.
+ * Uses strict AST-grep enforcement via NAPI + YAML rules.
  *
- * Integrates PARAGON guards (39 guards across 3 modules):
- * - Procedural: bash safety, commits, TDD, DevOps, secrets
- * - Content: type safety, imports, mocks, throw patterns
- * - Structural: clean code metrics
+ * architecture: Unified Purity (Context 7 + AST-Grep)
  */
 
+import * as path from 'node:path'
 import { Cause, Effect, pipe, Schema } from 'effect'
-import { ALL_RULES } from '../rules'
 import { isForbidden } from '../stack'
 import { checkContent, filterBySeverity, formatMatches } from './lib/ast-grep'
 import {
@@ -25,9 +23,17 @@ import {
   parseInput,
   readStdin,
 } from './lib/effect-hook'
-import { runContentGuards } from './lib/guards/content'
 import { runProceduralGuards } from './lib/guards/procedural'
-import { runStructuralGuards } from './lib/guards/structural'
+
+// =============================================================================
+// Constants
+// =============================================================================
+
+// Canonical Rules Directory (SSOT)
+const RULES_DIR = path.resolve(
+  import.meta.dir,
+  '../../../../quality/rules/paragon', // adjusted relative path
+)
 
 // =============================================================================
 // Schemas
@@ -54,11 +60,12 @@ const extractContent = (input: PreToolUseInput) => ({
 
 const checkRuleViolations = (content: string) =>
   Effect.gen(function* () {
-    const matches = yield* checkContent(content, ALL_RULES)
-    const errors = filterBySeverity(matches, ALL_RULES, 'error')
+    // Check using unified AST rules
+    const matches = yield* checkContent(content, RULES_DIR)
+    const errors = filterBySeverity(matches, 'error')
 
     if (errors.length > 0) {
-      return block(`Quality rule violations:\n\n${formatMatches(errors, ALL_RULES)}`)
+      return block(`Quality rule violations (AST-Strict):\n\n${formatMatches(errors)}`)
     }
 
     return approve()
@@ -123,10 +130,10 @@ const checkDangerousCommands = (input: PreToolUseInput) =>
   })
 
 // =============================================================================
-// PARAGON Guards Integration
+// PARAGON Guards Integration (Procedural Only)
 // =============================================================================
 
-const runParagonGuards = (input: PreToolUseInput) =>
+const runProceduralChecks = (input: PreToolUseInput) =>
   Effect.sync(() => {
     const { file_path: filePath, content, new_string, command } = input.tool_input
     const effectiveContent = content ?? new_string
@@ -142,27 +149,9 @@ const runParagonGuards = (input: PreToolUseInput) =>
       return block(proceduralResult.error)
     }
 
-    // Content guards (type safety, imports, throw patterns)
-    const contentResult = runContentGuards(effectiveContent, filePath)
-    if (!contentResult.ok) {
-      return block(contentResult.error)
-    }
-
-    // Structural guards (clean code metrics)
-    const structuralResult = runStructuralGuards(effectiveContent, filePath)
-    if (!structuralResult.ok) {
-      return block(structuralResult.error)
-    }
-
-    // Collect warnings from all guards
-    const warnings = [
-      ...(proceduralResult.warnings ?? []),
-      ...(contentResult.warnings ?? []),
-      ...(structuralResult.warnings ?? []),
-    ]
-
-    if (warnings.length > 0) {
-      return approve(`Warnings:\n${warnings.map((w) => `  - ${w}`).join('\n')}`)
+    // Warnings
+    if (proceduralResult.warnings && proceduralResult.warnings.length > 0) {
+      return approve(`Warnings:\n${proceduralResult.warnings.map((w) => `  - ${w}`).join('\n')}`)
     }
 
     return approve()
@@ -178,10 +167,10 @@ const main = Effect.gen(function* () {
 
   // Run all checks in order
   const checks = [
-    runParagonGuards, // PARAGON guards (39 guards)
-    checkTypeScriptContent, // AST-grep quality rules
-    checkForbiddenPackages, // Stack compliance
-    checkDangerousCommands, // Bash safety
+    runProceduralChecks, // Procedural logic (TDD, etc)
+    checkTypeScriptContent, // Pure AST-grep (Content)
+    checkForbiddenPackages, // Regex/Schema (Stack)
+    checkDangerousCommands, // Regex (Safety)
   ]
 
   for (const check of checks) {
