@@ -174,7 +174,7 @@ jobs:
       - name: Validate YAML Files
         run: |
           echo "Validating YAML files..."
-          pip install pyyaml
+          sudo apt-get install -y python3-yaml
           # Use fd (fdfind on Ubuntu) instead of find
           fdfind -e yaml -e yml | while read file; do
             echo "Checking: $file"
