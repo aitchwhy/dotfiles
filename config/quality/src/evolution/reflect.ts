@@ -8,7 +8,7 @@
  * Run: bun config/quality/evolution/reflect.ts
  */
 
-import { Effect, pipe, Data } from "effect";
+import { Effect, Data, pipe } from "effect";
 import { Database } from "bun:sqlite";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -94,31 +94,37 @@ const ensureDb = Effect.try({
 	catch: () => null,
 });
 
-const getHighConfidenceLessons = (db: Database): Effect.Effect<readonly Lesson[]> =>
-	Effect.try({
-		try: () =>
-			db.query<Lesson, []>(`
-				SELECT id, category, lesson, occurrence_count, decay_score
-				FROM lessons
-				WHERE decay_score > 0.8 AND occurrence_count >= 2
-				ORDER BY decay_score DESC, occurrence_count DESC
-				LIMIT 10
-			`).all(),
-		catch: () => [] as Lesson[],
-	});
+const getHighConfidenceLessons = (db: Database): Effect.Effect<readonly Lesson[], never> =>
+	pipe(
+		Effect.try({
+			try: () =>
+				db.query<Lesson, []>(`
+					SELECT id, category, lesson, occurrence_count, decay_score
+					FROM lessons
+					WHERE decay_score > 0.8 AND occurrence_count >= 2
+					ORDER BY decay_score DESC, occurrence_count DESC
+					LIMIT 10
+				`).all() as readonly Lesson[],
+			catch: () => new Error("Query failed"),
+		}),
+		Effect.orElseSucceed((): readonly Lesson[] => []),
+	);
 
-const markLessonsProcessed = (db: Database, ids: readonly number[]): Effect.Effect<void> =>
-	Effect.try({
-		try: () => {
-			for (const id of ids) {
-				db.run(
-					`UPDATE lessons SET last_accessed = datetime('now') WHERE id = ?`,
-					[id],
-				);
-			}
-		},
-		catch: () => undefined,
-	});
+const markLessonsProcessed = (db: Database, ids: readonly number[]): Effect.Effect<void, never> =>
+	pipe(
+		Effect.try({
+			try: (): void => {
+				for (const id of ids) {
+					db.run(
+						`UPDATE lessons SET last_accessed = datetime('now') WHERE id = ?`,
+						[id],
+					);
+				}
+			},
+			catch: () => new Error("Update failed"),
+		}),
+		Effect.orElseSucceed((): void => {}),
+	);
 
 // =============================================================================
 // Synthesis

@@ -20,9 +20,9 @@ import { logError } from '../hooks/lib/hook-logging';
 
 // Configuration (can be overridden via environment)
 const CONFIG = {
-  halfLifeDays: Number.parseInt(process.env.EVOLUTION_HALF_LIFE ?? '14', 10),
-  archiveThreshold: Number.parseFloat(process.env.EVOLUTION_ARCHIVE_THRESHOLD ?? '0.1'),
-  similarityThreshold: Number.parseFloat(process.env.EVOLUTION_SIMILARITY ?? '0.7'),
+  halfLifeDays: Number.parseInt(process.env['EVOLUTION_HALF_LIFE'] ?? '14', 10),
+  archiveThreshold: Number.parseFloat(process.env['EVOLUTION_ARCHIVE_THRESHOLD'] ?? '0.1'),
+  similarityThreshold: Number.parseFloat(process.env['EVOLUTION_SIMILARITY'] ?? '0.7'),
   minTokenLength: 2,
   maxLessonLength: 200,
   maxEvidenceLength: 500,
@@ -160,9 +160,12 @@ function findDuplicates(lessons: readonly Lesson[]): Map<number, number[]> {
   const duplicates = new Map<number, number[]>();
 
   for (let i = 0; i < lessons.length; i++) {
+    const a = lessons[i];
+    if (a === undefined) continue;
+
     for (let j = i + 1; j < lessons.length; j++) {
-      const a = lessons[i];
       const b = lessons[j];
+      if (b === undefined) continue;
 
       // Same category and similar content
       if (a.category === b.category) {
@@ -172,7 +175,7 @@ function findDuplicates(lessons: readonly Lesson[]): Map<number, number[]> {
           const primary = a.occurrence_count >= b.occurrence_count ? a : b;
           const duplicate = primary === a ? b : a;
 
-          const existing = duplicates.get(primary.id) || [];
+          const existing = duplicates.get(primary.id) ?? [];
           existing.push(duplicate.id);
           duplicates.set(primary.id, existing);
         }

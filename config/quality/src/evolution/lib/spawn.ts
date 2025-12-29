@@ -20,11 +20,14 @@ export const runCommand = (
 ): Effect.Effect<CommandResult, CommandError> =>
 	Effect.tryPromise({
 		try: async () => {
-			const proc = Bun.spawn([command, ...args], {
+			const spawnOptions: { stdout: "pipe"; stderr: "pipe"; cwd?: string } = {
 				stdout: "pipe",
 				stderr: "pipe",
-				cwd: options?.cwd,
-			});
+			};
+			if (options?.cwd !== undefined) {
+				spawnOptions.cwd = options.cwd;
+			}
+			const proc = Bun.spawn([command, ...args], spawnOptions);
 			const [stdout, stderr, exitCode] = await Promise.all([
 				new Response(proc.stdout).text(),
 				new Response(proc.stderr).text(),

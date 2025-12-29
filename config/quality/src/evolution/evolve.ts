@@ -52,11 +52,16 @@ const print = (text: string): Effect.Effect<void> =>
 // Dashboard
 // =============================================================================
 
-const parseDetails = (detailsJson: string): Effect.Effect<Record<string, { score?: number; message?: string }>> =>
-	Effect.try({
-		try: () => JSON.parse(detailsJson) as Record<string, { score?: number; message?: string }>,
-		catch: () => ({}),
-	});
+type DetailsRecord = Record<string, { score?: number; message?: string }>;
+
+const parseDetails = (detailsJson: string): Effect.Effect<DetailsRecord, never> =>
+	pipe(
+		Effect.try({
+			try: () => JSON.parse(detailsJson) as DetailsRecord,
+			catch: () => new Error("JSON parse failed"),
+		}),
+		Effect.orElseSucceed((): DetailsRecord => ({})),
+	);
 
 const renderDashboard = (
 	grades: readonly GradeRecord[],
@@ -70,8 +75,8 @@ const renderDashboard = (
 		yield* print("");
 
 		// Latest Grade Section
-		if (grades.length > 0) {
-			const latest = grades[0];
+		const latest = grades[0];
+		if (latest !== undefined) {
 			const scoreColor = getScoreColor(latest.overall_score);
 
 			yield* print(color("cyan", "┌─ Latest Grade ─────────────────────────────────────┐"));
@@ -112,10 +117,10 @@ const renderDashboard = (
 			yield* print("");
 
 			// Trend analysis
-			if (trends.length >= 2) {
-				const latest = trends[0].avg_score;
-				const previous = trends[1].avg_score;
-				const delta = latest - previous;
+			const latestTrend = trends[0];
+			const previousTrend = trends[1];
+			if (latestTrend !== undefined && previousTrend !== undefined) {
+				const delta = latestTrend.avg_score - previousTrend.avg_score;
 
 				if (Math.abs(delta) > 0.05) {
 					const trend = delta > 0 ? "↑ Improving" : "↓ Declining";
@@ -127,9 +132,10 @@ const renderDashboard = (
 		}
 
 		// Recommendations
-		if (grades.length > 0 && grades[0].overall_score < 0.8) {
+		const firstGrade = grades[0];
+		if (firstGrade !== undefined && firstGrade.overall_score < 0.8) {
 			yield* print(color("yellow", "Recommendations:"));
-			const details = yield* parseDetails(grades[0].details_json);
+			const details = yield* parseDetails(firstGrade.details_json);
 			for (const [name, result] of Object.entries(details)) {
 				if (typeof result === "object" && result !== null && "score" in result) {
 					const score = result.score ?? 100;
@@ -155,17 +161,20 @@ const renderJson = (
 	trends: readonly TrendRecord[],
 ): Effect.Effect<void> =>
 	Effect.sync(() => {
-		const latest = grades[0] ?? null;
+		const latest = grades[0];
+		const trend0 = trends[0];
+		const trend1 = trends[1];
+		const trendDirection = trend0 !== undefined && trend1 !== undefined
+			? trend0.avg_score > trend1.avg_score
+				? "improving"
+				: trend0.avg_score < trend1.avg_score
+					? "declining"
+					: "stable"
+			: null;
 		const output = {
-			score_percent: latest ? Math.round(latest.overall_score * 100) : null,
+			score_percent: latest !== undefined ? Math.round(latest.overall_score * 100) : null,
 			recommendation: latest?.recommendation ?? null,
-			trend: trends.length >= 2
-				? trends[0].avg_score > trends[1].avg_score
-					? "improving"
-					: trends[0].avg_score < trends[1].avg_score
-						? "declining"
-						: "stable"
-				: null,
+			trend: trendDirection,
 			weekly_avg: trends.length > 0
 				? Math.round(trends.reduce((sum, t) => sum + t.avg_score, 0) / trends.length * 100)
 				: null,

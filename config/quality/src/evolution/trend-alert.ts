@@ -71,6 +71,16 @@ const analyzeAlerts = Effect.gen(function* () {
 	const previous = trends[1];
 	const weekAgo = trends[6] ?? trends[trends.length - 1];
 
+	// Type guard - we know these exist due to length check above
+	if (latest === undefined || previous === undefined || weekAgo === undefined) {
+		return {
+			latest_score: null,
+			alerts: ["Unexpected data structure"],
+			trend: [],
+			status: "healthy" as const,
+		};
+	}
+
 	const alerts: string[] = [];
 	let status: "healthy" | "warning" | "critical" = "healthy";
 
@@ -100,7 +110,9 @@ const analyzeAlerts = Effect.gen(function* () {
 	// Check for consecutive drops (3+ days)
 	let consecutiveDrops = 0;
 	for (let i = 0; i < trends.length - 1 && i < 5; i++) {
-		if (trends[i].avg_score < trends[i + 1].avg_score) {
+		const current = trends[i];
+		const next = trends[i + 1];
+		if (current !== undefined && next !== undefined && current.avg_score < next.avg_score) {
 			consecutiveDrops++;
 		} else {
 			break;
