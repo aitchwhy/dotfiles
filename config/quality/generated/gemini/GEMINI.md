@@ -1315,15 +1315,20 @@ All exposed codebases should comply with:
 
 ---
 
-### context7-mcp
+### ref-mcp
 
-> Context7 MCP server for fetching up-to-date library documentation.
+> Ref.tools MCP server for SOTA documentation search (60-95% fewer tokens than alternatives).
 
 #### Overview
 
-# Context7 MCP Server (37.1k stars)
+# Ref.tools MCP Server
 
-Up-to-date documentation for 8,500+ libraries. Prevents hallucinated APIs by providing current, version-specific docs.
+State-of-the-art documentation search with 60-95% fewer tokens than context7/fetch alternatives.
+
+Key benefits:
+- Context-aware deduplication (doesn't repeat docs in same session)
+- Focused snippets instead of full pages
+- 8,500+ libraries indexed with version-specific docs
 
 #### When to Use
 
@@ -1336,89 +1341,59 @@ Up-to-date documentation for 8,500+ libraries. Prevents hallucinated APIs by pro
 #### Trigger Phrase
 
 ```
-use context7 - how do I create an Effect Layer?
+use ref - how do I create an Effect Layer?
 ```
 
 #### Tools
 
-### resolve-library-id
+### mcp__ref__search
 
-Find Context7-compatible library ID from package name.
+Search for documentation on any library or topic.
 
-```
-mcp__context7__resolve-library-id({
-  libraryName: "effect"
+```typescript
+mcp__ref__search({
+  query: "Effect Layer composition",
+  library: "effect-ts"  // optional: focus on specific library
 })
 ```
 
-Returns:
-- Library ID (format: `/org/project`)
-- Description
-- Code snippet count
-- Source reputation (High/Medium)
-- Benchmark score (0-100)
-
-### get-library-docs
-
-Fetch documentation for a library.
-
-```
-mcp__context7__get-library-docs({
-  context7CompatibleLibraryID: "/effect-ts/effect",
-  topic: "Layer",
-  mode: "code",    // "code" for API/examples, "info" for concepts
-  page: 1          // Pagination 1-10
-})
-```
-
-#### Common Library IDs
-
-| Package | Library ID |
-|---------|-----------|
-| effect | `/effect-ts/effect` |
-| @effect/platform | `/effect-ts/effect` |
-| next.js | `/vercel/next.js` |
-| react | `/facebook/react` |
-| drizzle-orm | `/drizzle-team/drizzle-orm` |
-| xstate | `/statelyai/xstate` |
-| tailwindcss | `/tailwindlabs/tailwindcss` |
+Returns focused documentation snippets with:
+- Code examples
+- API signatures
+- Best practices
 
 #### Usage Patterns
 
 ### Before Implementing New Feature
 
 ```
-1. resolve-library-id to get correct ID
-2. get-library-docs with relevant topic
-3. Use mode="code" for implementation examples
-```
-
-### Understanding Concepts
-
-```
-1. get-library-docs with mode="info"
-2. Paginate (page=2, page=3) for comprehensive coverage
+1. Search for library-specific patterns
+2. Review returned snippets
+3. Implement following documented patterns
 ```
 
 ### Effect-TS (Critical)
 
 The Effect API changes frequently. Training data is outdated.
 
-**Always query context7 before writing Effect code:**
+**Always query ref before writing Effect code:**
 
-```
-mcp__context7__get-library-docs({
-  context7CompatibleLibraryID: "/effect-ts/effect",
-  topic: "Effect.gen"
+```typescript
+mcp__ref__search({
+  query: "Effect.gen usage patterns",
+  library: "effect-ts"
 })
 ```
 
-#### Mode Selection
+#### Token Efficiency
 
-| Mode | Use For |
-|------|---------|
-| `code` | Function signatures, API references, code examples |
-| `info` | Architectural concepts, guides, best practices |
+| Approach | Tokens | Notes |
+|----------|--------|-------|
+| WebFetch full page | 5-20k | Includes nav, footer, unrelated content |
+| context7 | 2-5k | Better but still verbose |
+| **ref** | 0.5-2k | Focused snippets, session deduplication |
+
+Ref automatically deduplicates within a session - repeated queries for same docs return minimal tokens.
 
 ---
 
@@ -2217,12 +2192,9 @@ except AgentError as e:
 
 | Server | Purpose | Token Cost | When to Use |
 |--------|---------|------------|-------------|
-| `context7` | Library docs | Low (cached) | Before new library usage |
+| `ref` | Library docs (SOTA) | Very Low | Before new library usage (60-95% fewer tokens) |
+| `exa` | Code context search | Low | Find patterns across repos |
 | `repomix` | Codebase packing | High | Once per session for exploration |
-| `memory` | Persistent knowledge | Low | Session start/end |
-| `sequential-thinking` | Complex planning | Medium | Multi-step reasoning |
-| `fetch` | URL content | Medium | External documentation |
-| `filesystem` | File operations | Low | Prefer native Read/Write tools |
 | `github` | Repository operations | Low | PR/issue management |
 | `playwright` | Browser automation | Medium | E2E testing, web scraping |
 | `ast-grep` | AST-based search | Low | Code pattern matching |
@@ -2236,35 +2208,30 @@ except AgentError as e:
 | Architecture | 30-50k tokens | Full repomix, sequential thinking |
 | Audit/review | 50-100k tokens | Comprehensive (justified by scope) |
 
-#### Context7 Patterns
+#### Ref Patterns
 
-### Pre-fetch at Session Start
+### SOTA Documentation Search
+
+Ref.tools provides 60-95% fewer tokens than alternatives through:
+- Context-aware deduplication (same docs not repeated in session)
+- Focused snippets instead of full pages
+- Version-specific documentation
 
 ```typescript
-// Identify project dependencies
-const deps = await readPackageJson();
-
-// Pre-fetch docs for frequently used libraries
-await Promise.all([
-  mcp__context7__resolve-library-id({ libraryName: "effect" }),
-  mcp__context7__resolve-library-id({ libraryName: "@effect/platform" }),
-  mcp__context7__resolve-library-id({ libraryName: "drizzle-orm" }),
-]);
+// Search for documentation
+mcp__ref__search({
+  query: "Effect Layer composition patterns",
+  library: "effect-ts"  // optional: focus on specific library
+})
 ```
 
-### Mode Selection
+### Token Efficiency Comparison
 
-| Mode | Use For |
-|------|---------|
-| `code` | Function signatures, API references, examples |
-| `info` | Architectural concepts, guides, best practices |
-
-### Pagination Strategy
-
-When context insufficient:
-1. Try `page=2`, `page=3` with same topic
-2. Narrow topic to specific API
-3. Switch modes if conceptual vs implementation
+| Approach | Tokens | Notes |
+|----------|--------|-------|
+| WebFetch full page | 5-20k | Includes nav, footer, unrelated |
+| context7 (deprecated) | 2-5k | Better but verbose |
+| **ref** | 0.5-2k | Focused, deduplicated |
 
 #### Repomix Patterns
 
@@ -2297,48 +2264,6 @@ repomix pack . --include "*.nix,*.json,*.toml"
 2. grep_repomix_output(output_id, pattern) → targeted search
 3. read_repomix_output(output_id, startLine, endLine) → detailed view
 ```
-
-#### Memory Server Optimization
-
-### Structured Entity Storage
-
-```typescript
-// Prefer structured entities over free-form
-mcp__memory__create_entities([{
-  name: "auth-decision",
-  entityType: "architecture-decision",
-  observations: [
-    "library: better-auth@1.4.6",
-    "pattern: session-based",
-    "location: src/auth/",
-    "reason: Effect-compatible"
-  ]
-}]);
-```
-
-### Query Patterns
-
-| Need | Action |
-|------|--------|
-| Recall decision | `open_nodes(["auth-decision"])` |
-| Search context | `search_nodes("authentication")` |
-| Update learning | `add_observations(...)` |
-
-#### Sequential Thinking Discipline
-
-### Use For
-
-- Multi-file refactoring
-- Bug investigation with multiple hypotheses
-- Architecture decisions with trade-offs
-- Complex implementation planning
-
-### Skip For
-
-- Single file edits
-- Documentation updates
-- Simple feature additions
-- Trivial bug fixes (use TodoWrite instead)
 
 #### AST-Grep Patterns
 
@@ -2373,18 +2298,16 @@ mcp__ast-grep__rewrite_code({
 | Anti-Pattern | Correct Approach |
 |--------------|------------------|
 | Pack entire codebase for small task | Use targeted `--include` patterns |
-| Multiple context7 calls per library | Cache library ID, paginate docs |
+| Multiple ref calls for same topic | Ref auto-deduplicates in session |
 | Repomix without grep | Use grep_repomix_output for search |
-| Sequential thinking for simple tasks | Use TodoWrite for task tracking |
-| Memory for temporary data | Only store architectural decisions |
+| Full page WebFetch for docs | Use ref (60-95% fewer tokens) |
 
 #### Cost Optimization Checklist
 
-- [ ] Use native tools (Read/Write) over MCP filesystem
-- [ ] Pre-fetch context7 docs at session start
-- [ ] Use targeted repomix includes
-- [ ] Skip sequential thinking for trivial tasks
-- [ ] Cache library IDs for repeated queries
+- [ ] Use native tools (Read/Write) instead of MCP filesystem
+- [ ] Use ref for docs (60-95% fewer tokens than alternatives)
+- [ ] Use targeted repomix includes for large codebases
+- [ ] Use exa for cross-repo code pattern search
 - [ ] Use grep_repomix_output instead of full reads
 
 ---

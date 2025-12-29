@@ -109,8 +109,8 @@
       "WebFetch(domain:www.lazyvim.org)",
       "WebFetch(domain:macos-defaults.com)",
       "WebFetch(domain:apps.apple.com)",
-      "mcp__context7__resolve-library-id",
-      "mcp__context7__get-library-docs"
+      "mcp__ref__*",
+      "mcp__exa__*"
     ],
     "deny": [
       "Read(**/.env*)",
@@ -291,9 +291,5 @@
     "learning-output-style@claude-code-plugins": true,
     "pr-review-toolkit@claude-code-plugins": true,
     "ralph-wiggum@claude-code-plugins": true
-  },
-  "statusLine": {
-    "type": "command",
-    "command": "input=$(cat); cwd=$(echo \"$input\" | jq -r '.workspace.current_dir'); cd \"$cwd\" 2>/dev/null; dir=$(echo \"$cwd\" | awk -F/ '{n=NF; if(n<=5) print $0; else {printf \"…/\"; for(i=n-4;i<=n;i++){printf \"%s\", $i; if(i<n) printf \"/\"}}}'); git_info=\"\"; if git rev-parse --git-dir >/dev/null 2>&1; then branch=$(git branch --show-current 2>/dev/null || echo \"detached\"); status=\"\"; git diff-index --quiet HEAD -- 2>/dev/null || status=\"*\"; upstream=$(git rev-parse --abbrev-ref @{upstream} 2>/dev/null); if [ -n \"$upstream\" ]; then ahead_behind=$(git rev-list --left-right --count HEAD...@{upstream} 2>/dev/null); ahead=$(echo \"$ahead_behind\" | cut -f1); behind=$(echo \"$ahead_behind\" | cut -f2); [ \"$ahead\" -gt 0 ] && status=\"$status↑$ahead\"; [ \"$behind\" -gt 0 ] && status=\"$status↓$behind\"; fi; git_info=\" $branch$status\"; fi; model=$(echo \"$input\" | jq -r '.model.display_name' | sed 's/Claude //' | sed 's/ Sonnet/S/' | sed 's/ Opus/O/' | sed 's/ Haiku/H/'); context=\"\"; usage=$(echo \"$input\" | jq '.context_window.current_usage'); if [ \"$usage\" != \"null\" ]; then current=$(echo \"$usage\" | jq '.input_tokens + .cache_creation_input_tokens + .cache_read_input_tokens'); size=$(echo \"$input\" | jq '.context_window.context_window_size'); pct=$((current * 100 / size)); [ \"$pct\" -gt 10 ] && context=\" ${pct}%\"; fi; time=$(date +%R); printf \"\\033[38;2;163;174;210m░▒▓\\033[0m\\033[48;2;163;174;210m\\033[38;2;9;12;12m  \\033[0m\\033[38;2;118;159;240m %s\\033[0m\" \"$dir\"; [ -n \"$git_info\" ] && printf \"\\033[38;2;118;159;240m %s\\033[0m\" \"$git_info\"; printf \" \\033[38;2;160;169;203m%s%s  %s\\033[0m\" \"$model\" \"$context\" \"$time\""
   }
 }

@@ -15,12 +15,9 @@ token-budget: 600
 
 | Server | Purpose | Token Cost | When to Use |
 |--------|---------|------------|-------------|
-| `context7` | Library docs | Low (cached) | Before new library usage |
+| `ref` | Library docs (SOTA) | Very Low | Before new library usage (60-95% fewer tokens) |
+| `exa` | Code context search | Low | Find patterns across repos |
 | `repomix` | Codebase packing | High | Once per session for exploration |
-| `memory` | Persistent knowledge | Low | Session start/end |
-| `sequential-thinking` | Complex planning | Medium | Multi-step reasoning |
-| `fetch` | URL content | Medium | External documentation |
-| `filesystem` | File operations | Low | Prefer native Read/Write tools |
 | `github` | Repository operations | Low | PR/issue management |
 | `playwright` | Browser automation | Medium | E2E testing, web scraping |
 | `ast-grep` | AST-based search | Low | Code pattern matching |
@@ -34,35 +31,30 @@ token-budget: 600
 | Architecture | 30-50k tokens | Full repomix, sequential thinking |
 | Audit/review | 50-100k tokens | Comprehensive (justified by scope) |
 
-## Context7 Patterns
+## Ref Patterns
 
-### Pre-fetch at Session Start
+### SOTA Documentation Search
+
+Ref.tools provides 60-95% fewer tokens than alternatives through:
+- Context-aware deduplication (same docs not repeated in session)
+- Focused snippets instead of full pages
+- Version-specific documentation
 
 ```typescript
-// Identify project dependencies
-const deps = await readPackageJson();
-
-// Pre-fetch docs for frequently used libraries
-await Promise.all([
-  mcp__context7__resolve-library-id({ libraryName: "effect" }),
-  mcp__context7__resolve-library-id({ libraryName: "@effect/platform" }),
-  mcp__context7__resolve-library-id({ libraryName: "drizzle-orm" }),
-]);
+// Search for documentation
+mcp__ref__search({
+  query: "Effect Layer composition patterns",
+  library: "effect-ts"  // optional: focus on specific library
+})
 ```
 
-### Mode Selection
+### Token Efficiency Comparison
 
-| Mode | Use For |
-|------|---------|
-| `code` | Function signatures, API references, examples |
-| `info` | Architectural concepts, guides, best practices |
-
-### Pagination Strategy
-
-When context insufficient:
-1. Try `page=2`, `page=3` with same topic
-2. Narrow topic to specific API
-3. Switch modes if conceptual vs implementation
+| Approach | Tokens | Notes |
+|----------|--------|-------|
+| WebFetch full page | 5-20k | Includes nav, footer, unrelated |
+| context7 (deprecated) | 2-5k | Better but verbose |
+| **ref** | 0.5-2k | Focused, deduplicated |
 
 ## Repomix Patterns
 
@@ -95,48 +87,6 @@ repomix pack . --include "*.nix,*.json,*.toml"
 2. grep_repomix_output(output_id, pattern) → targeted search
 3. read_repomix_output(output_id, startLine, endLine) → detailed view
 ```
-
-## Memory Server Optimization
-
-### Structured Entity Storage
-
-```typescript
-// Prefer structured entities over free-form
-mcp__memory__create_entities([{
-  name: "auth-decision",
-  entityType: "architecture-decision",
-  observations: [
-    "library: better-auth@1.4.6",
-    "pattern: session-based",
-    "location: src/auth/",
-    "reason: Effect-compatible"
-  ]
-}]);
-```
-
-### Query Patterns
-
-| Need | Action |
-|------|--------|
-| Recall decision | `open_nodes(["auth-decision"])` |
-| Search context | `search_nodes("authentication")` |
-| Update learning | `add_observations(...)` |
-
-## Sequential Thinking Discipline
-
-### Use For
-
-- Multi-file refactoring
-- Bug investigation with multiple hypotheses
-- Architecture decisions with trade-offs
-- Complex implementation planning
-
-### Skip For
-
-- Single file edits
-- Documentation updates
-- Simple feature additions
-- Trivial bug fixes (use TodoWrite instead)
 
 ## AST-Grep Patterns
 
@@ -171,16 +121,14 @@ mcp__ast-grep__rewrite_code({
 | Anti-Pattern | Correct Approach |
 |--------------|------------------|
 | Pack entire codebase for small task | Use targeted `--include` patterns |
-| Multiple context7 calls per library | Cache library ID, paginate docs |
+| Multiple ref calls for same topic | Ref auto-deduplicates in session |
 | Repomix without grep | Use grep_repomix_output for search |
-| Sequential thinking for simple tasks | Use TodoWrite for task tracking |
-| Memory for temporary data | Only store architectural decisions |
+| Full page WebFetch for docs | Use ref (60-95% fewer tokens) |
 
 ## Cost Optimization Checklist
 
-- [ ] Use native tools (Read/Write) over MCP filesystem
-- [ ] Pre-fetch context7 docs at session start
-- [ ] Use targeted repomix includes
-- [ ] Skip sequential thinking for trivial tasks
-- [ ] Cache library IDs for repeated queries
+- [ ] Use native tools (Read/Write) instead of MCP filesystem
+- [ ] Use ref for docs (60-95% fewer tokens than alternatives)
+- [ ] Use targeted repomix includes for large codebases
+- [ ] Use exa for cross-repo code pattern search
 - [ ] Use grep_repomix_output instead of full reads
