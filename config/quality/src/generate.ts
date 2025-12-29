@@ -7,6 +7,7 @@
  * Run with: bun run src/generate.ts
  */
 
+import * as fs from 'node:fs'
 import * as path from 'node:path'
 import { Effect, pipe } from 'effect'
 import { BEHAVIOR_COUNTS } from './critic-mode'
@@ -41,6 +42,15 @@ const main = Effect.gen(function* () {
   yield* Effect.log(`Root Output: ${GENERATED_ROOT}`)
   yield* Effect.log('')
 
+  // CLEAN SLATE: Delete generated directory to prevent orphaned artifacts
+  // This ensures source count == generated count after each run
+  yield* Effect.log('--- Cleaning Generated Directory (Clean Slate) ---')
+  if (fs.existsSync(GENERATED_ROOT)) {
+    fs.rmSync(GENERATED_ROOT, { recursive: true, force: true })
+    yield* Effect.log('✓ Removed stale generated artifacts')
+  }
+  yield* Effect.log('')
+
   // 1. CLAUDE GENERATION
   yield* Effect.log('--- Generatng Claude Adapters ---')
   yield* Effect.log(`Output: ${CLAUDE_OUT}`)
@@ -71,6 +81,31 @@ const main = Effect.gen(function* () {
   yield* Effect.log(`  Rules:     ${ALL_RULES.length}`)
   yield* Effect.log(`  Memories:  ${MEMORY_COUNTS.total}`)
   yield* Effect.log(`  Behaviors: ${BEHAVIOR_COUNTS.total}`)
+
+  // VERIFICATION: Ensure generated skill count matches source count
+  // This catches any generation errors that would cause orphans or missing skills
+  yield* Effect.log('')
+  yield* Effect.log('--- Verifying Generated Artifacts ---')
+
+  const skillsDir = path.join(CLAUDE_OUT, 'skills')
+  const generatedSkills = fs.existsSync(skillsDir)
+    ? fs.readdirSync(skillsDir).filter((f) => !f.startsWith('.'))
+    : []
+
+  const sourceSkillCount = ALL_SKILLS.length
+  const generatedSkillCount = generatedSkills.length
+
+  yield* Effect.log(`Source skills:    ${sourceSkillCount}`)
+  yield* Effect.log(`Generated skills: ${generatedSkillCount}`)
+
+  if (sourceSkillCount !== generatedSkillCount) {
+    yield* Effect.logError(
+      `FATAL: Skill count mismatch! Source=${sourceSkillCount}, Generated=${generatedSkillCount}`,
+    )
+    process.exit(1)
+  }
+
+  yield* Effect.log('✓ Verification passed: source count == generated count')
 })
 
 void pipe(
