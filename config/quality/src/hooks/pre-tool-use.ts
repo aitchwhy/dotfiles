@@ -32,7 +32,7 @@ import { runProceduralGuards } from './lib/guards/procedural'
 // Canonical Rules Directory (SSOT)
 const RULES_DIR = path.resolve(
   import.meta.dir,
-  '../../../../quality/rules/paragon', // adjusted relative path
+  '../../rules/paragon', // hooks -> src -> quality -> rules/paragon
 )
 
 // =============================================================================
