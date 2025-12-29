@@ -23,6 +23,10 @@ let
   cfg = config.modules.darwin.secrets;
   secretsFile = ../../secrets/darwin.yaml;
   secretsExist = pathExists secretsFile;
+
+  # Generic MCP secrets path (not Claude-specific)
+  # Used by: Claude Code, Claude Desktop, Gemini CLI, and other agentic IDEs
+  mcpSecretsPath = "/Users/${config.system.primaryUser}/.config/mcp";
 in
 {
   options.modules.darwin.secrets = {
@@ -46,13 +50,17 @@ in
         mode = "0400";
       };
 
+      # ═══════════════════════════════════════════════════════════════════════════
+      # MCP Server Secrets (Generic path for Claude Code, Desktop, Gemini CLI, etc.)
+      # ═══════════════════════════════════════════════════════════════════════════
+
       # GitHub Personal Access Token for MCP server
       # Generate at: https://github.com/settings/tokens
       # Scopes needed: repo, read:org, read:user
       github-token = {
         mode = "0400";
         owner = config.system.primaryUser;
-        path = "/Users/${config.system.primaryUser}/.config/claude/github-token";
+        path = "${mcpSecretsPath}/github-token";
       };
 
       # Claude Code userID for analytics/preferences
@@ -60,24 +68,25 @@ in
       claude-user-id = {
         mode = "0400";
         owner = config.system.primaryUser;
-        path = "/Users/${config.system.primaryUser}/.config/claude/user-id";
+        path = "${mcpSecretsPath}/claude-user-id";
       };
 
-      # DataDog API Key for MCP server
-      # Generate at: https://app.datadoghq.com/organization-settings/api-keys
-      datadog-api-key = {
+      # Exa AI API Key for code context search MCP server
+      # Get at: https://exa.ai/
+      # Used by: exa-mcp-server (get_code_context_exa, web_search_exa)
+      exa-api-key = {
         mode = "0400";
         owner = config.system.primaryUser;
-        path = "/Users/${config.system.primaryUser}/.config/claude/datadog-api-key";
+        path = "${mcpSecretsPath}/exa-api-key";
       };
 
-      # DataDog Application Key for MCP server
-      # Generate at: https://app.datadoghq.com/organization-settings/application-keys
-      # Scopes: incidents_read, dashboards_read, monitors_read, metrics_read, logs_read
-      datadog-app-key = {
+      # Ref.tools API Key for documentation search MCP server
+      # Get at: https://ref.tools/
+      # Used by: Ref HTTP MCP (60-95% fewer tokens than alternatives)
+      ref-api-key = {
         mode = "0400";
         owner = config.system.primaryUser;
-        path = "/Users/${config.system.primaryUser}/.config/claude/datadog-app-key";
+        path = "${mcpSecretsPath}/ref-api-key";
       };
     };
   };
