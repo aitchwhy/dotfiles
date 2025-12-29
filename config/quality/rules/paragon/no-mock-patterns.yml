@@ -7,9 +7,9 @@ rule:
     - pattern: "jest.mock($PATH, $IMPL)"
     - pattern: "vi.mock($PATH)"
     - pattern: "vi.mock($PATH, $IMPL)"
-    - pattern: ".mockImplementation($IMPL)"
-    - pattern: ".mockResolvedValue($VALUE)"
-    - pattern: ".mockReturnValue($VALUE)"
+    - pattern: "$OBJ.mockImplementation($IMPL)"
+    - pattern: "$OBJ.mockResolvedValue($VALUE)"
+    - pattern: "$OBJ.mockReturnValue($VALUE)"
 message: |
   NO-MOCK VIOLATION detected.
 
