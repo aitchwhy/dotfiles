@@ -4,8 +4,9 @@
  * Validates that the Effect schemas correctly parse version strings
  * and reject invalid inputs.
  */
-import { describe, expect, it } from 'vitest'
+
 import { Either, Schema } from 'effect'
+import { describe, expect, it } from 'vitest'
 import { InfraVersionsSchema, RuntimeVersionsSchema, StackDefinitionSchema } from './schema'
 import { STACK } from './versions'
 

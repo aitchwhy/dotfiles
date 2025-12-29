@@ -4,7 +4,17 @@
  * Tests for the Result type utilities used throughout the quality system.
  */
 import { describe, expect, it } from 'vitest'
-import { Err, flatMap, isErr, isOk, map, Ok, tryCatch, tryCatchAsync, unwrapOr } from '../../src/lib/result'
+import {
+  Err,
+  flatMap,
+  isErr,
+  isOk,
+  map,
+  Ok,
+  tryCatch,
+  tryCatchAsync,
+  unwrapOr,
+} from '../../src/lib/result'
 
 describe('Result', () => {
   describe('Ok', () => {

@@ -104,13 +104,19 @@ jobs:
               // Give it 8s to start
               await setTimeout(8000);
 
-              // Check if still running (good) or crashed (bad)
-              if (proc.exitCode !== null) {
-                console.error(`❌ ${server.name} crashed with code ${proc.exitCode}`);
-                failed++;
-              } else {
+              // Check if still running (good) or crashed with error (bad)
+              // Note: exitCode 0 means clean exit, null means still running
+              if (proc.exitCode === null) {
+                // Still running - success
                 console.log(`✅ ${server.name} started successfully`);
                 passed++;
+              } else if (proc.exitCode === 0) {
+                // Clean exit - some MCP servers exit cleanly when idle
+                console.log(`✅ ${server.name} exited cleanly`);
+                passed++;
+              } else {
+                console.error(`❌ ${server.name} crashed with code ${proc.exitCode}`);
+                failed++;
               }
               proc.kill();
             } catch (err) {

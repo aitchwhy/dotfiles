@@ -4,28 +4,28 @@
  * Using Effect's Data.TaggedError for type-safe error handling.
  */
 
-import { Data } from "effect";
+import { Data } from 'effect'
 
-export class CommandError extends Data.TaggedError("CommandError")<{
-	readonly command: string;
-	readonly args: readonly string[];
-	readonly exitCode: number;
-	readonly stderr: string;
+export class CommandError extends Data.TaggedError('CommandError')<{
+  readonly command: string
+  readonly args: readonly string[]
+  readonly exitCode: number
+  readonly stderr: string
 }> {}
 
-export class DatabaseError extends Data.TaggedError("DatabaseError")<{
-	readonly operation: string;
-	readonly cause: unknown;
+export class DatabaseError extends Data.TaggedError('DatabaseError')<{
+  readonly operation: string
+  readonly cause: unknown
 }> {}
 
-export class FileSystemError extends Data.TaggedError("FileSystemError")<{
-	readonly path: string;
-	readonly operation: "read" | "write" | "stat";
-	readonly cause: unknown;
+export class FileSystemError extends Data.TaggedError('FileSystemError')<{
+  readonly path: string
+  readonly operation: 'read' | 'write' | 'stat'
+  readonly cause: unknown
 }> {}
 
-export class SpawnError extends Data.TaggedError("SpawnError")<{
-	readonly script: string;
-	readonly exitCode: number;
-	readonly stderr: string;
+export class SpawnError extends Data.TaggedError('SpawnError')<{
+  readonly script: string
+  readonly exitCode: number
+  readonly stderr: string
 }> {}

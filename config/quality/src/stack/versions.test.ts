@@ -4,8 +4,9 @@
  * Validates that the STACK object is well-formed
  * and helper functions work correctly.
  */
-import { describe, expect, it } from 'vitest'
+
 import { Either } from 'effect'
+import { describe, expect, it } from 'vitest'
 import {
   getDrift,
   getNpmVersion,
