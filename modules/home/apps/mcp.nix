@@ -1,11 +1,16 @@
-# Claude Desktop and Claude Code MCP server configuration
-# Single source of truth for all MCP servers
+# Generic MCP Server Single Source of Truth
+# Generates configs for: Claude Desktop, Claude Code CLI, Gemini CLI, and other agentic IDEs
 #
 # This module generates:
 # 1. Claude Desktop config (~/Library/Application Support/Claude/claude_desktop_config.json)
 #    - Uses /bin/sh wrapper to inject Nix PATH for Electron app compatibility
-# 2. Claude Code CLI config (~/.claude.json via agents.nix)
+# 2. Claude Code CLI config (~/.config/claude/mcp-servers.json)
 #    - Uses direct npx commands (shell PATH already available)
+#
+# Token Optimization (December 2025):
+# - Reduced from 16 to 6 MCP servers
+# - Uses SOTA servers: Ref.tools (60-95% fewer tokens), Exa AI (code search)
+# - Removed redundant servers that duplicate native Claude Code capabilities
 {
   config,
   lib,
@@ -15,6 +20,7 @@ let
   inherit (lib)
     concatStringsSep
     mapAttrs
+    filterAttrs
     mkEnableOption
     mkIf
     ;
@@ -29,120 +35,70 @@ let
   ];
   pathString = concatStringsSep ":" nixPaths;
 
+  # Generic MCP secrets path (shared across Claude, Gemini, Cursor, etc.)
+  mcpSecretsPath = "$HOME/.config/mcp";
+
   # ═══════════════════════════════════════════════════════════════════════════
-  # SINGLE SOURCE OF TRUTH: MCP Server Definitions
+  # SINGLE SOURCE OF TRUTH: MCP Server Definitions (Optimized December 2025)
   # ═══════════════════════════════════════════════════════════════════════════
-  # Add/remove servers here - both Desktop and CLI configs auto-generate
+  # Target: <25k tokens (down from ~116k)
+  # Strategy: SOTA search/docs (Ref, Exa) + unique capabilities only
   mcpServerDefs = {
-    filesystem = {
-      package = "@modelcontextprotocol/server-filesystem";
-      args = [
-        "${config.home.homeDirectory}/src"
-        "${config.home.homeDirectory}/dotfiles"
-        "${config.home.homeDirectory}/Documents"
-      ];
+    # ═══════════════════════════════════════════════════════════════════════════
+    # DOCUMENTATION & SEARCH (State-of-the-Art - December 2025)
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    ref = {
+      # Ref.tools - 60-95% fewer tokens than context7/fetch alternatives
+      # Context-aware documentation search with session deduplication
+      # https://ref.tools/
+      isHttp = true;
+      url = "https://api.ref.tools/mcp";
+      # API key will be appended at activation time from sops-nix
+      apiKeyPath = "${mcpSecretsPath}/ref-api-key";
     };
-    git = {
-      # Git repository operations - read, search, manipulate repos
-      package = "mcp-server-git";
+
+    exa = {
+      # Exa AI - Code context search across billions of repos
+      # Tools: get_code_context_exa, web_search_exa
+      # https://exa.ai/
+      package = "exa-mcp-server";
       args = [ ];
-      isPython = true;
+      envVars = {
+        EXA_API_KEY = "${mcpSecretsPath}/exa-api-key";
+      };
     };
-    sequential-thinking = {
-      package = "@modelcontextprotocol/server-sequential-thinking";
-      args = [ ];
-    };
-    context7 = {
-      package = "@upstash/context7-mcp";
-      args = [ ];
-    };
-    fetch = {
-      package = "mcp-server-fetch"; # Python package via uvx
-      args = [ ];
-      isPython = true;
-    };
-    repomix = {
-      package = "repomix";
-      args = [ "--mcp" ];
-    };
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # UNIQUE CAPABILITIES (No native Claude Code equivalent)
+    # ═══════════════════════════════════════════════════════════════════════════
+
     github = {
       # GitHub API: repos, issues, PRs, code search
       # Token sourced from sops-nix secret file
       package = "@modelcontextprotocol/server-github";
       args = [ ];
       envVars = {
-        GITHUB_PERSONAL_ACCESS_TOKEN = "$HOME/.config/claude/github-token";
+        GITHUB_PERSONAL_ACCESS_TOKEN = "${mcpSecretsPath}/github-token";
       };
     };
+
     playwright = {
       # Browser automation for testing and web interactions
       package = "@playwright/mcp";
       args = [ ];
     };
+
     ast-grep = {
       # AST-based structural code search across 20+ languages
       package = "@notprolands/ast-grep-mcp";
       args = [ ];
     };
 
-    # ═══════════════════════════════════════════════════════════════════════════
-    # Stack-specific MCP servers (Ember-Dash-Platform alignment)
-    # ═══════════════════════════════════════════════════════════════════════════
-    # NOTE: jsrepo removed - @jsrepo/mcp outputs non-JSON to stdout (MCP protocol violation)
-    docker = {
-      # Container and compose stack management
-      package = "mcp-server-docker";
-      args = [ ];
-      isPython = true;
-    };
-    shadcn = {
-      # Official shadcn/ui MCP - components, blocks, demos for React/Tailwind
-      # https://ui.shadcn.com/docs/mcp
-      package = "shadcn@latest";
-      args = [ "mcp" ];
-    };
-    chrome-devtools = {
-      # Chrome DevTools Protocol - browser debugging, performance, network
-      package = "chrome-devtools-mcp";
-      args = [ ];
-    };
-    reactbits = {
-      # React Bits - 135+ animated React components (buttons, backgrounds, text effects)
-      # https://reactbits.dev - provides component code and Tailwind/CSS variants
-      package = "reactbits-dev-mcp-server";
-      args = [ ];
-    };
-
-    # ═══════════════════════════════════════════════════════════════════════════
-    # Modern CLI Tool MCP Servers (schema-based enforcement)
-    # ═══════════════════════════════════════════════════════════════════════════
-    ripgrep = {
-      # Ripgrep search with proper schema - enforces correct flag usage
-      # Replaces: grep --include → rg --glob
-      package = "mcp-ripgrep";
-      args = [ ];
-    };
-    # NOTE: postgres removed - requires connection URL arg, package is deprecated
-
-    # ═══════════════════════════════════════════════════════════════════════════
-    # Observability & Infrastructure MCP Servers
-    # ═══════════════════════════════════════════════════════════════════════════
-    datadog = {
-      # Query logs, metrics, monitors, dashboards, incidents
-      # https://github.com/GeLi2001/datadog-mcp-server
-      package = "datadog-mcp-server";
-      args = [ ];
-      envVars = {
-        DD_API_KEY = "$HOME/.config/claude/datadog-api-key";
-        DD_APP_KEY = "$HOME/.config/claude/datadog-app-key";
-      };
-    };
-
-    pulumi = {
-      # Pulumi Cloud: stacks, resources, registry, Neo agent
-      # OAuth via browser - no local credentials stored
-      isRemote = true;
-      url = "https://mcp.ai.pulumi.com/mcp";
+    repomix = {
+      # Codebase packaging for AI analysis
+      package = "repomix";
+      args = [ "--mcp" ];
     };
   };
 
@@ -162,6 +118,9 @@ let
     in
     if sources == [ ] then "" else (lib.concatStringsSep "; " sources) + "; ";
 
+  # Filter out HTTP servers for stdio format generators
+  stdioServerDefs = filterAttrs (_name: def: !(def.isHttp or false)) mcpServerDefs;
+
   # Claude Desktop format: wrap commands in /bin/sh to inject Nix PATH
   # Electron apps don't inherit shell PATH, so we must inject it
   toDesktopFormat =
@@ -170,13 +129,7 @@ let
       argsString = if def.args or [ ] == [ ] then "" else " " + (concatStringsSep " " def.args);
       envSource = mkEnvSource def;
     in
-    # Remote MCP servers (HTTP transport, e.g., Pulumi OAuth)
-    if def.isRemote or false then
-      {
-        type = "http";
-        url = def.url;
-      }
-    else if def.isLocal or false then
+    if def.isLocal or false then
       {
         # Local servers (e.g., bun scripts) - wrap with PATH injection
         command = "/bin/sh";
@@ -212,13 +165,7 @@ let
       envSource = mkEnvSource def;
       needsWrapper = (def.envVars or { }) != { };
     in
-    # Remote MCP servers (HTTP transport, e.g., Pulumi OAuth)
-    if def.isRemote or false then
-      {
-        type = "http";
-        url = def.url;
-      }
-    else if def.isLocal or false then
+    if def.isLocal or false then
       {
         command = def.command;
         args = def.args;
@@ -255,21 +202,25 @@ let
         type = "stdio";
       };
 
-  # Generate both formats
-  desktopMcpServers = mapAttrs toDesktopFormat mcpServerDefs;
-  cliMcpServers = mapAttrs toCliFormat mcpServerDefs;
+  # Generate stdio server configs
+  desktopStdioServers = mapAttrs toDesktopFormat stdioServerDefs;
+  cliStdioServers = mapAttrs toCliFormat stdioServerDefs;
 
-  # Config JSON for Claude Desktop
-  desktopConfigJson = builtins.toJSON { mcpServers = desktopMcpServers; };
+  # Pre-compute JSON fragments for activation script (strip outer braces)
+  desktopStdioJson = builtins.toJSON desktopStdioServers;
+  desktopStdioFragment = builtins.substring 1 (builtins.stringLength desktopStdioJson - 2) desktopStdioJson;
 
-  # Config JSON for Claude Code CLI (used by agents.nix)
-  cliConfigJson = builtins.toJSON cliMcpServers;
+  cliStdioJson = builtins.toJSON cliStdioServers;
+  cliStdioFragment = builtins.substring 1 (builtins.stringLength cliStdioJson - 2) cliStdioJson;
+
+  # Config JSON for Claude Code CLI (stdio servers only - HTTP added at activation)
+  cliConfigJson = builtins.toJSON cliStdioServers;
 in
 {
-  options.modules.home.apps.claude = {
-    enable = mkEnableOption "Claude Desktop and Code MCP servers";
+  options.modules.home.apps.mcp = {
+    enable = mkEnableOption "MCP servers for Claude Desktop, Code CLI, and other agentic IDEs";
 
-    # Expose CLI config for agents.nix to use
+    # Expose CLI config for other modules to use
     cliMcpServersJson = lib.mkOption {
       type = lib.types.str;
       default = cliConfigJson;
@@ -278,42 +229,74 @@ in
     };
   };
 
-  config = mkIf config.modules.home.apps.claude.enable {
-    # Claude Desktop stores config in ~/Library/Application Support/Claude/
-    home.file."Library/Application Support/Claude/claude_desktop_config.json" = {
-      text = desktopConfigJson;
-    };
+  config = mkIf config.modules.home.apps.mcp.enable {
+    # ═══════════════════════════════════════════════════════════════════════════
+    # Claude Settings & Skills (SSOT - symlinks to Quality System generated files)
+    # ═══════════════════════════════════════════════════════════════════════════
 
-    # Settings SSOT - symlink prevents drift
-    # Points to generated settings from Quality System
     home.file.".claude/settings.json" = {
       source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/quality/generated/claude/settings.json";
     };
 
-    # Skills symlink - generated from TypeScript definitions
     home.file.".claude/skills" = {
       source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/quality/generated/claude/skills";
     };
 
-    # Personas symlink - generated from TypeScript definitions
     home.file.".claude/agents" = {
       source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/quality/generated/claude/personas";
     };
 
-    # Generate mcp-servers.json for Claude Code CLI (used by agents.nix)
-    # This replaces the manually maintained config/agents/mcp-servers.json
-    xdg.configFile."claude/mcp-servers.json" = {
-      text = cliConfigJson;
-    };
+    # ═══════════════════════════════════════════════════════════════════════════
+    # MCP Config Generation (Activation-time for HTTP server API key injection)
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    # Generate MCP configs at activation time (after sops decryption)
+    # This allows HTTP servers like Ref to have API keys injected into URLs
+    home.activation.generateMcpConfigs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      MCP_SECRETS="${config.home.homeDirectory}/.config/mcp"
+
+      # Read API key for Ref HTTP server
+      REF_KEY=""
+      if [ -f "$MCP_SECRETS/ref-api-key" ]; then
+        REF_KEY=$(cat "$MCP_SECRETS/ref-api-key")
+      fi
+
+      # Generate Claude Desktop config with HTTP servers
+      DESKTOP_CONFIG="${config.home.homeDirectory}/Library/Application Support/Claude/claude_desktop_config.json"
+      mkdir -p "$(dirname "$DESKTOP_CONFIG")"
+
+      # Combine stdio servers (from Nix) with HTTP servers (runtime key injection)
+      cat > "$DESKTOP_CONFIG" << DESKTOPEOF
+{
+  "mcpServers": {
+    "ref": {
+      "type": "http",
+      "url": "https://api.ref.tools/mcp?apiKey=$REF_KEY"
+    },
+    ${desktopStdioFragment}
+  }
+}
+DESKTOPEOF
+
+      # Generate Claude Code CLI config with HTTP servers
+      CLI_CONFIG="${config.home.homeDirectory}/.config/claude/mcp-servers.json"
+      mkdir -p "$(dirname "$CLI_CONFIG")"
+
+      cat > "$CLI_CONFIG" << CLIEOF
+{
+  "ref": {
+    "type": "http",
+    "url": "https://api.ref.tools/mcp?apiKey=$REF_KEY"
+  },
+  ${cliStdioFragment}
+}
+CLIEOF
+
+      echo "MCP configs generated (6 servers: ref, exa, github, playwright, ast-grep, repomix)"
+    '';
 
     # Generate Quality System artifacts (skills, personas, rules, settings)
     # Runs after writeBoundary to ensure all files are in place
-    # Errors are NOT swallowed - generation must succeed
-    #
-    # NOTE: We use absolute path to bun because:
-    # 1. PATH is not available during home-manager activation
-    # 2. builtins.pathExists evaluates at Nix build time, not runtime
-    # 3. This path is stable - it's where nix-darwin installs user packages
     home.activation.generateQuality = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       QUALITY_DIR="${config.home.homeDirectory}/dotfiles/config/quality"
       BUN="/etc/profiles/per-user/${config.home.username}/bin/bun"
