@@ -130,8 +130,8 @@ const PERMISSIONS = {
     'WebFetch(domain:macos-defaults.com)',
     'WebFetch(domain:apps.apple.com)',
 
-    'mcp__context7__resolve-library-id',
-    'mcp__context7__get-library-docs',
+    'mcp__ref__*',
+    'mcp__exa__*',
   ],
   deny: [
     'Read(**/.env*)',
