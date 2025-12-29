@@ -38,7 +38,7 @@ in
     ./apps/kanata.nix
     ./apps/bartender.nix
     ./apps/raycast.nix
-    ./apps/claude.nix
+    ./apps/mcp.nix
     ./apps/cursor.nix
     ./apps/misc.nix
     ./apps/keyboard-layout.nix
@@ -98,7 +98,7 @@ in
         kanata.enable = mkDefault true;
         bartender.enable = mkDefault true;
         raycast.enable = mkDefault true;
-        claude.enable = mkDefault true;
+        mcp.enable = mkDefault true;
 
         cursor.enable = mkDefault true;
         misc.enable = mkDefault true;
