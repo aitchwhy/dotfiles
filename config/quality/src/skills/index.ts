@@ -6,7 +6,7 @@
 
 export { apiContractSkill } from './api-contract.skill'
 export { codebaseExposureSkill } from './codebase-exposure.skill'
-export { context7McpSkill } from './context7-mcp.skill'
+export { refMcpSkill } from './ref-mcp.skill'
 export { devopsPatternsSkill } from './devops-patterns.skill'
 export { effectClockPatternsSkill } from './effect-clock-patterns.skill'
 export { effectResilienceSkill } from './effect-resilience.skill'
@@ -35,7 +35,7 @@ export { upgradeSkill } from './upgrade.skill'
 
 import { apiContractSkill } from './api-contract.skill'
 import { codebaseExposureSkill } from './codebase-exposure.skill'
-import { context7McpSkill } from './context7-mcp.skill'
+import { refMcpSkill } from './ref-mcp.skill'
 import { devopsPatternsSkill } from './devops-patterns.skill'
 import { effectClockPatternsSkill } from './effect-clock-patterns.skill'
 import { effectResilienceSkill } from './effect-resilience.skill'
@@ -65,7 +65,7 @@ import { upgradeSkill } from './upgrade.skill'
 export const ALL_SKILLS = [
   apiContractSkill,
   codebaseExposureSkill,
-  context7McpSkill,
+  refMcpSkill,
   devopsPatternsSkill,
   effectClockPatternsSkill,
   effectResilienceSkill,
