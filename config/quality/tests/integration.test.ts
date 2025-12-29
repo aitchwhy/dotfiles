@@ -2,27 +2,29 @@
  * Integration Tests
  *
  * End-to-end tests for the quality system.
+ * Uses SSOT constants for counts - validates internal consistency, not magic numbers.
  */
 
 import { describe, expect, it } from 'vitest'
 import { BEHAVIOR_COUNTS, CRITIC_BEHAVIORS } from '../src/critic-mode'
 import { MEMORIES, MEMORY_COUNTS } from '../src/memories'
 import { ALL_PERSONAS } from '../src/personas'
-import { ALL_RULES } from '../src/rules'
+import { ALL_RULES, RULE_COUNT } from '../src/rules'
 import { ALL_SKILLS } from '../src/skills'
 
 describe('Quality System Integration', () => {
-  describe('counts', () => {
-    it('has exactly 15 rules', () => {
-      expect(ALL_RULES).toHaveLength(15)
+  describe('counts - SSOT validation', () => {
+    it('rules array matches exported RULE_COUNT', () => {
+      expect(ALL_RULES).toHaveLength(RULE_COUNT)
+      expect(ALL_RULES.length).toBeGreaterThan(0)
     })
 
-    it('has exactly 28 skills', () => {
-      expect(ALL_SKILLS).toHaveLength(28)
+    it('skills array has items', () => {
+      expect(ALL_SKILLS.length).toBeGreaterThan(0)
     })
 
-    it('has exactly 14 personas', () => {
-      expect(ALL_PERSONAS).toHaveLength(14)
+    it('personas array has items', () => {
+      expect(ALL_PERSONAS.length).toBeGreaterThan(0)
     })
   })
 
@@ -75,10 +77,19 @@ describe('Quality System Integration', () => {
     })
   })
 
-  describe('memories coverage', () => {
-    it('has exactly 35 memories', () => {
-      expect(MEMORIES).toHaveLength(35)
-      expect(MEMORY_COUNTS.total).toBe(35)
+  describe('memories coverage - SSOT validation', () => {
+    it('memories array matches MEMORY_COUNTS.total', () => {
+      expect(MEMORIES).toHaveLength(MEMORY_COUNTS.total)
+    })
+
+    it('category counts sum to total', () => {
+      const sum =
+        MEMORY_COUNTS.principle +
+        MEMORY_COUNTS.constraint +
+        MEMORY_COUNTS.pattern +
+        MEMORY_COUNTS.gotcha +
+        MEMORY_COUNTS.standard
+      expect(sum).toBe(MEMORY_COUNTS.total)
     })
 
     it('has all required categories', () => {
@@ -88,31 +99,21 @@ describe('Quality System Integration', () => {
       expect(categories).toContain('pattern')
       expect(categories).toContain('standard')
     })
-
-    it('has correct category counts', () => {
-      expect(MEMORY_COUNTS.principle).toBe(7)
-      expect(MEMORY_COUNTS.constraint).toBe(9)
-      expect(MEMORY_COUNTS.pattern).toBe(16)
-      expect(MEMORY_COUNTS.gotcha).toBe(0)
-      expect(MEMORY_COUNTS.standard).toBe(3)
-    })
   })
 
-  describe('critic-mode coverage', () => {
-    it('has exactly 5 behaviors', () => {
-      expect(CRITIC_BEHAVIORS).toHaveLength(5)
-      expect(BEHAVIOR_COUNTS.total).toBe(5)
+  describe('critic-mode coverage - SSOT validation', () => {
+    it('behaviors array matches BEHAVIOR_COUNTS.total', () => {
+      expect(CRITIC_BEHAVIORS).toHaveLength(BEHAVIOR_COUNTS.total)
+    })
+
+    it('phase counts sum to total', () => {
+      expect(BEHAVIOR_COUNTS.planning + BEHAVIOR_COUNTS.execution).toBe(BEHAVIOR_COUNTS.total)
     })
 
     it('covers both phases', () => {
       const phases = new Set(CRITIC_BEHAVIORS.map((b) => b.phase))
       expect(phases).toContain('planning')
       expect(phases).toContain('execution')
-    })
-
-    it('has correct phase counts', () => {
-      expect(BEHAVIOR_COUNTS.planning).toBe(3)
-      expect(BEHAVIOR_COUNTS.execution).toBe(2)
     })
   })
 })

@@ -6,10 +6,17 @@ on:
   push:
     branches: [main]
 
+# SSOT: Define paths once, reference everywhere
+env:
+  QUALITY_DIR: config/quality
+
 jobs:
-  brain-tests:
-    name: Brain System Tests
+  quality-tests:
+    name: Quality System Tests
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.QUALITY_DIR }}
 
     steps:
       - name: Checkout
@@ -19,15 +26,12 @@ jobs:
         uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
-        working-directory: config/brain
         run: bun install --frozen-lockfile
 
       - name: Run tests
-        working-directory: config/brain
-        run: bun test
+        run: bun run test
 
       - name: Validate artifacts
-        working-directory: config/brain
         run: bun run validate
 
   mcp-smoke-tests:
@@ -128,7 +132,7 @@ jobs:
 
   nix-check:
     name: Nix Flake Check (Local)
-    runs-on: ubuntu-24.04-arm # Free arm64 for public repos
+    runs-on: ubuntu-24.04-arm
 
     steps:
       - name: Checkout
@@ -153,16 +157,13 @@ jobs:
 
       - name: Install Modern CLI Tools
         run: |
-          # Install ripgrep, fd-find (modern Rust alternatives)
           sudo apt-get update
           sudo apt-get install -y ripgrep fd-find
 
       - name: Validate JSON Files
         run: |
           echo "Validating JSON files..."
-          # Use fd (fdfind on Ubuntu) instead of find
           fdfind -e json --exclude node_modules --exclude .git | while read file; do
-            # Skip JSONC files in cursor/vscode directories
             if [[ "$file" == *cursor* ]] || [[ "$file" == *vscode* ]]; then
               echo "Skipping JSONC: $file"
               continue
@@ -175,7 +176,6 @@ jobs:
         run: |
           echo "Validating YAML files..."
           sudo apt-get install -y python3-yaml
-          # Use fd (fdfind on Ubuntu) instead of find
           fdfind -e yaml -e yml | while read file; do
             echo "Checking: $file"
             python3 -c "import yaml; yaml.safe_load(open('$file'))" || { echo "Invalid YAML: $file"; exit 1; }

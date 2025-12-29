@@ -1,5 +1,12 @@
 name: Schema Drift Detection
 on: [push, pull_request]
+
+# SSOT: Define paths once, reference everywhere
+env:
+  QUALITY_DIR: config/quality
+  SCHEMA_PATH: config/quality/src/schemas/official/claude-code-settings.schema.json
+  SETTINGS_PATH: config/quality/generated/claude/settings.json
+
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -8,7 +15,8 @@ jobs:
       - uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
-        run: cd config/brain && bun install --frozen-lockfile
+        working-directory: ${{ env.QUALITY_DIR }}
+        run: bun install --frozen-lockfile
 
       - name: Validate settings.json against official schema
         run: |
@@ -17,8 +25,8 @@ jobs:
           # schema's regex but work correctly in Claude Code. Validation focuses on
           # structural correctness, not permission pattern specifics.
           bunx ajv-cli validate \
-            -s config/brain/src/schemas/official/claude-code-settings.schema.json \
-            -d config/brain/generated/claude/settings.json \
+            -s ${{ env.SCHEMA_PATH }} \
+            -d ${{ env.SETTINGS_PATH }} \
             --strict=false \
             --all-errors || {
               echo "::warning::Schema validation found differences. Review output above."
@@ -26,5 +34,5 @@ jobs:
             }
 
       - name: Type-check Effect Schemas
-        run: |
-          cd config/brain && bun run typecheck
+        working-directory: ${{ env.QUALITY_DIR }}
+        run: bun run typecheck

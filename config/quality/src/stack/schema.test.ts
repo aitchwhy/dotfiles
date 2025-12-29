@@ -4,18 +4,18 @@
  * Validates that the Effect schemas correctly parse version strings
  * and reject invalid inputs.
  */
-import { describe, expect, test } from 'bun:test'
+import { describe, expect, it } from 'vitest'
 import { Either, Schema } from 'effect'
 import { InfraVersionsSchema, RuntimeVersionsSchema, StackDefinitionSchema } from './schema'
 import { STACK } from './versions'
 
 describe('Stack Schema', () => {
-  test('STACK satisfies StackDefinitionSchema', () => {
+  it('STACK satisfies StackDefinitionSchema', () => {
     const result = Schema.decodeUnknownEither(StackDefinitionSchema)(STACK)
     expect(Either.isRight(result)).toBe(true)
   })
 
-  test('RuntimeVersionsSchema validates valid versions', () => {
+  it('RuntimeVersionsSchema validates valid versions', () => {
     const valid = {
       pnpm: '9.15.4',
       node: '25.2.1',
@@ -26,7 +26,7 @@ describe('Stack Schema', () => {
     expect(Either.isRight(result)).toBe(true)
   })
 
-  test('RuntimeVersionsSchema rejects invalid semver', () => {
+  it('RuntimeVersionsSchema rejects invalid semver', () => {
     const invalid = {
       pnpm: 'not-a-version',
       node: '25.2.1',
@@ -37,7 +37,7 @@ describe('Stack Schema', () => {
     expect(Either.isLeft(result)).toBe(true)
   })
 
-  test('InfraVersionsSchema validates valid versions', () => {
+  it('InfraVersionsSchema validates valid versions', () => {
     const valid = {
       pulumi: '3.210.0',
       'pulumi-aws': '7.14.0',

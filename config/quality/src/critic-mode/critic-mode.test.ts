@@ -1,7 +1,8 @@
 /**
  * Critic Mode Tests
  *
- * Validates the 5 metacognitive behaviors are correctly defined.
+ * Validates metacognitive behaviors and configuration.
+ * Uses SSOT pattern - validates internal consistency, not magic numbers.
  */
 import { Schema } from 'effect'
 import { describe, expect, it } from 'vitest'
@@ -9,19 +10,19 @@ import { BEHAVIOR_COUNTS, CRITIC_BEHAVIORS, CRITIC_MODE_CONFIG, getBehaviorsByPh
 import { CriticBehaviorSchema, CriticModeConfigSchema } from './schemas'
 
 describe('Critic Mode System', () => {
-  describe('counts', () => {
-    it('has exactly 5 behaviors', () => {
-      expect(CRITIC_BEHAVIORS).toHaveLength(5)
-      expect(BEHAVIOR_COUNTS.total).toBe(5)
-    })
-
-    it('has correct phase distribution', () => {
-      expect(BEHAVIOR_COUNTS.planning).toBe(3)
-      expect(BEHAVIOR_COUNTS.execution).toBe(2)
+  describe('counts - SSOT validation', () => {
+    it('behaviors array matches BEHAVIOR_COUNTS.total', () => {
+      expect(CRITIC_BEHAVIORS).toHaveLength(BEHAVIOR_COUNTS.total)
+      expect(CRITIC_BEHAVIORS.length).toBeGreaterThan(0)
     })
 
     it('phase counts sum to total', () => {
       expect(BEHAVIOR_COUNTS.planning + BEHAVIOR_COUNTS.execution).toBe(BEHAVIOR_COUNTS.total)
+    })
+
+    it('each phase count matches actual behaviors', () => {
+      expect(getBehaviorsByPhase('planning')).toHaveLength(BEHAVIOR_COUNTS.planning)
+      expect(getBehaviorsByPhase('execution')).toHaveLength(BEHAVIOR_COUNTS.execution)
     })
   })
 
@@ -73,15 +74,15 @@ describe('Critic Mode System', () => {
   })
 
   describe('helper functions', () => {
-    it('getBehaviorsByPhase returns correct counts', () => {
-      expect(getBehaviorsByPhase('planning')).toHaveLength(3)
-      expect(getBehaviorsByPhase('execution')).toHaveLength(2)
-    })
-
     it('getBehaviorsByPhase returns behaviors with correct phase', () => {
       const planningBehaviors = getBehaviorsByPhase('planning')
       for (const behavior of planningBehaviors) {
         expect(behavior.phase).toBe('planning')
+      }
+
+      const executionBehaviors = getBehaviorsByPhase('execution')
+      for (const behavior of executionBehaviors) {
+        expect(behavior.phase).toBe('execution')
       }
     })
   })

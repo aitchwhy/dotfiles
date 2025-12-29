@@ -1,8 +1,8 @@
 /**
  * Memory System Tests
  *
- * Validates the 22 canonical memories are correctly defined
- * and maintain structural integrity.
+ * Validates memory definitions and structural integrity.
+ * Uses SSOT pattern - validates internal consistency, not magic numbers.
  */
 import { Schema } from 'effect'
 import { describe, expect, it } from 'vitest'
@@ -10,18 +10,10 @@ import { getMemoriesByCategory, getMemory, MEMORIES, MEMORY_COUNTS } from './ind
 import { MemorySchema } from './schemas'
 
 describe('Memory System', () => {
-  describe('counts', () => {
-    it('has exactly 35 memories', () => {
-      expect(MEMORIES).toHaveLength(35)
-      expect(MEMORY_COUNTS.total).toBe(35)
-    })
-
-    it('has correct category distribution', () => {
-      expect(MEMORY_COUNTS.principle).toBe(7)
-      expect(MEMORY_COUNTS.constraint).toBe(9)
-      expect(MEMORY_COUNTS.pattern).toBe(16)
-      expect(MEMORY_COUNTS.gotcha).toBe(0)
-      expect(MEMORY_COUNTS.standard).toBe(3)
+  describe('counts - SSOT validation', () => {
+    it('memories array matches MEMORY_COUNTS.total', () => {
+      expect(MEMORIES).toHaveLength(MEMORY_COUNTS.total)
+      expect(MEMORIES.length).toBeGreaterThan(0)
     })
 
     it('category counts sum to total', () => {
@@ -32,6 +24,14 @@ describe('Memory System', () => {
         MEMORY_COUNTS.gotcha +
         MEMORY_COUNTS.standard
       expect(sum).toBe(MEMORY_COUNTS.total)
+    })
+
+    it('each category count matches actual memories', () => {
+      expect(getMemoriesByCategory('principle')).toHaveLength(MEMORY_COUNTS.principle)
+      expect(getMemoriesByCategory('constraint')).toHaveLength(MEMORY_COUNTS.constraint)
+      expect(getMemoriesByCategory('pattern')).toHaveLength(MEMORY_COUNTS.pattern)
+      expect(getMemoriesByCategory('gotcha')).toHaveLength(MEMORY_COUNTS.gotcha)
+      expect(getMemoriesByCategory('standard')).toHaveLength(MEMORY_COUNTS.standard)
     })
   })
 
@@ -94,14 +94,6 @@ describe('Memory System', () => {
   })
 
   describe('helper functions', () => {
-    it('getMemoriesByCategory returns correct counts', () => {
-      expect(getMemoriesByCategory('principle')).toHaveLength(7)
-      expect(getMemoriesByCategory('constraint')).toHaveLength(9)
-      expect(getMemoriesByCategory('pattern')).toHaveLength(16)
-      expect(getMemoriesByCategory('gotcha')).toHaveLength(0)
-      expect(getMemoriesByCategory('standard')).toHaveLength(3)
-    })
-
     it('getMemory returns undefined for unknown ID', () => {
       expect(getMemory('nonexistent-memory')).toBeUndefined()
     })

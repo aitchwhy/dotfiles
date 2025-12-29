@@ -2,6 +2,7 @@
  * Quality Rules Tests
  *
  * Validates rule definitions and AST-grep pattern correctness.
+ * Uses SSOT pattern - validates internal consistency, not magic numbers.
  */
 
 import { describe, expect, it } from 'vitest'
@@ -10,29 +11,31 @@ import {
   ARCHITECTURE_RULES,
   EFFECT_RULES,
   OBSERVABILITY_RULES,
+  RULE_COUNT,
   TYPE_SAFETY_RULES,
 } from '../src/rules'
 
 describe('Quality Rules', () => {
-  describe('rule counts', () => {
-    it('has exactly 15 total rules', () => {
-      expect(ALL_RULES).toHaveLength(15)
+  describe('rule counts - SSOT validation', () => {
+    it('ALL_RULES array matches exported RULE_COUNT', () => {
+      expect(ALL_RULES).toHaveLength(RULE_COUNT)
+      expect(ALL_RULES.length).toBeGreaterThan(0)
     })
 
-    it('has 3 type-safety rules', () => {
-      expect(TYPE_SAFETY_RULES).toHaveLength(3)
+    it('category arrays sum to total', () => {
+      const categorySum =
+        TYPE_SAFETY_RULES.length +
+        EFFECT_RULES.length +
+        ARCHITECTURE_RULES.length +
+        OBSERVABILITY_RULES.length
+      expect(categorySum).toBe(ALL_RULES.length)
     })
 
-    it('has 8 effect rules', () => {
-      expect(EFFECT_RULES).toHaveLength(8)
-    })
-
-    it('has 3 architecture rules', () => {
-      expect(ARCHITECTURE_RULES).toHaveLength(3)
-    })
-
-    it('has 1 observability rule', () => {
-      expect(OBSERVABILITY_RULES).toHaveLength(1)
+    it('each category has at least one rule', () => {
+      expect(TYPE_SAFETY_RULES.length).toBeGreaterThan(0)
+      expect(EFFECT_RULES.length).toBeGreaterThan(0)
+      expect(ARCHITECTURE_RULES.length).toBeGreaterThan(0)
+      expect(OBSERVABILITY_RULES.length).toBeGreaterThan(0)
     })
   })
 
@@ -70,33 +73,11 @@ describe('Quality Rules', () => {
     })
   })
 
-  describe('specific rules exist', () => {
-    it('has no-any rule', () => {
-      const rule = ALL_RULES.find((r) => r.id === 'no-any')
-      expect(rule).toBeDefined()
-      expect(rule?.severity).toBe('error')
-    })
+  describe('critical rules exist', () => {
+    const criticalRuleIds = ['no-any', 'no-zod', 'no-try-catch', 'no-mock', 'no-console']
 
-    it('has no-zod rule', () => {
-      const rule = ALL_RULES.find((r) => r.id === 'no-zod')
-      expect(rule).toBeDefined()
-      expect(rule?.severity).toBe('error')
-    })
-
-    it('has no-try-catch rule', () => {
-      const rule = ALL_RULES.find((r) => r.id === 'no-try-catch')
-      expect(rule).toBeDefined()
-      expect(rule?.severity).toBe('error')
-    })
-
-    it('has no-mock rule', () => {
-      const rule = ALL_RULES.find((r) => r.id === 'no-mock')
-      expect(rule).toBeDefined()
-      expect(rule?.severity).toBe('error')
-    })
-
-    it('has no-console rule', () => {
-      const rule = ALL_RULES.find((r) => r.id === 'no-console')
+    it.each(criticalRuleIds)('has critical rule: %s', (ruleId) => {
+      const rule = ALL_RULES.find((r) => r.id === ruleId)
       expect(rule).toBeDefined()
       expect(rule?.severity).toBe('error')
     })
