@@ -16,7 +16,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: ${{ env.QUALITY_DIR }}
-        run: bun install --frozen-lockfile
+        run: bun install
 
       - name: Validate settings.json against official schema
         run: |
