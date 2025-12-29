@@ -208,7 +208,9 @@ let
 
   # Pre-compute JSON fragments for activation script (strip outer braces)
   desktopStdioJson = builtins.toJSON desktopStdioServers;
-  desktopStdioFragment = builtins.substring 1 (builtins.stringLength desktopStdioJson - 2) desktopStdioJson;
+  desktopStdioFragment = builtins.substring 1 (
+    builtins.stringLength desktopStdioJson - 2
+  ) desktopStdioJson;
 
   cliStdioJson = builtins.toJSON cliStdioServers;
   cliStdioFragment = builtins.substring 1 (builtins.stringLength cliStdioJson - 2) cliStdioJson;
@@ -253,46 +255,46 @@ in
     # Generate MCP configs at activation time (after sops decryption)
     # This allows HTTP servers like Ref to have API keys injected into URLs
     home.activation.generateMcpConfigs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      MCP_SECRETS="${config.home.homeDirectory}/.config/mcp"
+            MCP_SECRETS="${config.home.homeDirectory}/.config/mcp"
 
-      # Read API key for Ref HTTP server
-      REF_KEY=""
-      if [ -f "$MCP_SECRETS/ref-api-key" ]; then
-        REF_KEY=$(cat "$MCP_SECRETS/ref-api-key")
-      fi
+            # Read API key for Ref HTTP server
+            REF_KEY=""
+            if [ -f "$MCP_SECRETS/ref-api-key" ]; then
+              REF_KEY=$(cat "$MCP_SECRETS/ref-api-key")
+            fi
 
-      # Generate Claude Desktop config with HTTP servers
-      DESKTOP_CONFIG="${config.home.homeDirectory}/Library/Application Support/Claude/claude_desktop_config.json"
-      mkdir -p "$(dirname "$DESKTOP_CONFIG")"
+            # Generate Claude Desktop config with HTTP servers
+            DESKTOP_CONFIG="${config.home.homeDirectory}/Library/Application Support/Claude/claude_desktop_config.json"
+            mkdir -p "$(dirname "$DESKTOP_CONFIG")"
 
-      # Combine stdio servers (from Nix) with HTTP servers (runtime key injection)
-      cat > "$DESKTOP_CONFIG" << DESKTOPEOF
-{
-  "mcpServers": {
-    "ref": {
-      "type": "http",
-      "url": "https://api.ref.tools/mcp?apiKey=$REF_KEY"
-    },
-    ${desktopStdioFragment}
-  }
-}
-DESKTOPEOF
+            # Combine stdio servers (from Nix) with HTTP servers (runtime key injection)
+            cat > "$DESKTOP_CONFIG" << DESKTOPEOF
+      {
+        "mcpServers": {
+          "ref": {
+            "type": "http",
+            "url": "https://api.ref.tools/mcp?apiKey=$REF_KEY"
+          },
+          ${desktopStdioFragment}
+        }
+      }
+      DESKTOPEOF
 
-      # Generate Claude Code CLI config with HTTP servers
-      CLI_CONFIG="${config.home.homeDirectory}/.config/claude/mcp-servers.json"
-      mkdir -p "$(dirname "$CLI_CONFIG")"
+            # Generate Claude Code CLI config with HTTP servers
+            CLI_CONFIG="${config.home.homeDirectory}/.config/claude/mcp-servers.json"
+            mkdir -p "$(dirname "$CLI_CONFIG")"
 
-      cat > "$CLI_CONFIG" << CLIEOF
-{
-  "ref": {
-    "type": "http",
-    "url": "https://api.ref.tools/mcp?apiKey=$REF_KEY"
-  },
-  ${cliStdioFragment}
-}
-CLIEOF
+            cat > "$CLI_CONFIG" << CLIEOF
+      {
+        "ref": {
+          "type": "http",
+          "url": "https://api.ref.tools/mcp?apiKey=$REF_KEY"
+        },
+        ${cliStdioFragment}
+      }
+      CLIEOF
 
-      echo "MCP configs generated (6 servers: ref, exa, github, playwright, ast-grep, repomix)"
+            echo "MCP configs generated (6 servers: ref, exa, github, playwright, ast-grep, repomix)"
     '';
 
     # Generate Quality System artifacts (skills, personas, rules, settings)
