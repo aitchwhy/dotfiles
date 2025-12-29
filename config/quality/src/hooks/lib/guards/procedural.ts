@@ -566,7 +566,7 @@ const FORBIDDEN_DEPS = [
   'colors',
   'moment',
   'dayjs',
-  'date-fns',
+  // Note: date-fns is allowed as alternative to moment (see forbidden.ts)
   'jest',
   '@jest/core',
   'mocha',
