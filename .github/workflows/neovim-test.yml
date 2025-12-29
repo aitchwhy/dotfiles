@@ -83,22 +83,22 @@ jobs:
           done
           echo "✅ All debug adapters configured"
 
-      - name: Verify Nix LSP Override
+      - name: Verify Consolidated LSP Config
         run: |
-          echo "Verifying lang-nix.lua exists and configures nixd..."
-          if [ ! -f config/nvim/lua/plugins/lang-nix.lua ]; then
-            echo "❌ lang-nix.lua not found"
+          echo "Verifying nvim-lspconfig.lua has consolidated Nix LSP config..."
+          if [ ! -f config/nvim/lua/plugins/nvim-lspconfig.lua ]; then
+            echo "❌ nvim-lspconfig.lua not found"
             exit 1
           fi
-          if ! grep -q "nil_ls = false" config/nvim/lua/plugins/lang-nix.lua; then
-            echo "❌ nil_ls not disabled in lang-nix.lua"
+          if ! grep -q "nil_ls = false" config/nvim/lua/plugins/nvim-lspconfig.lua; then
+            echo "❌ nil_ls not disabled in nvim-lspconfig.lua"
             exit 1
           fi
-          if ! grep -q "nixd" config/nvim/lua/plugins/lang-nix.lua; then
-            echo "❌ nixd not configured in lang-nix.lua"
+          if ! grep -q "nixd" config/nvim/lua/plugins/nvim-lspconfig.lua; then
+            echo "❌ nixd not configured in nvim-lspconfig.lua"
             exit 1
           fi
-          echo "✅ Nix LSP override correctly configured"
+          echo "✅ Consolidated LSP config valid (nixd enabled, nil_ls disabled)"
 
       - name: Verify Linter References
         run: |
@@ -276,18 +276,6 @@ jobs:
             print('✅ LSP configuration structure valid') \
           " +qa
 
-      - name: Verify lang-nix.lua Structure
-        run: |
-          nvim --headless -c "lua \
-            local file = vim.fn.stdpath('config') .. '/lua/plugins/lang-nix.lua' \
-            local ok, result = pcall(dofile, file) \
-            if not ok then \
-              print('❌ lang-nix.lua failed to load: ' .. tostring(result)) \
-              vim.cmd('cq') \
-            end \
-            print('✅ lang-nix.lua structure valid') \
-          " +qa
-
   plugin-install-smoke:
     name: Plugin Install Smoke Test
     runs-on: ubuntu-latest
@@ -365,3 +353,139 @@ jobs:
               vim.cmd('qa') \
             end, 1000) \
           " 2>&1 || echo "⚠️ Check completed with warnings"
+
+  behavioral-smoke-test:
+    name: Behavioral Smoke Tests
+    runs-on: ubuntu-latest
+    needs: [neovim-headless, plugin-install-smoke]
+    continue-on-error: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Neovim (Stable)
+        uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: stable
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ripgrep fd-find
+
+      - name: Setup NeoVim
+        run: |
+          mkdir -p ~/.config ~/.local/share/nvim
+          ln -sf ${{ github.workspace }}/config/nvim ~/.config/nvim
+          git clone --filter=blob:none --branch=stable \
+            https://github.com/folke/lazy.nvim.git \
+            ~/.local/share/nvim/lazy/lazy.nvim
+
+      - name: Sync Plugins
+        timeout-minutes: 5
+        run: |
+          nvim --headless "+Lazy! sync" +qa 2>/dev/null || true
+
+      - name: Test Edgy Filter Configuration
+        run: |
+          nvim --headless -c "lua \
+            -- Verify edgy.lua has proper filter function \
+            local edgy_file = vim.fn.stdpath('config') .. '/lua/plugins/edgy.lua' \
+            local content = vim.fn.readfile(edgy_file) \
+            local content_str = table.concat(content, '\n') \
+            \
+            -- Check for snacks_win filter pattern \
+            if not content_str:match('snacks_win') then \
+              print('❌ edgy.lua missing snacks_win filter') \
+              vim.cmd('cq') \
+            end \
+            if not content_str:match('relative.-editor') then \
+              print('❌ edgy.lua missing relative == editor check') \
+              vim.cmd('cq') \
+            end \
+            print('✅ Edgy filter configuration valid') \
+          " +qa
+
+      - name: Test Snacks Picker Loads
+        timeout-minutes: 2
+        run: |
+          nvim --headless -c "lua \
+            vim.defer_fn(function() \
+              local ok, snacks = pcall(require, 'snacks') \
+              if not ok then \
+                print('⚠️ Snacks not loaded (expected in minimal CI)') \
+                vim.cmd('qa') \
+                return \
+              end \
+              if snacks.picker then \
+                print('✅ Snacks picker module available') \
+              else \
+                print('⚠️ Snacks picker not configured') \
+              end \
+              vim.cmd('qa') \
+            end, 2000) \
+          " 2>&1 || echo "⚠️ Snacks check completed"
+
+      - name: Test Minimal Stack - No Duplicates
+        run: |
+          echo "Verifying minimal stack - no duplicate configs..."
+
+          # Should NOT exist (deleted)
+          for file in nvim-web-devicons.lua lang-nix.lua; do
+            if [ -f config/nvim/lua/plugins/$file ]; then
+              echo "❌ $file should be deleted (redundant)"
+              exit 1
+            fi
+            echo "✓ $file correctly removed"
+          done
+
+          # Should exist (kept)
+          for file in mini.icons.lua nvim-lspconfig.lua snacks.lua edgy.lua; do
+            if [ ! -f config/nvim/lua/plugins/$file ]; then
+              echo "❌ $file missing (required)"
+              exit 1
+            fi
+            echo "✓ $file present"
+          done
+
+          echo "✅ Minimal stack verified - no duplicates"
+
+      - name: Test LSP Config Consolidation
+        run: |
+          echo "Verifying LSP config is consolidated..."
+
+          # nvim-lspconfig.lua should have all settings
+          if ! grep -q "lua_ls" config/nvim/lua/plugins/nvim-lspconfig.lua; then
+            echo "❌ lua_ls not in consolidated config"
+            exit 1
+          fi
+          if ! grep -q "nixd" config/nvim/lua/plugins/nvim-lspconfig.lua; then
+            echo "❌ nixd not in consolidated config"
+            exit 1
+          fi
+          if ! grep -q "nil_ls = false" config/nvim/lua/plugins/nvim-lspconfig.lua; then
+            echo "❌ nil_ls = false not in consolidated config"
+            exit 1
+          fi
+
+          echo "✅ LSP config properly consolidated"
+
+      - name: Test No Phantom References
+        run: |
+          echo "Verifying no phantom plugin references..."
+
+          # edgy.lua should NOT reference copilot-chat or trouble
+          if grep -q "copilot-chat" config/nvim/lua/plugins/edgy.lua; then
+            echo "❌ edgy.lua still references phantom copilot-chat"
+            exit 1
+          fi
+
+          # neotest.lua should NOT reference trouble.nvim
+          if grep -q "trouble.nvim" config/nvim/lua/plugins/neotest.lua; then
+            echo "❌ neotest.lua still references phantom trouble.nvim"
+            exit 1
+          fi
+
+          echo "✅ No phantom plugin references"

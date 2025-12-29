@@ -13,6 +13,8 @@ vim.g.sidekick_nes = true -- Enable Next Edit Suggestions
 
 -- Editor settings
 vim.opt.termguicolors = true
+vim.opt.laststatus = 3        -- Global statusline (required for edgy.nvim collapse)
+vim.opt.splitkeep = "screen"  -- Prevent main splits jumping with edgebar
 vim.opt.clipboard = "unnamedplus"
 vim.opt.mouse = "a"
 vim.opt.grepprg = "rg --vimgrep"
