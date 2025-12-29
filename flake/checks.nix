@@ -7,18 +7,18 @@
     {
       checks = {
         # ═══════════════════════════════════════════════════════════════════════════
-        # Brain System TypeScript Validation
-        # Validates the Brain System TypeScript code compiles correctly
+        # Quality System TypeScript Validation
+        # Validates the Quality System TypeScript code compiles correctly
         # ═══════════════════════════════════════════════════════════════════════════
-        brain-typecheck =
-          pkgs.runCommand "brain-typecheck"
+        quality-typecheck =
+          pkgs.runCommand "quality-typecheck"
             {
               nativeBuildInputs = [ pkgs.bun ];
               src = ../.;
             }
             ''
               # Copy source to writable directory
-              cp -r $src/config/brain $TMPDIR/brain
+              cp -r $src/config/quality $TMPDIR/brain
               chmod -R u+w $TMPDIR/brain
               cd $TMPDIR/brain
 
@@ -27,7 +27,7 @@
               mkdir -p "$HOME"
 
               echo "═══════════════════════════════════════════════════════════════"
-              echo "Brain System TypeCheck"
+              echo "Quality System TypeCheck"
               echo "═══════════════════════════════════════════════════════════════"
 
               # Install dependencies (frozen lockfile ensures reproducibility)
@@ -37,7 +37,7 @@
               ${pkgs.bun}/bin/bun x tsc --noEmit
 
               echo ""
-              echo "✓ Brain System TypeScript validation passed"
+              echo "✓ Quality System TypeScript validation passed"
               touch $out
             '';
 

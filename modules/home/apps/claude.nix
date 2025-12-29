@@ -285,19 +285,19 @@ in
     };
 
     # Settings SSOT - symlink prevents drift
-    # Points to generated settings from Brain System
+    # Points to generated settings from Quality System
     home.file.".claude/settings.json" = {
-      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/brain/generated/claude/settings.json";
+      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/quality/generated/claude/settings.json";
     };
 
     # Skills symlink - generated from TypeScript definitions
     home.file.".claude/skills" = {
-      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/brain/generated/claude/skills";
+      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/quality/generated/claude/skills";
     };
 
     # Personas symlink - generated from TypeScript definitions
     home.file.".claude/agents" = {
-      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/brain/generated/claude/personas";
+      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/quality/generated/claude/personas";
     };
 
     # Generate mcp-servers.json for Claude Code CLI (used by agents.nix)
@@ -315,20 +315,20 @@ in
     # 2. builtins.pathExists evaluates at Nix build time, not runtime
     # 3. This path is stable - it's where nix-darwin installs user packages
     home.activation.generateQuality = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      BRAIN_DIR="${config.home.homeDirectory}/dotfiles/config/brain"
+      QUALITY_DIR="${config.home.homeDirectory}/dotfiles/config/quality"
       BUN="/etc/profiles/per-user/${config.home.username}/bin/bun"
 
-      if [ -f "$BRAIN_DIR/package.json" ]; then
+      if [ -f "$QUALITY_DIR/package.json" ]; then
         echo "Generating Intelligence artifacts..."
-        cd "$BRAIN_DIR"
+        cd "$QUALITY_DIR"
 
         if ! $BUN install --frozen-lockfile; then
-          echo "ERROR: bun install failed in $BRAIN_DIR"
+          echo "ERROR: bun install failed in $QUALITY_DIR"
           exit 1
         fi
 
         if ! $BUN run generate; then
-          echo "ERROR: Intelligence generation failed in $BRAIN_DIR"
+          echo "ERROR: Intelligence generation failed in $QUALITY_DIR"
           exit 1
         fi
 

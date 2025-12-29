@@ -11,7 +11,7 @@
     "showLineNumbers": false,
     "copyToClipboard": false,
     "includeEmptyDirectories": false,
-    "instructionFilePath": "config/agents/AGENTS.md",
+    "instructionFilePath": "config/quality/BOOTLOADER.md",
     "git": {
       "sortByChanges": true,
       "sortByChangesMaxCommits": 50

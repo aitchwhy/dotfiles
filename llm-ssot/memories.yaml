@@ -1,0 +1,303 @@
+version: "2025.12.28"
+lastUpdated: "2025-12-28T00:00:00Z"
+
+memories:
+  # === LAYER 1: BUILD TOOLING ===
+  - id: 1
+    layer: build-tooling
+    content: "Ember stack: pnpm + Docker Compose + AWS ECS. tsx for dev, tsgo for typecheck (prod-ready, 10x faster), esbuild for prod bundles. Source-only packages. pnpm overrides pin Effect versions. Zero tsc."
+    enforcementType: block
+    patterns:
+      detect:
+        - 'npm install|npm i\s'
+        - 'yarn add|yarn install'
+        - 'npx tsc\s|tsc --'
+        - 'ts-node\s'
+      block:
+        - 'tsc --build|tsc -b'
+        - 'ts-node '
+      suggest:
+        - 'pnpm add'
+        - 'tsx'
+        - 'tsgo --noEmit'
+    examples:
+      bad:
+        - 'npm install lodash'
+        - 'npx tsc --build'
+        - 'ts-node script.ts'
+      good:
+        - 'pnpm add lodash'
+        - 'tsgo --noEmit'
+        - 'tsx script.ts'
+
+  - id: 13
+    layer: build-tooling
+    content: "Programmatic enforcement: tsgo (10x faster typecheck), oxlint (50-100x faster lint), biome (format), AST-grep, lefthook. tsgolint preview for type-aware rules. Zero tsc/eslint."
+    enforcementType: block
+    patterns:
+      detect:
+        - 'eslint\s|\.eslintrc|eslint\.config'
+        - 'tslint'
+        - 'prettier --write.*\.(ts|tsx|js|jsx)'
+      block:
+        - 'eslint '
+        - 'tslint '
+        - '.eslintrc'
+      suggest:
+        - 'oxlint'
+        - 'biome check'
+        - 'biome format'
+    examples:
+      bad:
+        - 'eslint src/'
+        - 'prettier --write "**/*.ts"'
+      good:
+        - 'oxlint src/'
+        - 'biome check --write'
+
+  - id: 15
+    layer: build-tooling
+    content: "Dec2025 deps: effect@3.19.13, tsx@4.19, vitest@4.0.15, react@19.2, vite@7.2, @tanstack/react-router@1.144, @playwright/test@1.57, typescript@5.9, tsgo, better-auth@1.4.9, oxlint@1.35, biome@2.4."
+    enforcementType: warn
+    patterns:
+      detect:
+        - '"effect":\s*"[^3]'
+        - '"vitest":\s*"[^4]'
+        - '"react":\s*"[^19]'
+        - '"jest":'
+      block:
+        - '"jest":'
+        - '"@types/jest":'
+      suggest:
+        - '"effect": "3.19.13"'
+        - '"vitest": "4.0.15"'
+    examples:
+      bad:
+        - '"effect": "2.0.0"'
+        - '"jest": "29.0.0"'
+      good:
+        - '"effect": "3.19.13"'
+        - '"vitest": "4.0.15"'
+
+  - id: 19
+    layer: build-tooling
+    content: "Source-only: package exports→./src/index.ts, noEmit:true, NodeNext, allowImportingTsExtensions. Zero rewriteRelativeImportExtensions, zero vitest aliases, zero dist/ in packages."
+    enforcementType: block
+    patterns:
+      detect:
+        - '"main":\s*".*dist/'
+        - '"exports".*dist/'
+        - 'rewriteRelativeImportExtensions'
+      block:
+        - 'dist/index.js'
+        - 'rewriteRelativeImportExtensions": true'
+      suggest:
+        - '"exports": { ".": "./src/index.ts" }'
+        - '"noEmit": true'
+    examples:
+      bad:
+        - '"main": "./dist/index.js"'
+        - '"rewriteRelativeImportExtensions": true'
+      good:
+        - '"exports": { ".": "./src/index.ts" }'
+        - '"noEmit": true'
+
+  # === LAYER 2: AUTH & SECURITY ===
+  - id: 3
+    layer: auth-security
+    content: "Effect-TS ONLY: HttpApi+HttpApiBuilder+HttpApiGroup pattern. BetterAuth via auth.api.* direct calls. returnHeaders:true for Set-Cookie. Zero try/catch, zero Hono/Express."
+    enforcementType: block
+    patterns:
+      detect:
+        - 'try\s*\{'
+        - 'catch\s*\('
+        - 'from\s+[''"]hono[''"]'
+        - 'from\s+[''"]express[''"]'
+        - 'from\s+[''"]fastify[''"]'
+      block:
+        - 'try {'
+        - '} catch'
+        - "from 'hono'"
+        - "from 'express'"
+      suggest:
+        - 'Effect.tryPromise'
+        - 'Effect.catchAll'
+        - '@effect/platform HttpApi'
+    examples:
+      bad:
+        - 'try { await fetch() } catch (e) { }'
+        - "import { Hono } from 'hono'"
+      good:
+        - 'Effect.tryPromise(() => fetch()).pipe(Effect.catchAll(...))'
+        - "import { HttpApi } from '@effect/platform'"
+
+  - id: 9
+    layer: architecture
+    content: "Parse don't validate: Zero `as Type` except TS2589 library boundary (cite instantiationDepth=100 limit). Schema.decodeUnknown for runtime. $Infer vendor types only."
+    enforcementType: block
+    patterns:
+      detect:
+        - '\s+as\s+(?!const|unknown|never)[A-Z]\w+'
+        - '\s+as\s+string(?!\s*\|)'
+        - '\s+as\s+number(?!\s*\|)'
+        - '\s+as\s+boolean(?!\s*\|)'
+      block:
+        - ' as User'
+        - ' as string'
+        - ' as number'
+        - ' as any'
+      suggest:
+        - 'Schema.decodeUnknown(UserSchema)(data)'
+        - 'Schema.decodeSync(StringSchema)(data)'
+    examples:
+      bad:
+        - 'const user = data as User'
+        - 'const id = value as string'
+      good:
+        - 'const user = Schema.decodeUnknownSync(User)(data)'
+        - 'const id = Schema.decodeSync(Schema.String)(value)'
+
+  - id: 16
+    layer: architecture
+    content: "Max IoC: Apps/packages/modules unaware of caller or environment. Define only own configs, accept env vars at runtime. No getEnvironment(), no context detection. Pure inversion of control."
+    enforcementType: block
+    patterns:
+      detect:
+        - 'process\.env\.NODE_ENV'
+        - 'getEnvironment\('
+        - "NODE_ENV.*===.*['\"]"
+        - 'isDevelopment|isProduction|isStaging'
+      block:
+        - 'process.env.NODE_ENV ==='
+        - 'getEnvironment()'
+      suggest:
+        - 'Config.string("ENV_VAR")'
+        - 'Effect Context/Layer DI'
+    examples:
+      bad:
+        - "process.env.NODE_ENV === 'production'"
+        - 'if (isDevelopment()) { }'
+      good:
+        - 'Config.string("DATABASE_URL")'
+        - 'Layer.provide(ConfigLive)'
+
+  - id: 26
+    layer: architecture
+    content: "fp-ts merged into Effect-TS ecosystem. Effect is fp-ts v3 successor. Giulio Canti joined Effect org. No need for separate fp-ts dependency."
+    enforcementType: block
+    patterns:
+      detect:
+        - "from ['\"]fp-ts"
+        - "from ['\"]io-ts"
+        - '"fp-ts":'
+        - '"io-ts":'
+      block:
+        - "from 'fp-ts"
+        - "from 'io-ts"
+        - '"fp-ts":'
+      suggest:
+        - "import { Option, Either, pipe } from 'effect'"
+        - "import { Schema } from 'effect'"
+    examples:
+      bad:
+        - "import * as O from 'fp-ts/Option'"
+        - "import * as t from 'io-ts'"
+      good:
+        - "import { Option } from 'effect'"
+        - "import { Schema } from 'effect'"
+
+  # === LAYER 4: DEV PRACTICES ===
+  - id: 8
+    layer: dev-practices
+    content: "No default values in code. All config must be explicit, well-typed, and DI'd via Effect Context/Layer or AppConfig. Zero magic numbers."
+    enforcementType: warn
+    patterns:
+      detect:
+        - '\?\?\s*[''"][^'']+[''"]'
+        - '\?\?\s*\d+'
+        - '\|\|\s*[''"][^'']+[''"]'
+        - 'process\.env\.\w+\s*\?\?'
+      block:
+        - '?? "localhost"'
+        - '?? 3000'
+        - "|| 'default'"
+      suggest:
+        - 'Config.string("VAR").pipe(Config.withDefault(...))'
+        - 'explicit config via Layer'
+    examples:
+      bad:
+        - 'const port = process.env.PORT ?? 3000'
+        - "const host = process.env.HOST || 'localhost'"
+      good:
+        - 'const port = yield* Config.number("PORT")'
+        - 'const host = yield* Config.string("HOST")'
+
+  - id: 11
+    layer: dev-practices
+    content: "No documentation/comments/ADRs - code is self-documenting through naming, structure, types. Enforcement via tooling, not docs."
+    enforcementType: warn
+    patterns:
+      detect:
+        - '^\s*//\s*TODO'
+        - '^\s*//\s*FIXME'
+        - '^\s*//\s*HACK'
+        - '/\*\*[\s\S]*?\*/'
+      block: []
+      suggest:
+        - 'Use descriptive function names'
+        - 'Use branded types for documentation'
+    examples:
+      bad:
+        - '// This function fetches user data'
+        - '/** @param id The user ID */'
+      good:
+        - 'const fetchUserById = (userId: UserId) =>'
+        - 'type UserId = string & Brand<"UserId">'
+
+  - id: 12
+    layer: dev-practices
+    content: "No one-off scripts - verification is tests, config is declarative (biome/lefthook/Pulumi), no standalone scripts to maintain."
+    enforcementType: warn
+    patterns:
+      detect:
+        - 'scripts/.*\.sh'
+        - 'scripts/.*\.ts'
+        - 'bin/.*\.ts'
+      block: []
+      suggest:
+        - 'Convert to vitest test'
+        - 'Convert to Pulumi resource'
+        - 'Convert to lefthook command'
+    examples:
+      bad:
+        - 'scripts/fix-database.sh'
+        - 'scripts/migrate.ts'
+      good:
+        - '__tests__/database.test.ts'
+        - 'infra/migrations.ts (Pulumi)'
+
+  # === LAYER 5: TESTING ===
+  - id: 20
+    layer: testing
+    content: "Vitest 4: Browser Mode stable, toMatchScreenshot() for visual regression, Playwright traces, @vitest/browser-playwright provider. schema matching for Zod/Valibot."
+    enforcementType: info
+    patterns:
+      detect:
+        - 'jest\.'
+        - '@jest/'
+        - 'describe\.skip'
+        - 'test\.skip'
+      block:
+        - 'jest.'
+        - '@jest/'
+      suggest:
+        - 'vitest'
+        - '@vitest/browser-playwright'
+        - 'toMatchScreenshot()'
+    examples:
+      bad:
+        - "import { jest } from '@jest/globals'"
+        - 'jest.mock()'
+      good:
+        - "import { vi } from 'vitest'"
+        - 'vi.mock()'

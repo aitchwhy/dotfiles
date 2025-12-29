@@ -14,8 +14,8 @@
         # ═══════════════════════════════════════════════════════════════════════
         # PARAGON GUARDS (AST-grep)
         # ═══════════════════════════════════════════════════════════════════════
-        # Scans all YAML rules in config/brain/rules/paragon/
-        # Matches logic in config/brain/src/hooks/pre-tool-use.ts (SSOT)
+        # Scans all YAML rules in config/quality/rules/paragon/
+        # Matches logic in config/quality/src/hooks/pre-tool-use.ts (SSOT)
         paragon-ast = {
           enable = true;
           name = "paragon-ast";
@@ -39,7 +39,7 @@
               [ ''${#files[@]} -eq 0 ] && exit 0
 
               # Scan rules directory
-              RULES_DIR="$HOME/dotfiles/config/brain/rules/paragon"
+              RULES_DIR="$HOME/dotfiles/config/quality/rules/paragon"
               if [ ! -d "$RULES_DIR" ]; then
                 echo "Warning: PARAGON rules directory not found at $RULES_DIR"
                 exit 0
