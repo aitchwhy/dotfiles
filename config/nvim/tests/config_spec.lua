@@ -82,19 +82,25 @@ describe("mason configuration", function()
   end)
 end)
 
-describe("nix lsp configuration", function()
-  it("lang-nix.lua exists", function()
-    local file = vim.fn.stdpath("config") .. "/lua/plugins/lang-nix.lua"
+describe("nix lsp configuration (consolidated)", function()
+  it("nvim-lspconfig.lua has consolidated nix config", function()
+    local file = vim.fn.stdpath("config") .. "/lua/plugins/nvim-lspconfig.lua"
     local stat = vim.uv.fs_stat(file)
-    assert.is_not_nil(stat, "lang-nix.lua should exist for nixd override")
+    assert.is_not_nil(stat, "nvim-lspconfig.lua should exist")
   end)
 
-  it("lang-nix.lua disables nil_ls", function()
-    local file = vim.fn.stdpath("config") .. "/lua/plugins/lang-nix.lua"
+  it("nvim-lspconfig.lua disables nil_ls and enables nixd", function()
+    local file = vim.fn.stdpath("config") .. "/lua/plugins/nvim-lspconfig.lua"
     local content = vim.fn.readfile(file)
     local text = table.concat(content, "\n")
 
-    assert.is_not_nil(text:match("nil_ls = false"), "nil_ls should be disabled")
-    assert.is_not_nil(text:match("nixd"), "nixd should be configured")
+    assert.is_not_nil(text:match("nil_ls = false"), "nil_ls should be disabled in consolidated config")
+    assert.is_not_nil(text:match("nixd"), "nixd should be configured in consolidated config")
+  end)
+
+  it("lang-nix.lua should NOT exist (consolidated)", function()
+    local file = vim.fn.stdpath("config") .. "/lua/plugins/lang-nix.lua"
+    local stat = vim.uv.fs_stat(file)
+    assert.is_nil(stat, "lang-nix.lua should be deleted (merged into nvim-lspconfig.lua)")
   end)
 end)
