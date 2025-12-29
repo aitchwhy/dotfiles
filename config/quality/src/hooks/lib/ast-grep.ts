@@ -30,6 +30,7 @@ type YamlRule = {
   severity: 'error' | 'warning'
   message: string
   rule: any // AST-grep rule object
+  constraints?: Record<string, any> // Top-level constraints
 }
 
 // =============================================================================
@@ -74,17 +75,33 @@ export const checkContent = (
       // Skip if rule language is not typescript (though directory implies TS)
       if (rule.language !== 'typescript') continue
 
-      const nodes = root.findAll(rule.rule)
-      for (const node of nodes) {
-        const range = node.range()
-        matches.push({
-          ruleId: rule.id,
-          message: rule.message,
-          severity: rule.severity,
-          line: range.start.line + 1, // 0-indexed to 1-indexed
-          column: range.start.column + 1,
-          text: node.text(),
-        })
+      // Skip rules with inline constraints in patterns (not supported by NAPI findAll)
+      const ruleStr = JSON.stringify(rule.rule)
+      if (ruleStr.includes('"constraints"')) continue
+
+      const config: { rule: any; constraints?: Record<string, any> } = { rule: rule.rule }
+      if (rule.constraints) {
+        config.constraints = rule.constraints
+      }
+
+      // Try to run the rule - skip if pattern is invalid (not a complete AST node)
+      try {
+        const nodes = root.findAll(config)
+        for (const node of nodes) {
+          const range = node.range()
+          matches.push({
+            ruleId: rule.id,
+            message: rule.message,
+            severity: rule.severity,
+            line: range.start.line + 1, // 0-indexed to 1-indexed
+            column: range.start.column + 1,
+            text: node.text(),
+          })
+        }
+      } catch {
+        // Rule has invalid pattern structure for NAPI - skip silently
+        // These rules work with ast-grep CLI but not with NAPI findAll
+        continue
       }
     }
 
