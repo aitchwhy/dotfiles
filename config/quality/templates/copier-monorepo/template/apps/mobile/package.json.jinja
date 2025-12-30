@@ -1,0 +1,36 @@
+{
+  "name": "@{{ scope }}/mobile",
+  "version": "0.0.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "expo start",
+    "ios": "expo run:ios",
+    "android": "expo run:android",
+    "web": "expo start --web",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@{{ scope }}/domain": "workspace:*",
+    "expo": "{{ versions['expo'] }}",
+    "expo-router": "{{ versions['expo-router'] }}",
+    "expo-splash-screen": "{{ versions['expo-splash-screen'] }}",
+    "expo-status-bar": "{{ versions['expo-status-bar'] }}",
+    "expo-constants": "{{ versions['expo-constants'] }}",
+    "expo-linking": "{{ versions['expo-linking'] }}",
+    "react": "{{ versions['react'] }}",
+    "react-native": "{{ versions['react-native'] }}",
+    "react-native-web": "{{ versions['react-native-web'] }}",
+    "react-native-reanimated": "{{ versions['react-native-reanimated'] }}",
+    "react-native-gesture-handler": "{{ versions['react-native-gesture-handler'] }}",
+    "react-native-screens": "{{ versions['react-native-screens'] }}",
+    "react-native-safe-area-context": "{{ versions['react-native-safe-area-context'] }}",
+    "nativewind": "{{ versions['nativewind'] }}",
+    "moti": "{{ versions['moti'] }}"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "typescript": "{{ versions['typescript'] }}",
+    "tailwindcss": "{{ versions['tailwindcss'] }}"
+  }
+}

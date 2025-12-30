@@ -1,0 +1,17 @@
+/**
+ * Pulumi infrastructure for {{ project_name }}
+ *
+ * Cloud provider: {{ cloud_provider }}
+ * Region: {{ aws_region }}
+ */
+
+import * as pulumi from '@pulumi/pulumi'
+{% if cloud_provider == 'aws' %}
+import * as aws from '@pulumi/aws'
+{% endif %}
+
+// Export stack outputs
+export const stackName = pulumi.getStack()
+{% if cloud_provider == 'aws' %}
+export const region = aws.config.region
+{% endif %}

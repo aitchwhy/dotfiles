@@ -1,0 +1,50 @@
+{
+  "name": "{{ project_name }}",
+  "private": true,
+  "description": "{{ project_description }}",
+  "packageManager": "pnpm@{{ pnpm }}",
+  "engines": {
+    "node": ">=24.0.0",
+    "pnpm": ">=10"
+  },
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "typecheck": "turbo typecheck",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "lint:ast": "ast-grep scan",
+    "test": "vitest",
+    "test:e2e": "playwright test",
+    "check": "pnpm typecheck && pnpm lint && pnpm lint:ast",
+    "clean": "rm -rf packages/*/dist apps/*/dist **/*.tsbuildinfo",
+    "prepare": "lefthook install || true"{% if include_mobile %},
+    "dev:mobile": "pnpm --filter @{{ scope }}/mobile start",
+    "dev:ios": "pnpm --filter @{{ scope }}/mobile ios",
+    "dev:android": "pnpm --filter @{{ scope }}/mobile android"{% endif %}
+  },
+  "devDependencies": {
+    "@ast-grep/cli": "{{ versions['@ast-grep/cli'] }}",
+    "@biomejs/biome": "{{ versions['@biomejs/biome'] }}",
+    "@effect/vitest": "{{ versions['@effect/vitest'] }}",
+    "@playwright/test": "{{ versions['@playwright/test'] }}",
+    "@types/node": "{{ versions['@types/node'] }}",
+    "@typescript/native-preview": "latest",
+    "lefthook": "{{ versions['lefthook'] }}",
+    "oxlint": "{{ versions['oxlint'] }}",
+    "tsx": "{{ versions['tsx'] }}",
+    "turbo": "{{ versions['turbo'] }}",
+    "typescript": "{{ versions['typescript'] }}",
+    "vitest": "{{ versions['vitest'] }}"
+  },
+  "pnpm": {
+    "overrides": {
+      "effect": "{{ versions['effect'] }}",
+      "@effect/platform": "{{ versions['@effect/platform'] }}",
+      "@effect/platform-node": "{{ versions['@effect/platform-node'] }}",
+      "@effect/vitest": "{{ versions['@effect/vitest'] }}",
+      "@types/node": "{{ versions['@types/node'] }}",
+      "vitest": "{{ versions['vitest'] }}"
+    }
+  }
+}

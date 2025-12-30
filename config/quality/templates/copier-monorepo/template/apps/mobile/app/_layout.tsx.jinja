@@ -1,0 +1,25 @@
+/**
+ * Root layout for Expo Router
+ *
+ * Uses NativeWind (Tailwind for RN) and Moti for animations.
+ * New Architecture enabled (React Native 0.79+).
+ */
+
+import { Stack } from 'expo-router'
+import { StatusBar } from 'expo-status-bar'
+import { View } from 'react-native'
+import '../global.css'
+
+export default function RootLayout() {
+	return (
+		<View className="flex-1">
+			<Stack
+				screenOptions={{
+					headerShown: false,
+					animation: 'slide_from_right',
+				}}
+			/>
+			<StatusBar style="auto" />
+		</View>
+	)
+}

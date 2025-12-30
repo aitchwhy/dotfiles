@@ -1,0 +1,17 @@
+{
+  "name": "@{{ scope }}/infra",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@pulumi/pulumi": "{{ versions['@pulumi/pulumi'] }}",
+    "@pulumi/aws": "{{ versions['@pulumi/aws'] }}",
+    "@pulumi/awsx": "{{ versions['@pulumi/awsx'] }}"
+  },
+  "devDependencies": {
+    "typescript": "{{ versions['typescript'] }}"
+  }
+}

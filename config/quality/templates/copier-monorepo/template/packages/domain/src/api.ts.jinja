@@ -1,0 +1,32 @@
+/**
+ * HttpApi contract definition
+ *
+ * This module defines the typed API contract using @effect/platform HttpApi.
+ * Both server (apps/api) and client implementations derive from this single source.
+ */
+
+import { HttpApi, HttpApiEndpoint, HttpApiGroup } from '@effect/platform'
+import { Schema } from 'effect'
+
+// =============================================================================
+// SCHEMAS
+// =============================================================================
+
+export class HealthResponse extends Schema.Class<HealthResponse>('HealthResponse')({
+	status: Schema.Literal('ok'),
+	version: Schema.String,
+}) {}
+
+// =============================================================================
+// API GROUPS
+// =============================================================================
+
+export class HealthGroup extends HttpApiGroup.make('health').add(
+	HttpApiEndpoint.get('check', '/health').addSuccess(HealthResponse),
+) {}
+
+// =============================================================================
+// API DEFINITION
+// =============================================================================
+
+export class Api extends HttpApi.make('{{ project_name }}').add(HealthGroup) {}

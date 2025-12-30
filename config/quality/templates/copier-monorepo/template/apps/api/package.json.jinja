@@ -1,0 +1,22 @@
+{
+  "name": "@{{ scope }}/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc --noEmit",
+    "dev": "tsx watch src/main.ts",
+    "start": "node dist/main.js"
+  },
+  "dependencies": {
+    "@{{ scope }}/domain": "workspace:*",
+    "effect": "{{ versions['effect'] }}",
+    "@effect/platform": "{{ versions['@effect/platform'] }}",
+    "@effect/platform-node": "{{ versions['@effect/platform-node'] }}"
+  },
+  "devDependencies": {
+    "typescript": "{{ versions['typescript'] }}",
+    "tsx": "{{ versions['tsx'] }}"
+  }
+}

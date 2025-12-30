@@ -1,0 +1,89 @@
+# {{ project_name }}
+
+{{ project_description }}
+
+## Architecture
+
+- **Monorepo**: pnpm workspaces + Turborepo
+- **Core**: Effect-TS for typed effects, errors, and dependencies
+- **API**: @effect/platform HttpApiBuilder (no Hono/Express){% if include_web %}
+- **Web**: TanStack Router + React 19{% endif %}{% if include_mobile %}
+- **Mobile**: Expo SDK 53 + React Native 0.79 (New Architecture){% endif %}
+
+## Key Patterns
+
+### Effect-TS (MANDATORY)
+
+```typescript
+// ✅ CORRECT: Effect pipe with typed errors
+import { Effect, pipe } from 'effect'
+
+const program = pipe(
+  fetchUser(id),
+  Effect.flatMap(validateUser),
+  Effect.mapError((e) => new UserError({ cause: e }))
+)
+
+// ❌ FORBIDDEN: try/catch, Promise, console.log
+```
+
+### Parse at Boundary
+
+```typescript
+// ✅ Parse external data at system boundaries
+import { Schema } from 'effect'
+
+const UserSchema = Schema.Struct({
+  id: Schema.String,
+  email: Schema.String,
+})
+
+// Parse at API boundary, trust internally
+const parseUser = Schema.decodeUnknown(UserSchema)
+```
+
+### Hexagonal Architecture
+
+```typescript
+// ✅ Ports via Context.Tag
+import { Context, Layer } from 'effect'
+
+interface UserRepo {
+  readonly findById: (id: string) => Effect.Effect<User, NotFoundError>
+}
+const UserRepo = Context.GenericTag<UserRepo>('UserRepo')
+
+// Adapter implementations via Layer
+const PostgresUserRepo = Layer.succeed(UserRepo, { ... })
+```
+
+## Commands
+
+```bash
+pnpm dev          # Start all apps
+pnpm build        # Build all apps
+pnpm typecheck    # Type check
+pnpm lint         # Biome format
+pnpm lint:ast     # AST-grep rules
+pnpm test         # Vitest
+```
+
+## Rules (Enforced via AST-grep)
+
+1. **No try/catch** - Use Effect error channel
+2. **No console.log** - Use Effect.log or structured logging
+3. **No any/unknown assertions** - Parse with Schema
+4. **No new Date()** - Use Effect Clock
+5. **No Promise** - Use Effect
+
+## Package Structure
+
+- `packages/domain/` - Shared schemas, types, and domain logic
+- `apps/api/` - Effect HTTP API{% if include_web %}
+- `apps/web/` - TanStack Router web app{% endif %}{% if include_mobile %}
+- `apps/mobile/` - Expo universal app{% endif %}{% if cloud_provider != 'none' %}
+- `infra/` - Pulumi infrastructure{% endif %}
+
+---
+
+SSOT v{{ _ssotVersion }} | Frozen {{ _frozen }}

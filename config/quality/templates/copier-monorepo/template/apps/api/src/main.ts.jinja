@@ -1,0 +1,47 @@
+/**
+ * Effect HTTP API Server
+ *
+ * Uses @effect/platform HttpApiBuilder for type-safe HTTP APIs.
+ * No Hono, no Express - pure Effect.
+ */
+
+import { HttpApiBuilder, HttpMiddleware, HttpServer } from '@effect/platform'
+import { NodeHttpServer, NodeRuntime } from '@effect/platform-node'
+import { Effect, Layer } from 'effect'
+import { createServer } from 'node:http'
+import { Api, HealthGroup, HealthResponse } from '@{{ scope }}/domain/api'
+
+// =============================================================================
+// HANDLERS
+// =============================================================================
+
+const HealthGroupLive = HttpApiBuilder.group(Api, 'health', (handlers) =>
+	handlers.handle('check', () =>
+		Effect.succeed(
+			new HealthResponse({
+				status: 'ok',
+				version: '0.0.0',
+			}),
+		),
+	),
+)
+
+// =============================================================================
+// SERVER
+// =============================================================================
+
+const ApiLive = HttpApiBuilder.api(Api).pipe(Layer.provide(HealthGroupLive))
+
+const ServerLive = HttpApiBuilder.serve(HttpMiddleware.logger).pipe(
+	Layer.provide(ApiLive),
+	Layer.provide(NodeHttpServer.layer(createServer, { port: 3000 })),
+)
+
+// =============================================================================
+// MAIN
+// =============================================================================
+
+Effect.log('Starting server on http://localhost:3000').pipe(
+	Effect.flatMap(() => Layer.launch(ServerLive)),
+	NodeRuntime.runMain,
+)

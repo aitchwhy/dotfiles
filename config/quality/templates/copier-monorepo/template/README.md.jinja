@@ -1,0 +1,47 @@
+# {{ project_name }}
+
+{{ project_description }}
+
+## Quick Start
+
+```bash
+pnpm install
+pnpm dev
+```
+
+## Structure
+
+```
+{{ project_name }}/
+├── apps/
+│   ├── api/          # Effect HTTP API{% if include_web %}
+│   └── web/          # TanStack Router web app{% endif %}{% if include_mobile %}
+│   └── mobile/       # Expo universal app{% endif %}
+├── packages/
+│   └── domain/       # Shared domain logic
+└── {% if cloud_provider != 'none' %}infra/            # Pulumi infrastructure{% endif %}
+```
+
+## Commands
+
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Start all apps in development |
+| `pnpm build` | Build all apps |
+| `pnpm typecheck` | Type check all packages |
+| `pnpm lint` | Run Biome formatter/linter |
+| `pnpm lint:ast` | Run AST-grep rules |
+| `pnpm test` | Run tests with Vitest |
+| `pnpm test:e2e` | Run E2E tests with Playwright |
+
+## Stack
+
+- **Runtime**: Node {{ node }}, pnpm {{ pnpm }}
+- **Language**: TypeScript 5.9+
+- **Core**: Effect ecosystem
+- **Testing**: Vitest, Playwright
+- **Linting**: Biome (format), Oxlint (lint), AST-grep (rules)
+
+---
+
+Generated from SSOT v{{ _ssotVersion }} ({{ _frozen }})

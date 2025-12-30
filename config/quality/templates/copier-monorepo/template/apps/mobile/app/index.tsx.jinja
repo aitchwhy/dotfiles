@@ -1,0 +1,25 @@
+/**
+ * Home screen
+ */
+
+import { MotiView } from 'moti'
+import { Text, View } from 'react-native'
+
+export default function HomeScreen() {
+	return (
+		<View className="flex-1 items-center justify-center bg-white dark:bg-black">
+			<MotiView
+				from={{ opacity: 0, scale: 0.9 }}
+				animate={{ opacity: 1, scale: 1 }}
+				transition={{ type: 'timing', duration: 500 }}
+			>
+				<Text className="text-2xl font-bold text-black dark:text-white">
+					[[ project_name ]]
+				</Text>
+				<Text className="mt-2 text-gray-500 dark:text-gray-400">
+					Expo SDK 53 • React Native 0.79 • New Architecture
+				</Text>
+			</MotiView>
+		</View>
+	)
+}

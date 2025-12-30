@@ -1,0 +1,28 @@
+{
+  "name": "@{{ scope }}/domain",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./api": {
+      "import": "./dist/api.js",
+      "types": "./dist/api.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc --noEmit",
+    "dev": "tsc -b --watch"
+  },
+  "dependencies": {
+    "effect": "{{ versions['effect'] }}",
+    "@effect/platform": "{{ versions['@effect/platform'] }}"
+  },
+  "devDependencies": {
+    "typescript": "{{ versions['typescript'] }}"
+  }
+}

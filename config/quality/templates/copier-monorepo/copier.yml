@@ -1,0 +1,127 @@
+# ~/dotfiles/config/quality/templates/copier-monorepo/copier.yml
+# SSOT Copier Template for TypeScript Monorepo (Dec 2025)
+_min_copier_version: "9.4.0"
+_subdirectory: template
+_answers_file: .copier-answers.yml
+
+# Custom delimiters for .ts.jinja files ONLY
+# JSON files use standard {{ }} (no conflict)
+_envops:
+  block_start_string: "[%"
+  block_end_string: "%]"
+  variable_start_string: "[["
+  variable_end_string: "]]"
+  comment_start_string: "[#"
+  comment_end_string: "#]"
+
+# =============================================================================
+# QUESTIONS
+# =============================================================================
+
+project_name:
+  type: str
+  help: "Project name (kebab-case)"
+  validator: "{% if not project_name | regex_search('^[a-z][a-z0-9-]*$') %}Must be kebab-case{% endif %}"
+
+project_description:
+  type: str
+  default: "A TypeScript monorepo"
+  help: "One-line description"
+
+scope:
+  type: str
+  default: "{{ project_name }}"
+  help: "npm scope (without @)"
+
+include_api:
+  type: bool
+  default: true
+  help: "Include Effect HTTP API (apps/api)"
+
+include_web:
+  type: bool
+  default: false
+  help: "Include TanStack Router web app (apps/web)"
+
+include_mobile:
+  type: bool
+  default: false
+  help: "Include Expo universal app (apps/mobile)"
+
+cloud_provider:
+  type: str
+  choices:
+    none: "No infrastructure"
+    aws: "AWS via Pulumi"
+  default: "none"
+  help: "Cloud provider for infra/"
+
+aws_region:
+  type: str
+  default: "us-east-1"
+  when: "{{ cloud_provider == 'aws' }}"
+  help: "AWS region"
+
+pulumi_org:
+  type: str
+  default: ""
+  when: "{{ cloud_provider != 'none' }}"
+  help: "Pulumi organization name"
+
+database:
+  type: str
+  choices:
+    none: "No database"
+    postgresql: "PostgreSQL 18+"
+    turso: "Turso (SQLite)"
+  default: "none"
+  help: "Database adapter"
+
+auth_provider:
+  type: str
+  choices:
+    none: "No auth"
+    better-auth: "Better Auth (TypeScript-first)"
+  default: "none"
+  help: "Authentication provider"
+
+# =============================================================================
+# CONDITIONAL EXCLUSIONS
+# =============================================================================
+
+_exclude:
+  - "{% if not include_api %}apps/api{% endif %}"
+  - "{% if not include_web %}apps/web{% endif %}"
+  - "{% if not include_mobile %}apps/mobile{% endif %}"
+  - "{% if cloud_provider == 'none' %}infra{% endif %}"
+  - "copier.yml"
+  - "scripts/"
+  - "*.pyc"
+  - "__pycache__"
+
+# =============================================================================
+# TASKS (run after copy)
+# =============================================================================
+
+_tasks:
+  # Generate versions.json from SSOT at copy-time
+  - command: |
+      tsx {{ _copier_conf.src_path }}/scripts/build-versions.ts > /dev/null 2>&1 || true
+    when: "{{ _copier_operation == 'copy' }}"
+
+  # Symlink AST-grep rules (absolute path - won't break)
+  - command: |
+      mkdir -p .quality
+      ln -sf ~/dotfiles/config/quality/rules .quality/rules
+    when: "{{ _copier_operation == 'copy' }}"
+
+  # Initialize
+  - command: pnpm install
+    when: "{{ _copier_operation == 'copy' }}"
+
+  - command: git init && git add -A
+    when: "{{ _copier_operation == 'copy' }}"
+
+  # Validate generated code compiles
+  - command: pnpm typecheck
+    when: "{{ _copier_operation == 'copy' }}"

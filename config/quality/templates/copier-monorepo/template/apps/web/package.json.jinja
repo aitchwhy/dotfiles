@@ -1,0 +1,25 @@
+{
+  "name": "@{{ scope }}/web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@{{ scope }}/domain": "workspace:*",
+    "react": "{{ versions['react'] }}",
+    "react-dom": "{{ versions['react-dom'] }}",
+    "@tanstack/react-router": "{{ versions['@tanstack/react-router'] }}"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "typescript": "{{ versions['typescript'] }}",
+    "vite": "{{ versions['vite'] }}",
+    "tailwindcss": "{{ versions['tailwindcss'] }}"
+  }
+}
