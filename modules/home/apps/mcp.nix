@@ -210,7 +210,11 @@ let
       {
         # npm packages with env vars - use env field with placeholders
         command = "npx";
-        args = [ "-y" def.package ] ++ def.args;
+        args = [
+          "-y"
+          def.package
+        ]
+        ++ def.args;
         type = "stdio";
         env = envWithPlaceholders;
       }
@@ -218,7 +222,11 @@ let
       {
         # npm packages via npx
         command = "npx";
-        args = [ "-y" def.package ] ++ def.args;
+        args = [
+          "-y"
+          def.package
+        ]
+        ++ def.args;
         type = "stdio";
       };
 
@@ -228,11 +236,10 @@ let
 
   # HTTP server format for CLI (with placeholder for runtime API key injection)
   # Placeholder format: __SERVERNAME_KEY__ (e.g., __REF_KEY__)
-  toCliHttpFormat =
-    name: def: {
-      type = "http";
-      url = "${def.url}?apiKey=__${toUpper name}_KEY__";
-    };
+  toCliHttpFormat = name: def: {
+    type = "http";
+    url = "${def.url}?apiKey=__${toUpper name}_KEY__";
+  };
 
   # Filter and generate HTTP server configs (CLI only - Desktop doesn't support HTTP)
   httpServerDefs = filterAttrs (_name: def: def.isHttp or false) mcpServerDefs;
