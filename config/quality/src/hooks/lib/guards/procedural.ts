@@ -3,7 +3,8 @@
  *
  * Guards: 1 (bash safety), 2 (commits), 3 (forbidden files),
  *         8 (TDD), 9-10 (DevOps), 11-12 (advisory), 27 (CLI tools),
- *         28-31 (config/stack), 32 (secrets detection), 33 (hook bypass)
+ *         28-31 (config/stack), 32 (secrets detection), 33 (hook bypass),
+ *         34 (scaffolding enforcement)
  *
  * Modernized to use Effect for FS operations (no sync FS).
  */
@@ -608,6 +609,65 @@ export function checkStackCompliance(content: string, filePath: string): GuardRe
 }
 
 // =============================================================================
+// Guard 34: Scaffolding Enforcement (Use Copier)
+// =============================================================================
+
+const SCAFFOLDING_ALLOWED_PATHS = [
+	'/templates/',
+	'/copier-monorepo/',
+	'config/quality/',
+	'/node_modules/',
+] as const
+
+const SCAFFOLDING_PATTERNS: readonly { pattern: RegExp; description: string }[] = [
+	// mkdir project structure patterns
+	{ pattern: /mkdir\s+(-p\s+)?.*\/(src|apps|packages|lib)\//, description: 'mkdir project dirs' },
+	{ pattern: /mkdir\s+(-p\s+)?.+\/(api|web|mobile|infra)/, description: 'mkdir app dirs' },
+	// npm/pnpm init (use template instead)
+	{ pattern: /\b(npm|pnpm|yarn)\s+init\b/, description: 'package init' },
+	// Creating config files manually (use template)
+	{
+		pattern: /touch\s+.*(tsconfig|biome|vitest\.config|turbo)\.(json|ts)/,
+		description: 'touch config file',
+	},
+	// Copying template directories
+	{ pattern: /cp\s+-r.*template/, description: 'cp -r template' },
+]
+
+export function checkScaffoldingEnforcement(command: string): GuardResult {
+	// Allow within template development paths
+	if (SCAFFOLDING_ALLOWED_PATHS.some((p) => command.includes(p))) {
+		return { ok: true }
+	}
+
+	for (const { pattern, description } of SCAFFOLDING_PATTERNS) {
+		if (pattern.test(command)) {
+			return {
+				ok: false,
+				error: `Guard 34: MANUAL SCAFFOLDING BLOCKED
+
+Detected: ${description}
+Command: ${command.substring(0, 60)}${command.length > 60 ? '...' : ''}
+
+Use Copier template instead:
+
+  pipx run copier copy ~/dotfiles/config/quality/templates/copier-monorepo ./my-project --trust
+
+Benefits:
+- SSOT version injection (no manual version management)
+- Consistent project structure
+- Automatic symlink to AST-grep rules
+- Pre-configured tooling (Biome, Vitest, Turbo)
+
+See: /copier-template skill`,
+			}
+		}
+	}
+
+	return { ok: true }
+}
+
+// =============================================================================
 // Main Entry Point
 // =============================================================================
 
@@ -635,6 +695,10 @@ export function runProceduralGuards(
     // Guard 27: Legacy CLI tool syntax detection
     const cliToolsResult = checkModernCLITools(command)
     if (!cliToolsResult.ok) return cliToolsResult
+
+    // Guard 34: Scaffolding enforcement (use Copier)
+    const scaffoldingResult = checkScaffoldingEnforcement(command)
+    if (!scaffoldingResult.ok) return scaffoldingResult
   }
 
   // Write/Edit guards
