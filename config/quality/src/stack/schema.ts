@@ -89,7 +89,7 @@ export type RuntimeVersions = {
 }
 
 /**
- * Frontend framework versions
+ * Frontend framework versions (Web)
  */
 export type FrontendVersions = {
   readonly react: string
@@ -97,6 +97,53 @@ export type FrontendVersions = {
   readonly xstate: string
   readonly 'tanstack-router': string
   readonly tailwindcss: string
+}
+
+/**
+ * Mobile/Universal versions (Expo SDK 53 - December 2025)
+ * iOS + Android + Web from single codebase
+ */
+export type MobileVersions = {
+  // Core runtime
+  readonly expo: string
+  readonly 'react-native': string
+  readonly 'react-native-web': string
+
+  // Routing
+  readonly 'expo-router': string
+
+  // Animation
+  readonly 'react-native-reanimated': string
+  readonly moti: string
+  readonly 'react-native-gesture-handler': string
+
+  // Styling
+  readonly nativewind: string
+
+  // Navigation primitives
+  readonly 'react-native-screens': string
+  readonly 'react-native-safe-area-context': string
+
+  // Essential Expo packages
+  readonly 'expo-splash-screen': string
+  readonly 'expo-status-bar': string
+  readonly 'expo-constants': string
+  readonly 'expo-linking': string
+  readonly 'expo-secure-store': string
+  readonly 'expo-image': string
+  readonly 'expo-video': string
+  readonly 'expo-audio': string
+  readonly 'expo-haptics': string
+  readonly 'expo-notifications': string
+  readonly 'expo-updates': string
+  readonly 'expo-background-task': string
+
+  // Performance
+  readonly '@shopify/flash-list': string
+
+  // Storage
+  readonly '@react-native-async-storage/async-storage': string
+  readonly 'expo-sqlite': string
 }
 
 /**
@@ -322,6 +369,33 @@ export type NpmVersions = {
 
   // WebGL
   readonly ogl: string
+
+  // Mobile / Universal
+  readonly expo: string
+  readonly 'react-native': string
+  readonly 'react-native-web': string
+  readonly 'expo-router': string
+  readonly 'react-native-reanimated': string
+  readonly moti: string
+  readonly 'react-native-gesture-handler': string
+  readonly nativewind: string
+  readonly 'react-native-screens': string
+  readonly 'react-native-safe-area-context': string
+  readonly 'expo-splash-screen': string
+  readonly 'expo-status-bar': string
+  readonly 'expo-constants': string
+  readonly 'expo-linking': string
+  readonly 'expo-secure-store': string
+  readonly 'expo-image': string
+  readonly 'expo-video': string
+  readonly 'expo-audio': string
+  readonly 'expo-haptics': string
+  readonly 'expo-notifications': string
+  readonly 'expo-updates': string
+  readonly 'expo-background-task': string
+  readonly '@shopify/flash-list': string
+  readonly '@react-native-async-storage/async-storage': string
+  readonly 'expo-sqlite': string
 }
 
 /**
@@ -332,6 +406,7 @@ export type StackDefinition = {
   readonly meta: StackMeta
   readonly runtime: RuntimeVersions
   readonly frontend: FrontendVersions
+  readonly mobile: MobileVersions
   readonly backend: BackendVersions
   readonly infra: InfraVersions
   readonly testing: TestingVersions
@@ -361,6 +436,49 @@ export const FrontendVersionsSchema = Schema.Struct({
   'tanstack-router': VersionString,
   tailwindcss: VersionString,
 }) satisfies Schema.Schema<FrontendVersions, FrontendVersions>
+
+export const MobileVersionsSchema = Schema.Struct({
+  // Core runtime
+  expo: VersionString,
+  'react-native': VersionString,
+  'react-native-web': VersionString,
+
+  // Routing
+  'expo-router': VersionString,
+
+  // Animation
+  'react-native-reanimated': VersionString,
+  moti: VersionString,
+  'react-native-gesture-handler': VersionString,
+
+  // Styling
+  nativewind: VersionString,
+
+  // Navigation primitives
+  'react-native-screens': VersionString,
+  'react-native-safe-area-context': VersionString,
+
+  // Essential Expo packages
+  'expo-splash-screen': VersionString,
+  'expo-status-bar': VersionString,
+  'expo-constants': VersionString,
+  'expo-linking': VersionString,
+  'expo-secure-store': VersionString,
+  'expo-image': VersionString,
+  'expo-video': VersionString,
+  'expo-audio': VersionString,
+  'expo-haptics': VersionString,
+  'expo-notifications': VersionString,
+  'expo-updates': VersionString,
+  'expo-background-task': VersionString,
+
+  // Performance
+  '@shopify/flash-list': VersionString,
+
+  // Storage
+  '@react-native-async-storage/async-storage': VersionString,
+  'expo-sqlite': VersionString,
+}) satisfies Schema.Schema<MobileVersions, MobileVersions>
 
 export const BackendVersionsSchema = Schema.Struct({
   'drizzle-orm': VersionString,
@@ -554,12 +672,40 @@ export const NpmVersionsSchema = Schema.Struct({
 
   // WebGL
   ogl: VersionString,
+
+  // Mobile / Universal
+  expo: VersionString,
+  'react-native': VersionString,
+  'react-native-web': VersionString,
+  'expo-router': VersionString,
+  'react-native-reanimated': VersionString,
+  moti: VersionString,
+  'react-native-gesture-handler': VersionString,
+  nativewind: VersionString,
+  'react-native-screens': VersionString,
+  'react-native-safe-area-context': VersionString,
+  'expo-splash-screen': VersionString,
+  'expo-status-bar': VersionString,
+  'expo-constants': VersionString,
+  'expo-linking': VersionString,
+  'expo-secure-store': VersionString,
+  'expo-image': VersionString,
+  'expo-video': VersionString,
+  'expo-audio': VersionString,
+  'expo-haptics': VersionString,
+  'expo-notifications': VersionString,
+  'expo-updates': VersionString,
+  'expo-background-task': VersionString,
+  '@shopify/flash-list': VersionString,
+  '@react-native-async-storage/async-storage': VersionString,
+  'expo-sqlite': VersionString,
 }) satisfies Schema.Schema<NpmVersions, NpmVersions>
 
 export const StackDefinitionSchema = Schema.Struct({
   meta: StackMetaSchema,
   runtime: RuntimeVersionsSchema,
   frontend: FrontendVersionsSchema,
+  mobile: MobileVersionsSchema,
   backend: BackendVersionsSchema,
   infra: InfraVersionsSchema,
   testing: TestingVersionsSchema,

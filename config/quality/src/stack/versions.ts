@@ -25,22 +25,22 @@ import { StackDefinitionSchema } from './schema'
 export const STACK = {
   meta: {
     frozen: '2025-12',
-    updated: '2024-12-24',
-    ssotVersion: '4.1.0',
+    updated: '2025-12-30',
+    ssotVersion: '4.2.0',
   },
 
   // ===========================================================================
   // RUNTIME
   // ===========================================================================
   runtime: {
-    pnpm: '10.25.0', // Fast, disk-efficient package manager
+    pnpm: '10.26.0', // Fast, disk-efficient package manager
     node: '24.12.0', // Current (NOT LTS - user preference)
     uv: '0.5.1', // Python manager (Rust)
     volta: '2.0.1', // Tool manager (Rust)
   },
 
   // ===========================================================================
-  // FRONTEND
+  // FRONTEND (Web)
   // ===========================================================================
   frontend: {
     react: '19.2.1',
@@ -48,6 +48,55 @@ export const STACK = {
     xstate: '5.25.0', // Actor model state machines (handles API state)
     'tanstack-router': '1.140.0',
     tailwindcss: '4.1.17',
+  },
+
+  // ===========================================================================
+  // MOBILE / UNIVERSAL (Expo SDK 53 - December 2025)
+  // Universal = iOS + Android + Web from single codebase
+  // Decision: SDK 53 (stable, 75% New Arch adoption) over SDK 54 (too new)
+  // ===========================================================================
+  mobile: {
+    // Core runtime
+    expo: '53.0.0',
+    'react-native': '0.79.0',
+    'react-native-web': '0.20.0',
+
+    // Routing (file-based, universal)
+    'expo-router': '5.0.0',
+
+    // Animation (Moti for declarative, Reanimated for gestures)
+    'react-native-reanimated': '4.1.0',
+    moti: '0.30.0',
+    'react-native-gesture-handler': '3.0.0',
+
+    // Styling (NativeWind = Tailwind for RN, aligns with tailwindcss SSOT)
+    nativewind: '4.1.23',
+    // NOTE: tailwindcss version shared with frontend section
+
+    // Navigation primitives
+    'react-native-screens': '4.9.0',
+    'react-native-safe-area-context': '5.4.0',
+
+    // Essential Expo packages
+    'expo-splash-screen': '0.30.0',
+    'expo-status-bar': '2.0.0',
+    'expo-constants': '17.0.0',
+    'expo-linking': '7.0.0',
+    'expo-secure-store': '14.0.0',
+    'expo-image': '2.0.0',
+    'expo-video': '2.0.0', // Replaces expo-av Video
+    'expo-audio': '1.0.0', // Replaces expo-av Audio
+    'expo-haptics': '14.0.0',
+    'expo-notifications': '0.30.0',
+    'expo-updates': '0.28.0',
+    'expo-background-task': '0.2.0', // Replaces expo-background-fetch
+
+    // Performance
+    '@shopify/flash-list': '2.0.0',
+
+    // Storage
+    '@react-native-async-storage/async-storage': '2.1.0',
+    'expo-sqlite': '15.0.0',
   },
 
   // ===========================================================================
@@ -224,13 +273,16 @@ export const STACK = {
     vite: '7.2.7',
     handlebars: '4.7.8',
 
-    // Dev & Linting
-    oxlint: '0.15.10', // Type-aware standard
-    'oxlint-tsgolint': '0.15.10',
-    '@biomejs/biome': '1.9.4', // Formatter only
-    '@types/node': '22.10.2',
+    // Dev & Linting (Dec 2025 - reconciled from templates)
+    oxlint: '1.35.0', // Type-aware linter (Oxlint 1.0 stable)
+    'oxlint-tsgolint': '1.35.0',
+    '@biomejs/biome': '2.3.8', // Formatter only (Biome 2.0 with type inference)
+    '@types/node': '24.10.1', // Node 24 LTS types
     tsx: '4.19.2', // TS runner
-    '@ast-grep/napi': '0.33.1',
+    '@ast-grep/napi': '0.40.3',
+    '@ast-grep/cli': '0.40.3', // CLI for ast-grep scan
+    lefthook: '1.13.6', // Git hooks manager
+    turbo: '2.5.0', // Monorepo orchestration
 
     // Pulumi (infrastructure) - Dec 2025
     '@pulumi/pulumi': '3.210.0',
@@ -265,6 +317,35 @@ export const STACK = {
 
     // WebGL
     ogl: '1.0.11',
+
+    // ===========================================================================
+    // MOBILE / UNIVERSAL (for package.json generation)
+    // ===========================================================================
+    expo: '53.0.0',
+    'react-native': '0.79.0',
+    'react-native-web': '0.20.0',
+    'expo-router': '5.0.0',
+    'react-native-reanimated': '4.1.0',
+    moti: '0.30.0',
+    'react-native-gesture-handler': '3.0.0',
+    nativewind: '4.1.23',
+    'react-native-screens': '4.9.0',
+    'react-native-safe-area-context': '5.4.0',
+    'expo-splash-screen': '0.30.0',
+    'expo-status-bar': '2.0.0',
+    'expo-constants': '17.0.0',
+    'expo-linking': '7.0.0',
+    'expo-secure-store': '14.0.0',
+    'expo-image': '2.0.0',
+    'expo-video': '2.0.0',
+    'expo-audio': '1.0.0',
+    'expo-haptics': '14.0.0',
+    'expo-notifications': '0.30.0',
+    'expo-updates': '0.28.0',
+    'expo-background-task': '0.2.0',
+    '@shopify/flash-list': '2.0.0',
+    '@react-native-async-storage/async-storage': '2.1.0',
+    'expo-sqlite': '15.0.0',
   },
 } as const satisfies StackDefinition
 
