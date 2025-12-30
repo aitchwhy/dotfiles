@@ -24,8 +24,11 @@ let
     concatStringsSep
     mapAttrs
     filterAttrs
+    hasSuffix
     mkEnableOption
     mkIf
+    removeSuffix
+    toUpper
     ;
 
   # Determinate Nix profile paths (in priority order)
@@ -160,13 +163,35 @@ let
         ];
       };
 
+  # Derive placeholder name from secret file path
+  # e.g., "~/.config/mcp/exa-api-key" → "__EXA_KEY__"
+  # e.g., "~/.config/mcp/github-token" → "__GITHUB_TOKEN__"
+  secretPathToPlaceholder =
+    path:
+    let
+      filename = builtins.baseNameOf path;
+    in
+    if hasSuffix "-api-key" filename then
+      let
+        prefix = removeSuffix "-api-key" filename;
+      in
+      "__${toUpper prefix}_KEY__"
+    else if hasSuffix "-token" filename then
+      let
+        prefix = removeSuffix "-token" filename;
+      in
+      "__${toUpper prefix}_TOKEN__"
+    else
+      throw "Unknown secret format: ${filename}. Expected *-api-key or *-token";
+
   # Claude Code CLI format: direct commands (shell has PATH)
-  # For servers needing env vars, we wrap in sh to source secrets
+  # Uses env field for secrets (cleaner than shell wrapper)
   toCliFormat =
     _name: def:
     let
-      envSource = mkEnvSource def;
-      needsWrapper = (def.envVars or { }) != { };
+      hasEnvVars = (def.envVars or { }) != { };
+      # Generate env with placeholder values for runtime substitution
+      envWithPlaceholders = mapAttrs (_: secretPathToPlaceholder) (def.envVars or { });
     in
     if def.isLocal or false then
       {
@@ -181,27 +206,19 @@ let
         args = [ def.package ] ++ def.args;
         type = "stdio";
       }
-    else if needsWrapper then
+    else if hasEnvVars then
       {
-        # npm packages that need env vars - wrap in shell
-        command = "/bin/sh";
-        args = [
-          "-c"
-          "${envSource}exec npx -y ${def.package}${
-            if def.args == [ ] then "" else " " + (concatStringsSep " " def.args)
-          }"
-        ];
+        # npm packages with env vars - use env field with placeholders
+        command = "npx";
+        args = [ "-y" def.package ] ++ def.args;
         type = "stdio";
+        env = envWithPlaceholders;
       }
     else
       {
         # npm packages via npx
         command = "npx";
-        args = [
-          "-y"
-          def.package
-        ]
-        ++ def.args;
+        args = [ "-y" def.package ] ++ def.args;
         type = "stdio";
       };
 
@@ -209,17 +226,30 @@ let
   desktopStdioServers = mapAttrs toDesktopFormat stdioServerDefs;
   cliStdioServers = mapAttrs toCliFormat stdioServerDefs;
 
+  # HTTP server format for CLI (with placeholder for runtime API key injection)
+  # Placeholder format: __SERVERNAME_KEY__ (e.g., __REF_KEY__)
+  toCliHttpFormat =
+    name: def: {
+      type = "http";
+      url = "${def.url}?apiKey=__${toUpper name}_KEY__";
+    };
+
+  # Filter and generate HTTP server configs (CLI only - Desktop doesn't support HTTP)
+  httpServerDefs = filterAttrs (_name: def: def.isHttp or false) mcpServerDefs;
+  cliHttpServers = mapAttrs toCliHttpFormat httpServerDefs;
+
+  # Combine stdio + HTTP for full CLI config
+  cliAllServers = cliStdioServers // cliHttpServers;
+  cliAllJson = builtins.toJSON cliAllServers;
+
   # Pre-compute JSON fragments for activation script (strip outer braces)
   desktopStdioJson = builtins.toJSON desktopStdioServers;
   desktopStdioFragment = builtins.substring 1 (
     builtins.stringLength desktopStdioJson - 2
   ) desktopStdioJson;
 
-  cliStdioJson = builtins.toJSON cliStdioServers;
-  cliStdioFragment = builtins.substring 1 (builtins.stringLength cliStdioJson - 2) cliStdioJson;
-
-  # Config JSON for Claude Code CLI (stdio servers only - HTTP added at activation)
-  cliConfigJson = builtins.toJSON cliStdioServers;
+  # Config JSON for Claude Code CLI (all servers - stdio + HTTP)
+  cliConfigJson = builtins.toJSON cliAllServers;
 in
 {
   options.modules.home.apps.mcp = {
@@ -255,48 +285,31 @@ in
     # MCP Config Generation (Activation-time for HTTP server API key injection)
     # ═══════════════════════════════════════════════════════════════════════════
 
-    # Generate MCP configs at activation time (after sops decryption)
-    # This allows HTTP servers like Ref to have API keys injected into URLs
+    # Generate Claude Desktop config (stdio servers only - Desktop doesn't support HTTP MCP)
     home.activation.generateMcpConfigs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-            MCP_SECRETS="${config.home.homeDirectory}/.config/mcp"
-
-            # Read API key for Ref HTTP server
-            REF_KEY=""
-            if [ -f "$MCP_SECRETS/ref-api-key" ]; then
-              REF_KEY=$(cat "$MCP_SECRETS/ref-api-key")
-            fi
-
-            # Generate Claude Desktop config with HTTP servers
             DESKTOP_CONFIG="${config.home.homeDirectory}/Library/Application Support/Claude/claude_desktop_config.json"
             mkdir -p "$(dirname "$DESKTOP_CONFIG")"
 
-            # Combine stdio servers (from Nix) with HTTP servers (runtime key injection)
             cat > "$DESKTOP_CONFIG" << DESKTOPEOF
       {
         "mcpServers": {
-          "ref": {
-            "type": "http",
-            "url": "https://api.ref.tools/mcp?apiKey=$REF_KEY"
-          },
           ${desktopStdioFragment}
         }
       }
       DESKTOPEOF
 
-            echo "Claude Desktop config generated (6 servers)"
+            echo "Claude Desktop config generated (5 stdio servers)"
     '';
 
     # Generate Claude Code CLI config (~/.claude.json)
     # Uses jq to MERGE mcpServers key with existing runtime state
     # Runtime state includes: numStartups, oauthAccount, projects, etc. (31+ keys)
+    # Server definitions derived from mcpServerDefs (SSOT)
     home.activation.generateClaudeCodeConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       MCP_SECRETS="${config.home.homeDirectory}/.config/mcp"
       CLAUDE_CODE_CONFIG="${config.home.homeDirectory}/.claude.json"
 
-      # ─────────────────────────────────────────────────────────────────────────
       # Read API keys for servers requiring authentication
-      # ─────────────────────────────────────────────────────────────────────────
-
       REF_KEY=""
       [ -f "$MCP_SECRETS/ref-api-key" ] && REF_KEY=$(cat "$MCP_SECRETS/ref-api-key")
 
@@ -306,65 +319,22 @@ in
       GITHUB_TOKEN=""
       [ -f "$MCP_SECRETS/github-token" ] && GITHUB_TOKEN=$(cat "$MCP_SECRETS/github-token")
 
-      # ─────────────────────────────────────────────────────────────────────────
-      # Build mcpServers JSON with resolved secrets
-      # ─────────────────────────────────────────────────────────────────────────
+      # MCP servers JSON from Nix SSOT (with placeholders for secrets)
+      MCP_SERVERS='${cliAllJson}'
 
-      MCP_SERVERS=$(cat <<'MCPEOF'
-      {
-        "ref": {
-          "type": "http",
-          "url": "https://api.ref.tools/mcp?apiKey=__REF_KEY__"
-        },
-        "exa": {
-          "type": "stdio",
-          "command": "npx",
-          "args": ["-y", "exa-mcp-server"],
-          "env": { "EXA_API_KEY": "__EXA_KEY__" }
-        },
-        "github": {
-          "type": "stdio",
-          "command": "npx",
-          "args": ["-y", "@modelcontextprotocol/server-github"],
-          "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": "__GITHUB_TOKEN__" }
-        },
-        "playwright": {
-          "type": "stdio",
-          "command": "npx",
-          "args": ["-y", "@playwright/mcp"]
-        },
-        "ast-grep": {
-          "type": "stdio",
-          "command": "npx",
-          "args": ["-y", "@notprolands/ast-grep-mcp"]
-        },
-        "repomix": {
-          "type": "stdio",
-          "command": "npx",
-          "args": ["-y", "repomix", "--mcp"]
-        }
-      }
-      MCPEOF
-      )
-
-      # Substitute placeholders with actual values
+      # Substitute placeholders with actual secret values
       MCP_SERVERS=$(echo "$MCP_SERVERS" | sed "s/__REF_KEY__/$REF_KEY/g")
       MCP_SERVERS=$(echo "$MCP_SERVERS" | sed "s/__EXA_KEY__/$EXA_KEY/g")
       MCP_SERVERS=$(echo "$MCP_SERVERS" | sed "s/__GITHUB_TOKEN__/$GITHUB_TOKEN/g")
 
-      # ─────────────────────────────────────────────────────────────────────────
       # Merge with existing config (preserve runtime state)
-      # ─────────────────────────────────────────────────────────────────────────
-
       if [ -f "$CLAUDE_CODE_CONFIG" ]; then
-        # Merge: replace only mcpServers key, preserve all other keys
         MERGED=$(jq --argjson servers "$MCP_SERVERS" '.mcpServers = $servers' "$CLAUDE_CODE_CONFIG")
         echo "$MERGED" > "$CLAUDE_CODE_CONFIG"
-        echo "Claude Code config updated (mcpServers merged, 6 servers)"
+        echo "Claude Code config updated (6 servers from SSOT)"
       else
-        # Initialize new config with just mcpServers
         echo "{\"mcpServers\": $MCP_SERVERS}" > "$CLAUDE_CODE_CONFIG"
-        echo "Claude Code config created (6 servers)"
+        echo "Claude Code config created (6 servers from SSOT)"
       fi
     '';
 
