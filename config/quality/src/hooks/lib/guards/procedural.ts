@@ -3,8 +3,10 @@
  *
  * Guards: 1 (bash safety), 2 (commits), 3 (forbidden files),
  *         8 (TDD), 9-10 (DevOps), 11-12 (advisory), 27 (CLI tools),
- *         28-31 (config/stack), 32 (secrets detection), 33 (hook bypass),
+ *         28-30 (config centralization), 32 (secrets detection), 33 (hook bypass),
  *         34 (scaffolding enforcement)
+ *
+ * Note: Guard 31 (stack compliance) consolidated to pre-tool-use.ts using src/stack SSOT
  *
  * Modernized to use Effect for FS operations (no sync FS).
  */
@@ -542,71 +544,9 @@ export function checkSecrets(content: string, filePath: string): GuardResult {
 }
 
 // =============================================================================
-// Guard 31: Stack Compliance
+// Guard 31: Stack Compliance - CONSOLIDATED
+// Now uses SSOT from src/stack/forbidden.ts via checkForbiddenPackages in pre-tool-use.ts
 // =============================================================================
-
-const FORBIDDEN_DEPS = [
-  'lodash',
-  'underscore',
-  'express',
-  'fastify',
-  'koa',
-  'hono',
-  '@prisma/client',
-  'prisma',
-  'sequelize',
-  'typeorm',
-  'mongoose',
-  'axios',
-  'node-fetch',
-  'request',
-  'winston',
-  'pino',
-  'bunyan',
-  'chalk',
-  'colors',
-  'moment',
-  'dayjs',
-  // Note: date-fns is allowed as alternative to moment (see forbidden.ts)
-  'jest',
-  '@jest/core',
-  'mocha',
-  'jasmine',
-  'chai',
-  'sinon',
-  'bun',
-  '@types/bun',
-]
-
-type PackageJson = {
-  readonly dependencies?: Record<string, string>
-  readonly devDependencies?: Record<string, string>
-}
-
-function parsePackageJson(content: string): PackageJson | null {
-  const parsed: unknown = JSON.parse(content)
-  if (typeof parsed !== 'object' || parsed === null) return null
-  return parsed as PackageJson
-}
-
-export function checkStackCompliance(content: string, filePath: string): GuardResult {
-  if (!filePath.endsWith('package.json')) return { ok: true }
-
-  const pkg = parsePackageJson(content)
-  if (!pkg) return { ok: true }
-
-  const allDeps = { ...pkg.dependencies, ...pkg.devDependencies }
-  const forbidden = Object.keys(allDeps).filter((dep) => FORBIDDEN_DEPS.includes(dep))
-
-  if (forbidden.length > 0) {
-    return {
-      ok: false,
-      error: `Guard 31: Forbidden dependencies: ${forbidden.join(', ')}\n\nSee stack.md for alternatives.`,
-    }
-  }
-
-  return { ok: true }
-}
 
 // =============================================================================
 // Guard 34: Scaffolding Enforcement (Use Copier)
@@ -722,9 +662,7 @@ export function runProceduralGuards(
       const urlsResult = checkHardcodedUrls(content, filePath)
       if (!urlsResult.ok) return urlsResult
 
-      // Stack compliance (package.json)
-      const stackResult = checkStackCompliance(content, filePath)
-      if (!stackResult.ok) return stackResult
+      // Guard 31: Stack compliance handled by checkForbiddenPackages in pre-tool-use.ts
 
       // Advisory guards (collect warnings)
       const warnings: string[] = []

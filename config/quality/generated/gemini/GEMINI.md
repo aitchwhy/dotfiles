@@ -1315,85 +1315,76 @@ All exposed codebases should comply with:
 
 ---
 
-### ref-mcp
+### copier-template
 
-> Ref.tools MCP server for SOTA documentation search (60-95% fewer tokens than alternatives).
+> Creating/updating SSOT projects with Copier
 
-#### Overview
+#### Creating New Projects
 
-# Ref.tools MCP Server
 
-State-of-the-art documentation search with 60-95% fewer tokens than context7/fetch alternatives.
+Use Copier to create projects from SSOT template:
 
-Key benefits:
-- Context-aware deduplication (doesn't repeat docs in same session)
-- Focused snippets instead of full pages
-- 8,500+ libraries indexed with version-specific docs
+```bash
+# Interactive mode
+pipx run copier copy ~/dotfiles/config/quality/templates/copier-monorepo ./my-project --trust
 
-#### When to Use
-
-- **Effect-TS**: APIs change frequently, training data outdated
-- Any library where unsure of current API
-- Before writing code with external imports
-- When user asks "how do I use X?"
-- Verifying function signatures and parameters
-
-#### Trigger Phrase
-
-```
-use ref - how do I create an Effect Layer?
+# Non-interactive with data
+pipx run copier copy ~/dotfiles/config/quality/templates/copier-monorepo ./my-project \
+  --data project_name=my-project \
+  --data include_api=true \
+  --data include_mobile=true \
+  --trust
 ```
 
-#### Tools
 
-### mcp__ref__search
+#### Version Injection
 
-Search for documentation on any library or topic.
 
-```typescript
-mcp__ref__search({
-  query: "Effect Layer composition",
-  library: "effect-ts"  // optional: focus on specific library
-})
+Versions are injected at copy-time from SSOT (versions.ts):
+
+1. `build-versions.ts` runs during `copier copy`
+2. Imports STACK from versions.ts
+3. Writes versions.json to template/
+4. Templates reference `{{ versions['package'] }}`
+
+NEVER hardcode versions in templates - always use SSOT.
+
+
+#### Template Questions
+
+
+| Question | Type | Purpose |
+|----------|------|---------|
+| project_name | str | kebab-case name |
+| scope | str | npm scope (without @) |
+| include_api | bool | Effect HTTP API |
+| include_web | bool | TanStack Router app |
+| include_mobile | bool | Expo universal app |
+| cloud_provider | choice | none/aws |
+| database | choice | none/postgresql/turso |
+| auth_provider | choice | none/better-auth |
+
+
+#### Updating Projects
+
+
+```bash
+# Update existing project to latest template
+cd my-project
+pipx run copier update --trust
 ```
 
-Returns focused documentation snippets with:
-- Code examples
-- API signatures
-- Best practices
+The `.copier-answers.yml` file preserves your choices.
 
-#### Usage Patterns
 
-### Before Implementing New Feature
+#### Jinja Delimiters
 
-```
-1. Search for library-specific patterns
-2. Review returned snippets
-3. Implement following documented patterns
-```
 
-### Effect-TS (Critical)
+- JSON files: Standard `{{ }}` delimiters
+- TypeScript files: Custom `[[ ]]` and `[% %]` delimiters
 
-The Effect API changes frequently. Training data is outdated.
+This prevents conflicts with template literals.
 
-**Always query ref before writing Effect code:**
-
-```typescript
-mcp__ref__search({
-  query: "Effect.gen usage patterns",
-  library: "effect-ts"
-})
-```
-
-#### Token Efficiency
-
-| Approach | Tokens | Notes |
-|----------|--------|-------|
-| WebFetch full page | 5-20k | Includes nav, footer, unrelated content |
-| context7 | 2-5k | Better but still verbose |
-| **ref** | 0.5-2k | Focused snippets, session deduplication |
-
-Ref automatically deduplicates within a session - repeated queries for same docs return minimal tokens.
 
 ---
 
@@ -1931,6 +1922,100 @@ getUser("123").pipe(
 
 ---
 
+### expo
+
+> Expo SDK 53 / Router v5 patterns and commands
+
+#### Project Structure
+
+
+```
+apps/mobile/
+├── app/           # File-based routing (Expo Router)
+│   ├── _layout.tsx
+│   ├── index.tsx
+│   └── (tabs)/
+├── assets/
+├── app.json       # Expo config
+├── metro.config.js
+└── package.json
+```
+
+
+#### Common Commands
+
+
+```bash
+# Development
+pnpm --filter @scope/mobile start     # Start Metro
+pnpm --filter @scope/mobile ios       # iOS simulator
+pnpm --filter @scope/mobile android   # Android emulator
+pnpm --filter @scope/mobile web       # Web browser
+
+# From apps/mobile
+npx expo start
+npx expo run:ios
+npx expo run:android
+```
+
+
+#### Expo Router Navigation
+
+
+```typescript
+// File-based routing
+// app/index.tsx -> /
+// app/profile.tsx -> /profile
+// app/(tabs)/home.tsx -> /home (grouped)
+
+import { Link, useRouter } from 'expo-router'
+
+// Declarative navigation
+<Link href="/profile">Go to Profile</Link>
+
+// Imperative navigation
+const router = useRouter()
+router.push('/profile')
+router.replace('/home')
+router.back()
+```
+
+
+#### Layout Files
+
+
+```typescript
+// app/_layout.tsx - Root layout
+import { Stack } from 'expo-router'
+
+export default function RootLayout() {
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="index" />
+      <Stack.Screen name="(tabs)" />
+    </Stack>
+  )
+}
+```
+
+
+#### New Architecture (SDK 53)
+
+
+SDK 53 defaults to New Architecture:
+- `newArchEnabled: true` in app.json
+- TurboModules for native modules
+- Fabric renderer for UI
+- Concurrent features enabled
+
+If issues arise, disable temporarily:
+```json
+{ "expo": { "newArchEnabled": false } }
+```
+
+
+---
+
 ### gha-oidc-patterns
 
 > GitHub Actions OIDC authentication patterns - AWS, Pulumi Cloud, Docker Hub. Official actions over curl|sh.
@@ -2309,6 +2394,222 @@ mcp__ast-grep__rewrite_code({
 - [ ] Use targeted repomix includes for large codebases
 - [ ] Use exa for cross-repo code pattern search
 - [ ] Use grep_repomix_output instead of full reads
+
+---
+
+### moti
+
+> Moti declarative animations for React Native
+
+#### Why Moti
+
+
+Moti provides declarative animations built on Reanimated:
+- Works on iOS, Android, and Web
+- Simpler API than raw Reanimated
+- Automatic layout animations
+- Presence animations (mount/unmount)
+
+Use Moti for UI animations, Reanimated for gestures.
+
+
+#### Basic Animation
+
+
+```typescript
+import { MotiView } from 'moti'
+
+// Animate on mount
+<MotiView
+  from={{ opacity: 0, scale: 0.9 }}
+  animate={{ opacity: 1, scale: 1 }}
+  transition={{ type: 'timing', duration: 500 }}
+>
+  <Text>Fades and scales in</Text>
+</MotiView>
+```
+
+
+#### State-Driven Animation
+
+
+```typescript
+import { MotiView } from 'moti'
+
+function Toggle({ isActive }: { isActive: boolean }) {
+  return (
+    <MotiView
+      animate={{
+        backgroundColor: isActive ? '#10B981' : '#6B7280',
+        scale: isActive ? 1.1 : 1,
+      }}
+      transition={{ type: 'spring', damping: 15 }}
+    />
+  )
+}
+```
+
+
+#### Presence (Enter/Exit)
+
+
+```typescript
+import { AnimatePresence, MotiView } from 'moti'
+
+function Modal({ visible }: { visible: boolean }) {
+  return (
+    <AnimatePresence>
+      {visible && (
+        <MotiView
+          from={{ opacity: 0, translateY: 50 }}
+          animate={{ opacity: 1, translateY: 0 }}
+          exit={{ opacity: 0, translateY: 50 }}
+          key="modal"
+        />
+      )}
+    </AnimatePresence>
+  )
+}
+```
+
+
+#### Skeleton Loader
+
+
+```typescript
+import { Skeleton } from 'moti/skeleton'
+
+function LoadingCard() {
+  return (
+    <Skeleton.Group show={isLoading}>
+      <Skeleton width={200} height={20} colorMode="light" />
+      <Skeleton width={150} height={16} colorMode="light" />
+    </Skeleton.Group>
+  )
+}
+```
+
+
+#### Transition Types
+
+
+```typescript
+// Spring (bouncy, natural)
+transition={{ type: 'spring', damping: 15, stiffness: 100 }}
+
+// Timing (linear, predictable)
+transition={{ type: 'timing', duration: 300 }}
+
+// Decay (gesture-driven momentum)
+transition={{ type: 'decay', velocity: 0.5 }}
+```
+
+Prefer spring for UI, timing for opacity/color.
+
+
+---
+
+### nativewind
+
+> NativeWind (Tailwind for React Native) patterns
+
+#### Setup
+
+
+Required files:
+
+```javascript
+// metro.config.js
+const { withNativeWind } = require('nativewind/metro')
+module.exports = withNativeWind(config, { input: './global.css' })
+```
+
+```css
+/* global.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+```typescript
+// app/_layout.tsx
+import '../global.css'
+```
+
+
+#### Basic Usage
+
+
+```typescript
+import { View, Text } from 'react-native'
+
+// Use className prop (NOT style)
+<View className="flex-1 items-center justify-center bg-white">
+  <Text className="text-2xl font-bold text-black">
+    Hello NativeWind
+  </Text>
+</View>
+
+// Conditional classes
+<View className={`p-4 ${isActive ? 'bg-blue-500' : 'bg-gray-200'}`} />
+```
+
+
+#### Dark Mode
+
+
+```typescript
+// Automatic with system preference
+<View className="bg-white dark:bg-black">
+  <Text className="text-black dark:text-white">
+    Adapts to system theme
+  </Text>
+</View>
+
+// app.json: userInterfaceStyle: "automatic"
+```
+
+
+#### Platform Variants
+
+
+```typescript
+// iOS-only styles
+<View className="ios:pt-12 android:pt-4" />
+
+// Web-only styles
+<View className="web:hover:bg-gray-100" />
+```
+
+
+#### Common Patterns
+
+
+```typescript
+// Full screen centered
+<View className="flex-1 items-center justify-center">
+
+// Card with shadow
+<View className="rounded-xl bg-white p-4 shadow-md">
+
+// Row with gap
+<View className="flex-row gap-2">
+
+// Safe area padding (use hooks instead)
+// AVOID: pt-safe - use useSafeAreaInsets()
+```
+
+
+#### Type Declarations
+
+
+```typescript
+// nativewind-env.d.ts
+/// <reference types="nativewind/types" />
+```
+
+This enables className prop typing on all RN components.
+
 
 ---
 
@@ -3556,6 +3857,188 @@ Rules are enforced at multiple layers:
 
 To see all rules: `config/quality/src/rules/`
 
+
+---
+
+### react-native
+
+> React Native 0.79 platform patterns and safe practices
+
+#### Platform-Specific Code
+
+
+```typescript
+// Option 1: Platform.select
+import { Platform } from 'react-native'
+
+const styles = {
+  padding: Platform.select({ ios: 20, android: 16, default: 16 }),
+}
+
+// Option 2: Platform-specific files
+// Button.ios.tsx
+// Button.android.tsx
+// Button.tsx (fallback)
+import Button from './Button'  // Auto-selects
+```
+
+
+#### Safe Area Handling
+
+
+```typescript
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
+
+// Wrap entire screen
+function Screen() {
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <Content />
+    </SafeAreaView>
+  )
+}
+
+// Or use hooks for fine control
+function Header() {
+  const insets = useSafeAreaInsets()
+  return <View style={{ paddingTop: insets.top }} />
+}
+```
+
+
+#### Lists and Performance
+
+
+```typescript
+// Use FlashList for large lists (Shopify)
+import { FlashList } from '@shopify/flash-list'
+
+<FlashList
+  data={items}
+  renderItem={({ item }) => <Item {...item} />}
+  estimatedItemSize={80}  // Required for performance
+  keyExtractor={(item) => item.id}
+/>
+
+// AVOID FlatList for 100+ items
+```
+
+
+#### Image Handling
+
+
+```typescript
+// Use expo-image (NOT react-native Image)
+import { Image } from 'expo-image'
+
+<Image
+  source={{ uri: 'https://example.com/image.jpg' }}
+  style={{ width: 200, height: 200 }}
+  contentFit="cover"
+  placeholder={blurhash}
+  transition={200}
+/>
+```
+
+expo-image provides caching, blurhash, and better performance.
+
+
+#### Keyboard Handling
+
+
+```typescript
+import { KeyboardAvoidingView, Platform } from 'react-native'
+
+<KeyboardAvoidingView
+  behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+  style={{ flex: 1 }}
+>
+  <TextInput />
+</KeyboardAvoidingView>
+```
+
+
+---
+
+### ref-mcp
+
+> Ref.tools MCP server for SOTA documentation search (60-95% fewer tokens than alternatives).
+
+#### Overview
+
+# Ref.tools MCP Server
+
+State-of-the-art documentation search with 60-95% fewer tokens than context7/fetch alternatives.
+
+Key benefits:
+- Context-aware deduplication (doesn't repeat docs in same session)
+- Focused snippets instead of full pages
+- 8,500+ libraries indexed with version-specific docs
+
+#### When to Use
+
+- **Effect-TS**: APIs change frequently, training data outdated
+- Any library where unsure of current API
+- Before writing code with external imports
+- When user asks "how do I use X?"
+- Verifying function signatures and parameters
+
+#### Trigger Phrase
+
+```
+use ref - how do I create an Effect Layer?
+```
+
+#### Tools
+
+### mcp__ref__search
+
+Search for documentation on any library or topic.
+
+```typescript
+mcp__ref__search({
+  query: "Effect Layer composition",
+  library: "effect-ts"  // optional: focus on specific library
+})
+```
+
+Returns focused documentation snippets with:
+- Code examples
+- API signatures
+- Best practices
+
+#### Usage Patterns
+
+### Before Implementing New Feature
+
+```
+1. Search for library-specific patterns
+2. Review returned snippets
+3. Implement following documented patterns
+```
+
+### Effect-TS (Critical)
+
+The Effect API changes frequently. Training data is outdated.
+
+**Always query ref before writing Effect code:**
+
+```typescript
+mcp__ref__search({
+  query: "Effect.gen usage patterns",
+  library: "effect-ts"
+})
+```
+
+#### Token Efficiency
+
+| Approach | Tokens | Notes |
+|----------|--------|-------|
+| WebFetch full page | 5-20k | Includes nav, footer, unrelated content |
+| context7 | 2-5k | Better but still verbose |
+| **ref** | 0.5-2k | Focused snippets, session deduplication |
+
+Ref automatically deduplicates within a session - repeated queries for same docs return minimal tokens.
 
 ---
 

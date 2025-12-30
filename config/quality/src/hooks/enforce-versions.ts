@@ -12,6 +12,7 @@
 import { FileSystem } from '@effect/platform'
 import { BunContext, BunRuntime } from '@effect/platform-bun'
 import { Effect, pipe, Schema } from 'effect'
+import { FORBIDDEN_PACKAGES } from '../stack'
 import { emitContinue, emitHalt } from './lib/hook-logging'
 
 // =============================================================================
@@ -30,32 +31,8 @@ const PackageJsonSchema = Schema.Struct({
 })
 
 // =============================================================================
-// Configuration (must match config/brain/src/stack/versions.ts)
+// Configuration - uses SSOT from src/stack/forbidden.ts
 // =============================================================================
-
-const FORBIDDEN_DEPS: Record<string, string> = {
-  lodash: 'Use native Array/Object methods or Effect utilities',
-  'lodash-es': 'Use native Array/Object methods or Effect utilities',
-  underscore: 'Use native Array/Object methods or Effect utilities',
-  express: 'Use Effect Platform HTTP instead (@effect/platform)',
-  fastify: 'Use Effect Platform HTTP instead (@effect/platform)',
-  koa: 'Use Effect Platform HTTP instead (@effect/platform)',
-  hono: 'Use Effect Platform HTTP instead (@effect/platform)',
-  prisma: 'Use Drizzle ORM instead (type-safe, SQL-first)',
-  '@prisma/client': 'Use Drizzle ORM instead (type-safe, SQL-first)',
-  mongoose: 'Use Drizzle + PostgreSQL instead of MongoDB',
-  moment: 'Use native Date API or Temporal (Stage 3)',
-  'moment-timezone': 'Use native Date API or Temporal (Stage 3)',
-  axios: 'Use native fetch() or Effect HttpClient',
-  jest: 'Use Vitest instead (Vite-native, faster)',
-  '@jest/globals': 'Use Vitest instead (Vite-native, faster)',
-  eslint: 'Use Biome or OXLint instead (faster, unified)',
-  prettier: 'Use Biome instead (unified format + lint)',
-  redux: 'Use XState (state machines) or Zustand (simple state)',
-  '@reduxjs/toolkit': 'Use XState (state machines) or Zustand (simple state)',
-  webpack: 'Use Vite instead (ESM-native, faster)',
-  'webpack-cli': 'Use Vite instead (ESM-native, faster)',
-}
 
 // =============================================================================
 // Main
@@ -82,11 +59,11 @@ const checkPackageJson = (pkgPath: string) =>
     }
 
     const violations: Violation[] = []
-    for (const [dep, reason] of Object.entries(FORBIDDEN_DEPS)) {
-      if (allDeps[dep]) {
+    for (const forbidden of FORBIDDEN_PACKAGES) {
+      if (allDeps[forbidden.name]) {
         violations.push({
-          package: dep,
-          message: `${dep} is forbidden. ${reason}`,
+          package: forbidden.name,
+          message: `${forbidden.name} is forbidden. ${forbidden.reason}. Alternative: ${forbidden.alternative}`,
           severity: 'high',
         })
       }
