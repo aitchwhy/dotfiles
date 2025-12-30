@@ -160,6 +160,35 @@ upgrade-diff:
     @echo "Run: just upgrade-check"
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# COPIER (Project Scaffolding)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Regenerate versions.json from SSOT (run before copier copy)
+build-copier-versions:
+    @echo "Generating versions.json from SSOT..."
+    @cd config/quality && tsx templates/copier-monorepo/scripts/build-versions.ts
+    @echo "✓ versions.json updated"
+
+# Create a new project from SSOT template
+# Usage: just new-project my-app --data include_mobile=true
+new-project NAME *ARGS:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "Creating project: {{ NAME }}"
+    just build-copier-versions
+    pipx run copier copy ~/dotfiles/config/quality/templates/copier-monorepo ./{{ NAME }} \
+        --data project_name={{ NAME }} \
+        {{ ARGS }} \
+        --trust
+    echo ""
+    echo "✓ Project created: {{ NAME }}"
+    echo ""
+    echo "Next steps:"
+    echo "  cd {{ NAME }}"
+    echo "  pnpm install"
+    echo "  pnpm dev"
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # HIDDEN HELPERS
 # ═══════════════════════════════════════════════════════════════════════════════
 
