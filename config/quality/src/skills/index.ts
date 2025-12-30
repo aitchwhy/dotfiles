@@ -1,18 +1,22 @@
 /**
  * Skills Registry
  *
- * All 28 skills with compile-time count assertion.
+ * All 33 skills with compile-time count assertion.
  */
 
 export { apiContractSkill } from './api-contract.skill'
 export { codebaseExposureSkill } from './codebase-exposure.skill'
+export { copierTemplateSkill } from './copier-template.skill'
 export { devopsPatternsSkill } from './devops-patterns.skill'
 export { effectClockPatternsSkill } from './effect-clock-patterns.skill'
 export { effectResilienceSkill } from './effect-resilience.skill'
 export { effectTsSkill } from './effect-ts.skill'
+export { expoSkill } from './expo.skill'
 export { ghaOidcPatternsSkill } from './gha-oidc-patterns.skill'
 export { hexagonalSkill } from './hexagonal.skill'
 export { livekitAgentsSkill } from './livekit-agents.skill'
+export { motiSkill } from './moti.skill'
+export { nativewindSkill } from './nativewind.skill'
 export { mcpOptimizationSkill } from './mcp-optimization.skill'
 export { nixConfigurationCentralizationSkill } from './nix-configuration-centralization.skill'
 export { nixPatternsSkill } from './nix-patterns.skill'
@@ -23,6 +27,7 @@ export { parseBoundarySkill } from './parse-boundary.skill'
 export { planningPatternsSkill } from './planning-patterns.skill'
 export { pulumiEscSkill } from './pulumi-esc.skill'
 export { qualityRulesSkill } from './quality-rules.skill'
+export { reactNativeSkill } from './react-native.skill'
 export { refMcpSkill } from './ref-mcp.skill'
 export { repomixSkill } from './repomix.skill'
 export { secretsManagementSkill } from './secrets-management.skill'
@@ -35,14 +40,18 @@ export { upgradeSkill } from './upgrade.skill'
 
 import { apiContractSkill } from './api-contract.skill'
 import { codebaseExposureSkill } from './codebase-exposure.skill'
+import { copierTemplateSkill } from './copier-template.skill'
 import { devopsPatternsSkill } from './devops-patterns.skill'
 import { effectClockPatternsSkill } from './effect-clock-patterns.skill'
 import { effectResilienceSkill } from './effect-resilience.skill'
 import { effectTsSkill } from './effect-ts.skill'
+import { expoSkill } from './expo.skill'
 import { ghaOidcPatternsSkill } from './gha-oidc-patterns.skill'
 import { hexagonalSkill } from './hexagonal.skill'
 import { livekitAgentsSkill } from './livekit-agents.skill'
 import { mcpOptimizationSkill } from './mcp-optimization.skill'
+import { motiSkill } from './moti.skill'
+import { nativewindSkill } from './nativewind.skill'
 import { nixConfigurationCentralizationSkill } from './nix-configuration-centralization.skill'
 import { nixPatternsSkill } from './nix-patterns.skill'
 import { observabilitySkill } from './observability.skill'
@@ -52,6 +61,7 @@ import { parseBoundarySkill } from './parse-boundary.skill'
 import { planningPatternsSkill } from './planning-patterns.skill'
 import { pulumiEscSkill } from './pulumi-esc.skill'
 import { qualityRulesSkill } from './quality-rules.skill'
+import { reactNativeSkill } from './react-native.skill'
 import { refMcpSkill } from './ref-mcp.skill'
 import { repomixSkill } from './repomix.skill'
 import { secretsManagementSkill } from './secrets-management.skill'
@@ -65,15 +75,18 @@ import { upgradeSkill } from './upgrade.skill'
 export const ALL_SKILLS = [
   apiContractSkill,
   codebaseExposureSkill,
-  refMcpSkill,
+  copierTemplateSkill,
   devopsPatternsSkill,
   effectClockPatternsSkill,
   effectResilienceSkill,
   effectTsSkill,
+  expoSkill,
   ghaOidcPatternsSkill,
   hexagonalSkill,
   livekitAgentsSkill,
   mcpOptimizationSkill,
+  motiSkill,
+  nativewindSkill,
   nixConfigurationCentralizationSkill,
   nixPatternsSkill,
   observabilitySkill,
@@ -83,6 +96,8 @@ export const ALL_SKILLS = [
   planningPatternsSkill,
   pulumiEscSkill,
   qualityRulesSkill,
+  reactNativeSkill,
+  refMcpSkill,
   repomixSkill,
   secretsManagementSkill,
   semanticCodebaseSkill,
@@ -93,10 +108,10 @@ export const ALL_SKILLS = [
   upgradeSkill,
 ] as const
 
-// Compile-time assertion: exactly 28 skills
+// Compile-time assertion: exactly 33 skills
 type AssertLength<T extends readonly unknown[], N extends number> = T['length'] extends N
   ? true
   : never
 
-const _assertSkillCount: AssertLength<typeof ALL_SKILLS, 28> = true
+const _assertSkillCount: AssertLength<typeof ALL_SKILLS, 33> = true
 void _assertSkillCount
