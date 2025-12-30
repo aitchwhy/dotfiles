@@ -42,6 +42,15 @@ type SessionStartOutput = {
 // Helpers
 // =============================================================================
 
+/**
+ * Check if a file/directory exists - Effect pattern (no .then().catch())
+ */
+const fileExists = (filePath: string) =>
+  Effect.tryPromise(() => fs.access(filePath)).pipe(
+    Effect.map(() => true),
+    Effect.catchAll(() => Effect.succeed(false)),
+  )
+
 const appendToLog = (message: string) =>
   Effect.gen(function* () {
     yield* Effect.tryPromise(async () => {
@@ -51,12 +60,7 @@ const appendToLog = (message: string) =>
   })
 
 const cleanOldPlans = Effect.gen(function* () {
-  const exists = yield* Effect.tryPromise(() =>
-    fs
-      .access(PLANS_DIR)
-      .then(() => true)
-      .catch(() => false),
-  )
+  const exists = yield* fileExists(PLANS_DIR)
   if (!exists) return 0
 
   const result = yield* Effect.tryPromise(async () => {
@@ -78,12 +82,7 @@ const cleanOldPlans = Effect.gen(function* () {
 
 const isInNixShell = Effect.gen(function* () {
   // Check for .nix-shell-info file that nix develop creates
-  const nixShellInfo = yield* Effect.tryPromise(() =>
-    fs
-      .access('/tmp/.nix-shell-info')
-      .then(() => true)
-      .catch(() => false),
-  )
+  const nixShellInfo = yield* fileExists('/tmp/.nix-shell-info')
   if (nixShellInfo) return true
 
   // Check for flake-based dev shell marker
@@ -99,39 +98,19 @@ const checkEnvironment = Effect.gen(function* () {
   const warnings: string[] = []
   const cwd = process.cwd()
 
-  const hasFlake = yield* Effect.tryPromise(() =>
-    fs
-      .access(path.join(cwd, 'flake.nix'))
-      .then(() => true)
-      .catch(() => false),
-  )
+  const hasFlake = yield* fileExists(path.join(cwd, 'flake.nix'))
   const inNixShell = yield* isInNixShell
   if (hasFlake && !inNixShell) {
     warnings.push('⚠️ Nix project - consider nix develop.')
   }
 
-  const hasPackageLock = yield* Effect.tryPromise(() =>
-    fs
-      .access(path.join(cwd, 'package-lock.json'))
-      .then(() => true)
-      .catch(() => false),
-  )
+  const hasPackageLock = yield* fileExists(path.join(cwd, 'package-lock.json'))
   if (hasPackageLock) {
     warnings.push('⚠️ package-lock.json found - use pnpm.')
   }
 
-  const hasEnv = yield* Effect.tryPromise(() =>
-    fs
-      .access(path.join(cwd, '.env'))
-      .then(() => true)
-      .catch(() => false),
-  )
-  const hasEnvExample = yield* Effect.tryPromise(() =>
-    fs
-      .access(path.join(cwd, '.env.example'))
-      .then(() => true)
-      .catch(() => false),
-  )
+  const hasEnv = yield* fileExists(path.join(cwd, '.env'))
+  const hasEnvExample = yield* fileExists(path.join(cwd, '.env.example'))
   if (hasEnv && !hasEnvExample) {
     warnings.push('⚠️ .env without .env.example.')
   }
@@ -142,12 +121,7 @@ const checkEnvironment = Effect.gen(function* () {
 const checkEvolutionMetrics = Effect.gen(function* () {
   const metricsPath = `${DOTFILES}/.claude-metrics/latest.json`
 
-  const exists = yield* Effect.tryPromise(() =>
-    fs
-      .access(metricsPath)
-      .then(() => true)
-      .catch(() => false),
-  )
+  const exists = yield* fileExists(metricsPath)
   if (!exists) return undefined
 
   const stats = yield* Effect.tryPromise(() => fs.stat(metricsPath))

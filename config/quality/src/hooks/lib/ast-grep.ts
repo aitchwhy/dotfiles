@@ -8,7 +8,7 @@
 import * as fs from 'node:fs/promises'
 import * as path from 'node:path'
 import { Lang, parse } from '@ast-grep/napi'
-import { Effect } from 'effect'
+import { Effect, Option } from 'effect'
 import * as yaml from 'js-yaml'
 
 // =============================================================================
@@ -85,23 +85,29 @@ export const checkContent = (
       }
 
       // Try to run the rule - skip if pattern is invalid (not a complete AST node)
-      try {
-        const nodes = root.findAll(config)
-        for (const node of nodes) {
-          const range = node.range()
-          matches.push({
-            ruleId: rule.id,
-            message: rule.message,
-            severity: rule.severity,
-            line: range.start.line + 1, // 0-indexed to 1-indexed
-            column: range.start.column + 1,
-            text: node.text(),
-          })
-        }
-      } catch {
-        // Rule has invalid pattern structure for NAPI - skip silently
-        // These rules work with ast-grep CLI but not with NAPI findAll
-        continue
+      // Uses Effect.option to handle errors gracefully (no try/catch)
+      const nodesOption = yield* Effect.option(
+        Effect.try({
+          try: () => root.findAll(config),
+          catch: () => new Error(`Invalid pattern for rule ${rule.id}`),
+        }),
+      )
+
+      // Skip if rule has invalid pattern structure for NAPI
+      // These rules work with ast-grep CLI but not with NAPI findAll
+      if (Option.isNone(nodesOption)) continue
+
+      const nodes = nodesOption.value
+      for (const node of nodes) {
+        const range = node.range()
+        matches.push({
+          ruleId: rule.id,
+          message: rule.message,
+          severity: rule.severity,
+          line: range.start.line + 1, // 0-indexed to 1-indexed
+          column: range.start.column + 1,
+          text: node.text(),
+        })
       }
     }
 

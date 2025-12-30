@@ -53,6 +53,12 @@ config/wispr-flow/
 config/httpie/sessions/
 .pre-commit-config.yaml
 
+# Health domain - sensitive personal data
+domains/health/snapshots/
+
+# Quality system generated files
+config/quality/generated/
+
 # Editor backups
 *.bak
 *~

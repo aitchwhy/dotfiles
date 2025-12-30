@@ -4,7 +4,8 @@ import { SkillName } from '../schemas'
 export const refMcpSkill: SkillDefinition = {
   frontmatter: {
     name: SkillName('ref-mcp'),
-    description: 'Ref.tools MCP server for SOTA documentation search (60-95% fewer tokens than alternatives).',
+    description:
+      'Ref.tools MCP server for SOTA documentation search (60-95% fewer tokens than alternatives).',
     allowedTools: ['mcp__ref__*'],
     tokenBudget: 500,
   },

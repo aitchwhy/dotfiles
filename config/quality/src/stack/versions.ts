@@ -175,7 +175,7 @@ export const STACK = {
     '@effect/platform-bun': '0.87.0',
     '@effect/printer': '0.47.0',
     '@effect/printer-ansi': '0.47.0',
-    zod: '4.1.13',
+    // NOTE: zod removed - it's in FORBIDDEN_PACKAGES (use Effect Schema)
 
     // Frontend
     react: '19.2.1',

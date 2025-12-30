@@ -18,30 +18,39 @@ export const runCommand = (
   args: readonly string[],
   options?: { readonly cwd?: string },
 ): Effect.Effect<CommandResult, CommandError> =>
-  Effect.tryPromise({
-    try: async () => {
-      const spawnOptions: { stdout: 'pipe'; stderr: 'pipe'; cwd?: string } = {
-        stdout: 'pipe',
-        stderr: 'pipe',
-      }
-      if (options?.cwd !== undefined) {
-        spawnOptions.cwd = options.cwd
-      }
-      const proc = Bun.spawn([command, ...args], spawnOptions)
-      const [stdout, stderr, exitCode] = await Promise.all([
-        new Response(proc.stdout).text(),
-        new Response(proc.stderr).text(),
-        proc.exited,
-      ])
-      return { stdout, stderr, exitCode }
-    },
-    catch: (cause) =>
-      new CommandError({
-        command,
-        args,
-        exitCode: -1,
-        stderr: String(cause),
-      }),
+  Effect.gen(function* () {
+    // Build spawn options - use spread to avoid undefined checks
+    const spawnOptions = {
+      stdout: 'pipe' as const,
+      stderr: 'pipe' as const,
+      ...options,
+    }
+
+    // Spawn process synchronously
+    const proc = Bun.spawn([command, ...args], spawnOptions)
+
+    // Wait for all streams and exit code using Effect.all (no Promise.all)
+    const [stdout, stderr, exitCode] = yield* Effect.all(
+      [
+        Effect.promise(() => new Response(proc.stdout).text()),
+        Effect.promise(() => new Response(proc.stderr).text()),
+        Effect.promise(() => proc.exited),
+      ],
+      { concurrency: 'unbounded' },
+    ).pipe(
+      Effect.catchAll((cause) =>
+        Effect.fail(
+          new CommandError({
+            command,
+            args,
+            exitCode: -1,
+            stderr: String(cause),
+          }),
+        ),
+      ),
+    )
+
+    return { stdout, stderr, exitCode }
   })
 
 /**

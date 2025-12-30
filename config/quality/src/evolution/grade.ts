@@ -12,7 +12,7 @@
 import { existsSync, readdirSync, statSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
-import { Console, Effect } from 'effect'
+import { Cause, Console, Effect } from 'effect'
 import { MetricsDbLive, MetricsDbService } from './lib/metrics-db'
 import { runCommand } from './lib/spawn'
 
@@ -232,7 +232,7 @@ const checkSkills = Effect.gen(function* () {
   }
 })
 
-const checkVersions = Effect.gen(function* () {
+const checkVersions = Effect.sync(() => {
   const name = 'versions'
   const weight = 15
 
@@ -409,9 +409,14 @@ const main = Effect.gen(function* () {
   yield* Console.log(JSON.stringify(output, null, 2))
 })
 
-// Run with provided layer
-Effect.runPromise(main.pipe(Effect.provide(MetricsDbLive))).catch((error: unknown) => {
-  const message = error instanceof Error ? error.message : String(error)
-  Effect.runSync(Console.error(`Grade failed: ${message}`))
-  process.exit(1)
-})
+// Run with Effect.runPromise (simpler entry point)
+void Effect.runPromise(
+  main.pipe(
+    Effect.provide(MetricsDbLive),
+    Effect.catchAllCause((cause) =>
+      Console.error(`Grade failed: ${Cause.pretty(cause)}`).pipe(
+        Effect.andThen(Effect.sync(() => (process.exitCode = 1))),
+      ),
+    ),
+  ),
+)

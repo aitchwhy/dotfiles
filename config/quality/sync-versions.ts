@@ -1,52 +1,71 @@
 #!/usr/bin/env bun
 
 /**
- * Sync versions from versions.json to package.json
+ * Sync versions from versions.ts SSOT to package.json
  * Run: bun run sync-versions.ts
+ *
+ * Uses Bun's native file APIs for simplicity (no @effect/platform dependency issues)
  */
 
-import { FileSystem } from '@effect/platform'
-import { BunContext, BunRuntime } from '@effect/platform-bun'
-import { Console, Effect } from 'effect'
+import { Console, Effect, Record, Schema } from 'effect'
+import { STACK } from './src/stack/versions'
+
+// Schema for package.json structure - parse at boundary with defaults
+const DepsRecord = Schema.Record({ key: Schema.String, value: Schema.String })
+
+const PackageJsonSchema = Schema.Struct({
+  dependencies: Schema.optionalWith(DepsRecord, { default: () => ({}) }),
+  devDependencies: Schema.optionalWith(DepsRecord, { default: () => ({}) }),
+}).pipe(Schema.extend(Schema.Record({ key: Schema.String, value: Schema.Unknown })))
 
 const program = Effect.gen(function* () {
-  const fs = yield* FileSystem.FileSystem
+  const pkgRaw = yield* Effect.try({
+    try: () => Bun.file('package.json').text(),
+    catch: (e) => new Error(`Failed to read package.json: ${e}`),
+  }).pipe(Effect.flatMap((p) => Effect.promise(() => p)))
 
-  const versionsRaw = yield* fs.readFileString('versions.json')
-  const versions = JSON.parse(versionsRaw) as Record<string, Record<string, string>>
+  const parsed = yield* Schema.decodeUnknown(Schema.parseJson(PackageJsonSchema))(pkgRaw)
 
-  const pkgRaw = yield* fs.readFileString('package.json')
-  const pkg = JSON.parse(pkgRaw) as Record<string, unknown>
-
-  const deps = pkg['dependencies'] as Record<string, string> | undefined
-  const devDeps = pkg['devDependencies'] as Record<string, string> | undefined
+  // After parsing, deps and devDeps are guaranteed to be objects (never undefined)
+  const deps = parsed.dependencies
+  const devDeps = parsed.devDependencies
 
   let updated = 0
+  const updatedDeps = { ...deps }
+  const updatedDevDeps = { ...devDeps }
 
-  const npmVersions = versions['npm'] ?? {}
-  const effectVersions = versions['effect'] ?? {}
-  const allVersions = { ...npmVersions, ...effectVersions }
+  // Use STACK.npm as the single source of truth
+  for (const [name, version] of Object.entries(STACK.npm)) {
+    const currentDep = Record.get(deps, name)
+    const currentDevDep = Record.get(devDeps, name)
 
-  for (const [name, version] of Object.entries(allVersions)) {
-    if (deps?.[name] && deps[name] !== version) {
-      deps[name] = version
+    if (currentDep._tag === 'Some' && currentDep.value !== version) {
+      updatedDeps[name] = version
       updated++
-      yield* Console.log(`Updated ${name}: ${deps[name]} → ${version}`)
+      yield* Console.log(`Updated ${name}: ${currentDep.value} → ${version}`)
     }
-    if (devDeps?.[name] && devDeps[name] !== version) {
-      devDeps[name] = version
+    if (currentDevDep._tag === 'Some' && currentDevDep.value !== version) {
+      updatedDevDeps[name] = version
       updated++
-      yield* Console.log(`Updated ${name}: ${devDeps[name]} → ${version}`)
+      yield* Console.log(`Updated ${name}: ${currentDevDep.value} → ${version}`)
     }
   }
 
   if (updated > 0) {
-    yield* fs.writeFileString('package.json', JSON.stringify(pkg, null, 2) + '\n')
+    const updatedPkg = {
+      ...parsed,
+      dependencies: updatedDeps,
+      devDependencies: updatedDevDeps,
+    }
+    yield* Effect.try({
+      try: () => Bun.write('package.json', JSON.stringify(updatedPkg, null, 2) + '\n'),
+      catch: (e) => new Error(`Failed to write package.json: ${e}`),
+    }).pipe(Effect.flatMap((p) => Effect.promise(() => p)))
     yield* Console.log(`\n✓ Updated ${updated} dependencies`)
   } else {
     yield* Console.log('✓ All dependencies up to date')
   }
 })
 
-const runnable = program.pipe(Effect.provide(BunContext.layer as any))
-BunRuntime.runMain(runnable as any)
+// Run with Effect.runPromise
+void Effect.runPromise(program)

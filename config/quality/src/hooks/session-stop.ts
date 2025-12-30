@@ -46,12 +46,13 @@ type StopOutput = {
 // Helpers
 // =============================================================================
 
+/**
+ * Check if a file/directory exists - Effect pattern (no .then().catch())
+ */
 const fileExists = (filePath: string) =>
-  Effect.tryPromise(() =>
-    fs
-      .access(filePath)
-      .then(() => true)
-      .catch(() => false),
+  Effect.tryPromise(() => fs.access(filePath)).pipe(
+    Effect.map(() => true),
+    Effect.catchAll(() => Effect.succeed(false)),
   )
 
 const readStdin = Effect.gen(function* () {

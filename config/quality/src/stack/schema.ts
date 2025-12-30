@@ -232,7 +232,7 @@ export type NpmVersions = {
   readonly '@effect/platform-bun': string
   readonly '@effect/printer': string
   readonly '@effect/printer-ansi': string
-  readonly zod: string
+  // NOTE: zod removed - it's in FORBIDDEN_PACKAGES (use Effect Schema)
 
   // Frontend
   readonly react: string
@@ -464,7 +464,7 @@ export const NpmVersionsSchema = Schema.Struct({
   '@effect/platform-bun': VersionString,
   '@effect/printer': VersionString,
   '@effect/printer-ansi': VersionString,
-  zod: VersionString,
+  // NOTE: zod removed - it's in FORBIDDEN_PACKAGES (use Effect Schema)
 
   // Frontend
   react: VersionString,
