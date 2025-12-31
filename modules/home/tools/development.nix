@@ -59,6 +59,9 @@ in
       just
       act
 
+      # Node.js version management (fnm for per-project .node-version)
+      fnm
+
       # NH - Modern Nix Helper (nh darwin switch, nh clean)
       nh
 

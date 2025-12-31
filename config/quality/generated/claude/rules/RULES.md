@@ -1,6 +1,6 @@
 # Quality Rules
 
-Total: 15 rules
+Total: 16 rules
 
 ## type-safety
 
@@ -30,6 +30,7 @@ Total: 15 rules
 | no-mock | error | jest.mock(, vi.mock(, jest.fn(, vi.fn( | Use Layer substitution: Effect.provide(TestLayer) with real implementations |
 | port-requires-adapter | warning | extends Context.Tag( | Create Live and Test layers: Layer.succeed(Port, { ...impl }) |
 | no-forbidden-import | error | from "lodash", from "express", from "axios", from "moment", from "prisma", from "hono" | Use stack alternatives: Effect for FP, @effect/platform for HTTP, Temporal for dates, Drizzle for DB |
+| no-env-conditionals | error | NODE_ENV, ENVIRONMENT, IS_PROD, IS_DEV, IS_PRODUCTION, IS_DEVELOPMENT, IS_TEST, import.meta.env.MODE, import.meta.env.DEV, import.meta.env.PROD, === "production", === "development", === "test", === 'production', === 'development', === 'test' | Inject behavior flags via Config service: { showStackTraces: false, logLevel: "warn" } loaded from config file or CLI args |
 
 ## observability
 

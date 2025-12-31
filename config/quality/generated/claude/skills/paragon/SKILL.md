@@ -1,6 +1,6 @@
 ---
 name: paragon
-description: PARAGON Enforcement System v3.6 - 50 guards for Clean Code, SOLID, configuration centralization, stack compliance, parse-at-boundary, shared utils enforcement, and evidence-based development.
+description: PARAGON Enforcement System v3.7 - 51 guards for Clean Code, SOLID, configuration centralization, stack compliance, parse-at-boundary, shared utils enforcement, IoC/Zero Environment Awareness, and evidence-based development.
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 token-budget: 500
 ---
@@ -23,7 +23,7 @@ token-budget: 500
 | Git | pre-commit hooks (`git-hooks.nix`) | Every commit |
 | CI | GitHub Actions (`paragon-check.yml`) | Every PR/push |
 
-## Guard Matrix Summary (50 Guards)
+## Guard Matrix Summary (51 Guards)
 
 ### Tier 1: Original Guards (1-14) - BLOCKING
 
@@ -60,6 +60,7 @@ See `references/guards-detail.md` for full details on:
 - Tier 7: Parse-at-Boundary (32-39)
 - Tier 8: Parse Don't Validate (40-49)
 - Tier 9: Shared Utils Enforcement (50)
+- Tier 10: IoC/Zero Environment Awareness (51)
 
 ## Verification-First Philosophy
 
@@ -107,3 +108,4 @@ touch .paragon-skip-31
 | `tdd-patterns` | Red-Green-Refactor |
 | `hexagonal-architecture` | No-mock testing |
 | `parse-boundary-patterns` | Guards 32-39 patterns |
+| `zero-environment-awareness` | Guard 51 - IoC behavior injection |
