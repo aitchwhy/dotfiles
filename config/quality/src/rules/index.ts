@@ -22,5 +22,5 @@ export const ALL_RULES = [
 ] as const
 
 // Note: TypeScript can't track array lengths through spreads
-// Actual count: 3 + 5 + 3 + 1 = 12 rules
+// Actual count: 3 + 5 + 4 + 1 = 13 rules (TYPE_SAFETY + EFFECT + ARCHITECTURE + OBSERVABILITY)
 export const RULE_COUNT = ALL_RULES.length
