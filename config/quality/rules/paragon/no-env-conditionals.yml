@@ -1,0 +1,66 @@
+id: no-env-conditionals
+language: typescript
+severity: error
+rule:
+  any:
+    # Direct environment variable name references
+    - kind: identifier
+      regex: "^(NODE_ENV|ENVIRONMENT|IS_PROD|IS_DEV|IS_PRODUCTION|IS_DEVELOPMENT|IS_TEST)$"
+    # import.meta.env patterns
+    - pattern: "import.meta.env.MODE"
+    - pattern: "import.meta.env.DEV"
+    - pattern: "import.meta.env.PROD"
+    # String comparisons with environment names
+    - kind: binary_expression
+      any:
+        - pattern: '$VAR === "production"'
+        - pattern: '$VAR === "development"'
+        - pattern: '$VAR === "test"'
+        - pattern: "$VAR === 'production'"
+        - pattern: "$VAR === 'development'"
+        - pattern: "$VAR === 'test'"
+        - pattern: '$VAR !== "production"'
+        - pattern: '$VAR !== "development"'
+        - pattern: '$VAR !== "test"'
+        - pattern: "$VAR !== 'production'"
+        - pattern: "$VAR !== 'development'"
+        - pattern: "$VAR !== 'test'"
+message: |
+  ZERO ENVIRONMENT AWARENESS VIOLATION (Guard 51):
+  Code must not check environment variables to determine behavior.
+
+  Instead of environment-aware conditionals:
+
+    // BAD - environment awareness
+    if (process.env.NODE_ENV === 'production') {
+      showStackTraces = false;
+    }
+    if (import.meta.env.DEV) { enableDebug(); }
+    const isProd = ENVIRONMENT === 'production';
+
+  Use Config service with behavior flags:
+
+    // GOOD - behavior injection
+    class Config extends Context.Tag("Config")<Config, {
+      readonly showStackTraces: boolean;
+      readonly logLevel: "debug" | "info" | "warn" | "error";
+      readonly enableMetrics: boolean;
+    }>() {}
+
+    // Config loaded from external file or CLI, NOT process.env
+    import { config } from "./config.json";
+    const ConfigLive = Layer.succeed(Config,
+      Schema.decodeUnknownSync(ConfigSchema)(config)
+    );
+
+    // Usage - code has ZERO environment awareness
+    const cfg = yield* Config;
+    if (cfg.showStackTraces) { ... }
+
+  Benefits:
+  - Testable: inject any config without mocking environment
+  - Portable: same binary runs anywhere
+  - Explicit: behaviors visible in config, not hidden in conditionals
+
+  See: zero-environment-awareness skill.
+note: "See: config/agents/skills/zero-environment-awareness/SKILL.md"
