@@ -4,7 +4,7 @@
  * Guards: 1 (bash safety), 2 (commits), 3 (forbidden files),
  *         8 (TDD), 9-10 (DevOps), 11-12 (advisory), 27 (CLI tools),
  *         28-30 (config centralization), 32 (secrets detection), 33 (hook bypass),
- *         34 (scaffolding enforcement)
+ *         34 (scaffolding enforcement), 51 (zero environment awareness)
  *
  * Note: Guard 31 (stack compliance) consolidated to pre-tool-use.ts using src/stack SSOT
  *
@@ -608,6 +608,94 @@ See: /copier-template skill`,
 }
 
 // =============================================================================
+// Guard 51: Zero Environment Awareness (IoC Behavior Injection)
+// =============================================================================
+
+/**
+ * Environment variable names and patterns that indicate environment awareness.
+ * Code should receive behavior flags (showStackTraces: false) not check environments.
+ */
+const ENV_CONDITIONAL_PATTERNS: readonly { pattern: RegExp; name: string }[] = [
+  // Direct environment variable names
+  { pattern: /\bNODE_ENV\b/, name: 'NODE_ENV' },
+  { pattern: /\bENVIRONMENT\b/, name: 'ENVIRONMENT' },
+  { pattern: /\bIS_PROD(UCTION)?\b/, name: 'IS_PROD/IS_PRODUCTION' },
+  { pattern: /\bIS_DEV(ELOPMENT)?\b/, name: 'IS_DEV/IS_DEVELOPMENT' },
+  { pattern: /\bIS_TEST\b/, name: 'IS_TEST' },
+  // import.meta.env patterns
+  { pattern: /import\.meta\.env\.MODE/, name: 'import.meta.env.MODE' },
+  { pattern: /import\.meta\.env\.DEV/, name: 'import.meta.env.DEV' },
+  { pattern: /import\.meta\.env\.PROD/, name: 'import.meta.env.PROD' },
+  // String comparisons with environment names
+  { pattern: /===\s*['"]production['"]/, name: '=== "production"' },
+  { pattern: /===\s*['"]development['"]/, name: '=== "development"' },
+  { pattern: /===\s*['"]test['"]/, name: '=== "test"' },
+  { pattern: /!==\s*['"]production['"]/, name: '!== "production"' },
+  { pattern: /!==\s*['"]development['"]/, name: '!== "development"' },
+  { pattern: /!==\s*['"]test['"]/, name: '!== "test"' },
+]
+
+/**
+ * Paths where environment checks are allowed (documentation, tests, skill files)
+ */
+const ENV_CHECK_ALLOWED_PATHS = [
+  '.test.ts',
+  '.spec.ts',
+  '.test.tsx',
+  '.spec.tsx',
+  'SKILL.md',
+  '/skills/',
+  '/templates/',
+  '/examples/',
+  '.md',
+] as const
+
+export function checkZeroEnvironmentAwareness(content: string, filePath: string): GuardResult {
+  // Skip allowed paths (tests, docs, skills, templates)
+  if (ENV_CHECK_ALLOWED_PATHS.some((p) => filePath.includes(p))) {
+    return { ok: true }
+  }
+
+  // Only check TypeScript/JavaScript files
+  if (!filePath.match(/\.(ts|tsx|js|jsx|mjs|cjs)$/)) {
+    return { ok: true }
+  }
+
+  for (const { pattern, name } of ENV_CONDITIONAL_PATTERNS) {
+    if (pattern.test(content)) {
+      return {
+        ok: false,
+        error: `Guard 51: ZERO ENVIRONMENT AWARENESS VIOLATION
+
+Detected: ${name}
+File: ${filePath}
+
+Code must not check environment variables to determine behavior.
+Instead, inject behavior flags via Config service:
+
+  // BAD - environment awareness
+  if (process.env.NODE_ENV === 'production') { ... }
+
+  // GOOD - behavior injection via Config service
+  class Config extends Context.Tag("Config")<Config, {
+    showStackTraces: boolean;
+    logLevel: "debug" | "info" | "warn" | "error";
+  }>() {}
+
+  const cfg = yield* Config;
+  if (cfg.showStackTraces) { ... }
+
+Config must be loaded from external files or CLI args, not process.env.
+
+See: zero-environment-awareness skill`,
+      }
+    }
+  }
+
+  return { ok: true }
+}
+
+// =============================================================================
 // Main Entry Point
 // =============================================================================
 
@@ -655,6 +743,10 @@ export function runProceduralGuards(
       // Secrets detection (Guard 32)
       const secretsResult = checkSecrets(content, filePath)
       if (!secretsResult.ok) return secretsResult
+
+      // Guard 51: Zero Environment Awareness (IoC behavior injection)
+      const envAwarenessResult = checkZeroEnvironmentAwareness(content, filePath)
+      if (!envAwarenessResult.ok) return envAwarenessResult
 
       const portsResult = checkHardcodedPorts(content, filePath)
       if (!portsResult.ok) return portsResult
