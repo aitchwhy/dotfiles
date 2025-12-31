@@ -5,7 +5,7 @@ export const paragonSkill: SkillDefinition = {
   frontmatter: {
     name: SkillName('paragon'),
     description:
-      'PARAGON Enforcement System v3.6 - 50 guards for Clean Code, SOLID, configuration centralization, stack compliance, parse-at-boundary, shared utils enforcement, and evidence-based development.',
+      'PARAGON Enforcement System v3.7 - 51 guards for Clean Code, SOLID, configuration centralization, stack compliance, parse-at-boundary, shared utils enforcement, IoC/Zero Environment Awareness, and evidence-based development.',
     allowedTools: ['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob'],
     tokenBudget: 500,
   },
@@ -27,7 +27,7 @@ export const paragonSkill: SkillDefinition = {
 | CI | GitHub Actions (\`paragon-check.yml\`) | Every PR/push |`,
     },
     {
-      heading: 'Guard Matrix Summary (50 Guards)',
+      heading: 'Guard Matrix Summary (51 Guards)',
       content: `### Tier 1: Original Guards (1-14) - BLOCKING
 
 | # | Guard | Blocks |
@@ -62,7 +62,8 @@ See \`references/guards-detail.md\` for full details on:
 - Tier 6: Stack Compliance (31)
 - Tier 7: Parse-at-Boundary (32-39)
 - Tier 8: Parse Don't Validate (40-49)
-- Tier 9: Shared Utils Enforcement (50)`,
+- Tier 9: Shared Utils Enforcement (50)
+- Tier 10: IoC/Zero Environment Awareness (51)`,
     },
     {
       heading: 'Verification-First Philosophy',
@@ -109,7 +110,8 @@ touch .paragon-skip-31
 | \`effect-ts-patterns\` | Typed errors, Layer DI |
 | \`tdd-patterns\` | Red-Green-Refactor |
 | \`hexagonal-architecture\` | No-mock testing |
-| \`parse-boundary-patterns\` | Guards 32-39 patterns |`,
+| \`parse-boundary-patterns\` | Guards 32-39 patterns |
+| \`zero-environment-awareness\` | Guard 51 - IoC behavior injection |`,
     },
   ],
 }
