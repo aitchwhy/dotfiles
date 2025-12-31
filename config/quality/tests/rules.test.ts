@@ -74,7 +74,14 @@ describe('Quality Rules', () => {
   })
 
   describe('critical rules exist', () => {
-    const criticalRuleIds = ['no-any', 'no-zod', 'no-try-catch', 'no-mock', 'no-console']
+    const criticalRuleIds = [
+      'no-any',
+      'no-zod',
+      'no-try-catch',
+      'no-mock',
+      'no-console',
+      'no-env-conditionals', // Guard 51: Zero Environment Awareness
+    ]
 
     it.each(criticalRuleIds)('has critical rule: %s', (ruleId) => {
       const rule = ALL_RULES.find((r) => r.id === ruleId)
