@@ -28,6 +28,8 @@ in
       };
 
       initContent = ''
+        # fnm (Fast Node Manager) - must be before direnv
+        eval "$(fnm env --use-on-cd --shell zsh)"
         # Fast directory navigation
         setopt AUTO_CD
         setopt AUTO_PUSHD
