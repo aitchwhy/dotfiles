@@ -37,6 +37,7 @@ export { testingSkill } from './testing.skill'
 export { typeBoundaryPatternsSkill } from './type-boundary-patterns.skill'
 export { typeSafetySkill } from './type-safety.skill'
 export { upgradeSkill } from './upgrade.skill'
+export { zeroEnvironmentAwarenessSkill } from './zero-environment-awareness.skill'
 
 import { apiContractSkill } from './api-contract.skill'
 import { codebaseExposureSkill } from './codebase-exposure.skill'
@@ -71,6 +72,7 @@ import { testingSkill } from './testing.skill'
 import { typeBoundaryPatternsSkill } from './type-boundary-patterns.skill'
 import { typeSafetySkill } from './type-safety.skill'
 import { upgradeSkill } from './upgrade.skill'
+import { zeroEnvironmentAwarenessSkill } from './zero-environment-awareness.skill'
 
 export const ALL_SKILLS = [
   apiContractSkill,
@@ -106,12 +108,13 @@ export const ALL_SKILLS = [
   typeBoundaryPatternsSkill,
   typeSafetySkill,
   upgradeSkill,
+  zeroEnvironmentAwarenessSkill,
 ] as const
 
-// Compile-time assertion: exactly 33 skills
+// Compile-time assertion: exactly 34 skills
 type AssertLength<T extends readonly unknown[], N extends number> = T['length'] extends N
   ? true
   : never
 
-const _assertSkillCount: AssertLength<typeof ALL_SKILLS, 33> = true
+const _assertSkillCount: AssertLength<typeof ALL_SKILLS, 34> = true
 void _assertSkillCount
