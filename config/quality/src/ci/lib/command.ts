@@ -1,12 +1,15 @@
 /**
  * Effect-based Command Runner for CI
  *
- * Uses Bun's $ shell template for reliable execution in containers.
+ * Uses Node.js child_process.exec for cross-platform compatibility.
  */
 
-import { Effect } from 'effect'
-import { $ } from 'bun'
+import { Effect, Schema } from 'effect'
+import { exec } from 'node:child_process'
+import { promisify } from 'node:util'
 import { CommandError } from './errors'
+
+const execAsync = promisify(exec)
 
 export interface CommandResult {
   readonly stdout: string
@@ -20,6 +23,13 @@ interface CommandOptions {
 
 const defaultOptions: CommandOptions = { cwd: process.cwd() }
 
+// Schema for parsing exec error shape at boundary
+const ExecErrorSchema = Schema.Struct({
+  stdout: Schema.optionalWith(Schema.String, { default: () => '' }),
+  stderr: Schema.optionalWith(Schema.String, { default: () => '' }),
+  code: Schema.optionalWith(Schema.Number, { default: () => 1 }),
+})
+
 export const runCommand = (
   command: string,
   args: readonly string[],
@@ -29,27 +39,24 @@ export const runCommand = (
     // Merge with defaults using Object.assign (no nullish coalescing needed)
     const opts: CommandOptions = Object.assign({}, defaultOptions, options)
 
-    // Use Bun's $ shell for reliable execution in containers
-    const result = yield* Effect.tryPromise({
-      try: async () => {
-        // Bun $ with array interpolation spreads elements as arguments
-        const cmd = [command, ...args]
-        const output = await $`${cmd}`.cwd(opts.cwd).quiet().nothrow()
-        return {
-          stdout: output.stdout.toString(),
-          stderr: output.stderr.toString(),
-          exitCode: output.exitCode,
-        }
-      },
-      catch: (error) => {
-        const errorMessage = error instanceof Error ? error.message : String(error)
-        return new CommandError({
-          command,
-          args,
-          exitCode: -1,
-          stderr: `Command execution failed: ${errorMessage}`,
+    // Build shell command string
+    const fullCommand = [command, ...args].join(' ')
+
+    // exec throws on non-zero exit, so we catch and parse the error for exit code
+    const result = yield* Effect.async<CommandResult, CommandError>((resume) => {
+      execAsync(fullCommand, {
+        cwd: opts.cwd,
+        env: process.env,
+        maxBuffer: 10 * 1024 * 1024,
+      })
+        .then(({ stdout, stderr }) => {
+          resume(Effect.succeed({ stdout, stderr, exitCode: 0 }))
         })
-      },
+        .catch((error: unknown) => {
+          // Parse error at boundary using Schema for non-zero exit
+          const parsed = Schema.decodeUnknownSync(ExecErrorSchema)(error)
+          resume(Effect.succeed({ stdout: parsed.stdout, stderr: parsed.stderr, exitCode: parsed.code }))
+        })
     })
 
     return result
