@@ -29,16 +29,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Install system dependencies first - bun container is minimal
+      - name: Install System Dependencies
+        run: |
+          apt-get update
+          apt-get install -y xz-utils curl git ripgrep fd-find python3 python3-yaml
+
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@main
 
       - name: Setup Nix Cache
         uses: DeterminateSystems/magic-nix-cache-action@main
-
-      - name: Install CLI Tools
-        run: |
-          apt-get update
-          apt-get install -y ripgrep fd-find python3 python3-pip python3-yaml
 
       - name: Install dependencies
         run: bun install
