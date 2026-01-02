@@ -13,31 +13,21 @@ concurrency:
 env:
   QUALITY_DIR: config/quality
   DOTFILES: ${{ github.workspace }}
+  # SSOT: Pin Bun version (must match package.json engines)
+  BUN_VERSION: '1.3.5'
 
 jobs:
   ci:
     name: Unified CI Pipeline
     runs-on: ubuntu-24.04-arm
 
+    # Use official Bun container - bun is pre-installed, no path issues
+    container:
+      image: oven/bun:1.3.5
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-
-      - name: Setup Node (for npx MCP servers)
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Setup Python (for uvx MCP servers)
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Install uv
-        run: pip install uv
 
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@main
@@ -45,18 +35,14 @@ jobs:
       - name: Setup Nix Cache
         uses: DeterminateSystems/magic-nix-cache-action@main
 
-      - name: Install Modern CLI Tools
+      - name: Install CLI Tools
         run: |
-          sudo apt-get update
-          sudo apt-get install -y ripgrep fd-find
+          apt-get update
+          apt-get install -y ripgrep fd-find python3 python3-pip python3-yaml
 
       - name: Install dependencies
         run: bun install
         working-directory: ${{ env.QUALITY_DIR }}
-
-      - name: Get Bun Path
-        id: bun-path
-        run: echo "path=$(which bun)" >> $GITHUB_OUTPUT
 
       - name: Run Unified CI Pipeline
         run: bun run ci
@@ -64,5 +50,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOTFILES: ${{ github.workspace }}
-          # Pass explicit bun path since Bun.spawn doesn't search PATH
-          BUN_PATH: ${{ steps.bun-path.outputs.path }}
