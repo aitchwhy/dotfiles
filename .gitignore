@@ -17,6 +17,12 @@ state.yml
 # Package manager cache
 .config/configstore/
 
+# Lock files (PARAGON Guard 3 - use package.json for deps)
+bun.lock
+bun.lockb
+package-lock.json
+yarn.lock
+
 # Auto-backups
 *.old.json
 *-backup.txt

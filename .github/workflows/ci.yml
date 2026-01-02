@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  QUALITY_DIR: config/quality
+  DOTFILES: ${{ github.workspace }}
+
+jobs:
+  ci:
+    name: Unified CI Pipeline
+    runs-on: ubuntu-24.04-arm
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Setup Node (for npx MCP servers)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Setup Python (for uvx MCP servers)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        run: pip install uv
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Setup Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Install Modern CLI Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ripgrep fd-find
+
+      - name: Install dependencies
+        run: bun install
+        working-directory: ${{ env.QUALITY_DIR }}
+
+      - name: Run Unified CI Pipeline
+        run: bun run ci
+        working-directory: ${{ env.QUALITY_DIR }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOTFILES: ${{ github.workspace }}
