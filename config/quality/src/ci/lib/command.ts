@@ -1,7 +1,7 @@
 /**
  * Effect-based Command Runner for CI
  *
- * Uses Bun's shell API (Bun.$) for reliable subprocess execution.
+ * Uses Bun.spawn with proper environment inheritance.
  */
 
 import { Effect } from 'effect'
@@ -19,30 +19,36 @@ export const runCommand = (
   options?: { readonly cwd?: string },
 ): Effect.Effect<CommandResult, CommandError> =>
   Effect.gen(function* () {
-    // Build command string with proper escaping
-    const cmdString = [command, ...args].join(' ')
-
-    // Use Bun.$ shell API for reliable PATH resolution
-    const result = yield* Effect.tryPromise({
-      try: async () => {
-        const shell = options?.cwd ? Bun.$.cwd(options.cwd) : Bun.$
-        // Use .nothrow() to not throw on non-zero exit, .quiet() to capture output
-        return shell`${cmdString}`.nothrow().quiet()
-      },
-      catch: (cause) =>
-        new CommandError({
-          command,
-          args,
-          exitCode: -1,
-          stderr: String(cause),
-        }),
+    const proc = Bun.spawn({
+      cmd: [command, ...args],
+      cwd: options?.cwd,
+      stdout: 'pipe',
+      stderr: 'pipe',
+      // Explicitly inherit environment including PATH
+      env: process.env,
     })
 
-    return {
-      stdout: result.stdout.toString(),
-      stderr: result.stderr.toString(),
-      exitCode: result.exitCode,
-    }
+    const [stdout, stderr, exitCode] = yield* Effect.all(
+      [
+        Effect.promise(() => new Response(proc.stdout).text()),
+        Effect.promise(() => new Response(proc.stderr).text()),
+        Effect.promise(() => proc.exited),
+      ],
+      { concurrency: 'unbounded' },
+    ).pipe(
+      Effect.catchAll((cause) =>
+        Effect.fail(
+          new CommandError({
+            command,
+            args,
+            exitCode: -1,
+            stderr: String(cause),
+          }),
+        ),
+      ),
+    )
+
+    return { stdout, stderr, exitCode }
   })
 
 /**
