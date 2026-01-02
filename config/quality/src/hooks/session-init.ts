@@ -150,24 +150,25 @@ const outputResult = (result: SessionStartOutput) => Console.log(JSON.stringify(
 const main = Effect.gen(function* () {
   const messages: string[] = []
 
-  // 1. Log session start
+  // 1. Log session start (must be first - sequential)
   const timestamp = new Date().toISOString()
   yield* appendToLog(`[${timestamp}] Session started: ${process.cwd()}`)
 
-  // 2. Clean old plans
-  const deletedCount = yield* cleanOldPlans.pipe(Effect.catchAll(() => Effect.succeed(0)))
+  // 2-4. Run independent checks IN PARALLEL
+  const [deletedCount, warnings, evolutionMsg] = yield* Effect.all(
+    [
+      cleanOldPlans.pipe(Effect.catchAll(() => Effect.succeed(0))),
+      checkEnvironment.pipe(Effect.catchAll(() => Effect.succeed([] as string[]))),
+      checkEvolutionMetrics.pipe(Effect.catchAll(() => Effect.succeed(undefined))),
+    ],
+    { concurrency: 'unbounded' },
+  )
+
+  // Aggregate messages
   if (deletedCount > 0) {
     messages.push(`Cleaned ${deletedCount} stale plan(s).`)
   }
-
-  // 3. Environment warnings
-  const warnings = yield* checkEnvironment.pipe(Effect.catchAll(() => Effect.succeed([])))
   messages.push(...warnings)
-
-  // 4. Evolution metrics
-  const evolutionMsg = yield* checkEvolutionMetrics.pipe(
-    Effect.catchAll(() => Effect.succeed(undefined)),
-  )
   if (evolutionMsg) {
     messages.push(evolutionMsg)
   }
