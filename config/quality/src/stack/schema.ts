@@ -335,6 +335,8 @@ export type NpmVersions = {
   readonly '@types/node': string
   readonly tsx: string
   readonly '@ast-grep/napi': string
+  readonly '@ast-grep/cli': string
+  readonly lefthook: string
 
   // Pulumi (infrastructure)
   readonly '@pulumi/pulumi': string
@@ -638,6 +640,8 @@ export const NpmVersionsSchema = Schema.Struct({
   '@types/node': VersionString,
   tsx: VersionString,
   '@ast-grep/napi': VersionString,
+  '@ast-grep/cli': VersionString,
+  lefthook: VersionString,
 
   // Pulumi
   '@pulumi/pulumi': VersionString,
