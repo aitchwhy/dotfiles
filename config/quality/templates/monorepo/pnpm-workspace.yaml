@@ -1,6 +1,0 @@
-# SSOT pnpm workspace (Dec 2025)
-packages:
-  - 'apps/*'
-  - 'packages/*'
-
-strictPeerDependencies: false
