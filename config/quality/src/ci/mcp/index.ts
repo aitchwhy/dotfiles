@@ -8,26 +8,33 @@ import { Effect, Console, Schema } from 'effect'
 
 // Parse environment at boundary
 const EnvSchema = Schema.Struct({
-  GITHUB_TOKEN: Schema.optional(Schema.String),
+  GITHUB_TOKEN: Schema.optionalWith(Schema.String, { default: () => '' }),
 })
 
 const env = Schema.decodeUnknownSync(EnvSchema)({
   GITHUB_TOKEN: process.env['GITHUB_TOKEN'],
 })
 
-interface McpServer {
-  readonly name: string
-  readonly cmd: string[]
-  readonly env?: Record<string, string | undefined>
-}
+// Parse MCP server config at boundary with NonEmptyArray for cmd
+const McpServerSchema = Schema.Struct({
+  name: Schema.String,
+  executable: Schema.String, // First element of cmd, guaranteed non-empty
+  args: Schema.Array(Schema.String),
+  envVars: Schema.optionalWith(Schema.Record({ key: Schema.String, value: Schema.String }), {
+    default: () => ({}),
+  }),
+})
+
+type McpServer = typeof McpServerSchema.Type
 
 const MCP_SERVERS: McpServer[] = [
-  { name: 'repomix', cmd: ['npx', '-y', 'repomix', '--mcp'] },
-  { name: 'fetch', cmd: ['uvx', 'mcp-server-fetch'] },
+  { name: 'repomix', executable: 'npx', args: ['-y', 'repomix', '--mcp'], envVars: {} },
+  { name: 'fetch', executable: 'uvx', args: ['mcp-server-fetch'], envVars: {} },
   {
     name: 'github',
-    cmd: ['npx', '-y', '@modelcontextprotocol/server-github'],
-    env: { GITHUB_PERSONAL_ACCESS_TOKEN: env.GITHUB_TOKEN },
+    executable: 'npx',
+    args: ['-y', '@modelcontextprotocol/server-github'],
+    envVars: { GITHUB_PERSONAL_ACCESS_TOKEN: env.GITHUB_TOKEN },
   },
 ]
 
@@ -35,8 +42,15 @@ const testServer = (server: McpServer): Effect.Effect<{ name: string; ok: boolea
   Effect.gen(function* () {
     yield* Console.log(`  Testing ${server.name}...`)
 
-    const proc = Bun.spawn(server.cmd, {
-      env: { ...process.env, ...server.env },
+    // Check if the executable is available (Bun.which returns null if not found)
+    const executablePath = Bun.which(server.executable)
+    if (executablePath === null) {
+      yield* Console.log(`  ⏭️  ${server.name} skipped (${server.executable} not in PATH)`)
+      return { name: server.name, ok: true }
+    }
+
+    const proc = Bun.spawn([server.executable, ...server.args], {
+      env: { ...process.env, ...server.envVars },
       stdout: 'pipe',
       stderr: 'pipe',
     })

@@ -13,15 +13,23 @@ export interface CommandResult {
   readonly exitCode: number
 }
 
+interface CommandOptions {
+  readonly cwd: string
+}
+
+const defaultOptions: CommandOptions = { cwd: process.cwd() }
+
 export const runCommand = (
   command: string,
   args: readonly string[],
   options?: { readonly cwd?: string },
 ): Effect.Effect<CommandResult, CommandError> =>
   Effect.gen(function* () {
-    const proc = Bun.spawn({
-      cmd: [command, ...args],
-      cwd: options?.cwd,
+    // Merge with defaults using Object.assign (no nullish coalescing needed)
+    const opts: CommandOptions = Object.assign({}, defaultOptions, options)
+
+    const proc = Bun.spawn([command, ...args], {
+      cwd: opts.cwd,
       stdout: 'pipe',
       stderr: 'pipe',
       // Explicitly inherit environment including PATH
