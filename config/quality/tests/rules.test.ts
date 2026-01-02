@@ -10,6 +10,7 @@ import {
   ALL_RULES,
   ARCHITECTURE_RULES,
   EFFECT_RULES,
+  EFFECT_XSTATE_RULES,
   OBSERVABILITY_RULES,
   RULE_COUNT,
   TYPE_SAFETY_RULES,
@@ -26,6 +27,7 @@ describe('Quality Rules', () => {
       const categorySum =
         TYPE_SAFETY_RULES.length +
         EFFECT_RULES.length +
+        EFFECT_XSTATE_RULES.length +
         ARCHITECTURE_RULES.length +
         OBSERVABILITY_RULES.length
       expect(categorySum).toBe(ALL_RULES.length)
@@ -34,6 +36,7 @@ describe('Quality Rules', () => {
     it('each category has at least one rule', () => {
       expect(TYPE_SAFETY_RULES.length).toBeGreaterThan(0)
       expect(EFFECT_RULES.length).toBeGreaterThan(0)
+      expect(EFFECT_XSTATE_RULES.length).toBeGreaterThan(0)
       expect(ARCHITECTURE_RULES.length).toBeGreaterThan(0)
       expect(OBSERVABILITY_RULES.length).toBeGreaterThan(0)
     })
@@ -66,7 +69,7 @@ describe('Quality Rules', () => {
     })
 
     it('all rules have valid category', () => {
-      const validCategories = ['type-safety', 'effect', 'architecture', 'observability']
+      const validCategories = ['type-safety', 'effect', 'effect-xstate', 'architecture', 'observability']
       for (const rule of ALL_RULES) {
         expect(validCategories).toContain(rule.category)
       }
