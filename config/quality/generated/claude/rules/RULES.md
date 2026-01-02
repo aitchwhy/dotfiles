@@ -1,6 +1,6 @@
 # Quality Rules
 
-Total: 16 rules
+Total: 20 rules
 
 ## type-safety
 
@@ -22,6 +22,15 @@ Total: 16 rules
 | no-raw-promise | error | new Promise, Promise.resolve, Promise.reject | Use Effect.promise, Effect.tryPromise, or Effect.async |
 | no-async-function | warning | async function, async () =>, async () | Use Effect.gen(function*() { ... }) |
 | no-await | error | await  | yield* effect |
+
+## effect-xstate
+
+| Rule | Severity | Patterns | Fix |
+|------|----------|----------|-----|
+| no-runpromise-then-catch | error | Effect.runPromise(, .then(, .catch( | Use Effect.runPromiseExit() + Exit.isFailure()/isSuccess() |
+| no-ref-for-machine-state | warning | useRef<, useMachine(, useActor( | Store API responses, tokens, URLs in machine context via assign() |
+| no-useeffect-runpromise | error | useEffect(, Effect.runPromise( | Use XState invoke with fromPromise actor instead |
+| no-string-error-conversion | warning | String(err), .message | Preserve Effect Cause types or use Schema.TaggedError |
 
 ## architecture
 
