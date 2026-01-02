@@ -126,3 +126,44 @@ export const block = (reason: string): HookDecision => ({
 
 export const skip = (reason?: string): HookDecision =>
   reason !== undefined ? { decision: 'skip', reason } : { decision: 'skip' }
+
+// =============================================================================
+// Parallel Hook Utilities
+// =============================================================================
+
+/**
+ * Race multiple check effects in parallel, returning the first 'block' decision.
+ * If all checks pass (approve/skip), returns approve.
+ * If any check fails with an error, it's converted to a block decision.
+ *
+ * Uses Effect.raceAll with channel inversion for race-to-first-failure semantics:
+ * - Block decisions are surfaced via success channel (to win the race)
+ * - Approve/skip decisions are surfaced via failure channel (to lose the race)
+ *
+ * When a block wins, all other fibers are interrupted immediately.
+ * When all effects "fail" (all approve), raceAll catches and returns the last approve.
+ */
+export const raceToFirstBlock = <E>(
+  checks: ReadonlyArray<Effect.Effect<HookDecision, E, never>>,
+): Effect.Effect<HookDecision, never, never> =>
+  Effect.gen(function* () {
+    if (checks.length === 0) return approve()
+
+    // Normalize checks: convert errors to block decisions, then invert channels
+    const raceable = checks.map((check) =>
+      check.pipe(
+        // Convert any error to a block decision
+        Effect.catchAll((error) => Effect.succeed(block(`Check error: ${String(error)}`))),
+        // Invert channels: block → succeed (wins race), approve/skip → fail (loses race)
+        Effect.flatMap((decision) =>
+          decision.decision === 'block' ? Effect.succeed(decision) : Effect.fail(decision),
+        ),
+      ),
+    )
+
+    // Race all - first block (now success) wins and interrupts others
+    return yield* Effect.raceAll(raceable).pipe(
+      // If all "failed" (all approved), return the last approve decision
+      Effect.catchAll((approved) => Effect.succeed(approved)),
+    )
+  })
