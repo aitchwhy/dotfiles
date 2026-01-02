@@ -1,0 +1,18 @@
+id: no-runpromise-then-catch
+language: typescript
+severity: error
+message: |
+  BANNED: Effect.runPromise().then/.catch loses typed errors.
+  Use Effect.runPromiseExit + Exit.isFailure/isSuccess instead.
+
+  BAD:
+    Effect.runPromise(myEffect).then(result => ...).catch(err => ...)
+
+  GOOD:
+    const exit = await Effect.runPromiseExit(myEffect)
+    if (Exit.isFailure(exit)) { /* handle typed error */ }
+rule:
+  any:
+    - pattern: Effect.runPromise($$$).then($$$)
+    - pattern: Effect.runPromise($$$).catch($$$)
+note: "Guard 52 - See: effect-xstate skill"

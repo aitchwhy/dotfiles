@@ -1,0 +1,23 @@
+id: no-ref-for-machine-state
+language: tsx
+severity: warning
+message: |
+  Suspicious: useRef near XState usage.
+  If storing API responses, tokens, or URLs, move to machine context instead.
+
+  BAD:
+    const tokenRef = useRef<string>(null)
+    const [state, send] = useMachine(myMachine)
+
+  GOOD:
+    // Store in machine context via assign actions
+    context: { token: string | null }
+rule:
+  all:
+    - has:
+        pattern: useRef<$TYPE>($$$)
+    - has:
+        any:
+          - pattern: useMachine($$$)
+          - pattern: useActor($$$)
+note: "Guard 53 (advisory) - Manual review: refs for DOM elements are OK, refs for state data are BANNED"

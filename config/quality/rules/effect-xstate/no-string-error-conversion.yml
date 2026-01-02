@@ -1,0 +1,23 @@
+id: no-string-error-conversion
+language: typescript
+severity: warning
+message: |
+  Suspicious: String(err) loses error type information.
+  Preserve Effect Cause types or use Schema.TaggedError.
+
+  BAD:
+    .catch(err => setError(String(err)))
+
+  GOOD:
+    if (Exit.isFailure(exit)) {
+      const cause = exit.cause  // Preserve typed Cause<E>
+    }
+rule:
+  any:
+    - pattern: String($ERR)
+      inside:
+        kind: catch_clause
+    - pattern: $ERR.message
+      inside:
+        kind: catch_clause
+note: "Guard 55 (advisory) - See: effect-xstate skill"

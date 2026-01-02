@@ -1,0 +1,22 @@
+id: no-useeffect-runpromise
+language: tsx
+severity: error
+message: |
+  BANNED: useEffect + Effect.runPromise for XState machines.
+  Use XState invoke with fromPromise actor instead.
+
+  BAD:
+    useEffect(() => {
+      Effect.runPromise(fetchData).then(data => send({ type: "DONE", data }))
+    }, [])
+
+  GOOD:
+    invoke: {
+      src: fromPromise(async () => Effect.runPromiseExit(fetchData)),
+      onDone: { actions: assign({ data: ({ event }) => event.output }) }
+    }
+rule:
+  pattern: useEffect($CALLBACK, $$$)
+  has:
+    pattern: Effect.runPromise($$$)
+note: "Guard 54 - See: effect-xstate skill"
