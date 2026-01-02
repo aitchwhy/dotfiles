@@ -18,21 +18,24 @@ const env = Schema.decodeUnknownSync(EnvSchema)({
   QUALITY_DIR: process.env['QUALITY_DIR'],
 })
 
+// Get bun path from current process (works in CI)
+const bunPath = process.execPath
+
 const runTypecheck = Effect.gen(function* () {
   yield* Console.log('  Running typecheck...')
-  const result = yield* runCommand('bun', ['run', 'typecheck'], { cwd: env.QUALITY_DIR })
+  const result = yield* runCommand(bunPath, ['run', 'typecheck'], { cwd: env.QUALITY_DIR })
   return result.exitCode === 0
 })
 
 const runTests = Effect.gen(function* () {
   yield* Console.log('  Running tests...')
-  const result = yield* runCommand('bun', ['run', 'test'], { cwd: env.QUALITY_DIR })
+  const result = yield* runCommand(bunPath, ['run', 'test'], { cwd: env.QUALITY_DIR })
   return result.exitCode === 0
 })
 
 const runValidate = Effect.gen(function* () {
   yield* Console.log('  Validating artifacts...')
-  const result = yield* runCommand('bun', ['run', 'validate'], { cwd: env.QUALITY_DIR })
+  const result = yield* runCommand(bunPath, ['run', 'validate'], { cwd: env.QUALITY_DIR })
   return result.exitCode === 0
 })
 

@@ -18,11 +18,14 @@ const env = Schema.decodeUnknownSync(EnvSchema)({
   DOTFILES: process.env['DOTFILES'],
 })
 
+// Use fdfind on Ubuntu (fd-find package), fd on macOS
+const fdCommand = process.platform === 'linux' ? 'fdfind' : 'fd'
+
 const validateJson = Effect.gen(function* () {
   yield* Console.log('  Validating JSON files...')
 
   // Find JSON files (exclude node_modules, cursor/vscode JSONC)
-  const findResult = yield* runCommand('fd', [
+  const findResult = yield* runCommand(fdCommand, [
     '-e',
     'json',
     '--exclude',
@@ -58,7 +61,7 @@ const validateYaml = Effect.gen(function* () {
   yield* Console.log('  Validating YAML files...')
 
   // Find YAML files
-  const findResult = yield* runCommand('fd', [
+  const findResult = yield* runCommand(fdCommand, [
     '-e',
     'yaml',
     '-e',
