@@ -29,8 +29,9 @@ export const runCommand = (
     const opts: CommandOptions = Object.assign({}, defaultOptions, options)
 
     // Use shell execution for reliable PATH resolution in containers
+    // Use /bin/sh with absolute path for container compatibility
     const fullCommand = [command, ...args].join(' ')
-    const proc = Bun.spawn(['sh', '-c', fullCommand], {
+    const proc = Bun.spawn(['/bin/sh', '-c', fullCommand], {
       cwd: opts.cwd,
       stdout: 'pipe',
       stderr: 'pipe',
