@@ -21,6 +21,7 @@ import {
   outputDecision,
   type PreToolUseInput,
   parseInput,
+  raceToFirstBlock,
   readStdin,
 } from './lib/effect-hook'
 import { runProceduralGuards } from './lib/guards/procedural'
@@ -165,23 +166,17 @@ const main = Effect.gen(function* () {
   const raw = yield* readStdin
   const input = yield* parseInput(raw)
 
-  // Run all checks in order
+  // Run all checks in PARALLEL with race-to-first-block
+  // First block wins and interrupts remaining checks
   const checks = [
-    runProceduralChecks, // Procedural logic (TDD, etc)
-    checkTypeScriptContent, // Pure AST-grep (Content)
-    checkForbiddenPackages, // Regex/Schema (Stack)
-    checkDangerousCommands, // Regex (Safety)
+    runProceduralChecks(input), // Procedural logic (TDD, etc)
+    checkTypeScriptContent(input), // Pure AST-grep (Content)
+    checkForbiddenPackages(input), // Regex/Schema (Stack)
+    checkDangerousCommands(input), // Regex (Safety)
   ]
 
-  for (const check of checks) {
-    const result = yield* check(input)
-    if (result.decision === 'block') {
-      yield* outputDecision(result)
-      return
-    }
-  }
-
-  yield* outputDecision(approve())
+  const result = yield* raceToFirstBlock(checks)
+  yield* outputDecision(result)
 })
 
 void pipe(
