@@ -99,8 +99,8 @@ const program = Effect.gen(function* () {
   // Run all formatters in parallel
   yield* Effect.all(
     [
-      runFormatter(['bunx', '@biomejs/biome', 'check', '--write', '--unsafe'], tsJsFiles),
-      runFormatter(['bunx', '@biomejs/biome', 'check', '--write', '--unsafe'], jsonFiles),
+      runFormatter(['bunx', '@biomejs/biome', 'format', '--write'], tsJsFiles),
+      runFormatter(['bunx', '@biomejs/biome', 'format', '--write'], jsonFiles),
       // Python needs sequential format then lint
       pipe(
         runFormatter(['ruff', 'format'], pyFiles),

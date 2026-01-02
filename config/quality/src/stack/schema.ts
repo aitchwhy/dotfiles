@@ -319,9 +319,8 @@ export const NpmVersionsSchema = Schema.Struct({
   vite: VersionString,
   handlebars: VersionString,
 
-  // Dev & Linting
+  // Dev & Linting (oxlint for linting, biome for formatting)
   oxlint: VersionString,
-  'oxlint-tsgolint': VersionString,
   '@biomejs/biome': VersionString,
   '@types/node': VersionString,
   tsx: VersionString,

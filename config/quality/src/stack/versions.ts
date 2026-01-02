@@ -25,8 +25,8 @@ import { StackDefinitionSchema } from './schema'
 export const STACK = {
   meta: {
     frozen: '2026-01',
-    updated: '2026-01-01',
-    ssotVersion: '5.0.0',
+    updated: '2026-01-02',
+    ssotVersion: '5.1.0', // SOTA Jan 2, 2026: tsgo + oxlint linting + biome formatting
   },
 
   // ===========================================================================
@@ -216,8 +216,9 @@ export const STACK = {
   // ===========================================================================
   npm: {
     // Core (Effect ecosystem - versions must be compatible)
-    typescript: '5.9.3',
-    effect: '3.19.13',
+    // NOTE: tsgo (@typescript/native-preview) used for compilation via scripts
+    typescript: '5.9.3', // Kept for types - tsgo handles compilation
+    effect: '3.19.14',
     '@effect/cli': '0.72.1',
     '@effect/platform': '0.94.0',
     '@effect/platform-node': '0.104.0',
@@ -273,10 +274,9 @@ export const STACK = {
     vite: '7.2.7',
     handlebars: '4.7.8',
 
-    // Dev & Linting (Jan 2026 - reconciled from templates)
-    oxlint: '1.35.0', // Type-aware linter (Oxlint 1.0 stable)
-    'oxlint-tsgolint': '1.35.0',
-    '@biomejs/biome': '2.3.8', // Formatter only (Biome 2.0 with type inference)
+    // Dev & Linting (Jan 2026 - SOTA: oxlint for linting, biome for formatting)
+    oxlint: '1.36.0', // Type-aware linter (Oxlint 1.0 stable, 645+ rules)
+    '@biomejs/biome': '2.3.10', // Formatter ONLY (linting disabled)
     '@types/node': '25.0.3', // Node 25 Current types
     tsx: '4.19.2', // TS runner
     '@ast-grep/napi': '0.40.3',
