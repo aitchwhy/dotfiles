@@ -29,8 +29,10 @@ type YamlRule = {
   language: string
   severity: 'error' | 'warning'
   message: string
-  rule: any // AST-grep rule object
-  constraints?: Record<string, any> // Top-level constraints
+  // biome-ignore lint/suspicious/noExplicitAny: AST-grep NAPI rule objects are untyped
+  rule: any
+  // biome-ignore lint/suspicious/noExplicitAny: AST-grep constraints are untyped
+  constraints?: Record<string, any>
 }
 
 // =============================================================================
@@ -79,6 +81,7 @@ export const checkContent = (
       const ruleStr = JSON.stringify(rule.rule)
       if (ruleStr.includes('"constraints"')) continue
 
+      // biome-ignore lint/suspicious/noExplicitAny: AST-grep findAll requires untyped config
       const config: { rule: any; constraints?: Record<string, any> } = { rule: rule.rule }
       if (rule.constraints) {
         config.constraints = rule.constraints

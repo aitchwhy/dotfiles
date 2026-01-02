@@ -105,7 +105,9 @@ const program = Effect.gen(function* () {
 const runnable = pipe(
   program,
   Effect.catchAll(() => Effect.sync(() => emitContinue())),
+  // biome-ignore lint/suspicious/noExplicitAny: BunContext.layer type variance issue
   Effect.provide(BunContext.layer as any),
 )
 
+// biome-ignore lint/suspicious/noExplicitAny: Effect runMain type inference
 BunRuntime.runMain(runnable as any)
