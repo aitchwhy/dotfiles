@@ -61,7 +61,6 @@ in
       # Database Clients (PostgreSQL 18+, SQLite/Turso - NO MySQL)
       ++ (optionals cfg.enableDatabases [
         postgresql_18
-        mongosh
         redis
         usql
       ])
@@ -108,7 +107,6 @@ in
         markdownlint-cli # Markdown linting
         yamllint # YAML linting
         hadolint # Dockerfile linting
-        sqlfluff # SQL linting
         biome # JS/TS/JSON formatting + linting
         ast-grep # AST search and replace
       ]
