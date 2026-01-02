@@ -54,9 +54,15 @@ jobs:
         run: bun install
         working-directory: ${{ env.QUALITY_DIR }}
 
+      - name: Get Bun Path
+        id: bun-path
+        run: echo "path=$(which bun)" >> $GITHUB_OUTPUT
+
       - name: Run Unified CI Pipeline
         run: bun run ci
         working-directory: ${{ env.QUALITY_DIR }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOTFILES: ${{ github.workspace }}
+          # Pass explicit bun path since Bun.spawn doesn't search PATH
+          BUN_PATH: ${{ steps.bun-path.outputs.path }}

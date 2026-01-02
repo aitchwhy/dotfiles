@@ -18,8 +18,14 @@ const env = Schema.decodeUnknownSync(EnvSchema)({
   QUALITY_DIR: process.env['QUALITY_DIR'],
 })
 
-// Get bun binary path - prefer BUN_INSTALL from setup-bun, fallback to process.execPath
+// Get bun binary path from environment or fallback
 const getBunPath = (): string => {
+  // First check explicit BUN_PATH from workflow
+  const bunPath = process.env['BUN_PATH']
+  if (bunPath) {
+    return bunPath
+  }
+  // Then check BUN_INSTALL from setup-bun
   const bunInstall = process.env['BUN_INSTALL']
   if (bunInstall) {
     return `${bunInstall}/bin/bun`
