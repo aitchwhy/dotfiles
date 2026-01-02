@@ -18,8 +18,11 @@ const env = Schema.decodeUnknownSync(EnvSchema)({
   QUALITY_DIR: process.env['QUALITY_DIR'],
 })
 
-// Use 'bun' from PATH (process.execPath is unreliable across installation methods)
-const bunPath = 'bun'
+// Resolve bun path using Bun.which() - Bun.spawn needs absolute paths
+const bunPath = Bun.which('bun')
+if (!bunPath) {
+  throw new Error('bun executable not found in PATH')
+}
 
 const runTypecheck = Effect.gen(function* () {
   yield* Console.log('  Running typecheck...')
