@@ -1,5 +1,5 @@
-version: "2025.12.28"
-lastUpdated: "2025-12-28T00:00:00Z"
+version: "2026.01.01"
+lastUpdated: "2026-01-01T00:00:00Z"
 
 memories:
   # === LAYER 1: BUILD TOOLING ===
@@ -130,6 +130,68 @@ memories:
       good:
         - 'Effect.tryPromise(() => fetch()).pipe(Effect.catchAll(...))'
         - "import { HttpApi } from '@effect/platform'"
+
+  # === LAYER 2.5: HTTP SSOT (HIGHEST PRIORITY) ===
+  - id: 27
+    layer: http-ssot
+    priority: critical
+    content: "HTTP SSOT (Jan 2026): ALL HTTP requests MUST derive from HttpApi contract. Contract defines once → HttpApiBuilder (server) + HttpApiClient.make() (client). Zero fetch(), zero axios, zero manual HttpClientRequest, zero URL strings in app code. AST-grep enforced."
+    enforcementType: block
+    patterns:
+      detect:
+        - 'fetch\('
+        - 'await fetch'
+        - 'axios\.'
+        - 'HttpClientRequest\.'
+        - 'HttpClient\.HttpClient'
+        - 'client\.execute\('
+        - '\.json\(\)'
+        - 'baseUrl \+'
+        - '`\$\{.*\}/api/'
+      block:
+        - 'fetch('
+        - 'await fetch('
+        - 'axios.'
+        - 'HttpClientRequest.get'
+        - 'HttpClientRequest.post'
+        - 'HttpClient.HttpClient'
+        - 'client.execute('
+        - 'response.json()'
+      suggest:
+        - 'HttpApiClient.make(YourApi, { baseUrl })'
+        - 'client.groupName.endpointName()'
+        - 'HttpApi.make() + HttpApiGroup.make() + HttpApiEndpoint'
+    examples:
+      bad:
+        - "const response = await fetch('/api/users')"
+        - 'HttpClientRequest.get("/api/conversation/start")'
+        - 'axios.post(`${baseUrl}/api/data`, payload)'
+        - "export const apiClient = { startConversation: async () => { fetch(...) } }"
+      good:
+        - "const client = yield* HttpApiClient.make(MyApi, { baseUrl })"
+        - 'yield* client.users.list()'
+        - 'yield* client.conversation.start({ payload: { questionId } })'
+    documentation: |
+      HTTP SSOT Pattern (Single Source of Truth):
+      
+      1. DEFINE CONTRACT (packages/contracts/src/api.ts):
+         export class MyApi extends HttpApi.make('myapi')
+           .add(HttpApiGroup.make('users')
+             .add(HttpApiEndpoint.get('list', '/users').addSuccess(Schema.Array(User))))
+      
+      2. IMPLEMENT SERVER (apps/server/src/handlers/*.ts):
+         HttpApiBuilder.group(MyApi, 'users', (h) => h.handle('list', () => ...))
+      
+      3. DERIVE CLIENT (apps/*/src/services/ApiClient.ts):
+         export class ApiClient extends Context.Tag('ApiClient')<ApiClient, typeof client>() {}
+         export const ApiClientLive = Layer.effect(ApiClient, HttpApiClient.make(MyApi, { baseUrl }))
+      
+      4. USE CLIENT (application code):
+         const client = yield* ApiClient
+         yield* client.users.list()  // Fully typed, no URL strings
+      
+      Benefits: Compile-time type safety, zero drift, auto-generated types, no URL typos possible.
+      Rules: ~/dotfiles/config/quality/rules/effect/http-ssot-*.yml
 
   - id: 9
     layer: architecture
