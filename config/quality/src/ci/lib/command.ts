@@ -24,11 +24,19 @@ interface CommandOptions {
 const defaultOptions: CommandOptions = { cwd: process.cwd() }
 
 // Schema for parsing exec error shape at boundary
+// code can be number (exit code) or string (like "ENOENT")
 const ExecErrorSchema = Schema.Struct({
   stdout: Schema.optionalWith(Schema.String, { default: () => '' }),
   stderr: Schema.optionalWith(Schema.String, { default: () => '' }),
-  code: Schema.optionalWith(Schema.Number, { default: () => 1 }),
+  code: Schema.optionalWith(Schema.Union(Schema.Number, Schema.String), { default: () => 1 }),
 })
+
+// Convert code to exit number
+const getExitCode = (code: number | string): number => {
+  if (typeof code === 'number') return code
+  // String codes like "ENOENT" indicate command not found = 127
+  return 127
+}
 
 export const runCommand = (
   command: string,
@@ -55,7 +63,7 @@ export const runCommand = (
         .catch((error: unknown) => {
           // Parse error at boundary using Schema for non-zero exit
           const parsed = Schema.decodeUnknownSync(ExecErrorSchema)(error)
-          resume(Effect.succeed({ stdout: parsed.stdout, stderr: parsed.stderr, exitCode: parsed.code }))
+          resume(Effect.succeed({ stdout: parsed.stdout, stderr: parsed.stderr, exitCode: getExitCode(parsed.code) }))
         })
     })
 

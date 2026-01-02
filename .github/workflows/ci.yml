@@ -21,9 +21,9 @@ jobs:
     name: Unified CI Pipeline
     runs-on: ubuntu-24.04-arm
 
-    # Use official Bun container - bun is pre-installed, no path issues
+    # Use Bun Debian container - has proper shell support for child_process
     container:
-      image: oven/bun:1.3.5
+      image: oven/bun:1.3.5-debian
 
     steps:
       - name: Checkout
