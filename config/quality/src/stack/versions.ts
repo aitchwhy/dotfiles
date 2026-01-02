@@ -25,7 +25,7 @@ import { StackDefinitionSchema } from './schema'
 export const STACK = {
   meta: {
     frozen: '2025-12',
-    updated: '2025-12-30',
+    updated: '2026-01-01',
     ssotVersion: '4.2.0',
   },
 
@@ -33,8 +33,8 @@ export const STACK = {
   // RUNTIME
   // ===========================================================================
   runtime: {
-    pnpm: '10.26.0', // Fast, disk-efficient package manager
-    node: '24.12.0', // Current (NOT LTS - user preference)
+    pnpm: '10.27.0', // Fast, disk-efficient package manager
+    node: '25.2.1', // Current release (EOL June 2026)
     uv: '0.5.1', // Python manager (Rust)
     volta: '2.0.1', // Tool manager (Rust)
   },
@@ -277,12 +277,11 @@ export const STACK = {
     oxlint: '1.35.0', // Type-aware linter (Oxlint 1.0 stable)
     'oxlint-tsgolint': '1.35.0',
     '@biomejs/biome': '2.3.8', // Formatter only (Biome 2.0 with type inference)
-    '@types/node': '24.10.1', // Node 24 LTS types
+    '@types/node': '25.0.3', // Node 25 Current types
     tsx: '4.19.2', // TS runner
     '@ast-grep/napi': '0.40.3',
     '@ast-grep/cli': '0.40.3', // CLI for ast-grep scan
     lefthook: '1.13.6', // Git hooks manager
-    turbo: '2.5.0', // Monorepo orchestration
 
     // Pulumi (infrastructure) - Dec 2025
     '@pulumi/pulumi': '3.210.0',
