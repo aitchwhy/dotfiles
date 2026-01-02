@@ -1,0 +1,3 @@
+# Minimal lefthook config for dotfiles repo
+# Silences warning from global hooks when no actual hooks are needed
+min_version: 1.6.0
