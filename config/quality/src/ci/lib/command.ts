@@ -30,11 +30,10 @@ export const runCommand = (
     const opts: CommandOptions = Object.assign({}, defaultOptions, options)
 
     // Use Bun's $ shell for reliable execution in containers
-    const fullCommand = [command, ...args].join(' ')
-
+    // Pass command array to $ for proper argument handling
     const result = yield* Effect.tryPromise({
       try: async () => {
-        const output = await $`cd ${opts.cwd} && ${fullCommand}`.quiet().nothrow()
+        const output = await $`${[command, ...args]}`.cwd(opts.cwd).quiet().nothrow()
         return {
           stdout: output.stdout.toString(),
           stderr: output.stderr.toString(),
