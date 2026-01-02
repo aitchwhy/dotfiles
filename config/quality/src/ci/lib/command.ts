@@ -26,11 +26,16 @@ export const CommandResultSchema = Schema.Struct({
 export type CommandResult = typeof CommandResultSchema.Type
 
 /**
- * Command options with defaults parsed at boundary
+ * Command options - parsed after merge with defaults
  */
 const CommandOptionsSchema = Schema.Struct({
-  cwd: Schema.optionalWith(Schema.String, { default: () => process.cwd() }),
+  cwd: Schema.String,
 })
+
+/**
+ * Default command options
+ */
+const defaultCommandOptions = { cwd: process.cwd() }
 
 /**
  * Exit code transformation: string codes (e.g., "ENOENT") → 127
@@ -70,8 +75,9 @@ export const runCommand = (
   options?: { readonly cwd?: string },
 ): Effect.Effect<CommandResult, never> =>
   Effect.gen(function* () {
-    // Parse options at boundary
-    const opts = Schema.decodeUnknownSync(CommandOptionsSchema)(options)
+    // Merge with defaults then parse at boundary
+    const merged = Object.assign({}, defaultCommandOptions, options)
+    const opts = Schema.decodeUnknownSync(CommandOptionsSchema)(merged)
 
     // Build shell command
     const fullCommand = [command, ...args].join(' ')
