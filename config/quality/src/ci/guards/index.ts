@@ -116,7 +116,10 @@ const guard26_noConsoleMethods = createGuard(
 /**
  * Run all PARAGON guards in parallel
  */
-export const runAllGuards = Effect.gen(function* () {
+export const runAllGuards: Effect.Effect<
+  { readonly success: boolean; readonly failures: readonly GuardResult[] },
+  never
+> = Effect.gen(function* () {
   yield* Console.log('\n🛡️  PARAGON Guards')
   yield* Console.log('─'.repeat(50))
 
