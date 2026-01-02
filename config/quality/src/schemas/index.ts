@@ -91,6 +91,7 @@ export const RuleCategorySchema = Schema.Literal(
   'type-safety',
   'effect-ts',
   'effect',
+  'effect-xstate',
   'architecture',
   'observability',
   'security',
