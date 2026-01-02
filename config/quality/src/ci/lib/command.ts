@@ -1,10 +1,11 @@
 /**
  * Effect-based Command Runner for CI
  *
- * Uses Bun.spawn with proper environment inheritance.
+ * Uses Bun's $ shell template for reliable execution in containers.
  */
 
 import { Effect } from 'effect'
+import { $ } from 'bun'
 import { CommandError } from './errors'
 
 export interface CommandResult {
@@ -28,38 +29,28 @@ export const runCommand = (
     // Merge with defaults using Object.assign (no nullish coalescing needed)
     const opts: CommandOptions = Object.assign({}, defaultOptions, options)
 
-    // Use shell execution for reliable PATH resolution in containers
-    // Use /bin/sh with absolute path for container compatibility
+    // Use Bun's $ shell for reliable execution in containers
     const fullCommand = [command, ...args].join(' ')
-    const proc = Bun.spawn(['/bin/sh', '-c', fullCommand], {
-      cwd: opts.cwd,
-      stdout: 'pipe',
-      stderr: 'pipe',
-      // Explicitly inherit environment including PATH
-      env: process.env,
+
+    const result = yield* Effect.tryPromise({
+      try: async () => {
+        const output = await $`cd ${opts.cwd} && ${fullCommand}`.quiet().nothrow()
+        return {
+          stdout: output.stdout.toString(),
+          stderr: output.stderr.toString(),
+          exitCode: output.exitCode,
+        }
+      },
+      catch: (error) =>
+        new CommandError({
+          command,
+          args,
+          exitCode: -1,
+          stderr: String(error),
+        }),
     })
 
-    const [stdout, stderr, exitCode] = yield* Effect.all(
-      [
-        Effect.promise(() => new Response(proc.stdout).text()),
-        Effect.promise(() => new Response(proc.stderr).text()),
-        Effect.promise(() => proc.exited),
-      ],
-      { concurrency: 'unbounded' },
-    ).pipe(
-      Effect.catchAll((cause) =>
-        Effect.fail(
-          new CommandError({
-            command,
-            args,
-            exitCode: -1,
-            stderr: String(cause),
-          }),
-        ),
-      ),
-    )
-
-    return { stdout, stderr, exitCode }
+    return result
   })
 
 /**
