@@ -30,23 +30,26 @@ export const runCommand = (
     const opts: CommandOptions = Object.assign({}, defaultOptions, options)
 
     // Use Bun's $ shell for reliable execution in containers
-    // Pass command array to $ for proper argument handling
     const result = yield* Effect.tryPromise({
       try: async () => {
-        const output = await $`${[command, ...args]}`.cwd(opts.cwd).quiet().nothrow()
+        // Bun $ with array interpolation spreads elements as arguments
+        const cmd = [command, ...args]
+        const output = await $`${cmd}`.cwd(opts.cwd).quiet().nothrow()
         return {
           stdout: output.stdout.toString(),
           stderr: output.stderr.toString(),
           exitCode: output.exitCode,
         }
       },
-      catch: (error) =>
-        new CommandError({
+      catch: (error) => {
+        const errorMessage = error instanceof Error ? error.message : String(error)
+        return new CommandError({
           command,
           args,
           exitCode: -1,
-          stderr: String(error),
-        }),
+          stderr: `Command execution failed: ${errorMessage}`,
+        })
+      },
     })
 
     return result
