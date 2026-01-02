@@ -21,6 +21,15 @@ const env = Schema.decodeUnknownSync(EnvSchema)({
 // Use fdfind on Ubuntu (fd-find package), fd on macOS
 const fdCommand = process.platform === 'linux' ? 'fdfind' : 'fd'
 
+// =============================================================================
+// Types
+// =============================================================================
+
+interface FileValidationResult {
+  readonly file: string
+  readonly valid: boolean
+}
+
 const validateJson = Effect.gen(function* () {
   yield* Console.log('  Validating JSON files...')
 
@@ -44,17 +53,25 @@ const validateJson = Effect.gen(function* () {
   }
 
   const files = findResult.stdout.split('\n').filter(Boolean)
-  let valid = true
 
-  for (const file of files) {
-    const checkResult = yield* runCommand('python3', ['-m', 'json.tool', file])
-    if (checkResult.exitCode !== 0) {
-      yield* Console.error(`    Invalid JSON: ${file}`)
-      valid = false
-    }
+  // PARALLEL validation - all files checked simultaneously
+  const results = yield* Effect.forEach(
+    files,
+    (file): Effect.Effect<FileValidationResult, never> =>
+      Effect.gen(function* () {
+        const checkResult = yield* runCommand('python3', ['-m', 'json.tool', file])
+        return { file, valid: checkResult.exitCode === 0 }
+      }),
+    { concurrency: 'unbounded' },
+  )
+
+  // Report all invalid files
+  const invalid = results.filter((r) => !r.valid)
+  for (const r of invalid) {
+    yield* Console.error(`    Invalid JSON: ${r.file}`)
   }
 
-  return valid
+  return invalid.length === 0
 })
 
 const validateYaml = Effect.gen(function* () {
@@ -78,20 +95,28 @@ const validateYaml = Effect.gen(function* () {
   }
 
   const files = findResult.stdout.split('\n').filter(Boolean)
-  let valid = true
 
-  for (const file of files) {
-    const checkResult = yield* runCommand('python3', [
-      '-c',
-      `import yaml; yaml.safe_load(open('${file}'))`,
-    ])
-    if (checkResult.exitCode !== 0) {
-      yield* Console.error(`    Invalid YAML: ${file}`)
-      valid = false
-    }
+  // PARALLEL validation - all files checked simultaneously
+  const results = yield* Effect.forEach(
+    files,
+    (file): Effect.Effect<FileValidationResult, never> =>
+      Effect.gen(function* () {
+        const checkResult = yield* runCommand('python3', [
+          '-c',
+          `import yaml; yaml.safe_load(open('${file}'))`,
+        ])
+        return { file, valid: checkResult.exitCode === 0 }
+      }),
+    { concurrency: 'unbounded' },
+  )
+
+  // Report all invalid files
+  const invalid = results.filter((r) => !r.valid)
+  for (const r of invalid) {
+    yield* Console.error(`    Invalid YAML: ${r.file}`)
   }
 
-  return valid
+  return invalid.length === 0
 })
 
 /**
