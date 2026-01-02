@@ -138,22 +138,23 @@
               echo ""
               echo "─── Nix LSP Override Check ───"
 
-              # Verify lang-nix.lua exists and disables nil_ls
-              if [ -f "config/nvim/lua/plugins/lang-nix.lua" ]; then
-                if grep -q "nil_ls = false" config/nvim/lua/plugins/lang-nix.lua; then
-                  echo "✓ nil_ls correctly disabled in lang-nix.lua"
+              # Verify nvim-lspconfig.lua has nixd enabled and nil_ls disabled
+              # (Nix LSP config consolidated into nvim-lspconfig.lua per commit a23a599)
+              if [ -f "config/nvim/lua/plugins/nvim-lspconfig.lua" ]; then
+                if grep -q "nil_ls = false" config/nvim/lua/plugins/nvim-lspconfig.lua; then
+                  echo "✓ nil_ls correctly disabled in nvim-lspconfig.lua"
                 else
-                  echo "✗ nil_ls not disabled in lang-nix.lua"
+                  echo "✗ nil_ls not disabled in nvim-lspconfig.lua"
                   ERRORS=$((ERRORS + 1))
                 fi
-                if grep -q "nixd" config/nvim/lua/plugins/lang-nix.lua; then
-                  echo "✓ nixd configured in lang-nix.lua"
+                if grep -q "nixd" config/nvim/lua/plugins/nvim-lspconfig.lua; then
+                  echo "✓ nixd configured in nvim-lspconfig.lua"
                 else
-                  echo "✗ nixd not configured in lang-nix.lua"
+                  echo "✗ nixd not configured in nvim-lspconfig.lua"
                   ERRORS=$((ERRORS + 1))
                 fi
               else
-                echo "✗ lang-nix.lua not found"
+                echo "✗ nvim-lspconfig.lua not found"
                 ERRORS=$((ERRORS + 1))
               fi
               TOTAL=$((TOTAL + 2))
