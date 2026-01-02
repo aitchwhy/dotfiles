@@ -19,19 +19,6 @@ interface CommandOptions {
 
 const defaultOptions: CommandOptions = { cwd: process.cwd() }
 
-// Cache bun executable path at module load time for reliable spawning in containers
-const bunExecutable: string = process.execPath
-
-/**
- * Resolve command to absolute path when needed (e.g., 'bun' in containers)
- */
-const resolveCommand = (command: string): string => {
-  if (command === 'bun') {
-    return bunExecutable
-  }
-  return command
-}
-
 export const runCommand = (
   command: string,
   args: readonly string[],
@@ -41,7 +28,9 @@ export const runCommand = (
     // Merge with defaults using Object.assign (no nullish coalescing needed)
     const opts: CommandOptions = Object.assign({}, defaultOptions, options)
 
-    const proc = Bun.spawn([resolveCommand(command), ...args], {
+    // Use shell execution for reliable PATH resolution in containers
+    const fullCommand = [command, ...args].join(' ')
+    const proc = Bun.spawn(['sh', '-c', fullCommand], {
       cwd: opts.cwd,
       stdout: 'pipe',
       stderr: 'pipe',
