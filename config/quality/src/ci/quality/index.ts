@@ -18,8 +18,8 @@ const env = Schema.decodeUnknownSync(EnvSchema)({
   QUALITY_DIR: process.env['QUALITY_DIR'],
 })
 
-// Get bun path from current process (works in CI)
-const bunPath = process.execPath
+// Use 'bun' from PATH (process.execPath is unreliable across installation methods)
+const bunPath = 'bun'
 
 const runTypecheck = Effect.gen(function* () {
   yield* Console.log('  Running typecheck...')
