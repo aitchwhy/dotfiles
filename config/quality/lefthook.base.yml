@@ -22,18 +22,23 @@ pre-commit:
     paragon-ast:
       glob: '*.{ts,tsx}'
       run: |
-        RULES_DIR="$HOME/dotfiles/config/agents/rules/ast-grep"
+        RULES_DIR="$HOME/dotfiles/config/quality/rules"
         [ ! -d "$RULES_DIR" ] && exit 0
         has_error=0
-        for rule in "$RULES_DIR"/*.yml; do
-          [ -f "$rule" ] || continue
-          # Run ast-grep and capture output
-          output=$(sg scan --rule "$rule" {staged_files} 2>&1 | grep -v "paragon-guard\|sig-\|ast-engine")
-          if [ -n "$output" ] && echo "$output" | grep -qE "error|warning"; then
-            echo "=== $(basename "$rule") ==="
-            echo "$output"
-            has_error=1
-          fi
+        # Scan all rule categories
+        for category in paragon effect effect-xstate xstate zod versions; do
+          category_dir="$RULES_DIR/$category"
+          [ ! -d "$category_dir" ] && continue
+          for rule in "$category_dir"/*.yml; do
+            [ -f "$rule" ] || continue
+            # Run ast-grep and capture output
+            output=$(sg scan --rule "$rule" {staged_files} 2>&1 | grep -v "paragon-guard\|sig-\|ast-engine")
+            if [ -n "$output" ] && echo "$output" | grep -qE "error|warning"; then
+              echo "=== $category/$(basename "$rule") ==="
+              echo "$output"
+              has_error=1
+            fi
+          done
         done
         exit $has_error
 
