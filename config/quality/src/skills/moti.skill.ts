@@ -8,16 +8,16 @@ import type { SkillDefinition } from '../schemas'
 import { SkillName } from '../schemas'
 
 export const motiSkill: SkillDefinition = {
-	frontmatter: {
-		name: SkillName('moti'),
-		description: 'Moti declarative animations for React Native',
-		allowedTools: ['Read', 'Write', 'Edit', 'Grep'],
-		tokenBudget: 400,
-	},
-	sections: [
-		{
-			heading: 'Why Moti',
-			content: `
+  frontmatter: {
+    name: SkillName('moti'),
+    description: 'Moti declarative animations for React Native',
+    allowedTools: ['Read', 'Write', 'Edit', 'Grep'],
+    tokenBudget: 400,
+  },
+  sections: [
+    {
+      heading: 'Why Moti',
+      content: `
 Moti provides declarative animations built on Reanimated:
 - Works on iOS, Android, and Web
 - Simpler API than raw Reanimated
@@ -26,10 +26,10 @@ Moti provides declarative animations built on Reanimated:
 
 Use Moti for UI animations, Reanimated for gestures.
 `,
-		},
-		{
-			heading: 'Basic Animation',
-			content: `
+    },
+    {
+      heading: 'Basic Animation',
+      content: `
 \`\`\`typescript
 import { MotiView } from 'moti'
 
@@ -43,10 +43,10 @@ import { MotiView } from 'moti'
 </MotiView>
 \`\`\`
 `,
-		},
-		{
-			heading: 'State-Driven Animation',
-			content: `
+    },
+    {
+      heading: 'State-Driven Animation',
+      content: `
 \`\`\`typescript
 import { MotiView } from 'moti'
 
@@ -63,10 +63,10 @@ function Toggle({ isActive }: { isActive: boolean }) {
 }
 \`\`\`
 `,
-		},
-		{
-			heading: 'Presence (Enter/Exit)',
-			content: `
+    },
+    {
+      heading: 'Presence (Enter/Exit)',
+      content: `
 \`\`\`typescript
 import { AnimatePresence, MotiView } from 'moti'
 
@@ -86,10 +86,10 @@ function Modal({ visible }: { visible: boolean }) {
 }
 \`\`\`
 `,
-		},
-		{
-			heading: 'Skeleton Loader',
-			content: `
+    },
+    {
+      heading: 'Skeleton Loader',
+      content: `
 \`\`\`typescript
 import { Skeleton } from 'moti/skeleton'
 
@@ -103,10 +103,10 @@ function LoadingCard() {
 }
 \`\`\`
 `,
-		},
-		{
-			heading: 'Transition Types',
-			content: `
+    },
+    {
+      heading: 'Transition Types',
+      content: `
 \`\`\`typescript
 // Spring (bouncy, natural)
 transition={{ type: 'spring', damping: 15, stiffness: 100 }}
@@ -120,6 +120,6 @@ transition={{ type: 'decay', velocity: 0.5 }}
 
 Prefer spring for UI, timing for opacity/color.
 `,
-		},
-	],
+    },
+  ],
 }

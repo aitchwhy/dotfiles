@@ -8,16 +8,16 @@ import type { SkillDefinition } from '../schemas'
 import { SkillName } from '../schemas'
 
 export const nativewindSkill: SkillDefinition = {
-	frontmatter: {
-		name: SkillName('nativewind'),
-		description: 'NativeWind (Tailwind for React Native) patterns',
-		allowedTools: ['Read', 'Write', 'Edit', 'Grep'],
-		tokenBudget: 400,
-	},
-	sections: [
-		{
-			heading: 'Setup',
-			content: `
+  frontmatter: {
+    name: SkillName('nativewind'),
+    description: 'NativeWind (Tailwind for React Native) patterns',
+    allowedTools: ['Read', 'Write', 'Edit', 'Grep'],
+    tokenBudget: 400,
+  },
+  sections: [
+    {
+      heading: 'Setup',
+      content: `
 Required files:
 
 \`\`\`javascript
@@ -38,10 +38,10 @@ module.exports = withNativeWind(config, { input: './global.css' })
 import '../global.css'
 \`\`\`
 `,
-		},
-		{
-			heading: 'Basic Usage',
-			content: `
+    },
+    {
+      heading: 'Basic Usage',
+      content: `
 \`\`\`typescript
 import { View, Text } from 'react-native'
 
@@ -56,10 +56,10 @@ import { View, Text } from 'react-native'
 <View className={\`p-4 \${isActive ? 'bg-blue-500' : 'bg-gray-200'}\`} />
 \`\`\`
 `,
-		},
-		{
-			heading: 'Dark Mode',
-			content: `
+    },
+    {
+      heading: 'Dark Mode',
+      content: `
 \`\`\`typescript
 // Automatic with system preference
 <View className="bg-white dark:bg-black">
@@ -71,10 +71,10 @@ import { View, Text } from 'react-native'
 // app.json: userInterfaceStyle: "automatic"
 \`\`\`
 `,
-		},
-		{
-			heading: 'Platform Variants',
-			content: `
+    },
+    {
+      heading: 'Platform Variants',
+      content: `
 \`\`\`typescript
 // iOS-only styles
 <View className="ios:pt-12 android:pt-4" />
@@ -83,10 +83,10 @@ import { View, Text } from 'react-native'
 <View className="web:hover:bg-gray-100" />
 \`\`\`
 `,
-		},
-		{
-			heading: 'Common Patterns',
-			content: `
+    },
+    {
+      heading: 'Common Patterns',
+      content: `
 \`\`\`typescript
 // Full screen centered
 <View className="flex-1 items-center justify-center">
@@ -101,10 +101,10 @@ import { View, Text } from 'react-native'
 // AVOID: pt-safe - use useSafeAreaInsets()
 \`\`\`
 `,
-		},
-		{
-			heading: 'Type Declarations',
-			content: `
+    },
+    {
+      heading: 'Type Declarations',
+      content: `
 \`\`\`typescript
 // nativewind-env.d.ts
 /// <reference types="nativewind/types" />
@@ -112,6 +112,6 @@ import { View, Text } from 'react-native'
 
 This enables className prop typing on all RN components.
 `,
-		},
-	],
+    },
+  ],
 }

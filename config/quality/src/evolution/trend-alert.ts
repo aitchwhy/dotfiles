@@ -46,7 +46,7 @@ const color = (c: keyof typeof COLORS, text: string): string => `${COLORS[c]}${t
 // CLI output helper
 const print = (text: string): Effect.Effect<void> =>
   Effect.sync(() => {
-    process.stdout.write(text + '\n')
+    process.stdout.write(`${text}\n`)
   })
 
 // =============================================================================
@@ -157,7 +157,7 @@ const renderHuman = (result: AlertResult): Effect.Effect<void> =>
 
 const renderJson = (result: AlertResult): Effect.Effect<void> =>
   Effect.sync(() => {
-    process.stdout.write(JSON.stringify(result) + '\n')
+    process.stdout.write(`${JSON.stringify(result)}\n`)
   })
 
 // =============================================================================

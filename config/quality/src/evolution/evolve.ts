@@ -48,7 +48,7 @@ const makeBar = (score: number, width: number = 20): string => {
 // CLI output helper (stdout is the intended output for CLI tools)
 const print = (text: string): Effect.Effect<void> =>
   Effect.sync(() => {
-    process.stdout.write(text + '\n')
+    process.stdout.write(`${text}\n`)
   })
 
 // =============================================================================
@@ -197,7 +197,7 @@ const renderJson = (
           : null,
       last_grade: latest?.timestamp ?? null,
     }
-    process.stdout.write(JSON.stringify(output) + '\n')
+    process.stdout.write(`${JSON.stringify(output)}\n`)
   })
 
 // =============================================================================
@@ -230,7 +230,7 @@ pipe(
   Effect.provide(MetricsDbLive),
   Effect.catchAll((error) =>
     Effect.sync(() => {
-      process.stderr.write(color('red', `Error: ${String(error)}`) + '\n')
+      process.stderr.write(`${color('red', `Error: ${String(error)}`)}\n`)
       process.exit(1)
     }),
   ),

@@ -554,38 +554,38 @@ export function checkSecrets(content: string, filePath: string): GuardResult {
 // =============================================================================
 
 const SCAFFOLDING_ALLOWED_PATHS = [
-	'/templates/',
-	'/copier-monorepo/',
-	'config/quality/',
-	'/node_modules/',
+  '/templates/',
+  '/copier-monorepo/',
+  'config/quality/',
+  '/node_modules/',
 ] as const
 
 const SCAFFOLDING_PATTERNS: readonly { pattern: RegExp; description: string }[] = [
-	// mkdir project structure patterns
-	{ pattern: /mkdir\s+(-p\s+)?.*\/(src|apps|packages|lib)\//, description: 'mkdir project dirs' },
-	{ pattern: /mkdir\s+(-p\s+)?.+\/(api|web|mobile|infra)/, description: 'mkdir app dirs' },
-	// npm/pnpm init (use template instead)
-	{ pattern: /\b(npm|pnpm|yarn)\s+init\b/, description: 'package init' },
-	// Creating config files manually (use template)
-	{
-		pattern: /touch\s+.*(tsconfig|biome|vitest\.config|turbo)\.(json|ts)/,
-		description: 'touch config file',
-	},
-	// Copying template directories
-	{ pattern: /cp\s+-r.*template/, description: 'cp -r template' },
+  // mkdir project structure patterns
+  { pattern: /mkdir\s+(-p\s+)?.*\/(src|apps|packages|lib)\//, description: 'mkdir project dirs' },
+  { pattern: /mkdir\s+(-p\s+)?.+\/(api|web|mobile|infra)/, description: 'mkdir app dirs' },
+  // npm/pnpm init (use template instead)
+  { pattern: /\b(npm|pnpm|yarn)\s+init\b/, description: 'package init' },
+  // Creating config files manually (use template)
+  {
+    pattern: /touch\s+.*(tsconfig|biome|vitest\.config|turbo)\.(json|ts)/,
+    description: 'touch config file',
+  },
+  // Copying template directories
+  { pattern: /cp\s+-r.*template/, description: 'cp -r template' },
 ]
 
 export function checkScaffoldingEnforcement(command: string): GuardResult {
-	// Allow within template development paths
-	if (SCAFFOLDING_ALLOWED_PATHS.some((p) => command.includes(p))) {
-		return { ok: true }
-	}
+  // Allow within template development paths
+  if (SCAFFOLDING_ALLOWED_PATHS.some((p) => command.includes(p))) {
+    return { ok: true }
+  }
 
-	for (const { pattern, description } of SCAFFOLDING_PATTERNS) {
-		if (pattern.test(command)) {
-			return {
-				ok: false,
-				error: `Guard 34: MANUAL SCAFFOLDING BLOCKED
+  for (const { pattern, description } of SCAFFOLDING_PATTERNS) {
+    if (pattern.test(command)) {
+      return {
+        ok: false,
+        error: `Guard 34: MANUAL SCAFFOLDING BLOCKED
 
 Detected: ${description}
 Command: ${command.substring(0, 60)}${command.length > 60 ? '...' : ''}
@@ -601,11 +601,11 @@ Benefits:
 - Pre-configured tooling (Biome, Vitest, Turbo)
 
 See: /copier-template skill`,
-			}
-		}
-	}
+      }
+    }
+  }
 
-	return { ok: true }
+  return { ok: true }
 }
 
 // =============================================================================

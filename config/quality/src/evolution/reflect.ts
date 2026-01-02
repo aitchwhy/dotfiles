@@ -58,7 +58,7 @@ const color = (c: keyof typeof COLORS, text: string): string => `${COLORS[c]}${t
 // CLI output helper
 const print = (text: string): Effect.Effect<void> =>
   Effect.sync(() => {
-    process.stdout.write(text + '\n')
+    process.stdout.write(`${text}\n`)
   })
 
 // =============================================================================

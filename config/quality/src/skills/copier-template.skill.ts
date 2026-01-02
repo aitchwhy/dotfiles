@@ -8,16 +8,16 @@ import type { SkillDefinition } from '../schemas'
 import { SkillName } from '../schemas'
 
 export const copierTemplateSkill: SkillDefinition = {
-	frontmatter: {
-		name: SkillName('copier-template'),
-		description: 'Creating/updating SSOT projects with Copier',
-		allowedTools: ['Read', 'Write', 'Edit', 'Bash', 'Grep'],
-		tokenBudget: 500,
-	},
-	sections: [
-		{
-			heading: 'Creating New Projects',
-			content: `
+  frontmatter: {
+    name: SkillName('copier-template'),
+    description: 'Creating/updating SSOT projects with Copier',
+    allowedTools: ['Read', 'Write', 'Edit', 'Bash', 'Grep'],
+    tokenBudget: 500,
+  },
+  sections: [
+    {
+      heading: 'Creating New Projects',
+      content: `
 Use Copier to create projects from SSOT template:
 
 \`\`\`bash
@@ -32,10 +32,10 @@ pipx run copier copy ~/dotfiles/config/quality/templates/copier-monorepo ./my-pr
   --trust
 \`\`\`
 `,
-		},
-		{
-			heading: 'Version Injection',
-			content: `
+    },
+    {
+      heading: 'Version Injection',
+      content: `
 Versions are injected at copy-time from SSOT (versions.ts):
 
 1. \`build-versions.ts\` runs during \`copier copy\`
@@ -45,10 +45,10 @@ Versions are injected at copy-time from SSOT (versions.ts):
 
 NEVER hardcode versions in templates - always use SSOT.
 `,
-		},
-		{
-			heading: 'Template Questions',
-			content: `
+    },
+    {
+      heading: 'Template Questions',
+      content: `
 | Question | Type | Purpose |
 |----------|------|---------|
 | project_name | str | kebab-case name |
@@ -60,10 +60,10 @@ NEVER hardcode versions in templates - always use SSOT.
 | database | choice | none/postgresql/turso |
 | auth_provider | choice | none/better-auth |
 `,
-		},
-		{
-			heading: 'Updating Projects',
-			content: `
+    },
+    {
+      heading: 'Updating Projects',
+      content: `
 \`\`\`bash
 # Update existing project to latest template
 cd my-project
@@ -72,15 +72,15 @@ pipx run copier update --trust
 
 The \`.copier-answers.yml\` file preserves your choices.
 `,
-		},
-		{
-			heading: 'Jinja Delimiters',
-			content: `
+    },
+    {
+      heading: 'Jinja Delimiters',
+      content: `
 - JSON files: Standard \`{{ }}\` delimiters
 - TypeScript files: Custom \`[[ ]]\` and \`[% %]\` delimiters
 
 This prevents conflicts with template literals.
 `,
-		},
-	],
+    },
+  ],
 }

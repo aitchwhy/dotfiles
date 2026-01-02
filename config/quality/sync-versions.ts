@@ -58,7 +58,7 @@ const program = Effect.gen(function* () {
       devDependencies: updatedDevDeps,
     }
     yield* Effect.try({
-      try: () => Bun.write('package.json', JSON.stringify(updatedPkg, null, 2) + '\n'),
+      try: () => Bun.write('package.json', `${JSON.stringify(updatedPkg, null, 2)}\n`),
       catch: (e) => new Error(`Failed to write package.json: ${e}`),
     }).pipe(Effect.flatMap((p) => Effect.promise(() => p)))
     yield* Console.log(`\n✓ Updated ${updated} dependencies`)

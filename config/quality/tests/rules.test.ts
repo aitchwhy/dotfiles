@@ -69,7 +69,13 @@ describe('Quality Rules', () => {
     })
 
     it('all rules have valid category', () => {
-      const validCategories = ['type-safety', 'effect', 'effect-xstate', 'architecture', 'observability']
+      const validCategories = [
+        'type-safety',
+        'effect',
+        'effect-xstate',
+        'architecture',
+        'observability',
+      ]
       for (const rule of ALL_RULES) {
         expect(validCategories).toContain(rule.category)
       }

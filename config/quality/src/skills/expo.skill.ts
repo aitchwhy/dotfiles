@@ -8,16 +8,16 @@ import type { SkillDefinition } from '../schemas'
 import { SkillName } from '../schemas'
 
 export const expoSkill: SkillDefinition = {
-	frontmatter: {
-		name: SkillName('expo'),
-		description: 'Expo SDK 53 / Router v5 patterns and commands',
-		allowedTools: ['Read', 'Write', 'Edit', 'Bash', 'Grep'],
-		tokenBudget: 500,
-	},
-	sections: [
-		{
-			heading: 'Project Structure',
-			content: `
+  frontmatter: {
+    name: SkillName('expo'),
+    description: 'Expo SDK 53 / Router v5 patterns and commands',
+    allowedTools: ['Read', 'Write', 'Edit', 'Bash', 'Grep'],
+    tokenBudget: 500,
+  },
+  sections: [
+    {
+      heading: 'Project Structure',
+      content: `
 \`\`\`
 apps/mobile/
 ├── app/           # File-based routing (Expo Router)
@@ -30,10 +30,10 @@ apps/mobile/
 └── package.json
 \`\`\`
 `,
-		},
-		{
-			heading: 'Common Commands',
-			content: `
+    },
+    {
+      heading: 'Common Commands',
+      content: `
 \`\`\`bash
 # Development
 pnpm --filter @scope/mobile start     # Start Metro
@@ -47,10 +47,10 @@ npx expo run:ios
 npx expo run:android
 \`\`\`
 `,
-		},
-		{
-			heading: 'Expo Router Navigation',
-			content: `
+    },
+    {
+      heading: 'Expo Router Navigation',
+      content: `
 \`\`\`typescript
 // File-based routing
 // app/index.tsx -> /
@@ -69,10 +69,10 @@ router.replace('/home')
 router.back()
 \`\`\`
 `,
-		},
-		{
-			heading: 'Layout Files',
-			content: `
+    },
+    {
+      heading: 'Layout Files',
+      content: `
 \`\`\`typescript
 // app/_layout.tsx - Root layout
 import { Stack } from 'expo-router'
@@ -87,10 +87,10 @@ export default function RootLayout() {
 }
 \`\`\`
 `,
-		},
-		{
-			heading: 'New Architecture (SDK 53)',
-			content: `
+    },
+    {
+      heading: 'New Architecture (SDK 53)',
+      content: `
 SDK 53 defaults to New Architecture:
 - \`newArchEnabled: true\` in app.json
 - TurboModules for native modules
@@ -102,6 +102,6 @@ If issues arise, disable temporarily:
 { "expo": { "newArchEnabled": false } }
 \`\`\`
 `,
-		},
-	],
+    },
+  ],
 }

@@ -8,16 +8,16 @@ import type { SkillDefinition } from '../schemas'
 import { SkillName } from '../schemas'
 
 export const reactNativeSkill: SkillDefinition = {
-	frontmatter: {
-		name: SkillName('react-native'),
-		description: 'React Native 0.79 platform patterns and safe practices',
-		allowedTools: ['Read', 'Write', 'Edit', 'Grep'],
-		tokenBudget: 500,
-	},
-	sections: [
-		{
-			heading: 'Platform-Specific Code',
-			content: `
+  frontmatter: {
+    name: SkillName('react-native'),
+    description: 'React Native 0.79 platform patterns and safe practices',
+    allowedTools: ['Read', 'Write', 'Edit', 'Grep'],
+    tokenBudget: 500,
+  },
+  sections: [
+    {
+      heading: 'Platform-Specific Code',
+      content: `
 \`\`\`typescript
 // Option 1: Platform.select
 import { Platform } from 'react-native'
@@ -33,10 +33,10 @@ const styles = {
 import Button from './Button'  // Auto-selects
 \`\`\`
 `,
-		},
-		{
-			heading: 'Safe Area Handling',
-			content: `
+    },
+    {
+      heading: 'Safe Area Handling',
+      content: `
 \`\`\`typescript
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -56,10 +56,10 @@ function Header() {
 }
 \`\`\`
 `,
-		},
-		{
-			heading: 'Lists and Performance',
-			content: `
+    },
+    {
+      heading: 'Lists and Performance',
+      content: `
 \`\`\`typescript
 // Use FlashList for large lists (Shopify)
 import { FlashList } from '@shopify/flash-list'
@@ -74,10 +74,10 @@ import { FlashList } from '@shopify/flash-list'
 // AVOID FlatList for 100+ items
 \`\`\`
 `,
-		},
-		{
-			heading: 'Image Handling',
-			content: `
+    },
+    {
+      heading: 'Image Handling',
+      content: `
 \`\`\`typescript
 // Use expo-image (NOT react-native Image)
 import { Image } from 'expo-image'
@@ -93,10 +93,10 @@ import { Image } from 'expo-image'
 
 expo-image provides caching, blurhash, and better performance.
 `,
-		},
-		{
-			heading: 'Keyboard Handling',
-			content: `
+    },
+    {
+      heading: 'Keyboard Handling',
+      content: `
 \`\`\`typescript
 import { KeyboardAvoidingView, Platform } from 'react-native'
 
@@ -108,6 +108,6 @@ import { KeyboardAvoidingView, Platform } from 'react-native'
 </KeyboardAvoidingView>
 \`\`\`
 `,
-		},
-	],
+    },
+  ],
 }
