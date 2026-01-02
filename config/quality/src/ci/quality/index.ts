@@ -18,27 +18,25 @@ const env = Schema.decodeUnknownSync(EnvSchema)({
   QUALITY_DIR: process.env['QUALITY_DIR'],
 })
 
-// Resolve bun path using Bun.which() - Bun.spawn needs absolute paths
-const bunPath = Bun.which('bun')
-if (!bunPath) {
-  throw new Error('bun executable not found in PATH')
-}
+// Helper to run bun commands via shell for proper PATH resolution
+const runBunScript = (script: string, cwd: string) =>
+  runCommand('/bin/sh', ['-c', `bun run ${script}`], { cwd })
 
 const runTypecheck = Effect.gen(function* () {
   yield* Console.log('  Running typecheck...')
-  const result = yield* runCommand(bunPath, ['run', 'typecheck'], { cwd: env.QUALITY_DIR })
+  const result = yield* runBunScript('typecheck', env.QUALITY_DIR)
   return result.exitCode === 0
 })
 
 const runTests = Effect.gen(function* () {
   yield* Console.log('  Running tests...')
-  const result = yield* runCommand(bunPath, ['run', 'test'], { cwd: env.QUALITY_DIR })
+  const result = yield* runBunScript('test', env.QUALITY_DIR)
   return result.exitCode === 0
 })
 
 const runValidate = Effect.gen(function* () {
   yield* Console.log('  Validating artifacts...')
-  const result = yield* runCommand(bunPath, ['run', 'validate'], { cwd: env.QUALITY_DIR })
+  const result = yield* runBunScript('validate', env.QUALITY_DIR)
   return result.exitCode === 0
 })
 
