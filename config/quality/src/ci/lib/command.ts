@@ -40,15 +40,11 @@ const defaultCommandOptions = { cwd: process.cwd() }
 /**
  * Exit code transformation: string codes (e.g., "ENOENT") → 127
  */
-const ExitCodeSchema = Schema.transform(
-  Schema.Union(Schema.Number, Schema.String),
-  Schema.Number,
-  {
-    strict: true,
-    decode: (input) => (typeof input === 'number' ? input : 127),
-    encode: (n) => n,
-  },
-)
+const ExitCodeSchema = Schema.transform(Schema.Union(Schema.Number, Schema.String), Schema.Number, {
+  strict: true,
+  decode: (input) => (typeof input === 'number' ? input : 127),
+  encode: (n) => n,
+})
 
 /**
  * Exec error shape at boundary - transforms to proper exit code
