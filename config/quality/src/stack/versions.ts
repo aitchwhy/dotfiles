@@ -2,7 +2,7 @@
  * Quality System Stack - Frozen Version Registry
  *
  * SSOT (Single Source of Truth) for all version numbers.
- * Frozen: December 2025
+ * Frozen: January 2026
  *
  * This file replaces lib/versions.nix.
  *
@@ -16,7 +16,7 @@ import type { StackDefinition } from './schema'
 import { StackDefinitionSchema } from './schema'
 
 /**
- * STACK - Frozen December 2025 Configuration
+ * STACK - Frozen January 2026 Configuration
  *
  * All versions are exact (no semver ranges) for reproducibility.
  * Use `npm.xyz` for package.json generation.
@@ -24,9 +24,9 @@ import { StackDefinitionSchema } from './schema'
  */
 export const STACK = {
   meta: {
-    frozen: '2025-12',
+    frozen: '2026-01',
     updated: '2026-01-01',
-    ssotVersion: '4.2.0',
+    ssotVersion: '5.0.0',
   },
 
   // ===========================================================================
@@ -43,15 +43,15 @@ export const STACK = {
   // FRONTEND (Web)
   // ===========================================================================
   frontend: {
-    react: '19.2.1',
-    'react-dom': '19.2.1',
+    react: '19.2.3',
+    'react-dom': '19.2.3',
     xstate: '5.25.0', // Actor model state machines (handles API state)
     'tanstack-router': '1.140.0',
     tailwindcss: '4.1.17',
   },
 
   // ===========================================================================
-  // MOBILE / UNIVERSAL (Expo SDK 53 - December 2025)
+  // MOBILE / UNIVERSAL (Expo SDK 53 - January 2026)
   // Universal = iOS + Android + Web from single codebase
   // Decision: SDK 53 (stable, 75% New Arch adoption) over SDK 54 (too new)
   // ===========================================================================
@@ -123,7 +123,7 @@ export const STACK = {
   // ===========================================================================
   testing: {
     playwright: '1.57.0',
-    vitest: '4.0.15',
+    vitest: '4.0.16',
     vite: '7.2.7',
     'bruno-cli': '1.30.0', // API testing
   },
@@ -155,7 +155,7 @@ export const STACK = {
   },
 
   // ===========================================================================
-  // OBSERVABILITY (December 2025 - Datadog + OTEL 2.x)
+  // OBSERVABILITY (January 2026 - Datadog + OTEL 2.x)
   // ===========================================================================
   observability: {
     'opentelemetry-api': '1.9.0',
@@ -175,7 +175,7 @@ export const STACK = {
   },
 
   // ===========================================================================
-  // NIX ECOSYSTEM (December 2025 - BLEEDING EDGE)
+  // NIX ECOSYSTEM (January 2026 - BLEEDING EDGE)
   // ===========================================================================
   nix: {
     // Core flake inputs - BLEEDING EDGE
@@ -183,11 +183,11 @@ export const STACK = {
     'nix-darwin': 'github:LnL7/nix-darwin',
     'home-manager': 'github:nix-community/home-manager', // master for 26.05
 
-    // State versions - December 2025 bleeding edge
+    // State versions - January 2026 bleeding edge
     'home-manager-stateVersion': '26.05',
     'nixos-stateVersion': '26.05',
 
-    // Flake architecture (December 2025 standard)
+    // Flake architecture (January 2026 standard)
     'flake-parts': 'github:hercules-ci/flake-parts',
     'git-hooks-nix': 'github:cachix/git-hooks.nix',
 
@@ -227,8 +227,8 @@ export const STACK = {
     // NOTE: zod removed - it's in FORBIDDEN_PACKAGES (use Effect Schema)
 
     // Frontend
-    react: '19.2.1',
-    'react-dom': '19.2.1',
+    react: '19.2.3',
+    'react-dom': '19.2.3',
     xstate: '5.25.0',
     '@xstate/react': '6.0.0',
     '@tanstack/react-router': '1.140.0',
@@ -266,14 +266,14 @@ export const STACK = {
 
     // Testing
     '@playwright/test': '1.57.0',
-    vitest: '4.0.15',
-    '@vitest/ui': '4.0.15',
+    vitest: '4.0.16',
+    '@vitest/ui': '4.0.16',
 
     // Build
     vite: '7.2.7',
     handlebars: '4.7.8',
 
-    // Dev & Linting (Dec 2025 - reconciled from templates)
+    // Dev & Linting (Jan 2026 - reconciled from templates)
     oxlint: '1.35.0', // Type-aware linter (Oxlint 1.0 stable)
     'oxlint-tsgolint': '1.35.0',
     '@biomejs/biome': '2.3.8', // Formatter only (Biome 2.0 with type inference)
@@ -283,7 +283,7 @@ export const STACK = {
     '@ast-grep/cli': '0.40.3', // CLI for ast-grep scan
     lefthook: '1.13.6', // Git hooks manager
 
-    // Pulumi (infrastructure) - Dec 2025
+    // Pulumi (infrastructure) - Jan 2026
     '@pulumi/pulumi': '3.210.0',
     '@pulumi/aws': '7.14.0',
     '@pulumi/awsx': '3.1.0',
