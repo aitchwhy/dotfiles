@@ -1,73 +1,99 @@
 /**
  * Effect-based Command Runner for CI
  *
- * Uses Node.js child_process.exec for cross-platform compatibility.
+ * Uses Node.js child_process.exec with full Effect-TS type safety.
  */
 
-import { Effect, Schema } from 'effect'
+import { Effect, Schema, pipe } from 'effect'
 import { exec } from 'node:child_process'
 import { promisify } from 'node:util'
 import { CommandError } from './errors'
 
 const execAsync = promisify(exec)
 
-export interface CommandResult {
-  readonly stdout: string
-  readonly stderr: string
-  readonly exitCode: number
-}
+// ─────────────────────────────────────────────────────────────
+// Schemas - Parse at boundary with transformations
+// ─────────────────────────────────────────────────────────────
 
-interface CommandOptions {
-  readonly cwd: string
-}
+/**
+ * Command result - the canonical output type
+ */
+export const CommandResultSchema = Schema.Struct({
+  stdout: Schema.String,
+  stderr: Schema.String,
+  exitCode: Schema.Number,
+})
+export type CommandResult = typeof CommandResultSchema.Type
 
-const defaultOptions: CommandOptions = { cwd: process.cwd() }
+/**
+ * Command options with defaults parsed at boundary
+ */
+const CommandOptionsSchema = Schema.Struct({
+  cwd: Schema.optionalWith(Schema.String, { default: () => process.cwd() }),
+})
 
-// Schema for parsing exec error shape at boundary
-// code can be number (exit code) or string (like "ENOENT")
+/**
+ * Exit code transformation: string codes (e.g., "ENOENT") → 127
+ */
+const ExitCodeSchema = Schema.transform(
+  Schema.Union(Schema.Number, Schema.String),
+  Schema.Number,
+  {
+    strict: true,
+    decode: (input) => (typeof input === 'number' ? input : 127),
+    encode: (n) => n,
+  },
+)
+
+/**
+ * Exec error shape at boundary - transforms to proper exit code
+ */
 const ExecErrorSchema = Schema.Struct({
   stdout: Schema.optionalWith(Schema.String, { default: () => '' }),
   stderr: Schema.optionalWith(Schema.String, { default: () => '' }),
-  code: Schema.optionalWith(Schema.Union(Schema.Number, Schema.String), { default: () => 1 }),
+  code: pipe(ExitCodeSchema, Schema.optionalWith({ default: () => 1 })),
 })
 
-// Convert code to exit number
-const getExitCode = (code: number | string): number => {
-  if (typeof code === 'number') return code
-  // String codes like "ENOENT" indicate command not found = 127
-  return 127
-}
+// ─────────────────────────────────────────────────────────────
+// Effects - Pure Effect-TS command execution
+// ─────────────────────────────────────────────────────────────
 
+/**
+ * Execute a command and return result (succeeds even for non-zero exit)
+ *
+ * This function uses Effect.promise with internal error handling to always
+ * return a CommandResult. Non-zero exits are encoded in the exitCode field.
+ */
 export const runCommand = (
   command: string,
   args: readonly string[],
   options?: { readonly cwd?: string },
-): Effect.Effect<CommandResult, CommandError> =>
+): Effect.Effect<CommandResult, never> =>
   Effect.gen(function* () {
-    // Merge with defaults using Object.assign (no nullish coalescing needed)
-    const opts: CommandOptions = Object.assign({}, defaultOptions, options)
+    // Parse options at boundary
+    const opts = Schema.decodeUnknownSync(CommandOptionsSchema)(options)
 
-    // Build shell command string
+    // Build shell command
     const fullCommand = [command, ...args].join(' ')
 
-    // exec throws on non-zero exit, so we catch and parse the error for exit code
-    const result = yield* Effect.async<CommandResult, CommandError>((resume) => {
-      execAsync(fullCommand, {
+    // Execute command - handle both success and non-zero exit as CommandResult
+    return yield* Effect.promise(async (): Promise<CommandResult> => {
+      const execResult = await execAsync(fullCommand, {
         cwd: opts.cwd,
         env: process.env,
         maxBuffer: 10 * 1024 * 1024,
+      }).catch((error: unknown) => {
+        // Parse exec error at boundary - transforms code to number
+        const parsed = Schema.decodeUnknownSync(ExecErrorSchema)(error)
+        return { stdout: parsed.stdout, stderr: parsed.stderr, exitCode: parsed.code }
       })
-        .then(({ stdout, stderr }) => {
-          resume(Effect.succeed({ stdout, stderr, exitCode: 0 }))
-        })
-        .catch((error: unknown) => {
-          // Parse error at boundary using Schema for non-zero exit
-          const parsed = Schema.decodeUnknownSync(ExecErrorSchema)(error)
-          resume(Effect.succeed({ stdout: parsed.stdout, stderr: parsed.stderr, exitCode: getExitCode(parsed.code) }))
-        })
-    })
 
-    return result
+      // Success case or already parsed error
+      if ('exitCode' in execResult) {
+        return execResult
+      }
+      return { stdout: execResult.stdout, stderr: execResult.stderr, exitCode: 0 }
+    })
   })
 
 /**
