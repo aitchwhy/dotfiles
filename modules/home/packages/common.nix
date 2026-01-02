@@ -38,8 +38,8 @@ in
       ]
       # Programming Languages & Tools
       ++ (optionals cfg.enableLanguages [
-        # Node.js 24 LTS
-        nodejs_24
+        # Node.js 25 Current (EOL June 2026)
+        nodejs_25
         nodePackages.pnpm
         yarn-berry
         bun
