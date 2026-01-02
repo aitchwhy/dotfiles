@@ -4,13 +4,13 @@
   "description": "{{ project_description }}",
   "packageManager": "pnpm@{{ pnpm }}",
   "engines": {
-    "node": ">=24.0.0",
+    "node": ">=25.0.0",
     "pnpm": ">=10"
   },
   "scripts": {
-    "build": "turbo build",
-    "dev": "turbo dev",
-    "typecheck": "turbo typecheck",
+    "build": "pnpm -r build",
+    "dev": "pnpm -r --parallel dev",
+    "typecheck": "pnpm -r typecheck",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "lint:ast": "ast-grep scan",
@@ -33,7 +33,6 @@
     "lefthook": "{{ versions['lefthook'] }}",
     "oxlint": "{{ versions['oxlint'] }}",
     "tsx": "{{ versions['tsx'] }}",
-    "turbo": "{{ versions['turbo'] }}",
     "typescript": "{{ versions['typescript'] }}",
     "vitest": "{{ versions['vitest'] }}"
   },
