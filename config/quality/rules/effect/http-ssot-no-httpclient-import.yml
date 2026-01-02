@@ -1,0 +1,39 @@
+# Effect HttpApi SSOT: Ban HttpClient import in app code
+# HttpClient is low-level; apps should use HttpApiClient for SSOT
+id: http-ssot-no-httpclient-import
+language: TypeScript
+severity: error
+message: "Direct HttpClient import is banned in application code. Use HttpApiClient.make(YourApi) to derive a type-safe client."
+note: |
+  HttpClient is a low-level primitive for manual HTTP requests.
+  Application code should use HttpApiClient which derives from contracts.
+
+  WRONG (low-level, bypass contract):
+    import { HttpClient } from '@effect/platform'
+    const client = yield* HttpClient.HttpClient
+    yield* client.execute(HttpClientRequest.get('/api/users'))
+
+  RIGHT (derived from contract):
+    import { HttpApiClient } from '@effect/platform'
+    import { MyApi } from '@mypackage/contracts'
+    const client = yield* HttpApiClient.make(MyApi, { baseUrl })
+    yield* client.users.list()
+
+  EXCEPTIONS:
+  - Server handlers may need HttpClient for proxying/middleware
+  - The ApiClient service file that wraps HttpApiClient.make
+
+ignores:
+  # Server code may legitimately use HttpClient
+  - "**/apps/server/**"
+  - "**/apps/agent/**"
+  # The SSOT service wrapper
+  - "**/services/*ApiClient.ts"
+  - "**/services/*Client.ts"
+  - "**/node_modules/**"
+
+rule:
+  any:
+    - pattern: import { HttpClient } from '@effect/platform'
+    - pattern: import { HttpClient, $$$REST } from '@effect/platform'
+    - pattern: HttpClient.HttpClient

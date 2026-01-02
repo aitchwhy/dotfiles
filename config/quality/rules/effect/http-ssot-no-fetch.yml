@@ -1,0 +1,36 @@
+# Effect HttpApi SSOT: Ban raw fetch()
+# @see https://effect.website/docs/platform/http-client
+id: http-ssot-no-fetch
+language: TypeScript
+severity: error
+message: "Direct fetch() is banned. Use HttpApiClient.make(YourApi) to derive a type-safe client from your contract."
+note: |
+  HTTP requests MUST be derived from an HttpApi contract using HttpApiClient.make().
+  This ensures:
+  - Compile-time type safety (URLs, payloads, responses)
+  - Single source of truth (contract defines everything)
+  - No drift between client and server
+  - No URL typos possible
+
+  WRONG:
+    const response = await fetch('/api/users')
+    const data = await response.json()
+
+  RIGHT:
+    // 1. Define contract in @yourpackage/contracts
+    export class UsersApi extends HttpApi.make('users').add(
+      HttpApiGroup.make('users').add(
+        HttpApiEndpoint.get('list', '/users').addSuccess(Schema.Array(User))
+      )
+    ) {}
+
+    // 2. Derive client from contract
+    const client = yield* HttpApiClient.make(UsersApi, { baseUrl })
+    const users = yield* client.users.list()
+
+rule:
+  any:
+    - pattern: fetch($$$)
+    - pattern: await fetch($$$)
+    - pattern: globalThis.fetch($$$)
+    - pattern: window.fetch($$$)

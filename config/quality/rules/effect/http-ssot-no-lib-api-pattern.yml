@@ -1,0 +1,38 @@
+# Effect HttpApi SSOT: Ban lib/api.ts pattern (split-brain indicator)
+# Detects files that look like manual API client modules
+id: http-ssot-no-lib-api-pattern
+language: TypeScript
+severity: error
+message: "Split-brain API client file detected. Delete this file and use HttpApiClient.make(YourApi) to derive a client from the contract."
+note: |
+  Files named api.ts in lib/ directories often indicate a split-brain architecture
+  where HTTP clients are manually constructed instead of derived from contracts.
+
+  WRONG (split-brain pattern):
+    apps/mobile/src/lib/api.ts ← This file should not exist
+    apps/web/src/lib/api.ts   ← This file should not exist
+    
+  Inside these files you typically find:
+    export async function startConversation(...) {
+      const response = await fetch(...)
+    }
+
+  RIGHT (SSOT pattern):
+    packages/contracts/src/api.ts   ← Contract definition (HttpApi.make)
+    apps/*/src/services/ApiClient.ts ← Derived via HttpApiClient.make
+
+rule:
+  kind: program
+  has:
+    any:
+      - pattern: export async function $NAME($$$) { $$$BODY }
+        constraints:
+          BODY:
+            any:
+              - pattern: fetch($$$)
+              - pattern: await fetch($$$)
+      - pattern: export const $NAME = async ($$$) => { $$$BODY }
+        constraints:
+          BODY:
+            any:
+              - pattern: fetch($$$)

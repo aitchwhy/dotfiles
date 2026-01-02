@@ -1,0 +1,41 @@
+# Effect HttpApi SSOT: Ban URL construction patterns
+# Detects baseUrl + path concatenation (indicates manual HTTP)
+id: http-ssot-no-url-construction
+language: TypeScript
+severity: error
+message: "URL construction via concatenation is banned. Use HttpApiClient.make(YourApi) - URLs are derived from the contract."
+note: |
+  Constructing URLs by concatenating baseUrl + path indicates manual HTTP clients.
+  With HttpApiClient.make(), the baseUrl is provided once, and paths come from the contract.
+
+  WRONG (manual URL construction):
+    const url = baseUrl + '/api/users'
+    const url = `${baseUrl}/api/users/${id}`
+    const url = apiUrl + endpoint
+    const fullUrl = config.apiUrl + '/conversation/start'
+
+  RIGHT (SSOT - URLs from contract):
+    // Contract defines: HttpApiEndpoint.get('list', '/api/users')
+    const client = yield* HttpApiClient.make(MyApi, { baseUrl })
+    yield* client.users.list()  // Path comes from contract
+
+ignores:
+  - "**/node_modules/**"
+  # Contract definitions need to define paths
+  - "**/packages/contracts/**"
+
+rule:
+  any:
+    # Template string with baseUrl variable
+    - pattern: "`${$BASE}/$$$PATH`"
+    # String concatenation with URL parts
+    - pattern: $BASE + '/$$$PATH'
+    - pattern: $BASE + "/$$$PATH"
+    # Common variable names for base URLs
+    - pattern: baseUrl + $$$
+    - pattern: apiUrl + $$$
+    - pattern: serverUrl + $$$
+    - pattern: $CONFIG.apiUrl + $$$
+    - pattern: $CONFIG.baseUrl + $$$
+    # new URL construction with path
+    - pattern: new URL($PATH, $BASE)

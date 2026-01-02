@@ -1,0 +1,23 @@
+# Effect HttpApi SSOT: Ban XMLHttpRequest
+# @see https://effect.website/docs/platform/http-client
+id: http-ssot-no-xhr
+language: TypeScript
+severity: error
+message: "XMLHttpRequest is banned. Use HttpApiClient.make(YourApi) to derive a type-safe client from your contract."
+note: |
+  XMLHttpRequest is a legacy API that bypasses the HttpApi contract system.
+  All HTTP requests must be derived from an HttpApi contract.
+
+  WRONG:
+    const xhr = new XMLHttpRequest()
+    xhr.open('GET', '/api/users')
+    xhr.send()
+
+  RIGHT:
+    const client = yield* HttpApiClient.make(MyApi, { baseUrl })
+    yield* client.users.list()
+
+rule:
+  any:
+    - pattern: new XMLHttpRequest($$$)
+    - pattern: XMLHttpRequest($$$)

@@ -1,0 +1,32 @@
+# Effect HttpApi SSOT: Ban manual HttpClientRequest construction
+# @see https://effect.website/docs/platform/http-client
+id: http-ssot-no-manual-request
+language: TypeScript
+severity: error
+message: "Manual HttpClientRequest construction is banned. Use HttpApiClient.make(YourApi) to derive a type-safe client."
+note: |
+  HttpClientRequest.get/post/put/patch/delete bypasses the HttpApi contract
+  and creates manual HTTP requests. This violates SSOT because:
+  - URLs are strings that can have typos
+  - Request/response schemas must be manually matched
+  - No compile-time verification against the contract
+
+  WRONG:
+    const request = HttpClientRequest.get('/api/users')
+    const response = yield* client.execute(request)
+    const users = yield* HttpClientResponse.schemaBodyJson(UsersSchema)(response)
+
+  RIGHT:
+    const client = yield* HttpApiClient.make(MyApi, { baseUrl })
+    const users = yield* client.users.list()  // Derived from contract
+
+rule:
+  any:
+    - pattern: HttpClientRequest.get($$$)
+    - pattern: HttpClientRequest.post($$$)
+    - pattern: HttpClientRequest.put($$$)
+    - pattern: HttpClientRequest.patch($$$)
+    - pattern: HttpClientRequest.del($$$)
+    - pattern: HttpClientRequest.delete($$$)
+    - pattern: HttpClientRequest.head($$$)
+    - pattern: HttpClientRequest.options($$$)

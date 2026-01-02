@@ -1,0 +1,25 @@
+# Effect HttpApi SSOT: Ban direct HttpClient.execute
+# @see https://effect.website/docs/platform/http-client
+id: http-ssot-no-client-execute
+language: TypeScript
+severity: error
+message: "Direct client.execute() is banned. Use HttpApiClient.make(YourApi) to derive a type-safe client."
+note: |
+  HttpClient.execute() bypasses the HttpApi contract system.
+  The derived client from HttpApiClient.make() handles execution internally
+  with full type safety.
+
+  WRONG:
+    const client = yield* HttpClient.HttpClient
+    const request = HttpClientRequest.get('/api/users')
+    yield* client.execute(request)
+
+  RIGHT:
+    const apiClient = yield* HttpApiClient.make(MyApi, { baseUrl })
+    yield* apiClient.users.list()  // Handles request/response automatically
+
+rule:
+  any:
+    - pattern: client.execute($$$)
+    - pattern: $CLIENT.execute($REQUEST)
+    - pattern: yield* $CLIENT.execute($$$)

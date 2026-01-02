@@ -1,0 +1,54 @@
+# Effect HttpApi SSOT: Ban all third-party HTTP clients
+# @see https://effect.website/docs/platform/http-client
+id: http-ssot-no-third-party-clients
+language: TypeScript
+severity: error
+message: "Third-party HTTP clients are banned. Use HttpApiClient.make(YourApi) to derive a type-safe client from your contract."
+note: |
+  HTTP requests MUST use the Effect HttpApi contract system:
+  1. Define API contract using HttpApi.make() + HttpApiGroup + HttpApiEndpoint
+  2. Implement server using HttpApiBuilder.group()
+  3. Derive client using HttpApiClient.make()
+
+  This ensures compile-time type safety and eliminates drift.
+
+  BANNED libraries:
+  - axios
+  - got
+  - ky
+  - superagent
+  - node-fetch
+  - cross-fetch
+  - isomorphic-fetch
+  - undici
+
+  These bypass the contract and lose type safety.
+
+rule:
+  any:
+    # axios patterns
+    - pattern: axios($$$)
+    - pattern: axios.get($$$)
+    - pattern: axios.post($$$)
+    - pattern: axios.put($$$)
+    - pattern: axios.patch($$$)
+    - pattern: axios.delete($$$)
+    - pattern: axios.request($$$)
+    - pattern: axios.create($$$)
+    # got patterns
+    - pattern: got($$$)
+    - pattern: got.get($$$)
+    - pattern: got.post($$$)
+    - pattern: got.extend($$$)
+    # ky patterns
+    - pattern: ky($$$)
+    - pattern: ky.get($$$)
+    - pattern: ky.post($$$)
+    - pattern: ky.create($$$)
+    # superagent patterns
+    - pattern: superagent($$$)
+    - pattern: superagent.get($$$)
+    - pattern: superagent.post($$$)
+    # undici patterns
+    - pattern: undici.fetch($$$)
+    - pattern: undici.request($$$)

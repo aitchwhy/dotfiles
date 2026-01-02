@@ -1,0 +1,34 @@
+# Effect HttpApi SSOT: Ban URL strings in API calls
+# @see https://effect.website/docs/platform/http-client
+id: http-ssot-no-url-strings
+language: TypeScript
+severity: warning
+message: "Hardcoded API URLs detected. API paths should only exist in HttpApi contract definitions."
+note: |
+  API URLs should ONLY be defined in HttpApiEndpoint declarations.
+  Hardcoded URL strings in application code indicate bypassing the contract.
+
+  WRONG (URL scattered in application code):
+    const response = await fetch('http://localhost:3000/api/users')
+    HttpClientRequest.get('/api/users')
+    client.get(`${baseUrl}/users`)
+
+  RIGHT (URL defined once in contract):
+    // In contracts package:
+    HttpApiEndpoint.get('list', '/users').addSuccess(Schema.Array(User))
+
+    // In application code (no URLs!):
+    const client = yield* HttpApiClient.make(MyApi, { baseUrl })
+    yield* client.users.list()
+
+rule:
+  any:
+    # Common API path patterns
+    - pattern: '"/api/$$$"'
+    - pattern: '`/api/$$$`'
+    - pattern: "'/api/$$$'"
+    - pattern: '"/v1/$$$"'
+    - pattern: '"/v2/$$$"'
+    # localhost with port (API server)
+    - pattern: '"http://localhost:$PORT/$$$"'
+    - pattern: '"https://localhost:$PORT/$$$"'

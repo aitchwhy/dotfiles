@@ -1,0 +1,28 @@
+# Effect HttpApi SSOT: Ban manual Response parsing
+# @see https://effect.website/docs/platform/http-client  
+id: http-ssot-no-manual-response-parsing
+language: TypeScript
+severity: error
+message: "Manual HttpClientResponse parsing is banned. Use HttpApiClient.make(YourApi) - response types are derived automatically."
+note: |
+  When using HttpApiClient.make(), response parsing is handled automatically
+  based on the contract definition. Manual parsing indicates you're not
+  using the derived client.
+
+  WRONG:
+    const response = yield* someHttpCall
+    const data = yield* HttpClientResponse.schemaBodyJson(SomeSchema)(response)
+
+  RIGHT:
+    const client = yield* HttpApiClient.make(MyApi, { baseUrl })
+    const data = yield* client.someGroup.someEndpoint()  // Auto-parsed per contract
+
+rule:
+  any:
+    - pattern: HttpClientResponse.schemaBodyJson($$$)($$$)
+    - pattern: HttpClientResponse.json($$$)
+    - pattern: HttpClientResponse.text($$$)
+    - pattern: HttpClientResponse.arrayBuffer($$$)
+    - pattern: HttpClientResponse.formData($$$)
+    - pattern: $RESPONSE.json($$$)
+    - pattern: yield* $RESPONSE.json

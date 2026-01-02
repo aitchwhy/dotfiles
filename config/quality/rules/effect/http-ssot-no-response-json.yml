@@ -1,0 +1,28 @@
+# Effect HttpApi SSOT: Ban Response.json() pattern
+# This indicates raw fetch usage without contract
+id: http-ssot-no-response-json
+language: TypeScript
+severity: error
+message: "Response.json() pattern detected. This indicates raw fetch() usage. Use HttpApiClient.make(YourApi) instead."
+note: |
+  The Response.json() pattern is typically used with fetch():
+    const response = await fetch(...)
+    const data = await response.json()
+
+  This bypasses the HttpApi contract system. With HttpApiClient.make(),
+  response parsing is automatic based on the contract schema.
+
+  WRONG:
+    const response = await fetch('/api/users')
+    const users = await response.json()
+
+  RIGHT:
+    const client = yield* HttpApiClient.make(MyApi, { baseUrl })
+    const users = yield* client.users.list()  // Auto-parsed per schema
+
+rule:
+  any:
+    - pattern: $RESPONSE.json()
+    - pattern: await $RESPONSE.json()
+    - pattern: (await $FETCH).json()
+    - pattern: response.json()
