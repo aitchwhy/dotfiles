@@ -4,7 +4,8 @@
  * Guards: 1 (bash safety), 2 (commits), 3 (forbidden files),
  *         8 (TDD), 9-10 (DevOps), 11-12 (advisory), 27 (CLI tools),
  *         28-30 (config centralization), 32 (secrets detection), 33 (hook bypass),
- *         34 (scaffolding enforcement), 51 (zero environment awareness)
+ *         34 (scaffolding enforcement), 51 (zero environment awareness),
+ *         52-55 (Effect-XState integration)
  *
  * Note: Guard 31 (stack compliance) consolidated to pre-tool-use.ts using src/stack SSOT
  *
@@ -696,6 +697,174 @@ See: zero-environment-awareness skill`,
 }
 
 // =============================================================================
+// Guards 52-55: Effect-XState Integration
+// =============================================================================
+
+/**
+ * Paths where Effect-XState guards are skipped (tests, docs, skills)
+ */
+const EFFECT_XSTATE_ALLOWED_PATHS = [
+  '.test.ts',
+  '.spec.ts',
+  '.test.tsx',
+  '.spec.tsx',
+  'SKILL.md',
+  '/skills/',
+  '/templates/',
+  '/examples/',
+  '.md',
+] as const
+
+function isEffectXstateExcluded(filePath: string): boolean {
+  return EFFECT_XSTATE_ALLOWED_PATHS.some((p) => filePath.includes(p))
+}
+
+/**
+ * Guard 52: No Effect.runPromise().then/.catch
+ * Loses typed errors - use runPromiseExit + Exit.isFailure instead
+ */
+export function checkRunPromiseThenCatch(content: string, filePath: string): GuardResult {
+  if (isEffectXstateExcluded(filePath)) return { ok: true }
+  if (!filePath.match(/\.(ts|tsx)$/)) return { ok: true }
+
+  // Check for Effect.runPromise followed by .then or .catch
+  const pattern = /Effect\.runPromise\([^)]+\)\s*\.(then|catch)\s*\(/
+  if (pattern.test(content)) {
+    return {
+      ok: false,
+      error: `Guard 52: EFFECT.RUNPROMISE().THEN/.CATCH BANNED
+
+File: ${filePath}
+
+Effect.runPromise().then/.catch loses typed errors.
+
+BAD:
+  Effect.runPromise(myEffect).then(r => ...).catch(e => String(e))
+
+GOOD:
+  const exit = await Effect.runPromiseExit(myEffect)
+  if (Exit.isFailure(exit)) {
+    const cause = exit.cause  // Typed Cause<E>
+  }
+
+See: effect-xstate skill`,
+    }
+  }
+
+  return { ok: true }
+}
+
+/**
+ * Guard 53: No useRef for XState-owned state
+ * Refs near useMachine/useActor indicate split-brain state
+ */
+export function checkRefForMachineState(content: string, filePath: string): GuardResult {
+  if (isEffectXstateExcluded(filePath)) return { ok: true }
+  if (!filePath.match(/\.(tsx)$/)) return { ok: true }
+
+  // Check if file uses XState hooks
+  const hasXstateHook = /use(Machine|Actor)\s*\(/.test(content)
+  if (!hasXstateHook) return { ok: true }
+
+  // Check for suspicious useRef patterns (not DOM refs)
+  const suspiciousRefPatterns = [
+    /useRef<string/,
+    /useRef<number/,
+    /useRef<boolean/,
+    /useRef<.*\|.*null/,
+    /useRef<.*Token/i,
+    /useRef<.*Response/i,
+    /useRef<.*Data/i,
+    /useRef<.*Result/i,
+  ]
+
+  for (const pattern of suspiciousRefPatterns) {
+    if (pattern.test(content)) {
+      return {
+        ok: true,
+        warnings: [
+          `Guard 53 (advisory): useRef near XState detected in ${filePath}. ` +
+            'If storing API responses/tokens/state, move to machine context instead.',
+        ],
+      }
+    }
+  }
+
+  return { ok: true }
+}
+
+/**
+ * Guard 54: No useEffect + Effect.runPromise
+ * Bypasses XState's invoke system - use fromPromise actor instead
+ */
+export function checkUseEffectRunPromise(content: string, filePath: string): GuardResult {
+  if (isEffectXstateExcluded(filePath)) return { ok: true }
+  if (!filePath.match(/\.(tsx)$/)) return { ok: true }
+
+  // Check for useEffect containing Effect.runPromise
+  const useEffectPattern = /useEffect\s*\(\s*(?:async\s*)?\(\s*\)\s*=>\s*\{[^}]*Effect\.runPromise/s
+  if (useEffectPattern.test(content)) {
+    return {
+      ok: false,
+      error: `Guard 54: USEEFFECT + EFFECT.RUNPROMISE BANNED
+
+File: ${filePath}
+
+useEffect + Effect.runPromise bypasses XState's invoke system.
+
+BAD:
+  useEffect(() => {
+    Effect.runPromise(fetchData).then(d => send({ type: "DONE", d }))
+  }, [])
+
+GOOD:
+  const fetchActor = fromPromise(async ({ input }) => {
+    const exit = await Effect.runPromiseExit(fetchData(input))
+    if (Exit.isFailure(exit)) throw exit.cause
+    return exit.value
+  })
+
+  // In machine:
+  invoke: { src: 'fetchActor', onDone: ..., onError: ... }
+
+See: effect-xstate skill`,
+    }
+  }
+
+  return { ok: true }
+}
+
+/**
+ * Guard 55: No String(err) error conversion
+ * Loses typed error information - preserve Cause types
+ */
+export function checkStringErrorConversion(content: string, filePath: string): GuardResult {
+  if (isEffectXstateExcluded(filePath)) return { ok: true }
+  if (!filePath.match(/\.(ts|tsx)$/)) return { ok: true }
+
+  // Check for String(err) or err.message in catch-like contexts
+  const patterns = [
+    /\.catch\s*\([^)]*=>\s*[^)]*String\s*\(\s*(err|error|e)\s*\)/,
+    /\.catch\s*\([^)]*=>\s*[^)]*\.(message|toString\(\))/,
+    /catch\s*\([^)]*\)\s*\{[^}]*String\s*\(\s*(err|error|e)\s*\)/,
+  ]
+
+  for (const pattern of patterns) {
+    if (pattern.test(content)) {
+      return {
+        ok: true,
+        warnings: [
+          `Guard 55 (advisory): String(err) detected in ${filePath}. ` +
+            'Consider preserving Effect Cause types instead of converting to string.',
+        ],
+      }
+    }
+  }
+
+  return { ok: true }
+}
+
+// =============================================================================
 // Main Entry Point
 // =============================================================================
 
@@ -748,6 +917,13 @@ export function runProceduralGuards(
       const envAwarenessResult = checkZeroEnvironmentAwareness(content, filePath)
       if (!envAwarenessResult.ok) return envAwarenessResult
 
+      // Guards 52-55: Effect-XState Integration
+      const runPromiseResult = checkRunPromiseThenCatch(content, filePath)
+      if (!runPromiseResult.ok) return runPromiseResult
+
+      const useEffectRunPromiseResult = checkUseEffectRunPromise(content, filePath)
+      if (!useEffectRunPromiseResult.ok) return useEffectRunPromiseResult
+
       const portsResult = checkHardcodedPorts(content, filePath)
       if (!portsResult.ok) return portsResult
 
@@ -767,6 +943,17 @@ export function runProceduralGuards(
       const portResult = checkPortRegistry(content, filePath)
       if (portResult.ok && portResult.warnings) {
         warnings.push(...portResult.warnings)
+      }
+
+      // Guards 53, 55: Advisory Effect-XState checks
+      const refMachineResult = checkRefForMachineState(content, filePath)
+      if (refMachineResult.ok && refMachineResult.warnings) {
+        warnings.push(...refMachineResult.warnings)
+      }
+
+      const stringErrorResult = checkStringErrorConversion(content, filePath)
+      if (stringErrorResult.ok && stringErrorResult.warnings) {
+        warnings.push(...stringErrorResult.warnings)
       }
 
       if (warnings.length > 0) {
