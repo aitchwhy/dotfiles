@@ -11,6 +11,7 @@ export { devopsPatternsSkill } from './devops-patterns.skill'
 export { effectClockPatternsSkill } from './effect-clock-patterns.skill'
 export { effectResilienceSkill } from './effect-resilience.skill'
 export { effectTsSkill } from './effect-ts.skill'
+export { effectXstateSkill } from './effect-xstate.skill'
 export { expoSkill } from './expo.skill'
 export { ghaOidcPatternsSkill } from './gha-oidc-patterns.skill'
 export { hexagonalSkill } from './hexagonal.skill'
@@ -46,6 +47,7 @@ import { devopsPatternsSkill } from './devops-patterns.skill'
 import { effectClockPatternsSkill } from './effect-clock-patterns.skill'
 import { effectResilienceSkill } from './effect-resilience.skill'
 import { effectTsSkill } from './effect-ts.skill'
+import { effectXstateSkill } from './effect-xstate.skill'
 import { expoSkill } from './expo.skill'
 import { ghaOidcPatternsSkill } from './gha-oidc-patterns.skill'
 import { hexagonalSkill } from './hexagonal.skill'
@@ -82,6 +84,7 @@ export const ALL_SKILLS = [
   effectClockPatternsSkill,
   effectResilienceSkill,
   effectTsSkill,
+  effectXstateSkill,
   expoSkill,
   ghaOidcPatternsSkill,
   hexagonalSkill,
@@ -111,10 +114,10 @@ export const ALL_SKILLS = [
   zeroEnvironmentAwarenessSkill,
 ] as const
 
-// Compile-time assertion: exactly 34 skills
+// Compile-time assertion: exactly 35 skills
 type AssertLength<T extends readonly unknown[], N extends number> = T['length'] extends N
   ? true
   : never
 
-const _assertSkillCount: AssertLength<typeof ALL_SKILLS, 34> = true
+const _assertSkillCount: AssertLength<typeof ALL_SKILLS, 35> = true
 void _assertSkillCount
