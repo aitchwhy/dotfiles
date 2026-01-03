@@ -47,7 +47,7 @@ in
         font-family = "Fira Code Nerd Font";
         cursor-style = "bar";
         cursor-style-blink = true;
-        cursor-invert-fg-bg = true;
+        cursor-color = "cell-foreground";
         bold-is-bright = true;
 
         # Colors (tokyonight-storm)
@@ -55,8 +55,7 @@ in
         foreground = "#c0caf5";
         selection-background = "#364a82";
         selection-foreground = "#c0caf5";
-        cursor-color = "#c0caf5";
-        cursor-text = "#1d202f";
+        cursor-text = "cell-background";
 
         # Clipboard
         clipboard-read = "allow";
