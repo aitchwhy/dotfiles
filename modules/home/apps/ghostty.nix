@@ -69,8 +69,8 @@ in
         quick-terminal-autohide = true;
         quick-terminal-size = "50%,40%";
 
-        # Bell (1.2.0 feature)
-        bell-features = "title-badge";
+        # Bell (1.2.0 feature) - title adds 🔔 emoji, attention bounces dock icon
+        bell-features = "title,attention";
 
         # Shell integration
         # Using "detect" to let terminal multiplexers (Zellij) handle their own integration
