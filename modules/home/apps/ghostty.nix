@@ -67,6 +67,10 @@ in
         quick-terminal-screen = "main";
         quick-terminal-animation-duration = 0;
         quick-terminal-autohide = true;
+        quick-terminal-size = "50%,40%";
+
+        # Bell (1.2.0 feature)
+        bell-features = "title-badge";
 
         # Shell integration
         # Using "detect" to let terminal multiplexers (Zellij) handle their own integration
