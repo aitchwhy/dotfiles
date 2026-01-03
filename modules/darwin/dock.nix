@@ -15,7 +15,7 @@ in
   config = mkIf config.modules.darwin.dock.enable {
     system.defaults.dock = {
       # Position and behavior
-      orientation = "left";
+      orientation = "bottom";
       autohide = true;
       autohide-delay = 0.0;
       autohide-time-modifier = 0.2;
