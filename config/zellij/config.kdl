@@ -294,8 +294,9 @@ default_mode "normal"
  
 // Choose the path to the default shell that zellij will use for opening new panes
 // Default: $SHELL
-// 
-default_shell "$SHELL"
+// Note: Zellij uses $SHELL by default, no need to override
+//
+// default_shell "$SHELL"
  
 // Choose the path to override cwd that zellij will use for opening new panes
 // 
@@ -303,7 +304,8 @@ default_cwd "/Users/hank/src"
  
 // The name of the default layout to load on startup
 // Default: "default"
-default_layout "compact"
+// Note: Using Zellij's built-in default layout (no custom layouts)
+// default_layout "compact"
  
 // The folder in which Zellij will look for layouts
 // (Requires restart)
