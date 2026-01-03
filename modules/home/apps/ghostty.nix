@@ -83,6 +83,9 @@ in
 
         # Keybinds
         keybind = [
+          # Smart copy - only consumes input when selection exists (1.2.0 feature)
+          "performable:cmd+c=copy_to_clipboard"
+
           # Font zoom - must be explicit since defining keybinds can override defaults
           "cmd+equal=increase_font_size:1"
           "cmd+plus=increase_font_size:1"
