@@ -366,6 +366,13 @@ return {
         desc = "Terminal",
       },
       {
+        "<leader>fy",
+        function()
+          Snacks.terminal("yazi", { cwd = vim.fn.getcwd() })
+        end,
+        desc = "Yazi File Manager",
+      },
+      {
         "<c-/>",
         function()
           Snacks.terminal()
