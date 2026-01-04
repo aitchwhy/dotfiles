@@ -102,7 +102,7 @@ export const FrontendVersionsSchema = Schema.Struct({
 })
 export type FrontendVersions = Schema.Schema.Type<typeof FrontendVersionsSchema>
 
-/** Mobile/Universal versions (Expo SDK 53 - January 2026) */
+/** Mobile/Universal versions (Expo SDK 54 - January 2026) */
 export const MobileVersionsSchema = Schema.Struct({
   // Core runtime
   expo: VersionString,
@@ -144,6 +144,10 @@ export const MobileVersionsSchema = Schema.Struct({
   // Storage
   '@react-native-async-storage/async-storage': VersionString,
   'expo-sqlite': VersionString,
+
+  // LiveKit for voice
+  '@livekit/react-native': VersionString,
+  '@livekit/react-native-webrtc': VersionString,
 })
 export type MobileVersions = Schema.Schema.Type<typeof MobileVersionsSchema>
 
@@ -190,7 +194,8 @@ export type DatabaseVersions = Schema.Schema.Type<typeof DatabaseVersionsSchema>
 /** Service versions (auth, realtime, etc.) */
 export const ServiceVersionsSchema = Schema.Struct({
   'better-auth': VersionString,
-  livekit: VersionString,
+  'livekit-client': VersionString,
+  'livekit-server-sdk': VersionString,
 })
 export type ServiceVersions = Schema.Schema.Type<typeof ServiceVersionsSchema>
 
@@ -286,6 +291,7 @@ export const NpmVersionsSchema = Schema.Struct({
 
   // Auth
   'better-auth': VersionString,
+  '@better-auth/expo': VersionString,
 
   // Observability (Datadog + OTEL 2.x)
   '@opentelemetry/api': VersionString,
@@ -388,6 +394,19 @@ export const NpmVersionsSchema = Schema.Struct({
   '@shopify/flash-list': VersionString,
   '@react-native-async-storage/async-storage': VersionString,
   'expo-sqlite': VersionString,
+
+  // LiveKit (Voice AI)
+  'livekit-client': VersionString,
+  'livekit-server-sdk': VersionString,
+  '@livekit/agents': VersionString,
+  '@livekit/agents-plugin-cartesia': VersionString,
+  '@livekit/agents-plugin-deepgram': VersionString,
+  '@livekit/agents-plugin-silero': VersionString,
+  '@livekit/react-native': VersionString,
+  '@livekit/react-native-webrtc': VersionString,
+
+  // Database (PostgreSQL + PGLite)
+  '@electric-sql/pglite': VersionString,
 })
 export type NpmVersions = Schema.Schema.Type<typeof NpmVersionsSchema>
 

@@ -25,8 +25,8 @@ import { StackDefinitionSchema } from './schema'
 export const STACK = {
   meta: {
     frozen: '2026-01',
-    updated: '2026-01-02',
-    ssotVersion: '5.1.0', // SOTA Jan 2, 2026: tsgo + oxlint linting + biome formatting
+    updated: '2026-01-03',
+    ssotVersion: '5.2.0', // SOTA Jan 3, 2026: synced with Told project
   },
 
   // ===========================================================================
@@ -43,41 +43,41 @@ export const STACK = {
   // FRONTEND (Web)
   // ===========================================================================
   frontend: {
-    react: '19.2.3',
-    'react-dom': '19.2.3',
+    react: '19.1.0', // Told uses 19.1.0
+    'react-dom': '19.1.0',
     xstate: '5.25.0', // Actor model state machines (handles API state)
     'tanstack-router': '1.140.0',
     tailwindcss: '4.1.17',
   },
 
   // ===========================================================================
-  // MOBILE / UNIVERSAL (Expo SDK 53 - January 2026)
+  // MOBILE / UNIVERSAL (Expo SDK 54 - January 2026)
   // Universal = iOS + Android + Web from single codebase
-  // Decision: SDK 53 (stable, 75% New Arch adoption) over SDK 54 (too new)
+  // Synced with Told project (apps/mobile)
   // ===========================================================================
   mobile: {
-    // Core runtime
-    expo: '53.0.0',
-    'react-native': '0.79.0',
-    'react-native-web': '0.20.0',
+    // Core runtime (SDK 54)
+    expo: '54.0.30',
+    'react-native': '0.81.5',
+    'react-native-web': '0.21.1',
 
     // Routing (file-based, universal)
-    'expo-router': '5.0.0',
+    'expo-router': '6.0.21',
 
     // Animation (Moti for declarative, Reanimated for gestures)
-    'react-native-reanimated': '4.1.0',
+    'react-native-reanimated': '4.1.1',
     moti: '0.30.0',
-    'react-native-gesture-handler': '3.0.0',
+    'react-native-gesture-handler': '2.28.0',
 
     // Styling (NativeWind = Tailwind for RN, aligns with tailwindcss SSOT)
     nativewind: '4.1.23',
     // NOTE: tailwindcss version shared with frontend section
 
     // Navigation primitives
-    'react-native-screens': '4.9.0',
-    'react-native-safe-area-context': '5.4.0',
+    'react-native-screens': '4.16.0',
+    'react-native-safe-area-context': '5.6.2',
 
-    // Essential Expo packages
+    // Essential Expo packages (SDK 54)
     'expo-splash-screen': '0.30.0',
     'expo-status-bar': '2.0.0',
     'expo-constants': '17.0.0',
@@ -97,6 +97,10 @@ export const STACK = {
     // Storage
     '@react-native-async-storage/async-storage': '2.1.0',
     'expo-sqlite': '15.0.0',
+
+    // LiveKit for voice (Told uses @livekit/react-native)
+    '@livekit/react-native': '2.9.6',
+    '@livekit/react-native-webrtc': '137.0.2',
   },
 
   // ===========================================================================
@@ -104,15 +108,15 @@ export const STACK = {
   // @effect/platform provides HttpServer via platform-node/platform-bun
   // ===========================================================================
   backend: {
-    'drizzle-orm': '0.45.0',
+    'drizzle-orm': '0.45.1',
   },
 
   // ===========================================================================
   // INFRASTRUCTURE
   // ===========================================================================
   infra: {
-    pulumi: '3.210.0', // IaC (TypeScript) - Dec 2025
-    'pulumi-aws': '7.14.0', // AWS provider
+    pulumi: '3.214.0', // IaC (TypeScript) - Jan 2026
+    'pulumi-aws': '7.15.0', // AWS provider
     'pulumi-awsx': '3.1.0', // AWS Crosswalk (higher-level constructs)
     'docker-compose': '2.32.0', // Container orchestration
     tailscale: '1.76.6', // Mesh network (nixpkgs-unstable, Dec 2025)
@@ -150,8 +154,9 @@ export const STACK = {
   // AUTH & SERVICES
   // ===========================================================================
   services: {
-    'better-auth': '1.4.7', // TypeScript-first auth (replaces Clerk)
-    livekit: '2.9.0',
+    'better-auth': '1.4.10', // TypeScript-first auth (replaces Clerk)
+    'livekit-client': '2.16.1', // Client SDK
+    'livekit-server-sdk': '2.15.0', // Server SDK
   },
 
   // ===========================================================================
@@ -220,7 +225,7 @@ export const STACK = {
     typescript: '5.9.3', // Kept for types - tsgo handles compilation
     effect: '3.19.14',
     '@effect/cli': '0.72.1',
-    '@effect/platform': '0.94.0',
+    '@effect/platform': '0.94.1',
     '@effect/platform-node': '0.104.0',
     '@effect/platform-bun': '0.87.0',
     '@effect/printer': '0.47.0',
@@ -228,19 +233,20 @@ export const STACK = {
     // NOTE: zod removed - it's in FORBIDDEN_PACKAGES (use Effect Schema)
 
     // Frontend
-    react: '19.2.3',
-    'react-dom': '19.2.3',
+    react: '19.1.0',
+    'react-dom': '19.1.0',
     xstate: '5.25.0',
     '@xstate/react': '6.0.0',
     '@tanstack/react-router': '1.140.0',
     tailwindcss: '4.1.17',
 
     // Backend (Effect Platform HTTP - no Hono)
-    'drizzle-orm': '0.45.0',
-    'drizzle-kit': '0.31.0',
+    'drizzle-orm': '0.45.1',
+    'drizzle-kit': '0.31.8',
 
     // Auth
-    'better-auth': '1.4.7',
+    'better-auth': '1.4.10',
+    '@better-auth/expo': '1.4.10',
 
     // Observability (Datadog + OTEL 2.x)
     '@opentelemetry/api': '1.9.0',
@@ -281,11 +287,11 @@ export const STACK = {
     tsx: '4.19.2', // TS runner
     '@ast-grep/napi': '0.40.3',
     '@ast-grep/cli': '0.40.3', // CLI for ast-grep scan
-    lefthook: '1.13.6', // Git hooks manager
+    lefthook: '2.0.13', // Git hooks manager
 
     // Pulumi (infrastructure) - Jan 2026
-    '@pulumi/pulumi': '3.210.0',
-    '@pulumi/aws': '7.14.0',
+    '@pulumi/pulumi': '3.214.0',
+    '@pulumi/aws': '7.15.0',
     '@pulumi/awsx': '3.1.0',
     '@pulumi/random': '4.18.4',
     '@pulumi/policy': '1.20.0',
@@ -318,18 +324,18 @@ export const STACK = {
     ogl: '1.0.11',
 
     // ===========================================================================
-    // MOBILE / UNIVERSAL (for package.json generation)
+    // MOBILE / UNIVERSAL (for package.json generation - SDK 54)
     // ===========================================================================
-    expo: '53.0.0',
-    'react-native': '0.79.0',
-    'react-native-web': '0.20.0',
-    'expo-router': '5.0.0',
-    'react-native-reanimated': '4.1.0',
+    expo: '54.0.30',
+    'react-native': '0.81.5',
+    'react-native-web': '0.21.1',
+    'expo-router': '6.0.21',
+    'react-native-reanimated': '4.1.1',
     moti: '0.30.0',
-    'react-native-gesture-handler': '3.0.0',
+    'react-native-gesture-handler': '2.28.0',
     nativewind: '4.1.23',
-    'react-native-screens': '4.9.0',
-    'react-native-safe-area-context': '5.4.0',
+    'react-native-screens': '4.16.0',
+    'react-native-safe-area-context': '5.6.2',
     'expo-splash-screen': '0.30.0',
     'expo-status-bar': '2.0.0',
     'expo-constants': '17.0.0',
@@ -345,6 +351,23 @@ export const STACK = {
     '@shopify/flash-list': '2.0.0',
     '@react-native-async-storage/async-storage': '2.1.0',
     'expo-sqlite': '15.0.0',
+
+    // ===========================================================================
+    // LIVEKIT (Voice AI - Told apps/agent)
+    // ===========================================================================
+    'livekit-client': '2.16.1',
+    'livekit-server-sdk': '2.15.0',
+    '@livekit/agents': '1.0.31',
+    '@livekit/agents-plugin-cartesia': '1.0.31',
+    '@livekit/agents-plugin-deepgram': '1.0.31',
+    '@livekit/agents-plugin-silero': '1.0.31',
+    '@livekit/react-native': '2.9.6',
+    '@livekit/react-native-webrtc': '137.0.2',
+
+    // ===========================================================================
+    // DATABASE (PostgreSQL + PGLite)
+    // ===========================================================================
+    '@electric-sql/pglite': '0.3.14',
   },
 } as const satisfies StackDefinition
 
