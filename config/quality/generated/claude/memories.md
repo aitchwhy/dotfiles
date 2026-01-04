@@ -3,10 +3,10 @@
 Staff-to-Principal level craft knowledge.
 Flat list of patterns, constraints, and gotchas.
 
-**Total**: 35 memories
+**Total**: 34 memories
 - Principles: 7
 - Constraints: 9
-- Patterns: 16
+- Patterns: 15
 - Gotchas: 0
 
 ---
@@ -140,17 +140,11 @@ Single baseUrl, /api/*→backend. Local=Caddy (tls internal), Deployed=CloudFron
 
 *Verified: 2025-12-28*
 
-### Ember Staging Strategy
-
-No custom domain. Uses CloudFront URL directly (*.cloudfront.net). No ember.app or staging.ember.app exists.
-
-*Verified: 2025-12-28*
-
 ### Contract-First API
 
-Backend (@ember/domain EmberApi) is source of truth. Frontend derives client via HttpApiClient.make(). Zero drift, auto-sync.
+Backend (@told/contracts ToldApi) is source of truth. Frontend derives client via HttpApiClient.make(). Zero drift, auto-sync.
 
-*Verified: 2025-12-28*
+*Verified: 2026-01-03*
 
 ### XState with Effect
 
