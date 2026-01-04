@@ -106,11 +106,10 @@ Thresholds: `ok` >= 0.80, `warning` 0.50-0.79, `urgent` < 0.50
 
 ## MCP Servers
 
-Shared across all AI tools:
-- `memory` - Persistent memory
-- `filesystem` - File access (~/src, ~/dotfiles, ~/Documents)
-- `git` - Git operations
-- `sequential-thinking` - Chain of thought
-- `context7` - Documentation fetcher
-- `fetch` - HTTP requests
+Optimized for token efficiency (Jan 2026):
+- `ref` - SOTA documentation search (60-95% fewer tokens)
+- `exa` - Code context search across repos
+- `github` - GitHub API integration
+- `playwright` - Browser automation
+- `ast-grep` - AST-based code search
 - `repomix` - Codebase packaging

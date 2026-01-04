@@ -97,22 +97,16 @@ The Quality System is a TypeScript-based code quality framework that generates C
 
 ## MCP Servers
 
-12 Model Context Protocol servers configured:
+6 Model Context Protocol servers configured (optimized Jan 2026):
 
 | Server | Purpose |
 |--------|---------|
-| memory | Persistent memory across sessions |
-| context7 | Library documentation lookup |
-| fetch | Web content fetching |
-| repomix | Codebase packaging for AI |
+| ref | SOTA documentation search (60-95% fewer tokens) |
+| exa | Code context search across repos |
 | github | GitHub API integration |
-| filesystem | Local file operations |
-| git | Git operations |
 | playwright | Browser automation |
-| docker | Container management |
 | ast-grep | AST-based code search |
-| shadcn | UI component library |
-| sequential-thinking | Chain of thought |
+| repomix | Codebase packaging for AI |
 
 ## Development
 

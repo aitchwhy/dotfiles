@@ -68,7 +68,7 @@ devops-patterns, gha-oidc-patterns, planning-patterns, typespec-patterns, pulumi
 
 ### Reference Skills
 
-repomix, context7-mcp
+repomix, ref-mcp, mcp-optimization
 
 ### Specialized Skills
 
