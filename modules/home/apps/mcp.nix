@@ -127,6 +127,12 @@ let
   # Filter out HTTP servers for stdio format generators
   stdioServerDefs = filterAttrs (_name: def: !(def.isHttp or false)) mcpServerDefs;
 
+  # Desktop-only servers (consumer use, not development)
+  # Desktop doesn't support HTTP MCP, so only stdio servers
+  desktopOnlyDefs = {
+    exa = mcpServerDefs.exa; # Web/code search for casual use
+  };
+
   # Claude Desktop format: wrap commands in /bin/sh to inject Nix PATH
   # Electron apps don't inherit shell PATH, so we must inject it
   toDesktopFormat =
@@ -231,7 +237,7 @@ let
       };
 
   # Generate stdio server configs
-  desktopStdioServers = mapAttrs toDesktopFormat stdioServerDefs;
+  desktopStdioServers = mapAttrs toDesktopFormat desktopOnlyDefs; # Only exa for Desktop
   cliStdioServers = mapAttrs toCliFormat stdioServerDefs;
 
   # HTTP server format for CLI (with placeholder for runtime API key injection)
@@ -305,7 +311,7 @@ in
       }
       DESKTOPEOF
 
-            echo "Claude Desktop config generated (5 stdio servers)"
+            echo "Claude Desktop config generated (1 stdio server: exa only)"
     '';
 
     # Generate Claude Code CLI config (~/.claude.json)
