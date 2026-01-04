@@ -1,12 +1,11 @@
 /**
  * Skills Registry
  *
- * All 33 skills with compile-time count assertion.
+ * All 34 skills with compile-time count assertion.
  */
 
 export { apiContractSkill } from './api-contract.skill'
 export { codebaseExposureSkill } from './codebase-exposure.skill'
-export { copierTemplateSkill } from './copier-template.skill'
 export { devopsPatternsSkill } from './devops-patterns.skill'
 export { effectClockPatternsSkill } from './effect-clock-patterns.skill'
 export { effectResilienceSkill } from './effect-resilience.skill'
@@ -42,7 +41,6 @@ export { zeroEnvironmentAwarenessSkill } from './zero-environment-awareness.skil
 
 import { apiContractSkill } from './api-contract.skill'
 import { codebaseExposureSkill } from './codebase-exposure.skill'
-import { copierTemplateSkill } from './copier-template.skill'
 import { devopsPatternsSkill } from './devops-patterns.skill'
 import { effectClockPatternsSkill } from './effect-clock-patterns.skill'
 import { effectResilienceSkill } from './effect-resilience.skill'
@@ -79,7 +77,6 @@ import { zeroEnvironmentAwarenessSkill } from './zero-environment-awareness.skil
 export const ALL_SKILLS = [
   apiContractSkill,
   codebaseExposureSkill,
-  copierTemplateSkill,
   devopsPatternsSkill,
   effectClockPatternsSkill,
   effectResilienceSkill,
@@ -114,10 +111,10 @@ export const ALL_SKILLS = [
   zeroEnvironmentAwarenessSkill,
 ] as const
 
-// Compile-time assertion: exactly 35 skills
+// Compile-time assertion: exactly 34 skills
 type AssertLength<T extends readonly unknown[], N extends number> = T['length'] extends N
   ? true
   : never
 
-const _assertSkillCount: AssertLength<typeof ALL_SKILLS, 35> = true
+const _assertSkillCount: AssertLength<typeof ALL_SKILLS, 34> = true
 void _assertSkillCount
