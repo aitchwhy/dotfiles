@@ -46,14 +46,6 @@ const INFRA_MEMORIES: Memory[] = [
       'Zero CORS, zero SSL bypass, 12-factor parity.',
     verified: '2025-12-28',
   },
-  {
-    id: 'ember-staging',
-    category: 'pattern',
-    title: 'Ember Staging Strategy',
-    content:
-      'No custom domain. Uses CloudFront URL directly (*.cloudfront.net). No ember.app or staging.ember.app exists.',
-    verified: '2025-12-28',
-  },
 ]
 
 // 2. Runtime
@@ -72,9 +64,9 @@ const RUNTIME_MEMORIES: Memory[] = [
     category: 'pattern',
     title: 'Contract-First API',
     content:
-      'Backend (@ember/domain EmberApi) is source of truth. Frontend derives client via HttpApiClient.make(). ' +
+      'Backend (@told/contracts ToldApi) is source of truth. Frontend derives client via HttpApiClient.make(). ' +
       'Zero drift, auto-sync.',
-    verified: '2025-12-28',
+    verified: '2026-01-03',
   },
   {
     id: 'xstate-machines',
