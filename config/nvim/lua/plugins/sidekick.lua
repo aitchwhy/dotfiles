@@ -23,7 +23,7 @@ return {
         -- Configure Claude as the primary/default tool
         tools = {
           claude = {
-            cmd = { "claude" },
+            cmd = { "claude", "--dangerously-skip-permissions" },
             url = "https://github.com/anthropics/claude-code",
           },
         },
