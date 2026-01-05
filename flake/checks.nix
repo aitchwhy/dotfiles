@@ -1,53 +1,75 @@
-# Custom checks - AI CLI configuration validation with coverage reporting
-# All tests are blocking - failures prevent builds
+# Flake Checks - SOTA Testing (January 2026)
+#
+# Architecture:
+# 1. Pure Nix tests via lib.debug.runTests (pattern validation)
+# 2. Module assertions via lib/testing (compile-time checks)
+# 3. Derivations only where runtime is required (TypeScript, Lua syntax, Zellij CLI)
+#
+# SSOT: All test logic lives in lib/testing/*.nix
+# DRY: Reusable validators, no duplicate patterns
 { ... }:
 {
   perSystem =
     { pkgs, ... }:
+    let
+      lib = pkgs.lib;
+      src = ./..;
+
+      # Import the type-safe testing library
+      testing = import ../lib/testing { inherit lib src; };
+
+      # Run all pure Nix tests
+      testResults = testing.runAllTests;
+
+      # Check if any tests failed
+      hasFailures = testResults != [ ];
+
+      # Format test failures for error message
+      formatFailures =
+        failures:
+        lib.concatStringsSep "\n" (
+          map (
+            f: "  FAIL: ${f.name}\n    Expected: ${toString f.expected}\n    Got: ${toString f.result}"
+          ) failures
+        );
+
+    in
     {
       checks = {
         # ═══════════════════════════════════════════════════════════════════════════
-        # Quality System TypeScript Validation
-        # Validates the Quality System TypeScript code compiles correctly
+        # PURE NIX TESTS - Pattern Validation (no runtime required)
+        # Uses lib.debug.runTests for structured output
         # ═══════════════════════════════════════════════════════════════════════════
-        quality-typecheck =
-          pkgs.runCommand "quality-typecheck"
-            {
-              nativeBuildInputs = [ pkgs.bun ];
-              src = ../.;
-            }
+        config-patterns =
+          if hasFailures then
+            throw ''
+              Configuration pattern validation failed!
+
+              ${formatFailures testResults}
+
+              Fix the issues above and run `nix flake check` again.
             ''
-              # Copy source to writable directory
-              cp -r $src/config/quality $TMPDIR/brain
-              chmod -R u+w $TMPDIR/brain
-              cd $TMPDIR/brain
-
-              # Bun needs writable directories
-              export HOME="$TMPDIR/home"
-              mkdir -p "$HOME"
-
+          else
+            pkgs.runCommand "config-patterns-check" { } ''
               echo "═══════════════════════════════════════════════════════════════"
-              echo "Quality System TypeCheck"
+              echo "Configuration Pattern Validation - PASSED"
               echo "═══════════════════════════════════════════════════════════════"
-
-              # Install dependencies (frozen lockfile ensures reproducibility)
-              ${pkgs.bun}/bin/bun install --frozen-lockfile
-
-              # Run typecheck
-              ${pkgs.bun}/bin/bun x tsc --noEmit
-
               echo ""
-              echo "✓ Quality System TypeScript validation passed"
+              echo "NeoVim tests: ${toString (builtins.length (builtins.attrNames testing.neovim.tests))}"
+              echo "Zellij tests: ${toString (builtins.length (builtins.attrNames testing.zellij.tests))}"
+              echo "Quality tests: ${toString (builtins.length (builtins.attrNames testing.quality.tests))}"
+              echo ""
+              echo "✓ All pattern validations passed"
               touch $out
             '';
 
         # ═══════════════════════════════════════════════════════════════════════════
-        # Port Conflict Detection
+        # PORT CONFLICT DETECTION - Pure Nix Assertions
         # Validates lib/config/ports.nix has no duplicate port assignments
         # ═══════════════════════════════════════════════════════════════════════════
         port-conflicts =
           let
-            cfg = import ../lib/config { inherit (pkgs) lib; };
+            cfg = import ../lib/config { inherit lib; };
             failed = builtins.filter (a: !a.assertion) cfg.assertions;
           in
           if failed == [ ] then
@@ -57,8 +79,6 @@
               echo "═══════════════════════════════════════════════════════════════"
               echo ""
               echo "Total ports defined: ${toString (builtins.length cfg.flatPorts)}"
-              echo "No duplicate port assignments detected."
-              echo ""
               echo "✓ All port assignments are unique"
               touch $out
             ''
@@ -66,75 +86,92 @@
             throw (builtins.concatStringsSep "\n" (map (a: a.message) failed));
 
         # ═══════════════════════════════════════════════════════════════════════════
-        # Comprehensive AI CLI Configuration Validation
-        # All assertions are BLOCKING - failures exit non-zero
+        # QUALITY SYSTEM TYPECHECK - Requires Bun Runtime
+        # TypeScript validation cannot be done in pure Nix
         # ═══════════════════════════════════════════════════════════════════════════
+        quality-typecheck =
+          pkgs.runCommand "quality-typecheck"
+            {
+              nativeBuildInputs = [ pkgs.bun ];
+              src = ./..;
+            }
+            ''
+              cp -r $src/config/quality $TMPDIR/quality
+              chmod -R u+w $TMPDIR/quality
+              cd $TMPDIR/quality
+
+              export HOME="$TMPDIR/home"
+              mkdir -p "$HOME"
+
+              echo "═══════════════════════════════════════════════════════════════"
+              echo "Quality System TypeCheck"
+              echo "═══════════════════════════════════════════════════════════════"
+
+              ${pkgs.bun}/bin/bun install --frozen-lockfile
+              ${pkgs.bun}/bin/bun x tsc --noEmit
+
+              echo ""
+              echo "✓ Quality System TypeScript validation passed"
+              touch $out
+            '';
 
         # ═══════════════════════════════════════════════════════════════════════════
-        # Zellij Configuration Validation
-        # Uses official `zellij setup --check` for KDL validation
+        # ZELLIJ CONFIG - Requires Zellij CLI for KDL Validation
+        # Official `zellij setup --check` validates KDL syntax
+        # Anti-pattern checks are done in pure Nix (testing.zellij)
         # ═══════════════════════════════════════════════════════════════════════════
-        zellij-config =
-          pkgs.runCommand "zellij-config-check"
+        zellij-syntax =
+          pkgs.runCommand "zellij-syntax-check"
             {
               nativeBuildInputs = [ pkgs.zellij ];
-              src = ../.;
+              src = ./..;
             }
             ''
               export ZELLIJ_CONFIG_DIR="$src/config/zellij"
 
-              echo "Zellij Configuration Validation"
-              echo "================================"
+              echo "═══════════════════════════════════════════════════════════════"
+              echo "Zellij KDL Syntax Validation"
+              echo "═══════════════════════════════════════════════════════════════"
 
-              # Official Zellij config validation
               if ${pkgs.zellij}/bin/zellij setup --check 2>&1 | grep -q "Well defined"; then
-                echo "✓ config.kdl is valid"
+                echo "✓ config.kdl KDL syntax is valid"
               else
-                echo "✗ Zellij config validation failed:"
+                echo "✗ Zellij config KDL syntax validation failed:"
                 ${pkgs.zellij}/bin/zellij setup --check 2>&1
                 exit 1
               fi
-
-              # Guard: No Alt+Arrow bindings (macOS word navigation conflict)
-              if grep -qE 'bind "Alt (left|right|up|down)"' "$ZELLIJ_CONFIG_DIR/config.kdl"; then
-                echo "✗ Alt+Arrow bindings conflict with macOS word navigation"
-                exit 1
-              fi
-              echo "✓ No Alt+Arrow conflicts"
 
               touch $out
             '';
 
         # ═══════════════════════════════════════════════════════════════════════════
-        # Neovim Configuration Validation
-        # Validates Lua syntax of all Neovim configuration files
+        # NEOVIM LUA SYNTAX - Requires LuaJIT for Bytecode Compilation
+        # Validates Lua files compile without syntax errors
+        # Pattern validation is done in pure Nix (testing.neovim)
         # ═══════════════════════════════════════════════════════════════════════════
-        neovim-config =
-          pkgs.runCommand "neovim-config-check"
+        neovim-lua-syntax =
+          pkgs.runCommand "neovim-lua-syntax-check"
             {
               nativeBuildInputs = [
                 pkgs.luajit
                 pkgs.fd
               ];
-              src = ../.;
+              src = ./..;
             }
             ''
               cd $src
 
               echo "═══════════════════════════════════════════════════════════════"
-              echo "Neovim Configuration Validation"
+              echo "NeoVim Lua Syntax Validation"
               echo "═══════════════════════════════════════════════════════════════"
 
               ERRORS=0
               TOTAL=0
 
-              echo ""
-              echo "─── Lua Syntax Validation ───"
-
-              # Check all Lua files in config/nvim/lua/
-              for file in $(${pkgs.fd}/bin/fd -e lua . config/nvim/lua/); do
+              # Validate all Lua files compile to bytecode
+              for file in $(${pkgs.fd}/bin/fd -e lua . config/nvim/lua/ config/nvim/tests/ 2>/dev/null); do
                 TOTAL=$((TOTAL + 1))
-                if ${pkgs.luajit}/bin/luajit -bl "$file" /dev/null; then
+                if ${pkgs.luajit}/bin/luajit -bl "$file" /dev/null 2>/dev/null; then
                   echo "✓ $file"
                 else
                   echo "✗ SYNTAX ERROR: $file"
@@ -143,68 +180,15 @@
               done
 
               echo ""
-              echo "─── Test Files Validation ───"
-
-              # Check test files (directory may not exist in all configurations)
-              if [ -d "config/nvim/tests" ]; then
-                for file in $(${pkgs.fd}/bin/fd -e lua . config/nvim/tests/); do
-                  TOTAL=$((TOTAL + 1))
-                  if ${pkgs.luajit}/bin/luajit -bl "$file" /dev/null; then
-                    echo "✓ $file"
-                  else
-                    echo "✗ SYNTAX ERROR: $file"
-                    ERRORS=$((ERRORS + 1))
-                  fi
-                done
-              fi
-
-              echo ""
-              echo "─── Mason Configuration Check ───"
-
-              # Verify Mason only has debug adapters (no linters)
-              if grep -qE '"(markdownlint|yamllint|hadolint|sqlfluff)"' config/nvim/lua/plugins/mason.lua; then
-                echo "✗ Mason contains linters that should be in Nix"
-                ERRORS=$((ERRORS + 1))
-              else
-                echo "✓ Mason correctly limited to debug adapters"
-              fi
-              TOTAL=$((TOTAL + 1))
-
-              echo ""
-              echo "─── Nix LSP Override Check ───"
-
-              # Verify nvim-lspconfig.lua has nixd enabled and nil_ls disabled
-              # (Nix LSP config consolidated into nvim-lspconfig.lua per commit a23a599)
-              if [ -f "config/nvim/lua/plugins/nvim-lspconfig.lua" ]; then
-                if grep -q "nil_ls = false" config/nvim/lua/plugins/nvim-lspconfig.lua; then
-                  echo "✓ nil_ls correctly disabled in nvim-lspconfig.lua"
-                else
-                  echo "✗ nil_ls not disabled in nvim-lspconfig.lua"
-                  ERRORS=$((ERRORS + 1))
-                fi
-                if grep -q "nixd" config/nvim/lua/plugins/nvim-lspconfig.lua; then
-                  echo "✓ nixd configured in nvim-lspconfig.lua"
-                else
-                  echo "✗ nixd not configured in nvim-lspconfig.lua"
-                  ERRORS=$((ERRORS + 1))
-                fi
-              else
-                echo "✗ nvim-lspconfig.lua not found"
-                ERRORS=$((ERRORS + 1))
-              fi
-              TOTAL=$((TOTAL + 2))
-
-              echo ""
-              echo "═══════════════════════════════════════════════════════════════"
-              echo "Summary: $((TOTAL - ERRORS)) / $TOTAL checks passed"
-              echo "═══════════════════════════════════════════════════════════════"
+              echo "───────────────────────────────────────────────────────────────"
+              echo "Validated $TOTAL Lua files"
 
               if [ "$ERRORS" -gt 0 ]; then
-                echo "✗ $ERRORS error(s) found"
+                echo "✗ $ERRORS syntax error(s) found"
                 exit 1
               fi
 
-              echo "✓ All Neovim configuration checks passed"
+              echo "✓ All Lua files have valid syntax"
               touch $out
             '';
       };

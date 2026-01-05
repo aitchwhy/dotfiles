@@ -1,54 +1,74 @@
 -- edgy.nvim - IDE-like window/pane management
--- Manages sidebar and panel layouts for snacks explorer, terminal, sidekick, etc.
+-- Merges with LazyVim defaults to preserve overseer, trouble, neotest integrations
 return {
   {
     "folke/edgy.nvim",
-    opts = function()
-      local opts = {
-        -- Left sidebar: Explorer, Symbols
-        left = {
-          {
-            title = "Explorer",
-            ft = "snacks_picker_list",
-            -- Filter to only capture sidebar explorer, NOT floating pickers
-            filter = function(buf, win)
-              return vim.w[win].snacks_win
-                and vim.w[win].snacks_win.position == "left"
-                and vim.w[win].snacks_win.relative == "editor"
-            end,
-          },
-          { title = "Symbols", ft = "Outline", size = { height = 0.4 } },
-          { title = "Neotest Summary", ft = "neotest-summary" },
-        },
-        -- Right sidebar: AI Sidekick, Grug Far
-        right = {
-          { title = "Sidekick", ft = "sidekick", size = { width = 0.35 } },
-          { title = "Grug Far", ft = "grug-far", size = { width = 0.4 } },
-        },
-        -- Bottom: Neotest Output, QuickFix
-        bottom = {
-          { title = "Neotest Output", ft = "neotest-output-panel", size = { height = 15 } },
-          { ft = "qf", title = "QuickFix" },
-        },
-        -- Resize keybindings
-        keys = {
-          ["<C-Right>"] = function(win)
-            win:resize("width", 2)
-          end,
-          ["<C-Left>"] = function(win)
-            win:resize("width", -2)
-          end,
-          ["<C-Up>"] = function(win)
-            win:resize("height", 2)
-          end,
-          ["<C-Down>"] = function(win)
-            win:resize("height", -2)
-          end,
-        },
-      }
+    event = "VeryLazy",
+    keys = {
+      { "<leader>ue", function() require("edgy").toggle() end, desc = "Edgy Toggle" },
+      { "<leader>uE", function() require("edgy").select() end, desc = "Edgy Select Window" },
+    },
+    opts = function(_, opts)
+      -- Initialize position tables
+      opts.left = opts.left or {}
+      opts.right = opts.right or {}
+      opts.bottom = opts.bottom or {}
 
-      -- Dynamic snacks_terminal integration for all positions
-      -- Only captures split terminals (relative == "editor"), not floating ones
+      -- LEFT SIDEBAR: Explorer, Symbols, Neotest Summary
+      table.insert(opts.left, 1, {
+        title = "Explorer",
+        ft = "snacks_picker_list",
+        filter = function(buf, win)
+          return vim.w[win].snacks_win
+            and vim.w[win].snacks_win.position == "left"
+            and vim.w[win].snacks_win.relative == "editor"
+        end,
+      })
+      table.insert(opts.left, { title = "Symbols", ft = "Outline", size = { height = 0.4 } })
+      table.insert(opts.left, { title = "Neotest Summary", ft = "neotest-summary" })
+
+      -- RIGHT SIDEBAR: Sidekick, Overseer, Grug Far
+      table.insert(opts.right, 1, { title = "Sidekick", ft = "sidekick", size = { width = 0.35 } })
+      table.insert(opts.right, {
+        title = "Overseer",
+        ft = "OverseerList",
+        open = function() require("overseer").open() end,
+        size = { width = 0.3 },
+      })
+      table.insert(opts.right, { title = "Grug Far", ft = "grug-far", size = { width = 0.4 } })
+
+      -- BOTTOM: Neotest Output, QuickFix, Help
+      table.insert(opts.bottom, { title = "Neotest Output", ft = "neotest-output-panel", size = { height = 15 } })
+      table.insert(opts.bottom, { ft = "qf", title = "QuickFix" })
+      table.insert(opts.bottom, {
+        ft = "help",
+        size = { height = 20 },
+        filter = function(buf) return vim.bo[buf].buftype == "help" end,
+      })
+
+      -- RESIZE KEYBINDINGS
+      opts.keys = opts.keys or {}
+      opts.keys["<C-Right>"] = function(win) win:resize("width", 2) end
+      opts.keys["<C-Left>"] = function(win) win:resize("width", -2) end
+      opts.keys["<C-Up>"] = function(win) win:resize("height", 2) end
+      opts.keys["<C-Down>"] = function(win) win:resize("height", -2) end
+
+      -- TROUBLE.NVIM INTEGRATION (all positions)
+      for _, pos in ipairs({ "top", "bottom", "left", "right" }) do
+        opts[pos] = opts[pos] or {}
+        table.insert(opts[pos], {
+          ft = "trouble",
+          filter = function(_buf, win)
+            return vim.w[win].trouble
+              and vim.w[win].trouble.position == pos
+              and vim.w[win].trouble.type == "split"
+              and vim.w[win].trouble.relative == "editor"
+              and not vim.w[win].trouble_preview
+          end,
+        })
+      end
+
+      -- SNACKS TERMINAL INTEGRATION (all positions)
       for _, pos in ipairs({ "top", "bottom", "left", "right" }) do
         opts[pos] = opts[pos] or {}
         table.insert(opts[pos], {
