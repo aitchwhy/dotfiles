@@ -71,6 +71,41 @@
         # ═══════════════════════════════════════════════════════════════════════════
 
         # ═══════════════════════════════════════════════════════════════════════════
+        # Zellij Configuration Validation
+        # Uses official `zellij setup --check` for KDL validation
+        # ═══════════════════════════════════════════════════════════════════════════
+        zellij-config =
+          pkgs.runCommand "zellij-config-check"
+            {
+              nativeBuildInputs = [ pkgs.zellij ];
+              src = ../.;
+            }
+            ''
+              export ZELLIJ_CONFIG_DIR="$src/config/zellij"
+
+              echo "Zellij Configuration Validation"
+              echo "================================"
+
+              # Official Zellij config validation
+              if ${pkgs.zellij}/bin/zellij setup --check 2>&1 | grep -q "Well defined"; then
+                echo "✓ config.kdl is valid"
+              else
+                echo "✗ Zellij config validation failed:"
+                ${pkgs.zellij}/bin/zellij setup --check 2>&1
+                exit 1
+              fi
+
+              # Guard: No Alt+Arrow bindings (macOS word navigation conflict)
+              if grep -qE 'bind "Alt (left|right|up|down)"' "$ZELLIJ_CONFIG_DIR/config.kdl"; then
+                echo "✗ Alt+Arrow bindings conflict with macOS word navigation"
+                exit 1
+              fi
+              echo "✓ No Alt+Arrow conflicts"
+
+              touch $out
+            '';
+
+        # ═══════════════════════════════════════════════════════════════════════════
         # Neovim Configuration Validation
         # Validates Lua syntax of all Neovim configuration files
         # ═══════════════════════════════════════════════════════════════════════════

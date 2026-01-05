@@ -2,10 +2,12 @@
  * Generator Tests
  *
  * Validates generators produce correct output.
+ * Uses SSOT constants for counts - validates internal consistency, not magic numbers.
  */
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 import { describe, expect, it } from 'vitest'
+import { MEMORY_COUNTS } from '../../memories'
 
 const GENERATED_DIR = path.join(__dirname, '../../../generated/claude')
 
@@ -31,7 +33,7 @@ describe('Generated Artifacts', () => {
 
     it('reports correct total', () => {
       const content = fs.readFileSync(filePath, 'utf-8')
-      expect(content).toContain('35 memories')
+      expect(content).toContain(`${MEMORY_COUNTS.total} memories`)
     })
   })
 
