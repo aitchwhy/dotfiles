@@ -10,8 +10,8 @@
 # Both configs are derived from mcpServerDefs (SSOT).
 # No manual scripts required after darwin-rebuild.
 #
-# Token Optimization (December 2025):
-# - Reduced from 16 to 6 MCP servers (~75% token reduction)
+# Token Optimization (January 2026):
+# - Reduced from 16 to 5 MCP servers (~70% token reduction)
 # - SOTA servers: Ref.tools (60-95% fewer tokens), Exa AI (code search)
 # - Removed redundant servers that duplicate native Claude Code capabilities
 {
@@ -87,12 +87,6 @@ let
       envVars = {
         GITHUB_PERSONAL_ACCESS_TOKEN = "${mcpSecretsPath}/github-token";
       };
-    };
-
-    playwright = {
-      # Browser automation for testing and web interactions
-      package = "@playwright/mcp";
-      args = [ ];
     };
 
     ast-grep = {
@@ -356,10 +350,10 @@ in
       if [ -f "$CLAUDE_CODE_CONFIG" ]; then
         MERGED=$(jq --argjson servers "$MCP_SERVERS" '.mcpServers = $servers' "$CLAUDE_CODE_CONFIG")
         echo "$MERGED" > "$CLAUDE_CODE_CONFIG"
-        echo "Claude Code config updated (6 servers from SSOT)"
+        echo "Claude Code config updated (5 servers from SSOT)"
       else
         echo "{\"mcpServers\": $MCP_SERVERS}" > "$CLAUDE_CODE_CONFIG"
-        echo "Claude Code config created (6 servers from SSOT)"
+        echo "Claude Code config created (5 servers from SSOT)"
       fi
     '';
 
