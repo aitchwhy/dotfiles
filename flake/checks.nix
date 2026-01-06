@@ -7,13 +7,13 @@
 #
 # SSOT: All test logic lives in lib/testing/*.nix
 # DRY: Reusable validators, no duplicate patterns
-{ ... }:
+{ self, ... }:
 {
   perSystem =
     { pkgs, ... }:
     let
       lib = pkgs.lib;
-      src = ./..;
+      src = self;
 
       # Import the type-safe testing library
       testing = import ../lib/testing { inherit lib src; };
