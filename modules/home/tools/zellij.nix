@@ -12,7 +12,9 @@ let
 
   # Plugin sources from flake inputs
   # zjstatus: Built WASM from flake
-  zjstatusWasm = "${inputs.zjstatus.packages.${pkgs.system}.default}/bin/zjstatus.wasm";
+  zjstatusWasm = "${
+    inputs.zjstatus.packages.${pkgs.stdenv.hostPlatform.system}.default
+  }/bin/zjstatus.wasm";
 
   # room: Fetch pre-built WASM from GitHub releases
   roomWasm = pkgs.fetchurl {
