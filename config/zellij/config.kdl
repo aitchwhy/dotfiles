@@ -300,8 +300,8 @@ default_cwd "/Users/hank/src"
  
 // The name of the default layout to load on startup
 // Default: "default"
-// Using compact layout with F1 tooltip support
-default_layout "compact"
+// Custom layout with told + dotfiles tabs
+default_layout "default"
  
 // The folder in which Zellij will look for layouts
 // (Requires restart)
