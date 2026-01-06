@@ -31,6 +31,16 @@ in
     # Security
     security.pam.services.sudo_local.touchIdAuth = true;
 
+    # Passwordless sudo for nix commands (prevents multiple prompts during darwin-rebuild)
+    # Uses stable paths that survive nix updates
+    security.sudo.extraConfig = ''
+      # Allow nix operations without password (Touch ID still required for first sudo)
+      %admin ALL=(ALL) NOPASSWD: /run/current-system/sw/bin/darwin-rebuild *
+      %admin ALL=(ALL) NOPASSWD: /nix/var/nix/profiles/default/bin/nix-collect-garbage *
+      %admin ALL=(ALL) NOPASSWD: /nix/var/nix/profiles/default/bin/nix *
+      %admin ALL=(ALL) NOPASSWD: /bin/launchctl *
+    '';
+
     # System behavior
     system.startup.chime = false;
 
