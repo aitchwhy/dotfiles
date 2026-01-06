@@ -88,6 +88,15 @@ in
         owner = config.system.primaryUser;
         path = "${mcpSecretsPath}/ref-api-key";
       };
+
+      # Linear API Key for issue tracking MCP server
+      # Get at: https://linear.app/<workspace>/settings/api
+      # Used by: @anthropic-ai/linear-mcp
+      linear-api-key = {
+        mode = "0400";
+        owner = config.system.primaryUser;
+        path = "${mcpSecretsPath}/linear-api-key";
+      };
     };
   };
 }
