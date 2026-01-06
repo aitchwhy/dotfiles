@@ -161,6 +161,9 @@ const PERMISSIONS = {
 // =============================================================================
 
 const ENABLED_PLUGINS = {
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Default marketplace (claude-code-plugins)
+  // ═══════════════════════════════════════════════════════════════════════════
   'code-review@claude-code-plugins': true,
   'commit-commands@claude-code-plugins': true,
   'explanatory-output-style@claude-code-plugins': true,
@@ -169,6 +172,49 @@ const ENABLED_PLUGINS = {
   'learning-output-style@claude-code-plugins': true,
   'pr-review-toolkit@claude-code-plugins': true,
   'ralph-wiggum@claude-code-plugins': true,
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Official Extended (claude-plugins-official)
+  // ═══════════════════════════════════════════════════════════════════════════
+  'typescript-lsp@claude-plugins-official': true, // LSP code intelligence
+  'security-guidance@claude-plugins-official': true, // Security warnings
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Dev-GOM Community (dev-gom-plugins)
+  // ═══════════════════════════════════════════════════════════════════════════
+  'ai-pair-programming@dev-gom-plugins': true, // Expert domain agents
+  'hook-complexity-monitor@dev-gom-plugins': true, // Quality monitoring
+  'spec-kit@dev-gom-plugins': true, // Specification workflow
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CC Marketplace (cc-marketplace)
+  // ═══════════════════════════════════════════════════════════════════════════
+  'ultrathink@cc-marketplace': true, // Multi-agent coordinator
+} as const
+
+// =============================================================================
+// Extra Marketplaces SSOT (third-party plugin sources)
+// =============================================================================
+
+const EXTRA_MARKETPLACES = {
+  'claude-plugins-official': {
+    source: {
+      source: 'github',
+      repo: 'anthropics/claude-plugins-official',
+    },
+  },
+  'dev-gom-plugins': {
+    source: {
+      source: 'github',
+      repo: 'Dev-GOM/claude-code-marketplace',
+    },
+  },
+  'cc-marketplace': {
+    source: {
+      source: 'github',
+      repo: 'ananddtyagi/cc-marketplace',
+    },
+  },
 } as const
 
 // =============================================================================
@@ -190,6 +236,7 @@ type ClaudeSettings = {
     readonly model?: string
   }[]
   readonly enabledPlugins: typeof ENABLED_PLUGINS
+  readonly extraKnownMarketplaces: typeof EXTRA_MARKETPLACES
 }
 
 // =============================================================================
@@ -205,18 +252,13 @@ const generateSettings = (personas: readonly PersonaDefinition[]): ClaudeSetting
   verbose: false,
   permissions: PERMISSIONS,
   hooks: HOOK_DEFINITIONS,
-  agents: personas.map((p) => {
-    const agent: {
-      readonly name: string
-      readonly description: string
-      readonly model?: string
-    } = { name: p.name, description: p.description }
-    if (p.model !== undefined) {
-      return { ...agent, model: p.model }
-    }
-    return agent
-  }),
+  agents: personas.map((p) => ({
+    name: p.name,
+    description: p.description,
+    ...(p.model ? { model: p.model } : {}),
+  })),
   enabledPlugins: ENABLED_PLUGINS,
+  extraKnownMarketplaces: EXTRA_MARKETPLACES,
 })
 
 export const generateSettingsFile = (
