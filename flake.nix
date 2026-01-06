@@ -116,6 +116,19 @@
       url = "github:BennyOe/tokyo-night.yazi/b3950bf";
       flake = false;
     };
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # ZELLIJ PLUGINS
+    # ═══════════════════════════════════════════════════════════════════════════
+    zjstatus = {
+      url = "github:dj95/zjstatus/v0.22.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    zellij-room = {
+      url = "github:rvcas/room/v1.2.0";
+      flake = false;
+    };
   };
 
   outputs =
