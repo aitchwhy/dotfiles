@@ -102,13 +102,12 @@ let
     };
 
     linear = {
-      # Linear API for issue tracking (toldone workspace)
-      # API key determines workspace access
-      package = "@anthropic-ai/linear-mcp";
-      args = [ ];
-      envVars = {
-        LINEAR_API_KEY = "${mcpSecretsPath}/linear-api-key";
-      };
+      # Linear official MCP server (OAuth-based, centrally hosted)
+      # Uses mcp-remote to connect to Linear's SSE endpoint
+      # Auth handled via OAuth flow on first use (run /mcp in Claude)
+      # https://linear.app/changelog/2025-05-01-mcp
+      package = "mcp-remote";
+      args = [ "https://mcp.linear.app/sse" ];
     };
   };
 
@@ -349,9 +348,6 @@ in
       GITHUB_TOKEN=""
       [ -f "$MCP_SECRETS/github-token" ] && GITHUB_TOKEN=$(cat "$MCP_SECRETS/github-token")
 
-      LINEAR_KEY=""
-      [ -f "$MCP_SECRETS/linear-api-key" ] && LINEAR_KEY=$(cat "$MCP_SECRETS/linear-api-key")
-
       # MCP servers JSON from Nix SSOT (with placeholders for secrets)
       MCP_SERVERS='${cliAllJson}'
 
@@ -359,7 +355,6 @@ in
       MCP_SERVERS=$(echo "$MCP_SERVERS" | sed "s/__REF_KEY__/$REF_KEY/g")
       MCP_SERVERS=$(echo "$MCP_SERVERS" | sed "s/__EXA_KEY__/$EXA_KEY/g")
       MCP_SERVERS=$(echo "$MCP_SERVERS" | sed "s/__GITHUB_TOKEN__/$GITHUB_TOKEN/g")
-      MCP_SERVERS=$(echo "$MCP_SERVERS" | sed "s/__LINEAR_KEY__/$LINEAR_KEY/g")
 
       # Merge with existing config (preserve runtime state)
       if [ -f "$CLAUDE_CODE_CONFIG" ]; then

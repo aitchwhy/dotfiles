@@ -9,12 +9,10 @@ import { Effect, Console, Schema } from 'effect'
 // Parse environment at boundary
 const EnvSchema = Schema.Struct({
   GITHUB_TOKEN: Schema.optionalWith(Schema.String, { default: () => '' }),
-  LINEAR_API_KEY: Schema.optionalWith(Schema.String, { default: () => '' }),
 })
 
 const env = Schema.decodeUnknownSync(EnvSchema)({
   GITHUB_TOKEN: process.env['GITHUB_TOKEN'],
-  LINEAR_API_KEY: process.env['LINEAR_API_KEY'],
 })
 
 // Parse MCP server config at boundary with NonEmptyArray for cmd
@@ -41,8 +39,8 @@ const MCP_SERVERS: McpServer[] = [
   {
     name: 'linear',
     executable: 'npx',
-    args: ['-y', '@anthropic-ai/linear-mcp'],
-    envVars: { LINEAR_API_KEY: env.LINEAR_API_KEY },
+    args: ['-y', 'mcp-remote', 'https://mcp.linear.app/sse'],
+    envVars: {},
   },
 ]
 
