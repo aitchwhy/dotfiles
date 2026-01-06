@@ -24,7 +24,7 @@ return {
             and vim.w[win].snacks_win.relative == "editor"
         end,
       })
-      table.insert(opts.left, { title = "Symbols", ft = "Outline", size = { height = 0.4 } })
+      table.insert(opts.left, { title = "Symbols", ft = "aerial", size = { height = 0.4 } })
       table.insert(opts.left, { title = "Neotest Summary", ft = "neotest-summary" })
 
       -- RIGHT SIDEBAR: Sidekick, Overseer, Grug Far

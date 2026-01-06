@@ -58,7 +58,7 @@ require("lazy").setup({
     -- NOTE: mini-animate skipped - vim.g.snacks_animate = false in options.lua
 
     -- Navigation & Symbols
-    { import = "lazyvim.plugins.extras.editor.outline" },
+    { import = "lazyvim.plugins.extras.editor.aerial" },
     { import = "lazyvim.plugins.extras.editor.navic" },
     { import = "lazyvim.plugins.extras.editor.illuminate" },
 

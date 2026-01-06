@@ -8,6 +8,16 @@ return {
     opts = {
       highlight = { enable = true },
       indent = { enable = true },
+      -- Incremental selection: + to expand, - to shrink (AST-aware)
+      incremental_selection = {
+        enable = true,
+        keymaps = {
+          init_selection = "+",
+          node_incremental = "+",
+          scope_incremental = false,
+          node_decremental = "-",
+        },
+      },
       ensure_installed = {
         "bash",
         "c",
