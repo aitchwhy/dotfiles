@@ -124,8 +124,10 @@ let
     in
     if sources == [ ] then "" else (lib.concatStringsSep "; " sources) + "; ";
 
-  # Filter out HTTP servers for stdio format generators
-  stdioServerDefs = filterAttrs (_name: def: !(def.isHttp or false)) mcpServerDefs;
+  # Filter out HTTP and SSE servers for stdio format generators
+  stdioServerDefs = filterAttrs (
+    _name: def: !(def.isHttp or false) && !(def.isSse or false)
+  ) mcpServerDefs;
 
   # Desktop-only servers (consumer use, not development)
   # Desktop doesn't support HTTP MCP, so only stdio servers
@@ -247,12 +249,22 @@ let
     url = "${def.url}?apiKey=__${toUpper name}_KEY__";
   };
 
+  # SSE server format for CLI (OAuth-based, no API key needed)
+  toCliSseFormat = _name: def: {
+    type = "sse";
+    url = def.url;
+  };
+
   # Filter and generate HTTP server configs (CLI only - Desktop doesn't support HTTP)
   httpServerDefs = filterAttrs (_name: def: def.isHttp or false) mcpServerDefs;
   cliHttpServers = mapAttrs toCliHttpFormat httpServerDefs;
 
-  # Combine stdio + HTTP for full CLI config
-  cliAllServers = cliStdioServers // cliHttpServers;
+  # Filter and generate SSE server configs (CLI only - Desktop doesn't support SSE)
+  sseServerDefs = filterAttrs (_name: def: def.isSse or false) mcpServerDefs;
+  cliSseServers = mapAttrs toCliSseFormat sseServerDefs;
+
+  # Combine stdio + HTTP + SSE for full CLI config
+  cliAllServers = cliStdioServers // cliHttpServers // cliSseServers;
   cliAllJson = builtins.toJSON cliAllServers;
 
   # Pre-compute JSON fragments for activation script (strip outer braces)
