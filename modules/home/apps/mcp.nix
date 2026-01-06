@@ -137,6 +137,7 @@ let
   # Desktop doesn't support HTTP MCP, so only stdio servers
   desktopOnlyDefs = {
     exa = mcpServerDefs.exa; # Web/code search for casual use
+    linear = mcpServerDefs.linear; # Issue tracking (toldone workspace)
   };
 
   # Claude Desktop format: wrap commands in /bin/sh to inject Nix PATH
@@ -327,7 +328,7 @@ in
       }
       DESKTOPEOF
 
-            echo "Claude Desktop config generated (1 stdio server: exa only)"
+            echo "Claude Desktop config generated (2 stdio servers: exa, linear)"
     '';
 
     # Generate Claude Code CLI config (~/.claude.json)
