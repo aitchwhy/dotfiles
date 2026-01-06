@@ -100,6 +100,16 @@ let
       package = "repomix";
       args = [ "--mcp" ];
     };
+
+    linear = {
+      # Linear API for issue tracking (toldone workspace)
+      # API key determines workspace access
+      package = "@anthropic-ai/linear-mcp";
+      args = [ ];
+      envVars = {
+        LINEAR_API_KEY = "${mcpSecretsPath}/linear-api-key";
+      };
+    };
   };
 
   # ═══════════════════════════════════════════════════════════════════════════
@@ -338,6 +348,9 @@ in
       GITHUB_TOKEN=""
       [ -f "$MCP_SECRETS/github-token" ] && GITHUB_TOKEN=$(cat "$MCP_SECRETS/github-token")
 
+      LINEAR_KEY=""
+      [ -f "$MCP_SECRETS/linear-api-key" ] && LINEAR_KEY=$(cat "$MCP_SECRETS/linear-api-key")
+
       # MCP servers JSON from Nix SSOT (with placeholders for secrets)
       MCP_SERVERS='${cliAllJson}'
 
@@ -345,15 +358,16 @@ in
       MCP_SERVERS=$(echo "$MCP_SERVERS" | sed "s/__REF_KEY__/$REF_KEY/g")
       MCP_SERVERS=$(echo "$MCP_SERVERS" | sed "s/__EXA_KEY__/$EXA_KEY/g")
       MCP_SERVERS=$(echo "$MCP_SERVERS" | sed "s/__GITHUB_TOKEN__/$GITHUB_TOKEN/g")
+      MCP_SERVERS=$(echo "$MCP_SERVERS" | sed "s/__LINEAR_KEY__/$LINEAR_KEY/g")
 
       # Merge with existing config (preserve runtime state)
       if [ -f "$CLAUDE_CODE_CONFIG" ]; then
         MERGED=$(jq --argjson servers "$MCP_SERVERS" '.mcpServers = $servers' "$CLAUDE_CODE_CONFIG")
         echo "$MERGED" > "$CLAUDE_CODE_CONFIG"
-        echo "Claude Code config updated (5 servers from SSOT)"
+        echo "Claude Code config updated (6 servers from SSOT)"
       else
         echo "{\"mcpServers\": $MCP_SERVERS}" > "$CLAUDE_CODE_CONFIG"
-        echo "Claude Code config created (5 servers from SSOT)"
+        echo "Claude Code config created (6 servers from SSOT)"
       fi
     '';
 
