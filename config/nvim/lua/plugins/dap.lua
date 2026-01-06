@@ -1,5 +1,5 @@
 -- Debug Adapter Protocol configuration
--- Keybindings for nvim-dap debugging
+-- Extends LazyVim's dap.core and lang.typescript with attach configs for Node.js
 return {
   {
     "mfussenegger/nvim-dap",
@@ -87,6 +87,91 @@ return {
           require("dap.ui.widgets").hover()
         end,
         desc = "Widgets",
+      },
+      -- Direct attach to Node.js inspector (most common workflow)
+      {
+        "<leader>dA",
+        function()
+          require("dap").run({
+            type = "pwa-node",
+            request = "attach",
+            name = "Attach to localhost:9229",
+            address = "localhost",
+            port = 9229,
+            cwd = vim.fn.getcwd(),
+            sourceMaps = true,
+            skipFiles = { "<node_internals>/**", "${workspaceFolder}/node_modules/**" },
+            resolveSourceMapLocations = { "${workspaceFolder}/**", "!**/node_modules/**" },
+          })
+        end,
+        desc = "Attach to Node (9229)",
+      },
+    },
+
+    opts = function()
+      local dap = require("dap")
+      local js_filetypes = { "typescript", "javascript", "typescriptreact", "javascriptreact" }
+
+      for _, language in ipairs(js_filetypes) do
+        dap.configurations[language] = dap.configurations[language] or {}
+
+        -- Insert direct attach at the TOP of the list (appears first in picker)
+        table.insert(dap.configurations[language], 1, {
+          type = "pwa-node",
+          request = "attach",
+          name = "Attach to localhost:9229",
+          address = "localhost",
+          port = 9229,
+          cwd = "${workspaceFolder}",
+          sourceMaps = true,
+          restart = true, -- Auto-reconnect on server restart (tsx watch)
+          skipFiles = { "<node_internals>/**", "${workspaceFolder}/node_modules/**" },
+          resolveSourceMapLocations = { "${workspaceFolder}/**", "!**/node_modules/**" },
+        })
+
+        -- Custom port attach option (for non-standard ports)
+        table.insert(dap.configurations[language], 2, {
+          type = "pwa-node",
+          request = "attach",
+          name = "Attach to custom port",
+          address = "localhost",
+          port = function()
+            return tonumber(vim.fn.input("Port: ", "9229"))
+          end,
+          cwd = "${workspaceFolder}",
+          sourceMaps = true,
+          restart = true,
+          skipFiles = { "<node_internals>/**", "${workspaceFolder}/node_modules/**" },
+          resolveSourceMapLocations = { "${workspaceFolder}/**", "!**/node_modules/**" },
+        })
+      end
+    end,
+  },
+
+  -- DAP UI layout configuration (bottom panel for REPL, breakpoints, watches)
+  {
+    "rcarriga/nvim-dap-ui",
+    opts = {
+      layouts = {
+        {
+          -- Left sidebar: Scopes and Stacks
+          elements = {
+            { id = "scopes", size = 0.5 },
+            { id = "stacks", size = 0.5 },
+          },
+          size = 40,
+          position = "left",
+        },
+        {
+          -- Bottom panel: REPL, Breakpoints, Watches
+          elements = {
+            { id = "repl", size = 0.4 },
+            { id = "breakpoints", size = 0.3 },
+            { id = "watches", size = 0.3 },
+          },
+          size = 12,
+          position = "bottom",
+        },
       },
     },
   },
