@@ -1,289 +1,196 @@
 layout {
     cwd "/Users/hank"
+
+    // zjstatus status bar - applies to all tabs via default_tab_template
+    default_tab_template {
+        children
+        pane size=1 borderless=true {
+            plugin location="file:~/.config/zellij/plugins/zjstatus.wasm" {
+                format_left   "{mode}#[fg=#7aa2f7,bold] {session}"
+                format_center "{tabs}"
+                format_right  "{datetime}"
+                format_space  "#[bg=#24283b]"
+
+                border_enabled  "false"
+                hide_frame_for_single_pane "true"
+
+                // Tokyo Night mode indicators
+                mode_normal        "#[bg=#7aa2f7,fg=#24283b,bold]  NORMAL "
+                mode_locked        "#[bg=#f7768e,fg=#24283b,bold]  LOCKED "
+                mode_pane          "#[bg=#bb9af7,fg=#24283b,bold]  PANE "
+                mode_tab           "#[bg=#ff9e64,fg=#24283b,bold]  TAB "
+                mode_resize        "#[bg=#9ece6a,fg=#24283b,bold]  RESIZE "
+                mode_scroll        "#[bg=#7dcfff,fg=#24283b,bold]  SCROLL "
+                mode_search        "#[bg=#e0af68,fg=#24283b,bold]  SEARCH "
+                mode_session       "#[bg=#bb9af7,fg=#24283b,bold]  SESSION "
+                mode_move          "#[bg=#9ece6a,fg=#24283b,bold]  MOVE "
+                mode_tmux          "#[bg=#ff9e64,fg=#24283b,bold]  TMUX "
+                mode_default_to_mode "normal"
+
+                // Tokyo Night tabs
+                tab_normal              "#[fg=#565f89] {index} {name} "
+                tab_active              "#[fg=#7aa2f7,bold,italic] {index} {name} "
+                tab_fullscreen_indicator "[] "
+                tab_sync_indicator       " "
+                tab_floating_indicator   " "
+
+                // Datetime
+                datetime          "#[fg=#565f89] {format} "
+                datetime_format   "%a %b %d  %H:%M"
+                datetime_timezone "America/New_York"
+            }
+        }
+    }
+
     tab name="told" hide_floating_panes=true {
         pane split_direction="vertical" {
             pane cwd="src/told" size="50%"
             pane cwd="src/told" size="50%"
         }
-        pane size=1 borderless=true {
-            plugin location="zellij:compact-bar" {
-                tooltip "F1"
-            }
-        }
     }
+
     tab name="dotfiles" focus=true hide_floating_panes=true {
         pane command="claude" cwd="dotfiles" focus=true {
             args "--dangerously-skip-permissions"
             start_suspended true
         }
-        pane size=1 borderless=true {
-            plugin location="zellij:compact-bar" {
-                tooltip "F1"
-            }
-        }
     }
+
     new_tab_template {
         pane
-        pane size=1 borderless=true {
-            plugin location="zellij:compact-bar" {
-                tooltip "F1"
-            }
-        }
     }
+
     swap_tiled_layout name="vertical" {
         tab max_panes=4 {
-            pane {
-                pane split_direction="vertical" {
-                    pane
-                    pane {
-                        children
-                    }
+            pane split_direction="vertical" {
+                pane
+                pane {
+                    children
                 }
-            }
-            pane size=1 borderless=true {
-                plugin location="compact-bar"
             }
         }
         tab max_panes=7 {
-            pane {
-                pane split_direction="vertical" {
-                    pane {
-                        children
-                    }
-                    pane {
-                        pane
-                        pane
-                        pane
-                        pane
-                    }
+            pane split_direction="vertical" {
+                pane {
+                    children
                 }
-            }
-            pane size=1 borderless=true {
-                plugin location="compact-bar"
+                pane {
+                    pane
+                    pane
+                    pane
+                    pane
+                }
             }
         }
         tab max_panes=11 {
-            pane {
-                pane split_direction="vertical" {
-                    pane {
-                        children
-                    }
-                    pane {
-                        pane
-                        pane
-                        pane
-                        pane
-                    }
-                    pane {
-                        pane
-                        pane
-                        pane
-                        pane
-                    }
+            pane split_direction="vertical" {
+                pane {
+                    children
                 }
-            }
-            pane size=1 borderless=true {
-                plugin location="compact-bar"
+                pane {
+                    pane
+                    pane
+                    pane
+                    pane
+                }
+                pane {
+                    pane
+                    pane
+                    pane
+                    pane
+                }
             }
         }
     }
+
     swap_tiled_layout name="horizontal" {
         tab max_panes=3 {
-            pane {
-                pane
-                pane
-            }
-            pane size=1 borderless=true {
-                plugin location="compact-bar"
-            }
+            pane
+            pane
         }
         tab max_panes=7 {
             pane {
-                pane {
-                    pane split_direction="vertical" {
-                        children
-                    }
-                    pane split_direction="vertical" {
-                        pane
-                        pane
-                        pane
-                        pane
-                    }
+                pane split_direction="vertical" {
+                    children
                 }
-            }
-            pane size=1 borderless=true {
-                plugin location="compact-bar"
+                pane split_direction="vertical" {
+                    pane
+                    pane
+                    pane
+                    pane
+                }
             }
         }
         tab max_panes=11 {
             pane {
-                pane {
-                    pane split_direction="vertical" {
-                        children
-                    }
-                    pane split_direction="vertical" {
-                        pane
-                        pane
-                        pane
-                        pane
-                    }
-                    pane split_direction="vertical" {
-                        pane
-                        pane
-                        pane
-                        pane
-                    }
+                pane split_direction="vertical" {
+                    children
                 }
-            }
-            pane size=1 borderless=true {
-                plugin location="compact-bar"
-            }
-        }
-    }
-    swap_tiled_layout name="stacked" {
-        tab min_panes=4 {
-            pane {
                 pane split_direction="vertical" {
                     pane
-                    pane stacked=true {
-                        children
-                    }
+                    pane
+                    pane
+                    pane
                 }
-            }
-            pane size=1 borderless=true {
-                plugin location="compact-bar"
+                pane split_direction="vertical" {
+                    pane
+                    pane
+                    pane
+                    pane
+                }
             }
         }
     }
+
+    swap_tiled_layout name="stacked" {
+        tab min_panes=4 {
+            pane split_direction="vertical" {
+                pane
+                pane stacked=true {
+                    children
+                }
+            }
+        }
+    }
+
     swap_floating_layout name="staggered" {
         floating_panes {
         }
     }
+
     swap_floating_layout name="enlarged" {
         floating_panes max_panes=10 {
-            pane {
-                height "90%"
-                width "90%"
-                x "5%"
-                y 1
-            }
-            pane {
-                height "90%"
-                width "90%"
-                x "5%"
-                y 2
-            }
-            pane {
-                height "90%"
-                width "90%"
-                x "5%"
-                y 3
-            }
-            pane {
-                height "90%"
-                width "90%"
-                x "5%"
-                y 4
-            }
-            pane {
-                height "90%"
-                width "90%"
-                x "5%"
-                y 5
-            }
-            pane {
-                height "90%"
-                width "90%"
-                x "5%"
-                y 6
-            }
-            pane {
-                height "90%"
-                width "90%"
-                x "5%"
-                y 7
-            }
-            pane {
-                height "90%"
-                width "90%"
-                x "5%"
-                y 8
-            }
-            pane {
-                height "90%"
-                width "90%"
-                x "5%"
-                y 9
-            }
-            pane {
-                height "90%"
-                width "90%"
-                x 10
-                y 10
-            }
+            pane { height "90%"; width "90%"; x "5%"; y 1 }
+            pane { height "90%"; width "90%"; x "5%"; y 2 }
+            pane { height "90%"; width "90%"; x "5%"; y 3 }
+            pane { height "90%"; width "90%"; x "5%"; y 4 }
+            pane { height "90%"; width "90%"; x "5%"; y 5 }
+            pane { height "90%"; width "90%"; x "5%"; y 6 }
+            pane { height "90%"; width "90%"; x "5%"; y 7 }
+            pane { height "90%"; width "90%"; x "5%"; y 8 }
+            pane { height "90%"; width "90%"; x "5%"; y 9 }
+            pane { height "90%"; width "90%"; x 10; y 10 }
         }
     }
+
     swap_floating_layout name="spread" {
         floating_panes max_panes=1 {
-            pane {
-                x "50%"
-                y "50%"
-            }
+            pane { x "50%"; y "50%" }
         }
         floating_panes max_panes=2 {
-            pane {
-                width "45%"
-                x "1%"
-                y "25%"
-            }
-            pane {
-                width "45%"
-                x "50%"
-                y "25%"
-            }
+            pane { width "45%"; x "1%"; y "25%" }
+            pane { width "45%"; x "50%"; y "25%" }
         }
         floating_panes max_panes=3 {
-            pane {
-                height "45%"
-                width "45%"
-                y "55%"
-            }
-            pane {
-                width "45%"
-                x "1%"
-                y "1%"
-            }
-            pane {
-                width "45%"
-                x "50%"
-                y "1%"
-            }
+            pane { height "45%"; width "45%"; y "55%" }
+            pane { width "45%"; x "1%"; y "1%" }
+            pane { width "45%"; x "50%"; y "1%" }
         }
         floating_panes max_panes=4 {
-            pane {
-                height "45%"
-                width "45%"
-                x "1%"
-                y "55%"
-            }
-            pane {
-                height "45%"
-                width "45%"
-                x "50%"
-                y "55%"
-            }
-            pane {
-                height "45%"
-                width "45%"
-                x "1%"
-                y "1%"
-            }
-            pane {
-                height "45%"
-                width "45%"
-                x "50%"
-                y "1%"
-            }
+            pane { height "45%"; width "45%"; x "1%"; y "55%" }
+            pane { height "45%"; width "45%"; x "50%"; y "55%" }
+            pane { height "45%"; width "45%"; x "1%"; y "1%" }
+            pane { height "45%"; width "45%"; x "50%"; y "1%" }
         }
     }
 }
