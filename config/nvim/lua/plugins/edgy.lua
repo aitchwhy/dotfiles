@@ -7,6 +7,27 @@ return {
     keys = {
       { "<leader>ue", function() require("edgy").toggle() end, desc = "Edgy Toggle" },
       { "<leader>uE", function() require("edgy").select() end, desc = "Edgy Select Window" },
+      {
+        "<leader>az",
+        function()
+          local edgy = require("edgy")
+          -- If in an edgy window, zoom it; otherwise zoom Sidekick
+          for _, w in ipairs(edgy.get_wins()) do
+            if w.win == vim.api.nvim_get_current_win() then
+              w:toggle_zoom()
+              return
+            end
+          end
+          -- Fallback: zoom Sidekick specifically
+          for _, w in ipairs(edgy.get_wins()) do
+            if w.view and w.view.ft == "sidekick" then
+              w:toggle_zoom()
+              return
+            end
+          end
+        end,
+        desc = "Zoom AI Pane",
+      },
     },
     opts = function(_, opts)
       -- Initialize position tables
@@ -28,7 +49,7 @@ return {
       table.insert(opts.left, { title = "Neotest Summary", ft = "neotest-summary" })
 
       -- RIGHT SIDEBAR: Sidekick, Overseer, Grug Far
-      table.insert(opts.right, 1, { title = "Sidekick", ft = "sidekick", size = { width = 0.35 } })
+      table.insert(opts.right, 1, { title = "Sidekick", ft = "sidekick", size = { width = 0.5 } })
       table.insert(opts.right, {
         title = "Overseer",
         ft = "OverseerList",

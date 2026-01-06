@@ -17,7 +17,7 @@ return {
         },
         win = {
           layout = "right",
-          split = { width = 80, height = 20 },
+          split = { width = 0.5, height = 20 },
           float = { width = 0.9, height = 0.9 },
         },
         -- Configure Claude as the primary/default tool
