@@ -32,7 +32,7 @@ in
         window-save-state = "always";
         confirm-close-surface = false;
         macos-non-native-fullscreen = true;
-        macos-option-as-alt = true;
+        macos-option-as-alt = "left";
         link-url = true;
         mouse-hide-while-typing = true;
 
