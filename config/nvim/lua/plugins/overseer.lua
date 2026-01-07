@@ -1,6 +1,6 @@
 -- overseer.nvim - Task runner with SOTA patterns (Jan 2026)
--- NOTE: LazyVim's overseer extra provides default keybindings (<leader>o*)
--- This file extends with custom component aliases and template hooks
+-- NOTE: LazyVim's overseer extra has broken keybindings for removed v2.0.0 commands
+-- This file fixes those keybindings and adds custom component aliases/template hooks
 return {
   {
     "stevearc/overseer.nvim",
@@ -92,8 +92,44 @@ return {
       end, {})
     end,
 
-    -- Additional keybindings beyond LazyVim defaults
+    -- Override broken LazyVim defaults (commands removed in overseer v2.0.0)
+    -- See: https://github.com/LazyVim/LazyVim/issues/6876
     keys = {
+      -- Disable removed commands
+      { "<leader>ob", false }, -- OverseerBuild removed in v2.0.0
+
+      -- C for Command: run raw shell commands
+      { "<leader>oc", "<cmd>OverseerRunCmd<cr>", desc = "Run command" },
+
+      -- Q for Quick: action on most recent task (replaces OverseerQuickAction)
+      {
+        "<leader>oq",
+        function()
+          local overseer = require("overseer")
+          local tasks = overseer.list_tasks({ recent_first = true })
+          if vim.tbl_isempty(tasks) then
+            vim.notify("No tasks found", vim.log.levels.WARN)
+          else
+            overseer.run_action(tasks[1])
+          end
+        end,
+        desc = "Action recent task",
+      },
+
+      -- Safe toggle that prevents accidental NeoVim quit
+      {
+        "<leader>ow",
+        function()
+          if vim.fn.winnr("$") == 1 and vim.bo.filetype == "OverseerList" then
+            vim.notify("Cannot close last window", vim.log.levels.WARN)
+            return
+          end
+          require("overseer").toggle()
+        end,
+        desc = "Task list",
+      },
+
+      -- Custom: restart last completed task
       { "<leader>or", "<cmd>OverseerRestartLast<cr>", desc = "Restart last task" },
     },
   },
