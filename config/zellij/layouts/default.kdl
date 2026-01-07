@@ -3,7 +3,6 @@ layout {
 
     // zjstatus status bar - applies to all tabs via default_tab_template
     default_tab_template {
-        children
         pane size=1 borderless=true {
             plugin location="file:~/.config/zellij/plugins/zjstatus.wasm" {
                 format_left   "{mode}#[fg=#7aa2f7,bold] {session}"
@@ -40,6 +39,7 @@ layout {
                 datetime_timezone "America/New_York"
             }
         }
+        children
     }
 
     tab name="told" hide_floating_panes=true {
