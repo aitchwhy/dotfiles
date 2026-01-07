@@ -125,6 +125,8 @@ keybinds clear-defaults=true {
         bind "Alt ]" { NextSwapLayout; }
         bind "Alt f" { ToggleFloatingPanes; }
         bind "Alt i" { MoveTab "left"; }
+        // Unbind Alt+Right (was opening floating terminal)
+        unbind "Alt Right"
     }
     shared_except "scroll" {
         bind "Alt j" { MoveFocus "down"; }
