@@ -24,6 +24,33 @@ export type GuardResultError = { readonly ok: false; readonly error: string }
 export type GuardResult = GuardResultOk | GuardResultError
 
 // =============================================================================
+// Fiber-Based Guard Types (Jan 2026 - SOTA Pattern)
+// =============================================================================
+
+/** Source identifier for each guard category */
+export type GuardSource = 'procedural' | 'ast-grep' | 'package' | 'command'
+
+/**
+ * Unified guard check result for fiber-based parallel execution.
+ * Each guard returns this type, enabling aggregation of ALL violations.
+ */
+export type GuardCheckResult = {
+  readonly source: GuardSource
+  readonly blocked: boolean
+  readonly message?: string // Only when blocked=true
+  readonly warnings?: readonly string[]
+}
+
+/**
+ * Aggregated result from running all guard fibers in parallel.
+ * Contains ALL blocked guards and ALL warnings.
+ */
+export type AggregatedGuardResult = {
+  readonly errors: readonly GuardCheckResult[]
+  readonly warnings: readonly string[]
+}
+
+// =============================================================================
 // Hook Input Schemas (must match SSOT at config/agents/hooks/lib/types.ts)
 // =============================================================================
 
@@ -142,6 +169,8 @@ export const skip = (reason?: string): HookDecision =>
  *
  * When a block wins, all other fibers are interrupted immediately.
  * When all effects "fail" (all approve), raceAll catches and returns the last approve.
+ *
+ * @deprecated Use runGuardsFibers for new code - it collects ALL errors instead of racing.
  */
 export const raceToFirstBlock = <E>(
   checks: ReadonlyArray<Effect.Effect<HookDecision, E, never>>,
@@ -167,3 +196,47 @@ export const raceToFirstBlock = <E>(
       Effect.catchAll((approved) => Effect.succeed(approved)),
     )
   })
+
+/**
+ * Run all guard checks as parallel fibers, collecting ALL results.
+ *
+ * SOTA Pattern (Jan 2026): Effect.all with unbounded concurrency
+ * - Each check runs as independent fiber on Bun's event loop
+ * - All fibers execute truly in parallel
+ * - Returns aggregated result with ALL blocked guards and warnings
+ *
+ * Unlike raceToFirstBlock, this collects ALL violations for better UX.
+ */
+export const runGuardsFibers = (
+  checks: ReadonlyArray<Effect.Effect<GuardCheckResult, never, never>>,
+): Effect.Effect<AggregatedGuardResult, never, never> =>
+  Effect.gen(function* () {
+    if (checks.length === 0) return { errors: [], warnings: [] }
+
+    // Run ALL checks as parallel fibers with unbounded concurrency
+    const results = yield* Effect.all(checks, { concurrency: 'unbounded' })
+
+    // Partition into blocked and passed, aggregate warnings
+    const errors = results.filter((r) => r.blocked)
+    const warnings = results.flatMap((r) => r.warnings ?? [])
+
+    return { errors, warnings }
+  })
+
+/**
+ * Format aggregated guard errors for display in hook output.
+ * Shows count header and each violation with source and message.
+ */
+export const formatAggregatedErrors = (result: AggregatedGuardResult): string => {
+  const n = result.errors.length
+  if (n === 0) return ''
+
+  const header = `━━━ ${n} guard violation${n > 1 ? 's' : ''} ━━━\n\n`
+
+  return (
+    header +
+    result.errors
+      .map((e, i) => `[${i + 1}/${n}] ${e.source}\n${e.message ?? 'No message'}`)
+      .join('\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n')
+  )
+}
