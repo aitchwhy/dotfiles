@@ -40,6 +40,11 @@ config/agents/memory/reflections/
 # Claude Code local settings (user-specific, not config)
 .claude/settings.local.json
 
+# Third-party Claude Code plugins (generated, not managed)
+.plugin-config/
+.complexity-log.md
+.pair-programming-session.md
+
 # Evolution system runtime metrics (machine-specific)
 .claude-metrics/
 
