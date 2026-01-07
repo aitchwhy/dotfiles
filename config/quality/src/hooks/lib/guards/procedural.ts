@@ -23,6 +23,34 @@ import {
 import type { GuardResult } from '../effect-hook'
 
 // =============================================================================
+// Pre-compiled Regex Patterns (Jan 2026 Optimization)
+// Moving inline patterns to module scope for performance
+// =============================================================================
+
+/** File extension patterns - used frequently in Write/Edit guards */
+const FILE_EXT = {
+  typescript: /\.(ts|tsx|js|jsx|mjs|cjs)$/,
+  typescriptStrict: /\.(ts|tsx)$/,
+  tsx: /\.(tsx)$/,
+  nix: /\.nix$/,
+  test: /\.(test|spec)\.[jt]sx?$/,
+} as const
+
+/** Git commit patterns */
+const GIT_COMMIT = {
+  hasCommit: /git\s+commit\s+.*-m\s+/,
+  extractDouble: /git\s+commit\s+.*-m\s+"([^"]+)"/,
+  extractSingle: /git\s+commit\s+.*-m\s+'([^']+)'/,
+  extractHeredoc: /git\s+commit\s+.*-m\s+"\$\(cat\s+<<['"]?(\w+)['"]?\n([\s\S]*?)\n\1/,
+} as const
+
+/** Command parsing patterns */
+const CMD_PARSE = {
+  extractCommand: /^(?:[A-Z_]+=\S+\s+)*(\w+)/,
+  xstateHook: /use(Machine|Actor)\s*\(/,
+} as const
+
+// =============================================================================
 // Guard 1: Bash Safety
 // =============================================================================
 
@@ -78,22 +106,20 @@ const CONVENTIONAL_COMMIT_REGEX =
 const VALID_COMMIT_TYPES = ['feat', 'fix', 'refactor', 'test', 'docs', 'chore', 'perf', 'ci']
 
 function extractCommitMessage(command: string): string | null {
-  const doubleQuoteMatch = command.match(/git\s+commit\s+.*-m\s+"([^"]+)"/)
+  const doubleQuoteMatch = command.match(GIT_COMMIT.extractDouble)
   if (doubleQuoteMatch?.[1]) return doubleQuoteMatch[1]
 
-  const singleQuoteMatch = command.match(/git\s+commit\s+.*-m\s+'([^']+)'/)
+  const singleQuoteMatch = command.match(GIT_COMMIT.extractSingle)
   if (singleQuoteMatch?.[1]) return singleQuoteMatch[1]
 
-  const heredocMatch = command.match(
-    /git\s+commit\s+.*-m\s+"\$\(cat\s+<<['"]?(\w+)['"]?\n([\s\S]*?)\n\1/,
-  )
+  const heredocMatch = command.match(GIT_COMMIT.extractHeredoc)
   if (heredocMatch?.[2]) return heredocMatch[2].trim().split('\n')[0] ?? null
 
   return null
 }
 
 export function checkConventionalCommit(command: string): GuardResult {
-  if (!/git\s+commit\s+.*-m\s+/.test(command)) return { ok: true }
+  if (!GIT_COMMIT.hasCommit.test(command)) return { ok: true }
 
   const message = extractCommitMessage(command)
   if (!message) return { ok: true }
@@ -360,7 +386,7 @@ export function checkDevOpsCommands(command: string): GuardResult {
  */
 export function checkModernCLITools(command: string): GuardResult {
   // Extract the base command (first word, ignoring env vars)
-  const cmdMatch = command.match(/^(?:[A-Z_]+=\S+\s+)*(\w+)/)
+  const cmdMatch = command.match(CMD_PARSE.extractCommand)
   if (!cmdMatch?.[1]) return { ok: true }
 
   const baseCmd = cmdMatch[1] as string
@@ -550,63 +576,10 @@ export function checkSecrets(content: string, filePath: string): GuardResult {
 // =============================================================================
 
 // =============================================================================
-// Guard 34: Scaffolding Enforcement (Use Copier)
+// Guard 34: REMOVED (Jan 2026)
+// Scaffolding enforcement was too restrictive for legitimate directory creation.
+// Copier templates remain available via: /copier-template skill
 // =============================================================================
-
-const SCAFFOLDING_ALLOWED_PATHS = [
-  '/templates/',
-  '/copier-monorepo/',
-  'config/quality/',
-  '/node_modules/',
-] as const
-
-const SCAFFOLDING_PATTERNS: readonly { pattern: RegExp; description: string }[] = [
-  // mkdir project structure patterns
-  { pattern: /mkdir\s+(-p\s+)?.*\/(src|apps|packages|lib)\//, description: 'mkdir project dirs' },
-  { pattern: /mkdir\s+(-p\s+)?.+\/(api|web|mobile|infra)/, description: 'mkdir app dirs' },
-  // npm/pnpm init (use template instead)
-  { pattern: /\b(npm|pnpm|yarn)\s+init\b/, description: 'package init' },
-  // Creating config files manually (use template)
-  {
-    pattern: /touch\s+.*(tsconfig|biome|vitest\.config|turbo)\.(json|ts)/,
-    description: 'touch config file',
-  },
-  // Copying template directories
-  { pattern: /cp\s+-r.*template/, description: 'cp -r template' },
-]
-
-export function checkScaffoldingEnforcement(command: string): GuardResult {
-  // Allow within template development paths
-  if (SCAFFOLDING_ALLOWED_PATHS.some((p) => command.includes(p))) {
-    return { ok: true }
-  }
-
-  for (const { pattern, description } of SCAFFOLDING_PATTERNS) {
-    if (pattern.test(command)) {
-      return {
-        ok: false,
-        error: `Guard 34: MANUAL SCAFFOLDING BLOCKED
-
-Detected: ${description}
-Command: ${command.substring(0, 60)}${command.length > 60 ? '...' : ''}
-
-Use Copier template instead:
-
-  pipx run copier copy ~/dotfiles/config/quality/templates/copier-monorepo ./my-project --trust
-
-Benefits:
-- SSOT version injection (no manual version management)
-- Consistent project structure
-- Automatic symlink to AST-grep rules
-- Pre-configured tooling (Biome, Vitest, Turbo)
-
-See: /copier-template skill`,
-      }
-    }
-  }
-
-  return { ok: true }
-}
 
 // =============================================================================
 // Guard 51: Zero Environment Awareness (IoC Behavior Injection)
@@ -658,7 +631,7 @@ export function checkZeroEnvironmentAwareness(content: string, filePath: string)
   }
 
   // Only check TypeScript/JavaScript files
-  if (!filePath.match(/\.(ts|tsx|js|jsx|mjs|cjs)$/)) {
+  if (!FILE_EXT.typescript.test(filePath)) {
     return { ok: true }
   }
 
@@ -725,7 +698,7 @@ function isEffectXstateExcluded(filePath: string): boolean {
  */
 export function checkRunPromiseThenCatch(content: string, filePath: string): GuardResult {
   if (isEffectXstateExcluded(filePath)) return { ok: true }
-  if (!filePath.match(/\.(ts|tsx)$/)) return { ok: true }
+  if (!FILE_EXT.typescriptStrict.test(filePath)) return { ok: true }
 
   // Check for Effect.runPromise followed by .then or .catch
   const pattern = /Effect\.runPromise\([^)]+\)\s*\.(then|catch)\s*\(/
@@ -760,10 +733,10 @@ See: effect-xstate skill`,
  */
 export function checkRefForMachineState(content: string, filePath: string): GuardResult {
   if (isEffectXstateExcluded(filePath)) return { ok: true }
-  if (!filePath.match(/\.(tsx)$/)) return { ok: true }
+  if (!FILE_EXT.tsx.test(filePath)) return { ok: true }
 
   // Check if file uses XState hooks
-  const hasXstateHook = /use(Machine|Actor)\s*\(/.test(content)
+  const hasXstateHook = CMD_PARSE.xstateHook.test(content)
   if (!hasXstateHook) return { ok: true }
 
   // Check for suspicious useRef patterns (not DOM refs)
@@ -799,7 +772,7 @@ export function checkRefForMachineState(content: string, filePath: string): Guar
  */
 export function checkUseEffectRunPromise(content: string, filePath: string): GuardResult {
   if (isEffectXstateExcluded(filePath)) return { ok: true }
-  if (!filePath.match(/\.(tsx)$/)) return { ok: true }
+  if (!FILE_EXT.tsx.test(filePath)) return { ok: true }
 
   // Check for useEffect containing Effect.runPromise
   const useEffectPattern = /useEffect\s*\(\s*(?:async\s*)?\(\s*\)\s*=>\s*\{[^}]*Effect\.runPromise/s
@@ -840,7 +813,7 @@ See: effect-xstate skill`,
  */
 export function checkStringErrorConversion(content: string, filePath: string): GuardResult {
   if (isEffectXstateExcluded(filePath)) return { ok: true }
-  if (!filePath.match(/\.(ts|tsx)$/)) return { ok: true }
+  if (!FILE_EXT.typescriptStrict.test(filePath)) return { ok: true }
 
   // Check for String(err) or err.message in catch-like contexts
   const patterns = [
@@ -893,9 +866,8 @@ export function runProceduralGuards(
     const cliToolsResult = checkModernCLITools(command)
     if (!cliToolsResult.ok) return cliToolsResult
 
-    // Guard 34: Scaffolding enforcement (use Copier)
-    const scaffoldingResult = checkScaffoldingEnforcement(command)
-    if (!scaffoldingResult.ok) return scaffoldingResult
+    // Guard 34: REMOVED - Scaffolding enforcement was too restrictive
+    // Copier templates are still available but not enforced
   }
 
   // Write/Edit guards
