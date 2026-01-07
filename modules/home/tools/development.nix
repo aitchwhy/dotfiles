@@ -70,8 +70,6 @@ in
       fd # Better find
       sd # Better sed
       dust # Better du
-      procs # Better ps
-      bottom # Better top
       hexyl # Binary hex viewer (for Yazi previews)
       ouch # Archive tool (for Yazi previews)
 
@@ -85,11 +83,16 @@ in
       # System monitoring (htop has dedicated module with custom settings)
       btop
       ncdu
-      tree
 
-      # Network tools
+      # Network & API tools (SOTA Jan 2026 - see ADR-009)
       wget
       curl
+      ookla-speedtest # Internet speed testing
+      trippy # Network path (replaces mtr + traceroute + ping)
+      rustscan # Port scanning (10x faster than nmap)
+      bandwhich # Per-process bandwidth monitor
+      termshark # TUI Wireshark
+      xh # HTTP client (Rust, replaces httpie)
 
       # File management
       watchman # File watcher
