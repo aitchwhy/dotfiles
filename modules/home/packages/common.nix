@@ -44,11 +44,8 @@ in
         yarn-berry
         bun
 
-        # Python - using uv for fast package management
-        python314
+        # Python - uv manages Python versions and tools (run: uv python install && uv tool install ruff)
         uv
-        ruff
-        poetry
 
         # Go
         go
@@ -64,9 +61,8 @@ in
         redis
         usql
       ])
-      # API Development
+      # API Development (xh in development.nix replaces httpie)
       ++ [
-        httpie
         grpcurl
       ]
       # Documentation
@@ -85,7 +81,6 @@ in
         sops
         age
         gnupg
-        _1password-cli
         bitwarden-cli
       ]
       # Code Quality & Formatting
@@ -100,7 +95,6 @@ in
         statix
 
         # Multi-language
-        dprint
         treefmt
 
         # Linters (moved from Mason for full Nix reproducibility)
@@ -108,14 +102,12 @@ in
         yamllint # YAML linting
         hadolint # Dockerfile linting
         biome # JS/TS/JSON formatting + linting
-        ast-grep # AST search and replace
       ]
       # Development Tools
       ++ (optionals cfg.enableNixTools [
         cachix
         devenv
         nixd
-        nil
         nix-tree
         tree-sitter # Required for LazyVim 15.x treesitter parser compilation
         nix-output-monitor
@@ -130,7 +122,23 @@ in
       # GitHub
       ++ [
         gh
-        act # Run GitHub Actions locally
       ];
+
+    # Declarative uv setup - installs Python and tools after uv is available
+    home.activation.setupUvTools = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      UV="/etc/profiles/per-user/${config.home.username}/bin/uv"
+
+      if [ -x "$UV" ]; then
+        echo "Setting up Python environment via uv..."
+
+        # Install Python 3.14 and set as default
+        "$UV" python install 3.14 --default 2>/dev/null || true
+
+        # Install Python tools (ruff for linting/formatting)
+        "$UV" tool install ruff@latest 2>/dev/null || true
+
+        echo "uv setup complete: Python 3.14 + ruff"
+      fi
+    '';
   };
 }
