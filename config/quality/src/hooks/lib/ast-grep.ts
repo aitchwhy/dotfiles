@@ -36,28 +36,47 @@ type YamlRule = {
 }
 
 // =============================================================================
+// Rule Cache (Jan 2026 Optimization)
+// =============================================================================
+
+/** Module-scope cache for loaded rules. Key: rulesDir, Value: parsed rules */
+const rulesCache = new Map<string, YamlRule[]>()
+
+// =============================================================================
 // Logic
 // =============================================================================
 
 /**
- * Load all YAML rules from a directory
+ * Load all YAML rules from a directory.
+ * Uses module-scope cache to avoid re-reading files on every check.
  */
 const loadRules = (rulesDir: string) =>
-  Effect.tryPromise({
-    try: async () => {
-      const files = await fs.readdir(rulesDir)
-      const rules: YamlRule[] = []
+  Effect.gen(function* () {
+    // Return cached rules if available
+    const cached = rulesCache.get(rulesDir)
+    if (cached) return cached
 
-      for (const file of files) {
-        if (!file.endsWith('.yml') && !file.endsWith('.yaml')) continue
+    // Load from filesystem
+    const rules = yield* Effect.tryPromise({
+      try: async () => {
+        const files = await fs.readdir(rulesDir)
+        const loadedRules: YamlRule[] = []
 
-        const content = await fs.readFile(path.join(rulesDir, file), 'utf-8')
-        const rule = yaml.load(content) as YamlRule
-        rules.push(rule)
-      }
-      return rules
-    },
-    catch: (error) => new Error(`Failed to load rules from ${rulesDir}: ${error}`),
+        for (const file of files) {
+          if (!file.endsWith('.yml') && !file.endsWith('.yaml')) continue
+
+          const content = await fs.readFile(path.join(rulesDir, file), 'utf-8')
+          const rule = yaml.load(content) as YamlRule
+          loadedRules.push(rule)
+        }
+        return loadedRules
+      },
+      catch: (error) => new Error(`Failed to load rules from ${rulesDir}: ${error}`),
+    })
+
+    // Cache for subsequent calls
+    rulesCache.set(rulesDir, rules)
+    return rules
   })
 
 /**
