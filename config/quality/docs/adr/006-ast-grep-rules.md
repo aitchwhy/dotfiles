@@ -6,7 +6,7 @@ consulted: []
 informed: []
 ---
 
-# Use AST-grep YAML Rules for Pattern Enforcement
+# AST-grep YAML Rules for Pattern Enforcement
 
 ## Context and Problem Statement
 
@@ -38,10 +38,10 @@ Chosen option: "AST-grep YAML rules", because YAML is declarative and @ast-grep/
 * Bad, because some complex patterns not expressible in YAML
 * Bad, because NAPI doesn't support all CLI features
 
-## Validation
+### Confirmation
 
 ```yaml
-# Rule must have required fields
+# Each rule must have required fields
 id: rule-id
 language: typescript
 severity: error | warning
@@ -50,13 +50,13 @@ rule:
   pattern: "..."
 ```
 
-```typescript
-// Rules must be cached
-const rulesCache = new Map<string, YamlRule[]>()
+```bash
+# Count rules
+ls rules/paragon/*.yml | wc -l  # Should be 21
 ```
 
 ## More Information
 
 * Rules directory: `rules/paragon/*.yml`
 * Integration: `src/hooks/lib/ast-grep.ts`
-* Count: 21 active rules
+* Cache: `rulesCache` Map at module scope

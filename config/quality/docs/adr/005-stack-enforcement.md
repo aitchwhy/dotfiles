@@ -6,7 +6,7 @@ consulted: []
 informed: []
 ---
 
-# Enforce Stack Versions and Forbidden Packages
+# Enforce Stack Versions via Forbidden Packages
 
 ## Context and Problem Statement
 
@@ -36,21 +36,19 @@ Chosen option: "Pre-tool-use hook with forbidden list", because it blocks violat
 * Good, because centralized in `src/stack/forbidden.ts`
 * Bad, because requires hook to be running
 
-## Validation
+### Confirmation
 
 ```typescript
-// Forbidden package structure
-{
-  name: 'moment',
-  reason: 'Legacy datetime library',
-  alternative: 'date-fns or Effect Duration',
-}
+// forbidden.ts must export isForbidden function
+export const isForbidden = (name: string): ForbiddenPackage | undefined
 
-// Hook must check package.json writes
+// pre-tool-use.ts must check package.json writes
 if (filePath?.endsWith('package.json')) {
-  // Parse and check dependencies
+  // check against forbidden list
 }
 ```
+
+Test: Add `moment` to a package.json and verify block with alternative.
 
 ## More Information
 

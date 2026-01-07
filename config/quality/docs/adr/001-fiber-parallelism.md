@@ -6,7 +6,7 @@ consulted: []
 informed: []
 ---
 
-# Use Effect Fiber Parallelism for Guard Execution
+# Effect Fiber Parallelism for Guard Execution
 
 ## Context and Problem Statement
 
@@ -38,17 +38,20 @@ Chosen option: "Fiber parallelism with Effect.all", because it provides true con
 * Bad, because order of errors is non-deterministic
 * Bad, because slightly more memory (all fibers allocated upfront)
 
-## Validation
+### Confirmation
 
 ```typescript
-// Must use unbounded concurrency
-Effect.all(checks, { concurrency: 'unbounded' })
+// pre-tool-use.ts must use unbounded concurrency
+const results = yield* Effect.all(guardChecks, { concurrency: 'unbounded' })
 
 // Must collect all results, not race
 const errors = results.filter(r => r.blocked)
 ```
 
+Verify with: `grep -n "concurrency.*unbounded" src/hooks/pre-tool-use.ts`
+
 ## More Information
 
 * [Effect Concurrency Docs](https://effect.website/docs/concurrency)
+* Implementation: `src/hooks/lib/effect-hook.ts:runGuardsFibers()`
 * Related: [ADR-002](002-all-errors-collection.md)

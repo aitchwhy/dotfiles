@@ -38,19 +38,18 @@ Chosen option: "Nix home-manager with file generation", because it integrates wi
 * Bad, because manual `~/.claude/` edits get overwritten
 * Bad, because requires Nix knowledge to modify
 
-## Validation
+### Confirmation
 
-```nix
-# MCP servers must be in single location
-# modules/home/apps/mcp.nix
+```bash
+# MCP servers must come from single Nix file
+grep -l "mcpServers" modules/home/apps/mcp.nix
 
-# Never edit directly
-# ~/.claude/settings.json
-# ~/.claude/claude_desktop_config.json
+# Never edit directly (should be symlinks or generated)
+ls -la ~/.claude/settings.json
 ```
 
 ## More Information
 
 * MCP SSOT: `modules/home/apps/mcp.nix`
-* Apply: `just switch`
+* Apply changes: `just switch`
 * Related: [ADR-004](004-typescript-ssot.md)

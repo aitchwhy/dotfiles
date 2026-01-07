@@ -36,19 +36,23 @@ Chosen option: "Pre-compiled at module scope", because it combines performance w
 * Good, because ~10-20% faster for pattern-heavy guards
 * Bad, because patterns less visible at point of use
 
-## Validation
+### Confirmation
 
 ```typescript
-// Patterns must be at module scope, not inside functions
-const FILE_EXT = {
-  typescript: /\.(ts|tsx|js|jsx|mjs|cjs)$/,
-  // ...
-} as const
+// Patterns must be at module scope (top of file)
+const FILE_EXT = { ... } as const
+const GIT_COMMIT = { ... } as const
+const CMD_PARSE = { ... } as const
 
-// Usage in guard
-if (FILE_EXT.typescript.test(filePath)) { ... }
+// NOT inside functions
+function check() {
+  const pattern = /.../ // WRONG
+}
 ```
+
+Verify: `grep -n "^const.*= {$" src/hooks/lib/guards/procedural.ts`
 
 ## More Information
 
-* Location: `src/hooks/lib/guards/procedural.ts`
+* Location: `src/hooks/lib/guards/procedural.ts` lines 1-30
+* Pattern groups: `FILE_EXT` (5), `GIT_COMMIT` (4), `CMD_PARSE` (2)

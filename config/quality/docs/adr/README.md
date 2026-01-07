@@ -1,24 +1,24 @@
 ---
 format: madr
-version: 3.0.0
+version: 4.0.0
 ---
 
 # Architecture Decision Records
 
-MADR-format decisions for the Claude Code quality system.
+MADR 4.0 format decisions for the Claude Code quality system.
 
 ## Index
 
 | ADR | Title | Status | Date |
 |-----|-------|--------|------|
-| [001](001-fiber-parallelism.md) | Effect Fiber Parallelism | accepted | 2026-01-07 |
-| [002](002-all-errors-collection.md) | Collect All Errors | accepted | 2026-01-07 |
-| [003](003-precompiled-regexes.md) | Pre-compiled Regexes | accepted | 2026-01-07 |
-| [004](004-typescript-ssot.md) | TypeScript SSOT | accepted | 2025-12-28 |
-| [005](005-stack-enforcement.md) | Stack Enforcement | accepted | 2025-12-28 |
-| [006](006-ast-grep-rules.md) | AST-grep Rules | accepted | 2025-12-28 |
-| [007](007-hook-architecture.md) | Hook Architecture | accepted | 2025-12-28 |
-| [008](008-nix-managed-config.md) | Nix-Managed Config | accepted | 2025-12-01 |
+| [001](001-fiber-parallelism.md) | Effect Fiber Parallelism for Guards | accepted | 2026-01-07 |
+| [002](002-all-errors-collection.md) | Collect All Errors, Not Fail-Fast | accepted | 2026-01-07 |
+| [003](003-precompiled-regexes.md) | Pre-compile Regexes at Module Scope | accepted | 2026-01-07 |
+| [004](004-typescript-ssot.md) | TypeScript SSOT for Configuration | accepted | 2025-12-28 |
+| [005](005-stack-enforcement.md) | Enforce Stack via Forbidden Packages | accepted | 2025-12-28 |
+| [006](006-ast-grep-rules.md) | AST-grep YAML for Pattern Enforcement | accepted | 2025-12-28 |
+| [007](007-hook-architecture.md) | Pre-Tool-Use Hook Architecture | accepted | 2025-12-28 |
+| [008](008-nix-managed-config.md) | Nix-Managed Claude Configuration | accepted | 2025-12-01 |
 
 ## Categories
 
@@ -40,14 +40,14 @@ MADR-format decisions for the Claude Code quality system.
 
 ## Format
 
-All ADRs use [MADR 3.0.0](https://adr.github.io/madr/) format with YAML frontmatter:
+All ADRs use [MADR 4.0.0](https://adr.github.io/madr/) format.
 
-```yaml
----
-status: proposed | accepted | deprecated | superseded
-date: YYYY-MM-DD
-decision-makers: []
----
-```
+Key sections:
+- **Context and Problem Statement** - What situation prompted this decision?
+- **Decision Drivers** - Forces and concerns motivating the choice
+- **Considered Options** - Alternatives evaluated
+- **Decision Outcome** - Chosen option with justification
+- **Consequences** - Good and bad impacts
+- **Confirmation** - How to verify implementation matches decision
 
 See [template.md](template.md) for full structure.

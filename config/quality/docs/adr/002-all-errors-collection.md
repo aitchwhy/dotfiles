@@ -6,7 +6,7 @@ consulted: []
 informed: []
 ---
 
-# Collect All Guard Errors Instead of Fail-Fast
+# Collect All Guard Errors, Not Fail-Fast
 
 ## Context and Problem Statement
 
@@ -32,11 +32,11 @@ Chosen option: "Collect all", because showing all violations enables fixing mult
 
 * Good, because users fix multiple issues per iteration
 * Good, because faster feedback loop overall
-* Good, because clear count header shows scope (`━━━ 3 guard violations ━━━`)
+* Good, because clear count header shows scope
 * Bad, because longer error output when many violations
 * Bad, because user must read entire output
 
-## Validation
+### Confirmation
 
 ```typescript
 // AggregatedGuardResult must contain array of errors
@@ -45,10 +45,13 @@ type AggregatedGuardResult = {
   readonly warnings: readonly string[]
 }
 
-// Format must show count and enumerate all
+// Output format must show count
 `━━━ ${n} guard violation${n > 1 ? 's' : ''} ━━━`
 ```
 
+Test: Trigger 2+ violations and verify both appear in output.
+
 ## More Information
 
+* Implementation: `src/hooks/lib/effect-hook.ts:formatAggregatedErrors()`
 * Related: [ADR-001](001-fiber-parallelism.md)

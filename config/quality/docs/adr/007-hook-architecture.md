@@ -6,7 +6,7 @@ consulted: []
 informed: []
 ---
 
-# Hook-Based Quality Enforcement Architecture
+# Pre-Tool-Use Hook Architecture for Quality Enforcement
 
 ## Context and Problem Statement
 
@@ -38,25 +38,22 @@ Chosen option: "Pre-tool-use hooks", because they block violations before disk w
 * Bad, because hook errors can block all operations
 * Bad, because requires Claude Code hook support
 
-## Validation
+### Confirmation
 
 ```typescript
-// Hook input structure
+// Hook must read from stdin and output JSON
 type PreToolUseInput = {
   hook_event_name: 'PreToolUse'
-  tool_name: 'Write' | 'Edit' | 'Bash' | ...
-  tool_input: {
-    file_path?: string
-    content?: string
-    command?: string
-  }
+  tool_name: string
+  tool_input: { file_path?: string; content?: string; command?: string }
 }
 
-// Hook output structure
 type HookDecision =
   | { decision: 'approve' }
   | { decision: 'block', reason: string }
 ```
+
+Verify: `head -1 src/hooks/pre-tool-use.ts` should be `#!/usr/bin/env bun`
 
 ## More Information
 

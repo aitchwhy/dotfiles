@@ -6,7 +6,7 @@ consulted: []
 informed: []
 ---
 
-# TypeScript as Single Source of Truth for Configuration
+# TypeScript SSOT for Multi-Adapter Configuration
 
 ## Context and Problem Statement
 
@@ -39,19 +39,21 @@ Chosen option: "TypeScript source with code generation", because it provides typ
 * Bad, because requires `bun run generate` after changes
 * Bad, because generated files need careful gitignore management
 
-## Validation
+### Confirmation
 
 ```bash
-# After any src/ change, regenerate
+# After any src/ change, regenerate and verify counts match
 cd config/quality && bun run generate
 
-# Verify counts match
+# Expected output includes:
 # Skills:    34
 # Personas:  14
 # Generated skills: 34
+# ✓ Verification passed
 ```
 
 ## More Information
 
 * Generator: `src/generate.ts`
 * Outputs: `generated/claude/`, `generated/cursor/`, `generated/gemini/`
+* Types: `src/lib/types.ts`

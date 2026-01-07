@@ -1,47 +1,54 @@
-# MADR Template
-
-Use this template for new Architecture Decision Records.
-
-```markdown
 ---
-status: proposed | accepted | deprecated | superseded
-date: YYYY-MM-DD
+status: proposed
+date: {YYYY-MM-DD}
 decision-makers: []
 consulted: []
 informed: []
 ---
 
-# {short title}
+# {Short title: problem and solution}
 
 ## Context and Problem Statement
 
-{Describe the context and problem statement}
+{Describe context in 2-3 sentences. Articulate problem as a question. Link to issues/boards.}
 
 ## Decision Drivers
 
-* {decision driver 1}
-* {decision driver 2}
+* {Driver 1: force or concern}
+* {Driver 2}
 
 ## Considered Options
 
-* {option 1}
-* {option 2}
-* {option 3}
+* {Option 1}
+* {Option 2}
+* {Option 3}
 
 ## Decision Outcome
 
-Chosen option: "{option}", because {justification}.
+Chosen option: "{Option}", because {justification}.
 
 ### Consequences
 
 * Good, because {positive consequence}
 * Bad, because {negative consequence}
 
-## Validation
+### Confirmation
 
-{How to verify the decision is being followed}
+{How to verify the decision is implemented correctly. Tests, code patterns, metrics.}
+
+## Pros and Cons of the Options
+
+### {Option 1}
+
+* Good, because {argument}
+* Neutral, because {argument}
+* Bad, because {argument}
+
+### {Option 2}
+
+* Good, because {argument}
+* Bad, because {argument}
 
 ## More Information
 
-{Links, references, related ADRs}
-```
+{Evidence, links, related ADRs, implementation timeline, team agreements.}
