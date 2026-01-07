@@ -65,6 +65,21 @@ flake.nix                    # Entry point
 | ast-grep | AST-based search |
 | repomix | Codebase packing |
 
+## Network & API Tools (Minimal)
+
+| Tool | Purpose |
+|------|---------|
+| speedtest | Internet speed (Ookla) |
+| trippy | Network path (mtr+traceroute+ping) |
+| rustscan | Port scanning |
+| bandwhich | Bandwidth by process |
+| termshark | Packet inspection |
+| xh | HTTP client (Rust) |
+| Proxyman | HTTP proxy (GUI) |
+| yaak | API collections (GUI) |
+
+See [ADR-009](config/quality/docs/adr/009-network-api-toolkit.md) for full details.
+
 ## Key Files
 
 - `modules/home/apps/mcp.nix` - MCP SSOT for Desktop + Code

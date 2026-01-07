@@ -123,6 +123,7 @@ Tool Use (Write/Edit/Bash)
 | AST-grep rules | [006](adr/006-ast-grep-rules.md) | YAML pattern matching |
 | Hook architecture | [007](adr/007-hook-architecture.md) | Pre-tool-use blocking |
 | Nix management | [008](adr/008-nix-managed-config.md) | home-manager integration |
+| Network/API toolkit | [009](adr/009-network-api-toolkit.md) | 6 CLI tools, minimal coverage |
 
 ## Commands
 
