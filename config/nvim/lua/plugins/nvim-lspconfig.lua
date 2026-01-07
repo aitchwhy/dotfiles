@@ -4,6 +4,8 @@ return {
   {
     "neovim/nvim-lspconfig",
     opts = {
+      -- Disable inlay hints globally (Effect-TS types are too verbose)
+      inlay_hints = { enabled = false },
       servers = {
         -- Lua LSP with custom diagnostics
         lua_ls = {
