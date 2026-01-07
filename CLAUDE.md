@@ -23,9 +23,10 @@ flake.nix                    # Entry point
 ├── modules/home/            # User config (shell, apps, tools)
 │   └── apps/mcp.nix        # MCP server SSOT (Claude Desktop + Code)
 ├── config/quality/          # Claude Code hooks, skills, agents
+│   ├── docs/               # Guards architecture & ADRs
 │   ├── src/skills/         # Auto-loaded context (34 skills)
 │   ├── src/personas/       # Subagents (@agent-name)
-│   ├── src/hooks/          # Pre/Post tool enforcement
+│   ├── src/hooks/          # Pre/Post tool enforcement (40 guards)
 │   ├── src/memories/       # Engineering patterns
 │   ├── src/stack/          # versions.ts SSOT
 │   └── generated/          # Output (DO NOT EDIT)
@@ -70,3 +71,5 @@ flake.nix                    # Entry point
 - `config/quality/src/stack/versions.ts` - Version SSOT
 - `config/quality/src/skills/` - Claude skills
 - `config/quality/src/hooks/` - Pre/post tool hooks
+- `config/quality/docs/ARCHITECTURE.md` - Guards architecture
+- `config/quality/docs/adr/` - Architecture Decision Records
