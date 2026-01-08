@@ -7,6 +7,7 @@
  * Run with: bun run src/generate.ts
  */
 
+import { BunContext } from '@effect/platform-bun'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 import { Effect, pipe } from 'effect'
@@ -110,6 +111,7 @@ const main = Effect.gen(function* () {
 
 void pipe(
   main,
+  Effect.provide(BunContext.layer),
   Effect.catchAll((error) =>
     Effect.gen(function* () {
       yield* Effect.logError('Generation failed', error)

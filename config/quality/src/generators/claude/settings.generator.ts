@@ -1,15 +1,17 @@
 /**
- * Settings Generator
+ * Settings Generator (Effect-TS Native)
  *
  * Generates complete Claude Code settings.json.
- * Imports HOOK_DEFINITIONS for all 4 hook types.
+ * Reads plugins/marketplaces from Nix-generated nix-config.json.
+ *
+ * SSOT: modules/home/apps/claude.nix → generated/nix-config.json → settings.json
  */
 
-import * as fs from 'node:fs/promises'
+import { FileSystem } from '@effect/platform'
 import * as path from 'node:path'
 import { Effect } from 'effect'
 import { HOOK_DEFINITIONS } from '../../hooks/definitions'
-import type { PersonaDefinition } from '../../schemas'
+import { decodeNixConfig, type NixConfig, type PersonaDefinition } from '../../schemas'
 
 // =============================================================================
 // Permissions SSOT
@@ -134,7 +136,7 @@ const PERMISSIONS = {
     'WebFetch(domain:apps.apple.com)',
 
     'mcp__ref__*',
-    'mcp__exa__*',
+    // REMOVED: mcp__exa__* (January 2026 MINIMAL)
   ],
   deny: [
     'Read(**/.env*)',
@@ -157,67 +159,6 @@ const PERMISSIONS = {
 } as const
 
 // =============================================================================
-// Enabled Plugins SSOT
-// =============================================================================
-
-const ENABLED_PLUGINS = {
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Default marketplace (claude-code-plugins)
-  // ═══════════════════════════════════════════════════════════════════════════
-  'code-review@claude-code-plugins': true,
-  'commit-commands@claude-code-plugins': true,
-  'explanatory-output-style@claude-code-plugins': true,
-  'feature-dev@claude-code-plugins': true,
-  'frontend-design@claude-code-plugins': true,
-  'learning-output-style@claude-code-plugins': true,
-  'pr-review-toolkit@claude-code-plugins': true,
-  'ralph-wiggum@claude-code-plugins': true,
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Official Extended (claude-plugins-official)
-  // ═══════════════════════════════════════════════════════════════════════════
-  'typescript-lsp@claude-plugins-official': true, // LSP code intelligence
-  'security-guidance@claude-plugins-official': true, // Security warnings
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Dev-GOM Community (dev-gom-plugins)
-  // ═══════════════════════════════════════════════════════════════════════════
-  'ai-pair-programming@dev-gom-plugins': true, // Expert domain agents
-  'hook-complexity-monitor@dev-gom-plugins': true, // Quality monitoring
-  'spec-kit@dev-gom-plugins': true, // Specification workflow
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // CC Marketplace (cc-marketplace)
-  // ═══════════════════════════════════════════════════════════════════════════
-  'ultrathink@cc-marketplace': true, // Multi-agent coordinator
-} as const
-
-// =============================================================================
-// Extra Marketplaces SSOT (third-party plugin sources)
-// =============================================================================
-
-const EXTRA_MARKETPLACES = {
-  'claude-plugins-official': {
-    source: {
-      source: 'github',
-      repo: 'anthropics/claude-plugins-official',
-    },
-  },
-  'dev-gom-plugins': {
-    source: {
-      source: 'github',
-      repo: 'Dev-GOM/claude-code-marketplace',
-    },
-  },
-  'cc-marketplace': {
-    source: {
-      source: 'github',
-      repo: 'ananddtyagi/cc-marketplace',
-    },
-  },
-} as const
-
-// =============================================================================
 // Settings Type
 // =============================================================================
 
@@ -235,15 +176,41 @@ type ClaudeSettings = {
     readonly description: string
     readonly model?: string
   }[]
-  readonly enabledPlugins: typeof ENABLED_PLUGINS
-  readonly extraKnownMarketplaces: typeof EXTRA_MARKETPLACES
+  readonly enabledPlugins: NixConfig['enabledPlugins']
+  readonly extraKnownMarketplaces: NixConfig['extraKnownMarketplaces']
 }
+
+// =============================================================================
+// Nix Config Reader (Effect-native)
+// =============================================================================
+
+const readNixConfig = (generatedDir: string) =>
+  Effect.gen(function* () {
+    const fs = yield* FileSystem.FileSystem
+    const nixConfigPath = path.join(generatedDir, 'nix-config.json')
+
+    const content = yield* fs.readFileString(nixConfigPath).pipe(
+      Effect.catchAll(() =>
+        Effect.succeed(JSON.stringify({ enabledPlugins: {}, extraKnownMarketplaces: {} })),
+      ),
+    )
+
+    const json = yield* Effect.try({
+      try: () => JSON.parse(content),
+      catch: () => new Error('Invalid JSON in nix-config.json'),
+    })
+
+    return yield* decodeNixConfig(json)
+  })
 
 // =============================================================================
 // Generator
 // =============================================================================
 
-const generateSettings = (personas: readonly PersonaDefinition[]): ClaudeSettings => ({
+const generateSettings = (
+  personas: readonly PersonaDefinition[],
+  nixConfig: NixConfig,
+): ClaudeSettings => ({
   $schema: 'https://json.schemastore.org/claude-code-settings.json',
   $comment: 'Generated by Quality System. Do not edit manually.',
   cleanupPeriodDays: 99999,
@@ -257,8 +224,8 @@ const generateSettings = (personas: readonly PersonaDefinition[]): ClaudeSetting
     description: p.description,
     ...(p.model ? { model: p.model } : {}),
   })),
-  enabledPlugins: ENABLED_PLUGINS,
-  extraKnownMarketplaces: EXTRA_MARKETPLACES,
+  enabledPlugins: nixConfig.enabledPlugins,
+  extraKnownMarketplaces: nixConfig.extraKnownMarketplaces,
 })
 
 export const generateSettingsFile = (
@@ -268,10 +235,16 @@ export const generateSettingsFile = (
   outDir: string,
 ) =>
   Effect.gen(function* () {
-    const settings = generateSettings(personas)
+    const fs = yield* FileSystem.FileSystem
+
+    // Read plugins/marketplaces from Nix-generated JSON
+    const generatedDir = path.dirname(outDir)
+    const nixConfig = yield* readNixConfig(generatedDir)
+
+    const settings = generateSettings(personas, nixConfig)
     const filePath = path.join(outDir, 'settings.json')
 
-    yield* Effect.tryPromise(() => fs.writeFile(filePath, JSON.stringify(settings, null, 2)))
+    yield* fs.writeFileString(filePath, JSON.stringify(settings, null, 2))
 
     yield* Effect.log(`Generated: ${filePath}`)
     return filePath
