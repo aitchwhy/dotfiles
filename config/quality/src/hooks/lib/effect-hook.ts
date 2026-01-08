@@ -60,6 +60,10 @@ const ToolInputSchema = Schema.Struct({
   new_string: Schema.optional(Schema.String),
   command: Schema.optional(Schema.String),
   description: Schema.optional(Schema.String),
+  // Grep tool fields (Guard 56)
+  pattern: Schema.optional(Schema.String),
+  glob: Schema.optional(Schema.String),
+  path: Schema.optional(Schema.String),
 }).pipe(Schema.extend(Schema.Record({ key: Schema.String, value: Schema.Unknown })))
 
 export const PreToolUseInputSchema = Schema.Struct({

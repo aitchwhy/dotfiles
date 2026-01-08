@@ -43,7 +43,7 @@ const qualityHook = (name: string) => `bun "$HOME/dotfiles/config/quality/src/ho
 export const HOOK_DEFINITIONS: HookDefinitions = {
   PreToolUse: [
     {
-      matcher: 'Write|Edit|Bash',
+      matcher: 'Write|Edit|Bash|Grep',
       hooks: [
         {
           type: 'command',

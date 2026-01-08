@@ -416,11 +416,61 @@ Problem: Incompatible flags for ${mapping.modern} (aliased from ${legacyCmd})
 Incompatible: ${incompatible.join(', ')}
 
 Options:
-1. Use MCP tool: mcp__ripgrep__search (if searching)
+1. Use ast-grep for AST-aware search: Bash(ast-grep -p '...' -l ts)
 2. Use native ${mapping.modern} syntax:
 
 Flag translation (${legacyCmd} → ${mapping.modern}):
 ${translations}`,
+  }
+}
+
+// =============================================================================
+// Guard 56: Grep for Code Files (AST-grep Enforcement)
+// =============================================================================
+
+/**
+ * Code file extensions that should use ast-grep instead of Grep.
+ * Regex matches glob patterns like "*.ts", "*.tsx", etc.
+ */
+const CODE_FILE_GLOB_PATTERNS = /\*\.(ts|tsx|js|jsx|mjs|cjs|py|rs|go|java|rb|php|vue|svelte)/i
+
+/**
+ * Guard 56: Block Grep for code files - use ast-grep instead.
+ *
+ * Claude's built-in Grep tool is text-based (ripgrep).
+ * For code files, AST-aware search via ast-grep provides:
+ * - Structural matching (not text patterns)
+ * - Language-aware parsing
+ * - No false positives from comments/strings
+ */
+export function checkGrepForCodeFiles(grepInput: {
+  pattern?: string
+  glob?: string
+  path?: string
+}): GuardResult {
+  const fileGlob = grepInput.glob ?? ''
+
+  // Allow Grep for non-code files (logs, json, yaml, md, txt, etc.)
+  if (!CODE_FILE_GLOB_PATTERNS.test(fileGlob)) {
+    return { ok: true }
+  }
+
+  return {
+    ok: false,
+    error: `Guard 56: USE AST-GREP FOR CODE SEARCH
+
+REQUIRED: Bash(ast-grep -p '...' -l ts)
+Pattern: ${grepInput.pattern ?? '(no pattern)'}
+Files: ${fileGlob}
+
+Example: ast-grep -p 'Effect.gen($$$)' -l ts
+
+Built-in Grep OK for: *.log, *.json, *.yaml, *.md, *.txt
+
+Why ast-grep:
+- AST-aware (matches code structure, not text)
+- No false positives from comments/strings
+- Language-aware parsing`,
   }
 }
 
@@ -843,9 +893,15 @@ export function checkStringErrorConversion(content: string, filePath: string): G
 
 export function runProceduralGuards(
   toolName: string,
-  toolInput: { file_path?: string; content?: string; command?: string },
+  toolInput: { file_path?: string; content?: string; command?: string; pattern?: string; glob?: string; path?: string },
 ): GuardResult {
-  const { file_path: filePath, content, command } = toolInput
+  const { file_path: filePath, content, command, pattern, glob, path } = toolInput
+
+  // Guard 56: Grep for code files
+  if (toolName === 'Grep') {
+    const grepResult = checkGrepForCodeFiles({ pattern, glob, path })
+    if (!grepResult.ok) return grepResult
+  }
 
   // Bash guards
   if (toolName === 'Bash' && command) {

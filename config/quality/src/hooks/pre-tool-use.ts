@@ -110,12 +110,16 @@ const runProceduralChecks = (
   input: PreToolUseInput,
 ): Effect.Effect<GuardCheckResult, never, never> =>
   Effect.sync(() => {
-    const { file_path: filePath, content, new_string, command } = input.tool_input
+    const { file_path: filePath, content, new_string, command, pattern, glob, path } = input.tool_input
     const effectiveContent = content ?? new_string
-    const toolInput: { file_path?: string; content?: string; command?: string } = {}
+    const toolInput: { file_path?: string; content?: string; command?: string; pattern?: string; glob?: string; path?: string } = {}
     if (filePath !== undefined) toolInput.file_path = filePath
     if (effectiveContent !== undefined) toolInput.content = effectiveContent
     if (command !== undefined) toolInput.command = command
+    // Grep fields (Guard 56)
+    if (pattern !== undefined) toolInput.pattern = pattern
+    if (glob !== undefined) toolInput.glob = glob
+    if (path !== undefined) toolInput.path = path
     const proceduralResult = runProceduralGuards(input.tool_name, toolInput)
     if (!proceduralResult.ok) return fail('procedural', proceduralResult.error)
     return proceduralResult.warnings !== undefined
