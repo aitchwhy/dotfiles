@@ -21,7 +21,7 @@ bun run test       # Run tests
 flake.nix                    # Entry point
 ├── modules/darwin/          # macOS system (dock, keyboard, services)
 ├── modules/home/            # User config (shell, apps, tools)
-│   └── apps/mcp.nix        # MCP server SSOT (Claude Desktop + Code)
+│   └── apps/claude.nix     # Claude SSOT (MCP, plugins, marketplaces)
 ├── config/quality/          # Claude Code hooks, skills, agents
 │   ├── docs/               # Guards architecture & ADRs
 │   ├── src/skills/         # Auto-loaded context (34 skills)
@@ -54,16 +54,17 @@ flake.nix                    # Entry point
 | Voice | LiveKit 2.16, @livekit/agents |
 | Infra | Pulumi 3.214, AWS ECS, CloudFront |
 
-## MCP Servers (6 total)
+## MCP Servers (MINIMAL - 1 total)
 
 | Server | Purpose |
 |--------|---------|
 | ref | SOTA docs (60-95% fewer tokens) |
-| exa | Code context search |
-| github | GitHub API |
-| playwright | Browser automation |
-| ast-grep | AST-based search |
-| repomix | Codebase packing |
+
+## Plugins (MINIMAL - 1 total)
+
+| Plugin | Purpose |
+|--------|---------|
+| ralph-wiggum | Autonomous loops |
 
 ## Network & API Tools (Minimal)
 
@@ -82,7 +83,7 @@ See [ADR-009](config/quality/docs/adr/009-network-api-toolkit.md) for full detai
 
 ## Key Files
 
-- `modules/home/apps/mcp.nix` - MCP SSOT for Desktop + Code
+- `modules/home/apps/claude.nix` - Claude SSOT (MCP, plugins, marketplaces)
 - `config/quality/src/stack/versions.ts` - Version SSOT
 - `config/quality/src/skills/` - Claude skills
 - `config/quality/src/hooks/` - Pre/post tool hooks
