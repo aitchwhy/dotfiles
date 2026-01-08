@@ -38,7 +38,7 @@ in
     ./apps/kanata.nix
     ./apps/bartender.nix
     ./apps/raycast.nix
-    ./apps/mcp.nix
+    ./apps/claude.nix
     ./apps/cursor.nix
     ./apps/misc.nix
     ./apps/keyboard-layout.nix
