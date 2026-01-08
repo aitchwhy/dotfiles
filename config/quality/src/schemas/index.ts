@@ -166,3 +166,9 @@ export const MemorySchema = Schema.Struct({
 export type Memory = typeof MemorySchema.Type
 
 export const decodeMemory = Schema.decodeUnknown(MemorySchema)
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Nix Config (from Nix-generated JSON)
+// ═══════════════════════════════════════════════════════════════════════════
+
+export { decodeNixConfig, type NixConfig, NixConfigSchema } from './nix-config.js'
