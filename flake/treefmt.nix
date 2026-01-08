@@ -17,7 +17,15 @@
         projectRootFile = "flake.nix";
 
         # Enable nixfmt (nixfmt-rfc-style is now the default)
-        programs.nixfmt.enable = true;
+        programs.nixfmt = {
+          enable = true;
+          # Exclude files with shell heredocs - nixfmt mangles indentation
+          # which breaks the heredoc content. See: https://github.com/NixOS/nixfmt/issues/91
+          # Remove when nixfmt supports `# nixfmt: off` directive
+          excludes = [
+            "modules/home/apps/claude.nix" # activation scripts with heredocs
+          ];
+        };
       };
     };
 }
