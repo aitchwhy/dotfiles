@@ -5,7 +5,7 @@
  *         8 (TDD), 9-10 (DevOps), 11-12 (advisory), 27 (CLI tools),
  *         28-30 (config centralization), 32 (secrets detection), 33 (hook bypass),
  *         34 (scaffolding enforcement), 51 (zero environment awareness),
- *         52-55 (Effect-XState integration)
+ *         52-55 (Effect-XState integration), 57 (nix clean git state)
  *
  * Note: Guard 31 (stack compliance) consolidated to pre-tool-use.ts using src/stack SSOT
  *
@@ -92,6 +92,84 @@ Legitimate alternatives:
 See: config/agents/skills/paragon/references/bypasses.md`,
       }
     }
+  }
+
+  return { ok: true }
+}
+
+// =============================================================================
+// Guard 57: Nix Commands Require Clean Git State
+// =============================================================================
+
+/**
+ * Nix commands that require committed changes.
+ * Nix flakes ignore uncommitted changes, leading to confusion.
+ */
+const NIX_COMMANDS = [
+  /\bnix\s+(build|flake|develop|run|shell|eval)/,
+  /\bdarwin-rebuild\s+(switch|build|check)/,
+  /\bnixos-rebuild\s+(switch|boot|test|build)/,
+  /\bjust\s+(switch|check|build|health)/,
+  /\bhome-manager\s+switch/,
+] as const
+
+/**
+ * Check if command is a Nix-related command that requires clean git state.
+ */
+function isNixCommand(command: string): boolean {
+  return NIX_COMMANDS.some((pattern) => pattern.test(command))
+}
+
+/**
+ * Guard 57: Block Nix commands when there are uncommitted changes.
+ *
+ * Nix flakes only see tracked files. Running nix commands with uncommitted
+ * changes leads to confusion as the flake won't see the latest changes.
+ */
+export function checkNixCleanGitState(command: string): GuardResult {
+  if (!isNixCommand(command)) return { ok: true }
+
+  // Check for uncommitted changes using synchronous exec
+  // Note: This runs in the hook context which has access to git
+  try {
+    const { execSync } = require('node:child_process')
+    const dotfilesPath = process.env.HOME + '/dotfiles'
+
+    // Check for uncommitted changes in modules/ and config/ directories
+    const status = execSync('git status --porcelain modules/ config/ flake.nix flake.lock 2>/dev/null || true', {
+      cwd: dotfilesPath,
+      encoding: 'utf8',
+    }).trim()
+
+    if (status.length > 0) {
+      const changedFiles = status
+        .split('\n')
+        .map((line: string) => line.substring(3))
+        .slice(0, 5)
+        .join('\n  ')
+      const hasMore = status.split('\n').length > 5 ? `\n  ... and ${status.split('\n').length - 5} more` : ''
+
+      return {
+        ok: false,
+        error: `Guard 57: NIX REQUIRES COMMITTED CHANGES
+
+Command: ${command.substring(0, 50)}${command.length > 50 ? '...' : ''}
+
+Nix flakes ignore uncommitted changes. Your changes won't be reflected.
+
+Uncommitted files:
+  ${changedFiles}${hasMore}
+
+Fix: Commit changes first with conventional commits:
+  git add <files>
+  git commit -m "feat(scope): description"
+
+Then re-run the Nix command.`,
+      }
+    }
+  } catch {
+    // If git check fails, allow command (don't block on tool errors)
+    return { ok: true }
   }
 
   return { ok: true }
@@ -917,6 +995,10 @@ export function runProceduralGuards(
 
     const devOpsResult = checkDevOpsCommands(command)
     if (!devOpsResult.ok) return devOpsResult
+
+    // Guard 57: Nix commands require clean git state
+    const nixGitResult = checkNixCleanGitState(command)
+    if (!nixGitResult.ok) return nixGitResult
 
     // Guard 27: Legacy CLI tool syntax detection
     const cliToolsResult = checkModernCLITools(command)
