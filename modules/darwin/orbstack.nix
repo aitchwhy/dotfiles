@@ -73,7 +73,10 @@ in
     preserveVolumes = mkOption {
       type = types.listOf types.str;
       default = [ ];
-      example = [ "postgres_data" "redis_data" ];
+      example = [
+        "postgres_data"
+        "redis_data"
+      ];
       description = ''
         List of Docker volume names to preserve during full reset.
         These volumes will be backed up before reset and restored after.
