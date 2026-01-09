@@ -105,10 +105,10 @@
       # ─────────────────────────────────────────────────────────────
       # System Utilities
       # ─────────────────────────────────────────────────────────────
-      "karabiner-elements" # DriverKit driver for Kanata
       "homerow" # Keyboard shortcuts for screen elements
       "betterdisplay" # Display management: HiDPI, DDC brightness, resolution scaling
       "swish" # Trackpad gesture control
+      "keymapp" # ZSA keyboard firmware flasher (Voyager)
 
       # ─────────────────────────────────────────────────────────────
       # QuickLook Plugins
