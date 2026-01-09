@@ -35,7 +35,6 @@ in
 
     # Apps (xdg.configFile based)
     ./apps/ghostty.nix
-    ./apps/kanata.nix
     ./apps/bartender.nix
     ./apps/raycast.nix
     ./apps/claude.nix
@@ -95,7 +94,6 @@ in
 
       apps = {
         ghostty.enable = mkDefault true;
-        kanata.enable = mkDefault true;
         bartender.enable = mkDefault true;
         raycast.enable = mkDefault true;
         mcp.enable = mkDefault true;

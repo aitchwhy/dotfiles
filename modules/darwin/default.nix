@@ -20,8 +20,8 @@ in
     ./spaces.nix
     ./window-manager.nix
     ./input-devices.nix
-    ./kanata.nix
     ./tailscale.nix
+    ./orbstack.nix
     ./secrets.nix
     ./login-items.nix
 
@@ -54,8 +54,8 @@ in
       spaces.enable = mkDefault true;
       windowManager.enable = mkDefault true;
       inputDevices.enable = mkDefault true;
-      kanata.enable = mkDefault true;
       tailscale.enable = mkDefault true;
+      orbstack.enable = mkDefault true;
       secrets.enable = mkDefault true;
       terminal.enable = mkDefault true;
       activityMonitor.enable = mkDefault true;
