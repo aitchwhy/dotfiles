@@ -121,7 +121,7 @@ in
         # Stop all containers first
         if docker ps -q 2>/dev/null | grep -q .; then
           echo "Stopping all containers..."
-          docker stop $(docker ps -q) 2>/dev/null || true
+          docker stop "$(docker ps -q)" 2>/dev/null || true
         fi
 
         # Delete all Docker data (containers, images, volumes, networks)
