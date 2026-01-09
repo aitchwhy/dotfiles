@@ -16,8 +16,8 @@ in
 {
   config = mkIf (cfg.enable && pkgs.stdenv.isDarwin) {
     home.packages = with pkgs; [
-      # Container Tools (not needed on NixOS - use system Docker)
-      docker-client
+      # Container Tools: OrbStack provides docker CLI on macOS
+      # (orbstack homebrew cask handles docker, docker-compose, buildx)
 
       # Infrastructure Tools (macOS workstation only)
       opentofu # Modern Terraform alternative
