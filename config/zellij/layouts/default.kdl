@@ -42,22 +42,12 @@ layout {
         children
     }
 
-    tab name="told" hide_floating_panes=true {
-        pane split_direction="vertical" {
-            pane cwd="src/told" size="50%"
-            pane cwd="src/told" size="50%"
-        }
+    tab name="told" {
+        pane cwd="tld/src/told"
     }
 
-    tab name="dotfiles" focus=true hide_floating_panes=true {
-        pane command="claude" cwd="dotfiles" focus=true {
-            args "--dangerously-skip-permissions"
-            start_suspended true
-        }
-    }
-
-    new_tab_template {
-        pane
+    tab name=".files" focus=true {
+        pane cwd=".files"
     }
 
     swap_tiled_layout name="vertical" {
