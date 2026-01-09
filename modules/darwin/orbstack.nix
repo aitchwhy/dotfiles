@@ -94,7 +94,7 @@ in
         message = "OrbStack cpuPercent must be between 100 (1 core) and 3200 (32 cores)";
       }
       {
-        assertion = cfg.cpuPercent mod 100 == 0;
+        assertion = lib.mod cfg.cpuPercent 100 == 0;
         message = "OrbStack cpuPercent must be a multiple of 100 (e.g., 100, 200, 800)";
       }
     ];
