@@ -30,8 +30,9 @@ let
     ;
 
   # Determinate Nix profile paths (in priority order)
+  # Uses $USER for portability - resolved at shell runtime, not Nix evaluation
   nixPaths = [
-    "/etc/profiles/per-user/hank/bin"
+    "/etc/profiles/per-user/$USER/bin"
     "/run/current-system/sw/bin"
     "/nix/var/nix/profiles/default/bin"
     "$HOME/.nix-profile/bin"
