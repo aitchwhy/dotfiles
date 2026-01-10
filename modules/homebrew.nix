@@ -18,7 +18,13 @@
     taps = [ ];
 
     # CLI tools (most in home.packages via Nix)
-    brews = [ ];
+    brews = [
+      # Container runtime (Colima VZ + Docker CLI)
+      "colima"
+      "docker"
+      "docker-compose"
+      "docker-credential-helper"
+    ];
 
     # GUI Applications (Homebrew Casks)
     casks = [
@@ -32,7 +38,6 @@
       # ─────────────────────────────────────────────────────────────
       "claude-code" # Claude CLI
       "cursor" # AI-first code editor
-      "orbstack" # Docker/Linux VM (faster than Docker Desktop)
       "proxyman" # HTTP debugging proxy
       "tableplus" # Database GUI
       "antigravity" # Google's AI IDE

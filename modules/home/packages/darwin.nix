@@ -16,8 +16,8 @@ in
 {
   config = mkIf (cfg.enable && pkgs.stdenv.isDarwin) {
     home.packages = with pkgs; [
-      # Container Tools: OrbStack provides docker CLI on macOS
-      # (orbstack homebrew cask handles docker, docker-compose, buildx)
+      # Container Tools: Colima provides docker runtime via Homebrew brews
+      # (colima, docker, docker-compose, docker-credential-helper)
 
       # Infrastructure Tools (macOS workstation only)
       opentofu # Modern Terraform alternative

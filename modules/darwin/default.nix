@@ -21,7 +21,7 @@ in
     ./window-manager.nix
     ./input-devices.nix
     ./tailscale.nix
-    ./orbstack.nix
+    ./colima.nix
     ./secrets.nix
     ./login-items.nix
 
@@ -55,7 +55,7 @@ in
       windowManager.enable = mkDefault true;
       inputDevices.enable = mkDefault true;
       tailscale.enable = mkDefault true;
-      orbstack.enable = mkDefault true;
+      colima.enable = mkDefault true;
       secrets.enable = mkDefault true;
       terminal.enable = mkDefault true;
       activityMonitor.enable = mkDefault true;
