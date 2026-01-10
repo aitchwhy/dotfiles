@@ -14,7 +14,7 @@ let
   sources = {
     "aarch64-darwin" = {
       url = "https://github.com/karl-cardenas-coding/mywhoop/releases/download/v${version}/mywhoop_darwin_arm64.zip";
-      hash = "sha256-0w6bs5aj5gwvfcmj0db8arca420h92fangaqw1rris7i0fhijzs6=";
+      hash = "sha256-Rn8ZoQPx6Jhz4Fg9q5xIEAiiWFZoNSArc5u/IlXRy3A=";
     };
     "x86_64-darwin" = {
       url = "https://github.com/karl-cardenas-coding/mywhoop/releases/download/v${version}/mywhoop_darwin_amd64.zip";
@@ -29,7 +29,9 @@ let
       hash = lib.fakeHash;
     };
   };
-  source = sources.${stdenv.hostPlatform.system} or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
+  source =
+    sources.${stdenv.hostPlatform.system}
+      or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
 in
 stdenv.mkDerivation {
   pname = "mywhoop";
