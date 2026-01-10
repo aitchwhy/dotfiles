@@ -70,6 +70,9 @@ domains/health/snapshots/
 # Quality system generated files
 config/quality/generated/
 
+# Shell completions generated files
+config/completions/generated/
+
 # Editor backups
 *.bak
 *~
