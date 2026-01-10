@@ -175,6 +175,11 @@
     checkMeta = true;
   };
 
+  # Custom packages overlay
+  nixpkgs.overlays = [
+    (final: _prev: import ../pkgs { pkgs = final; })
+  ];
+
   # Darwin-specific settings
   ids.gids.nixbld = lib.mkIf pkgs.stdenv.isDarwin 350;
 

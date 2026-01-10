@@ -30,6 +30,9 @@ in
       # macOS Apps (migrated from Homebrew)
       iina # Video player
       keka # File archiver
+
+      # Health Data Tools (ADR-011)
+      mywhoop # WHOOP API CLI client
     ];
   };
 }
