@@ -97,6 +97,24 @@ in
         owner = config.system.primaryUser;
         path = "${mcpSecretsPath}/linear-api-key";
       };
+
+      # ═══════════════════════════════════════════════════════════════════════════
+      # WHOOP API Credentials (ADR-011: mywhoop as single data source)
+      # ═══════════════════════════════════════════════════════════════════════════
+
+      # WHOOP OAuth Client ID
+      # Get at: https://developer.whoop.com/
+      # Used by: mywhoop CLI for health data export
+      whoop-client-id = {
+        mode = "0400";
+        owner = config.system.primaryUser;
+      };
+
+      # WHOOP OAuth Client Secret
+      whoop-client-secret = {
+        mode = "0400";
+        owner = config.system.primaryUser;
+      };
     };
   };
 }
