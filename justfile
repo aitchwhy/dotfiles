@@ -27,7 +27,7 @@ default:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 # Rebuild and switch local system configuration
-switch: _preflight _fmt _lint _test
+switch: _preflight _completions _fmt _lint _test
     #!/usr/bin/env bash
     set -euo pipefail
     echo "Switching configuration..."
@@ -204,6 +204,23 @@ _preflight:
         echo ""
         echo "Flakes only see tracked files. Run: git add <files>"
         exit 1
+    fi
+
+[private]
+_completions:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cd config/completions
+    [ -d node_modules ] || pnpm install --silent
+    # Generate completions (quiet mode - only show summary)
+    output=$(pnpm run generate 2>&1)
+    generated=$(echo "$output" | grep -o 'Generated [0-9]* completion' | head -1 || echo "Generated 0 completion")
+    echo "✓ Completions: $generated files"
+    # Auto-stage generated completions if changed (Nix only sees tracked files)
+    cd ../..
+    if ! git diff --quiet config/completions/generated/ 2>/dev/null; then
+        git add config/completions/generated/
+        echo "  (auto-staged updated completions)"
     fi
 
 [private]
