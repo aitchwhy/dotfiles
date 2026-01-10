@@ -133,7 +133,7 @@ export function checkNixCleanGitState(command: string): GuardResult {
   // Note: This runs in the hook context which has access to git
   try {
     const { execSync } = require('node:child_process')
-    const dotfilesPath = process.env.HOME + '/dotfiles'
+    const dotfilesPath = process.env['HOME'] + '/dotfiles'
 
     // Check for uncommitted changes in modules/ and config/ directories
     const status = execSync('git status --porcelain modules/ config/ flake.nix flake.lock 2>/dev/null || true', {
@@ -522,9 +522,9 @@ const CODE_FILE_GLOB_PATTERNS = /\*\.(ts|tsx|js|jsx|mjs|cjs|py|rs|go|java|rb|php
  * - No false positives from comments/strings
  */
 export function checkGrepForCodeFiles(grepInput: {
-  pattern?: string
-  glob?: string
-  path?: string
+  pattern?: string | undefined
+  glob?: string | undefined
+  path?: string | undefined
 }): GuardResult {
   const fileGlob = grepInput.glob ?? ''
 
