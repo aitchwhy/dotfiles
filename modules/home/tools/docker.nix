@@ -1,5 +1,5 @@
 # Docker client configuration (declarative)
-# Manages ~/.docker/config.json
+# Sets DOCKER_HOST to use Colima socket
 {
   config,
   lib,
@@ -16,12 +16,9 @@ in
   };
 
   config = mkIf cfg.enable {
-    home.file.".docker/config.json".text = builtins.toJSON {
-      auths = { };
-      credsStore = "osxkeychain";
-      cliPluginsExtraDirs = [
-        "/opt/homebrew/lib/docker/cli-plugins"
-      ];
+    # Set DOCKER_HOST to Colima socket (avoids config.json context conflicts)
+    home.sessionVariables = {
+      DOCKER_HOST = "unix:///Users/${config.home.username}/.colima/default/docker.sock";
     };
 
     home.packages = with pkgs; [
