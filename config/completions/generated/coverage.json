@@ -1,0 +1,58 @@
+{
+  "generatedAtMs": 1768069343276,
+  "total": 102,
+  "coverage": {
+    "nix-package": 83,
+    "generate-command": 2,
+    "home-manager": 11,
+    "none": 6
+  },
+  "byCategory": {
+    "cloud": 3,
+    "containers": 3,
+    "kubernetes": 4,
+    "languages": 10,
+    "nix": 8,
+    "unix": 12,
+    "git": 7,
+    "quality": 10,
+    "infra": 2,
+    "database": 3,
+    "network": 8,
+    "security": 4,
+    "dev": 22,
+    "told": 6
+  },
+  "missing": [
+    {
+      "name": "vitest",
+      "category": "told",
+      "reason": "Vitest does not provide shell completions"
+    },
+    {
+      "name": "tsx",
+      "category": "told",
+      "reason": "tsx is a wrapper around node"
+    },
+    {
+      "name": "expo",
+      "category": "told",
+      "reason": "Expo CLI does not provide shell completions"
+    },
+    {
+      "name": "drizzle-kit",
+      "category": "told",
+      "reason": "drizzle-kit does not provide completions"
+    },
+    {
+      "name": "knip",
+      "category": "told",
+      "reason": "knip does not provide completions"
+    },
+    {
+      "name": "oxlint",
+      "category": "told",
+      "reason": "oxlint does not provide completions"
+    }
+  ]
+}

@@ -17,10 +17,11 @@ in
   config = mkIf (cfg.enable && pkgs.stdenv.isDarwin) {
     home.packages = with pkgs; [
       # Container Tools: Colima provides docker runtime via Homebrew brews
-      # (colima, docker, docker-compose, docker-credential-helper)
+      # (colima, docker, docker-credential-helper)
+      # Note: docker-compose removed - use `docker compose` (v2 built-in)
 
       # Infrastructure Tools (macOS workstation only)
-      opentofu # Modern Terraform alternative
+      # Note: opentofu removed - using Pulumi only for IaC
       pulumiPackages.pulumi-nodejs
 
       # TUI Components

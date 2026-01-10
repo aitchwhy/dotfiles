@@ -1,0 +1,25 @@
+{
+  "name": "@dotfiles/completions",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "CLI Tool Completions SSOT - Shell completion management for all CLI tools",
+  "scripts": {
+    "generate": "bun run src/generator.ts",
+    "test": "bun test",
+    "typecheck": "bunx @typescript/native-preview@7.0.0-dev.20260102.1 --noEmit",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "check": "bun run typecheck && bun run format:check"
+  },
+  "dependencies": {
+    "effect": "3.19.14"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.3.10",
+    "bun-types": "1.2.14",
+    "typescript": "5.9.3"
+  },
+  "engines": {
+    "bun": ">=1.3.4"
+  }
+}

@@ -13,6 +13,7 @@ in
     ./shell/bash.nix
     ./shell/starship.nix
     ./shell/aliases.nix
+    ./shell/completions.nix
 
     # Tools
     ./tools/git.nix
@@ -70,6 +71,7 @@ in
         bash.enable = mkDefault true;
         starship.enable = mkDefault true;
         aliases.enable = mkDefault true;
+        completions.enable = mkDefault true;
       };
 
       tools = {

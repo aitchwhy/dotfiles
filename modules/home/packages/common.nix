@@ -23,12 +23,12 @@ in
         ])
       ])
       # Kubernetes & Infrastructure
+      # Note: terraform/opentofu removed - using Pulumi only for IaC
       ++ (optionals cfg.enableKubernetes [
         kubectl
         kubectx
         kubernetes-helm
         k9s
-        terraform
         pulumi
         pulumi-esc # ESC CLI for secrets/config management
       ])
