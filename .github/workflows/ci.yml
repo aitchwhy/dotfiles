@@ -13,15 +13,17 @@ concurrency:
 env:
   QUALITY_DIR: config/quality
   DOTFILES: ${{ github.workspace }}
-  # SSOT: Pin Bun version (must match package.json engines)
   BUN_VERSION: '1.3.5'
 
 jobs:
-  ci:
-    name: Unified CI Pipeline
+  # ===========================================================================
+  # UNIFIED CI PIPELINE
+  # Runs: PARAGON guards, quality tests, MCP smoke tests, Nix check, config validation
+  # ===========================================================================
+  unified-pipeline:
+    name: Unified Pipeline
     runs-on: ubuntu-24.04-arm
 
-    # Use Bun Debian container - has proper shell support for child_process
     container:
       image: oven/bun:1.3.5-debian
 
@@ -29,7 +31,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Install system dependencies first - bun container is minimal
       - name: Install System Dependencies
         run: |
           apt-get update
@@ -51,3 +52,129 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOTFILES: ${{ github.workspace }}
+
+  # ===========================================================================
+  # SCHEMA DRIFT DETECTION
+  # Validates settings.json against official Claude Code schema
+  # ===========================================================================
+  schema-drift:
+    name: Schema Drift
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install
+        working-directory: ${{ env.QUALITY_DIR }}
+
+      - name: Validate settings against schema
+        run: |
+          bunx ajv-cli validate \
+            -s ${{ env.QUALITY_DIR }}/src/schemas/official/claude-code-settings.schema.json \
+            -d ${{ env.QUALITY_DIR }}/generated/claude/settings.json \
+            --strict=false \
+            --all-errors || {
+              echo "::warning::Schema validation found differences"
+              echo "Known: permission wildcards may not match schema pattern"
+            }
+
+  # ===========================================================================
+  # NEOVIM TESTS (conditional on path changes)
+  # ===========================================================================
+  neovim-tests:
+    name: NeoVim Tests
+    runs-on: ubuntu-latest
+    if: |
+      contains(github.event.head_commit.modified, 'config/nvim/') ||
+      contains(github.event.head_commit.added, 'config/nvim/') ||
+      github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y luajit lua-check fd-find ripgrep
+
+      - name: Validate Lua Syntax
+        run: |
+          echo "Checking Lua syntax..."
+          fdfind -e lua . config/nvim/lua/ | while read file; do
+            luajit -bl "$file" /dev/null || { echo "Syntax error: $file"; exit 1; }
+          done
+          echo "All Lua files valid"
+
+      - name: Install Neovim
+        uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: stable
+
+      - name: Setup NeoVim
+        run: |
+          mkdir -p ~/.config ~/.local/share/nvim
+          ln -sf ${{ github.workspace }}/config/nvim ~/.config/nvim
+          git clone --filter=blob:none --branch=stable \
+            https://github.com/folke/lazy.nvim.git \
+            ~/.local/share/nvim/lazy/lazy.nvim
+
+      - name: Test NeoVim Loads
+        run: |
+          timeout 60 nvim --headless -c "lua print('NeoVim startup: OK')" +qa || {
+            echo "NeoVim failed to start"
+            exit 1
+          }
+
+      - name: Validate Plugin Specs
+        run: |
+          nvim --headless -c "lua \
+            local files = vim.fn.glob('${{ github.workspace }}/config/nvim/lua/plugins/*.lua', false, true) \
+            local errors = {} \
+            for _, file in ipairs(files) do \
+              local ok, err = pcall(dofile, file) \
+              if not ok then \
+                table.insert(errors, file .. ': ' .. tostring(err)) \
+              end \
+            end \
+            if #errors > 0 then \
+              for _, e in ipairs(errors) do print(e) end \
+              vim.cmd('cq') \
+            else \
+              print('All ' .. #files .. ' plugin specs valid') \
+            end \
+          " +qa
+
+      - name: Verify Tool Configuration
+        run: |
+          # Mason should only have debug adapters
+          if grep -qE '"(markdownlint|yamllint|hadolint|sqlfluff)"' config/nvim/lua/plugins/mason.lua; then
+            echo "Mason has linters - should be in Nix"
+            exit 1
+          fi
+
+          # LSP config should be consolidated
+          if ! grep -q "nil_ls = false" config/nvim/lua/plugins/nvim-lspconfig.lua; then
+            echo "nil_ls not disabled in consolidated config"
+            exit 1
+          fi
+
+          echo "Tool configuration valid"
+
+      - name: Verify No Phantom References
+        run: |
+          if grep -q "copilot-chat" config/nvim/lua/plugins/edgy.lua; then
+            echo "edgy.lua references phantom copilot-chat"
+            exit 1
+          fi
+          if grep -q "trouble.nvim" config/nvim/lua/plugins/neotest.lua; then
+            echo "neotest.lua references phantom trouble.nvim"
+            exit 1
+          fi
+          echo "No phantom references"
