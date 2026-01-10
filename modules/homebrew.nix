@@ -15,9 +15,7 @@
     };
 
     # Taps (formula repositories)
-    taps = [
-      "karl-cardenas-coding/tap" # mywhoop - WHOOP API CLI (ADR-011)
-    ];
+    taps = [ ];
 
     # CLI tools (most in home.packages via Nix)
     brews = [
@@ -26,9 +24,6 @@
       "colima"
       "docker"
       "docker-credential-helper"
-
-      # Health data
-      "mywhoop" # WHOOP API CLI - single source of truth (ADR-011)
     ];
 
     # GUI Applications (Homebrew Casks)
