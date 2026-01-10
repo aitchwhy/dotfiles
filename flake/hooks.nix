@@ -64,6 +64,24 @@
         };
 
         # ═══════════════════════════════════════════════════════════════════════════
+        # QUALITY VALIDATION (TypeScript typecheck, format, lint, test)
+        # ═══════════════════════════════════════════════════════════════════════════
+        quality-validate = {
+          enable = true;
+          name = "quality-validate";
+          description = "Run TypeScript validation (typecheck, format, lint, test)";
+          entry = toString (
+            pkgs.writeShellScript "quality-validate" ''
+              cd "$HOME/dotfiles/config/quality"
+              ${pkgs.bun}/bin/bun run validate
+            ''
+          );
+          files = "^config/quality/.*\\.(ts|tsx)$";
+          pass_filenames = false;
+          language = "system";
+        };
+
+        # ═══════════════════════════════════════════════════════════════════════════
         # CONVENTIONAL COMMITS
         # ═══════════════════════════════════════════════════════════════════════════
         commitizen.enable = true;
