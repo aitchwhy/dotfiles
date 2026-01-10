@@ -27,6 +27,7 @@ in
     ./tools/yazi.nix
     ./tools/zellij.nix
     ./tools/nixbuild.nix
+    ./tools/docker.nix
 
     # Editors
     ./editors/neovim.nix
@@ -86,6 +87,7 @@ in
         yazi.enable = mkDefault true;
         zellij.enable = mkDefault true;
         nixbuild.enable = mkDefault false; # Requires SSH key setup
+        docker.enable = mkDefault true;
       };
 
       editors = {

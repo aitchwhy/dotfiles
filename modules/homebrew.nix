@@ -20,10 +20,11 @@
     # CLI tools (most in home.packages via Nix)
     brews = [
       # Container runtime (Colima VZ + Docker CLI)
-      # Note: docker-compose removed - use `docker compose` (v2 built-in)
       "colima"
       "docker"
+      "docker-compose"
       "docker-credential-helper"
+      "lima" # Colima dependency
     ];
 
     # GUI Applications (Homebrew Casks)
