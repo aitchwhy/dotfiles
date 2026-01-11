@@ -83,6 +83,10 @@ in
         gnupg
         bitwarden-cli
       ]
+      # Cloud Storage
+      ++ [
+        rclone # rsync for cloud storage (Google Drive, S3, etc.)
+      ]
       # Code Quality & Formatting
       ++ [
         # Shell
