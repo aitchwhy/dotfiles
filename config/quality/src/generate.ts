@@ -20,6 +20,7 @@ import {
   generateRules,
   generateSettingsFile,
 } from './generators/claude'
+import { generateDesktopPreferences } from './generators/claude-desktop'
 import { generateCursorRules } from './generators/cursor'
 import { generateGeminiConfig } from './generators/gemini'
 
@@ -33,6 +34,7 @@ const GENERATED_ROOT = path.join(QUALITY_DIR, '..', 'generated')
 
 // Provider Output Directories
 const CLAUDE_OUT = path.join(GENERATED_ROOT, 'claude')
+const CLAUDE_DESKTOP_OUT = path.join(GENERATED_ROOT, 'claude-desktop')
 const CURSOR_OUT = path.join(GENERATED_ROOT, 'cursor')
 const GEMINI_OUT = path.join(GENERATED_ROOT, 'gemini')
 
@@ -74,6 +76,12 @@ const main = Effect.gen(function* () {
   yield* Effect.log('--- Generating Gemini Adapters ---')
   yield* Effect.log(`Output: ${GEMINI_OUT}`)
   yield* generateGeminiConfig(ALL_SKILLS, ALL_PERSONAS, GEMINI_OUT)
+
+  // 4. CLAUDE DESKTOP GENERATION
+  yield* Effect.log('')
+  yield* Effect.log('--- Generating Claude Desktop Adapters ---')
+  yield* Effect.log(`Output: ${CLAUDE_DESKTOP_OUT}`)
+  yield* generateDesktopPreferences(CLAUDE_DESKTOP_OUT)
 
   yield* Effect.log('')
   yield* Effect.log('All Generation complete!')
