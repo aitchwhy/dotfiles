@@ -19,7 +19,7 @@
 
 stdenvNoCC.mkDerivation rec {
   pname = "ralph-claude-code";
-  version = "0.9.0";
+  version = "0.9.9";
 
   src = fetchFromGitHub {
     owner = "frankbria";
