@@ -24,7 +24,7 @@ stdenvNoCC.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "frankbria";
     repo = "ralph-claude-code";
-    rev = "50f54e82e10d54f5b22bec58b5c08b7dc16dd343";
+    rev = "dd694ece495cc55720c2deb8f9b982bd4564da80";
     hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
   };
 
@@ -65,7 +65,17 @@ stdenvNoCC.mkDerivation rec {
 
     for script in $out/bin/*; do
       wrapProgram "$script" \
-        --prefix PATH : ${lib.makeBinPath [ tmux jq gnugrep gnused coreutils bash gawk ]} \
+        --prefix PATH : ${
+          lib.makeBinPath [
+            tmux
+            jq
+            gnugrep
+            gnused
+            coreutils
+            bash
+            gawk
+          ]
+        } \
         --set RALPH_LIB "$out/lib/ralph"
     done
 
