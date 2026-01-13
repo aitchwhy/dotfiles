@@ -37,17 +37,19 @@ stdenvNoCC.mkDerivation rec {
     for script in ralph_loop.sh ralph_monitor.sh setup.sh ralph_import.sh; do
       if [ -f "$script" ]; then
         substituteInPlace "$script" \
-          --replace 'source "$(dirname "$0")/lib/' 'source "$RALPH_LIB/' \
-          --replace 'source lib/' 'source "$RALPH_LIB/' \
-          --replace './lib/' '"$RALPH_LIB/'
+          --replace-quiet 'source "$(dirname "$0")/lib/' 'source "$RALPH_LIB/' \
+          --replace-quiet 'source "$SCRIPT_DIR/lib/' 'source "$RALPH_LIB/' \
+          --replace-quiet 'source lib/' 'source "$RALPH_LIB/' \
+          --replace-quiet './lib/' '$RALPH_LIB/'
       fi
     done
 
     for libfile in lib/*.sh; do
       if [ -f "$libfile" ]; then
         substituteInPlace "$libfile" \
-          --replace 'source "$(dirname "$0")/' 'source "$RALPH_LIB/' \
-          --replace 'source lib/' 'source "$RALPH_LIB/'
+          --replace-quiet 'source "$(dirname "$0")/' 'source "$RALPH_LIB/' \
+          --replace-quiet 'source "$SCRIPT_DIR/' 'source "$RALPH_LIB/' \
+          --replace-quiet 'source lib/' 'source "$RALPH_LIB/'
       fi
     done
   '';
