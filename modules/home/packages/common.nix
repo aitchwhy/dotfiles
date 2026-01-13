@@ -125,6 +125,7 @@ in
         ngrok # Expose local servers
         caddy # Modern web server
         ralph-claude-code # Autonomous AI development loop
+        agent-browser # AI browser automation CLI (run `agent-browser install` on first use)
       ]
       # GitHub
       ++ [

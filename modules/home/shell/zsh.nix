@@ -123,6 +123,28 @@ in
           infocmp -x xterm-ghostty | ssh "$1" -- tic -x -
           echo "✓ Installed xterm-ghostty terminfo on $1"
         }
+
+        # ========================================
+        # Agent Browser helpers
+        # ========================================
+
+        # Quick frontend test - opens URL and snapshots
+        # Usage: ab-test <url>
+        function ab-test() {
+          if [[ -z "$1" ]]; then
+            echo "Usage: ab-test <url>"
+            return 1
+          fi
+          agent-browser open "$1"
+          agent-browser snapshot -i -c
+        }
+
+        # Screenshot with timestamp
+        # Usage: ab-screenshot [name]
+        function ab-screenshot() {
+          local name="''${1:-screenshot}"
+          agent-browser screenshot "./$name-$(date +%Y%m%d-%H%M%S).png"
+        }
       '';
 
       history = {

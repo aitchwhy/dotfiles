@@ -1,9 +1,10 @@
 /**
  * Skills Registry
  *
- * All 34 skills with compile-time count assertion.
+ * All 35 skills with compile-time count assertion.
  */
 
+export { agentBrowserSkill } from './agent-browser.skill'
 export { apiContractSkill } from './api-contract.skill'
 export { codebaseExposureSkill } from './codebase-exposure.skill'
 export { devopsPatternsSkill } from './devops-patterns.skill'
@@ -39,6 +40,7 @@ export { typeSafetySkill } from './type-safety.skill'
 export { upgradeSkill } from './upgrade.skill'
 export { zeroEnvironmentAwarenessSkill } from './zero-environment-awareness.skill'
 
+import { agentBrowserSkill } from './agent-browser.skill'
 import { apiContractSkill } from './api-contract.skill'
 import { codebaseExposureSkill } from './codebase-exposure.skill'
 import { devopsPatternsSkill } from './devops-patterns.skill'
@@ -75,6 +77,7 @@ import { upgradeSkill } from './upgrade.skill'
 import { zeroEnvironmentAwarenessSkill } from './zero-environment-awareness.skill'
 
 export const ALL_SKILLS = [
+  agentBrowserSkill,
   apiContractSkill,
   codebaseExposureSkill,
   devopsPatternsSkill,
@@ -111,10 +114,10 @@ export const ALL_SKILLS = [
   zeroEnvironmentAwarenessSkill,
 ] as const
 
-// Compile-time assertion: exactly 34 skills
+// Compile-time assertion: exactly 35 skills
 type AssertLength<T extends readonly unknown[], N extends number> = T['length'] extends N
   ? true
   : never
 
-const _assertSkillCount: AssertLength<typeof ALL_SKILLS, 34> = true
+const _assertSkillCount: AssertLength<typeof ALL_SKILLS, 35> = true
 void _assertSkillCount
