@@ -79,10 +79,8 @@ let
 
   marketplaceDefs = { }; # Empty - ralph-wiggum is in default marketplace
 
-  nixConfigJson = builtins.toJSON {
-    enabledPlugins = enabledPlugins;
-    extraKnownMarketplaces = marketplaceDefs;
-  };
+  # JSON for direct injection into .claude.json (no intermediate file needed)
+  enabledPluginsJson = builtins.toJSON enabledPlugins;
 
   # ═══════════════════════════════════════════════════════════════════════════
   # Format Generators
@@ -300,9 +298,9 @@ DESKTOPEOF
     '';
 
     # Generate Claude Code CLI config (~/.claude.json)
-    # Uses jq to MERGE mcpServers key with existing runtime state
+    # Uses jq to MERGE mcpServers + enabledPlugins with existing runtime state
     # Runtime state includes: numStartups, oauthAccount, projects, etc. (31+ keys)
-    # MINIMAL: 1 server (ref)
+    # MINIMAL: 1 server (ref), 1 plugin (ralph-wiggum)
     home.activation.generateClaudeCodeConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       MCP_SECRETS="${config.home.homeDirectory}/.config/mcp"
       CLAUDE_CODE_CONFIG="${config.home.homeDirectory}/.claude.json"
@@ -313,33 +311,24 @@ DESKTOPEOF
 
       # MCP servers JSON from Nix SSOT (with placeholders for secrets)
       MCP_SERVERS='${cliAllJson}'
+      ENABLED_PLUGINS='${enabledPluginsJson}'
 
       # Substitute placeholder with actual secret value
       MCP_SERVERS=$(echo "$MCP_SERVERS" | sed "s/__REF_KEY__/$REF_KEY/g")
 
       # Merge with existing config (preserve runtime state)
       if [ -f "$CLAUDE_CODE_CONFIG" ]; then
-        MERGED=$(jq --argjson servers "$MCP_SERVERS" '.mcpServers = $servers' "$CLAUDE_CODE_CONFIG")
+        MERGED=$(jq --argjson servers "$MCP_SERVERS" --argjson plugins "$ENABLED_PLUGINS" \
+          '.mcpServers = $servers | .enabledPlugins = $plugins' "$CLAUDE_CODE_CONFIG")
         echo "$MERGED" > "$CLAUDE_CODE_CONFIG"
-        echo "Claude Code config updated (1 server from SSOT - MINIMAL)"
+        echo "Claude Code config updated (1 server, 1 plugin from SSOT)"
       else
-        echo "{\"mcpServers\": $MCP_SERVERS}" > "$CLAUDE_CODE_CONFIG"
-        echo "Claude Code config created (1 server from SSOT - MINIMAL)"
+        echo "{\"mcpServers\": $MCP_SERVERS, \"enabledPlugins\": $ENABLED_PLUGINS}" > "$CLAUDE_CODE_CONFIG"
+        echo "Claude Code config created (1 server, 1 plugin from SSOT)"
       fi
     '';
 
-    # Generate Nix config JSON for TypeScript to consume
-    home.activation.generateNixConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      NIX_CONFIG="${config.home.homeDirectory}/dotfiles/config/quality/generated/nix-config.json"
-      mkdir -p "$(dirname "$NIX_CONFIG")"
-      cat > "$NIX_CONFIG" << 'NIXCONFIGEOF'
-${nixConfigJson}
-NIXCONFIGEOF
-      echo "Nix config generated (1 plugin, 0 extra marketplaces)"
-    '';
-
     # Generate Quality System artifacts (skills, personas, rules, settings)
-    # Runs after writeBoundary to ensure all files are in place
     home.activation.generateQuality = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       QUALITY_DIR="${config.home.homeDirectory}/dotfiles/config/quality"
       BUN="/etc/profiles/per-user/${config.home.username}/bin/bun"

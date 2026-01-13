@@ -45,8 +45,8 @@ const main = Effect.gen(function* () {
   yield* Effect.log(`Root Output: ${GENERATED_ROOT}`)
   yield* Effect.log('')
 
-  // CLEAN SLATE: Delete generated directory to prevent orphaned artifacts
-  // This ensures source count == generated count after each run
+  // CLEAN SLATE: Delete entire generated directory to prevent orphaned artifacts
+  // nix-config.json lives at quality root (outside generated/) so this is safe
   yield* Effect.log('--- Cleaning Generated Directory (Clean Slate) ---')
   if (fs.existsSync(GENERATED_ROOT)) {
     fs.rmSync(GENERATED_ROOT, { recursive: true, force: true })
