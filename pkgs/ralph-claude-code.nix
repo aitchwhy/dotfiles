@@ -25,7 +25,7 @@ stdenvNoCC.mkDerivation rec {
     owner = "frankbria";
     repo = "ralph-claude-code";
     rev = "dd694ece495cc55720c2deb8f9b982bd4564da80";
-    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    hash = "sha256-QYuulocrE1zF20bilrvXeyBahdaCRj2hm2oqnZtb7KA=";
   };
 
   nativeBuildInputs = [ makeWrapper ];
