@@ -58,6 +58,8 @@ in
       # Database Clients (PostgreSQL 18+, SQLite/Turso - NO MySQL)
       ++ (optionals cfg.enableDatabases [
         postgresql_18
+        pgcli # Enhanced PostgreSQL CLI with autocomplete
+        drizzle-kit # Drizzle ORM CLI + Studio GUI
         redis
         usql
       ])
