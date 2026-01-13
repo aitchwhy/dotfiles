@@ -122,6 +122,7 @@ in
         mkcert # Local HTTPS certs
         ngrok # Expose local servers
         caddy # Modern web server
+        ralph-claude-code # Autonomous AI development loop
       ]
       # GitHub
       ++ [
