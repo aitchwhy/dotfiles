@@ -14,7 +14,7 @@
 
 stdenvNoCC.mkDerivation rec {
   pname = "drizzle-kit";
-  version = "0.30.4";
+  version = "0.31.8";
 
   # No source - we install from npm via bun
   dontUnpack = true;
