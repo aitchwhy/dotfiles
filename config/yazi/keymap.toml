@@ -171,9 +171,9 @@ desc = "Merge current project to other projects"
 
 # Save the last project when exiting
 [[mgr.prepend_keymap]]
-on = ["q"]
-run = "plugin projects quit"
-desc = "Save last project and exit the process"
+on = "q"
+run = ["plugin projects save", "quit"]
+desc = "Save project and quit"
 
 ################
 # Compress
