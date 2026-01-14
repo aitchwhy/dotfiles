@@ -350,5 +350,24 @@ DESKTOPEOF
         echo "Intelligence System artifacts generated successfully"
       fi
     '';
+
+    # Cleanup old plan and todo files (7-day retention)
+    # Runs on every `darwin-rebuild switch` or `home-manager switch`
+    home.activation.cleanupClaudeEphemeral = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      PLANS_DIR="${config.home.homeDirectory}/.claude/plans"
+      TODOS_DIR="${config.home.homeDirectory}/.claude/todos"
+
+      # Delete plan files older than 7 days
+      if [ -d "$PLANS_DIR" ]; then
+        /usr/bin/find "$PLANS_DIR" -name "*.md" -mtime +7 -type f -delete 2>/dev/null || true
+        echo "Claude plans cleanup: removed files older than 7 days"
+      fi
+
+      # Delete todo files older than 7 days
+      if [ -d "$TODOS_DIR" ]; then
+        /usr/bin/find "$TODOS_DIR" -name "*.json" -mtime +7 -type f -delete 2>/dev/null || true
+        echo "Claude todos cleanup: removed files older than 7 days"
+      fi
+    '';
   };
 }
