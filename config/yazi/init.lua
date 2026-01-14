@@ -38,8 +38,9 @@ require("starship"):setup({
 	hide_flags = false,
 	flags_after_prompt = true,
 	config_file = "~/.config/starship/starship.toml",
-	-- Enable Tokyo Night theme
-	theme = "tokyo-night",
+	-- Enable right prompt (new in latest starship.yazi)
+	right_prompt = true,
+	separator = " ",
 })
 
 -- Enhanced mime type detection

@@ -57,63 +57,63 @@
 
     # Official plugins (single repo)
     yazi-plugins = {
-      url = "github:yazi-rs/plugins/63f9650";
+      url = "github:yazi-rs/plugins/57f1863";
       flake = false;
     };
 
     # Third-party plugins
     yazi-relative-motions = {
-      url = "github:dedukun/relative-motions.yazi/ce2e890";
+      url = "github:dedukun/relative-motions.yazi/a603d9e";
       flake = false;
     };
     yazi-bunny = {
-      url = "github:stelcodes/bunny.yazi/059fe22";
+      url = "github:stelcodes/bunny.yazi/6ee99bc";
       flake = false;
     };
     yazi-projects = {
-      url = "github:MasouShizuka/projects.yazi/7037dd5";
+      url = "github:MasouShizuka/projects.yazi/eed0657";
       flake = false;
     };
     yazi-ouch = {
-      url = "github:ndtoan96/ouch.yazi/10b4627";
+      url = "github:ndtoan96/ouch.yazi/594b8a2";
       flake = false;
     };
     yazi-lazygit = {
-      url = "github:Lil-Dank/lazygit.yazi/7a08a09";
+      url = "github:Lil-Dank/lazygit.yazi/0e56060";
       flake = false;
     };
     yazi-what-size = {
-      url = "github:pirafrank/what-size.yazi/0a4904c";
+      url = "github:pirafrank/what-size.yazi/179ebf6";
       flake = false;
     };
     yazi-copy-file-contents = {
-      url = "github:AnirudhG07/plugins-yazi/907e292";
+      url = "github:AnirudhG07/plugins-yazi/71545f4";
       flake = false;
     };
     yazi-open-with-cmd = {
-      url = "github:Ape/open-with-cmd.yazi/433cf30";
+      url = "github:Ape/open-with-cmd.yazi/e3d430f";
       flake = false;
     };
     yazi-starship = {
-      url = "github:Rolv-Apneseth/starship.yazi/6a0f3f7";
+      url = "github:Rolv-Apneseth/starship.yazi/eca1861";
       flake = false;
     };
     yazi-glow = {
-      url = "github:Reledia/glow.yazi/2da96e3";
+      url = "github:Reledia/glow.yazi/bd3eaa5";
       flake = false;
     };
     yazi-rich-preview = {
-      url = "github:AnirudhG07/rich-preview.yazi/843c3fa";
+      url = "github:AnirudhG07/rich-preview.yazi/573b275";
       flake = false;
     };
 
     # Flavors (themes)
     yazi-flavor-ashen = {
-      url = "github:ficcdaf/ashen/514ed5a";
+      url = "github:ficcdaf/ashen/8add1b8";
       flake = false;
     };
     yazi-flavor-tokyo-night = {
-      url = "github:BennyOe/tokyo-night.yazi/b3950bf";
+      url = "github:BennyOe/tokyo-night.yazi/8e6296f";
       flake = false;
     };
 

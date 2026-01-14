@@ -36,14 +36,37 @@ delay_chain_threshold = 10 # Improve task chaining performance
 [opener]
 edit = [{ run = 'nvim "$@"', block = true }]
 
+# Terminal-based viewers for text formats
+markdown = [
+  { run = 'glow -p "$@"', block = true, desc = "View with Glow" },
+  { run = 'nvim "$@"', block = true, desc = "Edit with Neovim" },
+]
+
+json = [
+  { run = 'jq -C . "$1" | less -R', block = true, desc = "View with jq" },
+  { run = 'bat --paging=always --language=json "$@"', block = true, desc = "View with bat" },
+  { run = 'nvim "$@"', block = true, desc = "Edit with Neovim" },
+]
+
+yaml = [
+  { run = 'bat --paging=always --language=yaml "$@"', block = true, desc = "View with bat" },
+  { run = 'nvim "$@"', block = true, desc = "Edit with Neovim" },
+]
+
+toml = [
+  { run = 'bat --paging=always --language=toml "$@"', block = true, desc = "View with bat" },
+  { run = 'nvim "$@"', block = true, desc = "Edit with Neovim" },
+]
+
+text = [
+  { run = 'bat --paging=always "$@"', block = true, desc = "View with bat" },
+  { run = 'nvim "$@"', block = true, desc = "Edit with Neovim" },
+]
+
+# macOS native openers for non-text files
 open = [
   { run = 'open "$@"', desc = "Open with default macOS app" },
-  { run = 'open -a Safari "$@"', desc = "Open with Safari", for = "url" },
-  { run = 'qlmanage -p "$@" &>/dev/null', desc = "QuickLook preview", for = "file" },
-  { run = 'open -a Preview "$@"', desc = "Open with Preview", for = "image" },
-  { run = 'open -a "Visual Studio Code" "$@"', desc = "Open with VS Code", for = "text" },
-  { run = 'open -a "TextEdit" "$@"', desc = "Open with TextEdit" },
-  { run = 'bat --paging=always "$@"', desc = "Open with bat", for = "text" },
+  { run = 'qlmanage -p "$@" &>/dev/null', desc = "QuickLook preview" },
 ]
 
 reveal = [{ run = 'open -R "$@"', desc = "Reveal in Finder" }]
@@ -62,12 +85,19 @@ archive = [
 
 code = [
   { run = 'nvim "$@"', block = true, desc = "Edit with Neovim" },
-  { run = 'code "$@"', desc = "Open with VS Code", orphan = true },
 ]
 
 [open]
 prepend_rules = [
   { name = "bulk-rename.txt", use = "bulk-rename" },
+  # Terminal-based viewers
+  { name = "*.md", use = "markdown" },
+  { name = "*.json", use = "json" },
+  { name = "*.yaml", use = "yaml" },
+  { name = "*.yml", use = "yaml" },
+  { name = "*.toml", use = "toml" },
+  { name = "*.csv", use = "text" },
+  # Code files - edit with nvim
   { name = "*.py", use = "code" },
   { name = "*.js", use = "code" },
   { name = "*.ts", use = "code" },
@@ -75,6 +105,9 @@ prepend_rules = [
   { name = "*.jsx", use = "code" },
   { name = "*.lua", use = "code" },
   { name = "*.sh", use = "code" },
+  { name = "*.rs", use = "code" },
+  { name = "*.go", use = "code" },
+  { name = "*.nix", use = "code" },
 ]
 
 rules = [
