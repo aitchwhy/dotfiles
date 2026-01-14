@@ -124,7 +124,9 @@ rules = [
 
 [plugin]
 prepend_fetchers = [
-  { id = "mime", name = "*", run = "mime-ext", prio = "high" },
+  # mime-ext split into local/remote (yazi v25.12+)
+  { id = "mime", url = "local://*", run = "mime-ext.local", prio = "high" },
+  { id = "mime", url = "remote://*", run = "mime-ext.remote", prio = "high" },
   { id = "mactag", name = "*", run = "mactag" },
   { id = "mactag", name = "*/", run = "mactag" },
 ]

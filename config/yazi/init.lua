@@ -43,8 +43,8 @@ require("starship"):setup({
 	separator = " ",
 })
 
--- Enhanced mime type detection
-require("mime-ext"):setup({
+-- Enhanced mime type detection (local files only - remote uses defaults)
+require("mime-ext.local"):setup({
 	-- Expand the existing filename database (lowercase)
 	with_files = {
 		makefile = "text/makefile",
