@@ -8,6 +8,8 @@ rule:
       - pattern: "$EXPR as const"
       - pattern: "$EXPR as unknown"
       - pattern: "$EXPR as never"
+      # Allow empty object type markers (XState setup types, type-only declarations)
+      - pattern: "{} as $TYPE"
 message: |
   Guard 40: Type assertion 'as Type' detected.
 
