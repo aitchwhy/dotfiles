@@ -13,7 +13,7 @@ export const qualityTools: readonly CliTool[] = [
   nixTool("shfmt", "shfmt", "quality", "shfmt", "Shell script formatter"),
 
   // Nix
-  nixTool("nixfmt", "nixfmt", "quality", "nixfmt-rfc-style", "Nix formatter (RFC style)"),
+  nixTool("nixfmt", "nixfmt", "quality", "nixfmt", "Nix formatter (RFC style)"),
   nixTool("deadnix", "deadnix", "quality", "deadnix", "Find dead Nix code"),
   nixTool("statix", "statix", "quality", "statix", "Nix linter"),
 

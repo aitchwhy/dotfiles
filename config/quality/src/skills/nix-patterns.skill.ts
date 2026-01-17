@@ -74,7 +74,7 @@ export const nixPatternsSkill: SkillDefinition = {
       systems = [ "aarch64-darwin" "x86_64-linux" ];
 
       perSystem = { pkgs, ... }: {
-        formatter = pkgs.nixfmt-rfc-style;
+        formatter = pkgs.nixfmt;
       };
     };
 }
@@ -113,7 +113,7 @@ export const nixPatternsSkill: SkillDefinition = {
 {
   perSystem = { config, pkgs, system, ... }: {
     pre-commit.settings.hooks = {
-      nixfmt-rfc-style.enable = true;
+      nixfmt.enable = true;
       deadnix.enable = true;
       statix.enable = true;
     };
@@ -126,7 +126,7 @@ export const nixPatternsSkill: SkillDefinition = {
 
       packages = with pkgs; [
         nixd
-        nixfmt-rfc-style
+        nixfmt
         just
         git
       ];
@@ -240,7 +240,7 @@ Pass \`self\` via \`specialArgs\`:
 darwin-rebuild switch --flake .#hostname  # Apply changes
 nix develop           # Enter dev shell
 nix flake check       # Validate flake
-nix fmt               # Format with nixfmt-rfc-style
+nix fmt               # Format with nixfmt (RFC-style)
 nix flake update      # Update inputs
 \`\`\``,
     },

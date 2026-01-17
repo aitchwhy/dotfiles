@@ -197,7 +197,7 @@ export const STACK = {
     'git-hooks-nix': 'github:cachix/git-hooks.nix',
 
     // Formatters & linters
-    'nixfmt-rfc-style': '0.6.0',
+    nixfmt: '0.6.0',
     deadnix: '1.2.1',
     statix: '0.5.8',
     alejandra: '3.1.0',

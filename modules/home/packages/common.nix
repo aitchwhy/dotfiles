@@ -95,8 +95,8 @@ in
         shellcheck
         shfmt
 
-        # Nix (nixfmt-rfc-style is the December 2025 standard)
-        nixfmt-rfc-style
+        # Nix (nixfmt is RFC-style by default in January 2026)
+        nixfmt
         deadnix
         statix
 

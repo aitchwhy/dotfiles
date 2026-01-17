@@ -242,7 +242,7 @@ export const NixVersionsSchema = Schema.Struct({
   'git-hooks-nix': FlakeUrl,
 
   // Formatters & linters (semver)
-  'nixfmt-rfc-style': VersionString,
+  nixfmt: VersionString,
   deadnix: VersionString,
   statix: VersionString,
   alejandra: VersionString,

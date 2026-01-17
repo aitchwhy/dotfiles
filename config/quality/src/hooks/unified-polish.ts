@@ -78,7 +78,7 @@ const program = Effect.gen(function* () {
   // Python → Ruff format + lint (sequential)
   const pyFiles = getFiles('py')
 
-  // Nix → nixfmt-rfc-style
+  // Nix → nixfmt (RFC-style by default)
   const nixFiles = getFiles('nix')
 
   // Shell → shfmt

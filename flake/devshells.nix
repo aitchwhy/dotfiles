@@ -27,7 +27,7 @@
           echo "  just verify-paragon - Run PARAGON verification"
           echo ""
           echo "PARAGON pre-commit hooks active:"
-          echo "  nixfmt-rfc-style, biome, commitizen"
+          echo "  nixfmt, biome, commitizen"
           echo "  paragon-no-any, paragon-no-zinfer, paragon-no-mock"
           echo "  paragon-no-assumptions"
           echo ""
@@ -39,7 +39,7 @@
         packages =
           (with pkgs; [
             nixd
-            nixfmt-rfc-style
+            nixfmt
             deadnix
             statix
             just

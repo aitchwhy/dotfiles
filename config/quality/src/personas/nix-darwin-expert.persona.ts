@@ -99,7 +99,7 @@ just switch
 - [ ] Uses \`mkIf cfg.enable\` guard
 - [ ] Options have descriptions via \`mkEnableOption\` or \`description\`
 - [ ] No \`with\` expressions
-- [ ] Formatter is nixfmt-rfc-style
+- [ ] Formatter is nixfmt (RFC-style)
 - [ ] State version matches (26.05)
 - [ ] Uses flake-parts for system iteration
 - [ ] Imports use relative paths from module location`,
