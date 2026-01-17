@@ -67,13 +67,9 @@ return {
         filter = function(buf) return vim.bo[buf].buftype == "help" end,
       })
 
-      -- DAP Debug Windows (Bottom Panel)
-      table.insert(opts.bottom, { title = "DAP REPL", ft = "dap-repl", size = { height = 12 } })
-      table.insert(opts.bottom, { title = "DAP Scopes", ft = "dapui_scopes", size = { height = 12 } })
-      table.insert(opts.bottom, { title = "DAP Breakpoints", ft = "dapui_breakpoints", size = { height = 12 } })
-      table.insert(opts.bottom, { title = "DAP Stacks", ft = "dapui_stacks", size = { height = 12 } })
-      table.insert(opts.bottom, { title = "DAP Watches", ft = "dapui_watches", size = { height = 12 } })
-      table.insert(opts.bottom, { title = "DAP Console", ft = "dapui_console", size = { height = 12 } })
+      -- DAP View Integration (Bottom Panel) - Modern minimalistic debug UI
+      table.insert(opts.bottom, { title = "Debug", ft = "dap-view", size = { height = 0.3 } })
+      table.insert(opts.bottom, { title = "Debug Terminal", ft = "dap-view-term", size = { height = 0.3 } })
 
       -- RESIZE KEYBINDINGS
       opts.keys = opts.keys or {}
@@ -81,6 +77,14 @@ return {
       opts.keys["<C-Left>"] = function(win) win:resize("width", -2) end
       opts.keys["<C-Up>"] = function(win) win:resize("height", 2) end
       opts.keys["<C-Down>"] = function(win) win:resize("height", -2) end
+
+      -- IDE-like window options (resizable, winbar visible)
+      opts.animate = { enabled = false } -- Disable for snappier resize
+      opts.wo = {
+        winbar = true, -- Show winbar in edgy windows
+        winfixwidth = false, -- Allow width changes
+        winfixheight = false, -- Allow height changes
+      }
 
       -- TROUBLE.NVIM INTEGRATION (all positions)
       for _, pos in ipairs({ "top", "bottom", "left", "right" }) do
