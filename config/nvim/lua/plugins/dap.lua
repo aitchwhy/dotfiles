@@ -148,31 +148,4 @@ return {
     end,
   },
 
-  -- DAP UI layout configuration (bottom panel for REPL, breakpoints, watches)
-  {
-    "rcarriga/nvim-dap-ui",
-    opts = {
-      layouts = {
-        {
-          -- Left sidebar: Scopes and Stacks
-          elements = {
-            { id = "scopes", size = 0.5 },
-            { id = "stacks", size = 0.5 },
-          },
-          size = 40,
-          position = "left",
-        },
-        {
-          -- Bottom panel: REPL, Breakpoints, Watches
-          elements = {
-            { id = "repl", size = 0.4 },
-            { id = "breakpoints", size = 0.3 },
-            { id = "watches", size = 0.3 },
-          },
-          size = 12,
-          position = "bottom",
-        },
-      },
-    },
-  },
 }
