@@ -1,5 +1,5 @@
-# PARAGON pre-commit hooks via git-hooks.nix
-# AST-grep scans rules/paragon/ directory for all YAML rules
+# Pre-commit hooks via git-hooks.nix
+# Local-first architecture: project hooks via lefthook, Nix for CI validation
 { ... }:
 {
   perSystem =
@@ -12,14 +12,14 @@
         nixfmt.enable = true;
 
         # ═══════════════════════════════════════════════════════════════════════
-        # PARAGON GUARDS (AST-grep)
+        # AST-GREP TEMPLATES (for CI validation only)
         # ═══════════════════════════════════════════════════════════════════════
-        # Scans all YAML rules in config/quality/rules/paragon/
-        # Matches logic in config/quality/src/hooks/pre-tool-use.ts (SSOT)
+        # Validates that template rules are syntactically correct
+        # Project-specific enforcement is done via local lefthook
         paragon-ast = {
           enable = true;
           name = "paragon-ast";
-          description = "PARAGON AST guards: type safety, patterns, stack compliance";
+          description = "Validate AST-grep rule templates are syntactically correct";
           entry = toString (
             pkgs.writeShellScript "paragon-ast" ''
               # Skip if no files provided
@@ -38,10 +38,10 @@
 
               [ ''${#files[@]} -eq 0 ] && exit 0
 
-              # Scan rules directory
-              RULES_DIR="$HOME/dotfiles/config/quality/rules/paragon"
+              # Scan templates directory for effect-ts rules
+              RULES_DIR="$HOME/dotfiles/config/quality/rules/templates/effect-ts"
               if [ ! -d "$RULES_DIR" ]; then
-                echo "Warning: PARAGON rules directory not found at $RULES_DIR"
+                # Templates not installed - skip validation
                 exit 0
               fi
 
@@ -64,22 +64,11 @@
         };
 
         # ═══════════════════════════════════════════════════════════════════════════
-        # QUALITY VALIDATION (TypeScript typecheck, format, lint, test)
+        # QUALITY VALIDATION (CI only - local uses lefthook)
         # ═══════════════════════════════════════════════════════════════════════════
-        quality-validate = {
-          enable = true;
-          name = "quality-validate";
-          description = "Run TypeScript validation (typecheck, format, lint, test)";
-          entry = toString (
-            pkgs.writeShellScript "quality-validate" ''
-              cd "$HOME/dotfiles/config/quality"
-              ${pkgs.bun}/bin/bun run validate
-            ''
-          );
-          files = "^config/quality/.*\\.(ts|tsx)$";
-          pass_filenames = false;
-          language = "system";
-        };
+        # Disabled for local development - use lefthook instead
+        # Nix sandbox doesn't have access to $HOME/dotfiles structure
+        # quality-validate = { ... };
 
         # ═══════════════════════════════════════════════════════════════════════════
         # CONVENTIONAL COMMITS
