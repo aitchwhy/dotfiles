@@ -30,12 +30,13 @@ pre-commit:
         [ ! -d "$RULES_DIR" ] && exit 0
         has_error=0
 
-        # Filter out test files - they are composition roots (ADR-0045)
+        # Filter out test files and config files (match sgconfig.yml)
         filtered_files=""
         for f in {staged_files}; do
           case "$f" in
             *.test.ts|*.test.tsx|*.spec.ts|*.spec.tsx) continue ;;
             */__tests__/*|*/test/*|*/tests/*|*/e2e/*) continue ;;
+            *.config.ts|*/drizzle.config.ts|*/infra/*) continue ;;
           esac
           filtered_files="$filtered_files $f"
         done
