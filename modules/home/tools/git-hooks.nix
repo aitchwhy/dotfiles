@@ -1,5 +1,3 @@
-# Global git hooks directory setup
-# Lefthook manages actual hook files; this just sets the global path
 {
   config,
   lib,
@@ -10,16 +8,26 @@ let
 in
 {
   options.modules.home.tools.git-hooks = {
-    enable = mkEnableOption "global git hooks path";
+    enable = mkEnableOption "git hooks documentation";
   };
 
   config = mkIf config.modules.home.tools.git-hooks.enable {
-    # Set global hooks path - lefthook will install hooks here
-    programs.git.settings.core.hooksPath = "${config.home.homeDirectory}/.config/git/hooks";
+    # REMOVED: programs.git.settings.core.hooksPath
+    # Global hooks bypass project ignores, causing false positives.
+    # Each project uses local lefthook with project-specific rules.
 
-    # Ensure hooks directory exists
-    home.file.".config/git/hooks/.keep" = {
-      text = "# Hooks managed by lefthook - run 'lefthook install' in each repo\n";
-    };
+    # Explicitly unset any inherited value
+    programs.git.extraConfig.core.hooksPath = "";
+
+    home.file.".config/git/HOOKS.md".text = ''
+      # Git Hooks Architecture
+
+      **Global hooks are disabled by design.**
+
+      Each project uses local lefthook with project-specific rules.
+      Run `lefthook install` in each project.
+
+      See: ~/dotfiles/config/quality/rules/templates/README.md
+    '';
   };
 }

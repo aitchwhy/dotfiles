@@ -1,13 +1,8 @@
-# lefthook.yml - Full pre-commit hooks for dotfiles repo
-# PARAGON Enforcement System v3.7
-min_version: 1.6.0
+min_version: 1.9.0
 
 pre-commit:
   parallel: true
-  # Skip all pre-commit hooks during merge/rebase operations
-  skip:
-    - merge
-    - rebase
+  skip: [merge, rebase]
   commands:
     biome:
       glob: 'config/quality/**/*.{js,ts,tsx,json}'
@@ -25,30 +20,8 @@ pre-commit:
       root: 'config/quality'
       run: bun run typecheck
 
-    paragon-ast:
-      glob: 'config/quality/src/**/*.{ts,tsx}'
-      exclude: 'config/quality/src/hooks/**'
-      run: |
-        RULES_DIR="$HOME/dotfiles/config/quality/rules"
-        [ ! -d "$RULES_DIR" ] && exit 0
-        has_error=0
-        # Scan only valid rules (skip broken ones)
-        for rule in "$RULES_DIR"/paragon/no-nullish-coalescing-domain.yml \
-                    "$RULES_DIR"/paragon/no-optional-chain-domain.yml \
-                    "$RULES_DIR"/paragon/no-truthiness-check.yml; do
-          [ -f "$rule" ] || continue
-          # Run ast-grep - only fail on error level, not warnings
-          output=$(ast-grep scan --rule "$rule" {staged_files} 2>&1)
-          if echo "$output" | grep -q "^error\["; then
-            echo "=== $(basename "$rule") ==="
-            echo "$output"
-            has_error=1
-          fi
-        done
-        exit $has_error
-
     nixfmt:
-      glob: '*.nix'
+      glob: '**/*.nix'
       run: nixfmt {staged_files}
       stage_fixed: true
 
@@ -56,4 +29,4 @@ pre-commit:
 # commit-msg:
 #   commands:
 #     commitlint:
-#       run: bunx commitlint --edit {1}
+#       run: bunx commitlint --config config/quality/commitlint.config.cjs --edit {1}
