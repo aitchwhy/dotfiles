@@ -1,0 +1,39 @@
+# Effect: Prevent nested runtime execution
+# @see https://effect.website/docs/getting-started/running-effects
+id: no-nested-runtime
+language: TypeScript
+severity: error
+message: "Do not call Effect.runPromise/runSync inside Effect.gen. Use yield* to compose effects instead."
+note: |
+  Calling Effect.runPromise or Effect.runSync inside Effect.gen creates
+  nested execution contexts, bypasses the Effect runtime's fiber management,
+  and loses proper error handling and interruption support.
+
+  Example:
+    // BAD: nested runtime execution
+    Effect.gen(function* () {
+      const result = Effect.runPromise(someEffect)  // Loses fiber context
+      const value = Effect.runSync(syncEffect)      // Bypasses runtime
+    })
+
+    // GOOD: compose with yield*
+    Effect.gen(function* () {
+      const result = yield* someEffect
+      const value = yield* syncEffect
+    })
+
+  The yield* operator properly composes effects within the same fiber,
+  preserving context, interruption, and error handling.
+
+rule:
+  any:
+    - pattern: Effect.runPromise($$$)
+    - pattern: Effect.runSync($$$)
+    - pattern: Effect.runPromiseExit($$$)
+    - pattern: Effect.runSyncExit($$$)
+  inside:
+    kind: generator_function
+    stopBy: end
+    has:
+      pattern: Effect.gen($$$)
+      stopBy: end
