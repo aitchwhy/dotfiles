@@ -15,6 +15,10 @@ pre-commit:
       run: bunx @biomejs/biome check --write {staged_files}
       stage_fixed: true
 
+    oxlint:
+      glob: '*.{js,ts,tsx,jsx}'
+      run: bunx oxlint --deny correctness {staged_files}
+
     typecheck:
       glob: '*.{ts,tsx}'
       run: bun run typecheck
@@ -32,7 +36,7 @@ pre-commit:
           for rule in "$category_dir"/*.yml; do
             [ -f "$rule" ] || continue
             # Run ast-grep and capture output
-            output=$(sg scan --rule "$rule" {staged_files} 2>&1 | grep -v "paragon-guard\|sig-\|ast-engine")
+            output=$(ast-grep scan --rule "$rule" {staged_files} 2>&1 | grep -v "paragon-guard\|sig-\|ast-engine")
             if [ -n "$output" ] && echo "$output" | grep -qE "error|warning"; then
               echo "=== $category/$(basename "$rule") ==="
               echo "$output"
@@ -41,6 +45,11 @@ pre-commit:
           done
         done
         exit $has_error
+
+    nixfmt:
+      glob: '*.nix'
+      run: nixfmt {staged_files}
+      stage_fixed: true
 
 commit-msg:
   commands:

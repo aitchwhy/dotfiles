@@ -56,7 +56,13 @@ let
       url = "https://api.ref.tools/mcp";
       apiKeyPath = "${mcpSecretsPath}/ref-api-key";
     };
-    # REMOVED: exa, github, ast-grep, repomix, linear (January 2026 MINIMAL)
+    ast-grep = {
+      # AST-based code search and transformation
+      # https://github.com/ast-grep/ast-grep-mcp
+      isPython = true;
+      package = "--from git+https://github.com/ast-grep/ast-grep-mcp ast-grep-server";
+      args = [ ];
+    };
   };
 
   # ═══════════════════════════════════════════════════════════════════════════
@@ -289,16 +295,16 @@ in
 
     # Generate Claude Desktop config (MINIMAL: 0 servers)
     home.activation.generateMcpConfigs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      DESKTOP_CONFIG="${config.home.homeDirectory}/Library/Application Support/Claude/claude_desktop_config.json"
-      mkdir -p "$(dirname "$DESKTOP_CONFIG")"
+            DESKTOP_CONFIG="${config.home.homeDirectory}/Library/Application Support/Claude/claude_desktop_config.json"
+            mkdir -p "$(dirname "$DESKTOP_CONFIG")"
 
-      cat > "$DESKTOP_CONFIG" << 'DESKTOPEOF'
-{
-  "mcpServers": {}
-}
-DESKTOPEOF
+            cat > "$DESKTOP_CONFIG" << 'DESKTOPEOF'
+      {
+        "mcpServers": {}
+      }
+      DESKTOPEOF
 
-      echo "Claude Desktop config generated (0 servers - MINIMAL)"
+            echo "Claude Desktop config generated (0 servers - MINIMAL)"
     '';
 
     # Generate Claude Code CLI config (~/.claude.json)

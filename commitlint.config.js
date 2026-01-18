@@ -1,1 +1,0 @@
-config/quality/commitlint.config.js

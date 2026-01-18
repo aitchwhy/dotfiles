@@ -1,3 +1,59 @@
-# Minimal lefthook config for dotfiles repo
-# Silences warning from global hooks when no actual hooks are needed
+# lefthook.yml - Full pre-commit hooks for dotfiles repo
+# PARAGON Enforcement System v3.7
 min_version: 1.6.0
+
+pre-commit:
+  parallel: true
+  # Skip all pre-commit hooks during merge/rebase operations
+  skip:
+    - merge
+    - rebase
+  commands:
+    biome:
+      glob: 'config/quality/**/*.{js,ts,tsx,json}'
+      root: 'config/quality'
+      run: bunx @biomejs/biome check --write {staged_files}
+      stage_fixed: true
+
+    oxlint:
+      glob: 'config/quality/**/*.{js,ts,tsx,jsx}'
+      root: 'config/quality'
+      run: bunx oxlint --deny correctness {staged_files}
+
+    typecheck:
+      glob: 'config/quality/**/*.{ts,tsx}'
+      root: 'config/quality'
+      run: bun run typecheck
+
+    paragon-ast:
+      glob: 'config/quality/src/**/*.{ts,tsx}'
+      exclude: 'config/quality/src/hooks/**'
+      run: |
+        RULES_DIR="$HOME/dotfiles/config/quality/rules"
+        [ ! -d "$RULES_DIR" ] && exit 0
+        has_error=0
+        # Scan only valid rules (skip broken ones)
+        for rule in "$RULES_DIR"/paragon/no-nullish-coalescing-domain.yml \
+                    "$RULES_DIR"/paragon/no-optional-chain-domain.yml \
+                    "$RULES_DIR"/paragon/no-truthiness-check.yml; do
+          [ -f "$rule" ] || continue
+          # Run ast-grep - only fail on error level, not warnings
+          output=$(ast-grep scan --rule "$rule" {staged_files} 2>&1)
+          if echo "$output" | grep -q "^error\["; then
+            echo "=== $(basename "$rule") ==="
+            echo "$output"
+            has_error=1
+          fi
+        done
+        exit $has_error
+
+    nixfmt:
+      glob: '*.nix'
+      run: nixfmt {staged_files}
+      stage_fixed: true
+
+# commit-msg hooks disabled - conventional commits enforced by CI
+# commit-msg:
+#   commands:
+#     commitlint:
+#       run: bunx commitlint --edit {1}

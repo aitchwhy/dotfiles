@@ -61,7 +61,7 @@ export const HOOK_DEFINITIONS: HookDefinitions = {
         {
           type: 'command',
           command: qualityHook('unified-polish.ts'),
-          timeout: 60,
+          timeout: 120,
         },
       ],
     },
