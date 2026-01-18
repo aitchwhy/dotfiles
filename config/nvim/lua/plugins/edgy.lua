@@ -7,26 +7,35 @@ return {
     keys = {
       { "<leader>ue", function() require("edgy").toggle() end, desc = "Edgy Toggle" },
       { "<leader>uE", function() require("edgy").select() end, desc = "Edgy Select Window" },
+      -- Generic zoom: zoom current edgy window (must be in one)
       {
-        "<leader>az",
+        "<leader>uz",
         function()
           local edgy = require("edgy")
-          -- If in an edgy window, zoom it; otherwise zoom Sidekick
           for _, w in ipairs(edgy.get_wins()) do
             if w.win == vim.api.nvim_get_current_win() then
               w:toggle_zoom()
               return
             end
           end
-          -- Fallback: zoom Sidekick specifically
+          vim.notify("Not in an edgy window", vim.log.levels.WARN)
+        end,
+        desc = "Zoom Edgy Window",
+      },
+      -- AI-specific zoom: always zoom Sidekick
+      {
+        "<leader>az",
+        function()
+          local edgy = require("edgy")
           for _, w in ipairs(edgy.get_wins()) do
             if w.view and w.view.ft == "sidekick" then
               w:toggle_zoom()
               return
             end
           end
+          vim.notify("Sidekick not open", vim.log.levels.WARN)
         end,
-        desc = "Zoom AI Pane",
+        desc = "Zoom Sidekick",
       },
     },
     opts = function(_, opts)
