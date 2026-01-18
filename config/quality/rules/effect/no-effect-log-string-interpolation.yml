@@ -1,0 +1,31 @@
+# Effect: Encourage structured logging
+# @see https://effect.website/docs/observability/logging
+id: no-effect-log-string-interpolation
+language: TypeScript
+severity: warning
+message: "Prefer structured logging with Effect.annotateLogs over string interpolation"
+note: |
+  String interpolation in logs makes searching and aggregating difficult.
+  Use Effect.annotateLogs for structured, queryable log data.
+
+  Example:
+    // WARNING: string interpolation loses structure
+    yield* Effect.log(`User ${userId} logged in from ${ip}`)
+
+    // GOOD: structured logging
+    yield* Effect.log('User logged in').pipe(
+      Effect.annotateLogs({ userId, ip })
+    )
+
+    // ALSO GOOD: span annotations for request-scoped data
+    yield* myEffect.pipe(
+      Effect.annotateLogs({ requestId, traceId })
+    )
+
+  Structured logs enable:
+  - Efficient searching (e.g., userId:123)
+  - Aggregation and metrics
+  - Correlation across services
+
+rule:
+  pattern: Effect.log(`$$$`)
