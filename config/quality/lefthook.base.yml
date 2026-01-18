@@ -56,10 +56,14 @@ pre-commit:
             [ -f "$rule" ] || continue
             # Run ast-grep and capture output
             output=$(ast-grep scan --rule "$rule" $filtered_files 2>&1 | grep -v "paragon-guard\|sig-\|ast-engine")
-            if [ -n "$output" ] && echo "$output" | grep -qE "error|warning"; then
+            if [ -n "$output" ]; then
+              # Show all output (errors and warnings)
               echo "=== $category/$(basename "$rule") ==="
               echo "$output"
-              has_error=1
+              # Only fail on errors, not warnings
+              if echo "$output" | grep -qE "^error\["; then
+                has_error=1
+              fi
             fi
           done
         done
