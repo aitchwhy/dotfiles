@@ -32,6 +32,7 @@ pre-commit:
 
         # Filter out test files, config files, and composition roots
         # Mobile/agent apps are composition roots using XState, not Effect patterns
+        # Adapters implement ports and interface with third-party libraries
         filtered_files=""
         for f in {staged_files}; do
           case "$f" in
@@ -41,6 +42,7 @@ pre-commit:
             *.config.ts|*/drizzle.config.ts|*/infra/*) continue ;;
             infra/*) continue ;;
             apps/mobile/*|apps/agent/*) continue ;;
+            packages/adapters/*) continue ;;
           esac
           filtered_files="$filtered_files $f"
         done
