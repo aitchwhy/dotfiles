@@ -30,13 +30,15 @@ pre-commit:
         [ ! -d "$RULES_DIR" ] && exit 0
         has_error=0
 
-        # Filter out test files and config files (match sgconfig.yml)
+        # Filter out test files, config files, and composition roots
+        # Mobile app is a composition root using XState, not Effect patterns
         filtered_files=""
         for f in {staged_files}; do
           case "$f" in
             *.test.ts|*.test.tsx|*.spec.ts|*.spec.tsx) continue ;;
             */__tests__/*|*/test/*|*/tests/*|*/e2e/*) continue ;;
             *.config.ts|*/drizzle.config.ts|*/infra/*) continue ;;
+            */apps/mobile/*|*/apps/agent/*) continue ;;
           esac
           filtered_files="$filtered_files $f"
         done
