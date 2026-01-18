@@ -7,7 +7,18 @@ rule:
 message: |
   Guard 50: Custom requireEnv detected.
 
-  - Import from '@ember/config' instead.
-  - Shared utilities check validation and reporting consistently.
+  - Use Effect Config service for environment configuration
+  - Config.string('KEY') returns Effect<string, ConfigError>
+  - Provides typed, validated config access with proper error handling
 
-  See: config/agents/skills/paragon/SKILL.md
+  Example:
+    // BAD: custom requireEnv
+    function requireEnv(key: string): string { ... }
+
+    // GOOD: Effect Config
+    const config = Config.all({
+      databaseUrl: Config.string('DATABASE_URL'),
+      port: Config.number('PORT').pipe(Config.withDefault(3000))
+    })
+
+  See: effect-ts skill for Effect Config patterns
