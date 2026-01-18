@@ -37,7 +37,9 @@ pre-commit:
           case "$f" in
             *.test.ts|*.test.tsx|*.spec.ts|*.spec.tsx) continue ;;
             */__tests__/*|*/test/*|*/tests/*|*/e2e/*) continue ;;
+            e2e/*) continue ;;
             *.config.ts|*/drizzle.config.ts|*/infra/*) continue ;;
+            infra/*) continue ;;
             apps/mobile/*|apps/agent/*) continue ;;
           esac
           filtered_files="$filtered_files $f"
