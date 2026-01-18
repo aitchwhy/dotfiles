@@ -3,21 +3,61 @@ language: typescript
 severity: error
 rule:
   any:
+    # HTTP Frameworks -> Use @effect/platform HttpApiBuilder
     - pattern: "import { $$$ } from 'express'"
     - pattern: "import { $$$ } from 'fastify'"
     - pattern: "import { $$$ } from 'hono'"
+    - pattern: "import { $$$ } from 'koa'"
+    - pattern: "import express from 'express'"
+    - pattern: "import fastify from 'fastify'"
+    - pattern: "import { Hono } from 'hono'"
+    - pattern: "import Koa from 'koa'"
+    # ORM/Database -> Use drizzle-orm + postgres.js
     - pattern: "import { $$$ } from '@prisma/client'"
+    - pattern: "import { $$$ } from 'typeorm'"
+    - pattern: "import { $$$ } from 'sequelize'"
+    - pattern: "import { $$$ } from 'mysql2'"
     - pattern: "import { $$$ } from 'pg'"
+    # Observability -> Use @effect/opentelemetry
     - pattern: "import { $$$ } from 'dd-trace'"
+    # Testing -> Use vitest
     - pattern: "import { $$$ } from 'jest'"
     - pattern: "import { $$$ } from '@jest/globals'"
+    # Schema/Validation -> Use Effect Schema
+    - pattern: "import { $$$ } from 'zod'"
+    - pattern: "import { z } from 'zod'"
+    - pattern: "import * as z from 'zod'"
+    - pattern: "import { $$$ } from 'yup'"
+    - pattern: "import * as yup from 'yup'"
+    - pattern: "import { $$$ } from 'joi'"
+    - pattern: "import Joi from 'joi'"
+    # State Management -> Use XState v5
+    - pattern: "import { $$$ } from 'redux'"
+    - pattern: "import { $$$ } from '@reduxjs/toolkit'"
+    - pattern: "import { $$$ } from 'zustand'"
+    - pattern: "import { $$$ } from 'mobx'"
+    - pattern: "import { $$$ } from 'recoil'"
+    - pattern: "import { $$$ } from 'jotai'"
+    # HTTP Clients -> Use HttpApiClient
+    - pattern: "import { $$$ } from 'axios'"
+    - pattern: "import axios from 'axios'"
+    - pattern: "import { $$$ } from 'got'"
+    - pattern: "import got from 'got'"
+    - pattern: "import { $$$ } from 'ky'"
+    - pattern: "import ky from 'ky'"
+    - pattern: "import { $$$ } from 'superagent'"
+    - pattern: "import superagent from 'superagent'"
 message: |
   Guard 4: Forbidden import detected.
 
-  - express/fastify/hono -> Use @effect/platform HttpApiBuilder
-  - @prisma/client -> Use drizzle-orm
-  - pg -> Use postgres (postgres.js)
-  - dd-trace -> Use @effect/opentelemetry
-  - jest -> Use vitest
+  Replacements:
+  - express/fastify/hono/koa -> @effect/platform HttpApiBuilder
+  - @prisma/client/typeorm/sequelize -> drizzle-orm
+  - pg/mysql2 -> postgres (postgres.js)
+  - dd-trace -> @effect/opentelemetry
+  - jest -> vitest
+  - zod/yup/joi -> Effect Schema
+  - redux/zustand/mobx/recoil/jotai -> XState v5
+  - axios/got/ky/superagent -> HttpApiClient
 
   See: config/agents/skills/paragon/SKILL.md
