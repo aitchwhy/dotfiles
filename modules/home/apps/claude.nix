@@ -279,6 +279,10 @@ in
       source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/quality/generated/claude/personas";
     };
 
+    home.file.".claude/commands" = {
+      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/quality/commands";
+    };
+
     # ═══════════════════════════════════════════════════════════════════════════
     # MCP Config Generation (Activation-time for HTTP server API key injection)
     # ═══════════════════════════════════════════════════════════════════════════

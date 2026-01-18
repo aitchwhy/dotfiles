@@ -15,6 +15,17 @@ bun run typecheck  # Check types
 bun run test       # Run tests
 ```
 
+## Workflow Commands (Claude Code)
+
+| Command | Description |
+|---------|-------------|
+| /switch | Rebuild Nix system configuration |
+| /generate | Regenerate Claude artifacts from SSOT |
+| /audit | Audit Claude Code configuration state |
+| /verify-loop | Autonomous verification until green |
+| /commit-push-pr | Commit, push, and create PR |
+| /context-checkpoint | Save session context for teleport/resume |
+
 ## Architecture
 
 ```

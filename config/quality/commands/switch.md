@@ -1,4 +1,9 @@
-Rebuild the Nix system configuration:
+---
+description: Rebuild Nix system configuration
+allowed-tools: Bash
+---
+
+# Nix System Rebuild
 
 1. Run `just check` to validate flake
 2. Run `just switch` (or `sudo darwin-rebuild switch --flake ~/dotfiles`)

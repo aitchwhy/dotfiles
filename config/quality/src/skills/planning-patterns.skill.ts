@@ -275,5 +275,28 @@ just verify-paragon
 just lint-staged
 \`\`\``,
     },
+    {
+      heading: 'Context Window Management',
+      content: `### When to Checkpoint
+- Session > 1 hour
+- Before --teleport
+- Before major refactoring
+- Context feels "heavy"
+
+### Checkpoint Strategy
+1. Use /context-checkpoint command
+2. Keep: Goal, decisions, rationale
+3. Discard: Implementation details (Claude can re-read)
+4. Include: Resume prompt
+
+### Token Estimation
+- ~4 characters per token
+- 35 skills: ~15-20k tokens (acceptable)
+
+### ref MCP for Docs
+Use ref.tools for documentation:
+- 60-95% fewer tokens than raw fetch
+- Deduplicates within session`,
+    },
   ],
 }
