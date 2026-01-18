@@ -1,0 +1,34 @@
+# Schema: Prevent deriving types from schemas
+# Type-first principle: TypeScript interfaces are SSOT, schemas validate
+id: no-schema-type-inference
+language: typescript
+severity: error
+rule:
+  any:
+    # Zod patterns
+    - pattern: "z.infer<$TYPE>"
+    - pattern: "z.input<$TYPE>"
+    - pattern: "z.output<$TYPE>"
+    # Effect Schema patterns
+    - pattern: "Schema.Schema.Type<$TYPE>"
+    - pattern: "Schema.Type<$TYPE>"
+    - pattern: "typeof $SCHEMA.Type"
+message: |
+  SCHEMA TYPE INFERENCE VIOLATION detected.
+
+  TypeScript type MUST be source of truth. Never derive types from schemas.
+
+    // BAD - Zod
+    const schema = z.object({ name: z.string() });
+    type User = z.infer<typeof schema>;
+
+    // BAD - Effect Schema
+    const UserSchema = Schema.Struct({ name: Schema.String });
+    type User = Schema.Schema.Type<typeof UserSchema>;
+
+    // GOOD - Type first, schema satisfies
+    type User = { readonly name: string };
+    const UserSchema = Schema.Struct({ name: Schema.String }) satisfies Schema.Schema<User>;
+
+  See type-boundary-patterns skill for TypeScript-first patterns.
+note: "See: config/agents/skills/type-boundary-patterns/SKILL.md"
