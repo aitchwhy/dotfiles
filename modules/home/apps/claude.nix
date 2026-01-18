@@ -60,7 +60,8 @@ let
       # AST-based code search and transformation
       # https://github.com/ast-grep/ast-grep-mcp
       isPython = true;
-      package = "--from git+https://github.com/ast-grep/ast-grep-mcp ast-grep-server";
+      package = "git+https://github.com/ast-grep/ast-grep-mcp";
+      executable = "ast-grep-server";
       args = [ ];
     };
   };
@@ -132,12 +133,19 @@ let
         ];
       }
     else if def.isPython or false then
+      let
+        uvxCmd =
+          if def.executable or null != null then
+            "uvx --from ${def.package} ${def.executable}"
+          else
+            "uvx ${def.package}";
+      in
       {
         # Python packages via uvx
         command = "/bin/sh";
         args = [
           "-c"
-          "${envSource}PATH=${pathString}:$PATH exec uvx ${def.package}${argsString}"
+          "${envSource}PATH=${pathString}:$PATH exec ${uvxCmd}${argsString}"
         ];
       }
     else
@@ -190,7 +198,18 @@ let
       {
         # Python packages via uvx
         command = "uvx";
-        args = [ def.package ] ++ def.args;
+        args =
+          (
+            if def.executable or null != null then
+              [
+                "--from"
+                def.package
+                def.executable
+              ]
+            else
+              [ def.package ]
+          )
+          ++ (def.args or [ ]);
         type = "stdio";
       }
     else if hasEnvVars then
