@@ -29,6 +29,20 @@ pre-commit:
         RULES_DIR="$HOME/dotfiles/config/quality/rules"
         [ ! -d "$RULES_DIR" ] && exit 0
         has_error=0
+
+        # Filter out test files - they are composition roots (ADR-0045)
+        filtered_files=""
+        for f in {staged_files}; do
+          case "$f" in
+            *.test.ts|*.test.tsx|*.spec.ts|*.spec.tsx) continue ;;
+            */__tests__/*|*/test/*|*/tests/*|*/e2e/*) continue ;;
+          esac
+          filtered_files="$filtered_files $f"
+        done
+
+        # Exit if no non-test files to check
+        [ -z "$filtered_files" ] && exit 0
+
         # Scan all rule categories
         for category in paragon effect effect-xstate xstate zod versions; do
           category_dir="$RULES_DIR/$category"
@@ -36,7 +50,7 @@ pre-commit:
           for rule in "$category_dir"/*.yml; do
             [ -f "$rule" ] || continue
             # Run ast-grep and capture output
-            output=$(ast-grep scan --rule "$rule" {staged_files} 2>&1 | grep -v "paragon-guard\|sig-\|ast-engine")
+            output=$(ast-grep scan --rule "$rule" $filtered_files 2>&1 | grep -v "paragon-guard\|sig-\|ast-engine")
             if [ -n "$output" ] && echo "$output" | grep -qE "error|warning"; then
               echo "=== $category/$(basename "$rule") ==="
               echo "$output"
