@@ -25,14 +25,15 @@ rule:
   kind: program
   has:
     any:
-      - pattern: export async function $NAME($$$) { $$$BODY }
-        constraints:
-          BODY:
-            any:
-              - pattern: fetch($$$)
-              - pattern: await fetch($$$)
-      - pattern: export const $NAME = async ($$$) => { $$$BODY }
-        constraints:
-          BODY:
-            any:
-              - pattern: fetch($$$)
+      - all:
+          - pattern: export async function $NAME($$$) { $$$BODY }
+          - has:
+              any:
+                - pattern: fetch($$$)
+                - pattern: await fetch($$$)
+      - all:
+          - pattern: export const $NAME = async ($$$) => { $$$BODY }
+          - has:
+              any:
+                - pattern: fetch($$$)
+                - pattern: await fetch($$$)

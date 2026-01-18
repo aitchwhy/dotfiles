@@ -17,45 +17,23 @@ language: typescript
 severity: warning
 rule:
   any:
-    # grep patterns in strings/template literals
-    - pattern: "'$$$grep$$$'"
-      constraints:
-        grep:
-          regex: '\bgrep\s+'
-    - pattern: '"$$$grep$$$"'
-      constraints:
-        grep:
-          regex: '\bgrep\s+'
-    - pattern: '`$$$grep$$$`'
-      constraints:
-        grep:
-          regex: '\bgrep\s+'
-    # find patterns in strings (be careful not to match JS .find())
-    - pattern: "'$$$find$$$'"
-      constraints:
-        find:
-          regex: '\bfind\s+\.'
-    - pattern: '"$$$find$$$"'
-      constraints:
-        find:
-          regex: '\bfind\s+\.'
-    - pattern: '`$$$find$$$`'
-      constraints:
-        find:
-          regex: '\bfind\s+\.'
-    # ls -la patterns (avoid matching js-style usage)
-    - pattern: "'$$$ls$$$'"
-      constraints:
-        ls:
-          regex: '\bls\s+-'
-    - pattern: '"$$$ls$$$"'
-      constraints:
-        ls:
-          regex: '\bls\s+-'
-    - pattern: '`$$$ls$$$`'
-      constraints:
-        ls:
-          regex: '\bls\s+-'
+    # Match string literals containing legacy tool commands
+    - kind: string
+      regex: '\bgrep\s+-'
+    - kind: template_string
+      regex: '\bgrep\s+-'
+    - kind: string
+      regex: '\bfind\s+\.'
+    - kind: template_string
+      regex: '\bfind\s+\.'
+    - kind: string
+      regex: '\bls\s+-[la]'
+    - kind: template_string
+      regex: '\bls\s+-[la]'
+    - kind: string
+      regex: '\bdu\s+-'
+    - kind: template_string
+      regex: '\bdu\s+-'
 message: |
   LEGACY TOOL detected in string.
 

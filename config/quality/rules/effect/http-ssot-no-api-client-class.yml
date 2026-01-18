@@ -48,27 +48,16 @@ rule:
         export const $NAME = {
           $$$METHODS
         }
-      constraints:
-        METHODS:
-          any:
-            - pattern: fetch($$$)
-            - pattern: await fetch($$$)
+      has:
+        any:
+          - pattern: fetch($$$)
+          - pattern: await fetch($$$)
     # Class with methods that call fetch
     - pattern: |
         class $NAME {
           $$$BODY
         }
-      constraints:
-        BODY:
-          any:
-            - pattern: fetch($$$)
-            - pattern: await fetch($$$)
-    # Function that constructs manual clients
-    - pattern: |
-        const $NAME = async ($$$ARGS) => {
-          $$$BODY
-        }
-      constraints:
-        BODY:
-          any:
-            - pattern: fetch($URL, $$$)
+      has:
+        any:
+          - pattern: fetch($$$)
+          - pattern: await fetch($$$)

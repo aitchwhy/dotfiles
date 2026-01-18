@@ -3,11 +3,9 @@ language: typescript
 severity: error
 rule:
   any:
-    - pattern: ": any"
-    - pattern: "as any"
-    - pattern: "<any>"
-    - pattern: "<any,"
-    - pattern: ", any>"
+    - pattern: "$_: any"
+    - pattern: "$_ as any"
+    - pattern: "<any>$_"
 message: |
   ANY TYPE VIOLATION detected.
 
