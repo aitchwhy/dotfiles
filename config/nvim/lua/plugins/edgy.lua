@@ -60,7 +60,7 @@ return {
 
       -- BOTTOM: Neotest Output, QuickFix, Help
       table.insert(opts.bottom, { title = "Neotest Output", ft = "neotest-output-panel", size = { height = 15 } })
-      table.insert(opts.bottom, { ft = "qf", title = "QuickFix" })
+      table.insert(opts.bottom, { ft = "qf", title = "QuickFix", size = { height = 0.35 } })
       table.insert(opts.bottom, {
         ft = "help",
         size = { height = 20 },
