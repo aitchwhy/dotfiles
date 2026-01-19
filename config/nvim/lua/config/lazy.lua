@@ -70,6 +70,9 @@ require("lazy").setup({
     { import = "lazyvim.plugins.extras.editor.harpoon2" },
     { import = "lazyvim.plugins.extras.editor.overseer" },
 
+    -- Testing
+    { import = "lazyvim.plugins.extras.test.core" },
+
     -- import/override with your plugins
     { import = "plugins" },
   },

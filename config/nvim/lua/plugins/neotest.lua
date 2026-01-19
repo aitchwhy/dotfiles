@@ -6,6 +6,7 @@ return {
     dependencies = {
       "marilari88/neotest-vitest",
       "nvim-neotest/neotest-python",
+      "stevearc/overseer.nvim", -- CRITICAL: ensures overseer is in rtp before consumer require
     },
     opts = function(_, opts)
       -- Preserve LazyVim's overseer consumer injection
@@ -104,8 +105,16 @@ return {
         },
       })
 
-      -- NOTE: LazyVim's overseer extra automatically adds:
-      -- opts.consumers.overseer = require("neotest.consumers.overseer")
+      -- FIX: Override LazyVim's broken overseer consumer injection with safe loading
+      -- LazyVim's overseer extra does `opts.consumers.overseer = require(...)` during opts
+      -- resolution, before overseer.nvim's lua/ is in rtp. This pcall handles that gracefully.
+      opts.consumers = opts.consumers or {}
+      local ok, overseer_consumer = pcall(require, "neotest.consumers.overseer")
+      if ok then
+        opts.consumers.overseer = overseer_consumer
+      else
+        vim.notify("neotest: Failed to load overseer consumer", vim.log.levels.WARN)
+      end
 
       return opts
     end,
