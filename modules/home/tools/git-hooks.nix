@@ -17,7 +17,7 @@ in
     # Each project uses local lefthook with project-specific rules.
 
     # Explicitly unset any inherited value
-    programs.git.extraConfig.core.hooksPath = "";
+    programs.git.settings.core.hooksPath = "";
 
     home.file.".config/git/HOOKS.md".text = ''
       # Git Hooks Architecture
