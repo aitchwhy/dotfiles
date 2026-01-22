@@ -13,7 +13,7 @@ return {
         watch = true, -- Auto-reload files changed by AI CLI
         mux = {
           backend = "zellij", -- ENFORCED: Zellij only (no tmux)
-          enabled = true,     -- Persist sessions across NeoVim restarts
+          enabled = false,    -- Disabled for better clipboard/image paste (OSC 52 passthrough issues)
         },
         win = {
           layout = "right",
