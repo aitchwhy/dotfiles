@@ -27,6 +27,9 @@ return {
           },
         },
         sources = {
+          files = {
+            hidden = true, -- Show hidden files (.envrc, etc.) by default
+          },
           explorer = {
             layout = { preset = "sidebar", preview = false },
             git_status = true,
