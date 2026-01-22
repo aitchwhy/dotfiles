@@ -18,14 +18,8 @@
     taps = [ ];
 
     # CLI tools (most in home.packages via Nix)
-    brews = [
-      # Container runtime (Colima VZ + Docker CLI)
-      "colima"
-      "docker"
-      "docker-compose"
-      "docker-credential-helper"
-      "lima" # Colima dependency
-    ];
+    # OrbStack provides docker, docker-compose, and credential helpers
+    brews = [ ];
 
     # GUI Applications (Homebrew Casks)
     casks = [
@@ -39,6 +33,7 @@
       # ─────────────────────────────────────────────────────────────
       "claude-code" # Claude CLI
       "cursor" # AI-first code editor
+      "orbstack" # Docker runtime (replaces Docker Desktop/Colima)
       "proxyman" # HTTP debugging proxy
       "tableplus" # Database GUI
       "antigravity" # Google's AI IDE

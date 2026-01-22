@@ -55,7 +55,7 @@ in
       windowManager.enable = mkDefault true;
       inputDevices.enable = mkDefault true;
       tailscale.enable = mkDefault true;
-      colima.enable = mkDefault true;
+      colima.enable = mkDefault false; # Replaced by OrbStack
       secrets.enable = mkDefault true;
       terminal.enable = mkDefault true;
       activityMonitor.enable = mkDefault true;

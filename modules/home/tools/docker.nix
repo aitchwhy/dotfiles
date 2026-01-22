@@ -1,5 +1,5 @@
 # Docker client configuration (declarative)
-# Sets DOCKER_HOST to use Colima socket
+# OrbStack manages Docker context automatically - no DOCKER_HOST needed
 {
   config,
   lib,
@@ -16,10 +16,7 @@ in
   };
 
   config = mkIf cfg.enable {
-    # Set DOCKER_HOST to Colima socket (avoids config.json context conflicts)
-    # Docker CLI provided by Homebrew (alongside Colima) for version compatibility
-    home.sessionVariables = {
-      DOCKER_HOST = "unix:///Users/${config.home.username}/.colima/default/docker.sock";
-    };
+    # OrbStack automatically sets the Docker context via socket at /var/run/docker.sock
+    # No DOCKER_HOST override needed - Docker CLI provided by Homebrew
   };
 }
