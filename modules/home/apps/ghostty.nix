@@ -102,6 +102,9 @@ in
           "cmd+j=jump_to_prompt:1"
           "cmd+k=jump_to_prompt:-1"
 
+          # Explicit paste - ensures Cmd+V works before Zellij/NeoVim intercept
+          "cmd+v=paste_from_clipboard"
+
           # Literal newline
           "shift+enter=text:\\n"
         ];
