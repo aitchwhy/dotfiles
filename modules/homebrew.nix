@@ -15,7 +15,9 @@
     };
 
     # Taps (formula repositories)
-    taps = [ ];
+    taps = [
+      "steipete/tap" # Required for RepoBar
+    ];
 
     # CLI tools (most in home.packages via Nix)
     # OrbStack provides docker, docker-compose, and credential helpers
@@ -40,8 +42,7 @@
       "kaleidoscope" # Diff/merge tool
       "marta" # Dual-pane file manager
       "yaak" # API client (Postman alternative)
-      "repobar" # GitHub repo browser for menu bar
-      "qmd" # Quick markdown editor
+      "steipete/tap/repobar" # GitHub repo browser for menu bar
 
       # ─────────────────────────────────────────────────────────────
       # AI & LLM
