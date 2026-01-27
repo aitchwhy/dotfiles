@@ -25,15 +25,15 @@ import { StackDefinitionSchema } from './schema'
 export const STACK = {
   meta: {
     frozen: '2026-01',
-    updated: '2026-01-03',
-    ssotVersion: '5.2.0', // SOTA Jan 3, 2026: synced with Told project
+    updated: '2026-01-27',
+    ssotVersion: '5.3.0', // SOTA Jan 27, 2026: updated all packages
   },
 
   // ===========================================================================
   // RUNTIME
   // ===========================================================================
   runtime: {
-    pnpm: '10.27.0', // Fast, disk-efficient package manager
+    pnpm: '10.28.1', // Fast, disk-efficient package manager
     node: '25.2.1', // Current release (EOL June 2026)
     uv: '0.5.1', // Python manager (Rust)
     volta: '2.0.1', // Tool manager (Rust)
@@ -43,8 +43,8 @@ export const STACK = {
   // FRONTEND (Web)
   // ===========================================================================
   frontend: {
-    react: '19.1.0', // Told uses 19.1.0
-    'react-dom': '19.1.0',
+    react: '19.2.4', // Latest stable with security fixes
+    'react-dom': '19.2.4',
     xstate: '5.25.0', // Actor model state machines (handles API state)
     'tanstack-router': '1.140.0',
     tailwindcss: '4.1.17',
@@ -57,7 +57,7 @@ export const STACK = {
   // ===========================================================================
   mobile: {
     // Core runtime (SDK 54)
-    expo: '54.0.30',
+    expo: '54.0.31',
     'react-native': '0.81.5',
     'react-native-web': '0.21.1',
 
@@ -115,7 +115,7 @@ export const STACK = {
   // INFRASTRUCTURE
   // ===========================================================================
   infra: {
-    pulumi: '3.214.0', // IaC (TypeScript) - Jan 2026
+    pulumi: '3.217.0', // IaC (TypeScript) - Jan 2026
     'pulumi-aws': '7.15.0', // AWS provider
     'pulumi-awsx': '3.1.0', // AWS Crosswalk (higher-level constructs)
     'docker-compose': '2.32.0', // Container orchestration
@@ -127,8 +127,8 @@ export const STACK = {
   // ===========================================================================
   testing: {
     playwright: '1.57.0',
-    vitest: '4.0.16',
-    vite: '7.2.7',
+    vitest: '4.0.17',
+    vite: '7.3.1',
     'bruno-cli': '1.30.0', // API testing
   },
 
@@ -233,8 +233,8 @@ export const STACK = {
     // NOTE: zod removed - it's in FORBIDDEN_PACKAGES (use Effect Schema)
 
     // Frontend
-    react: '19.1.0',
-    'react-dom': '19.1.0',
+    react: '19.2.4',
+    'react-dom': '19.2.4',
     xstate: '5.25.0',
     '@xstate/react': '6.0.0',
     '@tanstack/react-router': '1.140.0',
@@ -273,16 +273,16 @@ export const STACK = {
 
     // Testing
     '@playwright/test': '1.57.0',
-    vitest: '4.0.16',
-    '@vitest/ui': '4.0.16',
+    vitest: '4.0.17',
+    '@vitest/ui': '4.0.17',
 
     // Build
-    vite: '7.2.7',
+    vite: '7.3.1',
     handlebars: '4.7.8',
 
     // Dev & Linting (Jan 2026 - SOTA: oxlint for linting, biome for formatting)
-    oxlint: '1.36.0', // Type-aware linter (Oxlint 1.0 stable, 645+ rules)
-    '@biomejs/biome': '2.3.10', // Formatter ONLY (linting disabled)
+    oxlint: '1.39.0', // Type-aware linter (Oxlint 1.0 stable, 655+ rules)
+    '@biomejs/biome': '2.3.11', // Formatter ONLY (linting disabled)
     '@types/node': '25.0.3', // Node 25 Current types
     tsx: '4.19.2', // TS runner
     '@ast-grep/napi': '0.40.3',
@@ -290,7 +290,7 @@ export const STACK = {
     lefthook: '2.0.13', // Git hooks manager
 
     // Pulumi (infrastructure) - Jan 2026
-    '@pulumi/pulumi': '3.214.0',
+    '@pulumi/pulumi': '3.217.0',
     '@pulumi/aws': '7.15.0',
     '@pulumi/awsx': '3.1.0',
     '@pulumi/random': '4.18.4',
@@ -326,7 +326,7 @@ export const STACK = {
     // ===========================================================================
     // MOBILE / UNIVERSAL (for package.json generation - SDK 54)
     // ===========================================================================
-    expo: '54.0.30',
+    expo: '54.0.31',
     'react-native': '0.81.5',
     'react-native-web': '0.21.1',
     'expo-router': '6.0.21',

@@ -40,6 +40,8 @@
       "kaleidoscope" # Diff/merge tool
       "marta" # Dual-pane file manager
       "yaak" # API client (Postman alternative)
+      "repobar" # GitHub repo browser for menu bar
+      "qmd" # Quick markdown editor
 
       # ─────────────────────────────────────────────────────────────
       # AI & LLM
