@@ -16,12 +16,15 @@
 
     # Taps (formula repositories)
     taps = [
+      "depot/tap" # Required for Depot CLI
       "steipete/tap" # Required for RepoBar
     ];
 
     # CLI tools (most in home.packages via Nix)
     # OrbStack provides docker, docker-compose, and credential helpers
-    brews = [ ];
+    brews = [
+      "depot" # Docker build acceleration
+    ];
 
     # GUI Applications (Homebrew Casks)
     casks = [
