@@ -25,16 +25,16 @@ import { StackDefinitionSchema } from './schema'
 export const STACK = {
   meta: {
     frozen: '2026-01',
-    updated: '2026-01-27',
-    ssotVersion: '5.3.0', // SOTA Jan 27, 2026: updated all packages
+    updated: '2026-01-28',
+    ssotVersion: '5.3.1', // SOTA Jan 28, 2026: updated all packages
   },
 
   // ===========================================================================
   // RUNTIME
   // ===========================================================================
   runtime: {
-    pnpm: '10.28.1', // Fast, disk-efficient package manager
-    node: '25.2.1', // Current release (EOL June 2026)
+    pnpm: '10.28.2', // Fast, disk-efficient package manager
+    node: '25.5.0', // Current release (EOL June 2026)
     uv: '0.5.1', // Python manager (Rust)
     volta: '2.0.1', // Tool manager (Rust)
   },
@@ -46,7 +46,7 @@ export const STACK = {
     react: '19.2.4', // Latest stable with security fixes
     'react-dom': '19.2.4',
     xstate: '5.25.0', // Actor model state machines (handles API state)
-    'tanstack-router': '1.140.0',
+    'tanstack-router': '1.151.6',
     tailwindcss: '4.1.17',
   },
 
@@ -115,7 +115,7 @@ export const STACK = {
   // INFRASTRUCTURE
   // ===========================================================================
   infra: {
-    pulumi: '3.217.0', // IaC (TypeScript) - Jan 2026
+    pulumi: '3.217.1', // IaC (TypeScript) - Jan 2026
     'pulumi-aws': '7.15.0', // AWS provider
     'pulumi-awsx': '3.1.0', // AWS Crosswalk (higher-level constructs)
     'docker-compose': '2.32.0', // Container orchestration
@@ -154,7 +154,7 @@ export const STACK = {
   // AUTH & SERVICES
   // ===========================================================================
   services: {
-    'better-auth': '1.4.10', // TypeScript-first auth (replaces Clerk)
+    'better-auth': '1.4.15', // TypeScript-first auth (replaces Clerk)
     'livekit-client': '2.16.1', // Client SDK
     'livekit-server-sdk': '2.15.0', // Server SDK
   },
@@ -237,7 +237,7 @@ export const STACK = {
     'react-dom': '19.2.4',
     xstate: '5.25.0',
     '@xstate/react': '6.0.0',
-    '@tanstack/react-router': '1.140.0',
+    '@tanstack/react-router': '1.151.6',
     tailwindcss: '4.1.17',
 
     // Backend (Effect Platform HTTP - no Hono)
@@ -245,8 +245,8 @@ export const STACK = {
     'drizzle-kit': '0.31.8',
 
     // Auth
-    'better-auth': '1.4.10',
-    '@better-auth/expo': '1.4.10',
+    'better-auth': '1.4.15',
+    '@better-auth/expo': '1.4.15',
 
     // Observability (Datadog + OTEL 2.x)
     '@opentelemetry/api': '1.9.0',
@@ -290,7 +290,7 @@ export const STACK = {
     lefthook: '2.0.13', // Git hooks manager
 
     // Pulumi (infrastructure) - Jan 2026
-    '@pulumi/pulumi': '3.217.0',
+    '@pulumi/pulumi': '3.217.1',
     '@pulumi/aws': '7.15.0',
     '@pulumi/awsx': '3.1.0',
     '@pulumi/random': '4.18.4',
