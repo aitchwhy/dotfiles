@@ -16,8 +16,8 @@ in
     # Global hooks bypass project ignores, causing false positives.
     # Each project uses local lefthook with project-specific rules.
 
-    # Explicitly unset any inherited value
-    programs.git.settings.core.hooksPath = "";
+    # Note: Do NOT set hooksPath to "" as it disables ALL hooks (including local ones)
+    # Git defaults to .git/hooks/ which allows per-project hooks to work
 
     home.file.".config/git/HOOKS.md".text = ''
       # Git Hooks Architecture
