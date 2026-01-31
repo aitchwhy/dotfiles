@@ -25,14 +25,18 @@ in
         "bun"
         "node"
       ];
-      default = "bun";
-      description = "Runtime for MCP server execution (bun = faster, no Node dependency)";
+      default = "node";
+      description = "Runtime for MCP server execution";
     };
   };
 
   config = mkIf cfg.enable {
-    # Ensure bun is available if selected as runtime
-    home.packages = mkIf (cfg.mcpRuntime == "bun") [ pkgs.bun ];
+    # Ensure runtime is available
+    home.packages =
+      if cfg.mcpRuntime == "bun" then
+        [ pkgs.bun ]
+      else
+        [ pkgs.nodejs_25 ];
 
     # Declarative MCP extension patching (runs on every darwin-rebuild/home-manager switch)
     # Survives Claude Desktop updates by re-applying patches on each activation
