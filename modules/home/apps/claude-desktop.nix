@@ -32,11 +32,7 @@ in
 
   config = mkIf cfg.enable {
     # Ensure runtime is available
-    home.packages =
-      if cfg.mcpRuntime == "bun" then
-        [ pkgs.bun ]
-      else
-        [ pkgs.nodejs_25 ];
+    home.packages = if cfg.mcpRuntime == "bun" then [ pkgs.bun ] else [ pkgs.nodejs_25 ];
 
     # Declarative MCP extension patching (runs on every darwin-rebuild/home-manager switch)
     # Survives Claude Desktop updates by re-applying patches on each activation
@@ -51,15 +47,17 @@ in
 
       echo "Patching Claude MCP extensions to use: $RUNTIME"
 
-      # Patch manifest.json files (idempotent - only patches if "node" found)
-      # Use while loop to handle files properly with GNU sed
-      ${pkgs.findutils}/bin/find "$EXT_DIR" -name "manifest.json" -type f | while read -r file; do
-        ${pkgs.gnused}/bin/sed -i "s/\"command\": \"node\"/\"command\": \"$RUNTIME\"/g" "$file"
+      # Patch manifest.json files (idempotent - patches both "bun" and "node" to target runtime)
+      # Use macOS system find and sed (fd alias conflicts with find command)
+      /usr/bin/find "$EXT_DIR" -name "manifest.json" -type f | while read -r file; do
+        sed -i.bak "s/\"command\": \"bun\"/\"command\": \"$RUNTIME\"/g" "$file" && rm -f "$file.bak"
+        sed -i.bak "s/\"command\": \"node\"/\"command\": \"$RUNTIME\"/g" "$file" && rm -f "$file.bak"
       done
 
-      # Patch .js shebangs (idempotent - only patches if node shebang found)
-      ${pkgs.findutils}/bin/find "$EXT_DIR" -name "*.js" -type f | while read -r file; do
-        ${pkgs.gnused}/bin/sed -i "s|#!/usr/bin/env node|#!/usr/bin/env $RUNTIME|g" "$file"
+      # Patch .js shebangs (idempotent - patches both bun and node shebangs)
+      /usr/bin/find "$EXT_DIR" -name "*.js" -type f | while read -r file; do
+        sed -i.bak "s|#!/usr/bin/env bun|#!/usr/bin/env $RUNTIME|g" "$file" && rm -f "$file.bak"
+        sed -i.bak "s|#!/usr/bin/env node|#!/usr/bin/env $RUNTIME|g" "$file" && rm -f "$file.bak"
       done
 
       echo "Claude MCP runtime enforcement complete"
