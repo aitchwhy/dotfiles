@@ -38,11 +38,10 @@ in
       ]
       # Programming Languages & Tools
       ++ (optionals cfg.enableLanguages [
-        # Node.js 25 Current (EOL June 2026)
-        nodejs_25
+        # pnpm global - transitive Node 24.x is isolated to pnpm binary only
+        # fnm manages per-project Node via .node-version files
         nodePackages.pnpm
-        yarn-berry
-        bun
+        bun # For MCP servers, scripts, and fast execution
 
         # Python - uv manages Python versions and tools (run: uv python install && uv tool install ruff)
         uv

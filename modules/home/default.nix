@@ -40,6 +40,7 @@ in
     ./apps/bartender.nix
     ./apps/raycast.nix
     ./apps/claude.nix
+    ./apps/claude-desktop.nix
     ./apps/cursor.nix
     ./apps/misc.nix
     ./apps/keyboard-layout.nix
@@ -101,6 +102,7 @@ in
         bartender.enable = mkDefault true;
         raycast.enable = mkDefault true;
         mcp.enable = mkDefault true;
+        claude-desktop.enable = mkDefault true;
 
         cursor.enable = mkDefault true;
         misc.enable = mkDefault true;
