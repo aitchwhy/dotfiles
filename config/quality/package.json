@@ -12,7 +12,7 @@
     "format": "biome format --write .",
     "format:check": "biome format .",
     "lint": "oxlint --ignore-pattern 'node_modules/**'",
-    "typecheck": "bunx @typescript/native-preview@7.0.0-dev.20260102.1 --noEmit",
+    "typecheck": "bunx @typescript/native-preview@7.0.0-dev.20260130.1 --noEmit",
     "check": "bun run typecheck && bun run format:check && bun run lint",
     "validate": "bun run check && bun run test",
     "sync-versions": "bun run sync-versions.ts",
