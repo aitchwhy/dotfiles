@@ -106,6 +106,7 @@
       # ─────────────────────────────────────────────────────────────
       # Utilities
       # ─────────────────────────────────────────────────────────────
+      "tailscale" # VPN mesh network (GUI + CLI)
       "imazing" # iOS device manager
       "kiwix" # Offline Wikipedia
       "qflipper" # Flipper Zero companion
@@ -157,7 +158,8 @@
       # ─────────────────────────────────────────────────────────────
       # Networking
       # ─────────────────────────────────────────────────────────────
-      "tailscale" # VPN mesh network (GUI + CLI)
+      # Tailscale: Installed via Homebrew cask (see casks section)
+      # GUI menubar app + CLI tools at /Applications/Tailscale.app
 
       # ─────────────────────────────────────────────────────────────
       # Utilities
