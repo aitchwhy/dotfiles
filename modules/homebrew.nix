@@ -157,8 +157,7 @@
       # ─────────────────────────────────────────────────────────────
       # Networking
       # ─────────────────────────────────────────────────────────────
-      # Tailscale managed by nix-darwin (services.tailscale)
-      # Use CLI: tailscale status, tailscale up, tailscale down
+      "tailscale" # VPN mesh network (GUI + CLI)
 
       # ─────────────────────────────────────────────────────────────
       # Utilities

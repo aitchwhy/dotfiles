@@ -54,7 +54,7 @@ in
       spaces.enable = mkDefault true;
       windowManager.enable = mkDefault true;
       inputDevices.enable = mkDefault true;
-      tailscale.enable = mkDefault true;
+      tailscale.enable = mkDefault false; # Using Homebrew cask instead (provides GUI + CLI)
       colima.enable = mkDefault false; # Replaced by OrbStack
       secrets.enable = mkDefault true;
       terminal.enable = mkDefault true;
