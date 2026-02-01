@@ -354,13 +354,21 @@ in
       EXT_CONFIG="$EXT_SETTINGS_DIR/ant.dir.ant.anthropic.filesystem.json"
       mkdir -p "$EXT_SETTINGS_DIR"
 
-      # Expand $HOME in allowed_directories paths
-      cat > "$EXT_CONFIG" << 'EXTEOF'
-      ${filesystemExtensionConfig}
-      EXTEOF
-
-      # Replace $HOME with actual home directory
-      sed -i "" "s|\$HOME|${config.home.homeDirectory}|g" "$EXT_CONFIG"
+      # Write config with $HOME expanded at activation time
+      cat > "$EXT_CONFIG" << EOF
+      {
+        "isEnabled": true,
+        "userConfig": {
+          "allowed_directories": [
+            "${config.home.homeDirectory}/src/told",
+            "${config.home.homeDirectory}/dotfiles",
+            "${config.home.homeDirectory}/.claude",
+            "${config.home.homeDirectory}/Downloads",
+            "${config.home.homeDirectory}/Documents"
+          ]
+        }
+      }
+      EOF
 
       echo "Filesystem extension config generated (5 allowed directories from SSOT)"
     '';
