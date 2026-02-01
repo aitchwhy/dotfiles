@@ -64,8 +64,8 @@
       # ─────────────────────────────────────────────────────────────
       # Productivity
       # ─────────────────────────────────────────────────────────────
-      # Note: Raycast managed via modules/home/apps/raycast.nix
-      # Note: Wispr Flow managed via modules/darwin/activation/wispr-flow.nix
+      "raycast" # Launcher (Spotlight replacement) - settings in modules/home/apps/raycast.nix
+      # Note: Wispr Flow managed via modules/darwin/activation/wispr-flow.nix (not Homebrew)
       "bartender" # Menu bar organizer
       "setapp" # App subscription (manages: Clop, LookAway, Downie, Base, SnapMotion)
       "cleanshot" # Screenshot tool - actively using with Hazel
