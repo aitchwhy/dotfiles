@@ -76,7 +76,6 @@
       "todoist-app" # Task manager
       "bitwarden" # Password manager
       "fantastical" # Calendar app - settings in modules/home/apps/fantastical.nix
-      # Dropover is managed by Setapp (not available as Homebrew cask)
 
       # ─────────────────────────────────────────────────────────────
       # Media
@@ -128,6 +127,7 @@
       # Utilities
       # ─────────────────────────────────────────────────────────────
       "rcmd" = 1596283165; # Right Command keyboard shortcuts
+      "Dropover - Easier Drag & Drop" = 1355679052; # Drag & drop shelf
     };
   };
 }
