@@ -39,7 +39,7 @@ in
     ./communication.nix
 
     # Activation scripts (apps without Homebrew casks)
-    ./activation/wispr-flow.nix
+    # ./activation/wispr-flow.nix # DISABLED: Now using Homebrew cask wispr-flow
   ];
 
   # Enable all darwin modules by default
@@ -71,7 +71,7 @@ in
       evolutionAgent.enable = mkDefault true;
 
       # Apps (activation scripts)
-      apps.wisprFlow.enable = mkDefault true;
+      # apps.wisprFlow.enable = mkDefault true; # DISABLED: Now using Homebrew cask wispr-flow
     };
 
     # System packages - only essential system-level tools
