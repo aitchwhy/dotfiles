@@ -97,6 +97,7 @@
       # System Utilities
       # ─────────────────────────────────────────────────────────────
       "betterdisplay" # Display management: HiDPI, DDC brightness, resolution scaling
+      "swish" # Trackpad gestures and window management
 
       # ─────────────────────────────────────────────────────────────
       # QuickLook Plugins
