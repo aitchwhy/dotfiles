@@ -1,0 +1,91 @@
+# Backups Lifecycle Hazel Rules
+# Purpose: Manage backup retention and cleanup
+# Order: Shortest to longest wait periods for proper execution flow
+# Apply to: /Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/Backups
+
+## Rule 1: Anthropic backups rotation
+## Trigger rotation script for Anthropic backups
+Conditions:
+- Folder path contains "Backups/Anthropic-Claude-AI"
+- Name contains "anthropic-account-data"
+- Extension is "zip"
+- Date Added is less than 1 day
+
+Actions:
+- Run shell script: ~/dotfiles/scripts/rotate-backups.sh
+- Add tag "rotated"
+- Display notification "Backup rotation triggered for {filename}"
+
+---
+
+## Rule 2: Old backups to archive (90-day)
+## Archive backups older than 90 days
+Conditions:
+- Folder path contains "Backups"
+- Date Last Modified is older than 90 days
+- Kind is not "Folder"
+- Folder path does not contain "Auto-Rotation/Archived"
+
+Actions:
+- If folder path contains "Anthropic"
+  → Move to "/Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/Backups/Auto-Rotation/Archived/Anthropic/"
+
+- Else if folder path contains "Claude"
+  → Move to "/Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/Backups/Auto-Rotation/Archived/Claude/"
+
+- Else
+  → Move to "/Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/Backups/Auto-Rotation/Archived/"
+
+- If Extension is not "zip" AND Extension is not "gz" AND Extension is not "7z"
+  → Compress with zip
+
+- Add tag "archived-backup"
+
+---
+
+## Rule 3: Very old backups cleanup (180-day)
+## Delete backups older than 180 days from archive
+Conditions:
+- Folder path contains "Backups/Auto-Rotation/Archived"
+- Date Last Modified is older than 180 days
+- Kind is not "Folder"
+
+Actions:
+- Move to Trash
+- Run shell script: echo "$(date): Deleted {filepath}" >> ~/Library/Logs/hazel-backup-cleanup.log
+- Display notification "Deleted old backup: {filename}"
+
+---
+
+## Rule 4: Orphaned backup cleanup
+## Clean up failed/incomplete backup files
+Conditions:
+- Folder path contains "Backups"
+- Name contains ".tmp" OR Name contains ".partial" OR Name contains ".download"
+- Date Last Modified is older than 7 days
+
+Actions:
+- Move to Trash
+- Display notification "Cleaned up orphaned backup file: {filename}"
+
+---
+
+# Implementation Notes:
+# 1. Import these rules into Hazel app manually
+# 2. Apply to Backups folder with "Include subfolders" enabled
+# 3. Ensure rotate-backups.sh script exists and is executable
+# 4. Log file location: ~/Library/Logs/hazel-backup-cleanup.log
+# 5. Rule 1 triggers custom rotation script for intelligent backup management
+# 6. 90-day archive → 180-day deletion provides safety buffer
+
+---
+
+# Directories to create:
+mkdir -p "/Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/Backups/Auto-Rotation/Archived"/{Anthropic,Claude}
+mkdir -p ~/Library/Logs
+
+---
+
+# Related Scripts:
+# - ~/dotfiles/scripts/rotate-backups.sh (keeps last 7 daily, 4 weekly, 12 monthly)
+# - ~/Library/LaunchAgents/com.user.backup-rotation.plist (existing LaunchAgent)

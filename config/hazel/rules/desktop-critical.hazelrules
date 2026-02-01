@@ -1,0 +1,28 @@
+# Desktop Critical Rule
+# Purpose: Prevent screenshot clutter with low-risk automation
+# Status: ACTIVE (Phase 1 - Critical Only)
+
+## Rule: Auto-organize screenshots (1-hour buffer)
+## Prevents accidental processing of screenshots you just took
+Conditions:
+- Name contains "Screenshot"
+- Kind is Image
+- Date Added is not in the last 1 hour
+
+Actions:
+- Import to Photos.app
+- Move to Trash
+
+---
+
+# Implementation Notes:
+# - Import this rule into Hazel app manually: Hazel → Desktop → Import Rules
+# - 1-hour buffer prevents processing screenshots you just took
+# - Low risk: Screenshots are backed up to iCloud Photos before deletion
+# - High value: Keeps Desktop clean without manual effort
+
+# Future Rules (Available in archive/desktop-lifecycle.hazelrules):
+# - Active → Review transition (24 hours)
+# - Review → Google Drive routing (7 days)
+# - Large file cold storage (>500 MB)
+# - Installer cleanup (7 days)

@@ -1,0 +1,136 @@
+# Google Drive Lifecycle Hazel Rules
+# Purpose: Manage Google Drive files through lifecycle stages (Inbox → Active → Recent → Archive → ColdStorage)
+# Order: Shortest to longest wait periods for proper execution flow
+# Apply to: /Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive
+
+## Rule 1: Inbox to Active notification (3-day flag)
+## Reminds you to organize inbox items manually
+Conditions:
+- Folder is "01-Inbox"
+- Date Added is older than 3 days
+- Does not have tag "needs-organization"
+
+Actions:
+- Add tag "needs-organization"
+- Display notification "Inbox items need organizing ({count} files)"
+
+---
+
+## Rule 2: Active to Recent (30-day transition)
+## Files not accessed in 30 days move from active to recent
+Conditions:
+- Folder is "02-Active"
+- Date Last Opened is older than 30 days
+- Kind is not "Folder"
+
+Actions:
+- If folder path contains "Personal"
+  → Move to "/Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/03-Recent/Personal/"
+
+- Else if folder path contains "Work"
+  → Move to "/Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/03-Recent/Work/"
+
+- Else if folder path contains "Projects"
+  → Move to "/Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/03-Recent/Projects/"
+
+- Else
+  → Move to "/Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/03-Recent/"
+
+- Add tag "auto-archived"
+- Continue matching rules
+
+---
+
+## Rule 3: Recent to Archive (90-day transition)
+## Files not accessed in 90 days move from recent to archive
+Conditions:
+- Folder is "03-Recent"
+- Date Last Opened is older than 90 days
+- Kind is not "Folder"
+
+Actions:
+- If folder path contains "Personal"
+  → Move to "/Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/04-Archive/2025/Personal/"
+
+- Else if folder path contains "Work"
+  → Move to "/Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/04-Archive/2025/Work/"
+
+- Else if folder path contains "Projects"
+  → Move to "/Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/04-Archive/2025/Projects/"
+
+- Else
+  → Move to "/Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/04-Archive/2025/"
+
+- Add tag "archived"
+- Continue matching rules
+
+---
+
+## Rule 4: Archive to Cold Storage (1-year transition)
+## Files not accessed in 1 year move to cold storage
+Conditions:
+- Folder is "04-Archive"
+- Date Last Opened is older than 365 days
+- Kind is not "Folder"
+
+Actions:
+- Move to "/Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/05-ColdStorage/"
+- Add tag "cold-storage"
+- If Size is greater than 10 MB AND Extension is not "zip" AND Extension is not "gz" AND Extension is not "7z"
+  → Compress with zip
+- Display notification "Moved to cold storage: {filename}"
+
+---
+
+## Rule 5: Continuous .DS_Store cleanup
+## Remove macOS .DS_Store files immediately
+Conditions:
+- Name is ".DS_Store"
+- Kind is "File"
+
+Actions:
+- Move to Trash immediately
+
+---
+
+## Rule 6: Root files to Inbox (14-day)
+## Files left in root for 14+ days move to inbox
+Conditions:
+- Depth is 1 (root level of My Drive)
+- Kind is not "Folder"
+- Date Last Modified is older than 14 days
+- Folder is not "01-Inbox"
+- Folder is not "02-Active"
+- Folder is not "03-Recent"
+- Folder is not "04-Archive"
+- Folder is not "05-ColdStorage"
+- Folder is not "Backups"
+- Folder is not "Books"
+- Folder is not "Journal"
+- Folder is not "RecordingStudio"
+- Folder is not "Refs"
+
+Actions:
+- Move to "/Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/01-Inbox/"
+- Add tag "from-root"
+- Display notification "Root file organized: {filename}"
+
+---
+
+# Implementation Notes:
+# 1. Import these rules into Hazel app manually
+# 2. Apply to Google Drive root folder with "Include subfolders" enabled
+# 3. Create subdirectories for Rule 2, 3, and 4:
+#    - 03-Recent/{Personal,Work,Projects}
+#    - 04-Archive/2025/{Personal,Work,Projects}
+# 4. Rules execute based on "Date Last Opened" for lifecycle management
+# 5. Year folder in Archive will need manual update (2025 → 2026) each year
+# 6. Consider creating folders for future years as needed
+
+---
+
+# Subdirectories to create:
+mkdir -p "03-Recent"/{Personal,Work,Projects}
+mkdir -p "04-Archive/2025"/{Personal,Work,Projects}
+mkdir -p "04-Archive/2026"/{Personal,Work,Projects}
+mkdir -p "05-ColdStorage/Large-Files"

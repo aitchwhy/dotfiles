@@ -1,0 +1,102 @@
+# Downloads Lifecycle Hazel Rules
+# Purpose: Automatically organize Downloads folder by file type and age
+# Order: Shortest to longest wait periods for proper execution flow
+# Apply to: ~/Downloads
+
+## Rule 1: PDFs by category (1-day)
+## Categorize PDFs based on filename content
+Conditions:
+- Extension is "pdf"
+- Date Added is older than 1 day
+
+Actions:
+- If Name contains "invoice" OR Name contains "receipt"
+  → Move to "/Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/04-Archive/2025/Personal/Receipts/"
+
+- Else if Name contains "statement" OR Name contains "bank"
+  → Move to "/Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/04-Archive/2025/Personal/Finance/"
+
+- Else
+  → Move to ~/Documents/PDFs/
+
+- Add tag "auto-organized"
+- Continue matching rules
+
+---
+
+## Rule 2: Images to Photos or Archive (2-day)
+## Process images based on size
+Conditions:
+- Kind is "Image"
+- Date Added is older than 2 days
+- Name does not contain "Screenshot"
+
+Actions:
+- If Size is less than 5 MB
+  → Import to Photos.app
+  → Move to Trash
+
+- Else
+  → Move to "/Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/02-Active/Personal/Images/"
+
+- Add tag "auto-organized"
+
+---
+
+## Rule 3: Old files to Archive (30-day)
+## Archive files older than 30 days
+Conditions:
+- Date Added is older than 30 days
+- Kind is not "Folder"
+- Extension is not "dmg"
+- Extension is not "zip"
+- Extension is not "pkg"
+
+Actions:
+- Move to "/Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/04-Archive/2025/Personal/Downloads/"
+- Add tag "auto-archived"
+- Display notification "Archived old download: {filename}"
+
+---
+
+## Rule 4: DMG installers cleanup (3-day)
+## Remove DMG files after 3 days
+Conditions:
+- Extension is "dmg"
+- Date Added is older than 3 days
+
+Actions:
+- Move to Trash
+- Display notification "Removed installer: {filename}"
+
+---
+
+## Rule 5: ZIP installers cleanup (7-day)
+## Remove ZIP files after 7 days (kept longer as they might contain data)
+Conditions:
+- Extension is "zip"
+- Date Added is older than 7 days
+- Size is less than 100 MB
+
+Actions:
+- Move to Trash
+- Display notification "Removed archive: {filename}"
+
+---
+
+# Implementation Notes:
+# 1. Import these rules into Hazel app manually
+# 2. Apply to ~/Downloads folder
+# 3. Rules execute top-to-bottom
+# 4. DMG files removed faster (3 days) than ZIP (7 days)
+# 5. Large ZIP files (>100 MB) kept indefinitely - might be important data
+# 6. Screenshots handled by Desktop rules, not Downloads rules
+
+---
+
+# Directories to create:
+mkdir -p ~/Documents/PDFs
+mkdir -p "/Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/04-Archive/2025/Personal/Receipts"
+mkdir -p "/Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/04-Archive/2025/Personal/Finance"
+mkdir -p "/Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/04-Archive/2025/Personal/Downloads"
+mkdir -p "/Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/02-Active/Personal/Images"
