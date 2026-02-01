@@ -2,9 +2,15 @@
 # https://pasteapp.io/
 # Bundle ID: com.wiheads.paste
 #
+# PRIMARY CLIPBOARD MANAGER (Feb 2026)
+# - Raycast clipboard history: DISABLED (known reliability bug)
+# - Clop clipboard monitoring: DISABLED (causes duplicate entries)
+# - Wispr Flow transcriptions: Won't appear in history (save/restore pattern)
+#
 # Mac App Store app (ID: 967805235)
 # Login item: Managed via macOS System Settings > General > Login Items
-# (Mac App Store apps don't expose startAtLogin via plist defaults)
+# Database: ~/Library/Containers/com.wiheads.paste/Data/Library/Application Support/Paste/
+# Current size: ~1.2GB (as of Feb 2026)
 {
   config,
   lib,

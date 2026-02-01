@@ -39,6 +39,7 @@ in
     ./apps/ghostty.nix
     ./apps/bartender.nix
     ./apps/raycast.nix
+    ./apps/clop.nix
     ./apps/claude.nix
     ./apps/claude-desktop.nix
     ./apps/cursor.nix
@@ -101,6 +102,7 @@ in
         ghostty.enable = mkDefault true;
         bartender.enable = mkDefault true;
         raycast.enable = mkDefault true;
+        clop.enable = mkDefault true;
         mcp.enable = mkDefault true;
         claude-desktop.enable = mkDefault true;
 

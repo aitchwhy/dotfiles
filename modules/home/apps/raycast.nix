@@ -18,8 +18,11 @@ in
       # Global hotkey: Cmd+Space (49 = spacebar keycode)
       raycastGlobalHotkey = "Command-49";
 
-      # Clipboard history
-      "clipboardHistory_selectedContentTypeFilter" = "all";
+      # Clipboard history DISABLED (Feb 2026)
+      # Reason: Known reliability bug - only saves 2-10 items out of 50-60
+      # Source: https://github.com/raycast/extensions/issues/24425
+      # Using Paste as sole clipboard manager to avoid conflicts
+      # "clipboardHistory_selectedContentTypeFilter" = "all";
 
       # Floating notes
       "floatingNotes_raycastNotesEditorTextSize" = "xxLarge";

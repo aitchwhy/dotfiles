@@ -1,5 +1,17 @@
 # Wispr Flow voice dictation - manual installation via activation script
 # No Homebrew cask available, downloads directly from wisprflow.ai
+# https://wisprflow.ai/
+#
+# CLIPBOARD BEHAVIOR:
+# Wispr Flow uses a save/restore clipboard pattern to preserve your
+# clipboard contents after pasting transcriptions. This means:
+# - Transcriptions paste correctly into active applications
+# - Transcriptions do NOT appear in clipboard managers like Paste
+# - This is intentional behavior to avoid polluting clipboard history
+# - Workaround: Manually copy transcription if you need it in history
+#
+# Keyboard shortcut: Reserved via modules/darwin/keyboard.nix
+# - Ctrl+Cmd+Space (disabled macOS Emoji & Symbols picker)
 {
   config,
   lib,
