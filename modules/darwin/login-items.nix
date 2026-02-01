@@ -136,6 +136,12 @@ in
       default = true;
       description = "Start Fantastical (calendar) at login";
     };
+
+    rcmd = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Start rcmd (Right Command shortcuts) at login";
+    };
   };
 
   config = mkIf cfg.enable {
@@ -311,6 +317,15 @@ in
         serviceConfig = {
           Label = "com.flexibits.fantastical2.mac";
           ProgramArguments = [ "/Applications/Fantastical.app/Contents/MacOS/Fantastical" ];
+          RunAtLoad = true;
+          KeepAlive = false;
+        };
+      };
+
+      rcmd = mkIf cfg.rcmd {
+        serviceConfig = {
+          Label = "com.lowtechguys.rcmd";
+          ProgramArguments = [ "/Applications/rcmd.app/Contents/MacOS/rcmd" ];
           RunAtLoad = true;
           KeepAlive = false;
         };
