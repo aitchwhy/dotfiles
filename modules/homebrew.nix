@@ -107,7 +107,7 @@
       # ─────────────────────────────────────────────────────────────
       # Utilities
       # ─────────────────────────────────────────────────────────────
-      "tailscale" # VPN mesh network (GUI + CLI)
+      "tailscale-app" # VPN mesh network (GUI + CLI)
       "imazing" # iOS device manager
       "kiwix" # Offline Wikipedia
       "qflipper" # Flipper Zero companion
