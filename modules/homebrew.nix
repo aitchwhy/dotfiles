@@ -65,6 +65,7 @@
       # Productivity
       # ─────────────────────────────────────────────────────────────
       "raycast" # Launcher - PRIMARY DRIVER APP (always keep!)
+      "wispr-flow" # Voice input - PRIMARY DRIVER APP (always keep!)
       "bartender" # Menu bar organizer
       "setapp" # App subscription (manages: Clop, LookAway, Downie, Base, SnapMotion)
       "cleanshot" # Screenshot tool - actively using with Hazel
