@@ -1,0 +1,35 @@
+# Hazel Sync Rules Paths
+# Use these exact paths when setting up "Sync Rules" in Hazel
+# Location: Hazel → Select folder → Gear icon (⚙️) → "Sync Rules..."
+
+Desktop Rules:
+/Users/hank/dotfiles/config/hazel/rules/desktop-critical.hazelrules
+
+Downloads Rules:
+/Users/hank/dotfiles/config/hazel/rules/downloads-critical.hazelrules
+
+Google Drive "My Drive" Rules:
+/Users/hank/dotfiles/config/hazel/rules/gdrive-critical.hazelrules
+
+Backups Rules:
+/Users/hank/dotfiles/config/hazel/rules/backups-critical.hazelrules
+
+---
+
+# Folder Paths to Add in Hazel:
+
+Desktop:
+/Users/hank/Desktop
+(Include subfolders: NO)
+
+Downloads:
+/Users/hank/Downloads
+(Include subfolders: NO)
+
+Google Drive - My Drive:
+/Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive
+(Include subfolders: YES ✓)
+
+Backups:
+/Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/Backups
+(Include subfolders: YES ✓)
