@@ -91,6 +91,7 @@
       "carbon-copy-cloner" # Backup utility
       "cleanshot" # Screenshot tool
       "a-better-finder-rename" # Batch file renaming
+      "hazel" # Automated file organization
 
       # ─────────────────────────────────────────────────────────────
       # Media
