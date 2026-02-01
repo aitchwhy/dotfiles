@@ -74,10 +74,10 @@
       "a-better-finder-rename" # Batch file renaming
       "hazel" # Automated file organization - just configured
       "paste" # Clipboard manager
-      "todoist" # Task manager
+      "todoist-app" # Task manager
       "bitwarden" # Password manager
       "fantastical" # Calendar app - settings in modules/home/apps/fantastical.nix
-      "dropover" # Drag & drop shelf
+      # Dropover is managed by Setapp
 
       # ─────────────────────────────────────────────────────────────
       # Media
