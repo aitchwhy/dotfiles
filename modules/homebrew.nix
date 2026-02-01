@@ -64,8 +64,8 @@
       # ─────────────────────────────────────────────────────────────
       # Productivity
       # ─────────────────────────────────────────────────────────────
-      "raycast" # Launcher - PRIMARY DRIVER APP (always keep!)
-      "wispr-flow" # Voice input - PRIMARY DRIVER APP (always keep!)
+      # Note: Raycast managed via modules/home/apps/raycast.nix
+      # Note: Wispr Flow managed via modules/darwin/activation/wispr-flow.nix
       "bartender" # Menu bar organizer
       "setapp" # App subscription (manages: Clop, LookAway, Downie, Base, SnapMotion)
       "cleanshot" # Screenshot tool - actively using with Hazel
