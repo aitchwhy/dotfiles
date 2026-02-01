@@ -60,7 +60,9 @@ in
         # Clipboard
         clipboard-read = "allow";
         clipboard-write = "allow";
-        copy-on-select = true;
+        # Disabled copy-on-select to fix scrollback selection issues
+        # (was causing interference when trying to select text in scrollback)
+        copy-on-select = false;
 
         # Quick terminal
         quick-terminal-position = "center";

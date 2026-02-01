@@ -20,6 +20,13 @@ let
     "medium" = 1;
     "firm" = 2;
   };
+
+  # Gesture sensitivity: 0 = Low, 1 = Medium, 2 = High
+  gestureSensitivityValue = {
+    "low" = 0;
+    "medium" = 1;
+    "high" = 2;
+  };
 in
 {
   options.modules.darwin.inputDevices = {
@@ -99,6 +106,21 @@ in
         default = true;
         description = "Enable haptic feedback for Force Touch trackpad";
       };
+
+      gestureSensitivity = mkOption {
+        type = types.enum [
+          "low"
+          "medium"
+          "high"
+        ];
+        default = "low";
+        description = ''
+          Multi-finger gesture sensitivity.
+          - low (0): Least sensitive, prevents phantom gestures
+          - medium (1): Default macOS setting
+          - high (2): Most sensitive, may cause accidental triggers
+        '';
+      };
     };
   };
 
@@ -145,6 +167,13 @@ in
       Clicking = cfg.trackpad.tapToClick;
       # Three-finger drag
       TrackpadThreeFingerDrag = cfg.trackpad.threeFingerDrag;
+      # Multi-finger gesture sensitivity (prevents phantom gestures)
+      TrackpadThreeFingerHorizSwipeGesture = gestureSensitivityValue.${cfg.trackpad.gestureSensitivity};
+      TrackpadThreeFingerVertSwipeGesture = gestureSensitivityValue.${cfg.trackpad.gestureSensitivity};
+      TrackpadFourFingerHorizSwipeGesture = gestureSensitivityValue.${cfg.trackpad.gestureSensitivity};
+      TrackpadFourFingerVertSwipeGesture = gestureSensitivityValue.${cfg.trackpad.gestureSensitivity};
+      TrackpadFourFingerPinchGesture = gestureSensitivityValue.${cfg.trackpad.gestureSensitivity};
+      TrackpadFiveFingerPinchGesture = gestureSensitivityValue.${cfg.trackpad.gestureSensitivity};
     };
 
     # Bluetooth trackpad settings (same as built-in)
@@ -154,6 +183,13 @@ in
       TrackpadHandResting = cfg.trackpad.palmRejection;
       Clicking = cfg.trackpad.tapToClick;
       TrackpadThreeFingerDrag = cfg.trackpad.threeFingerDrag;
+      # Multi-finger gesture sensitivity
+      TrackpadThreeFingerHorizSwipeGesture = gestureSensitivityValue.${cfg.trackpad.gestureSensitivity};
+      TrackpadThreeFingerVertSwipeGesture = gestureSensitivityValue.${cfg.trackpad.gestureSensitivity};
+      TrackpadFourFingerHorizSwipeGesture = gestureSensitivityValue.${cfg.trackpad.gestureSensitivity};
+      TrackpadFourFingerVertSwipeGesture = gestureSensitivityValue.${cfg.trackpad.gestureSensitivity};
+      TrackpadFourFingerPinchGesture = gestureSensitivityValue.${cfg.trackpad.gestureSensitivity};
+      TrackpadFiveFingerPinchGesture = gestureSensitivityValue.${cfg.trackpad.gestureSensitivity};
     };
   };
 }
