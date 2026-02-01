@@ -69,11 +69,10 @@
       "raycast" # Launcher (Spotlight replacement) - settings in modules/home/apps/raycast.nix
       "wispr-flow" # Voice dictation
       "bartender" # Menu bar organizer
-      "setapp" # App subscription (manages: Clop, LookAway, Dropover, Downie, Base, SnapMotion)
+      "setapp" # App subscription (manages: Paste, Clop, LookAway, Dropover, Downie, Base, SnapMotion)
       "cleanshot" # Screenshot tool - actively using with Hazel
       "a-better-finder-rename" # Batch file renaming
       "hazel" # Automated file organization - just configured
-      "paste" # Clipboard manager
       "todoist-app" # Task manager
       "bitwarden" # Password manager
       "fantastical" # Calendar app - settings in modules/home/apps/fantastical.nix
