@@ -76,6 +76,7 @@
       "paste" # Clipboard manager
       "todoist" # Task manager
       "bitwarden" # Password manager
+      "fantastical" # Calendar app - settings in modules/home/apps/fantastical.nix
 
       # ─────────────────────────────────────────────────────────────
       # Media

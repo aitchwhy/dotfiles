@@ -130,6 +130,12 @@ in
       default = true;
       description = "Start Wispr Flow (voice notes) at login";
     };
+
+    fantastical = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Start Fantastical (calendar) at login";
+    };
   };
 
   config = mkIf cfg.enable {
@@ -296,6 +302,15 @@ in
         serviceConfig = {
           Label = "com.electron.wispr-flow";
           ProgramArguments = [ "/Applications/Wispr Flow.app/Contents/MacOS/Wispr Flow" ];
+          RunAtLoad = true;
+          KeepAlive = false;
+        };
+      };
+
+      fantastical = mkIf cfg.fantastical {
+        serviceConfig = {
+          Label = "com.flexibits.fantastical2.mac";
+          ProgramArguments = [ "/Applications/Fantastical.app/Contents/MacOS/Fantastical" ];
           RunAtLoad = true;
           KeepAlive = false;
         };
