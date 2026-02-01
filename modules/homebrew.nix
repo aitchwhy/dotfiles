@@ -76,7 +76,7 @@
       "todoist-app" # Task manager
       "bitwarden" # Password manager
       "fantastical" # Calendar app - settings in modules/home/apps/fantastical.nix
-      # Dropover is managed by Setapp
+      "dropover" # Drag & drop shelf
 
       # ─────────────────────────────────────────────────────────────
       # Media
