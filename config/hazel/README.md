@@ -1,158 +1,246 @@
 # Hazel Configuration
 
-**Source of Truth:** This directory (`~/dotfiles/config/hazel/`)
-
-All Hazel rules are maintained here and symlinked to Hazel's configuration directory for use by the application.
+**Philosophy:** File-based, version-controlled automation with incremental adoption.
 
 ---
 
-## Directory Structure
+## Architecture
+
+### File-Based Configuration
+All rules stored in `~/dotfiles/config/hazel/` as source of truth. Hazel syncs from these files using its built-in [Sync Rules](https://www.noodlesoft.com/manual/hazel/work-with-folders-rules/manage-rules/sync-rules/) feature.
+
+**Benefits:**
+- Version controlled (git)
+- Portable across machines
+- Easy to review and modify
+- Auto-updates when files change
+
+### Directory Structure
 
 ```
 ~/dotfiles/config/hazel/
-├── README.md                           # This file
-├── rules/                              # Rule definitions
-│   ├── desktop-critical.hazelrules    # Desktop automation (1 rule)
-│   ├── downloads-critical.hazelrules  # Downloads automation (1 rule)
-│   ├── gdrive-critical.hazelrules     # Google Drive automation (1 rule)
-│   └── backups-critical.hazelrules    # Backup automation (1 rule)
-└── archive/                            # Full rule sets (for future use)
-    ├── desktop-lifecycle.hazelrules   # Complete Desktop rules (5 rules)
-    ├── downloads-lifecycle.hazelrules # Complete Downloads rules (5 rules)
-    ├── gdrive-lifecycle.hazelrules    # Complete Google Drive rules (6 rules)
-    └── backups-lifecycle.hazelrules   # Complete Backup rules (4 rules)
+├── README.md                    # This file
+├── audit-2026-02-01.md          # Implementation audit log
+├── SYNC-PATHS.txt               # Quick reference for setup
+├── rules/                       # Active rules (synced to Hazel)
+│   ├── desktop-critical.hazelrules
+│   ├── downloads-critical.hazelrules
+│   ├── gdrive-critical.hazelrules
+│   └── backups-critical.hazelrules
+└── archive/                     # Full rule sets (future use)
+    ├── desktop-lifecycle.hazelrules
+    ├── downloads-lifecycle.hazelrules
+    ├── gdrive-lifecycle.hazelrules
+    └── backups-lifecycle.hazelrules
 ```
 
 ---
 
-## Philosophy: Incremental Introduction
+## Core Principles
 
-**Why start minimal?**
-- Automation can be overwhelming if introduced all at once
-- Starting with 1 critical rule per folder allows time to observe and adjust
-- Build trust in the system before adding more automation
+### 1. Incremental Adoption
+**Why:** Automation can be overwhelming if introduced all at once.
+
+**Approach:**
+- Start with 1 critical, low-risk rule per folder
+- Observe behavior for 1-2 weeks
+- Gradually add more rules from `archive/`
+- Build trust in the system before expanding
+
+### 2. Buffer Times
+**Why:** Prevent processing files you just added.
+
+**Implementation:**
+- 1-hour buffer for media imports (screenshots, videos, images)
+- 7-day buffer for installer cleanup
+- Gives you time to use/review files before automation triggers
+
+### 3. Safety First
+**Why:** Avoid accidental data loss.
+
+**Safeguards:**
+- Import to Photos before deletion (media has backup)
+- Only delete re-downloadable files (DMG installers)
+- Only delete system clutter (.DS_Store) or failed artifacts (.tmp)
+- Never delete user documents automatically
+
+### 4. Lifecycle-Based Organization
+**Why:** Match natural file flow through time and usage.
+
+**Stages:**
+```
+Inbox → Active → Recent → Archive → Cold Storage
+  ↑       ↑        ↑         ↑          ↑
+ New   Current  1-3mo    >3mo       >1yr
+```
+
+Rules trigger based on:
+- Time since added (for new files)
+- Time since last opened (for existing files)
+
+---
+
+## Architectural Decisions
+
+### Decision 1: Sync Rules vs Import Rules
+**Chosen:** Sync Rules
+**Why:**
+- Auto-updates when dotfiles change
+- No manual re-import needed
+- File-based configuration persists across Hazel reinstalls
+- One-time setup, then fully automated
+
+**Trade-off:** Requires initial GUI setup (5 minutes), but saves hours long-term
+
+### Decision 2: Critical Rules Only (Phase 1)
+**Chosen:** 1 rule per folder initially
+**Why:**
+- Lower risk of unexpected behavior
 - Easier to debug if something goes wrong
+- Builds confidence in automation
+- Can expand to full lifecycle later
 
-**Current Phase:** Critical Rules Only (1 per folder)
+**Trade-off:** Less automation initially, but safer onboarding
 
-**Future:** Gradually introduce more rules from `archive/` as you become comfortable
+### Decision 3: Media → Photos.app
+**Chosen:** Auto-import videos/images to Photos, then delete
+**Why:**
+- Photos provides automatic iCloud backup
+- Prevents Downloads folder clutter
+- Searchable/organized in Photos app
+- Safe deletion (backed up before removal)
 
----
+**Trade-off:** Requires Photos.app, but standard on macOS
 
-## Critical Rules (Active)
+### Decision 4: No Auto-Delete of Documents
+**Chosen:** Manual review required for documents/PDFs
+**Why:**
+- Too high risk for accidental data loss
+- User documents often unique/irreplaceable
+- Better to notify than auto-delete
 
-### Desktop: Screenshot Auto-Import
-**File:** `rules/desktop-critical.hazelrules`
-**Purpose:** Prevent screenshot clutter on Desktop
-**Action:** Import screenshots to Photos.app after 1-hour buffer, then delete
-**Impact:** Low risk, high value - keeps Desktop clean
-
-### Downloads: DMG Installer Cleanup
-**File:** `rules/downloads-critical.hazelrules`
-**Purpose:** Remove old installer files automatically
-**Action:** Delete .dmg files older than 7 days
-**Impact:** Low risk - installers are re-downloadable
-
-### Google Drive: .DS_Store Cleanup
-**File:** `rules/gdrive-critical.hazelrules`
-**Purpose:** Remove macOS clutter files
-**Action:** Delete .DS_Store files immediately
-**Impact:** Zero risk - these files serve no purpose
-
-### Backups: Orphaned File Cleanup
-**File:** `rules/backups-critical.hazelrules`
-**Purpose:** Remove failed backup artifacts
-**Action:** Delete .tmp, .partial, .download files older than 7 days
-**Impact:** Low risk - only cleans up failed operations
+**Trade-off:** Manual organization needed for documents (acceptable)
 
 ---
 
-## Symlink Setup
+## Current Rules (Active)
 
-Hazel reads rules from its internal configuration directory. To maintain source of truth in dotfiles:
+| Folder | Rule | Trigger | Action | Risk |
+|--------|------|---------|--------|------|
+| **Desktop** | Screenshot import | Name contains "Screenshot" + 1h old | Import to Photos → Trash | Low |
+| **Downloads** | Video import | MP4/MOV/etc + 1h old | Import to Photos → Trash | Low |
+| **Downloads** | Image import | JPG/PNG/etc + 1h old | Import to Photos → Trash | Low |
+| **Downloads** | DMG cleanup | .dmg + 7 days old | Move to Trash | Low |
+| **Google Drive** | .DS_Store cleanup | Name is ".DS_Store" | Trash immediately | Zero |
+| **Backups** | Orphaned cleanup | .tmp/.partial/.download + 7 days old | Move to Trash | Low |
 
+**Total:** 6 critical rules across 4 folders
+
+---
+
+## Setup (One-Time)
+
+1. **Open Hazel** (System Settings → Hazel, or standalone app)
+
+2. **Add Folders:**
+   - Desktop
+   - Downloads
+   - Google Drive/My Drive (✓ Include subfolders)
+   - Backups (✓ Include subfolders)
+
+3. **Enable Sync Rules** for each folder:
+   - Select folder → Gear icon (⚙️) → "Sync Rules..."
+   - Choose corresponding `.hazelrules` file from `~/dotfiles/config/hazel/rules/`
+   - See `SYNC-PATHS.txt` for exact paths
+
+**Result:** Rules auto-update when you edit dotfiles. No manual import needed.
+
+---
+
+## Future Expansion
+
+**When ready** (after 1-2 weeks of observation):
+
+1. Review rules in `archive/` directory
+2. Copy desired rule from archive to active file
+3. Commit change to git
+4. Hazel automatically syncs new rule
+
+**Suggested order:**
+1. ✅ Critical rules (active now)
+2. Desktop: Day-old files → Review folder
+3. Downloads: PDF categorization by content
+4. Google Drive: Inbox flagging (3-day reminder)
+5. Full lifecycle transitions (Active → Recent → Archive → Cold)
+
+---
+
+## Maintenance
+
+### Modifying Rules
 ```bash
-# After Hazel is installed, create symlinks:
-# (This will be automated in darwin configuration)
+# Edit rule file
+vim ~/dotfiles/config/hazel/rules/downloads-critical.hazelrules
 
-# Hazel stores rules at:
-# ~/Library/Application Support/Hazel/Rules/
+# Commit changes
+cd ~/dotfiles
+git add config/hazel/rules/downloads-critical.hazelrules
+git commit -m "feat(hazel): add new condition to downloads rule"
 
-# Create symlinks from Hazel to dotfiles:
-ln -sf ~/dotfiles/config/hazel/rules/desktop-critical.hazelrules \
-  ~/Library/Application\ Support/Hazel/Rules/Desktop.hazelrules
-
-ln -sf ~/dotfiles/config/hazel/rules/downloads-critical.hazelrules \
-  ~/Library/Application\ Support/Hazel/Rules/Downloads.hazelrules
-
-# ... etc for each folder
+# Hazel automatically detects change and updates ✨
 ```
 
-**Note:** Actual symlink setup will be handled by nix-darwin activation script.
+### Viewing Logs
+```bash
+# Check Hazel is running
+ps aux | grep -i hazel
+
+# View Hazel logs
+tail -f ~/Library/Logs/Hazel/*.log
+
+# Or: Open Hazel → Select folder → Info tab → "Show Log"
+```
 
 ---
 
-## Adding More Rules (Future)
+## Best Practices
 
-When ready to add more automation:
+### Rule Ordering
+**Principle:** Most specific to least specific
+- Process screenshots before generic images
+- Check file type before checking age
+- Apply narrow conditions before broad ones
 
-1. Review archived rules in `archive/` directory
-2. Select next rule to add based on comfort level
-3. Copy rule from archive to active rules file
-4. Test for 1 week before adding more
-5. Repeat until all desired rules are active
+### Buffer Times
+**Principle:** Longer buffers for irreversible actions
+- 1 hour: Media imports (reversible via Photos)
+- 7 days: File deletions (re-downloadable)
+- 30+ days: Document archival (user content)
 
-**Suggested order for adding rules:**
-1. ✅ Critical rules (active now)
-2. Desktop: Day-old files → Review (after 1 week of comfort)
-3. Downloads: PDF categorization (after 2 weeks)
-4. Google Drive: Inbox flagging (after 3 weeks)
-5. Full lifecycle rules (after 1 month)
+### Exclusions
+**Principle:** Exclude what you know won't work
+- GIF files: Often used for reference (not auto-import)
+- .icloud files: Placeholder files (not real files)
+- System files: .DS_Store, .localized (auto-delete safe)
 
----
-
-## Troubleshooting
-
-### Rules not applying
-1. Check Hazel is running: `ps aux | grep -i hazel`
-2. Verify symlinks exist: `ls -la ~/Library/Application\ Support/Hazel/Rules/`
-3. Check Hazel logs: `tail -f ~/Library/Logs/Hazel/*.log`
-4. Open Hazel.app and verify rules are imported and enabled
-
-### Want to disable a rule temporarily
-1. Open Hazel.app
-2. Find the folder with the rule
-3. Uncheck the box next to the rule
-4. Re-enable when ready
-
-### Want to modify a rule
-1. Edit the source file in `~/dotfiles/config/hazel/rules/`
-2. Commit changes to git
-3. Reload rules in Hazel.app (or restart Hazel)
+### Testing
+**Principle:** Test before committing
+1. Add rule with 1-hour buffer
+2. Create test file
+3. Wait for rule to trigger
+4. Verify expected behavior
+5. If works, commit to git
 
 ---
 
-## Full Rule Sets (Available in Archive)
+## Related Systems
 
-When you're ready for full automation, the complete rule sets are available:
-
-- **Desktop** (5 rules): Screenshots, day-old transition, week-old transition, large files, installer cleanup
-- **Downloads** (5 rules): PDF categorization, image handling, old file archival, DMG cleanup, ZIP cleanup
-- **Google Drive** (6 rules): Inbox flagging, Active→Recent, Recent→Archive, Archive→Cold, .DS_Store, root cleanup
-- **Backups** (4 rules): Rotation trigger, archive old, delete ancient, orphaned cleanup
-
-See `archive/` directory for full rule definitions.
+- **Folder Organization:** `~/.claude/plans/folder-organization-system.md`
+- **Lifecycle Transitions:** Defined in `archive/*-lifecycle.hazelrules`
+- **iCloud→GDrive Sync:** Separate system (rclone + launchd)
 
 ---
 
-## Related Documentation
-
-- **System Overview:** `~/.claude/plans/folder-organization-system.md`
-- **Implementation Summary:** `~/.claude/plans/implementation-summary-2026-02-01.md`
-- **Import Instructions:** `~/Desktop/01-Today/HAZEL-IMPORT-INSTRUCTIONS.md`
-
----
-
-**Status:** Critical rules ready for use
+**Status:** ✅ Active (6 critical rules)
 **Last Updated:** 2026-02-01
-**Maintained by:** nix-darwin + home-manager
+**Audit Log:** `audit-2026-02-01.md`
