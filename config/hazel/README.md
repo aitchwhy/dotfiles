@@ -20,19 +20,12 @@ All rules stored in `~/dotfiles/config/hazel/` as source of truth. Hazel syncs f
 ```
 ~/dotfiles/config/hazel/
 ├── README.md                    # This file
-├── audit-2026-02-01.md          # Implementation audit log
-├── SYNC-PATHS.txt               # Quick reference for setup
-├── rules/                       # Active rules (synced to Hazel)
-│   ├── desktop-critical.hazelrules
-│   ├── downloads-critical.hazelrules
-│   ├── gdrive-critical.hazelrules
-│   └── backups-critical.hazelrules
-└── archive/                     # Full rule sets (future use)
-    ├── desktop-lifecycle.hazelrules
-    ├── downloads-lifecycle.hazelrules
-    ├── gdrive-lifecycle.hazelrules
-    └── backups-lifecycle.hazelrules
+└── rules/                       # Active rules (synced to Hazel) - SOURCE OF TRUTH
+    ├── Desktop.hazelrules       # Screenshot auto-import to Photos
+    └── Downloads.hazelrules     # Video/image auto-import to Photos
 ```
+
+**Note:** Only files in `rules/*.hazelrules` are active. Create/edit rules in Hazel GUI and they auto-sync here.
 
 ---
 
@@ -127,14 +120,17 @@ Rules trigger based on:
 
 | Folder | Rule | Trigger | Action | Risk |
 |--------|------|---------|--------|------|
-| **Desktop** | Screenshot import | Name contains "Screenshot" + 1h old | Import to Photos → Trash | Low |
-| **Downloads** | Video import | MP4/MOV/etc + 1h old | Import to Photos → Trash | Low |
-| **Downloads** | Image import | JPG/PNG/etc + 1h old | Import to Photos → Trash | Low |
-| **Downloads** | DMG cleanup | .dmg + 7 days old | Move to Trash | Low |
-| **Google Drive** | .DS_Store cleanup | Name is ".DS_Store" | Trash immediately | Zero |
-| **Backups** | Orphaned cleanup | .tmp/.partial/.download + 7 days old | Move to Trash | Low |
+| **Desktop** | Screenshot import | Name contains "Screenshot" + Kind is Image + 1h old | Import to Photos → Trash | Low |
+| **Downloads** | Video import | Type is public.movie + 1h old | Import to Photos → Trash | Low |
+| **Downloads** | Image import | Type is public.image + 1h old | Import to Photos → Trash | Low |
 
-**Total:** 6 critical rules across 4 folders
+**Total:** 3 active rules across 2 folders
+
+### Pending Rules to Add
+
+| Folder | Rule | Trigger | Action | Notes |
+|--------|------|---------|--------|-------|
+| **Downloads** | Meta export auto-backup | Name contains "meta-" + Extension is zip | Move to Google Drive/Backups/Meta-Facebook/ | Auto-organize Facebook exports |
 
 ---
 
@@ -150,28 +146,35 @@ Rules trigger based on:
 
 3. **Enable Sync Rules** for each folder:
    - Select folder → Gear icon (⚙️) → "Sync Rules..."
-   - Choose corresponding `.hazelrules` file from `~/dotfiles/config/hazel/rules/`
-   - See `SYNC-PATHS.txt` for exact paths
+   - Choose corresponding `.hazelrules` file:
+     - Desktop → `~/dotfiles/config/hazel/rules/Desktop.hazelrules`
+     - Downloads → `~/dotfiles/config/hazel/rules/Downloads.hazelrules`
 
 **Result:** Rules auto-update when you edit dotfiles. No manual import needed.
 
 ---
 
-## Future Expansion
+## Adding New Rules
 
-**When ready** (after 1-2 weeks of observation):
+**To add Meta export auto-backup:**
 
-1. Review rules in `archive/` directory
-2. Copy desired rule from archive to active file
-3. Commit change to git
-4. Hazel automatically syncs new rule
+1. Open Hazel → Select **Downloads** folder
+2. Click **"+"** to add new rule
+3. Name: **"Meta export auto-backup"**
+4. Conditions:
+   - Name contains "meta-"
+   - Extension is zip
+5. Actions:
+   - Move to folder: `/Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/Backups/Meta-Facebook/`
+6. Click OK
 
-**Suggested order:**
-1. ✅ Critical rules (active now)
-2. Desktop: Day-old files → Review folder
-3. Downloads: PDF categorization by content
-4. Google Drive: Inbox flagging (3-day reminder)
-5. Full lifecycle transitions (Active → Recent → Archive → Cold)
+**Hazel will automatically sync this to** `Downloads.hazelrules` → commit to git!
+
+**Future rules:**
+1. Downloads: DMG cleanup (7-day buffer)
+2. Downloads: PDF categorization
+3. Google Drive: .DS_Store cleanup
+4. Desktop: Day-old files → Review folder
 
 ---
 
