@@ -1,0 +1,141 @@
+# Desktop Hazel Rules - February 2026 SOTA Best Practices
+# Ultra-aggressive auto-organization for clean workspace
+# Based on 2026 trends: Zero Desktop, Lifecycle-based archiving, AI-ready metadata
+
+## Rule 1: Screenshots - Instant Processing
+Name: Auto-import Screenshots to Photos
+If ALL of the following conditions are met:
+  - Name contains "Screen" OR "Screenshot" OR "screen"
+  - Kind is Image
+Do the following:
+  - Import into Photos.app
+  - Move to Trash
+  - Play sound "Submarine"
+
+## Rule 2: Code Files - Route to Appropriate Repo
+Name: Code files to Workspace
+If ALL of the following conditions are met:
+  - Extension is js, ts, tsx, jsx, py, go, rs, java, kt, swift
+  - Age is greater than 1 day
+Do the following:
+  - Add tags: "code", "needs-review"
+  - Move to: ~/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/1-Active/Projects/Code-Snippets/
+  - Display notification "Code file moved to Active Projects"
+
+## Rule 3: Large Files - Immediate Archive
+Name: Large files (>500MB) to Google Drive
+If ALL of the following conditions are met:
+  - Size is greater than 500 MB
+  - Date Last Modified is less than 7 days ago
+Do the following:
+  - Add tags: "large-file", "auto-archived"
+  - Move to: ~/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/Archive/Large-Archives/
+  - Display notification "Large file archived: [filename]"
+
+## Rule 4: Documents - Smart Categorization
+Name: PDF documents by type
+If ALL of the following conditions are met:
+  - Extension is pdf
+  - Age is greater than 2 days
+Do the following:
+  - If Name contains "invoice" OR "receipt":
+    - Add tags: "finance", "receipt"
+    - Move to: ~/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/Archive/2025/Personal/Receipts/
+  - Else if Name contains "visa" OR "immigration" OR "green card" OR "uscis":
+    - Add tags: "immigration", "important"
+    - Move to: ~/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/Archive/2025/Personal/Immigration/
+  - Else:
+    - Add tags: "document"
+    - Move to: ~/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/Archive/2025/Personal/Documents/
+
+## Rule 5: Images - Smart Storage
+Name: Images to organized folders
+If ALL of the following conditions are met:
+  - Kind is Image
+  - Extension is not (jpg, jpeg, png) matching screenshots
+  - Age is greater than 7 days
+Do the following:
+  - If Date Last Modified is less than 30 days ago:
+    - Move to: ~/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/1-Active/Personal/Recent-Images/
+  - Else:
+    - Move to: ~/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/Archive/2025/Personal/Images/
+
+## Rule 6: Videos - Archive by size and age
+Name: Videos lifecycle management
+If ALL of the following conditions are met:
+  - Kind is Movie
+  - Age is greater than 3 days
+Do the following:
+  - If Size is greater than 1 GB:
+    - Move to: ~/Movies/Large-Videos/
+  - Else:
+    - Move to: ~/Movies/
+
+## Rule 7: Old Files - Aggressive 30-day cleanup
+Name: Files older than 30 days to Archive
+If ALL of the following conditions are met:
+  - Date Last Modified is more than 30 days ago
+  - Name does not contain "00-Active" OR "01-In-Progress"
+  - Kind is not Folder
+Do the following:
+  - Add tags: "auto-archived", "30-day-cleanup"
+  - Move to: ~/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/Archive/2025/Personal/Desktop-Archive/[YYYY-MM]/
+
+## Rule 8: Installers - Auto-cleanup
+Name: DMG and ZIP installers cleanup
+If ALL of the following conditions are met:
+  - Extension is dmg OR zip OR pkg
+  - Age is greater than 7 days
+Do the following:
+  - Move to Trash
+  - Display notification "Cleaned up installer: [filename]"
+
+## Rule 9: Folders - Project lifecycle
+Name: Project folders auto-archive
+If ALL of the following conditions are met:
+  - Kind is Folder
+  - Name does not contain "00-Active" OR "01-In-Progress" OR "ProjectQueue"
+  - Date Last Opened is more than 14 days ago
+Do the following:
+  - Add tags: "project", "inactive"
+  - Move to: ~/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/2-Workspace/Inactive-Projects/
+  - Display notification "Inactive project archived: [foldername]"
+
+## Rule 10: Empty folders - Immediate removal
+Name: Remove empty folders
+If ALL of the following conditions are met:
+  - Kind is Folder
+  - Contents is empty
+  - Age is greater than 1 day
+Do the following:
+  - Move to Trash
+
+## Rule 11: Duplicate files - Smart deduplication
+Name: Remove obvious duplicates
+If ALL of the following conditions are met:
+  - Name contains " (1)" OR " (2)" OR " copy" OR "_0"
+  - Age is greater than 3 days
+Do the following:
+  - Add tags: "duplicate", "needs-review"
+  - Move to: ~/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/Archive/Duplicates-Review-Jan-2026/
+
+## Rule 12: Text files - Context-aware routing
+Name: Text and markdown files
+If ALL of the following conditions are met:
+  - Extension is txt OR md OR markdown
+  - Age is greater than 2 days
+Do the following:
+  - If Name contains "todo" OR "task":
+    - Move to: ~/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/3-TODO/
+  - Else if Name contains "note" OR "idea":
+    - Move to: ~/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/Journal/
+  - Else:
+    - Move to: ~/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/Archive/2025/Personal/Documents/
+
+# 2026 Best Practices Applied:
+# - Zero Desktop Philosophy: Nothing stays longer than needed
+# - Lifecycle-based: Different retention for different file types
+# - Context-aware: Uses filename patterns for smart routing
+# - AI-ready: Consistent tagging for future AI organization
+# - Cloud-first: Everything goes to Google Drive for backup
+# - Aggressive: 7-30 day cleanup cycles

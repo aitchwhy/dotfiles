@@ -1,0 +1,71 @@
+# Backups Hazel Rules - February 2026 Auto-Rotation
+# Automated backup management and rotation
+
+## Rule 1: Anthropic backups - Keep latest 5
+Name: Rotate Anthropic Claude backups
+If ALL of the following conditions are met:
+  - Name contains "anthropic-account-data"
+  - Extension is zip
+  - Folder is "Backups/Anthropic-Claude-AI"
+Do the following:
+  - Run shell script: ~/dotfiles/scripts/rotate-backups.sh
+
+## Rule 2: App backups - Organize by app
+Name: Sort app backups by kind
+If ALL of the following conditions are met:
+  - Kind is Folder OR Archive
+  - Folder is "Backups"
+  - Depth is 2
+Do the following:
+  - If Name contains "Tana":
+    - Move to: Backups/Tana/
+  - Else if Name contains "Bear":
+    - Move to: Backups/Bear/
+  - Else if Name contains "Obsidian":
+    - Move to: Backups/Obsidian/
+  - Else if Name contains "Raycast":
+    - Move to: Backups/Raycast/
+
+## Rule 3: Old backups - Archive after 90 days
+Name: Archive old backups
+If ALL of the following conditions are met:
+  - Folder contains "Backups"
+  - Date Last Modified is more than 90 days ago
+  - Kind is Archive OR Folder
+  - Name does not contain "Auto-Rotation"
+Do the following:
+  - Move to: Backups/Auto-Rotation/Archived/
+  - Add tags: "archived-backup", "90-day"
+  - Compress (if not already compressed)
+
+## Rule 4: Very old backups - Delete after 180 days
+Name: Clean very old archived backups
+If ALL of the following conditions are met:
+  - Folder is "Backups/Auto-Rotation/Archived"
+  - Date Last Modified is more than 180 days ago
+Do the following:
+  - Move to Trash
+  - Run shell script: echo "Deleted old backup: $1 at $(date)" >> ~/Library/Logs/hazel-backup-cleanup.log
+
+## Rule 5: Backup size monitoring
+Name: Flag large backup accumulation
+If ALL of the following conditions are met:
+  - Folder is "Backups"
+  - Folder size is greater than 50 GB
+Do the following:
+  - Display notification "Backups folder >50GB - review and cleanup needed"
+  - Add tags: "needs-review", "large-backups"
+
+## Rule 6: Duplicate backups - Same day detection
+Name: Remove duplicate same-day backups
+If ALL of the following conditions are met:
+  - Name matches pattern: *-backup-YYYY-MM-DD*
+  - Folder contains "Backups"
+Do the following:
+  - Run shell script: ~/dotfiles/scripts/check-duplicate-backups.sh "$1"
+
+# Backup Philosophy:
+# - Keep latest 5 for quick access
+# - Archive 6-90 days old
+# - Delete >180 days (keep quarterly samples)
+# - Total backups should stay under 50 GB
