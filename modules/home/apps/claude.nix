@@ -437,5 +437,41 @@ in
         echo "Claude todos cleanup: removed files older than 7 days"
       fi
     '';
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # LAUNCHD AGENTS (SOTA Log Rotation - February 2026)
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    # Claude Desktop log rotation - runs daily at 3am
+    # Deletes logs >10MB to prevent disk bloat from large MCP responses
+    # SOTA: Keep logs manageable, Filesystem extension can produce 31MB+ responses
+    launchd.agents.claude-log-rotation = {
+      enable = true;
+      config = {
+        Label = "com.claude.log-rotation";
+        ProgramArguments = [
+          "/bin/sh"
+          "-c"
+          ''
+            LOG_DIR="$HOME/Library/Logs/Claude"
+            if [ -d "$LOG_DIR" ]; then
+              # Delete logs larger than 10MB
+              /usr/bin/find "$LOG_DIR" -name "*.log" -size +10M -delete 2>/dev/null
+              # Delete rotated logs (numbered backups)
+              /usr/bin/find "$LOG_DIR" -name "*.log.*" -mtime +7 -delete 2>/dev/null
+              echo "$(date): Claude log rotation completed" >> /tmp/claude-log-rotation.log
+            fi
+          ''
+        ];
+        StartCalendarInterval = [
+          {
+            Hour = 3;
+            Minute = 0;
+          }
+        ];
+        StandardOutPath = "/tmp/claude-log-rotation.log";
+        StandardErrorPath = "/tmp/claude-log-rotation.err";
+      };
+    };
   };
 }
