@@ -39,6 +39,7 @@
       "claude-code" # Claude CLI - actively using
       "cursor" # AI-first code editor - keep for development
       "kaleidoscope" # Diff/merge tool
+      "orbstack" # Container runtime (Docker/Lima replacement)
 
       # ─────────────────────────────────────────────────────────────
       # AI & LLM
@@ -60,6 +61,7 @@
       # Communication
       # ─────────────────────────────────────────────────────────────
       "slack"
+      "superhuman" # Email client
 
       # ─────────────────────────────────────────────────────────────
       # Productivity
@@ -67,10 +69,13 @@
       "raycast" # Launcher (Spotlight replacement) - settings in modules/home/apps/raycast.nix
       "wispr-flow" # Voice dictation
       "bartender" # Menu bar organizer
-      "setapp" # App subscription (manages: Clop, LookAway, Downie, Base, SnapMotion)
+      "setapp" # App subscription (manages: Clop, LookAway, Dropover, Downie, Base, SnapMotion)
       "cleanshot" # Screenshot tool - actively using with Hazel
       "a-better-finder-rename" # Batch file renaming
       "hazel" # Automated file organization - just configured
+      "paste" # Clipboard manager
+      "todoist" # Task manager
+      "bitwarden" # Password manager
 
       # ─────────────────────────────────────────────────────────────
       # Media
