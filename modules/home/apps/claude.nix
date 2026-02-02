@@ -404,12 +404,12 @@ in
       # Merge with existing config (preserve runtime state)
       if [ -f "$CLAUDE_CODE_CONFIG" ]; then
         MERGED=$(jq --argjson servers "$MCP_SERVERS" --argjson plugins "$ENABLED_PLUGINS" \
-          '.mcpServers = $servers | .enabledPlugins = $plugins | .defaultModel = "opus"' "$CLAUDE_CODE_CONFIG")
+          '.mcpServers = $servers | .enabledPlugins = $plugins | .defaultModel = "opus-4-5"' "$CLAUDE_CODE_CONFIG")
         echo "$MERGED" > "$CLAUDE_CODE_CONFIG"
-        echo "Claude Code config updated (1 server, 1 plugin, defaultModel=opus from SSOT)"
+        echo "Claude Code config updated (1 server, 1 plugin, defaultModel=opus-4-5 from SSOT)"
       else
-        echo "{\"mcpServers\": $MCP_SERVERS, \"enabledPlugins\": $ENABLED_PLUGINS, \"defaultModel\": \"opus\"}" > "$CLAUDE_CODE_CONFIG"
-        echo "Claude Code config created (1 server, 1 plugin, defaultModel=opus from SSOT)"
+        echo "{\"mcpServers\": $MCP_SERVERS, \"enabledPlugins\": $ENABLED_PLUGINS, \"defaultModel\": \"opus-4-5\"}" > "$CLAUDE_CODE_CONFIG"
+        echo "Claude Code config created (1 server, 1 plugin, defaultModel=opus-4-5 from SSOT)"
       fi
     '';
 
