@@ -65,11 +65,13 @@ flake.nix                    # Entry point
 | Voice | LiveKit 2.16, @livekit/agents |
 | Infra | Pulumi 3.214, AWS ECS, CloudFront |
 
-## MCP Servers (MINIMAL - 1 total)
+## MCP Servers (MINIMAL - 3 total)
 
 | Server | Purpose |
 |--------|---------|
 | ref | SOTA docs (60-95% fewer tokens) |
+| ast-grep | AST-based code search |
+| serena | LSP symbol navigation (Told) |
 
 ## Plugins (MINIMAL - 1 total)
 
