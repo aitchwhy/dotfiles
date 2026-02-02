@@ -66,6 +66,7 @@
       # ─────────────────────────────────────────────────────────────
       # Productivity
       # ─────────────────────────────────────────────────────────────
+      "homerow" # Keyboard navigation for every screen element - Opt+Shift+Space
       "raycast" # Launcher (Spotlight replacement) - settings in modules/home/apps/raycast.nix
       "wispr-flow" # Voice dictation
       "bartender" # Menu bar organizer

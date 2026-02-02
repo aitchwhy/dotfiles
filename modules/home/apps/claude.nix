@@ -65,15 +65,6 @@ let
       executable = "ast-grep-server";
       args = [ ];
     };
-    serena = {
-      # Serena - LSP-backed symbol navigation for Told
-      # Stores persistent memories in ~/src/told/.serena/memories/
-      # https://github.com/oraios/serena
-      isPython = true;
-      package = "git+https://github.com/oraios/serena";
-      executable = "serena";
-      args = [ "start-mcp-server" "--project" "/Users/hank/src/told" ];
-    };
   };
 
   # ═══════════════════════════════════════════════════════════════════════════
