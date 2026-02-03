@@ -76,6 +76,7 @@ in
       ++ [
         ffmpeg-full
         imagemagick
+        yt-dlp # YouTube video/audio downloader
       ]
       # Security Tools
       ++ [
