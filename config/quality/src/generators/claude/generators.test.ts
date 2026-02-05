@@ -88,10 +88,31 @@ describe('Generated Artifacts', () => {
       expect(content.hooks).toBeDefined()
     })
 
-    it('has agents configured', () => {
+    it('has model set to opus', () => {
       const content = JSON.parse(fs.readFileSync(filePath, 'utf-8'))
-      expect(content.agents).toBeDefined()
-      expect(content.agents.length).toBeGreaterThan(0)
+      expect(content.model).toBe('opus')
+    })
+
+    it('has attribution configured', () => {
+      const content = JSON.parse(fs.readFileSync(filePath, 'utf-8'))
+      expect(content.attribution).toBeDefined()
+      expect(content.attribution.commit).toBe('')
+      expect(content.attribution.pr).toBe('')
+    })
+
+    it('has env with MAX_THINKING_TOKENS', () => {
+      const content = JSON.parse(fs.readFileSync(filePath, 'utf-8'))
+      expect(content.env).toBeDefined()
+      expect(content.env.MAX_THINKING_TOKENS).toBe('31999')
+    })
+
+    it('does not have removed fields', () => {
+      const content = JSON.parse(fs.readFileSync(filePath, 'utf-8'))
+      expect(content.agents).toBeUndefined()
+      expect(content.enabledPlugins).toBeUndefined()
+      expect(content.extraKnownMarketplaces).toBeUndefined()
+      expect(content.defaultModel).toBeUndefined()
+      expect(content.includeCoAuthoredBy).toBeUndefined()
     })
   })
 })

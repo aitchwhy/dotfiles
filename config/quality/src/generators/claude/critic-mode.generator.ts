@@ -5,7 +5,7 @@
  * Output: human-readable markdown for Claude context.
  */
 
-import * as fs from 'node:fs/promises'
+import { FileSystem } from '@effect/platform'
 import * as path from 'node:path'
 import { Effect } from 'effect'
 import { BEHAVIOR_COUNTS, CRITIC_BEHAVIORS } from '../../critic-mode'
@@ -58,10 +58,11 @@ const generateMarkdown = (): string => {
 
 export const generateCriticModeFile = (outDir: string) =>
   Effect.gen(function* () {
+    const fs = yield* FileSystem.FileSystem
     const markdown = generateMarkdown()
     const filePath = path.join(outDir, 'critic-mode.md')
 
-    yield* Effect.tryPromise(() => fs.writeFile(filePath, markdown))
+    yield* fs.writeFileString(filePath, markdown)
 
     yield* Effect.log(`Generated: ${filePath} (${BEHAVIOR_COUNTS.total} behaviors)`)
     return filePath

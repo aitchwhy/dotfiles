@@ -6,7 +6,7 @@
  */
 
 import { BunContext, BunRuntime } from '@effect/platform-bun'
-import { Console, Effect, pipe, Schema } from 'effect'
+import { Console, Effect, Schema } from 'effect'
 
 // =============================================================================
 // Schemas
@@ -24,7 +24,7 @@ const PromptContextSchema = Schema.Struct({
 
 const INJECTION_PATTERNS = [
   /ignore\s+(previous|all)\s+instructions/i,
-  /you\s+are\s+(now|an?\s+)/i,
+  /you\s+are\s+now\s+/i,
   /system\s*:\s*/i,
   /\[SYSTEM\]/i,
   /forget\s+(everything|all|your)/i,
@@ -71,12 +71,9 @@ const program = Effect.gen(function* () {
   yield* Console.log(JSON.stringify(approve()))
 })
 
-const runnable = pipe(
-  program,
+const runnable = program.pipe(
   Effect.catchAll(() => Console.log(JSON.stringify(approve()))),
-  // biome-ignore lint/suspicious/noExplicitAny: BunContext.layer type variance issue
-  Effect.provide(BunContext.layer as any),
+  Effect.provide(BunContext.layer),
 )
 
-// biome-ignore lint/suspicious/noExplicitAny: Effect runMain type inference
-BunRuntime.runMain(runnable as any)
+BunRuntime.runMain(runnable)

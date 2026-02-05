@@ -7,8 +7,8 @@
  * Run with: bun run src/generate.ts
  */
 
+import { FileSystem } from '@effect/platform'
 import { BunContext } from '@effect/platform-bun'
-import * as fs from 'node:fs'
 import * as path from 'node:path'
 import { Effect, pipe } from 'effect'
 import { BEHAVIOR_COUNTS } from './critic-mode'
@@ -38,9 +38,9 @@ const CLAUDE_DESKTOP_OUT = path.join(GENERATED_ROOT, 'claude-desktop')
 const CURSOR_OUT = path.join(GENERATED_ROOT, 'cursor')
 const GEMINI_OUT = path.join(GENERATED_ROOT, 'gemini')
 
-const HOOK_PATH = path.join(QUALITY_DIR, 'hooks', 'pre-tool-use.ts')
-
 const main = Effect.gen(function* () {
+  const fileSystem = yield* FileSystem.FileSystem
+
   yield* Effect.log('Brain System Generator')
   yield* Effect.log(`Root Output: ${GENERATED_ROOT}`)
   yield* Effect.log('')
@@ -48,8 +48,9 @@ const main = Effect.gen(function* () {
   // CLEAN SLATE: Delete entire generated directory to prevent orphaned artifacts
   // nix-config.json lives at quality root (outside generated/) so this is safe
   yield* Effect.log('--- Cleaning Generated Directory (Clean Slate) ---')
-  if (fs.existsSync(GENERATED_ROOT)) {
-    fs.rmSync(GENERATED_ROOT, { recursive: true, force: true })
+  const generatedExists = yield* fileSystem.exists(GENERATED_ROOT)
+  if (generatedExists) {
+    yield* fileSystem.remove(GENERATED_ROOT, { recursive: true })
     yield* Effect.log('✓ Removed stale generated artifacts')
   }
   yield* Effect.log('')
@@ -63,7 +64,7 @@ const main = Effect.gen(function* () {
   yield* generateRules(ALL_RULES, CLAUDE_OUT)
   yield* generateMemoriesFile(CLAUDE_OUT)
   yield* generateCriticModeFile(CLAUDE_OUT)
-  yield* generateSettingsFile(ALL_SKILLS, ALL_PERSONAS, HOOK_PATH, CLAUDE_OUT)
+  yield* generateSettingsFile(CLAUDE_OUT)
 
   // 2. CURSOR GENERATION
   yield* Effect.log('')
@@ -97,8 +98,9 @@ const main = Effect.gen(function* () {
   yield* Effect.log('--- Verifying Generated Artifacts ---')
 
   const skillsDir = path.join(CLAUDE_OUT, 'skills')
-  const generatedSkills = fs.existsSync(skillsDir)
-    ? fs.readdirSync(skillsDir).filter((f) => !f.startsWith('.'))
+  const skillsDirExists = yield* fileSystem.exists(skillsDir)
+  const generatedSkills = skillsDirExists
+    ? (yield* fileSystem.readDirectory(skillsDir)).filter((f) => !f.startsWith('.'))
     : []
 
   const sourceSkillCount = ALL_SKILLS.length

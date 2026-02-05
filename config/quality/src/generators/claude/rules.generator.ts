@@ -4,7 +4,7 @@
  * Transforms QualityRule[] → rules markdown.
  */
 
-import * as fs from 'node:fs/promises'
+import { FileSystem } from '@effect/platform'
 import * as path from 'node:path'
 import { Effect } from 'effect'
 import type { QualityRule } from '../../schemas'
@@ -32,12 +32,13 @@ const generateRulesMarkdown = (rules: readonly QualityRule[]): string => {
 
 export const generateRules = (rules: readonly QualityRule[], outDir: string) =>
   Effect.gen(function* () {
+    const fs = yield* FileSystem.FileSystem
     const markdown = generateRulesMarkdown(rules)
     const rulesDir = path.join(outDir, 'rules')
     const filePath = path.join(rulesDir, 'RULES.md')
 
-    yield* Effect.tryPromise(() => fs.mkdir(rulesDir, { recursive: true }))
-    yield* Effect.tryPromise(() => fs.writeFile(filePath, markdown))
+    yield* fs.makeDirectory(rulesDir, { recursive: true })
+    yield* fs.writeFileString(filePath, markdown)
 
     yield* Effect.log(`Generated: ${filePath}`)
     return filePath
