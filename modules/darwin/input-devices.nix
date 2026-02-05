@@ -21,11 +21,11 @@ let
     "firm" = 2;
   };
 
-  # Gesture sensitivity: 0 = Low, 1 = Medium, 2 = High
+  # Gesture mode: 0 = Off, 1 = Navigate pages, 2 = Switch spaces/Mission Control (macOS default)
   gestureSensitivityValue = {
-    "low" = 0;
-    "medium" = 1;
-    "high" = 2;
+    "off" = 0;
+    "navigate" = 1;
+    "standard" = 2;
   };
 in
 {
@@ -109,16 +109,16 @@ in
 
       gestureSensitivity = mkOption {
         type = types.enum [
-          "low"
-          "medium"
-          "high"
+          "off"
+          "navigate"
+          "standard"
         ];
-        default = "low";
+        default = "standard";
         description = ''
-          Multi-finger gesture sensitivity.
-          - low (0): Least sensitive, prevents phantom gestures
-          - medium (1): Default macOS setting
-          - high (2): Most sensitive, may cause accidental triggers
+          Multi-finger gesture mode.
+          - off (0): Disables all 3/4/5-finger gestures
+          - navigate (1): 3-finger swipe navigates pages (Safari back/forward)
+          - standard (2): macOS default — swipe spaces, Mission Control, Launchpad
         '';
       };
     };

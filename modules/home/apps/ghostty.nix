@@ -64,12 +64,9 @@ in
         # (was causing interference when trying to select text in scrollback)
         copy-on-select = false;
 
-        # Scrollback and mouse settings
+        # Scrollback settings
         # Reduce from 10M default - 100K lines is plenty and reduces memory
         scrollback-limit = 100000;
-        # Reduce trackpad scroll sensitivity to prevent overshoot/phantom selection
-        # precision = trackpad, discrete = mouse wheel
-        mouse-scroll-multiplier = "precision:0.7,discrete:2";
 
         # Quick terminal
         quick-terminal-position = "center";
