@@ -23,6 +23,7 @@
     # OrbStack provides docker, docker-compose, and credential helpers
     brews = [
       "depot" # Docker build acceleration
+      "mas" # Required for masApps management
     ];
 
     # GUI Applications (Homebrew Casks)
