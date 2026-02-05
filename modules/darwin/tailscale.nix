@@ -55,6 +55,16 @@ in
       default = true;
       description = "Accept advertised routes from other nodes.";
     };
+
+    acceptDns = mkOption {
+      type = types.bool;
+      default = false;
+      description = ''
+        Accept Tailscale's DNS configuration on this device.
+        When false, prevents Tailscale from becoming the primary DNS resolver.
+        MagicDNS still works tailnet-wide; this only affects local resolution.
+      '';
+    };
   };
 
   config = mkIf cfg.enable {
@@ -95,6 +105,7 @@ in
             --auth-key="$(cat ${authKeyPath})" \
             --hostname="${hostname}" \
             ${lib.optionalString cfg.acceptRoutes "--accept-routes"} \
+            ${lib.optionalString (!cfg.acceptDns) "--accept-dns=false"} \
             --reset \
             || echo "Tailscale auth failed (may need manual login)"
         fi
