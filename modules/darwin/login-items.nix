@@ -31,12 +31,6 @@ in
       description = "Start Homerow (keyboard navigation) at login";
     };
 
-    amphetamine = mkOption {
-      type = types.bool;
-      default = true;
-      description = "Start Amphetamine (keep awake) at login";
-    };
-
     # Core productivity apps
     bartender = mkOption {
       type = types.bool;
@@ -56,34 +50,10 @@ in
       description = "Start Raycast (launcher) at login";
     };
 
-    paste = mkOption {
-      type = types.bool;
-      default = true;
-      description = "Start Paste (clipboard manager) at login";
-    };
-
     cleanShot = mkOption {
       type = types.bool;
       default = true;
       description = "Start CleanShot X (screenshot tool) at login";
-    };
-
-    clop = mkOption {
-      type = types.bool;
-      default = true;
-      description = "Start Clop (image optimizer) at login";
-    };
-
-    dropover = mkOption {
-      type = types.bool;
-      default = true;
-      description = "Start Dropover (drag & drop shelf) at login";
-    };
-
-    lookAway = mkOption {
-      type = types.bool;
-      default = true;
-      description = "Start LookAway (break reminder) at login";
     };
 
     # Security & sync
@@ -125,12 +95,6 @@ in
       description = "Start Todoist (task manager) at login";
     };
 
-    wisprFlow = mkOption {
-      type = types.bool;
-      default = true;
-      description = "Start Wispr Flow (voice notes) at login";
-    };
-
     fantastical = mkOption {
       type = types.bool;
       default = true;
@@ -165,15 +129,6 @@ in
         };
       };
 
-      amphetamine = mkIf cfg.amphetamine {
-        serviceConfig = {
-          Label = "com.if.Amphetamine";
-          ProgramArguments = [ "/Applications/Amphetamine.app/Contents/MacOS/Amphetamine" ];
-          RunAtLoad = true;
-          KeepAlive = false;
-        };
-      };
-
       # Core productivity apps
       bartender = mkIf cfg.bartender {
         serviceConfig = {
@@ -202,46 +157,10 @@ in
         };
       };
 
-      paste = mkIf cfg.paste {
-        serviceConfig = {
-          Label = "com.paste.Paste";
-          ProgramArguments = [ "/Applications/Paste.app/Contents/MacOS/Paste" ];
-          RunAtLoad = true;
-          KeepAlive = false;
-        };
-      };
-
       cleanShot = mkIf cfg.cleanShot {
         serviceConfig = {
           Label = "pl.maketheweb.cleanshotx";
           ProgramArguments = [ "/Applications/CleanShot X.app/Contents/MacOS/CleanShot X" ];
-          RunAtLoad = true;
-          KeepAlive = false;
-        };
-      };
-
-      clop = mkIf cfg.clop {
-        serviceConfig = {
-          Label = "com.lowtechguys.Clop";
-          ProgramArguments = [ "/Applications/Clop.app/Contents/MacOS/Clop" ];
-          RunAtLoad = true;
-          KeepAlive = false;
-        };
-      };
-
-      dropover = mkIf cfg.dropover {
-        serviceConfig = {
-          Label = "com.mkswap.Dropover";
-          ProgramArguments = [ "/Applications/Dropover.app/Contents/MacOS/Dropover" ];
-          RunAtLoad = true;
-          KeepAlive = false;
-        };
-      };
-
-      lookAway = mkIf cfg.lookAway {
-        serviceConfig = {
-          Label = "com.pragmaticcode.LookAway";
-          ProgramArguments = [ "/Applications/LookAway.app/Contents/MacOS/LookAway" ];
           RunAtLoad = true;
           KeepAlive = false;
         };
@@ -299,15 +218,6 @@ in
         serviceConfig = {
           Label = "com.todoist.mac.Todoist";
           ProgramArguments = [ "/Applications/Todoist.app/Contents/MacOS/Todoist" ];
-          RunAtLoad = true;
-          KeepAlive = false;
-        };
-      };
-
-      wisprFlow = mkIf cfg.wisprFlow {
-        serviceConfig = {
-          Label = "com.electron.wispr-flow";
-          ProgramArguments = [ "/Applications/Wispr Flow.app/Contents/MacOS/Wispr Flow" ];
           RunAtLoad = true;
           KeepAlive = false;
         };
