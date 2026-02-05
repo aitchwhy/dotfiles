@@ -117,7 +117,7 @@ in
         # Third-party apps
         fantastical.enable = mkDefault true;
         zoom.enable = mkDefault true;
-        spotify.enable = mkDefault true;
+        spotify.enable = mkDefault false; # Spotify not installed
         chrome.enable = mkDefault true;
         slack.enable = mkDefault true;
         obsidian.enable = mkDefault true;

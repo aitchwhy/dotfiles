@@ -27,6 +27,9 @@ in
       clickShortcutModifiers = 655360; # Opt+Shift
       scrollShortcutKeyCode = 1; # S
       scrollShortcutModifiers = 655360; # Opt+Shift
+
+      # Disable Homerow's own login item — Nix launchd agent handles startup
+      "launch-at-login" = 0;
     };
   };
 }

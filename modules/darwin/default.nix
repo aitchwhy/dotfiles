@@ -75,11 +75,11 @@ in
     };
 
     # System packages - only essential system-level tools
+    # Note: mas is managed by Homebrew (auto-installed by nix-darwin for masApps)
     environment.systemPackages = with pkgs; [
       coreutils
       gnumake
       darwin.trash
-      mas
     ];
   };
 }
