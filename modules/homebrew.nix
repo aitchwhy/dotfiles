@@ -78,6 +78,7 @@
       "hazel" # Automated file organization - just configured
       "todoist-app" # Task manager
       "bitwarden" # Password manager
+      "cardhop" # Contacts app (Flexibits)
       "fantastical" # Calendar app - settings in modules/home/apps/fantastical.nix
 
       # ─────────────────────────────────────────────────────────────
