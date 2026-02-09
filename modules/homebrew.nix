@@ -144,10 +144,6 @@
       "Dropover - Easier Drag & Drop" = 1355679052; # Drag & drop shelf
       "Whisper Transcription" = 1668083311; # Audio transcription
 
-      # ─────────────────────────────────────────────────────────────
-      # Security & Networking
-      # ─────────────────────────────────────────────────────────────
-      "NextDNS" = 1464122853; # DNS security & privacy
-    };
+};
   };
 }
