@@ -39,6 +39,7 @@ in
     # We can set a few basic defaults:
     targets.darwin.defaults."com.surteesstudios.Bartender" = {
       showForUpdates = cfg.showForUpdates;
+      SUEnableAutomaticChecks = false;
     };
   };
 }
