@@ -144,6 +144,6 @@
       "Dropover - Easier Drag & Drop" = 1355679052; # Drag & drop shelf
       "Whisper Transcription" = 1668083311; # Audio transcription
 
-};
+    };
   };
 }
