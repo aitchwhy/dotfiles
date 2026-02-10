@@ -25,9 +25,6 @@ in
     ./secrets.nix
     ./login-items.nix
 
-    # Services
-    ./services/evolution-agent.nix
-
     # Apple Applications
     ./terminal.nix
     ./activity-monitor.nix
@@ -66,9 +63,6 @@ in
       controlCenter.enable = mkDefault true;
       communication.enable = mkDefault true;
       loginItems.enable = mkDefault true;
-
-      # Services
-      evolutionAgent.enable = mkDefault true;
 
       # Apps (activation scripts)
       # apps.wisprFlow.enable = mkDefault true; # DISABLED: Now using Homebrew cask wispr-flow

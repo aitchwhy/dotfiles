@@ -396,8 +396,14 @@ in
       if [ -f "$CLAUDE_CODE_CONFIG" ]; then
         MERGED=$(jq --argjson servers "$MCP_SERVERS" --argjson plugins "$ENABLED_PLUGINS" \
           '.mcpServers = $servers | .enabledPlugins = $plugins | del(.defaultModel)' "$CLAUDE_CODE_CONFIG")
-        echo "$MERGED" > "$CLAUDE_CODE_CONFIG"
-        echo "Claude Code config updated (1 server, 1 plugin)"
+        # Only write if content actually changed (prevents Claude Code backup spam)
+        CURRENT=$(cat "$CLAUDE_CODE_CONFIG")
+        if [ "$MERGED" != "$CURRENT" ]; then
+          echo "$MERGED" > "$CLAUDE_CODE_CONFIG"
+          echo "Claude Code config updated (1 server, 1 plugin)"
+        else
+          echo "Claude Code config unchanged, skipping write"
+        fi
       else
         echo "{\"mcpServers\": $MCP_SERVERS, \"enabledPlugins\": $ENABLED_PLUGINS}" > "$CLAUDE_CODE_CONFIG"
         echo "Claude Code config created (1 server, 1 plugin)"
