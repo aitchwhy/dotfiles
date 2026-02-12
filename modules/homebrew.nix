@@ -80,6 +80,7 @@
       "bitwarden" # Password manager
       "cardhop" # Contacts app (Flexibits)
       "fantastical" # Calendar app - settings in modules/home/apps/fantastical.nix
+      "linear-linear" # Project management & issue tracking
 
       # ─────────────────────────────────────────────────────────────
       # Media
