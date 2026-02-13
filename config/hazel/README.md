@@ -20,117 +20,84 @@ All rules stored in `~/dotfiles/config/hazel/` as source of truth. Hazel syncs f
 ```
 ~/dotfiles/config/hazel/
 ├── README.md                    # This file
+├── scripts/                     # One-time maintenance scripts
+│   ├── cleanup-documents.sh     # Move app folders from Documents → Backups
+│   └── fix-archive-folders.sh   # Fix colon-separated Archive folder names
 └── rules/                       # Active rules (synced to Hazel) - SOURCE OF TRUTH
-    ├── Desktop.hazelrules       # Screenshot auto-import to Photos
-    └── Downloads.hazelrules     # Video/image auto-import to Photos
+    ├── Desktop.hazelrules       # Screenshot auto-import + iCloud sync to GDrive
+    ├── Downloads.hazelrules     # Video/image auto-import to Photos
+    └── Documents.hazelrules     # Stale project archival (6mo → Archive)
 ```
 
 **Note:** Only files in `rules/*.hazelrules` are active. Create/edit rules in Hazel GUI and they auto-sync here.
 
 ---
 
-## Core Principles
+## Taxonomy: Backups vs Archive
 
-### 1. Incremental Adoption
-**Why:** Automation can be overwhelming if introduced all at once.
+Google Drive organizes files into two top-level categories:
 
-**Approach:**
-- Start with 1 critical, low-risk rule per folder
-- Observe behavior for 1-2 weeks
-- Gradually add more rules from `archive/`
-- Build trust in the system before expanding
+| Category | Contents | Examples | Structure |
+|----------|----------|----------|-----------|
+| **Backups** | App-named folders (app data/metadata) | Zoom/, Cursor/, Anthropic-Claude-AI/ | Flat: `Backups/AppName/` |
+| **Archive** | Project-based folders (time-limited, clear deliverable) | Lease PDFs, export ZIPs, meeting notes | Nested: `Archive/2025/Apr/05/` |
 
-### 2. Buffer Times
-**Why:** Prevent processing files you just added.
+Additionally, `Backups/iCloud/` mirrors Desktop and Documents via Hazel Sync.
 
-**Implementation:**
-- 1-hour buffer for media imports (screenshots, videos, images)
-- 7-day buffer for installer cleanup
-- Gives you time to use/review files before automation triggers
-
-### 3. Safety First
-**Why:** Avoid accidental data loss.
-
-**Safeguards:**
-- Import to Photos before deletion (media has backup)
-- Only delete re-downloadable files (DMG installers)
-- Only delete system clutter (.DS_Store) or failed artifacts (.tmp)
-- Never delete user documents automatically
-
-### 4. Lifecycle-Based Organization
-**Why:** Match natural file flow through time and usage.
-
-**Stages:**
-```
-Inbox → Active → Recent → Archive → Cold Storage
-  ↑       ↑        ↑         ↑          ↑
- New   Current  1-3mo    >3mo       >1yr
-```
-
-Rules trigger based on:
-- Time since added (for new files)
-- Time since last opened (for existing files)
+**Active folders** (Hayaeh, Therapy, Told) stay in `~/Documents/` — evergreen, no end date.
 
 ---
 
-## Architectural Decisions
+## Core Principles
 
-### Decision 1: Sync Rules vs Import Rules
-**Chosen:** Sync Rules
-**Why:**
-- Auto-updates when dotfiles change
-- No manual re-import needed
-- File-based configuration persists across Hazel reinstalls
-- One-time setup, then fully automated
+### 1. Incremental Adoption
+- Start with 1 critical, low-risk rule per folder
+- Observe behavior for 1-2 weeks
+- Gradually add more rules
+- Build trust in the system before expanding
 
-**Trade-off:** Requires initial GUI setup (5 minutes), but saves hours long-term
+### 2. Buffer Times
+- 1-hour buffer for media imports (screenshots, videos, images)
+- 7-day buffer for installer cleanup
+- 6-month buffer for document archival
 
-### Decision 2: Critical Rules Only (Phase 1)
-**Chosen:** 1 rule per folder initially
-**Why:**
-- Lower risk of unexpected behavior
-- Easier to debug if something goes wrong
-- Builds confidence in automation
-- Can expand to full lifecycle later
+### 3. Safety First
+- Import to Photos before deletion (media has backup)
+- Only delete re-downloadable files (DMG installers)
+- Deletions NOT synced from iCloud to Google Drive (backup preserved)
+- Never delete user documents automatically
 
-**Trade-off:** Less automation initially, but safer onboarding
-
-### Decision 3: Media → Photos.app
-**Chosen:** Auto-import videos/images to Photos, then delete
-**Why:**
-- Photos provides automatic iCloud backup
-- Prevents Downloads folder clutter
-- Searchable/organized in Photos app
-- Safe deletion (backed up before removal)
-
-**Trade-off:** Requires Photos.app, but standard on macOS
-
-### Decision 4: No Auto-Delete of Documents
-**Chosen:** Manual review required for documents/PDFs
-**Why:**
-- Too high risk for accidental data loss
-- User documents often unique/irreplaceable
-- Better to notify than auto-delete
-
-**Trade-off:** Manual organization needed for documents (acceptable)
+### 4. Lifecycle-Based Organization
+```
+Inbox → Active → Recent → Archive → Cold Storage
+  ↑       ↑        ↑         ↑          ↑
+ New   Current  1-3mo    >6mo       >1yr
+```
 
 ---
 
 ## Current Rules (Active)
 
-| Folder | Rule | Trigger | Action | Risk |
-|--------|------|---------|--------|------|
-| **Desktop** | Screenshot import | Name contains "Screenshot" + Kind is Image + 1h old | Import to Photos → Trash | Low |
-| **Downloads** | Video import | Type is public.movie + 1h old | Import to Photos → Trash | Low |
-| **Downloads** | Image import | Type is public.image + 1h old | Import to Photos → Trash | Low |
+| Folder | Rule | Trigger | Action |
+|--------|------|---------|--------|
+| **Desktop** | Screenshot import | Name contains "Screenshot" + Kind is Image + 1h old | Import to Photos → Trash |
+| **Desktop** | Sync to Google Drive | Name is NOT .DS_Store + Ext is NOT icloud | Sync to `GDrive/Backups/iCloud/Desktop` |
+| **Downloads** | Video import | Type is public.movie + 1h old | Import to Photos → Trash |
+| **Downloads** | Image import | Type is public.image + 1h old | Import to Photos → Trash |
+| **Documents** | Sync to Google Drive | Name is NOT .DS_Store + Ext is NOT icloud | Sync to `GDrive/Backups/iCloud/Documents` |
+| **Documents** | Archive stale projects | NOT Hayaeh/Therapy/Told + 6mo untouched | Sort into `GDrive/Archive/{year}/{month}/{day}/` |
 
-**Total:** 3 active rules across 2 folders
+**Total:** 6 active rules across 3 folders
 
-### Pending Rules to Add
+### Sync Rules Details
 
-| Folder | Rule | Trigger | Action | Notes |
-|--------|------|---------|--------|-------|
-| **Downloads** | Meta export auto-backup | Name contains "meta-" + Extension is zip | Move to Google Drive/Backups/Meta-Facebook/ | Auto-organize Facebook exports |
+Desktop and Documents use Hazel's [Sync action](https://www.noodlesoft.com/manual/hazel/advanced-topics/syncing-folders/) for one-way iCloud → Google Drive backup:
+
+- **One-way only** — source → destination, never the reverse
+- **Incremental** — only new/changed files, not full copies each time
+- **Deletions NOT synced** — files deleted from iCloud stay in Google Drive
+- **Folder structure preserved** — "From Monitored Folder" maintains subfolder hierarchy
+- **Google Drive versioning** — overwrites keep old versions (up to 100 versions, 30-day retention)
 
 ---
 
@@ -139,111 +106,54 @@ Rules trigger based on:
 1. **Open Hazel** (System Settings → Hazel, or standalone app)
 
 2. **Add Folders:**
-   - Desktop
+   - Desktop (with subfolders)
    - Downloads
-   - Google Drive/My Drive (✓ Include subfolders)
-   - Backups (✓ Include subfolders)
+   - Documents (with subfolders for sync; without subfolders for archival)
 
 3. **Enable Sync Rules** for each folder:
-   - Select folder → Gear icon (⚙️) → "Sync Rules..."
+   - Select folder → Gear icon → "Sync Rules..."
    - Choose corresponding `.hazelrules` file:
      - Desktop → `~/dotfiles/config/hazel/rules/Desktop.hazelrules`
      - Downloads → `~/dotfiles/config/hazel/rules/Downloads.hazelrules`
+     - Documents → `~/dotfiles/config/hazel/rules/Documents.hazelrules`
 
 **Result:** Rules auto-update when you edit dotfiles. No manual import needed.
 
 ---
 
-## Adding New Rules
+## One-Time Scripts
 
-**To add Meta export auto-backup:**
+### Documents Cleanup
+Move app folders from `~/Documents/` to `Google Drive/Backups/`:
 
-1. Open Hazel → Select **Downloads** folder
-2. Click **"+"** to add new rule
-3. Name: **"Meta export auto-backup"**
-4. Conditions:
-   - Name contains "meta-"
-   - Extension is zip
-5. Actions:
-   - Move to folder: `/Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/Backups/Meta-Facebook/`
-6. Click OK
-
-**Hazel will automatically sync this to** `Downloads.hazelrules` → commit to git!
-
-**Future rules:**
-1. Downloads: DMG cleanup (7-day buffer)
-2. Downloads: PDF categorization
-3. Google Drive: .DS_Store cleanup
-4. Desktop: Day-old files → Review folder
-
----
-
-## Maintenance
-
-### Modifying Rules
 ```bash
-# Edit rule file
-vim ~/dotfiles/config/hazel/rules/downloads-critical.hazelrules
+# Preview changes
+config/hazel/scripts/cleanup-documents.sh --dry-run
 
-# Commit changes
-cd ~/dotfiles
-git add config/hazel/rules/downloads-critical.hazelrules
-git commit -m "feat(hazel): add new condition to downloads rule"
-
-# Hazel automatically detects change and updates ✨
+# Execute
+config/hazel/scripts/cleanup-documents.sh
 ```
 
-### Viewing Logs
+### Archive Folder Fix
+Convert malformed `2025:Apr:05:filename` folders to nested `2025/Apr/05/`:
+
 ```bash
-# Check Hazel is running
-ps aux | grep -i hazel
+# Preview changes
+config/hazel/scripts/fix-archive-folders.sh --dry-run
 
-# View Hazel logs
-tail -f ~/Library/Logs/Hazel/*.log
-
-# Or: Open Hazel → Select folder → Info tab → "Show Log"
+# Execute
+config/hazel/scripts/fix-archive-folders.sh
 ```
-
----
-
-## Best Practices
-
-### Rule Ordering
-**Principle:** Most specific to least specific
-- Process screenshots before generic images
-- Check file type before checking age
-- Apply narrow conditions before broad ones
-
-### Buffer Times
-**Principle:** Longer buffers for irreversible actions
-- 1 hour: Media imports (reversible via Photos)
-- 7 days: File deletions (re-downloadable)
-- 30+ days: Document archival (user content)
-
-### Exclusions
-**Principle:** Exclude what you know won't work
-- GIF files: Often used for reference (not auto-import)
-- .icloud files: Placeholder files (not real files)
-- System files: .DS_Store, .localized (auto-delete safe)
-
-### Testing
-**Principle:** Test before committing
-1. Add rule with 1-hour buffer
-2. Create test file
-3. Wait for rule to trigger
-4. Verify expected behavior
-5. If works, commit to git
 
 ---
 
 ## Related Systems
 
-- **Folder Organization:** `~/.claude/plans/folder-organization-system.md`
-- **Lifecycle Transitions:** Defined in `archive/*-lifecycle.hazelrules`
-- **iCloud→GDrive Sync:** Separate system (rclone + launchd)
+- **iCloud → Google Drive:** Hazel Sync rules (Desktop + Documents)
+- **Google Drive versioning:** Built-in (up to 100 versions, 30-day retention)
+- **Documents lifecycle:** Stale projects auto-archive after 6 months
 
 ---
 
-**Status:** ✅ Active (6 critical rules)
-**Last Updated:** 2026-02-01
-**Audit Log:** `audit-2026-02-01.md`
+**Status:** Active
+**Last Updated:** 2026-02-13
