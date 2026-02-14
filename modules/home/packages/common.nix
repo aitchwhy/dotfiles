@@ -121,6 +121,7 @@ in
       ])
       # Additional CLI Tools
       ++ [
+        fclones # Fast duplicate file finder (Rust)
         mkcert # Local HTTPS certs
         ngrok # Expose local servers
         caddy # Modern web server
