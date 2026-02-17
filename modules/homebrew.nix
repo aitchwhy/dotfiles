@@ -14,6 +14,9 @@
       cleanup = "uninstall"; # Remove apps not in config
     };
 
+    # Force-upgrade casks that have auto_updates (Claude, Slack, etc.)
+    greedyCasks = true;
+
     # Taps (formula repositories)
     taps = [
       "depot/tap" # Required for Depot CLI
