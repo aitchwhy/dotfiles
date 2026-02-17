@@ -73,9 +73,9 @@ describe('Generated Artifacts', () => {
       expect(() => JSON.parse(content)).not.toThrow()
     })
 
-    it('has cleanupPeriodDays set to 30', () => {
+    it('has cleanupPeriodDays set to 7', () => {
       const content = JSON.parse(fs.readFileSync(filePath, 'utf-8'))
-      expect(content.cleanupPeriodDays).toBe(30)
+      expect(content.cleanupPeriodDays).toBe(7)
     })
 
     it('has permissions configured', () => {
