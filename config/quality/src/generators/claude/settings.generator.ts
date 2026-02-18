@@ -135,7 +135,7 @@ const PERMISSIONS = {
     'WebFetch(domain:apps.apple.com)',
 
     'mcp__ref__*',
-    // REMOVED: mcp__exa__* (January 2026 MINIMAL)
+    'mcp__linear__*',
   ],
   deny: [
     'Read(**/.env*)',

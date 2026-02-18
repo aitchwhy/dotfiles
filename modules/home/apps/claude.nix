@@ -9,7 +9,7 @@
 # - nix-config.json: Plugins/marketplaces for TypeScript to consume
 #
 # MINIMAL Configuration (February 2026):
-# - 1 MCP server (ref) - SOTA docs, 60-95% fewer tokens
+# - 2 MCP servers (ref, ast-grep) + 1 SSE server (linear)
 # - 1 plugin (ralph-wiggum) - Autonomous loops only
 # - 0 extra marketplaces - ralph-wiggum is in default marketplace
 # - 1 DXT extension (Filesystem) - 5 focused allowed directories
@@ -45,7 +45,7 @@ let
   mcpSecretsPath = "$HOME/.config/mcp";
 
   # ═══════════════════════════════════════════════════════════════════════════
-  # MCP SERVERS SSOT (January 2026 - MINIMAL)
+  # MCP SERVERS SSOT (February 2026 - MINIMAL + Linear)
   # ═══════════════════════════════════════════════════════════════════════════
 
   mcpServerDefs = {
@@ -64,6 +64,14 @@ let
       package = "git+https://github.com/ast-grep/ast-grep-mcp";
       executable = "ast-grep-server";
       args = [ ];
+    };
+    linear = {
+      # Linear project management — OAuth-based SSE (no API key)
+      # ~23 tools: issues, projects, teams, comments, labels, cycles, search
+      # Authenticate: run /mcp in Claude Code after activation
+      # https://linear.app/docs/mcp
+      isSse = true;
+      url = "https://mcp.linear.app/sse";
     };
   };
 
@@ -376,7 +384,7 @@ in
     # Generate Claude Code CLI config (~/.claude.json)
     # Uses jq to MERGE mcpServers + enabledPlugins with existing runtime state
     # Runtime state includes: numStartups, oauthAccount, projects, etc. (31+ keys)
-    # MINIMAL: 1 server (ref), 1 plugin (ralph-wiggum)
+    # MINIMAL: 3 servers (ref, ast-grep, linear), 1 plugin (ralph-wiggum)
     home.activation.generateClaudeCodeConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       MCP_SECRETS="${config.home.homeDirectory}/.config/mcp"
       CLAUDE_CODE_CONFIG="${config.home.homeDirectory}/.claude.json"
@@ -400,13 +408,13 @@ in
         CURRENT=$(cat "$CLAUDE_CODE_CONFIG")
         if [ "$MERGED" != "$CURRENT" ]; then
           echo "$MERGED" > "$CLAUDE_CODE_CONFIG"
-          echo "Claude Code config updated (1 server, 1 plugin)"
+          echo "Claude Code config updated (3 servers, 1 plugin)"
         else
           echo "Claude Code config unchanged, skipping write"
         fi
       else
         echo "{\"mcpServers\": $MCP_SERVERS, \"enabledPlugins\": $ENABLED_PLUGINS}" > "$CLAUDE_CODE_CONFIG"
-        echo "Claude Code config created (1 server, 1 plugin)"
+        echo "Claude Code config created (3 servers, 1 plugin)"
       fi
     '';
 

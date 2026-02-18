@@ -19,11 +19,8 @@ export const mcpOptimizationSkill: SkillDefinition = {
       content: `| Server | Purpose | Token Cost | When to Use |
 |--------|---------|------------|-------------|
 | \`ref\` | Library docs (SOTA) | Very Low | Before new library usage (60-95% fewer tokens) |
-| \`exa\` | Code context search | Low | Find patterns across repos |
-| \`repomix\` | Codebase packing | High | Once per session for exploration |
-| \`github\` | Repository operations | Low | PR/issue management |
-| \`playwright\` | Browser automation | Medium | E2E testing, web scraping |
-| \`ast-grep\` | AST-based search | Low | Code pattern matching |`,
+| \`ast-grep\` | AST-based search | Low | Code pattern matching |
+| \`linear\` | Project management (SSE) | Low | Issue tracking, project queries, team ops |`,
     },
     {
       heading: 'Token Budget by Session Type',
@@ -132,9 +129,8 @@ mcp__ast-grep__rewrite_code({
       heading: 'Cost Optimization Checklist',
       content: `- [ ] Use native tools (Read/Write) instead of MCP filesystem
 - [ ] Use ref for docs (60-95% fewer tokens than alternatives)
-- [ ] Use targeted repomix includes for large codebases
-- [ ] Use exa for cross-repo code pattern search
-- [ ] Use grep_repomix_output instead of full reads`,
+- [ ] Use ast-grep for structural code pattern search
+- [ ] Use linear for issue tracking instead of manual browser lookups`,
     },
   ],
 }
