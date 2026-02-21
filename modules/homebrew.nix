@@ -49,6 +49,7 @@
       # AI & LLM
       # ─────────────────────────────────────────────────────────────
       "claude" # Claude Desktop - actively using
+      "granola" # AI-powered notepad for meetings
 
       # ─────────────────────────────────────────────────────────────
       # Design & Creative
