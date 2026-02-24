@@ -1,5 +1,6 @@
 # Homebrew configuration for macOS
-# Single source of truth for GUI applications
+# Single source of truth for GUI applications and most CLI tools
+# - Homebrew Brews: CLI tools (avoids Nix Python/build issues on macOS)
 # - Homebrew Casks: GUI apps not in nixpkgs
 # - Mac App Store: Apps only available via MAS
 # - Setapp apps are managed by Setapp.app itself
@@ -22,11 +23,73 @@
       "depot/tap" # Required for Depot CLI
     ];
 
-    # CLI tools (most in home.packages via Nix)
+    # CLI tools
     # OrbStack provides docker, docker-compose, and credential helpers
     brews = [
+      # Build & Deploy
       "depot" # Docker build acceleration
       "mas" # Required for masApps management
+
+      # Cloud Platforms
+      "awscli"
+      "azure-cli"
+
+      # Kubernetes & Infrastructure
+      "kubectl"
+      "kubectx"
+      "helm"
+      "k9s"
+      "pulumi"
+      "dive" # Docker image analyzer
+
+      # Programming Languages & Tools
+      "pnpm"
+      "uv"
+      "go"
+      "gopls"
+      "golangci-lint"
+      "rustup"
+
+      # Databases
+      "postgresql@18"
+      "pgcli"
+      "redis"
+
+      # API Development
+      "grpcurl"
+
+      # Documentation
+      "glow"
+      "pandoc"
+      "tldr"
+
+      # Media Processing
+      "ffmpeg"
+      "imagemagick"
+      "yt-dlp"
+
+      # Security
+      "sops"
+      "age"
+      "gnupg"
+      "bitwarden-cli"
+
+      # Cloud Storage
+      "rclone"
+
+      # Code Quality (non-Nix)
+      "shellcheck"
+      "shfmt"
+      "markdownlint-cli"
+      "yamllint"
+      "hadolint"
+      "biome"
+
+      # CLI Tools
+      "fclones"
+      "mkcert"
+      "caddy"
+      "gh"
     ];
 
     # GUI Applications (Homebrew Casks)
@@ -43,6 +106,7 @@
       "claude-code" # Claude CLI - actively using
       "cursor" # AI-first code editor - keep for development
       "kaleidoscope" # Diff/merge tool
+      "ngrok" # Expose local servers
       "orbstack" # Container runtime (Docker/Lima replacement)
 
       # ─────────────────────────────────────────────────────────────

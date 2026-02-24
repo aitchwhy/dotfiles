@@ -1,5 +1,6 @@
 # Cross-platform packages (shared between macOS and Linux)
-# Extracted from users/hank.nix and users/hank-linux.nix
+# Most CLI tools moved to Homebrew brews (managed via nix-darwin)
+# Only Nix-specific tools and custom packages remain here
 {
   config,
   lib,
@@ -14,102 +15,23 @@ in
   config = mkIf cfg.enable {
     home.packages =
       with pkgs;
-      # Cloud Platforms (Google Cloud primary - no Cloudflare/Fly.io)
-      (optionals cfg.enableCloudPlatforms [
-        awscli2
-        azure-cli
-        (google-cloud-sdk.withExtraComponents [
-          google-cloud-sdk.components.gke-gcloud-auth-plugin
-        ])
-      ])
       # Kubernetes & Infrastructure
-      # Note: terraform/opentofu removed - using Pulumi only for IaC
-      ++ (optionals cfg.enableKubernetes [
-        kubectl
-        kubectx
-        kubernetes-helm
-        k9s
-        pulumi
-        pulumi-esc # ESC CLI for secrets/config management
+      (optionals cfg.enableKubernetes [
+        pulumi-esc # ESC CLI for secrets/config management (not in Homebrew)
       ])
-      # Container Tools
-      ++ [
-        dive
-      ]
-      # Programming Languages & Tools
-      ++ (optionals cfg.enableLanguages [
-        # pnpm global - transitive Node 24.x is isolated to pnpm binary only
-        # fnm manages per-project Node via .node-version files
-        nodePackages.pnpm
-        bun # For MCP servers, scripts, and fast execution
-
-        # Python - uv manages Python versions and tools (run: uv python install && uv tool install ruff)
-        uv
-
-        # Go
-        go
-        gopls
-        golangci-lint
-
-        # Rust - via rustup for toolchain management
-        rustup
-      ])
-      # Database Clients (PostgreSQL 18+, SQLite/Turso - NO MySQL)
+      # Databases (not in Homebrew)
       ++ (optionals cfg.enableDatabases [
-        postgresql_18
-        pgcli # Enhanced PostgreSQL CLI with autocomplete
-        drizzle-kit # Drizzle ORM CLI + Studio GUI
-        redis
-        usql
+        drizzle-kit # Drizzle ORM CLI + Studio GUI (npm package)
+        usql # Universal SQL client (Go binary)
       ])
-      # API Development (xh in development.nix replaces httpie)
+      # Nix Code Quality & Formatting
       ++ [
-        grpcurl
-      ]
-      # Documentation
-      ++ [
-        glow
-        pandoc
-        tldr # Community-maintained man page summaries
-      ]
-      # Media Processing
-      ++ [
-        ffmpeg-full
-        imagemagick
-        yt-dlp # YouTube video/audio downloader
-      ]
-      # Security Tools
-      ++ [
-        sops
-        age
-        gnupg
-        bitwarden-cli
-      ]
-      # Cloud Storage
-      ++ [
-        rclone # rsync for cloud storage (Google Drive, S3, etc.)
-      ]
-      # Code Quality & Formatting
-      ++ [
-        # Shell
-        shellcheck
-        shfmt
-
-        # Nix (nixfmt is RFC-style by default in January 2026)
         nixfmt
         deadnix
         statix
-
-        # Multi-language
         treefmt
-
-        # Linters (moved from Mason for full Nix reproducibility)
-        markdownlint-cli # Markdown linting
-        yamllint # YAML linting
-        hadolint # Dockerfile linting
-        biome # JS/TS/JSON formatting + linting
       ]
-      # Development Tools
+      # Nix Development Tools
       ++ (optionals cfg.enableNixTools [
         cachix
         devenv
@@ -119,18 +41,11 @@ in
         nix-output-monitor
         nix-diff
       ])
-      # Additional CLI Tools
+      # Standalone binaries (no Python deps, not in Homebrew)
       ++ [
-        fclones # Fast duplicate file finder (Rust)
-        mkcert # Local HTTPS certs
-        ngrok # Expose local servers
-        caddy # Modern web server
+        bun # For MCP servers, scripts, and fast execution
         ralph-claude-code # Autonomous AI development loop
         agent-browser # AI browser automation CLI (run `agent-browser install` on first use)
-      ]
-      # GitHub
-      ++ [
-        gh
       ];
 
     # Declarative uv setup - installs Python and tools after uv is available
