@@ -7,16 +7,14 @@ This guide will help you set up ultra-aggressive auto-organization using Hazel w
 1. `desktop-2026-aggressive.hazelrules` - 12 rules for Desktop
 2. `downloads-2026-aggressive.hazelrules` - 10 rules for Downloads
 3. `google-drive-2026-maintenance.hazelrules` - 8 rules for Google Drive
-4. `backups-2026-rotation.hazelrules` - 6 rules for Backups
 
-**Total: 36 aggressive automation rules**
+**Total: 30 aggressive automation rules**
 
 ## Prerequisites
 1. Hazel app installed (https://www.noodlesoft.com/hazel/)
 2. Google Drive desktop app installed and syncing
 3. Automation scripts in place:
-   - `~/dotfiles/scripts/rotate-backups.sh`
-   - `~/dotfiles/scripts/check-duplicate-backups.sh`
+   - `~/dotfiles/scripts/gdrive-health-check.sh`
 
 ## Installation Steps
 
@@ -44,11 +42,6 @@ Add these folders to Hazel monitoring:
 - Path: `~/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/`
 - Match subfolders: YES (depth: 2 levels)
 - Run rules: Every 6 hours
-
-**Backups Folder** (Low priority)
-- Path: `~/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/Backups/`
-- Match subfolders: YES
-- Run rules: Daily at 3:00 AM
 
 ### Step 3: Import Rules (Manual Process)
 
@@ -161,7 +154,7 @@ open -a Hazel
 ✅ **Smart Deduplication**: Automatic duplicate detection
 ✅ **Size-based Actions**: Large files handled differently
 ✅ **Media Intelligence**: Photos, videos, documents routed appropriately
-✅ **Backup Rotation**: Automated with 5-90-180 day retention
+✅ **Cloud-first Backups**: Google Drive as primary storage
 
 ## Troubleshooting
 
@@ -188,12 +181,6 @@ open -a Hazel
 The rules use these scripts:
 
 ```bash
-# Backup rotation (runs daily)
-~/dotfiles/scripts/rotate-backups.sh
-
-# Duplicate backup cleanup (runs on-demand)
-~/dotfiles/scripts/check-duplicate-backups.sh
-
 # Health monitoring (run weekly)
 ~/dotfiles/scripts/gdrive-health-check.sh
 ```
