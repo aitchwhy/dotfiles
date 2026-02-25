@@ -252,13 +252,93 @@ in
       };
     };
 
-    # Lazygit config — override macOS ~/Library/Application Support/ default to XDG
-    xdg.configFile."lazygit/config.yml".source = ../../../config/git/lazygit.yml;
-    home.sessionVariables.LG_CONFIG_FILE = "${config.xdg.configHome}/lazygit/config.yml";
+    # Lazygit — fully managed by home-manager
+    programs.lazygit = {
+      enable = true;
+      enableZshIntegration = true;
+      settings = {
+        gui = {
+          nerdFontsVersion = "3";
+          border = "rounded";
+          showFileTree = true;
+          filterMode = "fuzzy";
+        };
+        git = {
+          pagers = {
+            colorArg = "always";
+            pager = "delta --dark --paging=never";
+          };
+          commit = {
+            autoWrapCommitMessage = true;
+            autoWrapWidth = 72;
+          };
+          mainBranches = [ "main" ];
+          skipHookPrefix = "WIP";
+          autoFetch = true;
+          autoRefresh = true;
+          fetchAll = true;
+          branchPrefix = "hank/";
+        };
+        os = {
+          edit = "nvim {{filename}}";
+          editAtLine = "nvim +{{line}} {{filename}}";
+          open = "open {{filename}}";
+        };
+        customCommands = [
+          {
+            key = "C";
+            context = "files";
+            description = "Commit with Conventional Commit";
+            prompts = [
+              {
+                type = "menu";
+                title = "Commit type";
+                key = "Type";
+                options = [
+                  { name = "feat"; description = "A new feature"; value = "feat"; }
+                  { name = "fix"; description = "A bug fix"; value = "fix"; }
+                  { name = "docs"; description = "Documentation only"; value = "docs"; }
+                  { name = "refactor"; description = "Code refactoring"; value = "refactor"; }
+                  { name = "test"; description = "Adding tests"; value = "test"; }
+                  { name = "chore"; description = "Maintenance"; value = "chore"; }
+                ];
+              }
+              {
+                type = "input";
+                title = "Scope (optional)";
+                key = "Scope";
+                initialValue = "";
+              }
+              {
+                type = "input";
+                title = "Message";
+                key = "Message";
+                initialValue = "";
+              }
+            ];
+            command = ''git commit -m "{{.Form.Type}}{{if .Form.Scope}}({{.Form.Scope}}){{end}}: {{.Form.Message}}"'';
+            loadingText = "Committing...";
+          }
+          {
+            key = "<c-g>";
+            context = "global";
+            description = "Open repo in GitHub";
+            command = "gh repo view --web";
+            output = "terminal";
+          }
+          {
+            key = "<c-p>";
+            context = "global";
+            description = "Create PR";
+            command = "gh pr create --web";
+            output = "terminal";
+          }
+        ];
+      };
+    };
 
     # Additional Git tools
     home.packages = with pkgs; [
-      lazygit
       commitizen
       lefthook
     ];

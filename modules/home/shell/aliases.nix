@@ -62,8 +62,7 @@ in
       zr = "exec zsh";
       ze = "$EDITOR $ZDOTDIR/.zshrc";
 
-      # Lazygit (CRITICAL)
-      lg = "lazygit";
+      # Lazygit (lg provided by programs.lazygit.enableZshIntegration)
       lgdot = "lazygit --path $DOTFILES";
 
       # Zellij
