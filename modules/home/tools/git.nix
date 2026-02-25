@@ -252,8 +252,8 @@ in
       };
     };
 
-    # Lazygit config — source lives in config/git/, linked to XDG location
-    xdg.configFile."lazygit/config.yml".source = ../../../config/git/lazygit.yml;
+    # Lazygit config — macOS uses ~/Library/Application Support/lazygit/
+    home.file."Library/Application Support/lazygit/config.yml".source = ../../../config/git/lazygit.yml;
 
     # Additional Git tools
     home.packages = with pkgs; [
