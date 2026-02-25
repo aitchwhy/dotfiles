@@ -89,6 +89,9 @@ in
       publicip = "curl -s https://api.ipify.org";
       flush = "dscacheutil -flushcache && killall -HUP mDNSResponder";
 
+      # macOS XDG overrides (these tools ignore XDG_CONFIG_HOME on macOS)
+      glow = "glow --config ~/.config/glow/glow.yml";
+
       # Tool shortcuts
       sp = "supabase";
       ts = "tailscale";
