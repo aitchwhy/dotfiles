@@ -20,6 +20,7 @@ in
     ./spaces.nix
     ./window-manager.nix
     ./input-devices.nix
+    ./network.nix
     ./tailscale.nix
     ./colima.nix
     ./secrets.nix
@@ -51,6 +52,8 @@ in
       spaces.enable = mkDefault true;
       windowManager.enable = mkDefault true;
       inputDevices.enable = mkDefault true;
+      network.enable = mkDefault true;
+      network.removeStaleServices = [ "NextDNS" ];
       tailscale.enable = mkDefault false; # Using Homebrew cask instead (provides GUI + CLI)
       colima.enable = mkDefault false; # Replaced by OrbStack
       secrets.enable = mkDefault true;

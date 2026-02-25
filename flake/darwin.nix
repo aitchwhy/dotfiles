@@ -55,9 +55,23 @@
           nix-homebrew = {
             enable = true;
             user = "hank";
-            autoMigrate = true;
+            mutableTaps = false;
+            taps = {
+              "homebrew/homebrew-core" = inputs.homebrew-core;
+              "homebrew/homebrew-cask" = inputs.homebrew-cask;
+              "homebrew/homebrew-bundle" = inputs.homebrew-bundle;
+              "depot/homebrew-tap" = inputs.homebrew-depot;
+            };
           };
         }
+
+        # Sync homebrew.taps with nix-homebrew (per README pattern)
+        (
+          { config, ... }:
+          {
+            homebrew.taps = builtins.attrNames config.nix-homebrew.taps;
+          }
+        )
       ];
     }
   );

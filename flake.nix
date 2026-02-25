@@ -42,6 +42,25 @@
 
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
 
+    # Homebrew taps (declarative, tracks latest)
+    homebrew-core = {
+      url = "github:homebrew/homebrew-core";
+      flake = false;
+    };
+    homebrew-cask = {
+      url = "github:homebrew/homebrew-cask";
+      flake = false;
+    };
+    homebrew-bundle = {
+      url = "github:homebrew/homebrew-bundle";
+      flake = false;
+    };
+    # Custom tap for depot CLI
+    homebrew-depot = {
+      url = "github:depot/homebrew-tap";
+      flake = false;
+    };
+
     # ═══════════════════════════════════════════════════════════════════════════
     # SECRETS MANAGEMENT
     # ═══════════════════════════════════════════════════════════════════════════

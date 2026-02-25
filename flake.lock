@@ -147,6 +147,70 @@
         "type": "github"
       }
     },
+    "homebrew-bundle": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1745335228,
+        "narHash": "sha256-TIKR2UgtyUmHLNZp255/vLs+1I10hXe+sciMEbAGFwE=",
+        "owner": "homebrew",
+        "repo": "homebrew-bundle",
+        "rev": "a3265c84b232e13048ecbf6fc18a2eedfadbeb08",
+        "type": "github"
+      },
+      "original": {
+        "owner": "homebrew",
+        "repo": "homebrew-bundle",
+        "type": "github"
+      }
+    },
+    "homebrew-cask": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1772039463,
+        "narHash": "sha256-TIydfGW1PEc1Z03d7OG41HQsvnQc+tsQPXLaPfGQvWA=",
+        "owner": "homebrew",
+        "repo": "homebrew-cask",
+        "rev": "865b508b668ed0f1a3a04cf718da22273f973a0a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "homebrew",
+        "repo": "homebrew-cask",
+        "type": "github"
+      }
+    },
+    "homebrew-core": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1772043859,
+        "narHash": "sha256-xP5cHg81VU84/t3r47SPp55lRvN848+w4AUK7ve7Zv4=",
+        "owner": "homebrew",
+        "repo": "homebrew-core",
+        "rev": "4afa901613b3e1646c1131d0d7be31c05b6901ea",
+        "type": "github"
+      },
+      "original": {
+        "owner": "homebrew",
+        "repo": "homebrew-core",
+        "type": "github"
+      }
+    },
+    "homebrew-depot": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1772034554,
+        "narHash": "sha256-ZRorBxrcPlU4HzcKGte78T/5sFJbAkfpCmtqabHJpKY=",
+        "owner": "depot",
+        "repo": "homebrew-tap",
+        "rev": "f436e7d8b55a5154e303069b9b9c52381394b2c4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "depot",
+        "repo": "homebrew-tap",
+        "type": "github"
+      }
+    },
     "nix-darwin": {
       "inputs": {
         "nixpkgs": [
@@ -221,6 +285,10 @@
         "flake-parts": "flake-parts",
         "git-hooks-nix": "git-hooks-nix",
         "home-manager": "home-manager",
+        "homebrew-bundle": "homebrew-bundle",
+        "homebrew-cask": "homebrew-cask",
+        "homebrew-core": "homebrew-core",
+        "homebrew-depot": "homebrew-depot",
         "nix-darwin": "nix-darwin",
         "nix-homebrew": "nix-homebrew",
         "nixpkgs": "nixpkgs",

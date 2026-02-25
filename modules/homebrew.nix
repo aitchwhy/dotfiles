@@ -18,11 +18,6 @@
     # Force-upgrade casks that have auto_updates (Claude, Slack, etc.)
     greedyCasks = true;
 
-    # Taps (formula repositories)
-    taps = [
-      "depot/tap" # Required for Depot CLI
-    ];
-
     # CLI tools
     # OrbStack provides docker, docker-compose, and credential helpers
     brews = [
@@ -61,7 +56,7 @@
       # Documentation
       "glow"
       "pandoc"
-      "tldr"
+      "tlrc"
 
       # Media Processing
       "ffmpeg"
@@ -175,13 +170,7 @@
       # ─────────────────────────────────────────────────────────────
       # QuickLook Plugins
       # ─────────────────────────────────────────────────────────────
-      "qlmarkdown" # Markdown preview
-      "syntax-highlight" # Code syntax highlighting
-      "quicklook-json" # JSON preview
-      "quicklook-csv" # CSV preview
-      "qlstephen" # Plain text files without extension
       "qlvideo" # Video thumbnails/preview
-      "webpquicklook" # WebP image preview
     ];
 
     # Mac App Store apps (requires `mas` CLI)

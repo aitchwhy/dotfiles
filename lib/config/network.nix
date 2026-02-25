@@ -28,21 +28,18 @@
   };
 
   # ===========================================================================
-  # DNS SERVERS
+  # DNS — NextDNS via macOS Encrypted DNS profile (DoH)
+  #
+  # Single provider. No manual DNS servers on interfaces.
+  # Profile is generated and managed by modules/darwin/network.nix
   # ===========================================================================
 
   dns = {
-    cloudflare = [
-      "1.1.1.1"
-      "1.0.0.1"
-    ];
-    google = [
-      "8.8.8.8"
-      "8.8.4.4"
-    ];
-    quad9 = [
-      "9.9.9.9"
-      "149.112.112.112"
-    ];
+    nextdns = {
+      configId = "35a3c4";
+      # Device name shown in NextDNS analytics dashboard
+      # URL-encoded in the DoH endpoint
+      deviceName = "Hank MBP";
+    };
   };
 }
