@@ -147,14 +147,8 @@ in
       OBS = "$HOME/obsidian/primary";
       GLOBAL_JUSTFILE = "$HOME/dotfiles/justfile";
 
-      # Tool config paths
-      LG_CONFIG_FILE = "$HOME/dotfiles/config/git/lazygit.yml";
-      ATUIN_CONFIG_DIR = "$HOME/dotfiles/config/atuin";
-      YAZI_CONFIG_DIR = "$HOME/dotfiles/config/yazi";
-
       # Secrets management (sops-nix)
       SOPS_AGE_KEY_FILE = "$HOME/.config/sops/age/keys.txt";
-      ZELLIJ_CONFIG_DIR = "$HOME/dotfiles/config/zellij";
 
       # Claude Code LSP support
       ENABLE_LSP_TOOL = "1";

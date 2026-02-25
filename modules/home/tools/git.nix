@@ -252,6 +252,9 @@ in
       };
     };
 
+    # Lazygit config — source lives in config/git/, linked to XDG location
+    xdg.configFile."lazygit/config.yml".source = ../../../config/git/lazygit.yml;
+
     # Additional Git tools
     home.packages = with pkgs; [
       lazygit
