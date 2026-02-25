@@ -8,7 +8,7 @@ gui:
   filterMode: fuzzy
 
 git:
-  paging:
+  pagers:
     colorArg: always
     pager: delta --dark --paging=never
   commit:
@@ -69,10 +69,10 @@ customCommands:
     context: global
     description: "Open repo in GitHub"
     command: "gh repo view --web"
-    subprocess: true
+    output: terminal
 
   - key: "<c-p>"
     context: global
     description: "Create PR"
     command: "gh pr create --web"
-    subprocess: true
+    output: terminal
