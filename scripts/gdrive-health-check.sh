@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-GDRIVE_ROOT="/Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive"
+GDRIVE_ROOT="/Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive"
 LOST_FOUND="/Users/hank/Library/Application Support/Google/DriveFS/lost_and_found"
 
 echo "=== Google Drive Health Check ==="
@@ -43,18 +43,6 @@ if [ "$root_items" -gt 50 ]; then
     echo "⚠️  WARNING: More than 50 items in root (target: <50)"
 else
     echo "✅ Root organization looks good"
-fi
-
-# Check Anthropic backups
-anthropic_backups=$(ls -1 "$GDRIVE_ROOT/Backups/Anthropic-Claude-AI/"*.zip 2>/dev/null | wc -l | tr -d ' ')
-echo "Anthropic backups in main folder: $anthropic_backups"
-
-if [ "$anthropic_backups" -gt 5 ]; then
-    echo "⚠️  WARNING: More than 5 Anthropic backups (rotation needed)"
-elif [ "$anthropic_backups" -lt 1 ]; then
-    echo "⚠️  WARNING: No Anthropic backups found"
-else
-    echo "✅ Backup count looks good"
 fi
 
 echo ""

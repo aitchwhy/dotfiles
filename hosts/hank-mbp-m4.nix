@@ -12,10 +12,8 @@
 
   # Tailscale is enabled via modules.darwin.tailscale (see modules/darwin/tailscale.nix)
 
-  # Machine-specific network tools
+  # Machine-specific network tools (trippy replaces mtr, see ADR-009)
   environment.systemPackages = with pkgs; [
-    # Network diagnostics
-    mtr
     iperf3
   ];
 }
