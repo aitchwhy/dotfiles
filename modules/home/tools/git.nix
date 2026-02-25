@@ -264,10 +264,12 @@ in
           filterMode = "fuzzy";
         };
         git = {
-          pagers = {
-            colorArg = "always";
-            pager = "delta --dark --paging=never";
-          };
+          pagers = [
+            {
+              colorArg = "always";
+              pager = "delta --dark --paging=never";
+            }
+          ];
           commit = {
             autoWrapCommitMessage = true;
             autoWrapWidth = 72;
@@ -295,12 +297,36 @@ in
                 title = "Commit type";
                 key = "Type";
                 options = [
-                  { name = "feat"; description = "A new feature"; value = "feat"; }
-                  { name = "fix"; description = "A bug fix"; value = "fix"; }
-                  { name = "docs"; description = "Documentation only"; value = "docs"; }
-                  { name = "refactor"; description = "Code refactoring"; value = "refactor"; }
-                  { name = "test"; description = "Adding tests"; value = "test"; }
-                  { name = "chore"; description = "Maintenance"; value = "chore"; }
+                  {
+                    name = "feat";
+                    description = "A new feature";
+                    value = "feat";
+                  }
+                  {
+                    name = "fix";
+                    description = "A bug fix";
+                    value = "fix";
+                  }
+                  {
+                    name = "docs";
+                    description = "Documentation only";
+                    value = "docs";
+                  }
+                  {
+                    name = "refactor";
+                    description = "Code refactoring";
+                    value = "refactor";
+                  }
+                  {
+                    name = "test";
+                    description = "Adding tests";
+                    value = "test";
+                  }
+                  {
+                    name = "chore";
+                    description = "Maintenance";
+                    value = "chore";
+                  }
                 ];
               }
               {
