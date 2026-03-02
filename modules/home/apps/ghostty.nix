@@ -64,9 +64,12 @@ in
         # (was causing interference when trying to select text in scrollback)
         copy-on-select = false;
 
-        # Scrollback settings
-        # Reduce from 10M default - 100K lines is plenty and reduces memory
-        scrollback-limit = 100000;
+        # Scrollback (measured in bytes, allocated lazily)
+        # 100MB ≈ 500K-1M lines — generous but cheap since Ghostty only allocates on use
+        scrollback-limit = 104857600;
+
+        # Scroll speed (Ghostty 1.2+) — subtle 15% boost
+        mouse-scroll-multiplier = "1.15";
 
         # Quick terminal
         quick-terminal-position = "center";
