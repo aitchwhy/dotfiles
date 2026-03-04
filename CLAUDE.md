@@ -94,6 +94,12 @@ flake.nix                    # Entry point
 
 See [ADR-009](config/quality/docs/adr/009-network-api-toolkit.md) for full details.
 
+## Sub-Configuration Docs
+
+| Path | Domain |
+|------|--------|
+| `config/hazel/CLAUDE.md` | Hazel file automation rules & scripts |
+
 ## Key Files
 
 - `modules/home/apps/claude.nix` - Claude SSOT (MCP, plugins, marketplaces)
