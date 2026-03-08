@@ -26,8 +26,6 @@ type HookDefinitions = {
   readonly PreToolUse: readonly MatcherHookGroup[]
   readonly PostToolUse: readonly MatcherHookGroup[]
   readonly SessionStart: readonly MatcherHookGroup[]
-  readonly Stop: readonly MatcherHookGroup[]
-  readonly UserPromptSubmit: readonly MatcherHookGroup[]
 }
 
 // =============================================================================
@@ -70,7 +68,7 @@ export const HOOK_DEFINITIONS: HookDefinitions = {
       hooks: [
         {
           type: 'command',
-          command: qualityHook('enforce-versions.ts'),
+          command: qualityHook('enforce-packages.ts'),
           timeout: 10,
         },
       ],
@@ -94,30 +92,6 @@ export const HOOK_DEFINITIONS: HookDefinitions = {
           type: 'command',
           command: qualityHook('session-init.ts'),
           timeout: 10,
-        },
-      ],
-    },
-  ],
-
-  Stop: [
-    {
-      hooks: [
-        {
-          type: 'command',
-          command: qualityHook('session-stop.ts'),
-          timeout: 45,
-        },
-      ],
-    },
-  ],
-
-  UserPromptSubmit: [
-    {
-      hooks: [
-        {
-          type: 'command',
-          command: qualityHook('prompt-validator.ts'),
-          timeout: 3,
         },
       ],
     },

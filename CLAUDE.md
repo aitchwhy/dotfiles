@@ -10,9 +10,8 @@ just check         # Validate flake
 just health        # Verify system state
 
 cd config/quality
-bun run generate   # Regenerate Claude artifacts
+bun run generate   # Regenerate settings.json
 bun run typecheck  # Check types
-bun run test       # Run tests
 ```
 
 ## Workflow Commands (Claude Code)
@@ -20,11 +19,8 @@ bun run test       # Run tests
 | Command | Description |
 |---------|-------------|
 | /switch | Rebuild Nix system configuration |
-| /generate | Regenerate Claude artifacts from SSOT |
-| /audit | Audit Claude Code configuration state |
-| /verify-loop | Autonomous verification until green |
-| /commit-push-pr | Commit, push, and create PR |
-| /context-checkpoint | Save session context for teleport/resume |
+| /generate | Regenerate settings.json from SSOT |
+| /commit | Git add, commit, and push |
 
 ## Architecture
 
@@ -33,45 +29,44 @@ flake.nix                    # Entry point
 ├── modules/darwin/          # macOS system (dock, keyboard, services)
 ├── modules/home/            # User config (shell, apps, tools)
 │   └── apps/claude.nix     # Claude SSOT (MCP, plugins, marketplaces)
-├── config/quality/          # Claude Code hooks, skills, agents
+├── config/quality/          # Claude Code hooks + settings generator
 │   ├── docs/               # Guards architecture & ADRs
-│   ├── src/skills/         # Auto-loaded context (34 skills)
-│   ├── src/personas/       # Subagents (@agent-name)
-│   ├── src/hooks/          # Pre/Post tool enforcement (40 guards)
-│   ├── src/memories/       # Engineering patterns
+│   ├── src/hooks/          # Pre/Post tool enforcement
 │   ├── src/stack/          # versions.ts SSOT
+│   ├── src/generators/     # settings.json generator
 │   └── generated/          # Output (DO NOT EDIT)
+├── config/claude/commands/  # Slash commands (add-app, clean-claude, commit)
 └── hosts/                   # Machine-specific config
 ```
 
 ## Rules
 
 - All Claude config via Nix (never edit ~/.claude/ manually)
-- Skills/agents generated from TypeScript SSOT
-- AST-grep rules enforce patterns at write-time
+- Hooks enforce quality at tool-use time (format, lint, typecheck)
+- AST-grep rules delegated to project-level sgconfig.yml
 - Told is the primary project (Effect-TS, Expo SDK 54, LiveKit)
 
-## Stack (Jan 2026)
+## Stack (Mar 2026)
 
 | Category | Tools |
 |----------|-------|
 | Runtime | Node 25, pnpm 10, TypeScript 5.9 |
 | Types | tsgo (native preview) for compilation |
-| Lint | oxlint (645+ rules, type-aware) |
+| Lint | oxlint (690+ rules, type-aware) |
 | Format | biome (format only, no lint) |
 | Backend | Effect-TS 3.19, HttpApi, Schema, Layer |
-| Frontend | React 19.1, XState 5.25, TanStack Router |
+| Frontend | React 19.2, XState 5.25, TanStack Router |
 | Mobile | Expo SDK 54, React Native 0.81, NativeWind |
 | Voice | LiveKit 2.16, @livekit/agents |
-| Infra | Pulumi 3.214, AWS ECS, CloudFront |
+| Infra | Pulumi 3.217, AWS ECS, CloudFront |
 
-## MCP Servers (MINIMAL - 3 total)
+## MCP Servers
 
-| Server | Purpose |
-|--------|---------|
-| ref | SOTA docs (60-95% fewer tokens) |
-| ast-grep | AST-based code search |
-| linear | Project management (SSE, OAuth) |
+| Server | Level | Purpose |
+|--------|-------|---------|
+| ref | user | SOTA docs (60-95% fewer tokens) |
+| ast-grep | user | AST-based code search |
+| linear | project | Project management (SSE, OAuth) |
 
 ## Plugins (MINIMAL - 1 total)
 
@@ -104,7 +99,7 @@ See [ADR-009](config/quality/docs/adr/009-network-api-toolkit.md) for full detai
 
 - `modules/home/apps/claude.nix` - Claude SSOT (MCP, plugins, marketplaces)
 - `config/quality/src/stack/versions.ts` - Version SSOT
-- `config/quality/src/skills/` - Claude skills
 - `config/quality/src/hooks/` - Pre/post tool hooks
+- `config/quality/src/generators/claude/settings.generator.ts` - Settings generator
 - `config/quality/docs/ARCHITECTURE.md` - Guards architecture
 - `config/quality/docs/adr/` - Architecture Decision Records

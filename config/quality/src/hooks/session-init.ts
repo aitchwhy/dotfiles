@@ -7,7 +7,6 @@
  * - Logs session start
  * - Cleans old plan files (>7 days)
  * - Environment warnings
- * - Evolution metrics display
  */
 
 import { exec } from 'node:child_process'
@@ -24,7 +23,6 @@ const execAsync = promisify(exec)
 // =============================================================================
 
 const HOME = os.homedir()
-const DOTFILES = `${HOME}/dotfiles`
 const PLANS_DIR = `${HOME}/.claude/plans`
 const MAX_AGE_DAYS = 7
 const LOG_FILE = `${HOME}/.claude/session.log`
@@ -118,29 +116,6 @@ const checkEnvironment = Effect.gen(function* () {
   return warnings
 })
 
-const checkEvolutionMetrics = Effect.gen(function* () {
-  const metricsPath = `${DOTFILES}/.claude-metrics/latest.json`
-
-  const exists = yield* fileExists(metricsPath)
-  if (!exists) return undefined
-
-  const stats = yield* Effect.tryPromise(() => fs.stat(metricsPath))
-  const ageHours = Math.floor((Date.now() - stats.mtimeMs) / (1000 * 60 * 60))
-
-  if (ageHours <= 24) return undefined
-
-  const content = yield* Effect.tryPromise(() => fs.readFile(metricsPath, 'utf-8'))
-  const metrics = yield* Effect.try({
-    try: () => JSON.parse(content) as { overall_score?: number; recommendation?: string },
-    catch: () => ({ overall_score: undefined, recommendation: 'unknown' }),
-  })
-
-  const score = metrics.overall_score ? Math.floor(metrics.overall_score * 100) : '?'
-  const rec = metrics.recommendation ?? 'unknown'
-
-  return `🧬 Evolution: ${score}% (${rec}) - stale (${ageHours}h). Run: just evolve.`
-})
-
 const outputResult = (result: SessionStartOutput) => Console.log(JSON.stringify(result))
 
 // =============================================================================
@@ -154,12 +129,11 @@ const main = Effect.gen(function* () {
   const timestamp = new Date().toISOString()
   yield* appendToLog(`[${timestamp}] Session started: ${process.cwd()}`)
 
-  // 2-4. Run independent checks IN PARALLEL
-  const [deletedCount, warnings, evolutionMsg] = yield* Effect.all(
+  // 2-3. Run independent checks in parallel
+  const [deletedCount, warnings] = yield* Effect.all(
     [
       cleanOldPlans.pipe(Effect.catchAll(() => Effect.succeed(0))),
       checkEnvironment.pipe(Effect.catchAll(() => Effect.succeed([] as string[]))),
-      checkEvolutionMetrics.pipe(Effect.catchAll(() => Effect.succeed(undefined))),
     ],
     { concurrency: 'unbounded' },
   )
@@ -169,9 +143,6 @@ const main = Effect.gen(function* () {
     messages.push(`Cleaned ${deletedCount} stale plan(s).`)
   }
   messages.push(...warnings)
-  if (evolutionMsg) {
-    messages.push(evolutionMsg)
-  }
 
   // Output result
   const output: SessionStartOutput =

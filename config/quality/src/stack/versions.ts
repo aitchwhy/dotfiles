@@ -2,7 +2,7 @@
  * Quality System Stack - Frozen Version Registry
  *
  * SSOT (Single Source of Truth) for all version numbers.
- * Frozen: January 2026
+ * Updated: March 2026
  *
  * This file replaces lib/versions.nix.
  *
@@ -16,7 +16,7 @@ import type { StackDefinition } from './schema'
 import { StackDefinitionSchema } from './schema'
 
 /**
- * STACK - Frozen January 2026 Configuration
+ * STACK - March 2026 Configuration
  *
  * All versions are exact (no semver ranges) for reproducibility.
  * Use `npm.xyz` for package.json generation.
@@ -24,9 +24,9 @@ import { StackDefinitionSchema } from './schema'
  */
 export const STACK = {
   meta: {
-    frozen: '2026-01',
-    updated: '2026-01-28',
-    ssotVersion: '5.3.1', // SOTA Jan 28, 2026: updated all packages
+    frozen: '2026-03',
+    updated: '2026-03-08',
+    ssotVersion: '5.4.0', // Mar 2026: version bumps + cleanup
   },
 
   // ===========================================================================
@@ -126,8 +126,8 @@ export const STACK = {
   // TESTING & BUILD
   // ===========================================================================
   testing: {
-    playwright: '1.57.0',
-    vitest: '4.0.17',
+    playwright: '1.58.2',
+    vitest: '4.0.18',
     vite: '7.3.1',
     'bruno-cli': '1.30.0', // API testing
   },
@@ -154,7 +154,7 @@ export const STACK = {
   // AUTH & SERVICES
   // ===========================================================================
   services: {
-    'better-auth': '1.4.15', // TypeScript-first auth (replaces Clerk)
+    'better-auth': '1.5.4', // TypeScript-first auth (replaces Clerk)
     'livekit-client': '2.16.1', // Client SDK
     'livekit-server-sdk': '2.15.0', // Server SDK
   },
@@ -223,7 +223,7 @@ export const STACK = {
     // Core (Effect ecosystem - versions must be compatible)
     // NOTE: tsgo (@typescript/native-preview) used for compilation via scripts
     typescript: '5.9.3', // Kept for types - tsgo handles compilation
-    effect: '3.19.14',
+    effect: '3.19.19',
     '@effect/cli': '0.72.1',
     '@effect/platform': '0.94.1',
     '@effect/platform-node': '0.104.0',
@@ -245,8 +245,8 @@ export const STACK = {
     'drizzle-kit': '0.31.8',
 
     // Auth
-    'better-auth': '1.4.15',
-    '@better-auth/expo': '1.4.15',
+    'better-auth': '1.5.4',
+    '@better-auth/expo': '1.5.4',
 
     // Observability (Datadog + OTEL 2.x)
     '@opentelemetry/api': '1.9.0',
@@ -272,17 +272,17 @@ export const STACK = {
     postgres: '3.4.7',
 
     // Testing
-    '@playwright/test': '1.57.0',
-    vitest: '4.0.17',
-    '@vitest/ui': '4.0.17',
+    '@playwright/test': '1.58.2',
+    vitest: '4.0.18',
+    '@vitest/ui': '4.0.18',
 
     // Build
     vite: '7.3.1',
     handlebars: '4.7.8',
 
     // Dev & Linting (Jan 2026 - SOTA: oxlint for linting, biome for formatting)
-    oxlint: '1.39.0', // Type-aware linter (Oxlint 1.0 stable, 655+ rules)
-    '@biomejs/biome': '2.3.11', // Formatter ONLY (linting disabled)
+    oxlint: '1.51.0', // Type-aware linter (690+ rules, --type-aware --type-check)
+    '@biomejs/biome': '2.4.6', // Formatter ONLY (linting disabled)
     '@types/node': '25.0.3', // Node 25 Current types
     tsx: '4.19.2', // TS runner
     '@ast-grep/napi': '0.40.3',
@@ -357,10 +357,10 @@ export const STACK = {
     // ===========================================================================
     'livekit-client': '2.16.1',
     'livekit-server-sdk': '2.15.0',
-    '@livekit/agents': '1.0.31',
-    '@livekit/agents-plugin-cartesia': '1.0.31',
-    '@livekit/agents-plugin-deepgram': '1.0.31',
-    '@livekit/agents-plugin-silero': '1.0.31',
+    '@livekit/agents': '1.0.47',
+    '@livekit/agents-plugin-cartesia': '1.0.47',
+    '@livekit/agents-plugin-deepgram': '1.0.47',
+    '@livekit/agents-plugin-silero': '1.0.47',
     '@livekit/react-native': '2.9.6',
     '@livekit/react-native-webrtc': '137.0.2',
 

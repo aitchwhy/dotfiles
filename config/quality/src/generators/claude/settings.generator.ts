@@ -65,12 +65,10 @@ const PERMISSIONS = {
     'Bash(python3:*)',
     'Bash(uv:*)',
     'Bash(uvx:*)',
-    'Bash(pipx:*)',
     'Bash(ruff:*)',
     'Bash(pytest:*)',
     'Bash(bun:*)',
     'Bash(tsx:*)',
-    'Bash(copier:*)',
     'Bash(just:*)',
     'Bash(make:*)',
     'Bash(cargo:*)',
@@ -85,10 +83,6 @@ const PERMISSIONS = {
     'Bash(docker-compose:*)',
     'Bash(pulumi:*)',
     'Bash(esc:*)',
-    'Bash(wrangler:*)',
-    'Bash(kubectl:*)',
-    'Bash(terraform:*)',
-
     'Bash(nix:*)',
     'Bash(nix-shell:*)',
     'Bash(darwin-rebuild:*)',
@@ -168,8 +162,8 @@ type ClaudeSettings = {
   readonly cleanupPeriodDays: number
   readonly attribution: { readonly commit: string; readonly pr: string }
   readonly alwaysThinkingEnabled: boolean
+  readonly skipDangerousModePermissionPrompt: boolean
   readonly verbose: boolean
-  readonly env: Readonly<Record<string, string>>
   readonly permissions: typeof PERMISSIONS
   readonly hooks: typeof HOOK_DEFINITIONS
 }
@@ -187,8 +181,8 @@ const generateSettings = (): ClaudeSettings => ({
   cleanupPeriodDays: 7,
   attribution: { commit: '', pr: '' },
   alwaysThinkingEnabled: true,
+  skipDangerousModePermissionPrompt: true,
   verbose: false,
-  env: { MAX_THINKING_TOKENS: '31999' },
   permissions: PERMISSIONS,
   hooks: HOOK_DEFINITIONS,
 })

@@ -3,26 +3,10 @@
 /**
  * Unified Polish - Full Quality Gate for PostToolUse
  *
- * PARAGON Enforcement System v3.7
- *
  * PHASE 1: Format (parallel, non-blocking)
- * - biome format (TS/JS/JSON)
- * - ruff format + lint (Python)
- * - nixfmt (Nix)
- * - shfmt (Shell)
- * - prettier (YAML/TOML/CSS)
- * - stylua (Lua)
- *
- * PHASE 2: Lint (blocking, exit 2)
- * - oxlint (645+ rules, type-aware)
- *
- * PHASE 3: AST-Grep (blocking, exit 2)
- * - paragon rules
- * - effect rules
- * - xstate rules
- *
- * PHASE 4: Type Check (blocking, exit 2)
- * - tsc --noEmit
+ * PHASE 2: Lint - oxlint (blocking)
+ * PHASE 3: AST-Grep - delegates to project sgconfig.yml (blocking)
+ * PHASE 4: Type Check - tsc --noEmit (blocking)
  *
  * Exit codes:
  * - 0: Success (emitContinue)
@@ -40,7 +24,6 @@ import { emitContinue, emitHalt, logError, logWarning } from './lib/hook-logging
 // ============================================================================
 
 const filePaths = (process.env['CLAUDE_FILE_PATHS'] ?? '').split(',').filter(Boolean)
-const RULES_DIR = `${process.env['HOME']}/dotfiles/config/quality/rules`
 
 // Exit early if no files
 if (filePaths.length === 0) {
@@ -134,79 +117,64 @@ const runQualityCheck = (
 // AST-Grep Runner
 // ============================================================================
 
-const runAstGrep = (files: readonly string[]): Effect.Effect<QualityResult> =>
-  files.length === 0
-    ? Effect.succeed({ tool: 'ast-grep', success: true, output: '' })
-    : pipe(
-        Effect.tryPromise({
-          try: async () => {
-            // Check if rules directory exists
-            if (!fs.existsSync(RULES_DIR)) {
-              return { tool: 'ast-grep', success: true, output: '' }
-            }
+/**
+ * Find nearest ancestor directory containing sgconfig.yml.
+ * Returns null if none found (no project-level ast-grep rules).
+ */
+const findSgConfig = (file: string): string | null => {
+  let dir = path.dirname(file)
+  while (dir !== '/') {
+    if (fs.existsSync(path.join(dir, 'sgconfig.yml'))) return dir
+    dir = path.dirname(dir)
+  }
+  return null
+}
 
-            const categories = ['paragon', 'effect', 'effect-xstate', 'xstate', 'zod', 'versions']
-            const errors: string[] = []
+const runAstGrep = (files: readonly string[]): Effect.Effect<QualityResult> => {
+  if (files.length === 0) {
+    return Effect.succeed({ tool: 'ast-grep', success: true, output: '' })
+  }
 
-            for (const category of categories) {
-              const categoryDir = path.join(RULES_DIR, category)
-              if (!fs.existsSync(categoryDir)) continue
+  // Find project root with sgconfig.yml (uses first file as reference)
+  const projectRoot = findSgConfig(files[0]!)
+  if (!projectRoot) {
+    // No sgconfig.yml = no ast-grep rules to enforce
+    return Effect.succeed({ tool: 'ast-grep', success: true, output: '' })
+  }
 
-              const ruleFiles = fs.readdirSync(categoryDir).filter((f) => f.endsWith('.yml'))
-              for (const ruleFile of ruleFiles) {
-                const rulePath = path.join(categoryDir, ruleFile)
-                const proc = spawn(['ast-grep', 'scan', '--rule', rulePath, ...files], {
-                  stderr: 'pipe',
-                  stdout: 'pipe',
-                })
+  return pipe(
+    Effect.tryPromise({
+      try: async () => {
+        const proc = spawn(['ast-grep', 'scan', ...files], {
+          cwd: projectRoot,
+          stderr: 'pipe',
+          stdout: 'pipe',
+        })
 
-                const [stdout, stderr] = await Promise.all([
-                  new Response(proc.stdout).text(),
-                  new Response(proc.stderr).text(),
-                ])
-                const exitCode = await proc.exited
+        const [stdout, stderr] = await Promise.all([
+          new Response(proc.stdout).text(),
+          new Response(proc.stderr).text(),
+        ])
+        const exitCode = await proc.exited
 
-                // ast-grep exits non-zero when it finds matches
-                if (exitCode !== 0) {
-                  const output = (stdout + stderr)
-                    .split('\n')
-                    .filter(
-                      (line) =>
-                        !line.includes('paragon-guard') &&
-                        !line.includes('sig-') &&
-                        !line.includes('ast-engine'),
-                    )
-                    .join('\n')
-                    .trim()
-
-                  if (
-                    output.length > 0 &&
-                    (output.includes('error') ||
-                      output.includes('warning') ||
-                      output.includes('note:'))
-                  ) {
-                    errors.push(`=== ${category}/${ruleFile} ===\n${output}`)
-                  }
-                }
-              }
-            }
-
-            return {
-              tool: 'ast-grep',
-              success: errors.length === 0,
-              output: errors.join('\n\n'),
-            }
-          },
-          catch: () => new Error('Failed to run ast-grep'),
-        }),
-        Effect.catchAll((error) =>
-          Effect.succeed({
-            tool: 'ast-grep',
-            success: false,
-            output: `Failed to run ast-grep: ${error.message}`,
-          }),
-        ),
-      )
+        const output = (stdout + stderr).trim()
+        return {
+          tool: 'ast-grep',
+          success: exitCode === 0,
+          output,
+        }
+      },
+      catch: () => new Error('Failed to run ast-grep'),
+    }),
+    Effect.catchAll((error) =>
+      Effect.succeed({
+        tool: 'ast-grep',
+        success: false,
+        output: `Failed to run ast-grep: ${error.message}`,
+      }),
+    ),
+  )
+}
 
 // ============================================================================
 // TypeScript Type Check Runner

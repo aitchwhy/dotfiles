@@ -1,20 +1,19 @@
 #!/usr/bin/env bun
 
 /**
- * Pre-Tool-Use Hook (Fiber Parallelism Architecture - Jan 2026)
+ * Pre-Tool-Use Hook
+ *
+ * Guards: procedural checks, forbidden packages, dangerous commands.
+ * AST-grep enforcement delegated to unified-polish.ts via project sgconfig.yml.
  */
 
-import * as path from 'node:path'
 import { Cause, Effect, pipe, Schema } from 'effect'
 import { isForbidden } from '../stack'
-import { checkContent, filterBySeverity, formatMatches } from './lib/ast-grep'
 import {
   approve,
   block,
   formatAggregatedErrors,
   type GuardCheckResult,
-  isExcludedPath,
-  isTypeScriptFile,
   outputDecision,
   type PreToolUseInput,
   parseInput,
@@ -22,8 +21,6 @@ import {
   runGuardsFibers,
 } from './lib/effect-hook'
 import { runProceduralGuards } from './lib/guards/procedural'
-
-const RULES_DIR = path.resolve(import.meta.dir, '../../rules/paragon')
 
 const DependenciesSchema = Schema.Record({ key: Schema.String, value: Schema.String })
 const PackageJsonSchema = Schema.Struct({
@@ -46,32 +43,12 @@ const parseDependencies = (content: string) =>
     return { ...pkg.dependencies, ...pkg.devDependencies }
   })
 
-const pass = (warnings?: readonly string[]): GuardCheckResult =>
-  warnings !== undefined
-    ? { source: 'ast-grep', blocked: false, warnings }
-    : { source: 'ast-grep', blocked: false }
+const pass = (): GuardCheckResult => ({ source: 'procedural', blocked: false })
 const fail = (source: GuardCheckResult['source'], message: string): GuardCheckResult => ({
   source,
   blocked: true,
   message,
 })
-
-const checkTypeScriptContent = (
-  input: PreToolUseInput,
-): Effect.Effect<GuardCheckResult, never, never> =>
-  Effect.gen(function* () {
-    const { filePath, content } = extractContent(input)
-    if (!filePath || !content) return pass()
-    if (!isTypeScriptFile(filePath)) return pass()
-    if (isExcludedPath(filePath)) return pass()
-    const matches = yield* checkContent(content, RULES_DIR).pipe(
-      Effect.catchAll(() => Effect.succeed([] as const)),
-    )
-    const errors = filterBySeverity(matches, 'error')
-    if (errors.length > 0)
-      return fail('ast-grep', `AST-grep violations:\n\n${formatMatches(errors)}`)
-    return pass()
-  })
 
 const checkForbiddenPackages = (
   input: PreToolUseInput,
@@ -116,7 +93,6 @@ const runProceduralChecks = (
     if (filePath !== undefined) toolInput.file_path = filePath
     if (effectiveContent !== undefined) toolInput.content = effectiveContent
     if (command !== undefined) toolInput.command = command
-    // Grep fields (Guard 56)
     if (pattern !== undefined) toolInput.pattern = pattern
     if (glob !== undefined) toolInput.glob = glob
     if (path !== undefined) toolInput.path = path
@@ -132,7 +108,6 @@ const main = Effect.gen(function* () {
   const input = yield* parseInput(raw)
   const guardChecks = [
     runProceduralChecks(input),
-    checkTypeScriptContent(input),
     checkForbiddenPackages(input),
     checkDangerousCommands(input),
   ]

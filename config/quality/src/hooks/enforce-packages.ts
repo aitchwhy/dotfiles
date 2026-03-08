@@ -1,11 +1,8 @@
 #!/usr/bin/env bun
 /**
- * Enforce Versions - PostToolUse hook for package.json changes
+ * Enforce Packages - PostToolUse hook for package.json changes
  *
- * Automatically checks package.json files for:
- * - Forbidden dependencies (lodash, express, prisma, etc.)
- * - Version drift from STACK.npm
- *
+ * Checks package.json files for forbidden dependencies (lodash, express, prisma, etc.).
  * Runs after Write/Edit operations on package.json files.
  */
 
@@ -94,7 +91,7 @@ const program = Effect.gen(function* () {
   if (forbidden.length > 0) {
     const errors = forbidden.map((v) => `  - ${v.message}`).join('\n')
     emitHalt({
-      error: `STACK VIOLATION: Forbidden dependencies detected:\n${errors}\n\nRemove these before continuing.`,
+      reason: `STACK VIOLATION: Forbidden dependencies detected:\n${errors}\n\nRemove these before continuing.`,
     })
     return
   }
