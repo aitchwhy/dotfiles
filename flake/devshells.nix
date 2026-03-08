@@ -50,7 +50,7 @@
             nix-output-monitor
             biome
             pnpm
-            nodejs_25
+            nodejs_24
           ])
           # Include pre-commit hook tools in PATH for manual use
           ++ config.pre-commit.settings.enabledPackages;

@@ -5,17 +5,17 @@
 # nixpkgs playwright-driver.browsers. We let agent-browser manage its own
 # browsers via `agent-browser install` for version compatibility.
 #
-# The wrapper uses npx for automatic updates and Node.js fallback when
-# Rust binaries aren't available.
+# The wrapper uses bunx per the dotfiles runtime convention (bun for
+# tooling wrappers, pnpm + Node.js 25 for application code).
 {
   lib,
   writeShellScriptBin,
-  nodejs_25,
+  bun,
 }:
 
 writeShellScriptBin "agent-browser" ''
   export PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=true
-  exec ${nodejs_25}/bin/npx -y agent-browser@latest "$@"
+  exec ${bun}/bin/bunx agent-browser@latest "$@"
 ''
 // {
   meta = with lib; {

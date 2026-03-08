@@ -1,5 +1,6 @@
 # Custom packages overlay
 # Packages not available in nixpkgs
+# Runtime convention: bun/bunx for tooling wrappers; pnpm + Node.js for application code
 { pkgs }:
 {
   agent-browser = pkgs.callPackage ./agent-browser.nix { };

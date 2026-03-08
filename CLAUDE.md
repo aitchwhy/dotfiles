@@ -39,6 +39,11 @@ flake.nix                    # Entry point
 └── hosts/                   # Machine-specific config
 ```
 
+## Runtime Convention
+
+- **bun**: scripts, MCP servers, tooling wrappers, config/quality hooks, pkgs/*.nix CLI wrappers
+- **pnpm + Node.js**: application code (~/src/told), devshells, production
+
 ## Rules
 
 - All Claude config via Nix (never edit ~/.claude/ manually)
@@ -94,6 +99,10 @@ See [ADR-009](config/quality/docs/adr/009-network-api-toolkit.md) for full detai
 | Path | Domain |
 |------|--------|
 | `config/hazel/CLAUDE.md` | Hazel file automation rules & scripts |
+
+## Known Gaps
+
+- **Told guard gap**: When working in ~/src/told, Told's PreToolUse replaces dotfiles' PreToolUse via deep merge with array replacement. Guards 3 (forbidden files), 32 (secrets detection), 33 (hook bypass prevention) do NOT run in Told. Tracked in Linear.
 
 ## Key Files
 

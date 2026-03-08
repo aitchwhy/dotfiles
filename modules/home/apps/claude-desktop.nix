@@ -25,8 +25,8 @@ in
         "bun"
         "node"
       ];
-      default = "node";
-      description = "Runtime for MCP server execution";
+      default = "bun";
+      description = "Runtime for MCP server execution (bun for tooling per runtime convention)";
     };
   };
 
