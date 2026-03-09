@@ -67,7 +67,6 @@
       "sops"
       "age"
       "gnupg"
-      "bitwarden-cli"
 
       # Cloud Storage
       "rclone"
@@ -75,7 +74,6 @@
       # Code Quality (non-Nix)
       "shellcheck"
       "shfmt"
-      "markdownlint-cli"
       "yamllint"
       "hadolint"
       "biome"
