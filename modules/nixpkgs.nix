@@ -178,6 +178,13 @@
   # Custom packages overlay
   nixpkgs.overlays = [
     (final: _prev: import ../pkgs { pkgs = final; })
+
+    # ast-grep 0.41.0: test_scan_invalid_rule_id fails with "Illegal byte sequence (os error 92)" on darwin
+    (final: prev: {
+      ast-grep = prev.ast-grep.overrideAttrs (old: {
+        doCheck = false;
+      });
+    })
   ];
 
   # Darwin-specific settings
