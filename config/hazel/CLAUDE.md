@@ -52,11 +52,11 @@ exec "$HOME/dotfiles/config/hazel/scripts/script-name.sh" "$1"
 | Folder | Rule | Trigger | Action |
 |--------|------|---------|--------|
 | Desktop | Screenshot import | Name contains "Screenshot" + Kind is Image + 1h old | Import to Photos → Trash |
-| Desktop | Sync to GDrive | Name is NOT .DS_Store + Ext is NOT icloud | Sync to GDrive/Backups/iCloud/Desktop |
+| Desktop | Sync to GDrive | Name is NOT .DS_Store + Ext is NOT icloud + Name does NOT contain "Google Drive" + Name does NOT contain "Lost and Found" + Name does NOT contain "google-drive-not-synced" | Sync to GDrive/Backups/iCloud/Desktop |
 | Downloads | Video convert → MP4 | Extension is webp/mkv/avi/mov/wmv/flv/webm/m4v/3gp/ts/ogv/mpg/mpeg | Run convert-video-to-mp4.sh → Trash original |
 | Downloads | Video import | Type is public.movie + 1h old | Import to Photos → Trash |
 | Downloads | Image import | Type is public.image + 1h old | Import to Photos → Trash |
-| Documents | Sync to GDrive | Name is NOT .DS_Store + Ext is NOT icloud | Sync to GDrive/Backups/iCloud/Documents |
+| Documents | Sync to GDrive | Name is NOT .DS_Store + Ext is NOT icloud + Name does NOT contain "Google Drive" + Name does NOT contain "Lost and Found" + Name does NOT contain "google-drive-not-synced" | Sync to GDrive/Backups/iCloud/Documents |
 | Documents | Archive stale projects | NOT Hayaeh/Therapy/Told + 6mo untouched | Sort into GDrive/Archive/{year}/{month}/{day}/ |
 
 ## Sync Paths

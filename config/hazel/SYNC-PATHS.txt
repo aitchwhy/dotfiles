@@ -3,16 +3,19 @@
 # Location: Hazel → Select folder → Gear icon (⚙️) → "Sync Rules..."
 
 Desktop Rules:
-/Users/hank/dotfiles/config/hazel/rules/desktop-critical.hazelrules
+/Users/hank/dotfiles/config/hazel/rules/Desktop.hazelrules
 
 Downloads Rules:
-/Users/hank/dotfiles/config/hazel/rules/downloads-critical.hazelrules
+/Users/hank/dotfiles/config/hazel/rules/Downloads.hazelrules
 
-Google Drive "My Drive" Rules:
-/Users/hank/dotfiles/config/hazel/rules/gdrive-critical.hazelrules
+Documents Rules:
+/Users/hank/dotfiles/config/hazel/rules/Documents.hazelrules
 
-Backups Rules:
-/Users/hank/dotfiles/config/hazel/rules/backups-critical.hazelrules
+Archive Rules:
+/Users/hank/dotfiles/config/hazel/rules/Archive.hazelrules
+
+Inbox Rules:
+/Users/hank/dotfiles/config/hazel/rules/Inbox.hazelrules
 
 ---
 
@@ -26,10 +29,10 @@ Downloads:
 /Users/hank/Downloads
 (Include subfolders: NO)
 
-Google Drive - My Drive:
-/Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive
-(Include subfolders: YES ✓)
+Documents:
+/Users/hank/Documents
+(Include subfolders: NO)
 
-Backups:
-/Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive/My Drive/Backups
+Google Drive - My Drive:
+/Users/hank/Library/CloudStorage/GoogleDrive-hank.lee.qed@gmail.com/My Drive
 (Include subfolders: YES ✓)
