@@ -70,14 +70,11 @@ flake.nix                    # Entry point
 | Server | Level | Purpose |
 |--------|-------|---------|
 | ref | user | SOTA docs (60-95% fewer tokens) |
-| ast-grep | user | AST-based code search |
 | linear | project | Project management (SSE, OAuth) |
 
-## Plugins (MINIMAL - 1 total)
+## Plugins (MINIMAL - 0)
 
-| Plugin | Purpose |
-|--------|---------|
-| ralph-wiggum | Autonomous loops |
+None.
 
 ## Network & API Tools (Minimal)
 

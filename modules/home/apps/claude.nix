@@ -9,9 +9,9 @@
 # - nix-config.json: Plugins/marketplaces for TypeScript to consume
 #
 # MINIMAL Configuration (March 2026):
-# - 2 MCP servers (ref, ast-grep) — Linear at project level
-# - 1 plugin (ralph-wiggum) - Autonomous loops only
-# - 0 extra marketplaces - ralph-wiggum is in default marketplace
+# - 1 MCP server (ref) — Linear at project level
+# - 0 plugins
+# - 0 extra marketplaces
 # - 1 DXT extension (Filesystem) - 5 focused allowed directories
 {
   config,
@@ -57,14 +57,6 @@ let
       url = "https://api.ref.tools/mcp";
       apiKeyPath = "${mcpSecretsPath}/ref-api-key";
     };
-    ast-grep = {
-      # AST-based code search and transformation
-      # https://github.com/ast-grep/ast-grep-mcp
-      isPython = true;
-      package = "git+https://github.com/ast-grep/ast-grep-mcp";
-      executable = "ast-grep-server";
-      args = [ ];
-    };
     # Linear MCP configured at project level (Told's .claude/settings.json)
   };
 
@@ -73,7 +65,7 @@ let
   # ═══════════════════════════════════════════════════════════════════════════
 
   pluginDefs = {
-    default = [ "ralph-wiggum" ]; # Autonomous loops only
+    default = [ ];
   };
 
   enabledPlugins =
@@ -86,7 +78,7 @@ let
     in
     builtins.listToAttrs defaultPlugins;
 
-  marketplaceDefs = { }; # Empty - ralph-wiggum is in default marketplace
+  marketplaceDefs = { };
 
   # JSON for direct injection into .claude.json (no intermediate file needed)
   enabledPluginsJson = builtins.toJSON enabledPlugins;
@@ -373,7 +365,7 @@ in
     # Generate Claude Code CLI config (~/.claude.json)
     # Uses jq to MERGE mcpServers + enabledPlugins with existing runtime state
     # Runtime state includes: numStartups, oauthAccount, projects, etc. (31+ keys)
-    # MINIMAL: 2 servers (ref, ast-grep), 1 plugin (ralph-wiggum)
+    # MINIMAL: 1 server (ref), 0 plugins
     home.activation.generateClaudeCodeConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       MCP_SECRETS="${config.home.homeDirectory}/.config/mcp"
       CLAUDE_CODE_CONFIG="${config.home.homeDirectory}/.claude.json"
@@ -397,13 +389,13 @@ in
         CURRENT=$(cat "$CLAUDE_CODE_CONFIG")
         if [ "$MERGED" != "$CURRENT" ]; then
           echo "$MERGED" > "$CLAUDE_CODE_CONFIG"
-          echo "Claude Code config updated (2 servers, 1 plugin)"
+          echo "Claude Code config updated (1 server, 0 plugins)"
         else
           echo "Claude Code config unchanged, skipping write"
         fi
       else
         echo "{\"mcpServers\": $MCP_SERVERS, \"enabledPlugins\": $ENABLED_PLUGINS}" > "$CLAUDE_CODE_CONFIG"
-        echo "Claude Code config created (2 servers, 1 plugin)"
+        echo "Claude Code config created (1 server, 0 plugins)"
       fi
     '';
 
