@@ -76,7 +76,7 @@
 
     # Official plugins (single repo)
     yazi-plugins = {
-      url = "github:yazi-rs/plugins/57f1863";
+      url = "github:yazi-rs/plugins/1962818";
       flake = false;
     };
 
@@ -86,19 +86,19 @@
       flake = false;
     };
     yazi-bunny = {
-      url = "github:stelcodes/bunny.yazi/6ee99bc";
+      url = "github:stelcodes/bunny.yazi/71b14a3";
       flake = false;
     };
     yazi-projects = {
-      url = "github:MasouShizuka/projects.yazi/eed0657";
+      url = "github:MasouShizuka/projects.yazi/198c2ba";
       flake = false;
     };
     yazi-ouch = {
-      url = "github:ndtoan96/ouch.yazi/594b8a2";
+      url = "github:ndtoan96/ouch.yazi/406ce6c";
       flake = false;
     };
     yazi-lazygit = {
-      url = "github:Lil-Dank/lazygit.yazi/0e56060";
+      url = "github:Lil-Dank/lazygit.yazi/8c4086c";
       flake = false;
     };
     yazi-what-size = {
@@ -114,7 +114,7 @@
       flake = false;
     };
     yazi-starship = {
-      url = "github:Rolv-Apneseth/starship.yazi/eca1861";
+      url = "github:Rolv-Apneseth/starship.yazi/a837101";
       flake = false;
     };
     yazi-glow = {
@@ -122,13 +122,13 @@
       flake = false;
     };
     yazi-rich-preview = {
-      url = "github:AnirudhG07/rich-preview.yazi/573b275";
+      url = "github:AnirudhG07/rich-preview.yazi/7d616ad";
       flake = false;
     };
 
     # Flavors (themes)
     yazi-flavor-ashen = {
-      url = "github:ficcdaf/ashen/8add1b8";
+      url = "github:ficcdaf/ashen/7d18c13";
       flake = false;
     };
     yazi-flavor-tokyo-night = {
@@ -145,7 +145,7 @@
     };
 
     zellij-room = {
-      url = "github:rvcas/room/v1.2.0";
+      url = "github:rvcas/room/v1.2.1";
       flake = false;
     };
   };
