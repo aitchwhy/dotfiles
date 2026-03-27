@@ -27,11 +27,16 @@ default:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 # Rebuild and switch local system configuration
-switch: _preflight _completions _fmt _lint _test
+switch: _preflight _completions _check
     #!/usr/bin/env bash
     set -euo pipefail
     echo "Switching configuration..."
     sudo darwin-rebuild switch --flake .#{{ host }}
+    # Upgrade Homebrew packages (nix-homebrew only declares, doesn't upgrade)
+    echo ""
+    echo "Upgrading Homebrew packages..."
+    brew update --quiet
+    brew upgrade
     # Auto-GC if > 10 generations (non-critical, don't fail on errors)
     gen_count=$(sudo darwin-rebuild --list-generations 2>/dev/null | wc -l | tr -d ' ' || echo "0")
     if [ "$gen_count" -gt 10 ]; then
@@ -52,11 +57,7 @@ deploy: switch
     @echo "✓ Full deployment complete"
 
 # Validate configuration without applying
-check: _preflight
-    @echo "Running validation..."
-    nix fmt -- --fail-on-change .
-    nix flake check --no-build
-    nix build .#darwinConfigurations.{{ host }}.system --no-link --print-out-paths > /dev/null
+check: _preflight _check
     @echo "✓ All checks passed"
 
 # Rollback to previous generation
@@ -223,17 +224,11 @@ _completions:
         echo "  (auto-staged updated completions)"
     fi
 
+# Validate formatting (fail on diff) and run flake checks
 [private]
-_fmt:
-    @nix fmt .
-
-[private]
-_lint:
+_check:
+    @nix fmt -- --fail-on-change .
     @nix flake check --no-build
-
-[private]
-_test:
-    @nix build .#darwinConfigurations.{{ host }}.system --no-link --print-out-paths > /dev/null
 
 [private]
 _gc:
