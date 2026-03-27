@@ -168,7 +168,7 @@
       # ─────────────────────────────────────────────────────────────
       # QuickLook Plugins
       # ─────────────────────────────────────────────────────────────
-      "qlvideo" # Video thumbnails/preview
+      "quicklook-video" # Video thumbnails/preview
     ];
 
     # Mac App Store apps (requires `mas` CLI)
