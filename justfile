@@ -32,11 +32,6 @@ switch: _preflight _completions _check
     set -euo pipefail
     echo "Switching configuration..."
     sudo darwin-rebuild switch --flake .#{{ host }}
-    # Upgrade Homebrew packages (nix-homebrew only declares, doesn't upgrade)
-    echo ""
-    echo "Upgrading Homebrew packages..."
-    brew update --quiet
-    brew upgrade
     # Auto-GC if > 10 generations (non-critical, don't fail on errors)
     gen_count=$(sudo darwin-rebuild --list-generations 2>/dev/null | wc -l | tr -d ' ' || echo "0")
     if [ "$gen_count" -gt 10 ]; then
