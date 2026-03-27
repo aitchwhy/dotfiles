@@ -15,8 +15,10 @@
       cleanup = "uninstall"; # Remove apps not in config
     };
 
-    # Force-upgrade casks that have auto_updates (Claude, Slack, etc.)
-    greedyCasks = true;
+    # Let auto-updating casks (Zoom, Slack, Chrome, etc.) manage themselves.
+    # greedyCasks would force brew to re-download them, causing failures
+    # when CDN URLs lag behind cask formula versions.
+    greedyCasks = false;
 
     # CLI tools
     # OrbStack provides docker, docker-compose, and credential helpers
