@@ -13,6 +13,7 @@
       autoUpdate = true;
       upgrade = true;
       cleanup = "uninstall"; # Remove apps not in config
+      extraFlags = [ "--verbose" ];
     };
 
     # Force-upgrade all casks to latest, including auto-updating ones
@@ -146,7 +147,6 @@
       # ─────────────────────────────────────────────────────────────
       # Media
       # ─────────────────────────────────────────────────────────────
-      "rekordbox" # DJ software
       "spotify" # Music streaming
 
       # ─────────────────────────────────────────────────────────────
