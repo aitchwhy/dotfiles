@@ -28,7 +28,6 @@
 
       # Cloud Platforms
       "awscli"
-      "azure-cli"
 
       # Kubernetes & Infrastructure
       "kubectl"
@@ -53,6 +52,7 @@
 
       # API Development
       "grpcurl"
+      "livekit-cli" # lk CLI for LiveKit Cloud ops (required by Told)
 
       # Documentation
       "glow"
