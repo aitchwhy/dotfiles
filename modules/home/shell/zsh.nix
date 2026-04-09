@@ -145,6 +145,32 @@ in
           local name="''${1:-screenshot}"
           agent-browser screenshot "./$name-$(date +%Y%m%d-%H%M%S).png"
         }
+
+        # ========================================
+        # Claude Code failover (GLM 5.1 via Z.ai)
+        # ========================================
+
+        # Launch Claude Code routed through Z.ai's GLM 5.1 API
+        # Usage: claude-glm [args...] (same args as claude)
+        function claude-glm() {
+          local zai_key
+          zai_key=$(esc run told/app/local -- printenv ZAI_API_KEY 2>/dev/null)
+          if [[ -z "$zai_key" ]]; then
+            echo "ERROR: ZAI_API_KEY not found in Pulumi ESC (told/app/local)." >&2
+            echo "  1. Check AWS SM: aws secretsmanager describe-secret --secret-id told/vendor/zai/api-key --region us-east-1" >&2
+            echo "  2. Sync ESC:     esc env edit told/app/base -f ~/src/told/infra/esc/base.yaml" >&2
+            return 1
+          fi
+          echo "→ Claude Code → GLM 5.1 via api.z.ai" >&2
+          ANTHROPIC_AUTH_TOKEN="$zai_key" \
+          ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic" \
+          ANTHROPIC_MODEL="glm-5.1" \
+          ANTHROPIC_DEFAULT_OPUS_MODEL="glm-5.1" \
+          ANTHROPIC_DEFAULT_SONNET_MODEL="glm-5.1" \
+          ANTHROPIC_DEFAULT_HAIKU_MODEL="glm-4.5-air" \
+          API_TIMEOUT_MS="3000000" \
+          claude "$@"
+        }
       '';
 
       history = {
