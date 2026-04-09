@@ -154,7 +154,7 @@ in
         # Usage: claude-glm [args...] (same args as claude)
         function claude-glm() {
           local zai_key
-          zai_key=$(esc run told/app/local -- printenv ZAI_API_KEY 2>/dev/null)
+          zai_key=$(esc open told/app/local --format shell 2>/dev/null | command grep '^export ZAI_API_KEY=' | sed 's/^export ZAI_API_KEY="//' | sed 's/"$//')
           if [[ -z "$zai_key" ]]; then
             echo "ERROR: ZAI_API_KEY not found in Pulumi ESC (told/app/local)." >&2
             echo "  1. Check AWS SM: aws secretsmanager describe-secret --secret-id told/vendor/zai/api-key --region us-east-1" >&2
@@ -162,7 +162,7 @@ in
             return 1
           fi
           echo "→ Claude Code → GLM 5.1 via api.z.ai" >&2
-          ANTHROPIC_AUTH_TOKEN="$zai_key" \
+          ANTHROPIC_API_KEY="$zai_key" \
           ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic" \
           ANTHROPIC_MODEL="glm-5.1" \
           ANTHROPIC_DEFAULT_OPUS_MODEL="glm-5.1" \
