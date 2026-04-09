@@ -152,7 +152,7 @@ in
 
         # Launch Claude Code routed through Z.ai's GLM 5.1 API
         # Usage: claude-glm [args...] (same args as claude)
-        # Note: --bare required to force API key auth over OAuth/keychain
+        # ANTHROPIC_AUTH_TOKEN takes precedence over OAuth/keychain (priority #2 vs #6)
         function claude-glm() {
           local zai_key
           zai_key=$(esc open told/app/local --format shell 2>/dev/null | command grep '^export ZAI_API_KEY=' | sed 's/^export ZAI_API_KEY="//' | sed 's/"$//')
@@ -162,18 +162,14 @@ in
             echo "  2. Sync ESC:     esc env edit told/app/base -f ~/src/told/infra/esc/base.yaml" >&2
             return 1
           fi
-          echo "→ Claude Code → GLM 5.1 via api.z.ai (bare mode)" >&2
-          ANTHROPIC_API_KEY="$zai_key" \
+          echo "→ Claude Code → GLM 5.1 via api.z.ai" >&2
+          ANTHROPIC_AUTH_TOKEN="$zai_key" \
           ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic" \
-          ANTHROPIC_MODEL="glm-5.1" \
           ANTHROPIC_DEFAULT_OPUS_MODEL="glm-5.1" \
           ANTHROPIC_DEFAULT_SONNET_MODEL="glm-5.1" \
           ANTHROPIC_DEFAULT_HAIKU_MODEL="glm-4.5-air" \
           API_TIMEOUT_MS="3000000" \
-          claude --bare \
-            --settings ~/.claude/settings.json \
-            --add-dir . \
-            "$@"
+          claude "$@"
         }
       '';
 
