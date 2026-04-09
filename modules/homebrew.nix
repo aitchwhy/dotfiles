@@ -97,7 +97,6 @@
       # ─────────────────────────────────────────────────────────────
       # Development
       # ─────────────────────────────────────────────────────────────
-      "claude-code" # Claude CLI - actively using
       "cursor" # AI-first code editor - keep for development
       "kaleidoscope" # Diff/merge tool
       "ngrok" # Expose local servers

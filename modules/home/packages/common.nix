@@ -45,6 +45,7 @@ in
       ++ [
         bitwarden-cli # Password manager CLI (moved from Homebrew to eliminate transitive node dep)
         bun # For MCP servers, scripts, and fast execution
+        claude-code # Claude Code CLI (moved from Homebrew cask for declarative version management)
         markdownlint-cli # Markdown linter (moved from Homebrew to eliminate transitive node dep)
         ralph-claude-code # Autonomous AI development loop
         agent-browser # AI browser automation CLI (run `agent-browser install` on first use)
