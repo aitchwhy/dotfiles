@@ -155,11 +155,10 @@ in
         # ANTHROPIC_AUTH_TOKEN takes precedence over OAuth/keychain (priority #2 vs #6)
         function claude-glm() {
           local zai_key
-          zai_key=$(esc open told/app/local --format shell 2>/dev/null | command grep '^export ZAI_API_KEY=' | sed 's/^export ZAI_API_KEY="//' | sed 's/"$//')
+          zai_key=$(aws secretsmanager get-secret-value --secret-id told/vendor/zai/api-key --region us-east-1 --query SecretString --output text 2>/dev/null)
           if [[ -z "$zai_key" ]]; then
-            echo "ERROR: ZAI_API_KEY not found in Pulumi ESC (told/app/local)." >&2
-            echo "  1. Check AWS SM: aws secretsmanager describe-secret --secret-id told/vendor/zai/api-key --region us-east-1" >&2
-            echo "  2. Sync ESC:     esc env edit told/app/base -f ~/src/told/infra/esc/base.yaml" >&2
+            echo "ERROR: ZAI_API_KEY not found in AWS Secrets Manager." >&2
+            echo "  Check: aws secretsmanager describe-secret --secret-id told/vendor/zai/api-key --region us-east-1" >&2
             return 1
           fi
           echo "→ Claude Code → GLM 5.1 via api.z.ai" >&2
