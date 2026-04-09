@@ -13,6 +13,21 @@ in
   };
 
   config = mkIf config.modules.home.tools.atuin.enable {
+    xdg.configFile."atuin/themes/catppuccin-mocha-lavender.toml".text = ''
+      [theme]
+      name = "catppuccin-mocha-lavender"
+
+      [colors]
+      AlertInfo = "#a6e3a1"
+      AlertWarn = "#fab387"
+      AlertError = "#f38ba8"
+      Annotation = "#b4befe"
+      Base = "#cdd6f4"
+      Guidance = "#9399b2"
+      Important = "#f38ba8"
+      Title = "#b4befe"
+    '';
+
     programs.atuin = {
       enable = true;
       enableZshIntegration = true;
@@ -63,7 +78,7 @@ in
         common_prefix = [ "sudo" ];
 
         sync.records = true;
-        theme.name = "autumn";
+        theme.name = "catppuccin-mocha-lavender";
       };
     };
   };
