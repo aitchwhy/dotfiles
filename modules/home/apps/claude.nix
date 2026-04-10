@@ -319,6 +319,10 @@ in
       source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/claude-code/skills";
     };
 
+    home.file.".claude/statusline.sh" = {
+      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/claude/statusline.sh";
+    };
+
     # ═══════════════════════════════════════════════════════════════════════════
     # MCP Config Generation (Activation-time for HTTP server API key injection)
     # ═══════════════════════════════════════════════════════════════════════════

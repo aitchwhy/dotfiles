@@ -7,8 +7,8 @@
  * SSOT: modules/home/apps/claude.nix → generated/nix-config.json → settings.json
  */
 
-import { FileSystem } from '@effect/platform'
 import * as path from 'node:path'
+import { FileSystem } from '@effect/platform'
 import { Effect } from 'effect'
 import { HOOK_DEFINITIONS } from '../../hooks/definitions'
 
@@ -167,6 +167,11 @@ type ClaudeSettings = {
   readonly verbose: boolean
   readonly permissions: typeof PERMISSIONS
   readonly hooks: typeof HOOK_DEFINITIONS
+  readonly statusLine: {
+    readonly type: 'command'
+    readonly command: string
+    readonly padding?: number
+  }
 }
 
 // =============================================================================
@@ -187,6 +192,10 @@ const generateSettings = (): ClaudeSettings => ({
   verbose: false,
   permissions: PERMISSIONS,
   hooks: HOOK_DEFINITIONS,
+  statusLine: {
+    type: 'command' as const,
+    command: '~/.claude/statusline.sh',
+  },
 })
 
 export const generateSettingsFile = (outDir: string) =>
