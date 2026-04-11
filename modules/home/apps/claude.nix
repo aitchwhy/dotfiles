@@ -99,6 +99,11 @@ let
     "$HOME/.claude" # Claude state
     "$HOME/Downloads" # File transfers
     "$HOME/Documents" # General docs
+    "$HOME/Desktop" # Desktop files
+    "$HOME/src/energy" # Energy project
+    "$HOME/src/told-vault" # Told vault
+    "$HOME/src/haute" # Haute project
+    "$HOME/src/korea-real-estate-analytics" # Korea RE analytics
   ];
 
   filesystemExtensionConfig = builtins.toJSON {
@@ -361,13 +366,18 @@ in
             "${config.home.homeDirectory}/dotfiles",
             "${config.home.homeDirectory}/.claude",
             "${config.home.homeDirectory}/Downloads",
-            "${config.home.homeDirectory}/Documents"
+            "${config.home.homeDirectory}/Documents",
+            "${config.home.homeDirectory}/Desktop",
+            "${config.home.homeDirectory}/src/energy",
+            "${config.home.homeDirectory}/src/told-vault",
+            "${config.home.homeDirectory}/src/haute",
+            "${config.home.homeDirectory}/src/korea-real-estate-analytics"
           ]
         }
       }
       EOF
 
-      echo "Filesystem extension config generated (5 allowed directories from SSOT)"
+      echo "Filesystem extension config generated (10 allowed directories from SSOT)"
     '';
 
     # Generate Claude Code CLI config (~/.claude.json)
