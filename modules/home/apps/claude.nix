@@ -374,7 +374,7 @@ in
     # Uses jq to MERGE mcpServers + enabledPlugins with existing runtime state
     # Runtime state includes: numStartups, oauthAccount, projects, etc. (31+ keys)
     # 1 server (ref), 1 plugin (caveman)
-    home.activation.generateClaudeCodeConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    home.activation.generateClaudeCodeConfig = lib.hm.dag.entryAfter [ "writeBoundary" "installPlugins" ] ''
       MCP_SECRETS="${config.home.homeDirectory}/.config/mcp"
       CLAUDE_CODE_CONFIG="${config.home.homeDirectory}/.claude.json"
 
@@ -407,21 +407,21 @@ in
       fi
     '';
 
-    # Install plugins from marketplace via `claude` CLI (idempotent)
-    # Runs after generateClaudeCodeConfig so enabledPlugins is already set
-    # NOTE: Git clone over SSH may fail in darwin-rebuild's sandboxed env.
-    # First install requires manual: `claude plugin marketplace add JuliusBrussee/caveman --scope user`
-    # Subsequent runs skip if already installed.
+    # Install + enable plugins from marketplace via `claude` CLI (idempotent)
+    # Runs BEFORE generateClaudeCodeConfig so the jq merge has final say on enabledPlugins.
+    # NOTE: First install requires network (git clone over SSH).
+    # If it fails in darwin-rebuild's sandboxed env, run manually:
+    #   claude plugin marketplace add JuliusBrussee/caveman --scope user
+    #   claude plugin install caveman@caveman --scope user
     home.activation.installPlugins = lib.hm.dag.entryAfter [
       "writeBoundary"
-      "generateClaudeCodeConfig"
     ] ''
       CLAUDE="/etc/profiles/per-user/${config.home.username}/bin/claude"
 
       if [ -x "$CLAUDE" ]; then
         # Check if caveman is already installed (skip network-dependent install)
         if $CLAUDE plugin list 2>/dev/null | grep -q "caveman@caveman"; then
-          echo "Caveman plugin already installed, skipping"
+          echo "Caveman plugin already installed"
         else
           echo "Caveman plugin not found, attempting install..."
           # Add marketplace (requires git clone — may fail in sandboxed env)
@@ -437,6 +437,10 @@ in
         echo "WARN: claude CLI not found, skipping plugin install"
       fi
     '';
+
+    # generateClaudeCodeConfig runs AFTER installPlugins — its jq merge
+    # overwrites enabledPlugins with Nix SSOT, ensuring caveman stays enabled
+    # even if `claude plugin install` defaults it to disabled.
 
     # Generate Quality System artifacts (settings.json)
     home.activation.generateQuality = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
