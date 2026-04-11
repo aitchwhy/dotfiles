@@ -409,6 +409,9 @@ in
 
     # Install plugins from marketplace via `claude` CLI (idempotent)
     # Runs after generateClaudeCodeConfig so enabledPlugins is already set
+    # NOTE: Git clone over SSH may fail in darwin-rebuild's sandboxed env.
+    # First install requires manual: `claude plugin marketplace add JuliusBrussee/caveman --scope user`
+    # Subsequent runs skip if already installed.
     home.activation.installPlugins = lib.hm.dag.entryAfter [
       "writeBoundary"
       "generateClaudeCodeConfig"
@@ -416,11 +419,20 @@ in
       CLAUDE="/etc/profiles/per-user/${config.home.username}/bin/claude"
 
       if [ -x "$CLAUDE" ]; then
-        # Add marketplace (idempotent — updates if already present)
-        $CLAUDE plugin marketplace add JuliusBrussee/caveman --scope user 2>/dev/null || true
-        # Install plugin (idempotent — no-ops if already installed)
-        $CLAUDE plugin install caveman@caveman --scope user 2>/dev/null || true
-        echo "Caveman plugin ensured (marketplace + install)"
+        # Check if caveman is already installed (skip network-dependent install)
+        if $CLAUDE plugin list 2>/dev/null | grep -q "caveman@caveman"; then
+          echo "Caveman plugin already installed, skipping"
+        else
+          echo "Caveman plugin not found, attempting install..."
+          # Add marketplace (requires git clone — may fail in sandboxed env)
+          if $CLAUDE plugin marketplace add JuliusBrussee/caveman --scope user 2>&1; then
+            $CLAUDE plugin install caveman@caveman --scope user 2>&1 || \
+              echo "WARN: caveman install failed — run manually: claude plugin install caveman@caveman --scope user"
+          else
+            echo "WARN: marketplace add failed (likely SSH/sandbox restriction)"
+            echo "  Run manually: claude plugin marketplace add JuliusBrussee/caveman --scope user"
+          fi
+        fi
       else
         echo "WARN: claude CLI not found, skipping plugin install"
       fi
