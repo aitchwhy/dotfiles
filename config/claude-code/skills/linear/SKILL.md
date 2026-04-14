@@ -13,16 +13,14 @@ Manage Linear tickets via GraphQL API using curl + jq. No MCP server — no OAut
 
 Requires `LINEAR_API_TOKEN` (personal API key). Generate at: https://linear.app/toldone/settings/account/security
 
+The token is stored in Pulumi ESC (`told/app/local-web` → `told/app/local` → `told/app/base` → AWS Secrets Manager `told/vendor/linear/api-token`).
+
 **Source inline** — Claude Code's Bash tool does not persist env vars across calls, so source it inline:
 ```bash
-# Source LINEAR_API_TOKEN (each Bash call is a fresh shell)
-# Try: (1) env var already set, (2) ~/.config/mcp file, (3) Pulumi ESC fallback
-export LINEAR_API_TOKEN="${LINEAR_API_TOKEN:-$(cat ~/.config/mcp/linear-api-key 2>/dev/null)}"
+# Source LINEAR_API_TOKEN from ESC (required: each Bash call is a fresh shell)
+export LINEAR_API_TOKEN="${LINEAR_API_TOKEN:-$(esc open told/app/local-web --format json 2>/dev/null | jq -r '.environmentVariables.LINEAR_API_TOKEN // empty')}"
 if [ -z "${LINEAR_API_TOKEN:-}" ]; then
-  export LINEAR_API_TOKEN="$(esc open told/app/local-web --format json 2>/dev/null | jq -r '.environmentVariables.LINEAR_API_TOKEN // empty')"
-fi
-if [ -z "${LINEAR_API_TOKEN:-}" ]; then
-  echo "ERROR: LINEAR_API_TOKEN is not set. Ensure: (1) ~/.config/mcp/linear-api-key exists, or (2) esc login + told/vendor/linear/api-token in AWS SM." >&2
+  echo "ERROR: LINEAR_API_TOKEN is not set. Ensure: (1) esc login, (2) told/vendor/linear/api-token in AWS SM, (3) base.yaml has linearApiToken." >&2
   exit 1
 fi
 ```

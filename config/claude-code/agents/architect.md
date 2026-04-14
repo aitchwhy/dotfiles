@@ -17,9 +17,8 @@ Your job: given a Linear ticket, produce a comprehensive implementation plan. Yo
 
 Fetch the ticket via Linear GraphQL API using Bash:
 ```bash
-# Source LINEAR_API_TOKEN inline (env vars don't persist across Bash calls)
-export LINEAR_API_TOKEN="${LINEAR_API_TOKEN:-$(cat ~/.config/mcp/linear-api-key 2>/dev/null)}"
-[ -z "${LINEAR_API_TOKEN:-}" ] && export LINEAR_API_TOKEN="$(esc open told/app/local-web --format json 2>/dev/null | jq -r '.environmentVariables.LINEAR_API_TOKEN // empty')"
+# Source LINEAR_API_TOKEN from ESC (required: each Bash call is a fresh shell)
+export LINEAR_API_TOKEN="${LINEAR_API_TOKEN:-$(esc open told/app/local-web --format json 2>/dev/null | jq -r '.environmentVariables.LINEAR_API_TOKEN // empty')}"
 jq -n --arg id "<TICKET_ID>" \
   '{"query": "query($id: String!) { issue(id: $id) { id identifier title description priority state { name } labels { nodes { name } } assignee { name } team { key } parent { identifier title } comments { nodes { body createdAt user { name } } } } }", "variables": {"id": $id}}' \
   | curl -s -X POST "https://api.linear.app/graphql" \
