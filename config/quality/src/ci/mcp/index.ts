@@ -36,12 +36,7 @@ const MCP_SERVERS: McpServer[] = [
     args: ['-y', '@modelcontextprotocol/server-github'],
     envVars: { GITHUB_PERSONAL_ACCESS_TOKEN: env.GITHUB_TOKEN },
   },
-  {
-    name: 'linear',
-    executable: 'npx',
-    args: ['-y', 'mcp-remote', 'https://mcp.linear.app/sse'],
-    envVars: {},
-  },
+  // Linear: uses GraphQL API via /linear skill (no MCP server)
 ]
 
 const testServer = (server: McpServer): Effect.Effect<{ name: string; ok: boolean }> =>

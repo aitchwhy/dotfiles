@@ -21,6 +21,8 @@ bun run typecheck  # Check types
 | /switch | Rebuild Nix system configuration |
 | /generate | Regenerate settings.json from SSOT |
 | /commit | Git add, commit, and push |
+| /linear | Manage Linear tickets (get, transition, comment) |
+| /plan-ticket | Plan + implement a Linear ticket |
 
 ## Architecture
 
@@ -36,6 +38,7 @@ flake.nix                    # Entry point
 │   ├── src/generators/     # settings.json generator
 │   └── generated/          # Output (DO NOT EDIT)
 ├── config/claude/commands/  # Slash commands (add-app, clean-claude, commit)
+├── config/claude-code/      # Skills (/linear, /plan-ticket) + agents (architect)
 └── hosts/                   # Machine-specific config
 ```
 
@@ -70,7 +73,12 @@ flake.nix                    # Entry point
 | Server | Level | Purpose |
 |--------|-------|---------|
 | ref | user | SOTA docs (60-95% fewer tokens) |
-| linear | project | Project management (SSE, OAuth) |
+
+## Vendor Skills (GraphQL API, no MCP)
+
+| Skill | Purpose |
+|-------|---------|
+| /linear | Linear ticket management (get, transition, comment) via GraphQL API |
 
 ## Plugins (MINIMAL - 0)
 

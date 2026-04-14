@@ -129,7 +129,6 @@ const PERMISSIONS = {
     'WebFetch(domain:apps.apple.com)',
 
     'mcp__ref__*',
-    'mcp__linear__*',
   ],
   deny: [
     'Read(**/.env*)',
