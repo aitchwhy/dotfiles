@@ -178,7 +178,7 @@ type ClaudeSettings = {
 // Generator
 // =============================================================================
 
-const CLAUDE_MODEL = 'opus' as const
+const CLAUDE_MODEL = 'opusplan' as const
 
 const generateSettings = (): ClaudeSettings => ({
   $schema: 'https://json.schemastore.org/claude-code-settings.json',
