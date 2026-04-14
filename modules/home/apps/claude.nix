@@ -396,7 +396,8 @@ in
     };
   };
 
-  config = mkIf config.modules.home.apps.mcp.enable {
+  config = mkIf config.modules.home.apps.mcp.enable (lib.mkMerge [
+    {
     # ═══════════════════════════════════════════════════════════════════════════
     # Claude Settings & Commands (SSOT - symlinks to Quality System generated files)
     # ═══════════════════════════════════════════════════════════════════════════
@@ -420,9 +421,6 @@ in
     home.file.".claude/statusline.sh" = {
       source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/claude/statusline.sh";
     };
-
-    # Alternate config dir symlinks (generated from accountDefs SSOT)
-    home.file = alternateHomeFiles;
 
     # ═══════════════════════════════════════════════════════════════════════════
     # MCP Config Generation (Activation-time for HTTP server API key injection)
@@ -658,5 +656,9 @@ in
         StandardErrorPath = "/tmp/claude-log-rotation.err";
       };
     };
-  };
+    }
+
+    # Alternate config dir symlinks (generated from accountDefs SSOT)
+    { home.file = alternateHomeFiles; }
+  ]);
 }
