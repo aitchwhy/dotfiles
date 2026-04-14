@@ -503,36 +503,40 @@ let
         ''cc *args="":''
         "    #!/usr/bin/env bash"
         "    set -euo pipefail"
-        ''    account="''${1:-}"''
+        "    account=\"\${1:-}\""
         "    shift || true"
         ""
-        ''    if [[ -z "$account" ]]; then''
+        "    if [[ -z \"$account\" ]]; then"
         "      account=$(printf '%s\\n' \\"
       ]
-      ++ map (e: "        ${e} \\") fzfEntries
+      ++ map (e: "        ${e} \\") (
+        fzfEntries
+        ++ [
+          ''"---"''
+          ''"status   Auth status for all accounts"''
+        ]
+      )
       ++ [
-        ''        "---" \''
-        ''        "status   Auth status for all accounts" \''
         "        | fzf --reverse --height=40% --prompt=\"cc > \" \\"
         "        | awk '{print $1}')"
-        ''      [[ -z "$account" || "$account" == "---" ]] && exit 1''
+        "      [[ -z \"$account\" || \"$account\" == \"---\" ]] && exit 1"
         "    fi"
         ""
-        ''    [[ "$account" != "status" && "$account" != "help" ]] && echo "-> cc $account" >&2''
+        "    [[ \"$account\" != \"status\" && \"$account\" != \"help\" ]] && echo \"-> cc $account\" >&2"
         ""
-        ''    case "$account" in''
+        "    case \"$account\" in"
         "      help|-h|--help)"
-        ''        echo "Usage: just -g cc [account] [claude args...]"''
-        ''        echo ""''
-        ''        echo "Accounts:"''
+        "        echo \"Usage: just -g cc [account] [claude args...]\""
+        "        echo \"\""
+        "        echo \"Accounts:\""
       ]
       ++ map (e: "        ${e}") helpEntries
       ++ [
-        ''        echo ""''
-        ''        echo "Commands:"''
-        ''        echo "  just -g cc             fzf account picker"''
-        ''        echo "  just -g cc status      auth status for all accounts"''
-        ''        echo "  just -g cc <acct> ...  launch claude with account + passthrough args"''
+        "        echo \"\""
+        "        echo \"Commands:\""
+        "        echo \"  just -g cc             fzf account picker\""
+        "        echo \"  just -g cc status      auth status for all accounts\""
+        "        echo \"  just -g cc <acct> ...  launch claude with account + passthrough args\""
         "        exit 0 ;;"
       ]
       ++ map (e: "      ${e}") caseBranches
@@ -542,7 +546,7 @@ let
       ++ map (e: "        ${e}") statusEntries
       ++ [
         "        ;;"
-        ''      *) echo "Unknown: $account. Run 'just -g cc help' for usage." >&2; exit 1 ;;''
+        "      *) echo \"Unknown: $account. Run 'just -g cc help' for usage.\" >&2; exit 1 ;;"
         "    esac"
         ""
         "# Show auth status for all accounts"
