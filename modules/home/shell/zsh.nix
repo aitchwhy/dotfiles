@@ -161,18 +161,37 @@ in
               "max-3    Max 20x — overflow 2" \
               "glm      GLM 5.1 via Z.ai" \
               "openai   GPT-5 via OpenRouter" \
+              "---" \
+              "status   Auth status for all accounts" \
               | fzf --reverse --height=40% --prompt="cc > " \
               | awk '{print $1}')
-            [[ -z "$account" ]] && return 1
+            [[ -z "$account" || "$account" == "---" ]] && return 1
           fi
 
+          # Confirmation echo for all account switches
+          [[ "$account" != "status" && "$account" != "help" ]] && echo "-> cc $account" >&2
+
           case "$account" in
+            help|-h|--help)
+              echo "Usage: cc [account] [claude args...]"
+              echo ""
+              echo "Accounts:"
+              echo "  max-1    Max 20x — primary (default ~/.claude/)"
+              echo "  max-2    Max 20x — overflow 1"
+              echo "  max-3    Max 20x — overflow 2"
+              echo "  glm      GLM 5.1 via Z.ai"
+              echo "  openai   GPT-5 via OpenRouter"
+              echo ""
+              echo "Commands:"
+              echo "  cc             fzf account picker"
+              echo "  cc status      auth status for all accounts"
+              echo "  cc <acct> ...  launch claude with account + passthrough args"
+              return 0 ;;
             max-1) claude "$@" ;;
             max-2) CLAUDE_CONFIG_DIR="$HOME/.claude-max-2" claude "$@" ;;
             max-3) CLAUDE_CONFIG_DIR="$HOME/.claude-max-3" claude "$@" ;;
             glm)
               local key; key=$(_cc_secret "told/vendor/zai/api-key") || return 1
-              echo "-> cc glm" >&2
               ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic" \
               ANTHROPIC_AUTH_TOKEN="$key" \
               ANTHROPIC_DEFAULT_OPUS_MODEL="glm-5.1" \
@@ -182,14 +201,13 @@ in
               claude "$@" ;;
             openai)
               local key; key=$(_cc_secret "told/vendor/openrouter/api-key") || return 1
-              echo "-> cc openai" >&2
               ANTHROPIC_BASE_URL="https://openrouter.ai/api" \
               ANTHROPIC_AUTH_TOKEN="$key" \
               ANTHROPIC_MODEL="openai/gpt-5" \
               CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
               claude "$@" ;;
             status) _cc_status ;;
-            *) echo "Unknown: $account. Valid: max-1 max-2 max-3 glm openai status" >&2; return 1 ;;
+            *) echo "Unknown: $account. Run 'cc help' for usage." >&2; return 1 ;;
           esac
         }
 
