@@ -396,269 +396,271 @@ in
     };
   };
 
-  config = mkIf config.modules.home.apps.mcp.enable (lib.mkMerge [
-    {
-    # ═══════════════════════════════════════════════════════════════════════════
-    # Claude Settings & Commands (SSOT - symlinks to Quality System generated files)
-    # ═══════════════════════════════════════════════════════════════════════════
-
-    home.file.".claude/settings.json" = {
-      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/quality/generated/claude/settings.json";
-    };
-
-    home.file.".claude/commands" = {
-      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/claude/commands";
-    };
-
-    home.file.".claude/skills" = {
-      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/claude-code/skills";
-    };
-
-    home.file.".claude/agents" = {
-      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/claude-code/agents";
-    };
-
-    home.file.".claude/statusline.sh" = {
-      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/claude/statusline.sh";
-    };
-
-    # ═══════════════════════════════════════════════════════════════════════════
-    # MCP Config Generation (Activation-time for HTTP server API key injection)
-    # ═══════════════════════════════════════════════════════════════════════════
-
-    # Generate Claude Desktop config (MINIMAL: 0 MCP servers, 1 DXT extension)
-    home.activation.generateMcpConfigs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      DESKTOP_CONFIG="${config.home.homeDirectory}/Library/Application Support/Claude/claude_desktop_config.json"
-      mkdir -p "$(dirname "$DESKTOP_CONFIG")"
-
-      cat > "$DESKTOP_CONFIG" << 'DESKTOPEOF'
+  config = mkIf config.modules.home.apps.mcp.enable (
+    lib.mkMerge [
       {
-        "mcpServers": {}
-      }
-      DESKTOPEOF
+        # ═══════════════════════════════════════════════════════════════════════════
+        # Claude Settings & Commands (SSOT - symlinks to Quality System generated files)
+        # ═══════════════════════════════════════════════════════════════════════════
 
-      echo "Claude Desktop config generated (0 MCP servers - MINIMAL)"
-    '';
+        home.file.".claude/settings.json" = {
+          source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/quality/generated/claude/settings.json";
+        };
 
-    # Generate Claude Desktop Filesystem extension settings (SSOT for allowed_directories)
-    home.activation.generateFilesystemExtensionConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      EXT_SETTINGS_DIR="${config.home.homeDirectory}/Library/Application Support/Claude/Claude Extensions Settings"
-      EXT_CONFIG="$EXT_SETTINGS_DIR/ant.dir.ant.anthropic.filesystem.json"
-      mkdir -p "$EXT_SETTINGS_DIR"
+        home.file.".claude/commands" = {
+          source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/claude/commands";
+        };
 
-      # Write config with $HOME expanded at activation time
-      cat > "$EXT_CONFIG" << EOF
-      {
-        "isEnabled": true,
-        "userConfig": {
-          "allowed_directories": [
-            "${config.home.homeDirectory}/src/told",
-            "${config.home.homeDirectory}/dotfiles",
-            "${config.home.homeDirectory}/.claude",
-            "${config.home.homeDirectory}/Downloads",
-            "${config.home.homeDirectory}/Documents",
-            "${config.home.homeDirectory}/Desktop",
-            "${config.home.homeDirectory}/src/energy",
-            "${config.home.homeDirectory}/src/told-vault",
-            "${config.home.homeDirectory}/src/haute",
-            "${config.home.homeDirectory}/src/korea-real-estate-analytics"
-          ]
-        }
-      }
-      EOF
+        home.file.".claude/skills" = {
+          source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/claude-code/skills";
+        };
 
-      echo "Filesystem extension config generated (10 allowed directories from SSOT)"
-    '';
+        home.file.".claude/agents" = {
+          source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/claude-code/agents";
+        };
 
-    # Generate Claude Code CLI config (~/.claude.json)
-    # Uses jq to MERGE mcpServers + enabledPlugins with existing runtime state
-    # Runtime state includes: numStartups, oauthAccount, projects, etc. (31+ keys)
-    # 1 server (ref), 1 plugin (caveman)
-    home.activation.generateClaudeCodeConfig =
-      lib.hm.dag.entryAfter [ "writeBoundary" "installPlugins" ]
-        ''
-          MCP_SECRETS="${config.home.homeDirectory}/.config/mcp"
-          CLAUDE_CODE_CONFIG="${config.home.homeDirectory}/.claude.json"
+        home.file.".claude/statusline.sh" = {
+          source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/claude/statusline.sh";
+        };
 
-          # Read API key for ref server
-          REF_KEY=""
-          [ -f "$MCP_SECRETS/ref-api-key" ] && REF_KEY=$(cat "$MCP_SECRETS/ref-api-key")
+        # ═══════════════════════════════════════════════════════════════════════════
+        # MCP Config Generation (Activation-time for HTTP server API key injection)
+        # ═══════════════════════════════════════════════════════════════════════════
 
-          # MCP servers JSON from Nix SSOT (with placeholders for secrets)
-          MCP_SERVERS='${cliAllJson}'
-          ENABLED_PLUGINS='${enabledPluginsJson}'
+        # Generate Claude Desktop config (MINIMAL: 0 MCP servers, 1 DXT extension)
+        home.activation.generateMcpConfigs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          DESKTOP_CONFIG="${config.home.homeDirectory}/Library/Application Support/Claude/claude_desktop_config.json"
+          mkdir -p "$(dirname "$DESKTOP_CONFIG")"
 
-          # Substitute placeholder with actual secret value
-          MCP_SERVERS=$(echo "$MCP_SERVERS" | sed "s/__REF_KEY__/$REF_KEY/g")
-
-          # Merge with existing config (preserve runtime state)
-          if [ -f "$CLAUDE_CODE_CONFIG" ]; then
-            MERGED=$(jq --argjson servers "$MCP_SERVERS" --argjson plugins "$ENABLED_PLUGINS" \
-              '.mcpServers = $servers | .enabledPlugins = $plugins | del(.defaultModel)' "$CLAUDE_CODE_CONFIG")
-            # Only write if content actually changed (prevents Claude Code backup spam)
-            CURRENT=$(cat "$CLAUDE_CODE_CONFIG")
-            if [ "$MERGED" != "$CURRENT" ]; then
-              echo "$MERGED" > "$CLAUDE_CODE_CONFIG"
-              echo "Claude Code config updated (1 server, 1 plugin)"
-            else
-              echo "Claude Code config unchanged, skipping write"
-            fi
-          else
-            echo "{\"mcpServers\": $MCP_SERVERS, \"enabledPlugins\": $ENABLED_PLUGINS}" > "$CLAUDE_CODE_CONFIG"
-            echo "Claude Code config created (1 server, 1 plugin)"
-          fi
-
-          # Generate .claude.json for alternate config dirs (from accountDefs SSOT)
-          # .claude.json is per-config-dir (verified by audit test 3)
-          for config_dir in ${alternateConfigDirPaths}; do
-            ALT_CONFIG="$config_dir/.claude.json"
-            if [ -f "$ALT_CONFIG" ]; then
-              MERGED=$(jq --argjson servers "$MCP_SERVERS" --argjson plugins "$ENABLED_PLUGINS" \
-                '.mcpServers = $servers | .enabledPlugins = $plugins | del(.defaultModel)' "$ALT_CONFIG")
-              CURRENT=$(cat "$ALT_CONFIG")
-              if [ "$MERGED" != "$CURRENT" ]; then
-                echo "$MERGED" > "$ALT_CONFIG"
-                echo "Claude Code config updated in $config_dir (1 server, 1 plugin)"
-              else
-                echo "Claude Code config unchanged in $config_dir, skipping write"
-              fi
-            else
-              echo "{\"mcpServers\": $MCP_SERVERS, \"enabledPlugins\": $ENABLED_PLUGINS}" > "$ALT_CONFIG"
-              echo "Claude Code config created in $config_dir (1 server, 1 plugin)"
-            fi
-          done
-        '';
-
-    # Install + enable plugins from marketplace via `claude` CLI (idempotent)
-    # Runs BEFORE generateClaudeCodeConfig so the jq merge has final say on enabledPlugins.
-    # NOTE: First install requires network (git clone over SSH).
-    # If it fails in darwin-rebuild's sandboxed env, run manually:
-    #   claude plugin marketplace add JuliusBrussee/caveman --scope user
-    #   claude plugin install caveman@caveman --scope user
-    home.activation.installPlugins =
-      lib.hm.dag.entryAfter
-        [
-          "writeBoundary"
-        ]
-        ''
-          CLAUDE="/etc/profiles/per-user/${config.home.username}/bin/claude"
-
-          if [ -x "$CLAUDE" ]; then
-            # Check if caveman is already installed (skip network-dependent install)
-            if $CLAUDE plugin list 2>/dev/null | grep -q "caveman@caveman"; then
-              echo "Caveman plugin already installed"
-            else
-              echo "Caveman plugin not found, attempting install..."
-              # Add marketplace (requires git clone — may fail in sandboxed env)
-              if $CLAUDE plugin marketplace add JuliusBrussee/caveman --scope user 2>&1; then
-                $CLAUDE plugin install caveman@caveman --scope user 2>&1 || \
-                  echo "WARN: caveman install failed — run manually: claude plugin install caveman@caveman --scope user"
-              else
-                echo "WARN: marketplace add failed (likely SSH/sandbox restriction)"
-                echo "  Run manually: claude plugin marketplace add JuliusBrussee/caveman --scope user"
-              fi
-            fi
-
-            # Install caveman in alternate config dirs (from accountDefs SSOT)
-            for config_dir in ${alternateConfigDirPaths}; do
-              if CLAUDE_CONFIG_DIR="$config_dir" $CLAUDE plugin list 2>/dev/null | grep -q "caveman@caveman"; then
-                echo "Caveman already installed in $config_dir"
-              else
-                echo "Installing caveman in $config_dir..."
-                CLAUDE_CONFIG_DIR="$config_dir" $CLAUDE plugin marketplace add JuliusBrussee/caveman --scope user 2>&1 || true
-                CLAUDE_CONFIG_DIR="$config_dir" $CLAUDE plugin install caveman@caveman --scope user 2>&1 || \
-                  echo "WARN: caveman install failed in $config_dir"
-              fi
-            done
-          else
-            echo "WARN: claude CLI not found, skipping plugin install"
-          fi
-        '';
-
-    # generateClaudeCodeConfig runs AFTER installPlugins — its jq merge
-    # overwrites enabledPlugins with Nix SSOT, ensuring caveman stays enabled
-    # even if `claude plugin install` defaults it to disabled.
-
-    # Generate Quality System artifacts (settings.json)
-    home.activation.generateQuality = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      QUALITY_DIR="${config.home.homeDirectory}/dotfiles/config/quality"
-      BUN="/etc/profiles/per-user/${config.home.username}/bin/bun"
-
-      if [ -f "$QUALITY_DIR/package.json" ]; then
-        echo "Generating Intelligence artifacts..."
-        cd "$QUALITY_DIR"
-
-        if ! $BUN install --frozen-lockfile; then
-          echo "ERROR: bun install failed in $QUALITY_DIR"
-          exit 1
-        fi
-
-        if ! $BUN run generate; then
-          echo "ERROR: Intelligence generation failed in $QUALITY_DIR"
-          exit 1
-        fi
-
-        echo "Intelligence System artifacts generated successfully"
-      fi
-    '';
-
-    # Cleanup old plan and todo files (7-day retention)
-    # Runs on every `darwin-rebuild switch` or `home-manager switch`
-    home.activation.cleanupClaudeEphemeral = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      PLANS_DIR="${config.home.homeDirectory}/.claude/plans"
-      TODOS_DIR="${config.home.homeDirectory}/.claude/todos"
-
-      # Delete plan files older than 7 days
-      if [ -d "$PLANS_DIR" ]; then
-        /usr/bin/find "$PLANS_DIR" -name "*.md" -mtime +7 -type f -delete 2>/dev/null || true
-        echo "Claude plans cleanup: removed files older than 7 days"
-      fi
-
-      # Delete todo files older than 7 days
-      if [ -d "$TODOS_DIR" ]; then
-        /usr/bin/find "$TODOS_DIR" -name "*.json" -mtime +7 -type f -delete 2>/dev/null || true
-        echo "Claude todos cleanup: removed files older than 7 days"
-      fi
-    '';
-
-    # ═══════════════════════════════════════════════════════════════════════════
-    # LAUNCHD AGENTS (SOTA Log Rotation - February 2026)
-    # ═══════════════════════════════════════════════════════════════════════════
-
-    # Claude Desktop log rotation - runs daily at 3am
-    # Deletes logs >10MB to prevent disk bloat from large MCP responses
-    # SOTA: Keep logs manageable, Filesystem extension can produce 31MB+ responses
-    launchd.agents.claude-log-rotation = {
-      enable = true;
-      config = {
-        Label = "com.claude.log-rotation";
-        ProgramArguments = [
-          "/bin/sh"
-          "-c"
-          ''
-            LOG_DIR="$HOME/Library/Logs/Claude"
-            if [ -d "$LOG_DIR" ]; then
-              # Delete logs larger than 10MB
-              /usr/bin/find "$LOG_DIR" -name "*.log" -size +10M -delete 2>/dev/null
-              # Delete rotated logs (numbered backups)
-              /usr/bin/find "$LOG_DIR" -name "*.log.*" -mtime +7 -delete 2>/dev/null
-              echo "$(date): Claude log rotation completed" >> /tmp/claude-log-rotation.log
-            fi
-          ''
-        ];
-        StartCalendarInterval = [
+          cat > "$DESKTOP_CONFIG" << 'DESKTOPEOF'
           {
-            Hour = 3;
-            Minute = 0;
+            "mcpServers": {}
           }
-        ];
-        StandardOutPath = "/tmp/claude-log-rotation.log";
-        StandardErrorPath = "/tmp/claude-log-rotation.err";
-      };
-    };
-    }
+          DESKTOPEOF
 
-    # Alternate config dir symlinks (generated from accountDefs SSOT)
-    { home.file = alternateHomeFiles; }
-  ]);
+          echo "Claude Desktop config generated (0 MCP servers - MINIMAL)"
+        '';
+
+        # Generate Claude Desktop Filesystem extension settings (SSOT for allowed_directories)
+        home.activation.generateFilesystemExtensionConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          EXT_SETTINGS_DIR="${config.home.homeDirectory}/Library/Application Support/Claude/Claude Extensions Settings"
+          EXT_CONFIG="$EXT_SETTINGS_DIR/ant.dir.ant.anthropic.filesystem.json"
+          mkdir -p "$EXT_SETTINGS_DIR"
+
+          # Write config with $HOME expanded at activation time
+          cat > "$EXT_CONFIG" << EOF
+          {
+            "isEnabled": true,
+            "userConfig": {
+              "allowed_directories": [
+                "${config.home.homeDirectory}/src/told",
+                "${config.home.homeDirectory}/dotfiles",
+                "${config.home.homeDirectory}/.claude",
+                "${config.home.homeDirectory}/Downloads",
+                "${config.home.homeDirectory}/Documents",
+                "${config.home.homeDirectory}/Desktop",
+                "${config.home.homeDirectory}/src/energy",
+                "${config.home.homeDirectory}/src/told-vault",
+                "${config.home.homeDirectory}/src/haute",
+                "${config.home.homeDirectory}/src/korea-real-estate-analytics"
+              ]
+            }
+          }
+          EOF
+
+          echo "Filesystem extension config generated (10 allowed directories from SSOT)"
+        '';
+
+        # Generate Claude Code CLI config (~/.claude.json)
+        # Uses jq to MERGE mcpServers + enabledPlugins with existing runtime state
+        # Runtime state includes: numStartups, oauthAccount, projects, etc. (31+ keys)
+        # 1 server (ref), 1 plugin (caveman)
+        home.activation.generateClaudeCodeConfig =
+          lib.hm.dag.entryAfter [ "writeBoundary" "installPlugins" ]
+            ''
+              MCP_SECRETS="${config.home.homeDirectory}/.config/mcp"
+              CLAUDE_CODE_CONFIG="${config.home.homeDirectory}/.claude.json"
+
+              # Read API key for ref server
+              REF_KEY=""
+              [ -f "$MCP_SECRETS/ref-api-key" ] && REF_KEY=$(cat "$MCP_SECRETS/ref-api-key")
+
+              # MCP servers JSON from Nix SSOT (with placeholders for secrets)
+              MCP_SERVERS='${cliAllJson}'
+              ENABLED_PLUGINS='${enabledPluginsJson}'
+
+              # Substitute placeholder with actual secret value
+              MCP_SERVERS=$(echo "$MCP_SERVERS" | sed "s/__REF_KEY__/$REF_KEY/g")
+
+              # Merge with existing config (preserve runtime state)
+              if [ -f "$CLAUDE_CODE_CONFIG" ]; then
+                MERGED=$(jq --argjson servers "$MCP_SERVERS" --argjson plugins "$ENABLED_PLUGINS" \
+                  '.mcpServers = $servers | .enabledPlugins = $plugins | del(.defaultModel)' "$CLAUDE_CODE_CONFIG")
+                # Only write if content actually changed (prevents Claude Code backup spam)
+                CURRENT=$(cat "$CLAUDE_CODE_CONFIG")
+                if [ "$MERGED" != "$CURRENT" ]; then
+                  echo "$MERGED" > "$CLAUDE_CODE_CONFIG"
+                  echo "Claude Code config updated (1 server, 1 plugin)"
+                else
+                  echo "Claude Code config unchanged, skipping write"
+                fi
+              else
+                echo "{\"mcpServers\": $MCP_SERVERS, \"enabledPlugins\": $ENABLED_PLUGINS}" > "$CLAUDE_CODE_CONFIG"
+                echo "Claude Code config created (1 server, 1 plugin)"
+              fi
+
+              # Generate .claude.json for alternate config dirs (from accountDefs SSOT)
+              # .claude.json is per-config-dir (verified by audit test 3)
+              for config_dir in ${alternateConfigDirPaths}; do
+                ALT_CONFIG="$config_dir/.claude.json"
+                if [ -f "$ALT_CONFIG" ]; then
+                  MERGED=$(jq --argjson servers "$MCP_SERVERS" --argjson plugins "$ENABLED_PLUGINS" \
+                    '.mcpServers = $servers | .enabledPlugins = $plugins | del(.defaultModel)' "$ALT_CONFIG")
+                  CURRENT=$(cat "$ALT_CONFIG")
+                  if [ "$MERGED" != "$CURRENT" ]; then
+                    echo "$MERGED" > "$ALT_CONFIG"
+                    echo "Claude Code config updated in $config_dir (1 server, 1 plugin)"
+                  else
+                    echo "Claude Code config unchanged in $config_dir, skipping write"
+                  fi
+                else
+                  echo "{\"mcpServers\": $MCP_SERVERS, \"enabledPlugins\": $ENABLED_PLUGINS}" > "$ALT_CONFIG"
+                  echo "Claude Code config created in $config_dir (1 server, 1 plugin)"
+                fi
+              done
+            '';
+
+        # Install + enable plugins from marketplace via `claude` CLI (idempotent)
+        # Runs BEFORE generateClaudeCodeConfig so the jq merge has final say on enabledPlugins.
+        # NOTE: First install requires network (git clone over SSH).
+        # If it fails in darwin-rebuild's sandboxed env, run manually:
+        #   claude plugin marketplace add JuliusBrussee/caveman --scope user
+        #   claude plugin install caveman@caveman --scope user
+        home.activation.installPlugins =
+          lib.hm.dag.entryAfter
+            [
+              "writeBoundary"
+            ]
+            ''
+              CLAUDE="/etc/profiles/per-user/${config.home.username}/bin/claude"
+
+              if [ -x "$CLAUDE" ]; then
+                # Check if caveman is already installed (skip network-dependent install)
+                if $CLAUDE plugin list 2>/dev/null | grep -q "caveman@caveman"; then
+                  echo "Caveman plugin already installed"
+                else
+                  echo "Caveman plugin not found, attempting install..."
+                  # Add marketplace (requires git clone — may fail in sandboxed env)
+                  if $CLAUDE plugin marketplace add JuliusBrussee/caveman --scope user 2>&1; then
+                    $CLAUDE plugin install caveman@caveman --scope user 2>&1 || \
+                      echo "WARN: caveman install failed — run manually: claude plugin install caveman@caveman --scope user"
+                  else
+                    echo "WARN: marketplace add failed (likely SSH/sandbox restriction)"
+                    echo "  Run manually: claude plugin marketplace add JuliusBrussee/caveman --scope user"
+                  fi
+                fi
+
+                # Install caveman in alternate config dirs (from accountDefs SSOT)
+                for config_dir in ${alternateConfigDirPaths}; do
+                  if CLAUDE_CONFIG_DIR="$config_dir" $CLAUDE plugin list 2>/dev/null | grep -q "caveman@caveman"; then
+                    echo "Caveman already installed in $config_dir"
+                  else
+                    echo "Installing caveman in $config_dir..."
+                    CLAUDE_CONFIG_DIR="$config_dir" $CLAUDE plugin marketplace add JuliusBrussee/caveman --scope user 2>&1 || true
+                    CLAUDE_CONFIG_DIR="$config_dir" $CLAUDE plugin install caveman@caveman --scope user 2>&1 || \
+                      echo "WARN: caveman install failed in $config_dir"
+                  fi
+                done
+              else
+                echo "WARN: claude CLI not found, skipping plugin install"
+              fi
+            '';
+
+        # generateClaudeCodeConfig runs AFTER installPlugins — its jq merge
+        # overwrites enabledPlugins with Nix SSOT, ensuring caveman stays enabled
+        # even if `claude plugin install` defaults it to disabled.
+
+        # Generate Quality System artifacts (settings.json)
+        home.activation.generateQuality = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          QUALITY_DIR="${config.home.homeDirectory}/dotfiles/config/quality"
+          BUN="/etc/profiles/per-user/${config.home.username}/bin/bun"
+
+          if [ -f "$QUALITY_DIR/package.json" ]; then
+            echo "Generating Intelligence artifacts..."
+            cd "$QUALITY_DIR"
+
+            if ! $BUN install --frozen-lockfile; then
+              echo "ERROR: bun install failed in $QUALITY_DIR"
+              exit 1
+            fi
+
+            if ! $BUN run generate; then
+              echo "ERROR: Intelligence generation failed in $QUALITY_DIR"
+              exit 1
+            fi
+
+            echo "Intelligence System artifacts generated successfully"
+          fi
+        '';
+
+        # Cleanup old plan and todo files (7-day retention)
+        # Runs on every `darwin-rebuild switch` or `home-manager switch`
+        home.activation.cleanupClaudeEphemeral = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          PLANS_DIR="${config.home.homeDirectory}/.claude/plans"
+          TODOS_DIR="${config.home.homeDirectory}/.claude/todos"
+
+          # Delete plan files older than 7 days
+          if [ -d "$PLANS_DIR" ]; then
+            /usr/bin/find "$PLANS_DIR" -name "*.md" -mtime +7 -type f -delete 2>/dev/null || true
+            echo "Claude plans cleanup: removed files older than 7 days"
+          fi
+
+          # Delete todo files older than 7 days
+          if [ -d "$TODOS_DIR" ]; then
+            /usr/bin/find "$TODOS_DIR" -name "*.json" -mtime +7 -type f -delete 2>/dev/null || true
+            echo "Claude todos cleanup: removed files older than 7 days"
+          fi
+        '';
+
+        # ═══════════════════════════════════════════════════════════════════════════
+        # LAUNCHD AGENTS (SOTA Log Rotation - February 2026)
+        # ═══════════════════════════════════════════════════════════════════════════
+
+        # Claude Desktop log rotation - runs daily at 3am
+        # Deletes logs >10MB to prevent disk bloat from large MCP responses
+        # SOTA: Keep logs manageable, Filesystem extension can produce 31MB+ responses
+        launchd.agents.claude-log-rotation = {
+          enable = true;
+          config = {
+            Label = "com.claude.log-rotation";
+            ProgramArguments = [
+              "/bin/sh"
+              "-c"
+              ''
+                LOG_DIR="$HOME/Library/Logs/Claude"
+                if [ -d "$LOG_DIR" ]; then
+                  # Delete logs larger than 10MB
+                  /usr/bin/find "$LOG_DIR" -name "*.log" -size +10M -delete 2>/dev/null
+                  # Delete rotated logs (numbered backups)
+                  /usr/bin/find "$LOG_DIR" -name "*.log.*" -mtime +7 -delete 2>/dev/null
+                  echo "$(date): Claude log rotation completed" >> /tmp/claude-log-rotation.log
+                fi
+              ''
+            ];
+            StartCalendarInterval = [
+              {
+                Hour = 3;
+                Minute = 0;
+              }
+            ];
+            StandardOutPath = "/tmp/claude-log-rotation.log";
+            StandardErrorPath = "/tmp/claude-log-rotation.err";
+          };
+        };
+      }
+
+      # Alternate config dir symlinks (generated from accountDefs SSOT)
+      { home.file = alternateHomeFiles; }
+    ]
+  );
 }
