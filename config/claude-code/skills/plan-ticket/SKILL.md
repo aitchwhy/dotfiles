@@ -56,11 +56,22 @@ For EACH ticket_id, transition to "In Progress" in Linear via GraphQL API. Plann
 export LINEAR_API_TOKEN="${LINEAR_API_TOKEN:-$(esc open told/app/local-web --format json 2>/dev/null | jq -r '.environmentVariables.LINEAR_API_TOKEN // empty')}"
 if [ -n "${LINEAR_API_TOKEN:-}" ]; then
   TEAM_KEY="${TICKET_ID%%-*}"
-  STATE_ID=$(resolve_state_id "In Progress" "$TEAM_KEY")  # See /linear skill
-  jq -n --arg id "$TICKET_ID" --arg stateId "$STATE_ID" \
-    '{"query": "mutation($id: String!, $stateId: String!) { issueUpdate(id: $id, input: { stateId: $stateId }) { success } }", "variables": {"id": $id, "stateId": $stateId}}' \
+
+  # Resolve human-readable state name to UUID
+  STATE_ID=$(jq -n --arg team "$TEAM_KEY" --arg state "In Progress" \
+    '{"query": "query($team: String!, $state: String!) { workflowStates(filter: { team: { key: { eq: $team } }, name: { eq: $state } }) { nodes { id name } } }", "variables": {"team": $team, "state": $state}}' \
     | curl -s -X POST "https://api.linear.app/graphql" \
-      -H "Authorization: $LINEAR_API_TOKEN" -H "Content-Type: application/json" -d @-
+      -H "Authorization: $LINEAR_API_TOKEN" -H "Content-Type: application/json" -d @- \
+    | jq -r '.data.workflowStates.nodes[0].id // empty')
+
+  if [ -n "$STATE_ID" ]; then
+    jq -n --arg id "$TICKET_ID" --arg stateId "$STATE_ID" \
+      '{"query": "mutation($id: String!, $stateId: String!) { issueUpdate(id: $id, input: { stateId: $stateId }) { success } }", "variables": {"id": $id, "stateId": $stateId}}' \
+      | curl -s -X POST "https://api.linear.app/graphql" \
+        -H "Authorization: $LINEAR_API_TOKEN" -H "Content-Type: application/json" -d @-
+  else
+    echo "Warning: Could not resolve 'In Progress' state for team $TEAM_KEY"
+  fi
 else
   echo "Warning: LINEAR_API_TOKEN not available — skipping state transition"
 fi
@@ -90,7 +101,7 @@ Task(
     # Source LINEAR_API_TOKEN from ESC (required: each Bash call is a fresh shell)
     export LINEAR_API_TOKEN="${LINEAR_API_TOKEN:-$(esc open told/app/local-web --format json 2>/dev/null | jq -r '.environmentVariables.LINEAR_API_TOKEN // empty')}"
     jq -n --arg id "{primary_ticket_id}" \
-      '{"query": "query($id: String!) { issue(id: $id) { id identifier title description priority state { name } labels { nodes { name } } assignee { name } team { key } comments { nodes { body createdAt user { name } } } } }", "variables": {"id": $id}}' \
+      '{"query": "query($id: String!) { issue(id: $id) { id identifier title description priority state { name } labels { nodes { name } } assignee { name } team { key } parent { identifier title } comments { nodes { body createdAt user { name } } } } }", "variables": {"id": $id}}' \
       | curl -s -X POST "https://api.linear.app/graphql" \
         -H "Authorization: $LINEAR_API_TOKEN" -H "Content-Type: application/json" -d @-
     ```
@@ -111,16 +122,17 @@ Task(
 
 After the architect completes, verify the plan:
 
-1. Read `~/.claude/plans/{primary_ticket_ref}.md`
+1. Read `~/.claude/plans/{primary_ticket_ref}.md` — if the file does not exist, treat all checks as failed
 2. Verify it contains `## File Change Map` section
 3. Verify it contains `## Architecture Decisions` section
 4. Verify the File Change Map has at least one `|` table row with a file path
 
-If ANY check fails, spawn a **recovery architect** for a targeted retry:
+If ANY check fails (including file not found), spawn a **recovery architect** for a targeted retry:
 
 ```
 Task(
   subagent_type: "architect",
+  model: opus,
   prompt: """
     The previous architect explored the codebase but failed to write the plan file.
     The plan file at ~/.claude/plans/{primary_ticket_ref}.md is empty or missing required sections.
@@ -169,7 +181,6 @@ The plan is locked. Begin implementation immediately:
    ```bash
    just check    # Validate flake
    just switch   # Rebuild system
-   just health   # Verify system state
    ```
 
 After implementation is complete, inform the user and prompt for `/commit` to ship it.

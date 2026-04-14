@@ -9,7 +9,7 @@
 # - nix-config.json: Plugins/marketplaces for TypeScript to consume
 #
 # Configuration (April 2026):
-# - 1 MCP server (ref) — Linear at project level
+# - 1 MCP server (ref) — Linear via /linear skill (GraphQL API)
 # - 1 plugin (caveman) — terse output, token savings
 # - 1 extra marketplace (JuliusBrussee/caveman)
 # - 1 DXT extension (Filesystem) - 5 focused allowed directories

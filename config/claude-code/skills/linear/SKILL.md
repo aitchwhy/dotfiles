@@ -75,7 +75,7 @@ Fetch issue details by human-readable identifier (e.g., TOLD-1354).
 
 ```bash
 jq -n --arg id "$ISSUE_ID" \
-  '{"query": "query($id: String!) { issue(id: $id) { id identifier title description priority state { name } labels { nodes { name } } assignee { name } team { key } comments { nodes { body createdAt user { name } } } } }", "variables": {"id": $id}}' \
+  '{"query": "query($id: String!) { issue(id: $id) { id identifier title description priority state { name } labels { nodes { name } } assignee { name } team { key } parent { identifier title } comments { nodes { body createdAt user { name } } } } }", "variables": {"id": $id}}' \
   | curl -s -X POST "https://api.linear.app/graphql" \
     -H "Authorization: $LINEAR_API_TOKEN" \
     -H "Content-Type: application/json" \
