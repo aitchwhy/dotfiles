@@ -147,28 +147,74 @@ in
         }
 
         # ========================================
-        # Claude Code failover (GLM 5.1 via Z.ai)
+        # Claude Code Multi-Account (cc)
         # ========================================
 
-        # Launch Claude Code routed through Z.ai's GLM 5.1 API
-        # Usage: claude-glm [args...] (same args as claude)
-        # ANTHROPIC_AUTH_TOKEN takes precedence over OAuth/keychain (priority #2 vs #6)
-        function claude-glm() {
-          local zai_key
-          zai_key=$(aws secretsmanager get-secret-value --secret-id told/vendor/zai/api-key --region us-east-1 --query SecretString --output text 2>/dev/null)
-          if [[ -z "$zai_key" ]]; then
-            echo "ERROR: ZAI_API_KEY not found in AWS Secrets Manager." >&2
-            echo "  Check: aws secretsmanager describe-secret --secret-id told/vendor/zai/api-key --region us-east-1" >&2
-            return 1
+        function cc() {
+          local account="''${1:-}"
+          shift 2>/dev/null || true
+
+          if [[ -z "$account" ]]; then
+            account=$(printf '%s\n' \
+              "max-1    Max 20x — primary" \
+              "max-2    Max 20x — overflow 1" \
+              "max-3    Max 20x — overflow 2" \
+              "glm      GLM 5.1 via Z.ai" \
+              "openai   GPT-5 via OpenRouter" \
+              | fzf --reverse --height=40% --prompt="cc > " \
+              | awk '{print $1}')
+            [[ -z "$account" ]] && return 1
           fi
-          echo "→ Claude Code → GLM 5.1 via api.z.ai" >&2
-          ANTHROPIC_AUTH_TOKEN="$zai_key" \
-          ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic" \
-          ANTHROPIC_DEFAULT_OPUS_MODEL="glm-5.1" \
-          ANTHROPIC_DEFAULT_SONNET_MODEL="glm-5.1" \
-          ANTHROPIC_DEFAULT_HAIKU_MODEL="glm-4.5-air" \
-          API_TIMEOUT_MS="3000000" \
-          claude "$@"
+
+          case "$account" in
+            max-1) claude "$@" ;;
+            max-2) CLAUDE_CONFIG_DIR="$HOME/.claude-max-2" claude "$@" ;;
+            max-3) CLAUDE_CONFIG_DIR="$HOME/.claude-max-3" claude "$@" ;;
+            glm)
+              local key; key=$(_cc_secret "told/vendor/zai/api-key") || return 1
+              echo "-> cc glm" >&2
+              ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic" \
+              ANTHROPIC_AUTH_TOKEN="$key" \
+              ANTHROPIC_DEFAULT_OPUS_MODEL="glm-5.1" \
+              ANTHROPIC_DEFAULT_SONNET_MODEL="glm-5.1" \
+              ANTHROPIC_DEFAULT_HAIKU_MODEL="glm-4.5-air" \
+              CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
+              claude "$@" ;;
+            openai)
+              local key; key=$(_cc_secret "told/vendor/openrouter/api-key") || return 1
+              echo "-> cc openai" >&2
+              ANTHROPIC_BASE_URL="https://openrouter.ai/api" \
+              ANTHROPIC_AUTH_TOKEN="$key" \
+              ANTHROPIC_MODEL="openai/gpt-5" \
+              CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
+              claude "$@" ;;
+            status) _cc_status ;;
+            *) echo "Unknown: $account. Valid: max-1 max-2 max-3 glm openai status" >&2; return 1 ;;
+          esac
+        }
+
+        function _cc_secret() {
+          local val
+          val=$(aws secretsmanager get-secret-value --secret-id "$1" --region us-east-1 --query SecretString --output text 2>/dev/null)
+          [[ -z "$val" ]] && { echo "ERROR: Secret $1 missing" >&2; return 1; }
+          echo "$val"
+        }
+
+        function _cc_status() {
+          echo "=== max-1 (primary) ==="
+          claude auth status 2>&1 | head -3
+          echo ""
+          echo "=== max-2 ==="
+          CLAUDE_CONFIG_DIR="$HOME/.claude-max-2" claude auth status 2>&1 | head -3
+          echo ""
+          echo "=== max-3 ==="
+          CLAUDE_CONFIG_DIR="$HOME/.claude-max-3" claude auth status 2>&1 | head -3
+          echo ""
+          echo "=== glm ==="
+          _cc_secret "told/vendor/zai/api-key" >/dev/null 2>&1 && echo "Key: OK" || echo "Key: MISSING"
+          echo ""
+          echo "=== openai ==="
+          _cc_secret "told/vendor/openrouter/api-key" >/dev/null 2>&1 && echo "Key: OK" || echo "Key: MISSING"
         }
       '';
 

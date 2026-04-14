@@ -98,7 +98,6 @@ in
       at = "atuin";
 
       # Claude Code
-      cc = "claude";
       ccd = "claude --dangerously-skip-permissions";
       ccr = "claude --resume";
       ccc = "claude --continue";
