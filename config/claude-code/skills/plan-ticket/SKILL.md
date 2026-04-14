@@ -28,6 +28,35 @@ For **each** token in the arguments, apply these rules:
    - `primary_ticket_id` — first ticket ID (used for plan file naming and architect focus)
    - `primary_ticket_ref` — first ticket ref in lowercase (used for plan file and branch naming)
 
+### Create feature worktree
+
+Create an isolated worktree so parallel `/plan-ticket` sessions don't collide on `main`.
+
+```bash
+BRANCH="hank/{primary_ticket_ref}"
+WORKTREE="$HOME/dotfiles-worktrees/{primary_ticket_ref}"
+mkdir -p "$HOME/dotfiles-worktrees"
+
+# Clean stale worktree from previous failed run
+if [ -d "$WORKTREE" ]; then
+  git worktree remove "$WORKTREE" --force 2>/dev/null || rm -rf "$WORKTREE"
+fi
+
+# Create worktree on feature branch from main
+if git show-ref --verify --quiet "refs/heads/$BRANCH"; then
+  git worktree add "$WORKTREE" "$BRANCH"
+else
+  git worktree add -b "$BRANCH" "$WORKTREE" main
+fi
+
+echo "Worktree: $WORKTREE"
+echo "Branch: $BRANCH"
+```
+
+Store `WORKTREE_PATH = $HOME/dotfiles-worktrees/{primary_ticket_ref}` for Phase 3.
+
+**CRITICAL**: Phase 3 implementation MUST use `WORKTREE_PATH` for ALL file paths. For example, use `$WORKTREE_PATH/modules/home/shell/zsh.nix` — NOT the main repo path. The main repo stays untouched.
+
 Create the plans directory:
 ```bash
 mkdir -p ~/.claude/plans
@@ -171,16 +200,28 @@ Present a brief summary to the user:
 
 **Do NOT stop. Do NOT suggest starting a fresh sitting. Implement now.**
 
-The plan is locked. Begin implementation immediately:
+The plan is locked. Begin implementation immediately **in the worktree**:
 
 1. Read the locked plan file: `~/.claude/plans/{primary_ticket_ref}.md`
 2. Parse the `## File Change Map` table — this is your implementation checklist
-3. Implement each file change in the order specified by the plan
+3. Implement each file change in the order specified by the plan, using **`WORKTREE_PATH`** (`$HOME/dotfiles-worktrees/{primary_ticket_ref}`) for ALL file paths (Read, Edit, Glob, Grep)
 4. Follow all architecture decisions and patterns specified in the plan
-5. Verify with:
+5. Commit in the worktree (Nix flakes require committed files):
    ```bash
-   just check    # Validate flake
-   just switch   # Rebuild system
+   cd "$HOME/dotfiles-worktrees/{primary_ticket_ref}"
+   git add -A
+   git commit -m "feat(scope): description"
    ```
+6. Verify the flake from the worktree:
+   ```bash
+   cd "$HOME/dotfiles-worktrees/{primary_ticket_ref}" && nix flake check
+   ```
+   If check fails, fix, re-commit, and re-check. Do NOT run `just switch` from the worktree — system rebuild happens after merge.
+7. Push feature branch and create PR:
+   ```bash
+   cd "$HOME/dotfiles-worktrees/{primary_ticket_ref}"
+   git push -u origin "hank/{primary_ticket_ref}"
+   ```
+   Then create a PR with `gh pr create`. Include `Fixes {primary_ticket_id}` in the body for auto-transition on merge.
 
-After implementation is complete, inform the user and prompt for `/commit` to ship it.
+After the PR is created, report the PR URL to the user.
