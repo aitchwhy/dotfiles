@@ -52,6 +52,12 @@ case "$model_short" in
   *)             ;; # pass through (glm-5.1, etc.)
 esac
 
+# Detect opusplan mode (configured=opus, active=sonnet)
+configured_model=$(jq -r '.model // "?"' "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/settings.json" 2>/dev/null)
+if [[ "$configured_model" == "opus" && "$model_short" == "sonnet" ]]; then
+  model_short="opusplan"
+fi
+
 # ═══════════════════════════════════════════════════
 # 4. Shared metrics formatting
 # ═══════════════════════════════════════════════════
