@@ -25,6 +25,7 @@ in
         nhb = "nh darwin build";
         nhc = "nh clean all --keep 5 --keep-since 7d";
         nhu = "nix flake update && nh darwin switch";
+        cc = "just -g cc";
       };
 
       initContent = ''
@@ -144,95 +145,6 @@ in
         function ab-screenshot() {
           local name="''${1:-screenshot}"
           agent-browser screenshot "./$name-$(date +%Y%m%d-%H%M%S).png"
-        }
-
-        # ========================================
-        # Claude Code Multi-Account (cc)
-        # ========================================
-
-        function cc() {
-          local account="''${1:-}"
-          shift 2>/dev/null || true
-
-          if [[ -z "$account" ]]; then
-            account=$(printf '%s\n' \
-              "max-1    Max 20x — primary" \
-              "max-2    Max 20x — overflow 1" \
-              "max-3    Max 20x — overflow 2" \
-              "glm      GLM 5.1 via Z.ai" \
-              "openai   GPT-5 via OpenRouter" \
-              "---" \
-              "status   Auth status for all accounts" \
-              | fzf --reverse --height=40% --prompt="cc > " \
-              | awk '{print $1}')
-            [[ -z "$account" || "$account" == "---" ]] && return 1
-          fi
-
-          # Confirmation echo for all account switches
-          [[ "$account" != "status" && "$account" != "help" ]] && echo "-> cc $account" >&2
-
-          case "$account" in
-            help|-h|--help)
-              echo "Usage: cc [account] [claude args...]"
-              echo ""
-              echo "Accounts:"
-              echo "  max-1    Max 20x — primary (default ~/.claude/)"
-              echo "  max-2    Max 20x — overflow 1"
-              echo "  max-3    Max 20x — overflow 2"
-              echo "  glm      GLM 5.1 via Z.ai"
-              echo "  openai   GPT-5 via OpenRouter"
-              echo ""
-              echo "Commands:"
-              echo "  cc             fzf account picker"
-              echo "  cc status      auth status for all accounts"
-              echo "  cc <acct> ...  launch claude with account + passthrough args"
-              return 0 ;;
-            max-1) claude "$@" ;;
-            max-2) CLAUDE_CONFIG_DIR="$HOME/.claude-max-2" claude "$@" ;;
-            max-3) CLAUDE_CONFIG_DIR="$HOME/.claude-max-3" claude "$@" ;;
-            glm)
-              local key; key=$(_cc_secret "told/vendor/zai/api-key") || return 1
-              ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic" \
-              ANTHROPIC_AUTH_TOKEN="$key" \
-              ANTHROPIC_DEFAULT_OPUS_MODEL="glm-5.1" \
-              ANTHROPIC_DEFAULT_SONNET_MODEL="glm-5.1" \
-              ANTHROPIC_DEFAULT_HAIKU_MODEL="glm-4.5-air" \
-              CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
-              claude "$@" ;;
-            openai)
-              local key; key=$(_cc_secret "told/vendor/openrouter/api-key") || return 1
-              ANTHROPIC_BASE_URL="https://openrouter.ai/api" \
-              ANTHROPIC_AUTH_TOKEN="$key" \
-              ANTHROPIC_MODEL="openai/gpt-5" \
-              CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
-              claude "$@" ;;
-            status) _cc_status ;;
-            *) echo "Unknown: $account. Run 'cc help' for usage." >&2; return 1 ;;
-          esac
-        }
-
-        function _cc_secret() {
-          local val
-          val=$(aws secretsmanager get-secret-value --secret-id "$1" --region us-east-1 --query SecretString --output text 2>/dev/null)
-          [[ -z "$val" ]] && { echo "ERROR: Secret $1 missing" >&2; return 1; }
-          echo "$val"
-        }
-
-        function _cc_status() {
-          echo "=== max-1 (primary) ==="
-          claude auth status 2>&1 | head -3
-          echo ""
-          echo "=== max-2 ==="
-          CLAUDE_CONFIG_DIR="$HOME/.claude-max-2" claude auth status 2>&1 | head -3
-          echo ""
-          echo "=== max-3 ==="
-          CLAUDE_CONFIG_DIR="$HOME/.claude-max-3" claude auth status 2>&1 | head -3
-          echo ""
-          echo "=== glm ==="
-          _cc_secret "told/vendor/zai/api-key" >/dev/null 2>&1 && echo "Key: OK" || echo "Key: MISSING"
-          echo ""
-          echo "=== openai ==="
-          _cc_secret "told/vendor/openrouter/api-key" >/dev/null 2>&1 && echo "Key: OK" || echo "Key: MISSING"
         }
       '';
 

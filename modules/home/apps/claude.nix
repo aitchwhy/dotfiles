@@ -41,18 +41,27 @@ let
       configDir = null;
       provider = "anthropic";
       description = "Max 20x — primary";
+      email = "hank.lee.qed@gmail.com";
+      authMethod = "claude.ai";
+      model = "opus";
     }
     {
       name = "max-2";
       configDir = ".claude-max-2";
       provider = "anthropic";
       description = "Max 20x — overflow 1";
+      email = null;
+      authMethod = "claude.ai";
+      model = "opus";
     }
     {
       name = "max-3";
       configDir = ".claude-max-3";
       provider = "anthropic";
       description = "Max 20x — overflow 2";
+      email = null;
+      authMethod = "claude.ai";
+      model = "opus";
     }
     {
       name = "glm";
@@ -60,6 +69,9 @@ let
       provider = "zai";
       description = "GLM 5.1 via Z.ai";
       secretId = "told/vendor/zai/api-key";
+      email = null;
+      authMethod = "api-key";
+      model = "glm-5.1";
     }
     {
       name = "openai";
@@ -67,6 +79,9 @@ let
       provider = "openrouter";
       description = "GPT-5 via OpenRouter";
       secretId = "told/vendor/openrouter/api-key";
+      email = null;
+      authMethod = "api-key";
+      model = "gpt-5";
     }
   ];
 
@@ -382,6 +397,163 @@ let
 
   # Config JSON for Claude Code CLI (all servers - stdio + HTTP)
   cliConfigJson = builtins.toJSON cliAllServers;
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # GLOBAL JUSTFILE GENERATION (from accountDefs SSOT)
+  # Generates ~/.config/just/justfile for `just -g cc` multi-account launcher
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  globalJustfileContent =
+    let
+      padName =
+        name:
+        name + builtins.substring 0 (9 - builtins.stringLength name) "         ";
+
+      # fzf picker entries (one per account, with email if available)
+      fzfEntries = map (
+        acct:
+        let
+          emailSuffix = if acct.email != null then " (${acct.email})" else "";
+        in
+        ''"${padName acct.name}${acct.description}${emailSuffix}"''
+      ) accountDefs;
+
+      # Help text lines
+      helpEntries = map (
+        acct: ''echo "  ${padName acct.name}${acct.description}"''
+      ) accountDefs;
+
+      # Case branches for account dispatch
+      mkCaseBranch =
+        acct:
+        if acct.provider == "anthropic" then
+          [
+            (
+              if acct.configDir != null then
+                ''${acct.name}) CLAUDE_CONFIG_DIR="$HOME/${acct.configDir}" claude "$@" ;;''
+              else
+                ''${acct.name}) claude "$@" ;;''
+            )
+          ]
+        else if acct.provider == "zai" then
+          [
+            "${acct.name})"
+            ''  key=$(aws secretsmanager get-secret-value --secret-id "${acct.secretId}" --region us-east-1 --query SecretString --output text 2>/dev/null)''
+            ''  [[ -z "$key" ]] && { echo "ERROR: Secret ${acct.secretId} missing" >&2; exit 1; }''
+            ''  ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic" \''
+            ''  ANTHROPIC_AUTH_TOKEN="$key" \''
+            ''  ANTHROPIC_DEFAULT_OPUS_MODEL="glm-5.1" \''
+            ''  ANTHROPIC_DEFAULT_SONNET_MODEL="glm-5.1" \''
+            ''  ANTHROPIC_DEFAULT_HAIKU_MODEL="glm-4.5-air" \''
+            ''  CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \''
+            ''  claude "$@" ;;''
+          ]
+        else if acct.provider == "openrouter" then
+          [
+            "${acct.name})"
+            ''  key=$(aws secretsmanager get-secret-value --secret-id "${acct.secretId}" --region us-east-1 --query SecretString --output text 2>/dev/null)''
+            ''  [[ -z "$key" ]] && { echo "ERROR: Secret ${acct.secretId} missing" >&2; exit 1; }''
+            ''  ANTHROPIC_BASE_URL="https://openrouter.ai/api" \''
+            ''  ANTHROPIC_AUTH_TOKEN="$key" \''
+            ''  ANTHROPIC_MODEL="openai/gpt-5" \''
+            ''  CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \''
+            ''  claude "$@" ;;''
+          ]
+        else
+          [ ];
+
+      caseBranches = builtins.concatLists (map mkCaseBranch accountDefs);
+
+      # Status check entries (reused in both status case and cc-status recipe)
+      mkStatusEntry =
+        acct:
+        if acct.provider == "anthropic" then
+          (
+            if acct.configDir == null then
+              [
+                ''echo "=== ${acct.name} (primary) ==="''
+                "claude auth status 2>&1 | head -3"
+                ''echo ""''
+              ]
+            else
+              [
+                ''echo "=== ${acct.name} ==="''
+                ''CLAUDE_CONFIG_DIR="$HOME/${acct.configDir}" claude auth status 2>&1 | head -3''
+                ''echo ""''
+              ]
+          )
+        else
+          [
+            ''echo "=== ${acct.name} ==="''
+            ''aws secretsmanager get-secret-value --secret-id "${acct.secretId}" --region us-east-1 --query SecretString --output text >/dev/null 2>&1 && echo "Key: OK" || echo "Key: MISSING"''
+            ''echo ""''
+          ];
+
+      statusEntries = builtins.concatLists (map mkStatusEntry accountDefs);
+    in
+    concatStringsSep "\n" (
+      [
+        "# Claude Code Multi-Account Launcher"
+        "# Generated by Nix from accountDefs SSOT. Do not edit manually."
+        ""
+        ''set shell := ["bash", "-euo", "pipefail", "-c"]''
+        ""
+        "# Launch Claude Code with account selection"
+        "[no-cd]"
+        ''cc *args="":''
+        "    #!/usr/bin/env bash"
+        "    set -euo pipefail"
+        ''    account="''${1:-}"''
+        "    shift || true"
+        ""
+        ''    if [[ -z "$account" ]]; then''
+        "      account=$(printf '%s\\n' \\"
+      ]
+      ++ map (e: "        ${e} \\") fzfEntries
+      ++ [
+        ''        "---" \''
+        ''        "status   Auth status for all accounts" \''
+        "        | fzf --reverse --height=40% --prompt=\"cc > \" \\"
+        "        | awk '{print $1}')"
+        ''      [[ -z "$account" || "$account" == "---" ]] && exit 1''
+        "    fi"
+        ""
+        ''    [[ "$account" != "status" && "$account" != "help" ]] && echo "-> cc $account" >&2''
+        ""
+        ''    case "$account" in''
+        "      help|-h|--help)"
+        ''        echo "Usage: just -g cc [account] [claude args...]"''
+        ''        echo ""''
+        ''        echo "Accounts:"''
+      ]
+      ++ map (e: "        ${e}") helpEntries
+      ++ [
+        ''        echo ""''
+        ''        echo "Commands:"''
+        ''        echo "  just -g cc             fzf account picker"''
+        ''        echo "  just -g cc status      auth status for all accounts"''
+        ''        echo "  just -g cc <acct> ...  launch claude with account + passthrough args"''
+        "        exit 0 ;;"
+      ]
+      ++ map (e: "      ${e}") caseBranches
+      ++ [
+        "      status)"
+      ]
+      ++ map (e: "        ${e}") statusEntries
+      ++ [
+        "        ;;"
+        ''      *) echo "Unknown: $account. Run 'just -g cc help' for usage." >&2; exit 1 ;;''
+        "    esac"
+        ""
+        "# Show auth status for all accounts"
+        "[no-cd]"
+        "cc-status:"
+        "    #!/usr/bin/env bash"
+        "    set -euo pipefail"
+      ]
+      ++ map (e: "    ${e}") statusEntries
+      ++ [ "" ]
+    );
 in
 {
   options.modules.home.apps.mcp = {
@@ -422,6 +594,9 @@ in
         home.file.".claude/statusline.sh" = {
           source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/claude/statusline.sh";
         };
+
+        # Global justfile for cc multi-account launcher (just -g cc)
+        home.file.".config/just/justfile".text = globalJustfileContent;
 
         # ═══════════════════════════════════════════════════════════════════════════
         # MCP Config Generation (Activation-time for HTTP server API key injection)
