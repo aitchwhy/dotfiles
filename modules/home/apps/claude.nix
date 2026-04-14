@@ -30,6 +30,91 @@ let
     toUpper
     ;
 
+  # ═══════════════════════════════════════════════════════════════════════════
+  # ACCOUNT REGISTRY SSOT (April 2026)
+  # Drives: config dir generation, symlinks, plugin installs, cc shell function
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  accountDefs = [
+    {
+      name = "max-1";
+      configDir = null;
+      provider = "anthropic";
+      description = "Max 20x — primary";
+    }
+    {
+      name = "max-2";
+      configDir = ".claude-max-2";
+      provider = "anthropic";
+      description = "Max 20x — overflow 1";
+    }
+    {
+      name = "max-3";
+      configDir = ".claude-max-3";
+      provider = "anthropic";
+      description = "Max 20x — overflow 2";
+    }
+    {
+      name = "glm";
+      configDir = null;
+      provider = "zai";
+      description = "GLM 5.1 via Z.ai";
+      secretId = "told/vendor/zai/api-key";
+    }
+    {
+      name = "openai";
+      configDir = null;
+      provider = "openrouter";
+      description = "GPT-5 via OpenRouter";
+      secretId = "told/vendor/openrouter/api-key";
+    }
+  ];
+
+  # Accounts that need their own config directory (configDir != null)
+  alternateConfigDirs = builtins.filter (a: a.configDir != null) accountDefs;
+
+  # Symlink targets shared across all config dirs
+  symlinkEntries = [
+    {
+      suffix = "settings.json";
+      source = "${config.home.homeDirectory}/dotfiles/config/quality/generated/claude/settings.json";
+    }
+    {
+      suffix = "commands";
+      source = "${config.home.homeDirectory}/dotfiles/config/claude/commands";
+    }
+    {
+      suffix = "skills";
+      source = "${config.home.homeDirectory}/dotfiles/config/claude-code/skills";
+    }
+    {
+      suffix = "agents";
+      source = "${config.home.homeDirectory}/dotfiles/config/claude-code/agents";
+    }
+    {
+      suffix = "statusline.sh";
+      source = "${config.home.homeDirectory}/dotfiles/config/claude/statusline.sh";
+    }
+  ];
+
+  # Generate home.file attrset for all alternate config dirs
+  alternateHomeFiles = builtins.listToAttrs (
+    builtins.concatMap (
+      acct:
+      map (entry: {
+        name = "${acct.configDir}/${entry.suffix}";
+        value = {
+          source = config.lib.file.mkOutOfStoreSymlink entry.source;
+        };
+      }) symlinkEntries
+    ) alternateConfigDirs
+  );
+
+  # Bash list of alternate config dir paths for activation hooks
+  alternateConfigDirPaths = builtins.concatStringsSep " " (
+    map (acct: "\"$HOME/${acct.configDir}\"") alternateConfigDirs
+  );
+
   # Determinate Nix profile paths (in priority order)
   # Uses $USER for portability - resolved at shell runtime, not Nix evaluation
   nixPaths = [
@@ -336,6 +421,9 @@ in
       source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/claude/statusline.sh";
     };
 
+    # Alternate config dir symlinks (generated from accountDefs SSOT)
+    home.file = alternateHomeFiles;
+
     # ═══════════════════════════════════════════════════════════════════════════
     # MCP Config Generation (Activation-time for HTTP server API key injection)
     # ═══════════════════════════════════════════════════════════════════════════
@@ -421,6 +509,26 @@ in
             echo "{\"mcpServers\": $MCP_SERVERS, \"enabledPlugins\": $ENABLED_PLUGINS}" > "$CLAUDE_CODE_CONFIG"
             echo "Claude Code config created (1 server, 1 plugin)"
           fi
+
+          # Generate .claude.json for alternate config dirs (from accountDefs SSOT)
+          # .claude.json is per-config-dir (verified by audit test 3)
+          for config_dir in ${alternateConfigDirPaths}; do
+            ALT_CONFIG="$config_dir/.claude.json"
+            if [ -f "$ALT_CONFIG" ]; then
+              MERGED=$(jq --argjson servers "$MCP_SERVERS" --argjson plugins "$ENABLED_PLUGINS" \
+                '.mcpServers = $servers | .enabledPlugins = $plugins | del(.defaultModel)' "$ALT_CONFIG")
+              CURRENT=$(cat "$ALT_CONFIG")
+              if [ "$MERGED" != "$CURRENT" ]; then
+                echo "$MERGED" > "$ALT_CONFIG"
+                echo "Claude Code config updated in $config_dir (1 server, 1 plugin)"
+              else
+                echo "Claude Code config unchanged in $config_dir, skipping write"
+              fi
+            else
+              echo "{\"mcpServers\": $MCP_SERVERS, \"enabledPlugins\": $ENABLED_PLUGINS}" > "$ALT_CONFIG"
+              echo "Claude Code config created in $config_dir (1 server, 1 plugin)"
+            fi
+          done
         '';
 
     # Install + enable plugins from marketplace via `claude` CLI (idempotent)
@@ -452,6 +560,18 @@ in
                 echo "  Run manually: claude plugin marketplace add JuliusBrussee/caveman --scope user"
               fi
             fi
+
+            # Install caveman in alternate config dirs (from accountDefs SSOT)
+            for config_dir in ${alternateConfigDirPaths}; do
+              if CLAUDE_CONFIG_DIR="$config_dir" $CLAUDE plugin list 2>/dev/null | grep -q "caveman@caveman"; then
+                echo "Caveman already installed in $config_dir"
+              else
+                echo "Installing caveman in $config_dir..."
+                CLAUDE_CONFIG_DIR="$config_dir" $CLAUDE plugin marketplace add JuliusBrussee/caveman --scope user 2>&1 || true
+                CLAUDE_CONFIG_DIR="$config_dir" $CLAUDE plugin install caveman@caveman --scope user 2>&1 || \
+                  echo "WARN: caveman install failed in $config_dir"
+              fi
+            done
           else
             echo "WARN: claude CLI not found, skipping plugin install"
           fi
