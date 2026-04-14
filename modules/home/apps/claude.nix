@@ -9,7 +9,7 @@
 # - nix-config.json: Plugins/marketplaces for TypeScript to consume
 #
 # Configuration (April 2026):
-# - 1 MCP server (ref) — Linear at project level
+# - 1 MCP server (ref) — Linear via /linear skill (GraphQL API)
 # - 1 plugin (caveman) — terse output, token savings
 # - 1 extra marketplace (JuliusBrussee/caveman)
 # - 1 DXT extension (Filesystem) - 5 focused allowed directories
@@ -57,7 +57,7 @@ let
       url = "https://api.ref.tools/mcp";
       apiKeyPath = "${mcpSecretsPath}/ref-api-key";
     };
-    # Linear MCP configured at project level (Told's .claude/settings.json)
+    # Linear: GraphQL API via /linear skill (no MCP server)
   };
 
   # ═══════════════════════════════════════════════════════════════════════════
@@ -328,6 +328,10 @@ in
       source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/claude-code/skills";
     };
 
+    home.file.".claude/agents" = {
+      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/claude-code/agents";
+    };
+
     home.file.".claude/statusline.sh" = {
       source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/claude/statusline.sh";
     };
@@ -384,38 +388,40 @@ in
     # Uses jq to MERGE mcpServers + enabledPlugins with existing runtime state
     # Runtime state includes: numStartups, oauthAccount, projects, etc. (31+ keys)
     # 1 server (ref), 1 plugin (caveman)
-    home.activation.generateClaudeCodeConfig = lib.hm.dag.entryAfter [ "writeBoundary" "installPlugins" ] ''
-      MCP_SECRETS="${config.home.homeDirectory}/.config/mcp"
-      CLAUDE_CODE_CONFIG="${config.home.homeDirectory}/.claude.json"
+    home.activation.generateClaudeCodeConfig =
+      lib.hm.dag.entryAfter [ "writeBoundary" "installPlugins" ]
+        ''
+          MCP_SECRETS="${config.home.homeDirectory}/.config/mcp"
+          CLAUDE_CODE_CONFIG="${config.home.homeDirectory}/.claude.json"
 
-      # Read API key for ref server
-      REF_KEY=""
-      [ -f "$MCP_SECRETS/ref-api-key" ] && REF_KEY=$(cat "$MCP_SECRETS/ref-api-key")
+          # Read API key for ref server
+          REF_KEY=""
+          [ -f "$MCP_SECRETS/ref-api-key" ] && REF_KEY=$(cat "$MCP_SECRETS/ref-api-key")
 
-      # MCP servers JSON from Nix SSOT (with placeholders for secrets)
-      MCP_SERVERS='${cliAllJson}'
-      ENABLED_PLUGINS='${enabledPluginsJson}'
+          # MCP servers JSON from Nix SSOT (with placeholders for secrets)
+          MCP_SERVERS='${cliAllJson}'
+          ENABLED_PLUGINS='${enabledPluginsJson}'
 
-      # Substitute placeholder with actual secret value
-      MCP_SERVERS=$(echo "$MCP_SERVERS" | sed "s/__REF_KEY__/$REF_KEY/g")
+          # Substitute placeholder with actual secret value
+          MCP_SERVERS=$(echo "$MCP_SERVERS" | sed "s/__REF_KEY__/$REF_KEY/g")
 
-      # Merge with existing config (preserve runtime state)
-      if [ -f "$CLAUDE_CODE_CONFIG" ]; then
-        MERGED=$(jq --argjson servers "$MCP_SERVERS" --argjson plugins "$ENABLED_PLUGINS" \
-          '.mcpServers = $servers | .enabledPlugins = $plugins | del(.defaultModel)' "$CLAUDE_CODE_CONFIG")
-        # Only write if content actually changed (prevents Claude Code backup spam)
-        CURRENT=$(cat "$CLAUDE_CODE_CONFIG")
-        if [ "$MERGED" != "$CURRENT" ]; then
-          echo "$MERGED" > "$CLAUDE_CODE_CONFIG"
-          echo "Claude Code config updated (1 server, 1 plugin)"
-        else
-          echo "Claude Code config unchanged, skipping write"
-        fi
-      else
-        echo "{\"mcpServers\": $MCP_SERVERS, \"enabledPlugins\": $ENABLED_PLUGINS}" > "$CLAUDE_CODE_CONFIG"
-        echo "Claude Code config created (1 server, 1 plugin)"
-      fi
-    '';
+          # Merge with existing config (preserve runtime state)
+          if [ -f "$CLAUDE_CODE_CONFIG" ]; then
+            MERGED=$(jq --argjson servers "$MCP_SERVERS" --argjson plugins "$ENABLED_PLUGINS" \
+              '.mcpServers = $servers | .enabledPlugins = $plugins | del(.defaultModel)' "$CLAUDE_CODE_CONFIG")
+            # Only write if content actually changed (prevents Claude Code backup spam)
+            CURRENT=$(cat "$CLAUDE_CODE_CONFIG")
+            if [ "$MERGED" != "$CURRENT" ]; then
+              echo "$MERGED" > "$CLAUDE_CODE_CONFIG"
+              echo "Claude Code config updated (1 server, 1 plugin)"
+            else
+              echo "Claude Code config unchanged, skipping write"
+            fi
+          else
+            echo "{\"mcpServers\": $MCP_SERVERS, \"enabledPlugins\": $ENABLED_PLUGINS}" > "$CLAUDE_CODE_CONFIG"
+            echo "Claude Code config created (1 server, 1 plugin)"
+          fi
+        '';
 
     # Install + enable plugins from marketplace via `claude` CLI (idempotent)
     # Runs BEFORE generateClaudeCodeConfig so the jq merge has final say on enabledPlugins.
@@ -423,30 +429,33 @@ in
     # If it fails in darwin-rebuild's sandboxed env, run manually:
     #   claude plugin marketplace add JuliusBrussee/caveman --scope user
     #   claude plugin install caveman@caveman --scope user
-    home.activation.installPlugins = lib.hm.dag.entryAfter [
-      "writeBoundary"
-    ] ''
-      CLAUDE="/etc/profiles/per-user/${config.home.username}/bin/claude"
+    home.activation.installPlugins =
+      lib.hm.dag.entryAfter
+        [
+          "writeBoundary"
+        ]
+        ''
+          CLAUDE="/etc/profiles/per-user/${config.home.username}/bin/claude"
 
-      if [ -x "$CLAUDE" ]; then
-        # Check if caveman is already installed (skip network-dependent install)
-        if $CLAUDE plugin list 2>/dev/null | grep -q "caveman@caveman"; then
-          echo "Caveman plugin already installed"
-        else
-          echo "Caveman plugin not found, attempting install..."
-          # Add marketplace (requires git clone — may fail in sandboxed env)
-          if $CLAUDE plugin marketplace add JuliusBrussee/caveman --scope user 2>&1; then
-            $CLAUDE plugin install caveman@caveman --scope user 2>&1 || \
-              echo "WARN: caveman install failed — run manually: claude plugin install caveman@caveman --scope user"
+          if [ -x "$CLAUDE" ]; then
+            # Check if caveman is already installed (skip network-dependent install)
+            if $CLAUDE plugin list 2>/dev/null | grep -q "caveman@caveman"; then
+              echo "Caveman plugin already installed"
+            else
+              echo "Caveman plugin not found, attempting install..."
+              # Add marketplace (requires git clone — may fail in sandboxed env)
+              if $CLAUDE plugin marketplace add JuliusBrussee/caveman --scope user 2>&1; then
+                $CLAUDE plugin install caveman@caveman --scope user 2>&1 || \
+                  echo "WARN: caveman install failed — run manually: claude plugin install caveman@caveman --scope user"
+              else
+                echo "WARN: marketplace add failed (likely SSH/sandbox restriction)"
+                echo "  Run manually: claude plugin marketplace add JuliusBrussee/caveman --scope user"
+              fi
+            fi
           else
-            echo "WARN: marketplace add failed (likely SSH/sandbox restriction)"
-            echo "  Run manually: claude plugin marketplace add JuliusBrussee/caveman --scope user"
+            echo "WARN: claude CLI not found, skipping plugin install"
           fi
-        fi
-      else
-        echo "WARN: claude CLI not found, skipping plugin install"
-      fi
-    '';
+        '';
 
     # generateClaudeCodeConfig runs AFTER installPlugins — its jq merge
     # overwrites enabledPlugins with Nix SSOT, ensuring caveman stays enabled
