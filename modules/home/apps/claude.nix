@@ -405,9 +405,7 @@ let
 
   globalJustfileContent =
     let
-      padName =
-        name:
-        name + builtins.substring 0 (9 - builtins.stringLength name) "         ";
+      padName = name: name + builtins.substring 0 (9 - builtins.stringLength name) "         ";
 
       # fzf picker entries (one per account, with email if available)
       fzfEntries = map (
@@ -419,9 +417,7 @@ let
       ) accountDefs;
 
       # Help text lines
-      helpEntries = map (
-        acct: ''echo "  ${padName acct.name}${acct.description}"''
-      ) accountDefs;
+      helpEntries = map (acct: ''echo "  ${padName acct.name}${acct.description}"'') accountDefs;
 
       # Case branches for account dispatch
       mkCaseBranch =
@@ -438,26 +434,26 @@ let
         else if acct.provider == "zai" then
           [
             "${acct.name})"
-            ''  key=$(aws secretsmanager get-secret-value --secret-id "${acct.secretId}" --region us-east-1 --query SecretString --output text 2>/dev/null)''
-            ''  [[ -z "$key" ]] && { echo "ERROR: Secret ${acct.secretId} missing" >&2; exit 1; }''
-            ''  ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic" \''
-            ''  ANTHROPIC_AUTH_TOKEN="$key" \''
-            ''  ANTHROPIC_DEFAULT_OPUS_MODEL="glm-5.1" \''
-            ''  ANTHROPIC_DEFAULT_SONNET_MODEL="glm-5.1" \''
-            ''  ANTHROPIC_DEFAULT_HAIKU_MODEL="glm-4.5-air" \''
-            ''  CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \''
-            ''  claude "$@" ;;''
+            "  key=$(aws secretsmanager get-secret-value --secret-id \"${acct.secretId}\" --region us-east-1 --query SecretString --output text 2>/dev/null)"
+            "  [[ -z \"$key\" ]] && { echo \"ERROR: Secret ${acct.secretId} missing\" >&2; exit 1; }"
+            "  ANTHROPIC_BASE_URL=\"https://api.z.ai/api/anthropic\" \\"
+            "  ANTHROPIC_AUTH_TOKEN=\"$key\" \\"
+            "  ANTHROPIC_DEFAULT_OPUS_MODEL=\"glm-5.1\" \\"
+            "  ANTHROPIC_DEFAULT_SONNET_MODEL=\"glm-5.1\" \\"
+            "  ANTHROPIC_DEFAULT_HAIKU_MODEL=\"glm-4.5-air\" \\"
+            "  CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \\"
+            "  claude \"$@\" ;;"
           ]
         else if acct.provider == "openrouter" then
           [
             "${acct.name})"
-            ''  key=$(aws secretsmanager get-secret-value --secret-id "${acct.secretId}" --region us-east-1 --query SecretString --output text 2>/dev/null)''
-            ''  [[ -z "$key" ]] && { echo "ERROR: Secret ${acct.secretId} missing" >&2; exit 1; }''
-            ''  ANTHROPIC_BASE_URL="https://openrouter.ai/api" \''
-            ''  ANTHROPIC_AUTH_TOKEN="$key" \''
-            ''  ANTHROPIC_MODEL="openai/gpt-5" \''
-            ''  CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \''
-            ''  claude "$@" ;;''
+            "  key=$(aws secretsmanager get-secret-value --secret-id \"${acct.secretId}\" --region us-east-1 --query SecretString --output text 2>/dev/null)"
+            "  [[ -z \"$key\" ]] && { echo \"ERROR: Secret ${acct.secretId} missing\" >&2; exit 1; }"
+            "  ANTHROPIC_BASE_URL=\"https://openrouter.ai/api\" \\"
+            "  ANTHROPIC_AUTH_TOKEN=\"$key\" \\"
+            "  ANTHROPIC_MODEL=\"openai/gpt-5\" \\"
+            "  CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \\"
+            "  claude \"$@\" ;;"
           ]
         else
           [ ];
