@@ -171,13 +171,14 @@ type ClaudeSettings = {
     readonly command: string
     readonly padding?: number
   }
+  readonly enabledPlugins: Record<string, boolean>
 }
 
 // =============================================================================
 // Generator
 // =============================================================================
 
-const CLAUDE_MODEL = 'opus' as const
+const CLAUDE_MODEL = 'opusplan' as const
 
 const generateSettings = (): ClaudeSettings => ({
   $schema: 'https://json.schemastore.org/claude-code-settings.json',
@@ -194,6 +195,9 @@ const generateSettings = (): ClaudeSettings => ({
   statusLine: {
     type: 'command' as const,
     command: '~/.claude/statusline.sh',
+  },
+  enabledPlugins: {
+    'caveman@caveman': true,
   },
 })
 

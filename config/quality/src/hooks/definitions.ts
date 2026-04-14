@@ -95,6 +95,16 @@ export const HOOK_DEFINITIONS: HookDefinitions = {
         },
       ],
     },
+    {
+      hooks: [
+        {
+          type: 'command',
+          command:
+            'node ~/.claude/plugins/cache/caveman/caveman/*/hooks/caveman-activate.js 2>/dev/null || echo "OK"',
+          timeout: 5,
+        },
+      ],
+    },
   ],
 } as const
 
