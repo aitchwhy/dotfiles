@@ -64,6 +64,15 @@ let
       model = "opus";
     }
     {
+      name = "max-4";
+      configDir = ".claude-max-4";
+      provider = "anthropic";
+      description = "Max 20x — overflow 3";
+      email = ""; # TBD — set after account creation
+      authMethod = "claude.ai";
+      model = "opus";
+    }
+    {
       name = "glm";
       configDir = null;
       provider = "zai";

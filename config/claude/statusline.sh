@@ -36,6 +36,7 @@ elif [[ -n "${CLAUDE_CONFIG_DIR:-}" ]]; then
   case "${CLAUDE_CONFIG_DIR##*/}" in
     .claude-max-2) account="max-2" ;;
     .claude-max-3) account="max-3" ;;
+    .claude-max-4) account="max-4" ;;
     *) account="max-1" ;;
   esac
 else
