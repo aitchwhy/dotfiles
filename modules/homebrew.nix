@@ -162,6 +162,7 @@
       # System Utilities
       # ─────────────────────────────────────────────────────────────
       "betterdisplay" # Display management: HiDPI, DDC brightness, resolution scaling
+      "carbon-copy-cloner" # Hard disk backup and cloning utility
       "swish" # Trackpad gestures and window management
 
       # ─────────────────────────────────────────────────────────────
