@@ -103,8 +103,6 @@ in
       ccd = "claude --dangerously-skip-permissions";
       ccr = "claude --resume";
       ccc = "claude --continue";
-      ccplan = "claude --model claude-opus-4-5-20251101";
-      ccfast = "claude --model claude-sonnet-4-5-20250929";
       ccnew = "claude --new";
       ccv = "claude --verbose";
 
