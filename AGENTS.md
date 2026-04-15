@@ -57,12 +57,17 @@ flake.nix                    # Entry point
 | Voice | LiveKit 2.16, @livekit/agents |
 | Infra | Pulumi 3.217, AWS ECS, CloudFront |
 
+## Codex Cross-Reference
+
+This is the Codex-compatible instruction file. See `CLAUDE.md` for the full Claude Code configuration including hooks, skills, agents, and MCP servers.
+
 ## Key Files
 
 - `modules/home/apps/claude.nix` - Claude SSOT (MCP, plugins, marketplaces)
 - `config/quality/src/stack/versions.ts` - Version SSOT
 - `config/quality/docs/ARCHITECTURE.md` - Guards architecture
 - `config/quality/docs/adr/` - Architecture Decision Records
+- `config/quality/docs/drift-governance.md` - AGENTS.md drift governance process
 
 ## Quality (Manual in Codex Sessions)
 

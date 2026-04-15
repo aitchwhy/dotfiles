@@ -68,15 +68,22 @@ codex mcp remove ref
 
 ## AGENTS.md
 
-Codex reads `AGENTS.md` at the repo root (analogous to `CLAUDE.md`). The dotfiles repo includes an `AGENTS.md` that mirrors critical rules from `CLAUDE.md`:
+Codex reads `AGENTS.md` at the repo root (analogous to `CLAUDE.md`). Both managed repos have an `AGENTS.md`:
 
+| Repo | File | Status |
+|------|------|--------|
+| `~/dotfiles` | `AGENTS.md` | Mirrors critical rules from CLAUDE.md |
+| `~/src/told` | `AGENTS.md` | Codex-compatible subset of told's CLAUDE.md |
+
+Each AGENTS.md includes:
 - Architecture overview and directory structure
-- Runtime conventions (bun vs pnpm)
-- Core rules (Nix-managed config, quality enforcement)
-- Stack versions
-- Key files
+- Stack versions and key files
+- Code rules (absolute rules, imports, git workflow)
+- Manual quality verification commands
 
-**Not included** (Claude Code specific): hooks, skills/commands, plugins, MCP JSON config.
+**Not included** (Claude Code specific): hooks, skills/commands, agents, domain rules, plugins, MCP JSON config.
+
+**Drift governance:** See `config/quality/docs/drift-governance.md` for the sync process and trigger checklist. Run `config/quality/scripts/check-agents-drift.sh` to detect structural drift.
 
 Discovery chain: `~/.codex/AGENTS.override.md` > `~/.codex/AGENTS.md` > project root walk. 32 KiB limit.
 
