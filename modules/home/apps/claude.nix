@@ -426,9 +426,9 @@ let
           [
             (
               if acct.configDir != null then
-                ''${acct.name}) CLAUDE_CONFIG_DIR="$HOME/${acct.configDir}" claude "$@" ;;''
+                ''${acct.name}) AI_ACCOUNT="${acct.name}" CLAUDE_CONFIG_DIR="$HOME/${acct.configDir}" claude "$@" ;;''
               else
-                ''${acct.name}) unset CLAUDE_CONFIG_DIR; claude "$@" ;;''
+                ''${acct.name}) unset CLAUDE_CONFIG_DIR; AI_ACCOUNT="${acct.name}" claude "$@" ;;''
             )
           ]
         else if acct.provider == "zai" then
@@ -442,6 +442,7 @@ let
             "  ANTHROPIC_DEFAULT_SONNET_MODEL=\"glm-5.1\" \\"
             "  ANTHROPIC_DEFAULT_HAIKU_MODEL=\"glm-4.5-air\" \\"
             "  CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \\"
+            "  AI_ACCOUNT=\"${acct.name}\" \\"
             "  claude \"$@\" ;;"
           ]
         else if acct.provider == "openrouter" then
@@ -451,8 +452,9 @@ let
             "  [[ -z \"$key\" ]] && { echo \"ERROR: Secret ${acct.secretId} missing\" >&2; exit 1; }"
             "  ANTHROPIC_BASE_URL=\"https://openrouter.ai/api\" \\"
             "  ANTHROPIC_AUTH_TOKEN=\"$key\" \\"
-            "  ANTHROPIC_MODEL=\"openai/${acct.model}\" \\
+            "  ANTHROPIC_MODEL=\"openai/${acct.model}\" \\"
             "  CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \\"
+            "  AI_ACCOUNT=\"${acct.name}\" \\"
             "  claude \"$@\" ;;"
           ]
         else

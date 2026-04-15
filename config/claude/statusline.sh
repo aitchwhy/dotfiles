@@ -26,8 +26,9 @@ IFS=$'\t' read -r model_id cost duration_ms lines_added lines_removed cwd contex
 # ═══════════════════════════════════════════════════
 # 2. Account identity (from env vars, no subprocess)
 # ═══════════════════════════════════════════════════
-account="max-1"
-if [[ "${ANTHROPIC_BASE_URL:-}" == *"z.ai"* ]]; then
+if [[ -n "${AI_ACCOUNT:-}" ]]; then
+  account="$AI_ACCOUNT"
+elif [[ "${ANTHROPIC_BASE_URL:-}" == *"z.ai"* ]]; then
   account="glm"
 elif [[ "${ANTHROPIC_BASE_URL:-}" == *"openrouter"* ]]; then
   account="openai"
@@ -35,7 +36,10 @@ elif [[ -n "${CLAUDE_CONFIG_DIR:-}" ]]; then
   case "${CLAUDE_CONFIG_DIR##*/}" in
     .claude-max-2) account="max-2" ;;
     .claude-max-3) account="max-3" ;;
+    *) account="max-1" ;;
   esac
+else
+  account="max-1"
 fi
 
 # ═══════════════════════════════════════════════════
