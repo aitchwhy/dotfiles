@@ -19,7 +19,10 @@ in
     xdg.configFile = {
       "lazydocker".source = ../../../config/lazydocker;
       "httpie".source = ../../../config/httpie;
-      "just".source = ../../../config/just;
+      "just" = {
+        source = ../../../config/just;
+        recursive = true;
+      };
       "glow".source = ../../../config/glow;
       "repomix".source = ../../../config/repomix;
       "tree-sitter".source = ../../../config/tree-sitter;

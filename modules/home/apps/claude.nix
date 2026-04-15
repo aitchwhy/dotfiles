@@ -596,7 +596,7 @@ in
         };
 
         # Global justfile for cc multi-account launcher (just -g cc)
-        home.file.".config/just/justfile".text = globalJustfileContent;
+        xdg.configFile."just/justfile".text = globalJustfileContent;
 
         # ═══════════════════════════════════════════════════════════════════════════
         # MCP Config Generation (Activation-time for HTTP server API key injection)
