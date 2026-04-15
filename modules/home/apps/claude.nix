@@ -451,7 +451,7 @@ let
             "  [[ -z \"$key\" ]] && { echo \"ERROR: Secret ${acct.secretId} missing\" >&2; exit 1; }"
             "  ANTHROPIC_BASE_URL=\"https://openrouter.ai/api\" \\"
             "  ANTHROPIC_AUTH_TOKEN=\"$key\" \\"
-            "  ANTHROPIC_MODEL=\"openai/gpt-5.3-codex\" \\"
+            "  ANTHROPIC_MODEL=\"openai/${acct.model}\" \\
             "  CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \\"
             "  claude \"$@\" ;;"
           ]
