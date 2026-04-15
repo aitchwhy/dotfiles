@@ -109,6 +109,10 @@ See [ADR-009](config/quality/docs/adr/009-network-api-toolkit.md) for full detai
 
 - **Told guard gap**: When working in ~/src/told, Told's PreToolUse replaces dotfiles' PreToolUse via deep merge with array replacement. Guards 3 (forbidden files), 32 (secrets detection), 33 (hook bypass prevention) do NOT run in Told. Tracked in Linear.
 
+## Codex Cross-Reference
+
+`AGENTS.md` at repo root is the Codex-compatible instruction file — a subset of this file excluding hooks, skills, agents, and MCP config. See `config/quality/docs/drift-governance.md` for the sync process.
+
 ## Key Files
 
 - `modules/home/apps/claude.nix` - Claude SSOT (MCP, plugins, marketplaces)
