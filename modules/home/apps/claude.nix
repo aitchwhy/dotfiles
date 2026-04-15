@@ -50,7 +50,7 @@ let
       configDir = ".claude-max-2";
       provider = "anthropic";
       description = "Max 20x — overflow 1";
-      email = null;
+      email = "hank@told.one";
       authMethod = "claude.ai";
       model = "opus";
     }
@@ -59,7 +59,7 @@ let
       configDir = ".claude-max-3";
       provider = "anthropic";
       description = "Max 20x — overflow 2";
-      email = null;
+      email = "eng@told.one";
       authMethod = "claude.ai";
       model = "opus";
     }
@@ -77,11 +77,11 @@ let
       name = "openai";
       configDir = null;
       provider = "openrouter";
-      description = "GPT-5 via OpenRouter";
+      description = "GPT-5.3-Codex via OpenRouter";
       secretId = "told/vendor/openrouter/api-key";
       email = null;
       authMethod = "api-key";
-      model = "gpt-5";
+      model = "gpt-5.3-codex";
     }
   ];
 
@@ -428,7 +428,7 @@ let
               if acct.configDir != null then
                 ''${acct.name}) CLAUDE_CONFIG_DIR="$HOME/${acct.configDir}" claude "$@" ;;''
               else
-                ''${acct.name}) claude "$@" ;;''
+                ''${acct.name}) unset CLAUDE_CONFIG_DIR; claude "$@" ;;''
             )
           ]
         else if acct.provider == "zai" then
@@ -451,7 +451,7 @@ let
             "  [[ -z \"$key\" ]] && { echo \"ERROR: Secret ${acct.secretId} missing\" >&2; exit 1; }"
             "  ANTHROPIC_BASE_URL=\"https://openrouter.ai/api\" \\"
             "  ANTHROPIC_AUTH_TOKEN=\"$key\" \\"
-            "  ANTHROPIC_MODEL=\"openai/gpt-5\" \\"
+            "  ANTHROPIC_MODEL=\"openai/gpt-5.3-codex\" \\"
             "  CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \\"
             "  claude \"$@\" ;;"
           ]
@@ -463,25 +463,29 @@ let
       # Status check entries (reused in both status case and cc-status recipe)
       mkStatusEntry =
         acct:
+        let
+          emailSuffix = if acct.email != null then " (${acct.email})" else "";
+          header = ''echo "=== ${acct.name}${emailSuffix} ==="'';
+        in
         if acct.provider == "anthropic" then
           (
             if acct.configDir == null then
               [
-                ''echo "=== ${acct.name} (primary) ==="''
-                "claude auth status 2>&1 | head -3"
+                header
+                "unset CLAUDE_CONFIG_DIR; claude auth status 2>&1 | jq ."
                 ''echo ""''
               ]
             else
               [
-                ''echo "=== ${acct.name} ==="''
-                ''CLAUDE_CONFIG_DIR="$HOME/${acct.configDir}" claude auth status 2>&1 | head -3''
+                header
+                ''CLAUDE_CONFIG_DIR="$HOME/${acct.configDir}" claude auth status 2>&1 | jq .''
                 ''echo ""''
               ]
           )
         else
           [
-            ''echo "=== ${acct.name} ==="''
-            ''aws secretsmanager get-secret-value --secret-id "${acct.secretId}" --region us-east-1 --query SecretString --output text >/dev/null 2>&1 && echo "Key: OK" || echo "Key: MISSING"''
+            header
+            ''printf '{"provider": "${acct.provider}", "model": "${acct.model}", "authMethod": "${acct.authMethod}", "key": %s}\n' "$(aws secretsmanager get-secret-value --secret-id "${acct.secretId}" --region us-east-1 --query SecretString --output text >/dev/null 2>&1 && echo true || echo false)" | jq .''
             ''echo ""''
           ];
 
