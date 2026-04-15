@@ -80,6 +80,7 @@ in
 
       # Just task runner
       j = "just";
+      jg = "just -g";
 
       # System utilities
       ports = "lsof -i -P -n | grep LISTEN";
