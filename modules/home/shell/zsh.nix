@@ -25,7 +25,6 @@ in
         nhb = "nh darwin build";
         nhc = "nh clean all --keep 5 --keep-since 7d";
         nhu = "nix flake update && nh darwin switch";
-        cc = "just -g cc";
       };
 
       initContent = ''

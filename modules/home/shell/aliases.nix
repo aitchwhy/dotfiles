@@ -81,6 +81,7 @@ in
       # Just task runner
       j = "just";
       jg = "just -g";
+      cc = "just -g cc";
 
       # System utilities
       ports = "lsof -i -P -n | grep LISTEN";
