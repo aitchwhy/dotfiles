@@ -130,7 +130,7 @@ main_repo="$HOME/src/told-vault"
    ```
 7. Remove parent worktree directory if empty:
    ```bash
-   rmdir "$HOME/told-vault-worktrees" 2>/dev/null || true
+   rmdir "$HOME/told-worktrees" 2>/dev/null || true
    ```
 
 ### If on main repo (not a worktree):
