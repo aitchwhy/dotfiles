@@ -128,9 +128,9 @@ main_repo="$HOME/src/told-vault"
    ```bash
    git worktree prune
    ```
-7. Remove parent worktree directory if empty:
+7. Remove parent worktree directory if empty (derive from the worktree path — `~/{repo}-worktrees`):
    ```bash
-   rmdir "$HOME/told-worktrees" 2>/dev/null || true
+   rmdir "$(dirname "<worktree_dir>")" 2>/dev/null || true
    ```
 
 ### If on main repo (not a worktree):
