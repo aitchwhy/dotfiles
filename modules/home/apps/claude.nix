@@ -12,7 +12,7 @@
 # - 1 MCP server (ref) — Linear via /linear skill (GraphQL API)
 # - 1 plugin (caveman) — terse output, token savings
 # - 1 extra marketplace (JuliusBrussee/caveman)
-# - 1 DXT extension (Filesystem) - 5 focused allowed directories
+# - 1 DXT extension (Filesystem) - 11 allowed directories
 {
   config,
   lib,
@@ -213,6 +213,7 @@ let
     "$HOME/src/told-vault" # Told vault
     "$HOME/src/haute" # Haute project
     "$HOME/src/korea-real-estate-analytics" # Korea RE analytics
+    "$HOME/told-worktrees" # Told ticket worktrees (parent — covers all current + future)
   ];
 
   filesystemExtensionConfig = builtins.toJSON {
@@ -652,13 +653,14 @@ in
                 "${config.home.homeDirectory}/src/energy",
                 "${config.home.homeDirectory}/src/told-vault",
                 "${config.home.homeDirectory}/src/haute",
-                "${config.home.homeDirectory}/src/korea-real-estate-analytics"
+                "${config.home.homeDirectory}/src/korea-real-estate-analytics",
+                "${config.home.homeDirectory}/told-worktrees"
               ]
             }
           }
           EOF
 
-          echo "Filesystem extension config generated (10 allowed directories from SSOT)"
+          echo "Filesystem extension config generated (11 allowed directories from SSOT)"
         '';
 
         # Generate Claude Code CLI config (~/.claude.json)
