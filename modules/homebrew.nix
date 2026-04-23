@@ -98,6 +98,7 @@
       # Development
       # ─────────────────────────────────────────────────────────────
       "cursor" # AI-first code editor - keep for development
+      "epic-games" # Epic Games Launcher — Unreal Engine 5.7 + MetaHuman
       "kaleidoscope" # Diff/merge tool
       "ngrok" # Expose local servers
       "orbstack" # Container runtime (Docker/Lima replacement)
