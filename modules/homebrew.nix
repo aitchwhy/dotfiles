@@ -106,7 +106,9 @@
       # ─────────────────────────────────────────────────────────────
       # AI & LLM
       # ─────────────────────────────────────────────────────────────
+      "chatgpt" # ChatGPT desktop (OpenAI official)
       "claude" # Claude Desktop - actively using
+      "codex-app" # Codex desktop app — manages OpenAI cloud coding agents
       "granola" # AI-powered notepad for meetings
 
       # ─────────────────────────────────────────────────────────────
