@@ -1,0 +1,103 @@
+# vulnix whitelist — entries here suppress false-positive CVE matches.
+#
+# Auto-generated patterns cover three classes of NVD name collisions:
+#   1. Bootstrap toolchains (build-time only, never on runtime PATH)
+#   2. Haskell/Cabal ecosystem packages (e.g., curl@0.4.49 is the Haskell
+#      curl binding, not the C curl CLI)
+#   3. VS Code extension CVEs that NVD ascribes to the upstream tool name
+#      (e.g., CVE-2021-28794 affects the unofficial ShellCheck VS Code
+#      extension, not the ShellCheck Haskell CLI)
+#
+# Add new entries below when audit triage surfaces additional false matches.
+# Format reference: https://github.com/flyingcircusio/vulnix#whitelist
+
+[[whitelist]]
+name    = "Diff"
+version = "1.0.2"
+cve     = ["CVE-2024-13278"]
+comment = "Haskell/Cabal ecosystem package; not the C/system equivalent NVD references"
+
+[[whitelist]]
+name    = "ShellCheck"
+version = "0.11.0"
+cve     = ["CVE-2021-28794"]
+comment = "NVD attributes VS Code extension CVE to upstream tool name"
+
+[[whitelist]]
+name    = "async"
+version = "2.2.6"
+cve     = ["CVE-2021-43138"]
+comment = "Haskell/Cabal ecosystem package; not the C/system equivalent NVD references"
+
+[[whitelist]]
+name    = "commonmark"
+version = "0.2.6.1"
+cve     = ["CVE-2026-30838"]
+comment = "Haskell/Cabal ecosystem package; not the C/system equivalent NVD references"
+
+[[whitelist]]
+name    = "crossbeam"
+version = "0.8.4"
+cve     = ["CVE-2022-23639"]
+comment = "Haskell/Cabal ecosystem package; not the C/system equivalent NVD references"
+
+[[whitelist]]
+name    = "curl"
+version = "0.4.49"
+cve     = ["CVE-2022-27776","CVE-2022-27781","CVE-2022-27782","CVE-2022-32206","CVE-2022-32221","CVE-2022-35252","CVE-2022-43552","CVE-2023-28319","CVE-2023-28320","CVE-2023-28321","CVE-2023-28322"]
+comment = "Haskell/Cabal ecosystem package; not the C/system equivalent NVD references"
+
+[[whitelist]]
+name    = "dash"
+version = "0.5.13.1"
+cve     = ["CVE-2024-21485"]
+comment = "Haskell/Cabal ecosystem package; not the C/system equivalent NVD references"
+
+[[whitelist]]
+name    = "filelock"
+version = "0.1.1.8"
+cve     = ["CVE-2025-68146","CVE-2026-22701"]
+comment = "Haskell/Cabal ecosystem package; not the C/system equivalent NVD references"
+
+[[whitelist]]
+name    = "go"
+version = "1.22.12-darwin-arm64-bootstrap"
+cve     = ["CVE-2023-49292","CVE-2025-0913","CVE-2025-22873","CVE-2025-4674","CVE-2025-47906","CVE-2025-47907","CVE-2025-47912","CVE-2025-58185","CVE-2025-58187","CVE-2025-58188","CVE-2025-58189","CVE-2025-61723","CVE-2025-61724","CVE-2025-61726","CVE-2025-61727","CVE-2025-61728","CVE-2025-61729","CVE-2025-61730","CVE-2025-61731","CVE-2025-61732","CVE-2025-68119","CVE-2025-68121","CVE-2026-25679","CVE-2026-27139","CVE-2026-27140","CVE-2026-27142","CVE-2026-27143","CVE-2026-27144","CVE-2026-32280","CVE-2026-32281","CVE-2026-32282","CVE-2026-32283","CVE-2026-32288","CVE-2026-32289"]
+comment = "Bootstrap toolchain — build-time only, not on runtime PATH"
+
+[[whitelist]]
+name    = "go"
+version = "1.24.13-darwin-arm64-bootstrap"
+cve     = ["CVE-2023-49292","CVE-2026-25679","CVE-2026-27139","CVE-2026-27140","CVE-2026-27142","CVE-2026-27143","CVE-2026-27144","CVE-2026-32280","CVE-2026-32281","CVE-2026-32282","CVE-2026-32283","CVE-2026-32288","CVE-2026-32289"]
+comment = "Bootstrap toolchain — build-time only, not on runtime PATH"
+
+[[whitelist]]
+name    = "hedgehog"
+version = "1.5"
+cve     = ["CVE-2021-4276"]
+comment = "Haskell/Cabal ecosystem package; not the C/system equivalent NVD references"
+
+[[whitelist]]
+name    = "hedgehog"
+version = "1.5-r2.cabal"
+cve     = ["CVE-2021-4276"]
+comment = "Haskell/Cabal ecosystem package; not the C/system equivalent NVD references"
+
+[[whitelist]]
+name    = "network"
+version = "3.2.8.0"
+cve     = ["CVE-2021-35047","CVE-2021-35048","CVE-2021-35049","CVE-2021-35050","CVE-2022-0486","CVE-2022-0997","CVE-2022-24388","CVE-2022-24389","CVE-2022-24390","CVE-2022-24391","CVE-2022-24392","CVE-2022-24393","CVE-2022-24394"]
+comment = "Haskell/Cabal ecosystem package; not the C/system equivalent NVD references"
+
+[[whitelist]]
+name    = "python"
+version = "2.7.18.12"
+cve     = ["CVE-2021-23336","CVE-2021-3733","CVE-2022-0391","CVE-2022-26488","CVE-2022-45061","CVE-2022-48560","CVE-2022-48564","CVE-2022-48565","CVE-2022-48566","CVE-2023-24329","CVE-2023-36632","CVE-2023-40217","CVE-2024-49050","CVE-2024-6232","CVE-2024-7592","CVE-2024-9287","CVE-2025-12084","CVE-2025-12781","CVE-2025-13836","CVE-2025-13837","CVE-2025-49714","CVE-2025-6075","CVE-2026-4519"]
+comment = "Haskell/Cabal ecosystem package; not the C/system equivalent NVD references"
+
+[[whitelist]]
+name    = "zlib"
+version = "0.7.1.1"
+cve     = ["CVE-2022-37434","CVE-2023-45853","CVE-2023-6992","CVE-2026-22184"]
+comment = "Haskell/Cabal ecosystem package; not the C/system equivalent NVD references"
+

@@ -1,0 +1,45 @@
+# osv-scanner ignore config — applied via `--config` to suppress advisories
+# that we have triaged and accepted (with an expiry date so they re-surface).
+#
+# Format reference: https://google.github.io/osv-scanner/configuration/
+#
+# When you ignore something, write *why* in `reason` and pick a future
+# `ignoreUntil` so this list does not silently grow stale. When the date
+# passes, the audit will surface the entry again and you re-evaluate.
+
+# eas-cli@18.8.1 (latest as of 2026-04-25) bundles vulnerable tar@7.5.7 and
+# minimatch@5.1.2 as direct dependencies. There is no upstream eas-cli fix
+# yet. eas-cli is a developer build-time tool that does not process
+# attacker-controlled archives in our usage, so the practical exploitability
+# is low. Re-evaluate once Expo ships an eas-cli that depends on
+# tar@>=7.5.13 and minimatch@>=10.x.
+
+[[IgnoredVulns]]
+id = "GHSA-83g3-92jg-28cx" # CVE-2026-26960 — tar
+ignoreUntil = "2026-07-31T00:00:00Z"
+reason = "tar@7.5.7 bundled by eas-cli@18.8.1; eas-cli is build-time only. Re-check when Expo bumps the dep."
+
+[[IgnoredVulns]]
+id = "GHSA-qffp-2rhf-9h96" # CVE-2026-29786 — tar
+ignoreUntil = "2026-07-31T00:00:00Z"
+reason = "tar@7.5.7 bundled by eas-cli@18.8.1; eas-cli is build-time only."
+
+[[IgnoredVulns]]
+id = "GHSA-9ppj-qmqm-q256" # CVE-2026-31802 — tar
+ignoreUntil = "2026-07-31T00:00:00Z"
+reason = "tar@7.5.7 bundled by eas-cli@18.8.1; eas-cli is build-time only."
+
+[[IgnoredVulns]]
+id = "GHSA-7r86-cg39-jmmj" # CVE-2026-27903 — minimatch ReDoS
+ignoreUntil = "2026-07-31T00:00:00Z"
+reason = "minimatch@5.1.2 bundled by eas-cli@18.8.1; eas-cli is build-time only."
+
+[[IgnoredVulns]]
+id = "GHSA-23c5-xmqv-rm74" # CVE-2026-27904 — minimatch ReDoS
+ignoreUntil = "2026-07-31T00:00:00Z"
+reason = "minimatch@5.1.2 bundled by eas-cli@18.8.1; eas-cli is build-time only."
+
+[[IgnoredVulns]]
+id = "GHSA-3ppc-4f35-3m26" # CVE-2026-26996 — minimatch
+ignoreUntil = "2026-07-31T00:00:00Z"
+reason = "minimatch@5.1.2 bundled by eas-cli@18.8.1; eas-cli is build-time only."

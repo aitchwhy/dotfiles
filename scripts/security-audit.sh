@@ -70,39 +70,47 @@ VULNIX_OUT="$(mktemp -t vulnix.XXXXXX)"
 trap 'rm -f "$TALLY" "$VULNIX_OUT"' EXIT
 
 if command -v vulnix >/dev/null 2>&1; then
-  # Default profile contains the active system + user packages
-  if vulnix --system --json > "$VULNIX_OUT" 2>/dev/null; then
-    :
+  # Vulnix exits 0 when no CVEs, 2 when CVEs are found, 1 on error.
+  # JSON output is on stdout regardless.
+  WHITELIST_FLAG=()
+  if [ -f "$HOME/dotfiles/config/security/vulnix-whitelist.toml" ]; then
+    WHITELIST_FLAG=(-w "$HOME/dotfiles/config/security/vulnix-whitelist.toml")
   fi
 
-  # Parse JSON output: each entry has "affected_by" CVE list with severity
-  if [ -s "$VULNIX_OUT" ]; then
-    # Use jq to bucket by severity. vulnix doesn't always carry severity in
-    # its JSON; treat any reported CVE as at-least-medium and rely on the NVD
-    # CVSS score field if present.
+  vulnix --system --json "${WHITELIST_FLAG[@]}" > "$VULNIX_OUT" 2>/dev/null
+  VULNIX_EXIT=$?
+
+  # vulnix JSON shape: array of {name, pname, version, affected_by: [CVE...],
+  # whitelisted: [CVE...], cvssv3_basescore: {CVE: score}, description: {CVE: str}}
+  if [ -s "$VULNIX_OUT" ] && jq -e 'length > 0' "$VULNIX_OUT" >/dev/null 2>&1; then
     SUMMARY="$(jq -r '
       def sev(c):
         if c >= 9.0 then "CRITICAL"
         elif c >= 7.0 then "HIGH"
         elif c >= 4.0 then "MEDIUM"
         else "LOW" end;
-      .[] | . as $pkg
-        | (.affected_by // [])[]
-        | "\(sev(.cvssv3 // .cvssv2 // 5.0))\t\($pkg.name // "?")@\($pkg.version // "?")\t\(.cve // "?")"
+      .[]
+      | . as $pkg
+      | (.affected_by // [])[] as $cve
+      | select(($pkg.whitelisted // []) | index($cve) | not)
+      | ($pkg.cvssv3_basescore[$cve] // 5.0) as $score
+      | "\(sev($score))\t\($score)\t\($pkg.pname // $pkg.name)@\($pkg.version)\t\($cve)"
     ' "$VULNIX_OUT" 2>/dev/null | sort -u)"
 
     if [ -z "$SUMMARY" ]; then
-      emit "✅ No CVEs reported by vulnix."
+      emit "✅ No CVEs (after whitelist) reported by vulnix."
     else
-      emit '```'
-      echo "$SUMMARY" >> "$REPORT"
-      emit '```'
-      while IFS=$'\t' read -r sev pkgver cve; do
+      emit "| Severity | CVSS | Package | CVE |"
+      emit "|---|---|---|---|"
+      while IFS=$'\t' read -r sev score pkgver cve; do
+        emit "| $sev | $score | $pkgver | $cve |"
         bump "$sev"
       done <<< "$SUMMARY"
     fi
+  elif [ "$VULNIX_EXIT" -eq 0 ]; then
+    emit "✅ vulnix: no CVEs."
   else
-    emit "ℹ️  vulnix produced no JSON output (possibly no CVEs, possibly NVD fetch failure)."
+    emit "ℹ️  vulnix exited $VULNIX_EXIT with no parseable JSON (possibly NVD fetch failure on first run)."
   fi
 else
   emit "⚠️  \`vulnix\` not on PATH — install via Nix (\`pkgs.vulnix\`)."
@@ -123,39 +131,46 @@ if [ "$FAST" = 0 ]; then
     [ -d "$HOME/src/told" ] && SCAN_TARGETS+=("$HOME/src/told")
     SCAN_TARGETS+=("$HOME/dotfiles")
 
+    OSV_CONFIG_FLAG=()
+    if [ -f "$HOME/dotfiles/config/security/osv-scanner.toml" ]; then
+      OSV_CONFIG_FLAG=(--config "$HOME/dotfiles/config/security/osv-scanner.toml")
+    fi
+
     for target in "${SCAN_TARGETS[@]}"; do
       emit "### ${target/$HOME/~}"
-      if osv-scanner --format json --recursive "$target" > "$OSV_OUT" 2>/dev/null; then
-        :
-      fi
+      # osv-scanner v2: `scan source [path]`. Exits 1 when vulns found, 0 clean.
+      osv-scanner scan source --format json "${OSV_CONFIG_FLAG[@]}" "$target" > "$OSV_OUT" 2>/dev/null
+      OSV_EXIT=$?
 
-      if [ -s "$OSV_OUT" ]; then
+      if [ -s "$OSV_OUT" ] && jq -e '.results | length > 0' "$OSV_OUT" >/dev/null 2>&1; then
+        # Use groups[].max_severity (CVSS score) for accurate bucketing.
         FINDINGS="$(jq -r '
-          .results[]?.packages[]? as $p
-          | $p.vulnerabilities[]?
-          | (
-              ($p.package.name // "?") + "@" + ($p.package.version // "?") + " " +
-              (.id // "?") + " " +
-              ((.database_specific.severity // "UNKNOWN") | ascii_upcase)
-            )
+          def sev(c):
+            if c >= 9.0 then "CRITICAL"
+            elif c >= 7.0 then "HIGH"
+            elif c >= 4.0 then "MEDIUM"
+            else "LOW" end;
+          .results[]?.packages[]?
+          | . as $p
+          | (.groups // [])[]
+          | (.max_severity // "0" | tonumber? // 0) as $score
+          | "\(sev($score))\t\($score)\t\($p.package.name)@\($p.package.version)\t\(.aliases | join(","))"
         ' "$OSV_OUT" 2>/dev/null | sort -u)"
 
         if [ -z "$FINDINGS" ]; then
           emit "✅ No vulnerabilities."
         else
-          emit '```'
-          echo "$FINDINGS" >> "$REPORT"
-          emit '```'
-          while read -r line; do
-            sev="$(echo "$line" | awk '{print $NF}')"
-            case "$sev" in
-              CRITICAL|HIGH|MEDIUM|LOW) bump "$sev" ;;
-              *) bump "MEDIUM" ;;
-            esac
+          emit "| Severity | CVSS | Package | Aliases |"
+          emit "|---|---|---|---|"
+          while IFS=$'\t' read -r sev score pkgver aliases; do
+            emit "| $sev | $score | $pkgver | $aliases |"
+            bump "$sev"
           done <<< "$FINDINGS"
         fi
+      elif [ "$OSV_EXIT" -eq 0 ]; then
+        emit "✅ No vulnerabilities."
       else
-        emit "ℹ️  osv-scanner returned no JSON for this target."
+        emit "ℹ️  osv-scanner exited $OSV_EXIT with no parseable findings."
       fi
     done
 
