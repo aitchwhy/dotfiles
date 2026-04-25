@@ -27,7 +27,7 @@ default:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 # Rebuild and switch local system configuration
-switch: _preflight _completions _check
+switch: _preflight _completions _check _audit
     #!/usr/bin/env bash
     set -euo pipefail
     echo "Switching configuration..."
@@ -52,8 +52,17 @@ deploy: switch
     @echo "✓ Full deployment complete"
 
 # Validate configuration without applying
-check: _preflight _check
+check: _preflight _check _audit-fast
     @echo "✓ All checks passed"
+
+# Full vulnerability audit (vulnix + osv-scanner + Homebrew freshness)
+# Fails on Critical or High severity. Report under audit-reports/.
+audit:
+    @./scripts/security-audit.sh
+
+# Run audit in warn-only mode (for advisory contexts; never fails)
+audit-no-gate:
+    @./scripts/security-audit.sh --no-gate
 
 # Rollback to previous generation
 rollback:
@@ -67,9 +76,12 @@ rollback:
 dev:
     nix develop -c $SHELL
 
-# Update flake inputs
+# Update flake inputs (followed by audit so new inputs are checked for CVEs)
 update:
     nix flake update
+    @echo ""
+    @echo "Running post-update security audit..."
+    @./scripts/security-audit.sh
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # GITHUB ACTIONS (Local)
@@ -224,6 +236,16 @@ _completions:
 _check:
     @nix fmt -- --fail-on-change .
     @nix flake check --no-build
+
+# Full audit (vulnix + osv-scanner). Fails on Critical/High. Used by `just switch`.
+[private]
+_audit:
+    @./scripts/security-audit.sh
+
+# Fast audit (vulnix only, skips lockfile scan). Used by `just check` for tighter inner loop.
+[private]
+_audit-fast:
+    @./scripts/security-audit.sh --fast
 
 [private]
 _gc:

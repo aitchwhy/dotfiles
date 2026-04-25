@@ -49,6 +49,11 @@ in
         markdownlint-cli # Markdown linter (moved from Homebrew to eliminate transitive node dep)
         ralph-claude-code # Autonomous AI development loop
         agent-browser # AI browser automation CLI (run `agent-browser install` on first use)
+      ]
+      # Security audit tooling (used by `just audit` and `just switch`)
+      ++ [
+        vulnix # NVD-backed CVE scanner over the Nix system closure
+        osv-scanner # Google's vulnerability scanner for npm/pnpm/cargo/pip lockfiles
       ];
 
     # Declarative uv setup - installs Python and tools after uv is available
