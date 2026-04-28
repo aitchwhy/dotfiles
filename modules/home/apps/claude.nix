@@ -740,33 +740,49 @@ in
             ''
               CLAUDE="/etc/profiles/per-user/${config.home.username}/bin/claude"
 
-              if [ -x "$CLAUDE" ]; then
-                # Check if caveman is already installed (skip network-dependent install)
-                if $CLAUDE plugin list 2>/dev/null | grep -q "caveman@caveman"; then
-                  echo "Caveman plugin already installed"
-                else
-                  echo "Caveman plugin not found, attempting install..."
-                  # Add marketplace (requires git clone — may fail in sandboxed env)
-                  if $CLAUDE plugin marketplace add JuliusBrussee/caveman --scope user 2>&1; then
-                    $CLAUDE plugin install caveman@caveman --scope user 2>&1 || \
-                      echo "WARN: caveman install failed — run manually: claude plugin install caveman@caveman --scope user"
-                  else
-                    echo "WARN: marketplace add failed (likely SSH/sandbox restriction)"
-                    echo "  Run manually: claude plugin marketplace add JuliusBrussee/caveman --scope user"
+              # Retry helper for transient git clone failures (ERR_STREAM_PREMATURE_CLOSE).
+              # Args: max_attempts, then command + args. Sleeps 2s, 4s between retries.
+              retry_cmd() {
+                local max="$1"; shift
+                local attempt=1
+                while [ "$attempt" -le "$max" ]; do
+                  if "$@"; then return 0; fi
+                  if [ "$attempt" -lt "$max" ]; then
+                    echo "  attempt $attempt/$max failed, retrying in $((attempt * 2))s..."
+                    sleep $((attempt * 2))
                   fi
-                fi
-
-                # Install caveman in alternate config dirs (from accountDefs SSOT)
-                for config_dir in ${alternateConfigDirPaths}; do
-                  if CLAUDE_CONFIG_DIR="$config_dir" $CLAUDE plugin list 2>/dev/null | grep -q "caveman@caveman"; then
-                    echo "Caveman already installed in $config_dir"
-                  else
-                    echo "Installing caveman in $config_dir..."
-                    CLAUDE_CONFIG_DIR="$config_dir" $CLAUDE plugin marketplace add JuliusBrussee/caveman --scope user 2>&1 || true
-                    CLAUDE_CONFIG_DIR="$config_dir" $CLAUDE plugin install caveman@caveman --scope user 2>&1 || \
-                      echo "WARN: caveman install failed in $config_dir"
-                  fi
+                  attempt=$((attempt + 1))
                 done
+                return 1
+              }
+
+              install_caveman() {
+                local dir_label="$1"
+                local config_dir="$2" # empty for default, or path for alternates
+                if [ -n "$config_dir" ]; then
+                  export CLAUDE_CONFIG_DIR="$config_dir"
+                else
+                  unset CLAUDE_CONFIG_DIR
+                fi
+                if $CLAUDE plugin list 2>/dev/null | grep -q "caveman@caveman"; then
+                  echo "Caveman already installed in $dir_label"
+                  return 0
+                fi
+                echo "Installing caveman in $dir_label..."
+                if retry_cmd 3 $CLAUDE plugin marketplace add JuliusBrussee/caveman --scope user; then
+                  retry_cmd 3 $CLAUDE plugin install caveman@caveman --scope user || \
+                    echo "WARN: caveman install failed in $dir_label after retries"
+                else
+                  echo "WARN: marketplace add failed in $dir_label after retries (network or SSH issue)"
+                fi
+              }
+
+              if [ -x "$CLAUDE" ]; then
+                install_caveman "default" ""
+                for config_dir in ${alternateConfigDirPaths}; do
+                  install_caveman "$config_dir" "$config_dir"
+                done
+                unset CLAUDE_CONFIG_DIR
               else
                 echo "WARN: claude CLI not found, skipping plugin install"
               fi
