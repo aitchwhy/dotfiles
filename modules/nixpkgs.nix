@@ -185,6 +185,15 @@
         doCheck = false;
       });
     })
+
+    # direnv: test/direnv-test.zsh hangs indefinitely in macOS Nix sandbox.
+    # The make test-{go,bash,fish,zsh} target spawns interactive zsh subshells that
+    # never complete during nix build, causing repeated "waiting for lock" stalls.
+    (final: prev: {
+      direnv = prev.direnv.overrideAttrs (old: {
+        doCheck = false;
+      });
+    })
   ];
 
   # Darwin-specific settings
