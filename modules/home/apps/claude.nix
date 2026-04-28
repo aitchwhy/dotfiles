@@ -756,6 +756,12 @@ in
                 return 1
               }
 
+              # Force HTTPS for github.com — claude's bundled SSH clone fails
+              # with ERR_STREAM_PREMATURE_CLOSE in some Node child_process contexts.
+              export GIT_CONFIG_COUNT=1
+              export GIT_CONFIG_KEY_0="url.https://github.com/.insteadOf"
+              export GIT_CONFIG_VALUE_0="git@github.com:"
+
               install_caveman() {
                 local dir_label="$1"
                 local config_dir="$2" # empty for default, or path for alternates
