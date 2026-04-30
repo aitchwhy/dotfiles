@@ -78,3 +78,30 @@ exec "$HOME/dotfiles/config/hazel/scripts/script-name.sh" "$1"
 
 - `ffmpeg` / `ffprobe` — declared in `modules/homebrew.nix` (line 62)
 - Hazel — declared in `modules/homebrew.nix` casks (line 141)
+
+## Drive Folder Taxonomy & Stream Retention Policy
+
+Google Drive is the host's largest storage liability — at one point it carried
+~1.4 TB locally because every subfolder defaulted to "Available offline." After
+CC-58, the policy is **stream-only by default**. Only mark folders "Available
+offline" when there is a concrete reason (offline editing, frequent reads).
+
+| `~/My Drive/<folder>` | Mode | Reason |
+|---|---|---|
+| `Archive` | STREAM ONLY | 782 GB cold archive — primary disk-fill failure mode |
+| `Refs` | STREAM ONLY | Read-only references; rare access |
+| `Media` | STREAM ONLY | Large media; access on demand |
+| `Korean Traditional Art Yuran Choi` | STREAM ONLY | Cold archive |
+| `Areas` | CASE-BY-CASE | Mark only sub-folders actively edited offline |
+
+**Hazel interaction**: the Documents `Archive stale projects` rule writes into
+`~/My Drive/Archive`. That triggers a brief local cache write before Drive Stream
+re-evicts on sync — acceptable. The Archive folder itself must remain stream-only.
+
+**Drift check**: re-run `just disk-audit` quarterly. The script flags any
+subfolder >100 GB locally as a likely "Available offline" mistake.
+
+**iMazing**: not declared in `modules/homebrew.nix` and not currently installed
+(verified on 2026-04-29). Policy: do **not** reinstall — iCloud Backup is the
+canonical iOS backup path. iMazing's local backups grew to 738 GB unaccounted
+for, which is the failure mode CC-58 documents.

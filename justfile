@@ -64,6 +64,11 @@ audit:
 audit-no-gate:
     @./scripts/security-audit.sh --no-gate
 
+# Quarterly disk inventory (read-only). Report under audit-reports/disk/.
+# Independent of `just switch` / `just check` — disk hygiene shouldn't gate rebuild.
+disk-audit:
+    @./scripts/disk-audit.sh
+
 # Rollback to previous generation
 rollback:
     sudo darwin-rebuild switch --rollback
