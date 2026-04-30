@@ -8,6 +8,7 @@ Nix-managed macOS configuration for senior engineer building Told (voice memory 
 just switch        # Rebuild darwin + home-manager
 just check         # Validate flake
 just health        # Verify system state
+just disk-audit    # Read-only host disk inventory (run quarterly)
 
 cd config/quality
 bun run generate   # Regenerate settings.json
