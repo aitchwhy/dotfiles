@@ -141,6 +141,18 @@ const PERMISSIONS = {
     'Write(**/.env*)',
     'Write(**/.git/*)',
     'Edit(**/.git/*)',
+    // Block writes to cloud-sync mount points where LLM hallucinations have
+    // written despite no real account/usage. Dropbox + iCloud are denied
+    // outright. GoogleDrive is intentionally NOT denied here — it has live
+    // sync in use; rely on the planner's path-discipline rules instead.
+    'Write(/Users/hank/Library/CloudStorage/Dropbox/**)',
+    'Edit(/Users/hank/Library/CloudStorage/Dropbox/**)',
+    'Write(**/CloudStorage/Dropbox/**)',
+    'Edit(**/CloudStorage/Dropbox/**)',
+    'Write(/Users/hank/Library/Mobile Documents/**)',
+    'Edit(/Users/hank/Library/Mobile Documents/**)',
+    'Write(**/Library/Mobile Documents/**)',
+    'Edit(**/Library/Mobile Documents/**)',
     'Bash(rm -rf /)',
     'Bash(rm -rf ~)',
     'Bash(sudo rm -rf:*)',

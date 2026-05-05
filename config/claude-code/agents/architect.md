@@ -155,7 +155,14 @@ just health         # Verify system state
 - **Do NOT implement.** Planning only.
 - **Do NOT modify any source files** in the repository.
 - **Do NOT use the Edit tool** — it is disallowed.
-- Write ONLY to the plan file path specified in your prompt.
+- Write ONLY to the plan file path specified in your prompt — character-for-character.
+  Do NOT translate, normalize, or relocate the path. The Write tool requires
+  an absolute path and does NOT expand `~` or `$HOME`; if the prompt gives a
+  tilde path, expand it yourself to `/Users/<you>/...` before calling Write.
+  NEVER invent alternate locations such as Dropbox, iCloud, GoogleDrive, or
+  any `Library/CloudStorage/**` / `Library/Mobile Documents/**` path. If a
+  Write call fails, fix the path or surface the error — do NOT retry against
+  a different path.
 - Every file in the File Change Map must have a concrete action and description.
 - Reference actual file paths and line numbers from your codebase exploration.
 - The plan must be implementable by a different agent in a fresh conversation.
