@@ -42,6 +42,8 @@ in
     ./apps/clop.nix
     ./apps/claude.nix
     ./apps/claude-desktop.nix
+    ./apps/codex.nix
+    ./apps/agents-launcher.nix
     ./apps/cursor.nix
     ./apps/misc.nix
     ./apps/keyboard-layout.nix
@@ -105,6 +107,8 @@ in
         clop.enable = mkDefault true;
         mcp.enable = mkDefault true;
         claude-desktop.enable = mkDefault true;
+        codex.enable = mkDefault true;
+        agentsLauncher.enable = mkDefault true;
 
         cursor.enable = mkDefault true;
         misc.enable = mkDefault true;

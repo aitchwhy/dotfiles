@@ -108,6 +108,7 @@
       # ─────────────────────────────────────────────────────────────
       "chatgpt" # ChatGPT desktop (OpenAI official)
       "claude" # Claude Desktop - actively using
+      "codex" # Codex CLI (native Rust binary) — drives the `cx` multi-account launcher
       "codex-app" # Codex desktop app — manages OpenAI cloud coding agents
       "granola" # AI-powered notepad for meetings
 

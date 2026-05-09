@@ -73,21 +73,8 @@ in
       fi
     '';
 
-    # Codex CLI - OpenAI's coding agent (fallback provider, see ADR-014)
-    home.activation.setupCodexCli = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      NPM="/etc/profiles/per-user/${config.home.username}/bin/npm"
-
-      if [ -x "$NPM" ]; then
-        CURRENT=$("$NPM" list -g @openai/codex --depth=0 2>/dev/null | grep @openai/codex | sed 's/.*@openai\/codex@//' || true)
-        LATEST=$("$NPM" view @openai/codex version 2>/dev/null || true)
-
-        if [ -z "$CURRENT" ] || [ "$CURRENT" != "$LATEST" ]; then
-          echo "Installing @openai/codex@''${LATEST:-latest}..."
-          "$NPM" i -g @openai/codex@latest 2>/dev/null || true
-        else
-          echo "Codex CLI up to date: $CURRENT"
-        fi
-      fi
-    '';
+    # Codex CLI is now installed via Homebrew cask `codex` (native Rust binary).
+    # See modules/homebrew.nix and modules/home/apps/codex.nix for the `cx`
+    # multi-account launcher.
   };
 }
