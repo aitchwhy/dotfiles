@@ -90,6 +90,9 @@ let
         ''cx *args="":''
         "    #!/usr/bin/env bash"
         "    set -euo pipefail"
+        "    # just doesn't pass variadic recipe args to shebang scripts as $1, $2."
+        "    # Use {{args}} interpolation to populate bash positional args."
+        "    set -- {{args}}"
         "    account=\"\${1:-}\""
         "    shift || true"
         ""
