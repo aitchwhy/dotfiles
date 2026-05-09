@@ -27,7 +27,7 @@ default:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 # Rebuild and switch local system configuration
-switch: _preflight _completions _check _audit
+switch: _preflight _completions _check
     #!/usr/bin/env bash
     set -euo pipefail
     echo "Switching configuration..."
