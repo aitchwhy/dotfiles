@@ -32,13 +32,7 @@ let
       email = "hank.lee.qed@gmail.com";
       authMethod = "chatgpt-oauth";
     }
-    {
-      name = "codex-max-2";
-      codexHome = ".codex-max-2";
-      description = "Codex Max — overflow 1";
-      email = "hank@told.one";
-      authMethod = "chatgpt-oauth";
-    }
+    # Add additional accounts here when needed (e.g., codex-max-2 with hank@told.one).
   ];
 
   # ═══════════════════════════════════════════════════════════════════════════
