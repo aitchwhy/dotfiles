@@ -82,6 +82,7 @@ in
       j = "just";
       jg = "just -g";
       cc = "just -g cc";
+      cx = "just -g cx";
 
       # System utilities
       ports = "lsof -i -P -n | grep LISTEN";
