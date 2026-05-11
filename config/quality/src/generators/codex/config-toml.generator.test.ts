@@ -65,12 +65,14 @@ describe('codex config-toml generator', () => {
     expect(config.features?.codex_hooks).toBeUndefined()
   })
 
-  it('declares the ref MCP server', async () => {
+  it('declares the ref MCP server (OAuth, no bearer_token_env_var)', async () => {
     const filePath = await generateToTmp()
     // biome-ignore lint/suspicious/noExplicitAny: parsed TOML shape
     const config: any = TOML.parse(readFileSync(filePath, 'utf8'))
     expect(config.mcp_servers?.ref?.url).toMatch(/^https:\/\//)
-    expect(config.mcp_servers?.ref?.bearer_token_env_var).toBe('REF_API_KEY')
+    // ref uses OAuth (`codex mcp login ref`), not bearer-token auth.
+    // Configuring both confused Codex's session-startup auth check.
+    expect(config.mcp_servers?.ref?.bearer_token_env_var).toBeUndefined()
   })
 
   it('emits hook blocks for every wired Codex event', async () => {

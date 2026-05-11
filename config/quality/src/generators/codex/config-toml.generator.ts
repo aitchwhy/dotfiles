@@ -117,10 +117,17 @@ const generateConfigToml = (): string => {
   lines.push('')
 
   // --- MCP servers
-  lines.push('# MCP servers — substituted at activation time.')
+  //
+  // ref auths via Codex's built-in OAuth flow (run `codex mcp login ref` once
+  // per CODEX_HOME). Credentials are stored in CODEX_HOME and reused across
+  // sessions. Bearer-token auth (bearer_token_env_var = "REF_API_KEY") was
+  // tried earlier but Codex's session-startup check requires OAuth login
+  // when the server has been logged into via `codex mcp login`. Configuring
+  // both confused Codex — sticking with OAuth-only since it's the path the
+  // user has already validated.
+  lines.push('# MCP servers. Auth via `codex mcp login <name>` per CODEX_HOME.')
   lines.push('[mcp_servers.ref]')
   lines.push(`url = ${tomlString('https://api.ref.tools/mcp')}`)
-  lines.push(`bearer_token_env_var = ${tomlString('REF_API_KEY')}`)
   lines.push('startup_timeout_sec = 20')
   lines.push('')
 
