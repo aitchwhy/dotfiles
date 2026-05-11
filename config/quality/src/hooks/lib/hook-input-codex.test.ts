@@ -136,6 +136,58 @@ describe('codexToClaudeShape — non-tool events', () => {
       codexToClaudeShape({ hook_event_name: 'PostCompact', session_id: 's' }).hook_event_name,
     ).toBe('PostCompact')
   })
+
+  it('handles Stop (CC-91 wiring; passthrough w/ session_id + cwd)', () => {
+    const input: CodexHookInput = {
+      hook_event_name: 'Stop',
+      session_id: 's',
+      cwd: '/tmp/work',
+      stop_hook_active: false,
+      last_assistant_message: 'done',
+    }
+    const out = codexToClaudeShape(input)
+    expect(out.hook_event_name).toBe('Stop')
+    expect(out.session_id).toBe('s')
+    expect(out.cwd).toBe('/tmp/work')
+    // Adapter intentionally drops stop_hook_active / last_assistant_message —
+    // Stop-hook consumers (e.g., session-end unified-polish branch) read
+    // CLAUDE_FILE_PATHS via env or re-scan the diff; they do not need the
+    // last assistant message. Re-add the projection only if a future consumer
+    // requires it.
+    expect(out.tool_input).toBeUndefined()
+  })
+
+  it('PermissionRequest preserves tool_name + tool_input (CC-48 / CC-91)', () => {
+    const input: CodexHookInput = {
+      hook_event_name: 'PermissionRequest',
+      session_id: 's',
+      cwd: '/tmp/work',
+      tool_name: 'Bash',
+      tool_input: { command: 'rm -rf /' },
+    }
+    const out = codexToClaudeShape(input)
+    // PermissionRequest re-uses the PreToolUse guard pipeline, so the
+    // adapter routes it through the tool-event projection (not the
+    // non-tool passthrough). Guards inspect tool_name + tool_input.
+    expect(out.hook_event_name).toBe('PermissionRequest')
+    expect(out.tool_name).toBe('Bash')
+    expect(out.tool_input?.command).toBe('rm -rf /')
+  })
+
+  it('PermissionRequest for apply_patch projects file_path + CLAUDE_FILE_PATHS', () => {
+    const patch =
+      '*** Begin Patch\n*** Update File: src/a.ts\n@@\n*** Add File: src/b.ts\n*** End Patch'
+    const input: CodexHookInput = {
+      hook_event_name: 'PermissionRequest',
+      session_id: 's',
+      tool_name: 'apply_patch',
+      tool_input: { command: patch },
+    }
+    const out = codexToClaudeShape(input)
+    expect(out.tool_name).toBe('apply_patch')
+    expect(out.tool_input?.file_path).toBe('src/a.ts')
+    expect(process.env['CLAUDE_FILE_PATHS']).toBe('src/a.ts,src/b.ts')
+  })
 })
 
 describe('isCodexShape', () => {

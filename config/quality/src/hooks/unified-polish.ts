@@ -25,7 +25,38 @@ import { emitContinue, emitHalt, logError, logWarning } from './lib/hook-logging
 // Configuration
 // ============================================================================
 
-const filePaths = (process.env['CLAUDE_FILE_PATHS'] ?? '').split(',').filter(Boolean)
+let filePaths: string[] = (process.env['CLAUDE_FILE_PATHS'] ?? '').split(',').filter(Boolean)
+
+// Stop-event branch (CC-39 / CC-40): when invoked at session-end with no
+// CLAUDE_FILE_PATHS pre-set, derive touched files from `git diff --name-only
+// HEAD`. Distinct from per-edit PostToolUse polish; same downstream pipeline.
+// Quiet best-effort: any failure falls through to the existing early-exit.
+if (filePaths.length === 0) {
+  const isStopEvent = (() => {
+    try {
+      const raw = fs.readFileSync(0, 'utf8')
+      if (!raw) return false
+      const parsed = JSON.parse(raw) as { hook_event_name?: string }
+      return parsed.hook_event_name === 'Stop'
+    } catch {
+      return false
+    }
+  })()
+
+  if (isStopEvent) {
+    try {
+      const proc = spawn(['git', 'diff', '--name-only', 'HEAD'], {
+        stderr: 'ignore',
+        stdout: 'pipe',
+      })
+      const out = await new Response(proc.stdout).text()
+      await proc.exited
+      filePaths = out.split('\n').filter(Boolean)
+    } catch {
+      // git unavailable or not a repo — fall through
+    }
+  }
+}
 
 // Exit early if no files
 if (filePaths.length === 0) {

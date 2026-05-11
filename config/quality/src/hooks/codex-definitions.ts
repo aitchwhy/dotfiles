@@ -138,10 +138,59 @@ export const CODEX_HOOK_DEFINITIONS: CodexHookDefinitions = {
     },
   ],
 
-  // Future placeholders — empty arrays documented; generator skips empty events.
-  Stop: [],
-  UserPromptSubmit: [],
-  PermissionRequest: [],
+  // Session-end batch polish (CC-39 / CC-40 / CC-41). Stop fires once per
+  // session-end. unified-polish.ts branches on CLAUDE_HOOK_EVENT === 'Stop'
+  // to git-diff touched files and run the same format/lint/typecheck/ast-grep
+  // pipeline as PostToolUse. Distinct from per-edit polish.
+  Stop: [
+    {
+      hooks: [
+        {
+          type: 'command',
+          command: qualityHook('unified-polish.ts'),
+          timeout: 180,
+          statusMessage: 'Session-end polish (batch)',
+        },
+      ],
+    },
+  ],
+
+  // Lightweight prompt-time guards (CC-38). prompt-guards.ts is an exit-0
+  // placeholder on first land; future content-policy guards land additively.
+  UserPromptSubmit: [
+    {
+      hooks: [
+        {
+          type: 'command',
+          command: qualityHook('prompt-guards.ts'),
+          timeout: 5,
+          statusMessage: 'Prompt guards',
+        },
+      ],
+    },
+  ],
+
+  // Codex prompts the user before granting elevated permission (e.g.
+  // approval-required apply_patch outside the sandbox). PermissionRequest
+  // carries the same tool_name/tool_input shape as PreToolUse — re-using
+  // pre-tool-use.ts here closes Guard 3/32/33 escape paths (CC-48). The
+  // adapter in lib/hook-input-codex.ts projects PermissionRequest through
+  // the tool-event branch.
+  PermissionRequest: [
+    {
+      matcher: '^(apply_patch|Bash|Grep)$',
+      hooks: [
+        {
+          type: 'command',
+          command: qualityHook('pre-tool-use.ts'),
+          timeout: 5,
+          statusMessage: 'Permission-request guards',
+        },
+      ],
+    },
+  ],
+
+  // PreCompact / PostCompact remain empty — no current consumer.
   PreCompact: [],
   PostCompact: [],
 }

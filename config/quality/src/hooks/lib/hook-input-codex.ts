@@ -129,8 +129,7 @@ export function codexToClaudeShape(input: CodexHookInput): ClaudeShapeInput {
     input.hook_event_name === 'UserPromptSubmit' ||
     input.hook_event_name === 'Stop' ||
     input.hook_event_name === 'PreCompact' ||
-    input.hook_event_name === 'PostCompact' ||
-    input.hook_event_name === 'PermissionRequest'
+    input.hook_event_name === 'PostCompact'
   ) {
     return {
       hook_event_name: input.hook_event_name,
@@ -139,6 +138,10 @@ export function codexToClaudeShape(input: CodexHookInput): ClaudeShapeInput {
       prompt: input.prompt,
     }
   }
+
+  // PermissionRequest carries the same tool_name/tool_input shape as
+  // PreToolUse — re-using pre-tool-use.ts as the consumer requires that
+  // projection. Fall through to the tool-event path below.
 
   // Tool events: PreToolUse / PostToolUse.
   const codexToolInput = input.tool_input ?? {}
