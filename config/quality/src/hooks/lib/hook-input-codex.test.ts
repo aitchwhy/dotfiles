@@ -62,7 +62,7 @@ describe('codexToClaudeShape — apply_patch', () => {
     expect(out.tool_input?.file_path).toBe('src/a.ts')
     expect(out.tool_input?.content).toBe(patch)
     expect(out.session_id).toBe('sess_xyz')
-    expect(process.env['CLAUDE_FILE_PATHS']).toBe('src/a.ts\nsrc/b.ts')
+    expect(process.env['CLAUDE_FILE_PATHS']).toBe('src/a.ts,src/b.ts')
   })
 
   it('falls back to turn_id when session_id is missing', () => {

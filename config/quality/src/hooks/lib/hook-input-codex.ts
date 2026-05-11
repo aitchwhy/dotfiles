@@ -147,8 +147,11 @@ export function codexToClaudeShape(input: CodexHookInput): ClaudeShapeInput {
     const patchBody = String(codexToolInput['command'] ?? codexToolInput['input'] ?? '')
     const paths = parseApplyPatchPaths(patchBody)
     if (paths.length > 0) {
-      // Standard env var the existing unified-polish.ts already reads.
-      process.env['CLAUDE_FILE_PATHS'] = paths.join('\n')
+      // CLAUDE_FILE_PATHS is comma-joined — matches the
+      // `.split(',')` consumers in unified-polish.ts:26 and
+      // enforce-packages.ts:38. Paths with commas are not supported (none
+      // of the dotfiles or told paths contain commas).
+      process.env['CLAUDE_FILE_PATHS'] = paths.join(',')
     }
     return {
       hook_event_name: input.hook_event_name,
