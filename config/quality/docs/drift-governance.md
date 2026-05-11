@@ -70,7 +70,7 @@ but a few areas diverge by design. Don't treat these as drift to fix.
 | Hook stdin shape | `tool_name`, `tool_input.{file_path,content,...}`, `session_id` | `tool_name`, `tool_input.command` (raw patch body), `tool_use_id`, `turn_id` | `config/quality/src/hooks/lib/hook-input-codex.ts` adapter projects Codex → Claude shape |
 | Per-skill `allowed-tools` | First-class in SKILL.md frontmatter | Not supported | Permission lives in `approval_policy` + `sandbox_mode` per project `.codex/config.toml` |
 | Custom slash commands | `config/claude/commands/*.md` | Not user-extensible — all user surfaces are skills | The `commit` / `add-app` / `clean-claude` commands stay Claude-only; Codex users invoke equivalents via skills |
-| Subagent definition | Markdown with frontmatter (`agents/*.md`) | Standalone TOML (`~/.agents/agents/*.toml`) | `config/claude-code/agents/architect.toml` mirrors the `.md` body |
+| Subagent definition | Markdown with frontmatter (`agents/*.md`) | Standalone TOML — user: `$CODEX_HOME/agents/*.toml`; project: `$CWD/.codex/agents/*.toml` | `config/claude-code/agents/architect.toml` symlinked into each `$CODEX_HOME/agents/` (CC-87 corrected from `~/.agents/agents/`) |
 | Plugin manifest path | `.claude-plugin/plugin.json` | `.codex-plugin/plugin.json` (per CC-60 doc) or `.claude-plugin/plugin.json` (per audit reconciliation — cross-tool) | T13 (stretch) verifies before publishing |
 | `apply_patch` hook coverage | N/A — separate tools | Fires `PreToolUse`/`PostToolUse` since v0.130 (PR #18391) | Single matcher in codex-definitions.ts |
 | `requirements.toml` (org pin) | N/A | Codex admin-enforced constraint file | Not used in personal dotfiles; would live at `~/.codex/requirements.toml` |

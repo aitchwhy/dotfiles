@@ -147,9 +147,12 @@ const generateConfigToml = (): string => {
   lines.push('job_max_runtime_seconds = 1800')
   lines.push('')
 
-  // --- Built-in agent definitions are loaded from ~/.agents/agents/*.toml
-  //     (symlinked by codex.nix). Listed here as a stable reference.
-  lines.push('# Subagents discovered from ~/.agents/agents/*.toml:')
+  // --- Subagent TOML files are discovered by Codex at runtime from
+  //     $CODEX_HOME/agents/*.toml (user scope) and $CWD/.codex/agents/*.toml
+  //     (project scope). codex.nix symlinks every config/claude-code/agents/*.toml
+  //     into each $CODEX_HOME/agents/. Listed here as a stable reference.
+  lines.push('# Subagents discovered from $CODEX_HOME/agents/*.toml (user)')
+  lines.push('# and $CWD/.codex/agents/*.toml (project):')
   lines.push('#   - architect (config/claude-code/agents/architect.toml)')
   lines.push('')
 

@@ -46,7 +46,7 @@ The original "Codex is a fallback, no quality enforcement, no shared skills" sta
 - Hooks live at `config/quality/src/hooks/*.ts`. A new `lib/hook-input-codex.ts` adapter projects Codex's stdin JSON into the Claude shape the existing scripts consume. The hook scripts call the adapter conditionally based on `CODEX_HOME` env presence (T10).
 - A new generator at `config/quality/src/generators/codex/` emits `generated/codex/config.toml` from a `codex-definitions.ts` SSOT (parallel to `definitions.ts` for Claude).
 - `modules/home/apps/codex.nix` mirrors `claude.nix`'s symlink farm to wire `~/.codex-max-N/{AGENTS.md, config.toml, agents/}` per account.
-- Architect agent ports to `~/.codex/agents/architect.toml` (a standalone TOML agent file, not `[profiles.architect]` — profiles are flagged experimental in v0.130).
+- Architect agent ports to `$CODEX_HOME/agents/architect.toml` (per-account; e.g. `~/.codex-max-1/agents/architect.toml`). Standalone TOML agent file, not `[profiles.architect]` — profiles are flagged experimental in v0.130. See "Correction (CC-87)" at the end of this ADR.
 - The Caveman plugin is intentionally NOT ported as a Codex plugin. The persona is encoded in `AGENTS.md` prose / a `personality` preset; the marketplace plugin path is gated on `plugin_hooks` stabilizing (currently under-development).
 
 ### Hook event mapping
@@ -122,5 +122,11 @@ Hook events Claude has that Codex does not: `Notification`, `SubagentStart/Stop`
 - CC-60 Phase B doc (locked source of truth for the port).
 - ADR-014 (superseded by this ADR).
 - ADR-007 (hook architecture; underlying pattern reused).
-- Codex docs: [hooks](https://developers.openai.com/codex/hooks), [skills](https://developers.openai.com/codex/skills), [config-reference](https://developers.openai.com/codex/config-reference).
+- Codex docs: [hooks](https://developers.openai.com/codex/hooks), [skills](https://developers.openai.com/codex/skills), [subagents](https://developers.openai.com/codex/subagents), [config-reference](https://developers.openai.com/codex/config-reference).
 - PR [#18391](https://github.com/openai/codex/pull/18391) — apply_patch hook fix.
+
+## Correction (CC-87, 2026-05-11)
+
+Phase B's initial implementation symlinked the architect to `~/.agents/agents/architect.toml`, conflating the skills user-scope (`~/.agents/skills/`) with the subagents user-scope. Per [Codex subagents docs](https://developers.openai.com/codex/subagents#custom-agents), subagents are discovered at `$CODEX_HOME/agents/` (user) and `$CWD/.codex/agents/` (project) — there is no `~/.agents/agents/` scan path. Skills and subagents share no directory.
+
+CC-87 moves the architect symlink farm into `$CODEX_HOME/agents/<name>.toml` per account (e.g. `~/.codex-max-1/agents/architect.toml`) and enumerates `config/claude-code/agents/*.toml` so new agents auto-deploy on `just switch`. The `~/.agents/skills` user-scope symlink is unchanged (skills *do* live there per the skills docs). Sibling told-repo work renames `~/src/told/.agents/agents/` → `~/src/told/.codex/agents/` to expose the 16 reviewer + 1 synthesizer subagents at project scope.
