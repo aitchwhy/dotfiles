@@ -23,9 +23,14 @@ const execAsync = promisify(exec)
 // =============================================================================
 
 const HOME = os.homedir()
-const PLANS_DIR = `${HOME}/.claude/plans`
+// When invoked from Codex (cx recipe sets CODEX_HOME), plans + logs land
+// under $CODEX_HOME so they don't intermix with Claude state. Cleanup
+// honors the same dir, so old Codex plans get GC'd alongside Claude's.
+const CODEX_HOME = process.env['CODEX_HOME']
+const BASE_DIR = CODEX_HOME ?? `${HOME}/.claude`
+const PLANS_DIR = `${BASE_DIR}/plans`
 const MAX_AGE_DAYS = 7
-const LOG_FILE = `${HOME}/.claude/session.log`
+const LOG_FILE = `${BASE_DIR}/session.log`
 
 // =============================================================================
 // Types

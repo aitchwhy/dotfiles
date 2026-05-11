@@ -64,16 +64,6 @@ export const HOOK_DEFINITIONS: HookDefinitions = {
       ],
     },
     {
-      matcher: 'Write(**/package.json)|Edit(**/package.json)',
-      hooks: [
-        {
-          type: 'command',
-          command: qualityHook('enforce-packages.ts'),
-          timeout: 10,
-        },
-      ],
-    },
-    {
       matcher: 'Bash(darwin-rebuild switch:*)|Bash(sudo darwin-rebuild switch:*)',
       hooks: [
         {

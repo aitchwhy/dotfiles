@@ -107,27 +107,16 @@ export const CODEX_HOOK_DEFINITIONS: CodexHookDefinitions = {
   PostToolUse: [
     {
       // Codex's single edit path is apply_patch — one matcher replaces the
-      // Claude Write|Edit|MultiEdit glob.
+      // Claude Write|Edit|MultiEdit glob. Polish includes package.json
+      // forbidden-dependency checks inline (consolidated from the former
+      // enforce-packages.ts hook — see ADR-015 and audit follow-up).
       matcher: '^apply_patch$',
       hooks: [
         {
           type: 'command',
           command: qualityHook('unified-polish.ts'),
           timeout: 120,
-          statusMessage: 'Polish (format, lint, types, ast-grep)',
-        },
-      ],
-    },
-    {
-      // Package.json enforcement — match any apply_patch and let the script
-      // check tool_input.file_path (extracted by hook-input-codex adapter).
-      matcher: '^apply_patch$',
-      hooks: [
-        {
-          type: 'command',
-          command: qualityHook('enforce-packages.ts'),
-          timeout: 10,
-          statusMessage: 'Package.json enforcement',
+          statusMessage: 'Polish (format, lint, types, ast-grep, package.json)',
         },
       ],
     },

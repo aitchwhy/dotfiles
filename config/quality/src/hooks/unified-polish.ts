@@ -16,7 +16,8 @@
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 import { spawn } from 'bun'
-import { Effect, pipe } from 'effect'
+import { Effect, pipe, Schema } from 'effect'
+import { FORBIDDEN_PACKAGES } from '../stack'
 import { emitContinue, emitHalt, logError, logWarning } from './lib/hook-logging'
 
 // ============================================================================
@@ -177,6 +178,70 @@ const runAstGrep = (files: readonly string[]): Effect.Effect<QualityResult> => {
 }
 
 // ============================================================================
+// Package.json Forbidden-Dependency Check (was: enforce-packages.ts)
+// ============================================================================
+
+const PackageJsonSchema = Schema.Struct({
+  dependencies: Schema.optional(Schema.Record({ key: Schema.String, value: Schema.String })),
+  devDependencies: Schema.optional(Schema.Record({ key: Schema.String, value: Schema.String })),
+})
+
+const runPackageJsonCheck = (files: readonly string[]): Effect.Effect<QualityResult> => {
+  const packageJsonFiles = files.filter((p) => p.endsWith('package.json'))
+  if (packageJsonFiles.length === 0) {
+    return Effect.succeed({ tool: 'forbidden-packages', success: true, output: '' })
+  }
+
+  return pipe(
+    Effect.tryPromise({
+      try: async () => {
+        const violations: string[] = []
+        for (const pkgPath of packageJsonFiles) {
+          const content = await Bun.file(pkgPath).text()
+          const rawJson = JSON.parse(content)
+          const decoded = await Effect.runPromise(
+            Schema.decodeUnknown(PackageJsonSchema)(rawJson).pipe(
+              Effect.catchAll(() =>
+                Effect.succeed(
+                  {} as {
+                    dependencies?: Record<string, string>
+                    devDependencies?: Record<string, string>
+                  },
+                ),
+              ),
+            ),
+          )
+          const allDeps: Record<string, string> = {
+            ...decoded.dependencies,
+            ...decoded.devDependencies,
+          }
+          for (const forbidden of FORBIDDEN_PACKAGES) {
+            if (allDeps[forbidden.name]) {
+              violations.push(
+                `  - ${forbidden.name} (${pkgPath}): ${forbidden.reason}. Alternative: ${forbidden.alternative}`,
+              )
+            }
+          }
+        }
+        return {
+          tool: 'forbidden-packages',
+          success: violations.length === 0,
+          output: violations.length > 0 ? `STACK VIOLATION:\n${violations.join('\n')}` : '',
+        }
+      },
+      catch: () => new Error('Failed to scan package.json files'),
+    }),
+    Effect.catchAll((error) =>
+      Effect.succeed({
+        tool: 'forbidden-packages',
+        success: false,
+        output: `Failed: ${error.message}`,
+      }),
+    ),
+  )
+}
+
+// ============================================================================
 // TypeScript Type Check Runner
 // ============================================================================
 
@@ -311,23 +376,26 @@ const program = Effect.gen(function* () {
   // Only run on TS/JS/TSX/JSX files
   // ============================================================================
 
-  if (tsJsFiles.length === 0) {
+  const packageJsonFiles = filePaths.filter((p) => p.endsWith('package.json'))
+
+  if (tsJsFiles.length === 0 && packageJsonFiles.length === 0) {
     emitContinue()
     return
   }
 
   // Run quality checks in parallel
-  const [oxlintResult, astGrepResult, tscResult] = yield* Effect.all(
+  const [oxlintResult, astGrepResult, tscResult, pkgResult] = yield* Effect.all(
     [
       runQualityCheck('oxlint', ['oxlint', '--deny', 'correctness'], tsJsFiles),
       runAstGrep(tsJsFiles),
       runTypeCheck(tsJsFiles),
+      runPackageJsonCheck(filePaths),
     ],
     { concurrency: 'unbounded' },
   )
 
   // Collect failures
-  const failures: QualityResult[] = [oxlintResult, astGrepResult, tscResult].filter(
+  const failures: QualityResult[] = [oxlintResult, astGrepResult, tscResult, pkgResult].filter(
     (r) => !r.success,
   )
 
