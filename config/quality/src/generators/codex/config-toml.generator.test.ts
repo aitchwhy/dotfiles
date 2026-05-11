@@ -50,6 +50,21 @@ describe('codex config-toml generator', () => {
     expect(config.approval_policy).toBeTypeOf('string')
   })
 
+  it('pins model to gpt-5.5', async () => {
+    const filePath = await generateToTmp()
+    // biome-ignore lint/suspicious/noExplicitAny: parsed TOML shape
+    const config: any = TOML.parse(readFileSync(filePath, 'utf8'))
+    expect(config.model).toBe('gpt-5.5')
+  })
+
+  it('emits [features].hooks (not deprecated codex_hooks)', async () => {
+    const filePath = await generateToTmp()
+    // biome-ignore lint/suspicious/noExplicitAny: parsed TOML shape
+    const config: any = TOML.parse(readFileSync(filePath, 'utf8'))
+    expect(config.features?.hooks).toBe(true)
+    expect(config.features?.codex_hooks).toBeUndefined()
+  })
+
   it('declares the ref MCP server', async () => {
     const filePath = await generateToTmp()
     // biome-ignore lint/suspicious/noExplicitAny: parsed TOML shape
