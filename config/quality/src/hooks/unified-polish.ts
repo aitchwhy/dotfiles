@@ -18,6 +18,7 @@ import * as path from 'node:path'
 import { spawn } from 'bun'
 import { Effect, pipe, Schema } from 'effect'
 import { FORBIDDEN_PACKAGES } from '../stack'
+import { findSgConfigs } from './lib/find-sgconfig'
 import { emitContinue, emitHalt, logError, logWarning } from './lib/hook-logging'
 
 // ============================================================================
@@ -118,51 +119,52 @@ const runQualityCheck = (
 // AST-Grep Runner
 // ============================================================================
 
-/**
- * Find nearest ancestor directory containing sgconfig.yml.
- * Returns null if none found (no project-level ast-grep rules).
- */
-const findSgConfig = (file: string): string | null => {
-  let dir = path.dirname(file)
-  while (dir !== '/') {
-    if (fs.existsSync(path.join(dir, 'sgconfig.yml'))) return dir
-    dir = path.dirname(dir)
-  }
-  return null
-}
-
 const runAstGrep = (files: readonly string[]): Effect.Effect<QualityResult> => {
   if (files.length === 0) {
     return Effect.succeed({ tool: 'ast-grep', success: true, output: '' })
   }
 
-  // Find project root with sgconfig.yml (uses first file as reference)
-  const projectRoot = findSgConfig(files[0]!)
-  if (!projectRoot) {
-    // No sgconfig.yml = no ast-grep rules to enforce
+  // Find project root + all sgconfig*.yml files (uses first file as reference).
+  const found = findSgConfigs(files[0]!)
+  if (!found) {
     return Effect.succeed({ tool: 'ast-grep', success: true, output: '' })
   }
+  const { root, configs } = found
 
   return pipe(
     Effect.tryPromise({
       try: async () => {
-        const proc = spawn(['ast-grep', 'scan', ...files], {
-          cwd: projectRoot,
-          stderr: 'pipe',
-          stdout: 'pipe',
-        })
+        const sections: string[] = []
+        let allOk = true
 
-        const [stdout, stderr] = await Promise.all([
-          new Response(proc.stdout).text(),
-          new Response(proc.stderr).text(),
-        ])
-        const exitCode = await proc.exited
+        for (const config of configs) {
+          const proc = spawn(['ast-grep', 'scan', '-c', config, ...files], {
+            cwd: root,
+            stderr: 'pipe',
+            stdout: 'pipe',
+          })
 
-        const output = (stdout + stderr).trim()
+          const [stdout, stderr] = await Promise.all([
+            new Response(proc.stdout).text(),
+            new Response(proc.stderr).text(),
+          ])
+          const exitCode = await proc.exited
+          const output = (stdout + stderr).trim()
+
+          if (exitCode !== 0) {
+            allOk = false
+            sections.push(
+              output.length > 0
+                ? `── ${config} ──\n${output}`
+                : `── ${config} ── (exit ${exitCode})`,
+            )
+          }
+        }
+
         return {
           tool: 'ast-grep',
-          success: exitCode === 0,
-          output,
+          success: allOk,
+          output: sections.join('\n\n'),
         }
       },
       catch: () => new Error('Failed to run ast-grep'),
