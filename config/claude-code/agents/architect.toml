@@ -20,8 +20,11 @@ approval_policy = "on-request"
 # Reasoning effort high — planning rewards deeper thought.
 model_reasoning_effort = "high"
 
-# Inherit `ref` MCP server for docs lookup during web-research step.
-mcp_servers = ["ref"]
+# Note: `ref` MCP server is inherited from the parent config layer
+# (`$CODEX_HOME/config.toml` [mcp_servers.ref]) via this role file's
+# flattened ConfigToml. Do NOT redeclare `mcp_servers` as an array —
+# Codex schema is HashMap<String, McpServerConfig> and rejects sequences
+# at deserialize with "invalid type: sequence, expected a map" (CC-89).
 
 developer_instructions = """
 You are a Principal Architect planning implementation for the dotfiles repo
