@@ -39,9 +39,7 @@ let
   ];
 
   # Bash list of CODEX_HOME absolute paths for activation hooks
-  codexHomePaths = concatStringsSep " " (
-    map (acct: ''"$HOME/${acct.codexHome}"'') codexAccountDefs
-  );
+  codexHomePaths = concatStringsSep " " (map (acct: ''"$HOME/${acct.codexHome}"'') codexAccountDefs);
 
   # ═══════════════════════════════════════════════════════════════════════════
   # PER-ACCOUNT SYMLINK FARM
