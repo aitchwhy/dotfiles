@@ -145,6 +145,16 @@ in
           local name="''${1:-screenshot}"
           agent-browser screenshot "./$name-$(date +%Y%m%d-%H%M%S).png"
         }
+
+        # ========================================
+        # Codex CLI: user-wide MCP env vars
+        # ========================================
+        # REF_API_KEY for the Codex `ref` MCP server's bearer_token_env_var.
+        # Exported per-shell so running `codex` directly (not just via `cx`)
+        # also resolves the ref MCP. Source file is sops-managed.
+        if [ -r "$HOME/.config/mcp/ref-api-key" ]; then
+          export REF_API_KEY="$(command cat -- "$HOME/.config/mcp/ref-api-key" 2>/dev/null)"
+        fi
       '';
 
       history = {
