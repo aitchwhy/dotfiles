@@ -103,8 +103,7 @@ let
       # account's env. Lets `cx mcp login ref` Just Work.
       defaultAcct = builtins.head codexAccountDefs;
 
-      defaultPassthroughBranch =
-        ''*) set -- "$account" "$@"; REF_API_KEY="$(cat "$HOME/.config/mcp/ref-api-key" 2>/dev/null || true)" AI_ACCOUNT="${defaultAcct.name}" CODEX_HOME="$HOME/${defaultAcct.codexHome}" codex "$@" ;;'';
+      defaultPassthroughBranch = ''*) set -- "$account" "$@"; REF_API_KEY="$(cat "$HOME/.config/mcp/ref-api-key" 2>/dev/null || true)" AI_ACCOUNT="${defaultAcct.name}" CODEX_HOME="$HOME/${defaultAcct.codexHome}" codex "$@" ;;'';
 
       caseBranches = map mkCaseBranch codexAccountDefs;
 
