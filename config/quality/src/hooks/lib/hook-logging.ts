@@ -7,6 +7,8 @@
  * Zero dependencies - hooks should be lightweight.
  */
 
+import { shouldSuppressDecision } from './hook-output-codex'
+
 // =============================================================================
 // Types
 // =============================================================================
@@ -43,6 +45,10 @@ export type HookContinue = {
  * ```
  */
 export const emitDecision = (output: HookDecision): void => {
+  // Codex rejects `decision: 'approve' | 'skip'` with a red TUI notice
+  // before failing open. Suppress these emissions under Codex; `block` is
+  // honored by both harnesses and always emitted. See ./hook-output-codex.
+  if (shouldSuppressDecision(output)) return
   process.stdout.write(`${JSON.stringify(output)}\n`)
 }
 
