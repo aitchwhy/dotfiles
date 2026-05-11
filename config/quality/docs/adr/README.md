@@ -19,6 +19,8 @@ MADR 4.0 format decisions for the Claude Code quality system.
 | [006](006-ast-grep-rules.md) | AST-grep YAML for Pattern Enforcement | accepted | 2025-12-28 |
 | [007](007-hook-architecture.md) | Pre-Tool-Use Hook Architecture | accepted | 2025-12-28 |
 | [008](008-nix-managed-config.md) | Nix-Managed Claude Configuration | accepted | 2025-12-01 |
+| [015](015-codex-harness-port.md) | Codex Harness Port | accepted | 2026-05-10 |
+| [017](017-codex-hook-layering-superset.md) | Codex Hook Layering Closes Array-Replace Gap | accepted | 2026-05-11 |
 
 ## Categories
 
@@ -33,6 +35,8 @@ MADR 4.0 format decisions for the Claude Code quality system.
 - [ADR-004](004-typescript-ssot.md) - TypeScript SSOT
 - [ADR-007](007-hook-architecture.md) - Hook architecture
 - [ADR-008](008-nix-managed-config.md) - Nix management
+- [ADR-015](015-codex-harness-port.md) - Codex harness port
+- [ADR-017](017-codex-hook-layering-superset.md) - Codex hook layering closes array-replace gap
 
 ### Enforcement
 - [ADR-005](005-stack-enforcement.md) - Stack versions

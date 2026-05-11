@@ -108,7 +108,9 @@ See [ADR-009](config/quality/docs/adr/009-network-api-toolkit.md) for full detai
 
 ## Known Gaps
 
-- **Told guard gap**: When working in ~/src/told, Told's PreToolUse replaces dotfiles' PreToolUse via deep merge with array replacement. Guards 3 (forbidden files), 32 (secrets detection), 33 (hook bypass prevention) do NOT run in Told. Tracked in Linear.
+- **Told guard gap (per harness)**:
+  - **Claude (open)**: Project-scope `~/src/told/.claude/settings.json` `hooks.PreToolUse` array replaces the user-scope array via deep-merge — Guards 3 (forbidden files), 32 (secrets detection), 33 (hook bypass prevention) do NOT run in Told under Claude Code. Told falls back to a narrower bash reimplementation in `~/src/told/.claude/hooks/`. Tracked separately in Linear; close target is a Claude-side merge fix.
+  - **Codex (closed)**: Codex (v0.130+, `[features].codex_hooks = true`) layers hooks additively across config layers — user-scope hooks fire alongside project-scope hooks. With the SSOT dispatch fix in `procedural.ts` (CC-50, May 2026), Guards 3, 32, 33 now fire on Codex `apply_patch` and `Bash` from inside Told. See ADR-017 for the architectural rationale and `~/src/told/.codex/hooks/codex-hook-layering.test.sh` for the regression smoke test.
 
 ## Codex (dual-harness, May 2026)
 

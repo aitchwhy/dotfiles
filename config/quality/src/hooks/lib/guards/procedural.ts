@@ -1019,8 +1019,11 @@ export function runProceduralGuards(
     // Copier templates are still available but not enforced
   }
 
-  // Write/Edit guards
-  if ((toolName === 'Write' || toolName === 'Edit') && filePath) {
+  // Write/Edit guards (Codex `apply_patch` is mapped to this branch — the
+  // codex adapter at lib/hook-input-codex.ts projects `tool_input.file_path`
+  // to the first changed path and `tool_input.content` to the raw patch body,
+  // so Guards 3 + 32 see the same shape they see for Claude Write/Edit.)
+  if ((toolName === 'Write' || toolName === 'Edit' || toolName === 'apply_patch') && filePath) {
     const forbiddenResult = checkForbiddenFiles(filePath)
     if (!forbiddenResult.ok) return forbiddenResult
 
