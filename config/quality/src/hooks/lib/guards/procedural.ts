@@ -136,10 +136,13 @@ export function checkNixCleanGitState(command: string): GuardResult {
     const dotfilesPath = process.env['HOME'] + '/dotfiles'
 
     // Check for uncommitted changes in modules/ and config/ directories
-    const status = execSync('git status --porcelain modules/ config/ flake.nix flake.lock 2>/dev/null || true', {
-      cwd: dotfilesPath,
-      encoding: 'utf8',
-    }).trim()
+    const status = execSync(
+      'git status --porcelain modules/ config/ flake.nix flake.lock 2>/dev/null || true',
+      {
+        cwd: dotfilesPath,
+        encoding: 'utf8',
+      },
+    ).trim()
 
     if (status.length > 0) {
       const changedFiles = status
@@ -147,7 +150,8 @@ export function checkNixCleanGitState(command: string): GuardResult {
         .map((line: string) => line.substring(3))
         .slice(0, 5)
         .join('\n  ')
-      const hasMore = status.split('\n').length > 5 ? `\n  ... and ${status.split('\n').length - 5} more` : ''
+      const hasMore =
+        status.split('\n').length > 5 ? `\n  ... and ${status.split('\n').length - 5} more` : ''
 
       return {
         ok: false,
@@ -971,7 +975,14 @@ export function checkStringErrorConversion(content: string, filePath: string): G
 
 export function runProceduralGuards(
   toolName: string,
-  toolInput: { file_path?: string; content?: string; command?: string; pattern?: string; glob?: string; path?: string },
+  toolInput: {
+    file_path?: string
+    content?: string
+    command?: string
+    pattern?: string
+    glob?: string
+    path?: string
+  },
 ): GuardResult {
   const { file_path: filePath, content, command, pattern, glob, path } = toolInput
 

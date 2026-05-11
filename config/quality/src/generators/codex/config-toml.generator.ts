@@ -11,7 +11,7 @@
  *
  * Sections emitted:
  *   - top-level `model`, `model_provider`, `approval_policy`, `sandbox_mode`
- *   - `[features]`             enable codex_hooks, multi_agent, web_search
+ *   - `[features]`             enable hooks, multi_agent, plugins
  *   - `[shell_environment_policy]`
  *   - `[mcp_servers.<name>]`   one block per MCP server (ref only today)
  *   - `[[hooks.<Event>]]`      from CODEX_HOOK_DEFINITIONS
@@ -34,7 +34,7 @@ import {
 // Defaults
 // =============================================================================
 
-const CODEX_MODEL = 'gpt-5.3-codex'
+const CODEX_MODEL = 'gpt-5.5'
 const CODEX_MODEL_PROVIDER = 'openai'
 const CODEX_SANDBOX_MODE = 'workspace-write'
 const CODEX_APPROVAL_POLICY = 'on-request'
@@ -50,7 +50,10 @@ const tomlString = (s: string): string => {
   return `"${s.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`
 }
 
-const emitHookBlocks = (event: CodexHookEvent, groups: readonly CodexMatcherHookGroup[]): string => {
+const emitHookBlocks = (
+  event: CodexHookEvent,
+  groups: readonly CodexMatcherHookGroup[],
+): string => {
   if (groups.length === 0) return ''
   const lines: string[] = []
   for (const group of groups) {
@@ -97,7 +100,7 @@ const generateConfigToml = (): string => {
 
   // --- Features
   lines.push('[features]')
-  lines.push('codex_hooks = true')
+  lines.push('hooks = true')
   lines.push('multi_agent = true')
   lines.push('plugins = true')
   lines.push('')
