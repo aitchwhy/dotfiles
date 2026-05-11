@@ -123,7 +123,7 @@ After Phase B, this repo also drives a Codex CLI harness in parallel. Both harne
 | Skills discovery | `~/.claude/skills` (symlinked per CLAUDE_CONFIG_DIR) | `~/.agents/skills` (per-user, shared) |
 | Hook event count | ~30 | 8 (PreToolUse, PostToolUse, PermissionRequest, SessionStart, UserPromptSubmit, Stop, PreCompact, PostCompact) |
 | Hook script entry | `config/quality/src/hooks/*.ts` (Effect-TS, bun) | same scripts — `lib/hook-input-codex.ts` adapter projects Codex stdin to Claude shape inside `parseInput` |
-| Subagents | Markdown agents in `config/claude-code/agents/*.md` | Standalone TOML at `~/.agents/agents/<name>.toml` (architect ported in Phase B) |
+| Subagents | Markdown agents in `config/claude-code/agents/*.md` | Standalone TOML at `$CODEX_HOME/agents/<name>.toml` (per-account user scope) + `$CWD/.codex/agents/<name>.toml` (project scope); architect ported in Phase B |
 | Sandbox model | Permissions allow/deny in settings.json | `sandbox_mode` + `approval_policy` in config.toml; per-project overrides in `.codex/config.toml` |
 
 ## Key Files

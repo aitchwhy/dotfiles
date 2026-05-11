@@ -2,7 +2,6 @@
 name: commit
 allowed-tools: Bash(git *), Bash(gh *), Bash(eval *), Bash(export *), Bash(jq *), Bash(curl *), Bash(while *), Bash(sleep *), Bash(date *), Bash(ls *), Bash(rm *), Read, Edit, Glob, Grep, Task
 description: Commit, push, create PR, monitor checks, auto-merge, and clean up worktree
-disable-model-invocation: true
 ---
 
 # Commit -> PR -> Merge -> Clean Up

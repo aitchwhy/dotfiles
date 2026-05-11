@@ -57,20 +57,46 @@ let
   );
 
   # ═══════════════════════════════════════════════════════════════════════════
-  # USER-SCOPED .agents/ SYMLINK FARM
-  # Codex resolves skills and subagents from ~/.agents/{skills,agents}/ at
-  # user scope (per agentskills.io standard + Codex docs). Shared across all
-  # accounts; dotfiles owns the source of truth.
+  # USER-SCOPED .agents/skills SYMLINK
+  # Codex resolves skills from ~/.agents/skills/ at user scope (agentskills.io
+  # standard, Codex skills docs). Shared across all accounts; dotfiles owns
+  # the source of truth.
+  #
+  # Subagents do NOT live here. Per Codex docs, subagents are discovered at
+  # $CODEX_HOME/agents/ (user scope) and $CWD/.codex/agents/ (project scope).
+  # See perAccountAgentSymlinks below for the per-account user-scope farm.
   # ═══════════════════════════════════════════════════════════════════════════
 
   userAgentsSymlinks = {
     ".agents/skills" = {
       source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/claude-code/skills";
     };
-    ".agents/agents/architect.toml" = {
-      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/claude-code/agents/architect.toml";
-    };
   };
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # PER-ACCOUNT SUBAGENT FARM
+  # Codex's user-scope subagent path is $CODEX_HOME/agents/*.toml. Enumerate
+  # config/claude-code/agents/*.toml and symlink each one into every account's
+  # agents dir. Dropping a new TOML file auto-deploys on next `just switch`.
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  agentTomlNames = builtins.attrNames (
+    lib.filterAttrs (n: t: t == "regular" && lib.hasSuffix ".toml" n) (
+      builtins.readDir ../../../config/claude-code/agents
+    )
+  );
+
+  perAccountAgentSymlinks = builtins.listToAttrs (
+    lib.concatMap (
+      acct:
+      map (fname: {
+        name = "${acct.codexHome}/agents/${fname}";
+        value = {
+          source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/claude-code/agents/${fname}";
+        };
+      }) agentTomlNames
+    ) codexAccountDefs
+  );
 
   # ═══════════════════════════════════════════════════════════════════════════
   # `cx` RECIPE GENERATION (mirrors claude.nix:411–576)
@@ -204,8 +230,9 @@ in
 
   config = mkIf config.modules.home.apps.codex.enable {
     # Per-account AGENTS.md symlinks (~/.codex-max-N/AGENTS.md → ~/dotfiles/AGENTS.md)
-    # + user-scoped .agents/{skills,agents} farm (Codex's canonical discovery path).
-    home.file = perAccountSymlinks // userAgentsSymlinks;
+    # + user-scope skills symlink (~/.agents/skills) + per-account subagent
+    # symlinks (~/.codex-max-N/agents/<name>.toml).
+    home.file = perAccountSymlinks // userAgentsSymlinks // perAccountAgentSymlinks;
 
     # Activation hook: deploy the generated config.toml to each CODEX_HOME.
     # MUST run AFTER `generateQuality` (defined in claude.nix) — otherwise

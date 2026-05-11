@@ -85,7 +85,7 @@ Per [Codex skills docs](https://developers.openai.com/codex/skills) and Phase B 
 |---------|-----------------|----------------------|
 | Skills | `config/claude-code/skills/*/SKILL.md` | `~/.agents/skills/` (per-user) + `<repo>/.agents/skills/` (project) |
 | Hooks | `config/quality/src/hooks/*.ts` (Effect-TS, bun) | invoked via `[[hooks.<Event>]]` in `~/.codex-<acct>/config.toml` |
-| Sub-agents | `config/claude-code/agents/*.md` | `~/.agents/agents/<name>.toml` (user-scope shared dir, standalone TOML files, not `[profiles.<name>]`) |
+| Sub-agents | `config/claude-code/agents/*.md` | `$CODEX_HOME/agents/<name>.toml` (per-account user scope) + `$CWD/.codex/agents/<name>.toml` (project scope). Standalone TOML files, not `[profiles.<name>]`. |
 | Slash commands | `config/claude/commands/*.md` | Codex built-ins only; user extensions go through skills |
 | MCP servers | `modules/home/apps/claude.nix` (cliAllJson) | `[mcp_servers.<name>]` in `~/.codex-<acct>/config.toml` |
 
