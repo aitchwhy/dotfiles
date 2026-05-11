@@ -110,15 +110,32 @@ See [ADR-009](config/quality/docs/adr/009-network-api-toolkit.md) for full detai
 
 - **Told guard gap**: When working in ~/src/told, Told's PreToolUse replaces dotfiles' PreToolUse via deep merge with array replacement. Guards 3 (forbidden files), 32 (secrets detection), 33 (hook bypass prevention) do NOT run in Told. Tracked in Linear.
 
-## Codex Cross-Reference
+## Codex (dual-harness, May 2026)
 
-`AGENTS.md` at repo root is the Codex-compatible instruction file — a subset of this file excluding hooks, skills, agents, and MCP config. See `config/quality/docs/drift-governance.md` for the sync process.
+After Phase B, this repo also drives a Codex CLI harness in parallel. Both harnesses share skills, hooks, and the `ref` MCP server. See `AGENTS.md` for the canonical Codex-side instruction set, ADR-015 for the architecture, and `config/quality/docs/drift-governance.md` for divergence rules.
+
+| Concern | Claude Code | Codex |
+|---------|-------------|-------|
+| CLI launch | `cc [account]` (alias of `just -g cc`) | `cx [account]` (alias of `just -g cx`) |
+| Account isolation | `CLAUDE_CONFIG_DIR=$HOME/.claude-max-N` | `CODEX_HOME=$HOME/.codex-max-N` |
+| SSOT module | `modules/home/apps/claude.nix` | `modules/home/apps/codex.nix` |
+| Generated config | `config/quality/generated/claude/settings.json` | `config/quality/generated/codex/config.toml` |
+| Skills discovery | `~/.claude/skills` (symlinked per CLAUDE_CONFIG_DIR) | `~/.agents/skills` (per-user, shared) |
+| Hook event count | ~30 | 8 (PreToolUse, PostToolUse, PermissionRequest, SessionStart, UserPromptSubmit, Stop, PreCompact, PostCompact) |
+| Hook script entry | `config/quality/src/hooks/*.ts` (Effect-TS, bun) | same scripts — `lib/hook-input-codex.ts` adapter projects Codex stdin to Claude shape inside `parseInput` |
+| Subagents | Markdown agents in `config/claude-code/agents/*.md` | Standalone TOML at `~/.agents/agents/<name>.toml` (architect ported in Phase B) |
+| Sandbox model | Permissions allow/deny in settings.json | `sandbox_mode` + `approval_policy` in config.toml; per-project overrides in `.codex/config.toml` |
 
 ## Key Files
 
 - `modules/home/apps/claude.nix` - Claude SSOT (MCP, plugins, marketplaces)
+- `modules/home/apps/codex.nix` - Codex SSOT (cx picker + symlink farm + config deploy)
 - `config/quality/src/stack/versions.ts` - Version SSOT
-- `config/quality/src/hooks/` - Pre/post tool hooks
-- `config/quality/src/generators/claude/settings.generator.ts` - Settings generator
+- `config/quality/src/hooks/` - Pre/post tool hooks (cross-harness)
+- `config/quality/src/hooks/codex-definitions.ts` - Codex hook event SSOT
+- `config/quality/src/hooks/lib/hook-input-codex.ts` - Codex → Claude stdin adapter
+- `config/quality/src/generators/claude/settings.generator.ts` - Claude settings generator
+- `config/quality/src/generators/codex/config-toml.generator.ts` - Codex config.toml generator
 - `config/quality/docs/ARCHITECTURE.md` - Guards architecture
-- `config/quality/docs/adr/` - Architecture Decision Records
+- `config/quality/docs/adr/` - Architecture Decision Records (ADR-015 = dual-harness)
+- `config/quality/docs/drift-governance.md` - AGENTS.md ↔ CLAUDE.md sync + Codex divergence table

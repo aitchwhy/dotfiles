@@ -8,6 +8,7 @@
  */
 
 import { Console, Effect, Schema } from 'effect'
+import { codexToClaudeShape, isCodexShape } from './hook-input-codex'
 
 // =============================================================================
 // Hook Protocol Types (must match SSOT at config/agents/hooks/lib/types.ts)
@@ -139,7 +140,12 @@ export const parseInput = (raw: string) =>
       try: () => JSON.parse(raw),
       catch: () => new Error('Invalid JSON input'),
     })
-    return yield* Schema.decodeUnknown(PreToolUseInputSchema)(json)
+    // Codex CLI emits a slightly different stdin shape than Claude Code.
+    // Project it into the Claude shape so existing schema-decoding works.
+    // See lib/hook-input-codex.ts for the mapping (apply_patch → file_path,
+    // turn_id → session_id, etc.).
+    const normalized = isCodexShape(json) ? codexToClaudeShape(json) : json
+    return yield* Schema.decodeUnknown(PreToolUseInputSchema)(normalized)
   })
 
 export const outputDecision = (decision: HookDecision) =>
