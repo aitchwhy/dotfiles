@@ -472,6 +472,16 @@ let
 
       caseBranches = builtins.concatLists (map mkCaseBranch accountDefs);
 
+      # Default account for passthrough mode (when $1 isn't a known account or
+      # keyword, fall through to default with all args preserved — lets
+      # `cc mcp` or `cc /agents` Just Work).
+      defaultAcct = builtins.head accountDefs;
+      defaultPassthroughBranch =
+        if defaultAcct.configDir != null then
+          ''*) set -- "$account" "$@"; AI_ACCOUNT="${defaultAcct.name}" CLAUDE_CONFIG_DIR="$HOME/${defaultAcct.configDir}" claude "$@" ;;''
+        else
+          ''*) set -- "$account" "$@"; unset CLAUDE_CONFIG_DIR; AI_ACCOUNT="${defaultAcct.name}" claude "$@" ;;'';
+
       # Status check entries (reused in both status case and cc-status recipe)
       mkStatusEntry =
         acct:
@@ -560,7 +570,7 @@ let
       ++ map (e: "        ${e}") statusEntries
       ++ [
         "        ;;"
-        "      *) echo \"Unknown: $account. Run 'just -g cc help' for usage.\" >&2; exit 1 ;;"
+        "      ${defaultPassthroughBranch}"
         "    esac"
         ""
         "# Show auth status for all accounts"

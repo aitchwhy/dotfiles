@@ -98,6 +98,14 @@ let
         acct:
         ''${acct.name}) REF_API_KEY="$(cat "$HOME/.config/mcp/ref-api-key" 2>/dev/null || true)" AI_ACCOUNT="${acct.name}" CODEX_HOME="$HOME/${acct.codexHome}" codex "$@" ;;'';
 
+      # Default account used when $1 isn't a recognized account or keyword —
+      # the passthrough case below restores $1 to "$@" and launches with this
+      # account's env. Lets `cx mcp login ref` Just Work.
+      defaultAcct = builtins.head codexAccountDefs;
+
+      defaultPassthroughBranch =
+        ''*) set -- "$account" "$@"; REF_API_KEY="$(cat "$HOME/.config/mcp/ref-api-key" 2>/dev/null || true)" AI_ACCOUNT="${defaultAcct.name}" CODEX_HOME="$HOME/${defaultAcct.codexHome}" codex "$@" ;;'';
+
       caseBranches = map mkCaseBranch codexAccountDefs;
 
       mkStatusEntry =
@@ -170,7 +178,7 @@ let
       ++ map (e: "        ${e}") statusEntries
       ++ [
         "        ;;"
-        "      *) echo \"Unknown: $account. Run 'just -g cx help' for usage.\" >&2; exit 1 ;;"
+        "      ${defaultPassthroughBranch}"
         "    esac"
         ""
         "# Show auth status for all Codex accounts"
