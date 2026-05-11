@@ -1,12 +1,14 @@
-# Codex CLI Multi-Account Launcher (cx)
+# Codex CLI Multi-Account Launcher (cx) + Harness
 #
-# Mirrors the `cc` picker for Claude Code (modules/home/apps/claude.nix).
-# Each account is isolated by setting CODEX_HOME=$HOME/.codex-<name>, which
-# overrides the default ~/.codex location for auth.json, config.toml, history,
-# and sessions. CODEX_HOME is supported in Codex CLI v0.130+.
+# Phase A: cx FCF picker mirroring cc. CODEX_HOME=$HOME/.codex-<name>
+# isolates each account's auth.json, config.toml, history, sessions.
 #
-# Phase A scope (May 2026): two ChatGPT-OAuth Max accounts. No skills, hooks,
-# MCP, or AGENTS.md gen yet — those are Phase B (separate Linear ticket).
+# Phase B (May 2026): symlink farm for shared skills/agents and per-account
+# AGENTS.md + activation hook that deploys the generated config.toml.
+#
+# References:
+#   config/quality/docs/adr/015-codex-harness-port.md
+#   Linear: Codex Harness Parity project
 {
   config,
   lib,
@@ -21,7 +23,8 @@ let
 
   # ═══════════════════════════════════════════════════════════════════════════
   # CODEX ACCOUNT REGISTRY SSOT
-  # Drives: cx fzf picker entries, dispatch case, cx-status recipe.
+  # Drives: cx fzf picker, dispatch case, status recipe, per-account symlinks,
+  # activation hook target paths.
   # ═══════════════════════════════════════════════════════════════════════════
 
   codexAccountDefs = [
@@ -34,6 +37,42 @@ let
     }
     # Add additional accounts here when needed (e.g., codex-max-2 with hank@told.one).
   ];
+
+  # Bash list of CODEX_HOME absolute paths for activation hooks
+  codexHomePaths = concatStringsSep " " (
+    map (acct: ''"$HOME/${acct.codexHome}"'') codexAccountDefs
+  );
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # PER-ACCOUNT SYMLINK FARM
+  # Each ~/.codex-<acct>/AGENTS.md → ~/dotfiles/AGENTS.md (the canonical
+  # Codex instruction set written in Phase B T7).
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  perAccountSymlinks = builtins.listToAttrs (
+    map (acct: {
+      name = "${acct.codexHome}/AGENTS.md";
+      value = {
+        source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/AGENTS.md";
+      };
+    }) codexAccountDefs
+  );
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # USER-SCOPED .agents/ SYMLINK FARM
+  # Codex resolves skills and subagents from ~/.agents/{skills,agents}/ at
+  # user scope (per agentskills.io standard + Codex docs). Shared across all
+  # accounts; dotfiles owns the source of truth.
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  userAgentsSymlinks = {
+    ".agents/skills" = {
+      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/claude-code/skills";
+    };
+    ".agents/agents/architect.toml" = {
+      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/claude-code/agents/architect.toml";
+    };
+  };
 
   # ═══════════════════════════════════════════════════════════════════════════
   # `cx` RECIPE GENERATION (mirrors claude.nix:411–576)
@@ -54,9 +93,12 @@ let
 
       helpEntries = map (acct: ''echo "  ${padName acct.name}${acct.description}"'') codexAccountDefs;
 
+      # Each dispatch branch exports REF_API_KEY (sourced from the secret file
+      # if present) so the codex MCP `ref` server's bearer_token_env_var
+      # resolves at runtime.
       mkCaseBranch =
         acct:
-        ''${acct.name}) AI_ACCOUNT="${acct.name}" CODEX_HOME="$HOME/${acct.codexHome}" codex "$@" ;;'';
+        ''${acct.name}) REF_API_KEY="$(cat "$HOME/.config/mcp/ref-api-key" 2>/dev/null || true)" AI_ACCOUNT="${acct.name}" CODEX_HOME="$HOME/${acct.codexHome}" codex "$@" ;;'';
 
       caseBranches = map mkCaseBranch codexAccountDefs;
 
@@ -145,7 +187,7 @@ let
 in
 {
   options.modules.home.apps.codex = {
-    enable = mkEnableOption "Codex CLI multi-account launcher (cx) with CODEX_HOME-based isolation";
+    enable = mkEnableOption "Codex CLI multi-account launcher (cx) + harness symlinks";
 
     cxJustRecipes = lib.mkOption {
       type = lib.types.str;
@@ -156,11 +198,29 @@ in
   };
 
   config = mkIf config.modules.home.apps.codex.enable {
-    # No file writes here — agents-launcher.nix consumes cxJustRecipes and
-    # writes the combined ~/.config/just/justfile.
-    #
-    # The Codex CLI binary itself is installed via the `codex` Homebrew cask
-    # (see modules/homebrew.nix). Account dirs (~/.codex-max-N) are created
-    # on first OAuth login when CODEX_HOME points at them.
+    # Per-account AGENTS.md symlinks (~/.codex-max-N/AGENTS.md → ~/dotfiles/AGENTS.md)
+    # + user-scoped .agents/{skills,agents} farm (Codex's canonical discovery path).
+    home.file = perAccountSymlinks // userAgentsSymlinks;
+
+    # Activation hook: deploy the generated config.toml to each CODEX_HOME.
+    # The generator emits `bearer_token_env_var = "REF_API_KEY"` (not a baked
+    # key), and the `cx` recipe exports REF_API_KEY from the secret file at
+    # invocation time. So the activation only needs a straight copy.
+    home.activation.deployCodexConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      GENERATED="${config.home.homeDirectory}/dotfiles/config/quality/generated/codex/config.toml"
+      if [ ! -f "$GENERATED" ]; then
+        echo "Codex: generated config.toml not found at $GENERATED — run 'bun run generate' in config/quality first."
+        exit 0
+      fi
+      for codex_home in ${codexHomePaths}; do
+        mkdir -p "$codex_home"
+        TARGET="$codex_home/config.toml"
+        # Only rewrite when content changed (avoid touch-storms on activation).
+        if [ ! -f "$TARGET" ] || ! /usr/bin/cmp -s "$GENERATED" "$TARGET"; then
+          /bin/cp "$GENERATED" "$TARGET"
+          echo "Codex: deployed config.toml → $TARGET"
+        fi
+      done
+    '';
   };
 }
