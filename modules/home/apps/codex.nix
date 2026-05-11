@@ -208,10 +208,10 @@ in
     home.file = perAccountSymlinks // userAgentsSymlinks;
 
     # Activation hook: deploy the generated config.toml to each CODEX_HOME.
-    # The generator emits `bearer_token_env_var = "REF_API_KEY"` (not a baked
-    # key), and the `cx` recipe exports REF_API_KEY from the secret file at
-    # invocation time. So the activation only needs a straight copy.
-    home.activation.deployCodexConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    # MUST run AFTER `generateQuality` (defined in claude.nix) — otherwise
+    # we deploy the stale on-disk config.toml from before the latest
+    # `bun run generate`. Pin the order via entryAfter.
+    home.activation.deployCodexConfig = lib.hm.dag.entryAfter [ "generateQuality" ] ''
       GENERATED="${config.home.homeDirectory}/dotfiles/config/quality/generated/codex/config.toml"
       if [ ! -f "$GENERATED" ]; then
         echo "Codex: generated config.toml not found at $GENERATED — run 'bun run generate' in config/quality first."
