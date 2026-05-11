@@ -9,6 +9,7 @@
 
 import { Console, Effect, Schema } from 'effect'
 import { codexToClaudeShape, isCodexShape } from './hook-input-codex'
+import { shouldSuppressDecision } from './hook-output-codex'
 
 // =============================================================================
 // Hook Protocol Types (must match SSOT at config/agents/hooks/lib/types.ts)
@@ -150,6 +151,10 @@ export const parseInput = (raw: string) =>
 
 export const outputDecision = (decision: HookDecision) =>
   Effect.gen(function* () {
+    // Codex rejects `decision: 'approve' | 'skip'` with a red TUI notice
+    // before failing open. Suppress these emissions under Codex; `block` is
+    // honored by both harnesses and always emitted. See lib/hook-output-codex.ts.
+    if (shouldSuppressDecision(decision)) return
     yield* Console.log(JSON.stringify(decision))
   })
 
