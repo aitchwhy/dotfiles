@@ -61,10 +61,19 @@ Store `WORKTREE_PATH = $WORKTREE_ROOT/{primary_ticket_ref}` (e.g. `$HOME/told-wo
 
 **CRITICAL**: Phase 3 implementation MUST use `WORKTREE_PATH` for ALL file paths. For example, use `$WORKTREE_PATH/decisions/PITCH.md` — NOT the main repo path. The main repo stays untouched.
 
-Create the plans directory:
+### Resolve the canonical plan path ONCE
+
+Compute the literal absolute plan path. This value is the **single source of truth** for the entire pipeline — every downstream reference is a substitution of this resolved string.
+
 ```bash
-mkdir -p ~/.claude/plans
+PLAN_DIR="$WORKTREE/.claude/plans"
+PLAN_FILE="$PLAN_DIR/{primary_ticket_ref}.md"
+mkdir -p "$PLAN_DIR"
+touch "$PLAN_DIR/.write-test" && rm "$PLAN_DIR/.write-test"
+echo "Plan target: $PLAN_FILE"
 ```
+
+**Contract**: `$PLAN_FILE` is a literal absolute path (e.g. `/Users/hank/told-worktrees/cc-90/.claude/plans/cc-90.md`). Every spawn prompt and downstream reference must substitute this resolved literal — do NOT pass `$WORKTREE`-style expressions across process boundaries; subagents see the prompt as opaque text and will not re-expand shell metacharacters.
 
 ### Source LINEAR_API_TOKEN
 
@@ -140,7 +149,7 @@ Task(
     ```
     (Best-effort: if the API call fails, proceed without Linear data if unavailable.)
 
-    Write the plan to: ~/.claude/plans/{primary_ticket_ref}.md
+    Write the plan to: {PLAN_FILE}
 
     Follow your system prompt for the complete workflow:
     1. Fetch the Linear ticket
@@ -155,7 +164,7 @@ Task(
 
 After the architect completes, verify the plan:
 
-1. Read `~/.claude/plans/{primary_ticket_ref}.md` — if the file does not exist, treat all checks as failed
+1. Read `{PLAN_FILE}` — if the file does not exist, treat all checks as failed
 2. Verify it contains `## File Change Map` section
 3. Verify it contains `## Architecture Decisions` section
 4. Verify the File Change Map has at least one `|` table row with a file path
@@ -168,7 +177,7 @@ Task(
   model: opus,
   prompt: """
     The previous architect explored the codebase but failed to write the plan file.
-    The plan file at ~/.claude/plans/{primary_ticket_ref}.md is empty or missing required sections.
+    The plan file at {PLAN_FILE} is empty or missing required sections.
 
     Specific failures: {list of failed guard checks}
 
@@ -176,7 +185,7 @@ Task(
     Prioritize writing over additional exploration.
     Read CLAUDE.md for context, then write the plan immediately.
 
-    Write the plan to: ~/.claude/plans/{primary_ticket_ref}.md
+    Write the plan to: {PLAN_FILE}
   """
 )
 ```
@@ -197,7 +206,7 @@ Present a brief summary to the user:
 ## Plan LOCKED: {primary_ticket_id}
 
 **Title**: {ticket title}
-**Plan**: ~/.claude/plans/{primary_ticket_ref}.md
+**Plan**: {PLAN_FILE}
 ```
 
 ### Implementation
@@ -206,7 +215,7 @@ Present a brief summary to the user:
 
 The plan is locked. Begin implementation immediately **in the worktree**:
 
-1. Read the locked plan file: `~/.claude/plans/{primary_ticket_ref}.md`
+1. Read the locked plan file: `{PLAN_FILE}`
 2. Parse the `## File Change Map` table — this is your implementation checklist
 3. Implement each file change in the order specified by the plan, using **`WORKTREE_PATH`** (`$WORKTREE_ROOT/{primary_ticket_ref}`, e.g. `$HOME/told-worktrees/told-1851`) for ALL file paths (Read, Edit, Glob, Grep)
 4. Follow all architecture decisions and patterns specified in the plan
