@@ -2,7 +2,7 @@
 
 Nix-managed macOS configuration for a senior engineer building Told (voice memory platform). This file is the canonical instruction set for **Codex CLI** sessions in this repo. See `CLAUDE.md` for the Claude Code equivalent — both harnesses now share skills, hooks, and the `ref` MCP server.
 
-> Phase B shipped 2026-05-10. Codex hooks fire on `apply_patch` and Bash; the `config/quality/src/hooks/*.ts` scripts are shared with Claude Code via `lib/hook-input-codex.ts`. Manual quality only needed if you bypass `cx` (see "Quality" below).
+> Phase B shipped 2026-05-10; CC-91 Phase 1 (2026-05-11) extended the Codex hook surface to `Stop` (session-end batch polish), `UserPromptSubmit` (placeholder for content-policy guards), and `PermissionRequest` (re-uses `pre-tool-use.ts` so Guards 3/32/33 close on approval-required actions). Manual quality only needed if you bypass `cx` (see "Quality" below).
 
 ## Quick Commands
 
@@ -37,7 +37,16 @@ flake.nix                          # Entry point
 
 ## Codex Multi-Account
 
-`cx <account>` sets `CODEX_HOME=$HOME/.codex-<name>` and execs `codex`, fully isolating `auth.json` / `config.toml` / history / sessions. Currently one account: `codex-max-1` (hank.lee.qed@gmail.com). Add accounts via `codexAccountDefs` in `modules/home/apps/codex.nix`.
+`cx <account>` sets `CODEX_HOME=$HOME/.codex-<name>` and execs `codex`, fully isolating `auth.json` / `config.toml` / history / sessions.
+
+| Account | Email | Purpose |
+|---------|-------|---------|
+| `codex-max-1` | hank.lee.qed@gmail.com | Primary daily-driver |
+| `codex-max-2` | hank@told.one | Secondary (parallelism, separate quota) |
+
+Add accounts via `codexAccountDefs` in `modules/home/apps/codex.nix`; activation hooks deploy `config.toml`, the AGENTS.md symlink, and the subagent farm automatically.
+
+`REF_API_KEY` is fetched from AWS Secrets Manager (`told/vendor/ref/api-key`) with a fallback to `~/.config/mcp/ref-api-key` for offline / SSO-expired use (CC-45).
 
 ## Sandbox + Approvals (Codex)
 
@@ -83,7 +92,7 @@ Per [Codex skills docs](https://developers.openai.com/codex/skills) and Phase B 
 
 | Concern | Source of truth | Codex discovery path |
 |---------|-----------------|----------------------|
-| Skills | `config/claude-code/skills/*/SKILL.md` | `~/.agents/skills/` (per-user) + `<repo>/.agents/skills/` (project) |
+| Skills | `config/claude-code/skills/*/SKILL.md` (currently: `caveman`, `commit`, `datadog`, `grill-me`, `linear`, `plan-ticket`, `spawn-agents-on-csv`) | `~/.agents/skills/` (per-user) + `<repo>/.agents/skills/` (project) |
 | Hooks | `config/quality/src/hooks/*.ts` (Effect-TS, bun) | invoked via `[[hooks.<Event>]]` in `~/.codex-<acct>/config.toml` |
 | Sub-agents | `config/claude-code/agents/*.md` | `$CODEX_HOME/agents/<name>.toml` (per-account user scope) + `$CWD/.codex/agents/<name>.toml` (project scope). Standalone TOML files, not `[profiles.<name>]`. |
 | Slash commands | `config/claude/commands/*.md` | Codex built-ins only; user extensions go through skills |
@@ -118,8 +127,13 @@ just check                        # Flake validation (required before commit)
 - `config/quality/docs/adr/015-codex-harness-port.md` — dual-harness architecture (supersedes ADR-014)
 - `config/quality/docs/drift-governance.md` — AGENTS.md ↔ CLAUDE.md sync process
 
+## Known Gaps
+
+- **Told guard-layering (closed under Codex)**: Project-scope `~/src/told/.codex/config.toml` adds a narrow `^Bash$` marker hook that runs alongside (not replacing) the dotfiles user-scope `^(apply_patch|Bash|Grep)$` hook. With CC-50 + CC-91 Phase 1, Guards 3 (forbidden files), 32 (secrets), 33 (hook bypass) fire on Codex `apply_patch` and `Bash` from inside Told. Regression smoke: `~/src/told/.codex/hooks/codex-hook-layering.test.sh` (4/4 PASS post-deploy). Drift smoke: `~/src/told/.codex/hooks/check-agents-drift.sh`. The mirror under Claude Code remains open — see `CLAUDE.md` "Known Gaps".
+
 ## Cross-References
 
 - `CLAUDE.md` — Claude Code instruction set (full hooks/skills/agents/MCP details).
 - Linear project: [Codex Harness Parity](https://linear.app/toldone/project/codex-harness-parity-23a9f66f278c) (CC team).
 - CC-60 Phase B doc: the locked source-of-truth for Phase B execution.
+- CC-91: Phase 1 (Stop/UserPromptSubmit/PermissionRequest wiring + agent-drift smoke + bun unblock) shipped 2026-05-11; Phases 2-3 (matrix sweep + capstone + verdict) tracked open.
