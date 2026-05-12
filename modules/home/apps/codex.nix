@@ -35,7 +35,13 @@ let
       email = "hank.lee.qed@gmail.com";
       authMethod = "chatgpt-oauth";
     }
-    # Add additional accounts here when needed (e.g., codex-max-2 with hank@told.one).
+    {
+      name = "codex-max-2";
+      codexHome = ".codex-max-2";
+      description = "Codex Max — secondary";
+      email = "hank@told.one";
+      authMethod = "chatgpt-oauth";
+    }
   ];
 
   # Bash list of CODEX_HOME absolute paths for activation hooks
@@ -117,19 +123,24 @@ let
 
       helpEntries = map (acct: ''echo "  ${padName acct.name}${acct.description}"'') codexAccountDefs;
 
-      # Each dispatch branch exports REF_API_KEY (sourced from the secret file
-      # if present) so the codex MCP `ref` server's bearer_token_env_var
-      # resolves at runtime.
+      # REF_API_KEY resolution: AWS Secrets Manager first (auth-rotated),
+      # local file fallback for offline/SSO-expired use (CC-45). Both halves
+      # tolerate failure with `|| true` so codex still launches; missing
+      # bearer token degrades to no-MCP-ref instead of breaking the picker.
+      refKeyResolve = ''$(aws secretsmanager get-secret-value --secret-id told/vendor/ref/api-key --profile AdministratorAccess-952084167040 --query SecretString --output text 2>/dev/null || cat "$HOME/.config/mcp/ref-api-key" 2>/dev/null || true)'';
+
+      # Each dispatch branch exports REF_API_KEY so the codex MCP `ref`
+      # server's bearer_token_env_var resolves at runtime.
       mkCaseBranch =
         acct:
-        ''${acct.name}) REF_API_KEY="$(cat "$HOME/.config/mcp/ref-api-key" 2>/dev/null || true)" AI_ACCOUNT="${acct.name}" CODEX_HOME="$HOME/${acct.codexHome}" codex "$@" ;;'';
+        ''${acct.name}) REF_API_KEY="${refKeyResolve}" AI_ACCOUNT="${acct.name}" CODEX_HOME="$HOME/${acct.codexHome}" codex "$@" ;;'';
 
       # Default account used when $1 isn't a recognized account or keyword —
       # the passthrough case below restores $1 to "$@" and launches with this
       # account's env. Lets `cx mcp login ref` Just Work.
       defaultAcct = builtins.head codexAccountDefs;
 
-      defaultPassthroughBranch = ''*) set -- "$account" "$@"; REF_API_KEY="$(cat "$HOME/.config/mcp/ref-api-key" 2>/dev/null || true)" AI_ACCOUNT="${defaultAcct.name}" CODEX_HOME="$HOME/${defaultAcct.codexHome}" codex "$@" ;;'';
+      defaultPassthroughBranch = ''*) set -- "$account" "$@"; REF_API_KEY="${refKeyResolve}" AI_ACCOUNT="${defaultAcct.name}" CODEX_HOME="$HOME/${defaultAcct.codexHome}" codex "$@" ;;'';
 
       caseBranches = map mkCaseBranch codexAccountDefs;
 
