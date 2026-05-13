@@ -92,6 +92,16 @@ let
       authMethod = "api-key";
       model = "gpt-5.3-codex";
     }
+    {
+      name = "codex";
+      configDir = null;
+      provider = "codex";
+      description = "Codex CLI — native OpenAI agent";
+      secretId = "told/vendor/openai/api-key";
+      email = null;
+      authMethod = "api-key";
+      model = "codex";
+    }
   ];
 
   # Accounts that need their own config directory (configDir != null)
@@ -466,6 +476,15 @@ let
             "  CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \\"
             "  AI_ACCOUNT=\"${acct.name}\" \\"
             "  claude \"$@\" ;;"
+          ]
+        else if acct.provider == "codex" then
+          [
+            "${acct.name})"
+            "  key=$(aws secretsmanager get-secret-value --secret-id \"${acct.secretId}\" --region us-east-1 --query SecretString --output text 2>/dev/null)"
+            "  [[ -z \"$key\" ]] && { echo \"ERROR: Secret ${acct.secretId} missing\" >&2; exit 1; }"
+            "  OPENAI_API_KEY=\"$key\" \\"
+            "  AI_ACCOUNT=\"${acct.name}\" \\"
+            "  codex \"$@\" ;;"
           ]
         else
           [ ];
