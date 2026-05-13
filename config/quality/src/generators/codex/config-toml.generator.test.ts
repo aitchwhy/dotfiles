@@ -57,6 +57,13 @@ describe('codex config-toml generator', () => {
     expect(config.model).toBe('gpt-5.5')
   })
 
+  it('defaults global Codex reasoning effort to high', async () => {
+    const filePath = await generateToTmp()
+    // biome-ignore lint/suspicious/noExplicitAny: parsed TOML shape
+    const config: any = TOML.parse(readFileSync(filePath, 'utf8'))
+    expect(config.model_reasoning_effort).toBe('high')
+  })
+
   it('emits [features].hooks (not deprecated codex_hooks)', async () => {
     const filePath = await generateToTmp()
     // biome-ignore lint/suspicious/noExplicitAny: parsed TOML shape
