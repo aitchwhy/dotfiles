@@ -25,6 +25,13 @@ import { emitContinue, emitHalt, logError, logWarning } from './lib/hook-logging
 // Configuration
 // ============================================================================
 
+const QUALITY_ROOT = path.resolve(import.meta.dir, '../..')
+
+const qualityBin = (name: string): string => {
+  const localBin = path.join(QUALITY_ROOT, 'node_modules', '.bin', name)
+  return fs.existsSync(localBin) ? localBin : name
+}
+
 let filePaths: string[] = (process.env['CLAUDE_FILE_PATHS'] ?? '').split(',').filter(Boolean)
 
 // Stop-event branch (CC-39 / CC-40): when invoked at session-end with no
@@ -419,7 +426,7 @@ const program = Effect.gen(function* () {
   // Run quality checks in parallel
   const [oxlintResult, astGrepResult, tscResult, pkgResult] = yield* Effect.all(
     [
-      runQualityCheck('oxlint', ['oxlint', '--deny', 'correctness'], tsJsFiles),
+      runQualityCheck('oxlint', [qualityBin('oxlint'), '--deny', 'correctness'], tsJsFiles),
       runAstGrep(tsJsFiles),
       runTypeCheck(tsJsFiles),
       runPackageJsonCheck(filePaths),

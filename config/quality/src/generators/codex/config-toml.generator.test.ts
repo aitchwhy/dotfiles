@@ -64,6 +64,13 @@ describe('codex config-toml generator', () => {
     expect(config.model_reasoning_effort).toBe('high')
   })
 
+  it('defaults Codex plan mode reasoning effort to high', async () => {
+    const filePath = await generateToTmp()
+    // biome-ignore lint/suspicious/noExplicitAny: parsed TOML shape
+    const config: any = TOML.parse(readFileSync(filePath, 'utf8'))
+    expect(config.plan_mode_reasoning_effort).toBe('high')
+  })
+
   it('emits [features].hooks (not deprecated codex_hooks)', async () => {
     const filePath = await generateToTmp()
     // biome-ignore lint/suspicious/noExplicitAny: parsed TOML shape

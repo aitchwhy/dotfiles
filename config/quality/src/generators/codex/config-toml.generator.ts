@@ -37,6 +37,7 @@ import {
 const CODEX_MODEL = 'gpt-5.5'
 const CODEX_MODEL_PROVIDER = 'openai'
 const CODEX_MODEL_REASONING_EFFORT = 'high'
+const CODEX_PLAN_MODE_REASONING_EFFORT = 'high'
 const CODEX_SANDBOX_MODE = 'workspace-write'
 const CODEX_APPROVAL_POLICY = 'on-request'
 
@@ -96,6 +97,7 @@ const generateConfigToml = (): string => {
   lines.push(`model = ${tomlString(CODEX_MODEL)}`)
   lines.push(`model_provider = ${tomlString(CODEX_MODEL_PROVIDER)}`)
   lines.push(`model_reasoning_effort = ${tomlString(CODEX_MODEL_REASONING_EFFORT)}`)
+  lines.push(`plan_mode_reasoning_effort = ${tomlString(CODEX_PLAN_MODE_REASONING_EFFORT)}`)
   lines.push(`sandbox_mode = ${tomlString(CODEX_SANDBOX_MODE)}`)
   lines.push(`approval_policy = ${tomlString(CODEX_APPROVAL_POLICY)}`)
   lines.push('')

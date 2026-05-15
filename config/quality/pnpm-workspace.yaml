@@ -1,4 +1,8 @@
+allowBuilds:
+  "@parcel/watcher": true
+  esbuild: true
+  msgpackr-extract: true
 onlyBuiltDependencies:
-  - '@parcel/watcher'
+  - "@parcel/watcher"
   - esbuild
   - msgpackr-extract

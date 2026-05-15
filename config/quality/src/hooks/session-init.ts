@@ -15,6 +15,7 @@ import * as os from 'node:os'
 import * as path from 'node:path'
 import { promisify } from 'node:util'
 import { Cause, Console, Effect, pipe } from 'effect'
+import { isCodexOutputContext } from './lib/hook-output-codex'
 
 const execAsync = promisify(exec)
 
@@ -39,6 +40,10 @@ const LOG_FILE = `${BASE_DIR}/session.log`
 type SessionStartOutput = {
   readonly continue: boolean
   readonly additionalContext?: string
+  readonly hookSpecificOutput?: {
+    readonly hookEventName: 'SessionStart'
+    readonly additionalContext: string
+  }
 }
 
 // =============================================================================
@@ -121,6 +126,18 @@ const checkEnvironment = Effect.gen(function* () {
   return warnings
 })
 
+const sessionStartOutput = (additionalContext?: string): SessionStartOutput => {
+  if (additionalContext === undefined) return { continue: true }
+  if (!isCodexOutputContext()) return { continue: true, additionalContext }
+  return {
+    continue: true,
+    hookSpecificOutput: {
+      hookEventName: 'SessionStart',
+      additionalContext,
+    },
+  }
+}
+
 const outputResult = (result: SessionStartOutput) => Console.log(JSON.stringify(result))
 
 // =============================================================================
@@ -150,18 +167,13 @@ const main = Effect.gen(function* () {
   messages.push(...warnings)
 
   // Output result
-  const output: SessionStartOutput =
-    messages.length > 0
-      ? { continue: true, additionalContext: messages.join(' ') }
-      : { continue: true }
-
-  yield* outputResult(output)
+  yield* outputResult(sessionStartOutput(messages.length > 0 ? messages.join(' ') : undefined))
 })
 
 void pipe(
   main,
   Effect.catchAllCause((cause) =>
-    outputResult({ continue: true, additionalContext: `Hook error: ${Cause.pretty(cause)}` }),
+    outputResult(sessionStartOutput(`Hook error: ${Cause.pretty(cause)}`)),
   ),
   Effect.runPromise,
 )
