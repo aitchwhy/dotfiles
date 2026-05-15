@@ -33,6 +33,22 @@ Extract:
 - Labels, priority, parent issue (if any)
 - Comments (included in the query above)
 
+### Step 1.5: Pre-plan worktree audit (mandatory)
+
+Before exploring the codebase, audit the gap between the worktree HEAD and `origin/main`. This catches in-flight work that could moot the current ticket (TOLD-2555 / TOLD-2561 lineage — a duplicate plan landed because the architect didn't see commits that had merged ~2h into the session).
+
+1. `git fetch origin main` — idempotent.
+2. `git merge-base HEAD origin/main` then `git log <merge-base>..origin/main --oneline` — list commits ahead of the worktree base.
+3. For each commit line, extract `(TOLD|GRO|CC)-[0-9]+` refs and fetch each in-flight ticket's title + description via the Step 1 GraphQL query. Skim the commit's diff (`git show <sha> --stat`) — title alone misses scope-creep cases.
+4. Pick the primary identifiers the current ticket would introduce (Nix attribute names, module options, generator names, file paths). For each, run `git grep -l '<symbol>' origin/main`. Any hit = duplication risk.
+
+Write the audit results into the plan's `## Codebase Analysis` section under a new first subsection `### Pre-plan origin/main audit` — verbatim header, mandatory even when there is no drift.
+
+Halt rules:
+- 0 commits ahead → write "no drift" line and continue to Step 2.
+- N commits ahead, no overlap → write the commit list + "no scope overlap" and continue.
+- Plausible overlap OR identifier collision → write findings AND append a `## Risks / Open Questions` entry AND include a `STOP-AND-ASK: <reason>` line in your final message. Leave the plan in DRAFT.
+
 ### Step 2: Explore the codebase
 
 Deeply investigate the existing architecture relevant to the ticket:
@@ -93,6 +109,9 @@ Branch: hank/{ticket-id-kebab-title}
 {acceptance criteria, bullet points}
 
 ## Codebase Analysis
+
+### Pre-plan origin/main audit
+{git fetch + log output, any in-flight ticket refs analyzed, any identifier overlap probes — see Step 1.5. Mandatory even when there is no drift.}
 
 ### Relevant Modules
 {Nix modules, home-manager apps, overlays involved}
